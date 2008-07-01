@@ -25,6 +25,15 @@
 
         <tbody>
           <row>
+            <entry align="left">AbstractBufferedItemReaderItemStream</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Abstract base class that provides bufferring
+            functionality for any subclass.</entry>
+          </row>
+
+          <row>
             <entry align="left">ListItemReader</entry>
 
             <entry align="left">java.lang.Object</entry>
@@ -40,6 +49,15 @@
 
             <entry align="left">A simple extension of DelegatingItemReader
             that provides for validation before returning input.</entry>
+          </row>
+
+          <row>
+            <entry align="left">ItemReaderAdapter</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Adapts any class to the
+            <classname>ItemReader</classname> interface.</entry>
           </row>
 
           <row>
@@ -161,6 +179,38 @@
 
         <tbody>
           <row>
+            <entry align="left">AbstractItemStreamItemWriter</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Abstract base class that combines the
+            <classname>ItemStream</classname> and
+            <classname>ItemWriter</classname> interfaces.</entry>
+          </row>
+
+          <row>
+            <entry align="left">AbstractItemWriter</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Abstract base class of the
+            <classname>ItemWriter</classname> interface with default
+            implmentations of the <methodname>flush</methodname> and
+            <methodname>clear</methodname> methods.</entry>
+          </row>
+
+          <row>
+            <entry align="left">BatchSqlUpdateItemWriter</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left"><classname>ItemWriter</classname> that uses
+            batching freatures from a <classname>PreparedStatement</classname>
+            if available and can take rudimentary steps to locate a failure
+            during a <methodname>flush</methodname>.</entry>
+          </row>
+
+          <row>
             <entry align="left">CompositeItemWriter</entry>
 
             <entry align="left">java.lang.Object</entry>
@@ -178,6 +228,15 @@
             <entry align="left">Wraps ItemWriter and is BeanAware allowing it
             to respond to Spring Bean events like
             afterPropertiesSet().</entry>
+          </row>
+
+          <row>
+            <entry align="left">ItemWriterAdapter</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Adapts any class to the
+            <classname>ItemWriter</classname> interface.</entry>
           </row>
 
           <row>
