@@ -10,6 +10,8 @@ import org.springframework.batch.item.ItemWriter;
 /**
  * Calls a collection of ItemWriters in fixed-order sequence.
  * 
+ * The implementation is thread-safe if all delegates are thread-safe.
+ * 
  * @author Robert Kasanicky
  */
 public class CompositeItemWriter implements ItemWriter {

@@ -22,6 +22,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * equals another. Furthermore, because these parameters will need to be
  * persisted, it is vital that the types added are restricted.
  * 
+ * This class is immutable and therefore thread-safe.
+ * 
  * @author Lucas Ward
  * @since 1.0
  */

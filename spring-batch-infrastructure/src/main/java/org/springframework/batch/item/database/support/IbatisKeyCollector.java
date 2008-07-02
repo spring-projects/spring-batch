@@ -15,9 +15,12 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 /**
  * {@link KeyCollector} based on iBATIS ORM framework. It is functionally
  * similar to {@link SingleColumnJdbcKeyCollector} but does not make assumptions
- * about the primary key structure.  A separate restart query is necessary to 
- * ensure that only the required keys remaining for processing are returned, rather
- * than the entire original list.</p>
+ * about the primary key structure. A separate restart query is necessary to
+ * ensure that only the required keys remaining for processing are returned,
+ * rather than the entire original list.</p>
+ * 
+ * The writer is thread safe after its properties are set (normal singleton
+ * behaviour).
  * 
  * @author Robert Kasanicky
  * @author Lucas Ward
@@ -54,6 +57,7 @@ public class IbatisKeyCollector extends ExecutionContextUserSupport implements K
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see KeyCollector#saveState(Object, ExecutionContext)
 	 */
 	public void updateContext(Object key, ExecutionContext executionContext) {
@@ -64,7 +68,9 @@ public class IbatisKeyCollector extends ExecutionContextUserSupport implements K
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * 
+	 * @see
+	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(sqlMapClientTemplate, "SqlMaperClientTemplate must not be null.");

@@ -23,6 +23,8 @@ import org.springframework.util.StringUtils;
  * Value object used to carry information about the status of a
  * {@link RepeatOperations}.
  * 
+ * ExitStatus is immutable and therefore thread-safe. 
+ * 
  * @author Dave Syer
  * 
  */
@@ -170,8 +172,8 @@ public class ExitStatus implements Serializable {
 	}
 
 	/**
-	 * Add an exit code to an existing {@link ExitStatus}. If there is already
-	 * a code present tit will be replaced.
+	 * Add an exit code to an existing {@link ExitStatus}. If there is already a
+	 * code present tit will be replaced.
 	 * 
 	 * @param code the code to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit

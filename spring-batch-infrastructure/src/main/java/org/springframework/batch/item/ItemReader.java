@@ -21,9 +21,10 @@ package org.springframework.batch.item;
  * 
  * Implementations are expected to be stateful and will be called multiple times
  * for each batch, with each call to {@link #read()} returning a different value
- * and finally returning <code>null</code> when all input data is exhausted.<br/>
+ * and finally returning <code>null</code> when all input data is
+ * exhausted.<br/>
  * 
- * Implementations need to be thread safe and clients of a {@link ItemReader}
+ * Implementations need *not* be thread safe and clients of a {@link ItemReader}
  * need to be aware that this is the case.<br/>
  * 
  * A richer interface (e.g. with a look ahead or peek) is not feasible because
@@ -48,13 +49,11 @@ public interface ItemReader {
 	Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException;
 
 	/**
-	 * Mark the stream so that it can be reset later and the items backed out.<br/>
+	 * Mark the stream so that it can be reset later and the items backed
+	 * out.<br/>
 	 * 
 	 * Mark is called before reading a new chunk of items - in case of rollback
 	 * mark will not be called again before re-processing the chunk.<br/>
-	 * 
-	 * In a multi-threaded setting implementations have to ensure that only the
-	 * state from the current thread is saved.
 	 * 
 	 * @throws MarkFailedException if there is a problem with the mark. If a
 	 * mark fails inside a transaction, it would be worrying, but not normally
@@ -66,9 +65,6 @@ public interface ItemReader {
 	 * Reset the stream to the last mark. After a reset the stream state will be
 	 * such that changes (items read or written) since the last call to mark
 	 * will not be visible after a call to close.<br/>
-	 * 
-	 * In a multi-threaded setting implementations have to ensure that only the
-	 * state from the current thread is reset.
 	 * 
 	 * @throws ResetFailedException if there is a problem with the reset. If a
 	 * reset fails inside a transaction, it would normally be fatal, and would

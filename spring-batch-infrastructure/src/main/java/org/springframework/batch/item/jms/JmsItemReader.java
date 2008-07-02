@@ -39,6 +39,9 @@ import org.springframework.util.Assert;
  * {@link #read()}. If a recovery step is needed, set the error destination and
  * the item will be sent there if processing fails in a stateful retry.
  * 
+ * The implementation is thread safe after its properties are set (normal
+ * singleton behaviour).
+ * 
  * @author Dave Syer
  * 
  */

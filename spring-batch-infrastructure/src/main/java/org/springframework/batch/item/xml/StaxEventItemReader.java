@@ -26,6 +26,8 @@ import org.springframework.util.ClassUtils;
  * events so that the fragments can be further processed like standalone XML
  * documents.
  * 
+ * The implementation is *not* thread-safe.
+ * 
  * @author Robert Kasanicky
  */
 public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream implements

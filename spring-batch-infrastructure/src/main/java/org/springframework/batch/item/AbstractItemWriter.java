@@ -15,20 +15,17 @@
  */
 package org.springframework.batch.item;
 
-
 /**
- * Abstract {@link ItemWriter} that allows for base classes to only
- * implement the close method if they need it.  Because it is likely
- * that the flush and clear methods may not need to be implemented,
- * they are provided in this class.
+ * Abstract {@link ItemWriter} that allows for base classes to only implement
+ * the {@link #flush()} and {@link #clear()} methods if they need it.
  * 
  * @author Lucas Ward
  */
-public abstract class AbstractItemWriter implements ItemWriter{
-	
+public abstract class AbstractItemWriter implements ItemWriter {
+
 	public void flush() throws FlushFailedException {
 	}
-	
+
 	public void clear() throws ClearFailedException {
 	}
 }

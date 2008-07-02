@@ -41,6 +41,8 @@ import org.springframework.util.CollectionUtils;
  * Output is buffered until {@link #flush()} is called - only then the actual
  * writing to file takes place.
  * 
+ * The implementation is *not* thread-safe.
+ * 
  * @author Peter Zozom
  * @author Robert Kasanicky
  * 

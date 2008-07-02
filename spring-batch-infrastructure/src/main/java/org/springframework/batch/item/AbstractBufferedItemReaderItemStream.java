@@ -12,6 +12,8 @@ import org.springframework.util.Assert;
  * {@link ExecutionContext} (therefore requires item ordering to be preserved
  * between runs).
  * 
+ * Subclasses are inherently *not* thread-safe.
+ * 
  * @author Robert Kasanicky
  */
 public abstract class AbstractBufferedItemReaderItemStream implements ItemReader, ItemStream {

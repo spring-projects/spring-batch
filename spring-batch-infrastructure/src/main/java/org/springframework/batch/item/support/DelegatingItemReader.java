@@ -22,9 +22,11 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Simple wrapper around {@link ItemReader}. The input source is expected to
+ * Simple wrapper around {@link ItemReader}. The item reader is expected to
  * take care of open and close operations. If necessary it should be registered
  * as a step scoped bean to ensure that the lifecycle methods are called.
+ * 
+ * The implementation is thread-safe if the delegate is thread-safe.
  * 
  * @author Dave Syer
  */

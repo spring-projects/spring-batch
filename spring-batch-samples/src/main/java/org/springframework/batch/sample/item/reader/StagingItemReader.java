@@ -25,6 +25,10 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
+/**
+ * Thread-safe database {@link ItemReader} implementing the process indicator
+ * pattern.
+ */
 public class StagingItemReader extends JdbcDaoSupport implements ItemStream, ItemReader, StepExecutionListener {
 
 	// Key for buffer in transaction synchronization manager
@@ -45,7 +49,8 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	/**
 	 * Public setter for the {@link LobHandler}.
 	 * 
-	 * @param lobHandler the {@link LobHandler} to set (defaults to {@link DefaultLobHandler}).
+	 * @param lobHandler the {@link LobHandler} to set (defaults to
+	 * {@link DefaultLobHandler}).
 	 */
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
@@ -107,18 +112,18 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 			return null;
 		}
 		Object result = getJdbcTemplate().queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
-		        new Object[] { id }, new RowMapper() {
-			        public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				        byte[] blob = lobHandler.getBlobAsBytes(rs, 1);
-				        return SerializationUtils.deserialize(blob);
-			        }
-		        });
+				new Object[] { id }, new RowMapper() {
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+						byte[] blob = lobHandler.getBlobAsBytes(rs, 1);
+						return SerializationUtils.deserialize(blob);
+					}
+				});
 		// Update now - changes will rollback if there is a problem later.
 		int count = getJdbcTemplate().update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
-		        new Object[] { StagingItemWriter.DONE, id, StagingItemWriter.NEW });
+				new Object[] { StagingItemWriter.DONE, id, StagingItemWriter.NEW });
 		if (count != 1) {
 			throw new OptimisticLockingFailureException("The staging record with ID=" + id
-			        + " was updated concurrently when trying to mark as complete (updated " + count + " records.");
+					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");
 		}
 		return result;
 	}
@@ -133,14 +138,15 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 			synchronized (lock) {
 				if (keys.hasNext()) {
 					Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
-					        "Transaction not active for this thread.");
+							"Transaction not active for this thread.");
 					Long next = (Long) keys.next();
 					getBuffer().add(next);
 					key = next;
 					logger.debug("Retrieved key from list: " + key);
 				}
 			}
-		} else {
+		}
+		else {
 			logger.debug("Retrieved key from buffer: " + key);
 		}
 		return key;
@@ -192,9 +198,12 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	}
 
 	/**
-	 * Mark is supported in a multi- as well as a single-threaded environment. The state backing the mark is a buffer,
-	 * and access is synchronized, so multiple threads can be accommodated. Buffers are stored as transaction resources
-	 * (using {@link TransactionSynchronizationManager#bindResource(Object, Object)}), so they are thread bound.
+	 * Mark is supported in a multi- as well as a single-threaded environment.
+	 * The state backing the mark is a buffer, and access is synchronized, so
+	 * multiple threads can be accommodated. Buffers are stored as transaction
+	 * resources (using
+	 * {@link TransactionSynchronizationManager#bindResource(Object, Object)}),
+	 * so they are thread bound.
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
@@ -205,7 +214,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
+	 * @see
+	 * org.springframework.batch.item.ItemStream#reset(org.springframework.batch
+	 * .item.ExecutionContext)
 	 */
 	public void reset() {
 		getBuffer().rollback();
@@ -214,7 +225,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.ExecutionContextProvider#getExecutionContext()
+	 * @see
+	 * org.springframework.batch.item.ExecutionContextProvider#getExecutionContext
+	 * ()
 	 */
 	public void update(ExecutionContext executionContext) {
 	}
@@ -222,7 +235,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution)
+	 * @see
+	 * org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
+	 * )
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
@@ -231,7 +246,8 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	 * @seeorg.springframework.batch.core.domain.StepListener#beforeStep(org.
+	 * springframework.batch.core.domain.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
@@ -240,7 +256,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.core.domain.StepListener#onErrorInStep(java.lang.Throwable)
+	 * @see
+	 * org.springframework.batch.core.domain.StepListener#onErrorInStep(java
+	 * .lang.Throwable)
 	 */
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		return null;

@@ -60,6 +60,8 @@ import org.springframework.util.Assert;
  * database for all the keys would be too resource intensive.
  * </p>
  * 
+ * The implementation is *not* thread-safe.
+ * 
  * 
  * @author Lucas Ward
  */
@@ -190,7 +192,9 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.io.support.AbstractTransactionalIoSource#reset(org.springframework.batch.item.ExecutionContext)
+	 * @see
+	 * org.springframework.batch.io.support.AbstractTransactionalIoSource#reset
+	 * (org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
 		keysIterator = keys.listIterator(lastCommitIndex);

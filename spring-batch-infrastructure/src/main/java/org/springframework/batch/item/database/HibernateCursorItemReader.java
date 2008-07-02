@@ -46,6 +46,8 @@ import org.springframework.util.ClassUtils;
  * Reset(rollback) functionality is implemented by item buffering allowing the
  * cursor used to be forward-only.
  * 
+ * The implementation is *not* thread-safe.
+ * 
  * @author Robert Kasanicky
  * @author Dave Syer
  */

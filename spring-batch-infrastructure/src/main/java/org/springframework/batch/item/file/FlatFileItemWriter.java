@@ -59,6 +59,8 @@ import org.springframework.util.ClassUtils;
  * actual writing to file occurs.
  * </p>
  * 
+ * The implementation is *not* thread-safe.
+ * 
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky

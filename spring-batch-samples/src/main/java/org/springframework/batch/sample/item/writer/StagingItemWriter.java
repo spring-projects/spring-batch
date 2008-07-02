@@ -19,6 +19,9 @@ import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+/**
+ * Database {@link ItemWriter} implementing the process indicator pattern.
+ */
 public class StagingItemWriter extends JdbcDaoSupport implements StepExecutionListener, ItemWriter {
 
 	public static final String NEW = "N";
@@ -71,16 +74,15 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepExecutionLi
 		final long id = incrementer.nextLongValue();
 		final long jobId = stepExecution.getJobExecution().getJobId().longValue();
 		final byte[] blob = SerializationUtils.serialize((Serializable) data);
-		getJdbcTemplate()
-				.update("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
-						new PreparedStatementSetter() {
-							public void setValues(PreparedStatement ps) throws SQLException {
-								ps.setLong(1, id);
-								ps.setLong(2, jobId);
-								lobHandler.getLobCreator().setBlobAsBytes(ps, 3, blob);
-								ps.setString(4, NEW);
-							}
-					
+		getJdbcTemplate().update("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
+				new PreparedStatementSetter() {
+					public void setValues(PreparedStatement ps) throws SQLException {
+						ps.setLong(1, id);
+						ps.setLong(2, jobId);
+						lobHandler.getLobCreator().setBlobAsBytes(ps, 3, blob);
+						ps.setString(4, NEW);
+					}
+
 				});
 	}
 
@@ -90,22 +92,33 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepExecutionLi
 	public void flush() throws FlushFailedException {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
+	 * )
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#beforeStep(org.springframework.batch.core.domain.StepExecution)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.springframework.batch.core.domain.StepListener#beforeStep(org.
+	 * springframework.batch.core.domain.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.StepListener#onErrorInStep(java.lang.Throwable)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.domain.StepListener#onErrorInStep(java
+	 * .lang.Throwable)
 	 */
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		return null;

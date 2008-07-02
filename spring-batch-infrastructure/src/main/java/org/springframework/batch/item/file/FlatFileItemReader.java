@@ -55,12 +55,15 @@ import org.springframework.util.ClassUtils;
  * header, skip given number of lines at the beginning of the file.
  * </p>
  * 
+ * The implementation is *not* thread-safe.
+ * 
  * @author Waseem Malik
  * @author Tomas Slanina
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream implements ResourceAwareItemReaderItemStream, InitializingBean {
+public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream implements
+		ResourceAwareItemReaderItemStream, InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
@@ -257,7 +260,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 				((AbstractLineTokenizer) tokenizer).setNames(names);
 			}
 		}
-		
+
 	}
 
 	/**

@@ -9,6 +9,8 @@ import org.springframework.util.Assert;
 /**
  * Simple wrapper around {@link ItemWriter}.
  * 
+ * The implementation is thread-safe if the delegate is thread-safe.
+ * 
  * @author Dave Syer
  * @author Robert Kasanicky
  */

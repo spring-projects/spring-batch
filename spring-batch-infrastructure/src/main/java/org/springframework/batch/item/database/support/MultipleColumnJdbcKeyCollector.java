@@ -40,18 +40,23 @@ import org.springframework.util.StringUtils;
  * row in the result set to an Object must be set in order to work correctly.
  * </p>
  * 
+ * The implementation is thread-safe as long as the
+ * {@link #setPreparedStatementSetter(ItemPreparedStatementSetter)} and
+ * {@link #setKeyMapper(RowMapper)} are thread-safe (true for default values).
+ * 
  * @author Lucas Ward
+ * 
  * @see DrivingQueryItemReader
  * @see ItemPreparedStatementSetter
  */
 public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
 	private static final String CURRENT_KEY = "current.key";
-	
+
 	private JdbcTemplate jdbcTemplate;
 
 	private RowMapper keyMapper = new ColumnMapRowMapper();
-	
+
 	private ItemPreparedStatementSetter preparedStatementSetter = new ColumnMapItemPreparedStatementSetter();
 
 	private String sql;
@@ -66,8 +71,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 	 * Construct a new ItemReader.
 	 * 
 	 * @param jdbcTemplate
-	 * @param sql - SQL statement that returns all keys to process.
-	 * object.
+	 * @param sql - SQL statement that returns all keys to process. object.
 	 */
 	public MultipleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
 		this();
@@ -79,17 +83,21 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader#retrieveKeys()
+	 * 
+	 * @see
+	 * org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader
+	 * #retrieveKeys()
 	 */
 	public List retrieveKeys(ExecutionContext executionContext) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"
 				+ " in order to restart.");
-		
+
 		if (executionContext.size() > 0) {
 			Object key = executionContext.get(getKey(CURRENT_KEY));
-			return jdbcTemplate.query(restartSql, new PreparedStatementSetterKeyWrapper(key, preparedStatementSetter), keyMapper);
+			return jdbcTemplate.query(restartSql, new PreparedStatementSetterKeyWrapper(key, preparedStatementSetter),
+					keyMapper);
 		}
 		else {
 			return jdbcTemplate.query(sql, keyMapper);
@@ -98,7 +106,10 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext(java.lang.Object)
+	 * 
+	 * @see
+	 * org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext
+	 * (java.lang.Object)
 	 */
 	public void updateContext(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "The key must not be null");
@@ -118,7 +129,9 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * 
+	 * @see
+	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "The JdbcTemplate must not be null.");
@@ -127,8 +140,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 	}
 
 	/**
-	 * Set the {@link RowMapper} to be used to map a result set
-	 * to keys.
+	 * Set the {@link RowMapper} to be used to map a result set to keys.
 	 * 
 	 * @param keyMapper
 	 */
@@ -148,17 +160,17 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
-	
-	public void setPreparedStatementSetter(
-			ItemPreparedStatementSetter preparedStatementSetter) {
+
+	public void setPreparedStatementSetter(ItemPreparedStatementSetter preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
 	}
-	
-	private static class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter{
-		
+
+	private static class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter {
+
 		private Object key;
+
 		private ItemPreparedStatementSetter pss;
-		
+
 		public PreparedStatementSetterKeyWrapper(Object key, ItemPreparedStatementSetter pss) {
 			this.key = key;
 			this.pss = pss;

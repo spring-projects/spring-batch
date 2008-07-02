@@ -26,6 +26,8 @@ import java.io.Serializable;
  * A BatchStatus can be safely serialized, however, it should be noted that the pattern can break down if different
  * class loaders load the enumeration.
  * 
+ * This class is immutable and therefore thread-safe.
+ * 
  * @author Lucas Ward
  * @author Greg Kick
  */
