@@ -61,7 +61,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		List list = jdbcTemplate.queryForList("select name, CREDIT from customer");
 		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 			Map map = (Map) iterator.next();
-			credits.put(map.get("NAME"), map.get("CREDIT"));
+			credits.put(map.get("NAME"), new Double(((Number)map.get("CREDIT")).doubleValue()));
 		}
 	}
 	
