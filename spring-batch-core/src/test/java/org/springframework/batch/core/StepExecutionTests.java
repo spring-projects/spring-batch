@@ -88,7 +88,7 @@ public class StepExecutionTests extends TestCase {
 	 * {@link org.springframework.batch.core.JobExecution#getExitStatus()}.
 	 */
 	public void testGetExitCode() {
-		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
+		assertEquals(ExitStatus.CONTINUABLE, execution.getExitStatus());
 		execution.setExitStatus(ExitStatus.FINISHED);
 		assertEquals(ExitStatus.FINISHED, execution.getExitStatus());
 	}

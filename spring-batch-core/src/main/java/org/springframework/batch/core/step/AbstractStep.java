@@ -150,7 +150,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * resource initialization ({@link #open(ExecutionContext)}), execution
 	 * logic ({@link #doExecute(StepExecution)}) and resource closing ({@link #close(ExecutionContext)}).
 	 */
-	public final void execute(StepExecution stepExecution) throws JobInterruptedException, UnexpectedJobExecutionException {
+	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
+			UnexpectedJobExecutionException {
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
 
@@ -176,13 +177,13 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 			catch (Exception e) {
 				commitException = e;
-				stepExecution.setStatus(BatchStatus.UNKNOWN);
+				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
 			}
 
 		}
 		catch (Throwable e) {
 
-			logger.error("Encountered an error executing the step: "+e.getClass()+": "+e.getMessage());
+			logger.error("Encountered an error executing the step: " + e.getClass() + ": " + e.getMessage());
 			stepExecution.setStatus(determineBatchStatus(e));
 			exitStatus = getDefaultExitStatusForFailure(e);
 
@@ -191,7 +192,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 			}
 			catch (Exception ex) {
-				logger.error("Encountered an error on listener close.", ex);
+				logger.error("Encountered an error on listener error callback.", ex);
 			}
 			rethrow(e);
 		}
@@ -204,18 +205,24 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				getJobRepository().saveOrUpdate(stepExecution);
 			}
 			catch (Exception e) {
-				commitException = e;
+				if (commitException == null) {
+					commitException = e;
+				}
+				else {
+					logger.error("Exception while updating step execution after commit exception", e);
+				}
 			}
 
 			try {
 				close(stepExecution.getExecutionContext());
 			}
 			catch (Exception e) {
-				logger.error("Exception while closing step's resources", e);
-				throw new UnexpectedJobExecutionException("Exception while closing step's resources", e);
+				logger.error("Exception while closing step execution resources", e);
+				throw new UnexpectedJobExecutionException("Exception while closing step resources", e);
 			}
 
 			if (commitException != null) {
+				stepExecution.setStatus(BatchStatus.UNKNOWN);
 				logger.error("Encountered an error saving batch meta data."
 						+ "This job is now in an unknown state and should not be restarted.", commitException);
 				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.",

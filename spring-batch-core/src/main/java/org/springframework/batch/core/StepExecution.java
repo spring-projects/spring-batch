@@ -57,7 +57,7 @@ public class StepExecution extends Entity {
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
-	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
+	private volatile ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
 	private volatile boolean terminateOnly;
 

@@ -170,9 +170,43 @@ public class AbstractStepTests extends TestCase {
 		assertEquals(7, events.size());
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
-		
+
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("onErrorInStep"));
+	}
+
+	/**
+	 * Exception during business processing.
+	 */
+	public void testFailureInSavingExecutionContext() throws Exception {
+		tested = new EventTrackingStep() {
+			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+				super.doExecute(stepExecution);
+				return ExitStatus.FINISHED;
+			}
+		};
+		repository = new JobRepositoryStub() {
+			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+				throw new RuntimeException("Bad context!");
+			}
+		};
+		tested.setJobRepository(repository);
+
+		try {
+			tested.execute(execution);
+			fail();
+		}
+		catch (RuntimeException expected) {
+			assertEquals("Bad context!", expected.getCause().getMessage());
+		}
+
+		int i = 0;
+		assertEquals("open", events.get(i++));
+		assertEquals("doExecute", events.get(i++));
+		assertEquals("close", events.get(i++));
+		assertEquals(3, events.size());
+
+		assertEquals(ExitStatus.UNKNOWN.getExitCode(), execution.getExitStatus().getExitCode());
 	}
 
 	/**

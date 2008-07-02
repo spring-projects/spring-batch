@@ -76,7 +76,7 @@ public class ItemOrientedStepTests extends TestCase {
 	private ItemOrientedStep itemOrientedStep;
 
 	private Job job;
-	
+
 	private JobInstance jobInstance;
 
 	private ResourcelessTransactionManager transactionManager;
@@ -314,7 +314,6 @@ public class ItemOrientedStepTests extends TestCase {
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 	}
 
-
 	/*
 	 * Test that a job that is being restarted, but has saveExecutionAttributes
 	 * set to false, doesn't have restore or getExecutionAttributes called on
@@ -539,7 +538,8 @@ public class ItemOrientedStepTests extends TestCase {
 		catch (JobInterruptedException ex) {
 			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg, "JobInterruptedException"));
+			assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg,
+					"JobInterruptedException"));
 		}
 	}
 
@@ -664,14 +664,12 @@ public class ItemOrientedStepTests extends TestCase {
 
 	public void testStatusForFinalUpdateFailedException() throws Exception {
 
-		itemOrientedStep.setJobRepository(new JobRepositorySupport() {
-			public void saveOrUpdate(StepExecution stepExecution) {
-				if (stepExecution.getEndTime() != null) {
-					throw new RuntimeException("Bar");
-				}
-				super.saveOrUpdate(stepExecution);
+		itemOrientedStep.setJobRepository(new JobRepositorySupport());
+		itemOrientedStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
+			public void close(ExecutionContext executionContext) throws ItemStreamException {
+				throw new RuntimeException("Bar");
 			}
-		});
+		} });
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
@@ -681,12 +679,13 @@ public class ItemOrientedStepTests extends TestCase {
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException ex) {
-			// The job actually completeed, but teh streams couldn't be closed.
+			// The job actually completed, but the streams couldn't be closed.
 			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'saving batch meta data': " + msg, contains(msg, "saving batch meta data"));
+			assertTrue("Message does not contain 'closing step': " + msg, contains(msg,
+					"closing step"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -754,7 +753,7 @@ public class ItemOrientedStepTests extends TestCase {
 			assertTrue(stepExecution.getExecutionContext().getString("spam").equals("bucket"));
 		}
 	}
-	
+
 	public void testStepToCompletion() throws Exception {
 
 		RepeatTemplate template = new RepeatTemplate();
@@ -769,7 +768,7 @@ public class ItemOrientedStepTests extends TestCase {
 		itemOrientedStep.execute(stepExecution);
 		assertEquals(3, processed.size());
 		assertEquals(3, stepExecution.getItemCount().intValue());
-		}
+	}
 
 	/**
 	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)}
