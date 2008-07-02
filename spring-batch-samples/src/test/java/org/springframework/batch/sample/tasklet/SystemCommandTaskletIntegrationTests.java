@@ -46,7 +46,7 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 	 * Failed execution scenario - error exit code returned by system command.
 	 */
 	public void testExecuteFailure() throws Exception {
-		String command = "java -invalid-argument";
+		String command = "java org.springframework.batch.sample.tasklet.UnknownClass";
 		tasklet.setCommand(command);
 		tasklet.afterPropertiesSet();
 
