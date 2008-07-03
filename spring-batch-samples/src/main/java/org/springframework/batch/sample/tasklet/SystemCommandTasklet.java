@@ -3,6 +3,10 @@ package org.springframework.batch.sample.tasklet;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang.time.StopWatch;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -15,9 +19,18 @@ import org.springframework.util.Assert;
  * be set, so that the batch job does not hang forever if the external process
  * hangs.
  * 
+ * Tasklet periodically checks for termination status (i.e.
+ * {@link #setCommand(String)} finished its execution or
+ * {@link #setTimeout(long)} expired or job was interrupted). The check interval
+ * is given by {@link #setTerminationCheckInterval(long)}.
+ * 
+ * When job interrupt is detected the thread executing the system command will
+ * be interrupted and tasklet's execution terminated by throwing
+ * {@link JobInterruptedException}.
+ * 
  * @author Robert Kasanicky
  */
-public class SystemCommandTasklet implements Tasklet, InitializingBean {
+public class SystemCommandTasklet extends StepExecutionListenerSupport implements Tasklet, InitializingBean {
 
 	private String command;
 
@@ -29,6 +42,10 @@ public class SystemCommandTasklet implements Tasklet, InitializingBean {
 
 	private long timeout = 0;
 
+	private long checkInterval = 1000;
+
+	private StepExecution execution = null;
+
 	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
@@ -36,15 +53,28 @@ public class SystemCommandTasklet implements Tasklet, InitializingBean {
 	public ExitStatus execute() throws Exception {
 		ExecutorThread executorThread = new ExecutorThread();
 		executorThread.start();
-		executorThread.join(timeout);
+
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+
+		while (stopWatch.getTime() < timeout && executorThread.isAlive() && !execution.isTerminateOnly()) {
+			Thread.sleep(checkInterval);
+		}
+		
+		stopWatch.stop();
 
 		if (executorThread.finishedSuccessfully) {
 			return systemProcessExitCodeMapper.getExitStatus(executorThread.exitCode);
 		}
 		else {
 			executorThread.interrupt();
-			throw new SystemCommandException(
-					"Execution of system command failed (did not finish successfully within the timeout)");
+			if (execution.isTerminateOnly()) {
+				throw new JobInterruptedException("Job interrupted while executing system command '" + command + "'");
+			}
+			else {
+				throw new SystemCommandException(
+						"Execution of system command failed (did not finish successfully within the timeout)");
+			}
 		}
 
 	}
@@ -100,6 +130,24 @@ public class SystemCommandTasklet implements Tasklet, InitializingBean {
 	 */
 	public void setTimeout(long timeout) {
 		this.timeout = timeout;
+	}
+
+	/**
+	 * The time interval how often the tasklet will check for termination
+	 * status.
+	 * 
+	 * @param checkInterval time interval in milliseconds (1 second by default).
+	 */
+	public void setTerminationCheckInterval(long checkInterval) {
+		this.checkInterval = checkInterval;
+	}
+
+	/**
+	 * Get a reference to {@link StepExecution} for interrupt checks during
+	 * system command execution.
+	 */
+	public void beforeStep(StepExecution stepExecution) {
+		this.execution = stepExecution;
 	}
 
 	/**

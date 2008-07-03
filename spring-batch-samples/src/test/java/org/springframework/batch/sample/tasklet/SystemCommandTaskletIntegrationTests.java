@@ -6,6 +6,11 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.sample.tasklet.SystemCommandException;
 import org.springframework.batch.sample.tasklet.SystemCommandTasklet;
@@ -21,11 +26,19 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 
 	private SystemCommandTasklet tasklet = new SystemCommandTasklet();
 
+	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(
+			new Long(1), new JobParameters(), "systemCommandJob")));
+
 	protected void setUp() throws Exception {
 		tasklet.setEnvironmentParams(null); // inherit from parent process
 		tasklet.setWorkingDirectory(null); // inherit from parent process
 		tasklet.setSystemProcessExitCodeMapper(new TestExitCodeMapper());
 		tasklet.setTimeout(5000); // long enough timeout
+		tasklet.setTerminationCheckInterval(500);
+		tasklet.setCommand("invalid command, change value for successful execution");
+		tasklet.afterPropertiesSet();
+
+		tasklet.beforeStep(stepExecution);
 	}
 
 	/**
@@ -72,6 +85,27 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		}
 		catch (SystemCommandException e) {
 			assertTrue(e.getMessage().indexOf("did not finish successfully within the timeout") > 0);
+		}
+	}
+
+	/**
+	 * Job interrupted scenario.
+	 */
+	public void testInterruption() throws Exception {
+		String command = "sleep 5";
+		tasklet.setCommand(command);
+		tasklet.setTerminationCheckInterval(10);
+		tasklet.afterPropertiesSet();
+
+		stepExecution.setTerminateOnly();
+		try {
+			tasklet.execute();
+			fail();
+		}
+		catch (JobInterruptedException e) {
+			System.out.println(e.getMessage());
+			assertTrue(e.getMessage().indexOf("Job interrupted while executing system command") > -1);
+			assertTrue(e.getMessage().indexOf(command) > -1);
 		}
 	}
 
@@ -158,7 +192,8 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		public ExitStatus getExitStatus(int exitCode) {
 			if (exitCode == 0) {
 				return ExitStatus.FINISHED;
-			} else {
+			}
+			else {
 				return ExitStatus.FAILED;
 			}
 		}
