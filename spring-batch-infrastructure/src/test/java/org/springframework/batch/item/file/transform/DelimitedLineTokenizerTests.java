@@ -178,6 +178,4 @@ public class DelimitedLineTokenizerTests extends TestCase {
 		assertEquals(4, line.getFieldCount());
 		assertEquals("", line.readString(2));
 	}
-
-
 }

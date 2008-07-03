@@ -35,6 +35,15 @@ public class FixedLengthTokenizerTests extends TestCase {
 		FieldSet tokens = tokenizer.tokenize("");
 		assertEquals(0, tokens.getFieldCount());
 	}
+	
+	public void testTokenizeSmallerStringThanRanges() {
+		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,10),new Range(11,15)});
+		FieldSet tokens = tokenizer.tokenize("12345");
+		assertEquals(3, tokens.getFieldCount());
+		assertEquals("12345", tokens.readString(0));
+		assertEquals("", tokens.readString(1));
+		assertEquals("", tokens.readString(2));
+	}
 
 	public void testTokenizeNullString() {
 		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,10),new Range(11,15)});

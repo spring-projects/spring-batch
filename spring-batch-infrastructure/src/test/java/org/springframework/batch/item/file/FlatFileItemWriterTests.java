@@ -103,6 +103,24 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		return reader.readLine();
 	}
+	
+	public void testWriteWithMultipleOpen() throws Exception{
+		
+		writer.open(executionContext);
+		writer.write("test1");
+		writer.flush();
+		writer.open(executionContext);
+		writer.write("test2");
+		writer.flush();
+		assertEquals("test1", readLine());
+		assertEquals("test2", readLine());
+	}
+	
+	public void testOpenTwice(){
+		//opening the writer twice should cause no issues
+		writer.open(executionContext);
+		writer.open(executionContext);
+	}
 
 	/**
 	 * Regular usage of <code>write(String)</code> method
@@ -131,6 +149,7 @@ public class FlatFileItemWriterTests extends TestCase {
 			}
 		});
 		Object data = new Object();
+		writer.open(executionContext);
 		writer.write(data);
 		writer.flush();
 		String lineFromFile = readLine();
@@ -150,6 +169,7 @@ public class FlatFileItemWriterTests extends TestCase {
 			}
 		});
 		Object data = new Object();
+		writer.open(executionContext);
 		writer.write(data);
 		writer.flush();
 		String lineFromFile = readLine();
@@ -168,6 +188,7 @@ public class FlatFileItemWriterTests extends TestCase {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
+		writer.open(executionContext);
 		writer.write(TEST_STRING);
 		writer.flush();
 		String lineFromFile = readLine();
@@ -181,6 +202,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 */
 	public void testWriteRecord() throws Exception {
 		String args = "1";
+		writer.open(executionContext);
 		writer.write(args);
 		writer.flush();
 		String lineFromFile = readLine();
@@ -189,6 +211,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	public void testWriteRecordWithrecordSeparator() throws Exception {
 		writer.setLineSeparator("|");
+		writer.open(executionContext);
 		writer.write("1");
 		writer.write("2");
 		writer.flush();
@@ -197,6 +220,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testRollback() throws Exception {
+		writer.open(executionContext);
 		writer.write("testLine1");
 		// rollback
 		rollback();
@@ -207,6 +231,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testCommit() throws Exception {
+		writer.open(executionContext);
 		writer.write("testLine1");
 		// rollback
 		commit();

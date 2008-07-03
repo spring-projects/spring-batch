@@ -36,6 +36,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
+import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetCreator;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
@@ -97,7 +98,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	private List headerLines = new ArrayList();
 
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
-
+	
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
@@ -206,11 +207,17 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 * 
 	 * @param data Object (a String or Object that can be converted) to be
 	 * written to output stream
-	 * @throws Exception if the transformer or file output fail
+	 * @throws Exception if the transformer or file output fail, WriterNotOpenException
+	 * if the writer has not been initialized.
 	 */
 	public void write(Object data) throws Exception {
-		FieldSet fieldSet = fieldSetCreator.mapItem(data);
-		lineBuffer.add(lineAggregator.aggregate(fieldSet) + lineSeparator);
+		if(getOutputState().isInitialized()){
+			FieldSet fieldSet = fieldSetCreator.mapItem(data);
+			lineBuffer.add(lineAggregator.aggregate(fieldSet) + lineSeparator);
+		}
+		else{
+			throw new WriterNotOpenException("Writer must be open before it can be written to");
+		}
 	}
 
 	/**
@@ -224,11 +231,19 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Initialize the reader.
+	 * Initialize the reader.  This method may be called multiple times before close is
+	 * called.
 	 * 
 	 * @see ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
+
+		if(!getOutputState().isInitialized()){
+			doOpen(executionContext);
+		}
+	}
+	
+	private void doOpen(ExecutionContext executionContext){
 		OutputState outputState = getOutputState();
 		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
 			outputState.restoreFrom(executionContext);
@@ -328,8 +343,6 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 		boolean restarted = false;
 
-		boolean initialized = false;
-
 		long lastMarkedByteOffsetPosition = 0;
 
 		long linesWritten = 0;
@@ -337,6 +350,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		long restartCount = 0;
 
 		boolean shouldDeleteIfExists = true;
+		
+		boolean initialized = false;
 
 		/**
 		 * Return the byte offset position of the cursor in the output file as a
@@ -445,6 +460,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		 * @throws IOException
 		 */
 		private void initializeBufferedWriter() throws IOException {
+			
+			
 			File file = resource.getFile();
 
 			FileUtils.setUpOutputFile(file, restarted, shouldDeleteIfExists);
@@ -460,6 +477,10 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 			initialized = true;
 			linesWritten = 0;
+		}
+		
+		public boolean isInitialized() {
+			return initialized;
 		}
 
 		/**
