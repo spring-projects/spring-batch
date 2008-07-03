@@ -2,8 +2,8 @@ package example;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 
 
 /**

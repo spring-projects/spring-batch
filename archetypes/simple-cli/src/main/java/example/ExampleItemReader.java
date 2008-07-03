@@ -1,7 +1,7 @@
 package example;
 
-import org.springframework.batch.item.AbstractItemReader;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.support.AbstractItemReader;
 
 /**
  * {@link ItemReader} with hard-coded input data.
