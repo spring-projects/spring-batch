@@ -2,7 +2,7 @@ package org.springframework.batch.integration.chunk;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.stereotype.Component;
 
 @Component

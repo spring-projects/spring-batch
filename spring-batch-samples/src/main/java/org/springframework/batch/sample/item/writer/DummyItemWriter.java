@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 
 /**
  * @author Dave Syer

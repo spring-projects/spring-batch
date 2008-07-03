@@ -1,10 +1,13 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.file;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 
+import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.xml.EventReaderDeserializer;
 import org.springframework.batch.item.xml.StaxEventItemReader;

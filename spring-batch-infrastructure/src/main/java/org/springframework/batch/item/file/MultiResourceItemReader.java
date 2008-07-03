@@ -1,9 +1,19 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.file;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.NoWorkFoundException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.ResetFailedException;
+import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;

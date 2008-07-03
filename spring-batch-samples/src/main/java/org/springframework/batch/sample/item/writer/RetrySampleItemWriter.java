@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 
 /**
  * Simulates temporary output trouble - requires to

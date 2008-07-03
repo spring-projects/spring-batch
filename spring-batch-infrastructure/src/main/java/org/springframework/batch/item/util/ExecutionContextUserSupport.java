@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item;
+package org.springframework.batch.item.util;
 
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.util.Assert;
 
 /**

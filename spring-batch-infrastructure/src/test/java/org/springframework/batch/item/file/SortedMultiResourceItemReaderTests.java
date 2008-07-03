@@ -1,4 +1,4 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.file;
 
 import java.util.Comparator;
 

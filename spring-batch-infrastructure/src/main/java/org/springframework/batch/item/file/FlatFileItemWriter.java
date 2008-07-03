@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -41,6 +40,7 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetCreator;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;

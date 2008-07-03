@@ -1,4 +1,6 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.util;
+
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 
 import junit.framework.TestCase;
 

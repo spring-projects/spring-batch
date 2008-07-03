@@ -22,7 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 
 public class ItemReaderRepeatCallbackTests extends TestCase {

@@ -1,5 +1,7 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.file;
 
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.core.io.Resource;
 
 /**

@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.integration.item;
 
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;

@@ -27,9 +27,9 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.AbstractBufferedItemReaderItemStream;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;

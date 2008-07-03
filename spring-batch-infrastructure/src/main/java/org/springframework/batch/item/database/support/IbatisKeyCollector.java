@@ -3,9 +3,9 @@ package org.springframework.batch.item.database.support;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.database.DrivingQueryItemReader;
 import org.springframework.batch.item.database.KeyCollector;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;

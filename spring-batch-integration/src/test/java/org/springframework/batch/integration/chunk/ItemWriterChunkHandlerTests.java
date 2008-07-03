@@ -9,7 +9,7 @@ import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.integration.chunk.ChunkRequest;
 import org.springframework.batch.integration.chunk.ChunkResponse;
 import org.springframework.batch.integration.chunk.ItemWriterChunkHandler;
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.StringUtils;
 

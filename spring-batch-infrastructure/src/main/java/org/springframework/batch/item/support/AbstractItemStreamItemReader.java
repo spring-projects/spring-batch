@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item;
+package org.springframework.batch.item.support;
+
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStreamSupport;
 
 
 /**
- * Base class for {@link ItemWriter} implementations.
+ * Base class for {@link ItemReader} implementations.
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemStreamItemWriter extends ItemStreamSupport implements ItemWriter {
+public abstract class AbstractItemStreamItemReader extends ItemStreamSupport implements ItemReader {
 
 }

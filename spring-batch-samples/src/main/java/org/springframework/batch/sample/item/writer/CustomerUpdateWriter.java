@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.dao.CustomerDebitDao;
 import org.springframework.batch.sample.dao.JdbcCustomerDebitDao;
 import org.springframework.batch.sample.domain.CustomerDebit;

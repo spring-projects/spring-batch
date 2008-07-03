@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item;
 
+import org.springframework.batch.item.support.AbstractItemReader;
+
 import junit.framework.TestCase;
 
 

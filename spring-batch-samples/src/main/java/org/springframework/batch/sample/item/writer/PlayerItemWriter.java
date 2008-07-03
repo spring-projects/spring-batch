@@ -1,6 +1,6 @@
 package org.springframework.batch.sample.item.writer;
 
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.dao.PlayerDao;
 import org.springframework.batch.sample.domain.Player;
 

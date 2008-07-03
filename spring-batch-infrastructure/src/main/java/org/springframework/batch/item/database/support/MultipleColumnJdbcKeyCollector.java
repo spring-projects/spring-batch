@@ -20,10 +20,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ExecutionContextUserSupport;
 import org.springframework.batch.item.database.DrivingQueryItemReader;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.KeyCollector;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;

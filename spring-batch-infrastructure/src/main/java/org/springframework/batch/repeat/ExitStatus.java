@@ -32,9 +32,9 @@ public class ExitStatus implements Serializable {
 
 	/**
 	 * Convenient constant value representing unknown state - assumed
-	 * continuable.
+	 * not continuable.
 	 */
-	public static final ExitStatus UNKNOWN = new ExitStatus(true, "UNKNOWN");
+	public static final ExitStatus UNKNOWN = new ExitStatus(false, "UNKNOWN");
 
 	/**
 	 * Convenient constant value representing unfinished processing.

@@ -3,7 +3,7 @@ package org.springframework.batch.sample.item.writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.AbstractItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.validator.ValidationException;
 
 /**

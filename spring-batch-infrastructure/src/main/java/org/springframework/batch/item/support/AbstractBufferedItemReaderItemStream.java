@@ -1,9 +1,19 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.NoWorkFoundException;
+import org.springframework.batch.item.ParseException;
+import org.springframework.batch.item.ResetFailedException;
+import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.Assert;
 
 /**
@@ -91,7 +101,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
 	 * 
-	 * @see org.springframework.batch.item.AbstractItemReader#mark()
+	 * @see org.springframework.batch.item.support.AbstractItemReader#mark()
 	 */
 	public void mark() throws MarkFailedException {
 

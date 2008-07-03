@@ -1,8 +1,8 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.file;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.core.io.ByteArrayResource;

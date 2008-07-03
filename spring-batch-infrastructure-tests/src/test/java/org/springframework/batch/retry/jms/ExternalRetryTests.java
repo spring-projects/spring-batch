@@ -21,9 +21,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.item.AbstractItemReader;
-import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.support.AbstractItemReader;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;

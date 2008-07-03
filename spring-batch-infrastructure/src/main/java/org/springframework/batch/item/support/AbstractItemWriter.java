@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item;
+package org.springframework.batch.item.support;
+
+import org.springframework.batch.item.ClearFailedException;
+import org.springframework.batch.item.FlushFailedException;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * Abstract {@link ItemWriter} that allows for base classes to only implement

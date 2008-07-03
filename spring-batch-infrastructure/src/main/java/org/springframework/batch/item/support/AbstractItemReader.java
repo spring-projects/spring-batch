@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item;
+package org.springframework.batch.item.support;
+
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 
 
 /**

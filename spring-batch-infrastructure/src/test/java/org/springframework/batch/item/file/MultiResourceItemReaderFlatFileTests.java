@@ -1,6 +1,8 @@
-package org.springframework.batch.item;
+package org.springframework.batch.item.file;
 
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.sample.Foo;

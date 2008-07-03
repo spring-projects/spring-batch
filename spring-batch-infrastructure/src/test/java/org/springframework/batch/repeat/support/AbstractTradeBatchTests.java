@@ -18,11 +18,11 @@ package org.springframework.batch.repeat.support;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.AbstractItemWriter;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
