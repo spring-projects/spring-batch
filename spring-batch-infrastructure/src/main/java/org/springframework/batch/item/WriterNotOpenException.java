@@ -16,9 +16,10 @@
 package org.springframework.batch.item;
 
 /**
- * Exception indicating that an {@link ItemReader} needed to be opened before read.
+ * Exception indicating that an {@link ItemWriter} needed to be opened before being
+ * written to..
  * 
- * @author Ben Hale
+ * @author Lucas Ward
  */
 public class WriterNotOpenException extends ItemReaderException {
 
