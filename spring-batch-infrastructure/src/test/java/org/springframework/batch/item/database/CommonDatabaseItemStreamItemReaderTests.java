@@ -10,7 +10,7 @@ public abstract class CommonDatabaseItemStreamItemReaderTests extends CommonItem
 	private ClassPathXmlApplicationContext ctx;
 
 	protected void setUp() throws Exception {
-		ctx = new ClassPathXmlApplicationContext("foo-data-source-context.xml", JdbcCursorItemReaderCommonTests.class);
+		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/data-source-context.xml");
 		super.setUp();
 	}
 

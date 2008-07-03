@@ -221,7 +221,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 		try {
 			if (reader != null) {
 				log.debug("Closing flat file for reading: " + resource);
-				reader.close(null);
+				reader.close();
 			}
 		}
 		finally {

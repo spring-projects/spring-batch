@@ -25,11 +25,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
@@ -54,7 +52,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader extends ItemStreamSupport implements LineReader, ItemReader {
+public class ResourceLineReader implements LineReader, ItemReader {
 
 	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
 
@@ -156,10 +154,8 @@ public class ResourceLineReader extends ItemStreamSupport implements LineReader,
 
 	/**
 	 * Close the reader associated with this input source.
-	 * 
-	 * @see org.springframework.batch.item.ItemStreamSupport#close(org.springframework.batch.item.ExecutionContext)
 	 */
-	public synchronized void close(ExecutionContext executionContext) {
+	public synchronized void close() {
 		if (state == null) {
 			return;
 		}

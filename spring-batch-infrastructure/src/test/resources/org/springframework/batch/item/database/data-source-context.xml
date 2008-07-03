@@ -10,7 +10,6 @@
 			</bean>
 		</property>
 		<property name="initScripts" value="org/springframework/batch/item/database/init-foo-schema-hsqldb.sql" />
-		<property name="destroyScript" value="org/springframework/batch/item/database/destroy-foo-schema-hsqldb.sql" />
 	</bean>
 
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
