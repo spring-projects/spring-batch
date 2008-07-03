@@ -16,6 +16,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Jdbc implementation of {@link JobInstanceDao}. Uses sequences (via Spring's
@@ -38,7 +39,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, "
 			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL) values (?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String FIND_JOBS = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
+	private static final String FIND_JOBS_WITH_KEY = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
+
+	private static final String FIND_JOBS_WITH_EMPTY_KEY =
+			"SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
 
@@ -169,7 +173,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		Assert.hasLength(job.getName(), "Job must have a name");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		Object[] parameters = new Object[] { job.getName(), createJobKey(jobParameters) };
+		String jobKey = createJobKey(jobParameters);
+
+		Object[] parameters = new Object[] { job.getName(), jobKey };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -178,7 +184,13 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			}
 		};
 		
-		List instances = getJdbcTemplate().query(getQuery(FIND_JOBS), parameters, rowMapper);
+		List instances;
+		if (StringUtils.hasLength(jobKey)) {
+			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY), parameters, rowMapper);
+		}
+		else {
+			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_EMPTY_KEY), parameters, rowMapper);
+		}
 		
 		if (instances.isEmpty()) {
 			return null;
