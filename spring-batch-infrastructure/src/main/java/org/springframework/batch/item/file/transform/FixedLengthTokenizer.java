@@ -26,10 +26,12 @@ import java.util.List;
  * @author tomas.slanina
  * @author peter.zozom
  * @author Dave Syer
+ * @author Lucas Ward
  */
 public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 	private Range[] ranges;
+	private int maxRange;
 
 	/**
 	 * Set the column ranges. Used in conjunction with the
@@ -41,6 +43,23 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 */
 	public void setColumns(Range[] ranges) {
 		this.ranges = ranges;
+		
+		calculateMaxRange(ranges);
+	}
+	
+	private void calculateMaxRange(Range[] ranges){
+		if(ranges == null || ranges.length == 0){
+			maxRange = 0;
+			return;
+		}
+		
+		maxRange = ranges[0].getMax();
+		
+		for(int i = 0; i < ranges.length; i++){
+			if(ranges[i].getMax() > maxRange){
+				maxRange = ranges[i].getMax();
+			}
+		}
 	}
 
 	/**
@@ -51,6 +70,8 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 *            the line to be tokenised (can be <code>null</code>)
 	 * 
 	 * @return the resulting tokens (empty if the line is null)
+	 * @throws IncorrectLineLengthException if line length is greater than
+	 * or less than the max range set.
 	 */
 	protected List doTokenize(String line) {
 		List tokens = new ArrayList(ranges.length);
@@ -58,6 +79,11 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 		String token;
 
 		lineLength = line.length();
+		
+		if(lineLength > maxRange || lineLength < maxRange){
+			//line is longer than max range, throw exception
+			throw new IncorrectLineLengthException(maxRange, lineLength);
+		}
 
 		for (int i = 0; i < ranges.length; i++) {
 

@@ -68,19 +68,24 @@ public class DelimitedLineTokenizerTests extends TestCase {
 		tokenizer.setNames(new String[] {"A", "B"});
 		try {
 			tokenizer.tokenize("a,b,c");
-			fail("Expected IllegalArgumentException");
+			fail("Expected IncorrectTokenCountException");
 		}
-		catch (IllegalArgumentException e) {
-			// expected
+		catch (IncorrectTokenCountException e) {
+			assertEquals(2, e.getExpectedCount());
+			assertEquals(3, e.getActualCount());
 		}
 	}
-
+	
 	public void testTooManyNames() {
 		tokenizer.setNames(new String[] {"A", "B", "C", "D"});
-		FieldSet line = tokenizer.tokenize("a,b,c");
-		assertEquals(4, line.getFieldCount());
-		assertEquals("c", line.readString("C"));
-		assertEquals(null, line.readString("D"));
+		try{
+			tokenizer.tokenize("a,b,c");
+		}
+		catch(IncorrectTokenCountException e){
+			assertEquals(4, e.getExpectedCount());
+			assertEquals(3, e.getActualCount());
+		}
+		
 	}
 
 	public void testDelimitedLineTokenizerChar() {
@@ -145,6 +150,18 @@ public class DelimitedLineTokenizerTests extends TestCase {
 	public void testEmptyLine() throws Exception {
 		FieldSet line = tokenizer.tokenize("");
 		assertEquals(0, line.getFieldCount());
+	}
+	
+	public void testEmptyLineWithNames(){
+		
+		tokenizer.setNames(new String[]{"A", "B"});
+		try{
+			tokenizer.tokenize("");
+		}
+		catch(IncorrectTokenCountException ex){
+			assertEquals(2, ex.getExpectedCount());
+			assertEquals(0, ex.getActualCount());
+		}
 	}
 
 	public void testWhitespaceLine() throws Exception {

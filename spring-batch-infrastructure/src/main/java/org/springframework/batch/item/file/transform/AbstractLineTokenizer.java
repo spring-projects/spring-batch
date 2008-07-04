@@ -24,9 +24,12 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 
 
 /**
+ * Abstract class handling common concerns of various {@link LineTokenizer} implementations
+ * such as dealing with names and actual construction of {@link FieldSet}
+ * 
  * @author Dave Syer
  * @author Robert Kasanicky
- *
+ * @author Lucas Ward
  */
 public abstract class AbstractLineTokenizer implements LineTokenizer {
 
@@ -63,18 +66,23 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 */
 	public FieldSet tokenize(String line) {
 
-		if (line == null || line.length()==0) {
-			return new DefaultFieldSet(new String[0]);
+//		if (line == null || line.length()==0) {
+//			return new DefaultFieldSet(new String[0]);
+//		}
+		
+		if(line == null){
+			line = "";
 		}
 
 		List tokens = new ArrayList(doTokenize(line));
-		for (int i=tokens.size(); i<names.length; i++) {
-			tokens.add(null);
-		}
 
 		String[] values = (String[]) tokens.toArray(new String[tokens.size()]);
+		
 		if (names.length==0) {
 			return new DefaultFieldSet(values);
+		}
+		else if(values.length != names.length){
+			throw new IncorrectTokenCountException(names.length, values.length);
 		}
 		return new DefaultFieldSet(values, names);
 	}
