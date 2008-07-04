@@ -1,6 +1,8 @@
 package org.springframework.batch.item.file;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -24,10 +26,11 @@ import org.springframework.util.ClassUtils;
  * {@link #setResources(Resource[])}, the actual reading is delegated to
  * {@link #setDelegate(ResourceAwareItemReaderItemStream)}.
  * 
- * Reset (rollback) capability is implemented by item buffering. To restart
- * correctly resource ordering needs to be preserved between runs.
+ * Input resources are ordered using {@link #setComparator(Comparator)} to make
+ * sure resource ordering is preserved between job runs in restart scenario.
  * 
- * @see SortedMultiResourceItemReader
+ * Reset (rollback) capability is implemented by item buffering.
+ * 
  * 
  * @author Robert Kasanicky
  */
@@ -52,6 +55,19 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	private boolean shouldReadBuffer = false;
 
 	private boolean saveState = false;
+
+	private Comparator comparator = new Comparator() {
+
+		/**
+		 * Compares resource filenames.
+		 */
+		public int compare(Object o1, Object o2) {
+			Resource r1 = (Resource) o1;
+			Resource r2 = (Resource) o2;
+			return r1.getFilename().compareTo(r2.getFilename());
+		}
+
+	};
 
 	public MultiResourceItemReader() {
 		setName(ClassUtils.getShortName(MultiResourceItemReader.class));
@@ -126,6 +142,10 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 		return buffered;
 	}
 
+	/**
+	 * Remove the longer needed items from buffer, mark the index position and
+	 * call mark() on delegate so that it clears its buffers.
+	 */
 	public void mark() throws MarkFailedException {
 		emptyBuffer();
 
@@ -179,6 +199,8 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
+		Arrays.sort(resources, comparator);
+
 		index.open(executionContext);
 
 		delegate.setResource(resources[index.currentResource]);
@@ -217,13 +239,6 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	}
 
 	/**
-	 * @param resources input resources
-	 */
-	public void setResources(Resource[] resources) {
-		this.resources = resources;
-	}
-
-	/**
 	 * Set the boolean indicating whether or not state should be saved in the
 	 * provided {@link ExecutionContext} during the {@link ItemStream} call to
 	 * update.
@@ -232,6 +247,21 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
+	}
+
+	/**
+	 * @param comparator used to order the injected resources, by default
+	 * compares {@link Resource#getFilename()} values.
+	 */
+	public void setComparator(Comparator comparator) {
+		this.comparator = comparator;
+	}
+
+	/**
+	 * @param resources input resources
+	 */
+	public void setResources(Resource[] resources) {
+		this.resources = resources;
 	}
 
 	/**

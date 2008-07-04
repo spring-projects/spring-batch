@@ -35,7 +35,7 @@
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
 	<bean id="testItemReader"
-		class="org.springframework.batch.item.file.SortedMultiResourceItemReader">
+		class="org.springframework.batch.item.file.MultiResourceItemReader">
 		<property name="resources"
 			value="classpath:data/multiResourceJob/input/file-*.txt" />
 		<property name="delegate" ref="flatFileItemReader" />

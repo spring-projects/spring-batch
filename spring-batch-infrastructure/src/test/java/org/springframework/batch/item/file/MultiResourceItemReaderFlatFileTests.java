@@ -1,5 +1,7 @@
 package org.springframework.batch.item.file;
 
+import java.util.Comparator;
+
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -35,6 +37,12 @@ public class MultiResourceItemReaderFlatFileTests extends
 
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
+		multiReader.setComparator(new Comparator() {
+			public int compare(Object arg0, Object arg1) {
+				return 0; // preserve original ordering
+			}
+			
+		});
 		multiReader.afterPropertiesSet();
 
 		return multiReader;

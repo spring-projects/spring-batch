@@ -1,5 +1,7 @@
 package org.springframework.batch.item.file;
 
+import java.util.Comparator;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -38,6 +40,10 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
 
 		tested.setDelegate(itemReader);
+		tested.setComparator(new Comparator() {
+			public int compare(Object o1, Object o2) {
+				return 0; // do not change ordering
+			}});
 		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
 		tested.afterPropertiesSet();
 	}
@@ -135,6 +141,40 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("7", readItem());
 		assertEquals("8", readItem());
 		assertEquals(null, readItem());
+	}
+
+	/**
+	 * Resources are ordered according to injected comparator.
+	 */
+	public void testResourceOrderingWithCustomComparator() {
+		
+		Resource r1 = new ByteArrayResource("".getBytes(), "b");
+		Resource r2 = new ByteArrayResource("".getBytes(), "a");
+		Resource r3 = new ByteArrayResource("".getBytes(), "c");
+		
+		
+		Resource[] resources = new Resource[] {r1, r2, r3};
+		
+		Comparator comp = new Comparator() {
+
+			/**
+			 * Reversed ordering by filename.
+			 */
+			public int compare(Object o1, Object o2) {
+				Resource r1 = (Resource) o1;
+				Resource r2 = (Resource) o2;
+				return -r1.getDescription().compareTo(r2.getDescription());
+			}
+
+		};
+
+		tested.setComparator(comp);
+		tested.setResources(resources);
+		tested.open(ctx);
+
+		assertSame(r3, resources[0]);
+		assertSame(r1, resources[1]);
+		assertSame(r2, resources[2]);
 	}
 
 	private String readItem() throws Exception {

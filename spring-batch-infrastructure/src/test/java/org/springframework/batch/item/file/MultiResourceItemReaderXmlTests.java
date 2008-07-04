@@ -1,5 +1,7 @@
 package org.springframework.batch.item.file;
 
+import java.util.Comparator;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
@@ -49,6 +51,11 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 		multiReader.setDelegate(reader);
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
+		multiReader.setComparator(new Comparator() {
+			public int compare(Object arg0, Object arg1) {
+				return 0; // preserve original ordering
+			}
+		});
 		multiReader.afterPropertiesSet();
 
 		return multiReader;
