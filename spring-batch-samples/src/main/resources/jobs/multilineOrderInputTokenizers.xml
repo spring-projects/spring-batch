@@ -22,8 +22,7 @@
 	</bean>
 
 	<bean id="defaultLineTokenizer"
-		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<property name="columns" value="1-120" />
+		class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
 	</bean>
 
 	<bean id="parentLineTokenizer" abstract="true"
