@@ -71,6 +71,13 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		return (String[]) names.toArray();
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.file.mapping.FieldSet#hasNames()
+	 */
+	public boolean hasNames() {
+		return names!=null;
+	}
 
 	/*
 	 * (non-Javadoc)

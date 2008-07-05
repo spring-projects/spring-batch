@@ -103,5 +103,13 @@ public class JobExecutionRequest extends AttributeAccessorSupport {
 	public JobExecution getJobExecution() {
 		return jobExecution;
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": "+jobExecution;
+	}
 
 }

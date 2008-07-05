@@ -45,11 +45,13 @@ public class FieldSetTests extends TestCase {
 	}
 
 	public void testNames() throws Exception {
+		assertTrue(fieldSet.hasNames());
 		assertEquals(fieldSet.getFieldCount(), fieldSet.getNames().length);
 	}
 
 	public void testNamesNotKnown() throws Exception {
 		fieldSet = new DefaultFieldSet(new String[] { "foo" });
+		assertFalse(fieldSet.hasNames());
 		try {
 			fieldSet.getNames();
 			fail("Expected IllegalStateException");

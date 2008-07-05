@@ -25,7 +25,7 @@ import org.springframework.batch.core.JobParameters;
  * @author Dave Syer
  * 
  */
-public class JobExecutionRequest {
+public class JobLaunchRequest {
 
 	private final Job job;
 	private final JobParameters jobParameters;
@@ -34,7 +34,7 @@ public class JobExecutionRequest {
 	 * @param job
 	 * @param jobParameters
 	 */
-	public JobExecutionRequest(Job job, JobParameters jobParameters) {
+	public JobLaunchRequest(Job job, JobParameters jobParameters) {
 		super();
 		this.job = job;
 		this.jobParameters = jobParameters;

@@ -58,7 +58,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private int startLimit = Integer.MAX_VALUE;
 
-	private boolean allowStartIfComplete;
+	private boolean allowStartIfComplete = false;
 
 	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
@@ -122,9 +122,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	}
 
 	/**
-	 * Public setter for the shouldAllowStartIfComplete.
+	 * Public setter for flag that determines whether the step should start
+	 * again if it is already complete. Defaults to false.
 	 * 
-	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
+	 * @param allowStartIfComplete the value of the flag to set
 	 */
 	public void setAllowStartIfComplete(boolean allowStartIfComplete) {
 		this.allowStartIfComplete = allowStartIfComplete;

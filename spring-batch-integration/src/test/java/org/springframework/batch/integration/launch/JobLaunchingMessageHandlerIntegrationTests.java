@@ -43,7 +43,7 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
 	public void testNoReply() {
-		GenericMessage<JobExecutionRequest> trigger = new GenericMessage<JobExecutionRequest>(new JobExecutionRequest(job, new JobParameters()));
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job, new JobParameters()));
 		requestChannel.send(trigger);
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
@@ -56,7 +56,7 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	public void testReply() {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("dontclash", "12");
-		GenericMessage<JobExecutionRequest> trigger = new GenericMessage<JobExecutionRequest>(new JobExecutionRequest(job, builder.toJobParameters()));
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job, builder.toJobParameters()));
 		trigger.getHeader().setReturnAddress("response");
 		requestChannel.send(trigger);
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);

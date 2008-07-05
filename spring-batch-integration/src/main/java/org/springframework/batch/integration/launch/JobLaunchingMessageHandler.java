@@ -28,7 +28,7 @@ public class JobLaunchingMessageHandler {
 	}
 
 	@Handler
-	public JobExecution launch(JobExecutionRequest request) {
+	public JobExecution launch(JobLaunchRequest request) {
 		Job job = request.getJob();
 		JobParameters jobParameters = request.getJobParameters();
 

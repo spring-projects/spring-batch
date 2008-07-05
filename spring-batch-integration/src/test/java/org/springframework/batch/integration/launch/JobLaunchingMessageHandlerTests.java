@@ -43,7 +43,7 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 	
 	@Test
 	public void testSimpleDelivery() throws Exception{
-		messageHandler.launch(new JobExecutionRequest(new JobSupport("testjob"), null));
+		messageHandler.launch(new JobLaunchRequest(new JobSupport("testjob"), null));
 		
 		assertEquals("Wrong job count", 1, jobLauncher.jobs.size());
 		assertEquals("Wrong job name", jobLauncher.jobs.get(0).getName(), "testjob");

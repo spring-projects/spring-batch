@@ -71,19 +71,6 @@
 
 	<bean id="logAdvice" class="org.springframework.batch.sample.advice.ProcessorLogAdvice" />
 
-	<bean id="eventAdvice" class="org.springframework.batch.sample.advice.MethodExecutionApplicationEventAdvice" />
-
-	<aop:config>
-		<aop:aspect ref="logAdvice">
-			<aop:after pointcut="execution( * org.springframework.batch.sample..InfiniteLoopTasklet+.execute(..))"
-				method="doBasicLogging" />
-		</aop:aspect>
-		<aop:aspect ref="eventAdvice">
-			<aop:before pointcut="execution( * org.springframework.batch..Step+.execute(..))" method="before" />
-			<aop:after pointcut="execution( * org.springframework.batch..Step+.execute(..))" method="after" />
-			<aop:after-throwing throwing="t" pointcut="execution( * org.springframework.batch..Step+.execute(..))"
-				method="onError" />
-		</aop:aspect>
-	</aop:config>
+	<bean id="eventAdvice" class="org.springframework.batch.sample.advice.StepExecutionApplicationEventAdvice" />
 
 </beans>

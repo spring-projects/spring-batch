@@ -28,10 +28,10 @@ import org.springframework.integration.annotation.Handler;
 public class JobRequestConverter {
 
 	@Handler
-	public JobExecutionRequest convert(String jobName) {
+	public JobLaunchRequest convert(String jobName) {
 		// TODO: get these from message header
 		Properties properties = new Properties();
-		return new JobExecutionRequest(new JobSupport(jobName), new DefaultJobParametersConverter().getJobParameters(properties));
+		return new JobLaunchRequest(new JobSupport(jobName), new DefaultJobParametersConverter().getJobParameters(properties));
 	}
 
 }

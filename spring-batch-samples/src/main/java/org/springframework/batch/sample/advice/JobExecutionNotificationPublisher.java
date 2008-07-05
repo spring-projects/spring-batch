@@ -29,7 +29,7 @@ import org.springframework.jmx.export.notification.NotificationPublisherAware;
  * JMX notification broadcaster
  * 
  * @author Dave Syer
- * @since 2.1
+ * @since 1.0
  */
 public class JobExecutionNotificationPublisher implements ApplicationListener, NotificationPublisherAware {
 

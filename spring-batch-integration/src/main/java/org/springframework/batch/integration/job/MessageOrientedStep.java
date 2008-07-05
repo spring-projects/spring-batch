@@ -43,6 +43,27 @@ public class MessageOrientedStep extends AbstractStep {
 
 	private MessageChannel replyChannel;
 
+	private int executionTimeoutMinutes = 30;
+
+	private long pollingInterval = 5;
+
+	/**
+	 * Public setter for the execution timeout in minutes. Defaults to 30.
+	 * @param executionTimeoutMinutes the timeout to set
+	 */
+	public void setExecutionTimeoutMinutes(int executionTimeoutMinutes) {
+		this.executionTimeoutMinutes = executionTimeoutMinutes;
+	}
+
+	/**
+	 * Public setter for the polling interval in milliseconds while waiting for
+	 * replies signalling the end of the step.  Defaults to 5.
+	 * @param pollingInterval the polling interval to set
+	 */
+	public void setPollingInterval(long pollingInterval) {
+		this.pollingInterval = pollingInterval;
+	}
+
 	/**
 	 * Public setter for the requestChannel.
 	 * @param requestChannel the requestChannel to set
@@ -88,7 +109,7 @@ public class MessageOrientedStep extends AbstractStep {
 		return ExitStatus.FINISHED;
 
 	}
-	
+
 	/**
 	 * Do nothing.
 	 * 
@@ -97,7 +118,7 @@ public class MessageOrientedStep extends AbstractStep {
 	@Override
 	protected void open(ExecutionContext ctx) throws Exception {
 	}
-	
+
 	/**
 	 * Do nothing.
 	 * 
@@ -111,12 +132,12 @@ public class MessageOrientedStep extends AbstractStep {
 	 * @param expectedJobId
 	 */
 	private void waitForReply(Long expectedJobId) {
-		// TODO: promote timeout to field and calculate count
-		long timeout = 5;
-		int count = 0;
+		long timeout = pollingInterval;
+		long maxCount = executionTimeoutMinutes * 1000 * 60 / timeout;
+		long count = 0;
 
 		// TODO: use a ReponseCorrelator?, or just a SynchronousChannel
-		while (count++ < 100) {
+		while (count++ < maxCount) {
 
 			Message<?> message = replyChannel.receive(timeout);
 
@@ -144,7 +165,7 @@ public class MessageOrientedStep extends AbstractStep {
 			}
 		}
 
-		if (count >= 100) {
+		if (count >= maxCount) {
 			throw new StepExecutionTimeoutException("Timed out waiting for steps to execute.");
 		}
 	}

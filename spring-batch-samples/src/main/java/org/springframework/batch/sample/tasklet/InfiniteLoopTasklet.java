@@ -18,6 +18,7 @@ package org.springframework.batch.sample.tasklet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -52,9 +53,10 @@ public class InfiniteLoopTasklet extends StepExecutionListenerSupport implements
 				Thread.currentThread().interrupt();
 				throw new RuntimeException("Job interrupted.");
 			}
-			count++;
+			stepExecution.setItemCount(++count);
 			logger.info("Executing infinite loop, at count="+count);
 		}
+		stepExecution.setStatus(BatchStatus.STOPPING);
 		return ExitStatus.FAILED;
 	}
 	
@@ -63,6 +65,16 @@ public class InfiniteLoopTasklet extends StepExecutionListenerSupport implements
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.listener.StepExecutionListenerSupport#afterStep(org.springframework.batch.core.StepExecution)
+	 */
+	public ExitStatus afterStep(StepExecution stepExecution) {
+		if (stepExecution.isTerminateOnly()) {
+			stepExecution.setStatus(BatchStatus.STOPPED);
+		}
+		return stepExecution.getExitStatus();
 	}
 
 }

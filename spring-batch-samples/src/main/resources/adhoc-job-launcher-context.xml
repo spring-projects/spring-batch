@@ -7,7 +7,7 @@
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 	<import resource="simple-job-launcher-context.xml" />
 	
-	<!--  For Java 1.4 we need to ceate teh mbean server explicitly -->
+	<!--  For Java 1.4 we need to ceate the mbean server explicitly -->
 	<bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
 		<property name="locateExistingServerIfPossible" value="true" />
 	</bean>

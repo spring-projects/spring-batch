@@ -41,6 +41,13 @@ public interface FieldSet {
 	String[] getNames();
 
 	/**
+	 * Check if there are names defined for the fields.
+	 * 
+	 * @return true if there are names for the fields
+	 */
+	boolean hasNames();
+
+	/**
 	 * @return fields wrapped by this '<code>FieldSet</code>' instance as
 	 * String values.
 	 */

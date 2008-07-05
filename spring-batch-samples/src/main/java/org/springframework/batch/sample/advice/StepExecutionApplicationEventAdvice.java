@@ -17,16 +17,18 @@
 package org.springframework.batch.sample.advice;
 
 import org.aspectj.lang.JoinPoint;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 
 /**
- * Wraps calls for 'Processing' methods which output a single Object to write
- * the string representation of the object to the log.
+ * Wraps calls for methods taking {@link StepExecution} as an argument and
+ * publishes notifications in the form of {@link ApplicationEvent}.
  * 
- * @author Lucas Ward
+ * @author Dave Syer
  */
-public class MethodExecutionApplicationEventAdvice implements ApplicationEventPublisherAware {
+public class StepExecutionApplicationEventAdvice implements ApplicationEventPublisherAware {
 
 	private ApplicationEventPublisher applicationEventPublisher;
 
@@ -38,21 +40,21 @@ public class MethodExecutionApplicationEventAdvice implements ApplicationEventPu
 		this.applicationEventPublisher = applicationEventPublisher;
 	}
 
-	public void before(JoinPoint jp) {
-		String msg = "Before: "+jp.toShortString();
+	public void before(JoinPoint jp, StepExecution stepExecution) {
+		String msg = "Before: " + jp.toShortString() + " with: " + stepExecution;
 		publish(jp.getTarget(), msg);
 	}
 
-	public void after(JoinPoint jp) {
-		String msg = "After: "+jp.toShortString();
+	public void after(JoinPoint jp, StepExecution stepExecution) {
+		String msg = "After: " + jp.toShortString() + " with: " + stepExecution;
 		publish(jp.getTarget(), msg);
 	}
 
-	public void onError(JoinPoint jp, Throwable t) {
-		String msg = "Error in: "+jp.toShortString()+"("+t.getClass()+":"+t.getMessage()+")";
+	public void onError(JoinPoint jp, StepExecution stepExecution, Throwable t) {
+		String msg = "Error in: " + jp.toShortString() + " with: " + stepExecution + " (" + t.getClass() + ":" + t.getMessage() + ")";
 		publish(jp.getTarget(), msg);
 	}
-	
+
 	/**
 	 * Publish a {@link RepeatOperationsApplicationEvent} with the given
 	 * parameters.

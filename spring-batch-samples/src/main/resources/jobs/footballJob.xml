@@ -119,18 +119,18 @@
 		</aop:aspect>
 		<aop:aspect ref="eventAdvice">
 			<aop:before
-				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
 				method="before" />
 			<aop:after
-				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
 				method="after" />
 			<aop:after-throwing throwing="t" 
-				pointcut="execution( * org.springframework.batch..Step+.execute(..))"
+				pointcut="execution( * org.springframework.batch..Step+.execute(..)) and args(stepExecution)"
 				method="onError" />
 		</aop:aspect>
 	</aop:config>
 
-	<bean id="footbalProperties"
+	<bean id="footballProperties"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="properties">
 			<value>
