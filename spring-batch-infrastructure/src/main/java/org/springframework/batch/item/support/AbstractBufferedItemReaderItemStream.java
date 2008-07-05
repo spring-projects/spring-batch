@@ -44,7 +44,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 
 	private ExecutionContextUserSupport ecSupport = new ExecutionContextUserSupport();
 
-	private boolean saveState = false;
+	private boolean saveState = true;
 
 	/**
 	 * Read next item from input.
@@ -189,7 +189,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 	 * {@link ExecutionContext}. Only switch this to false if you don't want to
 	 * save any state from this stream, and you don't need it to be restartable.
 	 * 
-	 * @param saveState flag value (default true)
+	 * @param saveState flag value (default true).
 	 */
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
