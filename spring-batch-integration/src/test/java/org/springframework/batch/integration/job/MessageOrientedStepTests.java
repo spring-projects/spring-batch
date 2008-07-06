@@ -107,6 +107,8 @@ public class MessageOrientedStepTests {
 	@Test
 	public void testExecuteWithTimeout() throws Exception {
 		try {
+			step.setExecutionTimeout(1000);
+			step.setPollingInterval(100);
 			step.execute(jobExecution.createStepExecution(step));
 			fail("Expected StepExecutionTimeoutException");
 		}

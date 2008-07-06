@@ -43,7 +43,9 @@ public class MessageOrientedStep extends AbstractStep {
 
 	private MessageChannel replyChannel;
 
-	private int executionTimeoutMinutes = 30;
+	private static int MINUTE = 1000 * 60;
+
+	private long executionTimeout = 30*MINUTE ;
 
 	private long pollingInterval = 5;
 
@@ -52,7 +54,15 @@ public class MessageOrientedStep extends AbstractStep {
 	 * @param executionTimeoutMinutes the timeout to set
 	 */
 	public void setExecutionTimeoutMinutes(int executionTimeoutMinutes) {
-		this.executionTimeoutMinutes = executionTimeoutMinutes;
+		this.executionTimeout = executionTimeoutMinutes * MINUTE;
+	}
+	
+	/**
+	 * Public setter for the execution timeout in milliseconds.  Defaults to 30 minutes.
+	 * @param executionTimeout
+	 */
+	public void setExecutionTimeout(long executionTimeout) {
+		this.executionTimeout = executionTimeout;
 	}
 
 	/**
@@ -133,7 +143,7 @@ public class MessageOrientedStep extends AbstractStep {
 	 */
 	private void waitForReply(Long expectedJobId) {
 		long timeout = pollingInterval;
-		long maxCount = executionTimeoutMinutes * 1000 * 60 / timeout;
+		long maxCount = executionTimeout / timeout;
 		long count = 0;
 
 		// TODO: use a ReponseCorrelator?, or just a SynchronousChannel
