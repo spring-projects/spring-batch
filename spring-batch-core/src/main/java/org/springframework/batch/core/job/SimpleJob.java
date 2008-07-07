@@ -102,6 +102,11 @@ public class SimpleJob extends AbstractJob {
 				}
 			}
 
+			// Need to check again for stopped job
+			if (execution.getStatus() == BatchStatus.STOPPING) {
+				throw new JobInterruptedException("JobExecution interrupted.");
+			}
+
 			updateStatus(execution, BatchStatus.COMPLETED);
 
 			getCompositeListener().afterJob(execution);

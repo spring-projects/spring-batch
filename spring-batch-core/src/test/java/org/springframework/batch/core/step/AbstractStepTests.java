@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -170,6 +171,43 @@ public class AbstractStepTests extends TestCase {
 		assertEquals(7, events.size());
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
+
+		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
+				.containsKey("onErrorInStep"));
+	}
+
+	/**
+	 * Exception during business processing.
+	 */
+	public void testStoppedStep() throws Exception {
+		tested = new EventTrackingStep() {
+			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+				stepExecution.setTerminateOnly();
+				return super.doExecute(stepExecution);
+			}
+		};
+		tested.setJobRepository(repository);
+		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
+
+		try {
+			tested.execute(execution);
+			fail();
+		}
+		catch (JobInterruptedException expected) {
+			assertEquals("JobExecution interrupted.", expected.getMessage());
+		}
+
+		int i = 0;
+		assertEquals("listener1#beforeStep", events.get(i++));
+		assertEquals("listener2#beforeStep", events.get(i++));
+		assertEquals("open", events.get(i++));
+		assertEquals("doExecute", events.get(i++));
+		assertEquals("listener2#onErrorInStep", events.get(i++));
+		assertEquals("listener1#onErrorInStep", events.get(i++));
+		assertEquals("close", events.get(i++));
+		assertEquals(7, events.size());
+
+		assertEquals("JOB_INTERRUPTED", execution.getExitStatus().getExitCode());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("onErrorInStep"));

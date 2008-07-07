@@ -169,6 +169,12 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 			exitStatus = doExecute(stepExecution);
 
+			// Check if someone is trying to stop us
+			if (stepExecution.isTerminateOnly()) {
+				stepExecution.setStatus(BatchStatus.STOPPED);
+				throw new JobInterruptedException("JobExecution interrupted.");
+			}
+
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 
