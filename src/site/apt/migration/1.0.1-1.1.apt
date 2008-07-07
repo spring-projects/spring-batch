@@ -20,9 +20,12 @@ Spring Batch 1.1 Release Notes
   * MapJobRepositoryFactoryBean for easy setup of in-memory repository
 
   * StepExecution has persistent rollbackCount, readSkipCount and writeSkipCount
+  
+  * All ItemReader implementations default to returning null in the initial call to read if no data is found to process.  NoWorkFoundListener can be used to fail a step if no work was done. (e.g. input was empty)
 
-  * NoWorkFoundListener can be used to fail the step if no work was done (e.g. input was empty)
-
+  * LineTokenizer implementations now properly enforce formatting.  For example, a fixed length line must match the maximum line length defined in the provided ranges.
+  
+  * FlatFileItemWriter must be opened before it can be written to.  However, open can be called multiple times before closing.
 
 * Other
 
