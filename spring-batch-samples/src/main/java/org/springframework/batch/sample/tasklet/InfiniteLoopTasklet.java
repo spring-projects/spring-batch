@@ -67,14 +67,4 @@ public class InfiniteLoopTasklet extends StepExecutionListenerSupport implements
 		this.stepExecution = stepExecution;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.listener.StepExecutionListenerSupport#afterStep(org.springframework.batch.core.StepExecution)
-	 */
-	public ExitStatus afterStep(StepExecution stepExecution) {
-		if (stepExecution.isTerminateOnly()) {
-			stepExecution.setStatus(BatchStatus.STOPPED);
-		}
-		return stepExecution.getExitStatus();
-	}
-
 }
