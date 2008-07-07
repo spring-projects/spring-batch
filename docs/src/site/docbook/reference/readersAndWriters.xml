@@ -2200,6 +2200,52 @@
   </section>
 
   <section>
+    <title>Preventing state persistence</title>
+
+    <para>By default, all of the <classname>ItemReader</classname> and
+    <classname>ItemWriter</classname> implementations store their current
+    state in the <classname>ExecutionContext</classname> before it is
+    committed. However, this may not always be the desired behavior. For
+    example, many developers choose to make their database readers
+    'rerunnable' by using a process indicator. An extra column is added to the
+    input data to indicate whether or not it has been processed. When a
+    particular record is being read (or written out) the processed flag is
+    flipped from false to true. The SQL statement can then contain an extra
+    statement in the where clause, such as: "where PROCESSED_IND = false",
+    thereby insuring that only unprocessed records will be returned in the
+    case of a restart. In this scenario, it is prefereable to not store any
+    state, such as the current row number, since it will be irrelevant upon
+    restart. For this reason, all readers and writers include the 'saveState'
+    property:</para>
+
+    <programlisting>
+  &lt;bean id="playerSummarizationSource"
+        class="org.springframework.batch.item.database.JdbcCursorItemReader"&gt;
+    &lt;property name="dataSource" ref="dataSource" /&gt;
+    &lt;property name="mapper"&gt;
+      &lt;bean class="org.springframework.batch.sample.mapping.PlayerSummaryMapper" /&gt;
+    &lt;/property&gt;
+    &lt;property name="saveState" value="false" /&gt;
+    &lt;property name="sql"&gt;
+      &lt;value&gt;
+      SELECT games.player_id, games.year_no, SUM(COMPLETES),
+      SUM(ATTEMPTS), SUM(PASSING_YARDS), SUM(PASSING_TD),
+      SUM(INTERCEPTIONS), SUM(RUSHES), SUM(RUSH_YARDS),
+      SUM(RECEPTIONS), SUM(RECEPTIONS_YARDS), SUM(TOTAL_TD)
+      from games, players where players.player_id =
+      games.player_id group by games.player_id, games.year_no
+      &lt;/value&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;
+
+</programlisting>
+
+    <para>The <classname>ItemReader</classname> configured above will not make
+    any entries in the <classname>ExecutionContext</classname> for any
+    executions it participates in.</para>
+  </section>
+
+  <section>
     <title id="infrastructure.1.1">Creating Custom ItemReaders and
     ItemWriters</title>
 
