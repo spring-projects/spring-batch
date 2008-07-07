@@ -1212,8 +1212,8 @@
         factory beans through the streams property, as illustrated
         below:</para>
 
-        <programlisting>&lt;bean id="step1" parent="simpleStep"
-        class="org.springframework.batch.core.step.item.StatefulRetryStepFactoryBean"&gt;
+        <programlisting>&lt;bean id="step1"
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
     &lt;property name="streams" ref="fileItemReader" /&gt;
     &lt;property name="itemReader"&gt;
         &lt;bean
@@ -1360,6 +1360,36 @@
           method will be called. The exception encountered and the item that
           was attempted to be written will be provided, so that they can be
           logged.</para>
+        </section>
+
+        <section>
+          <title>SkipListener</title>
+
+          <para>Both <classname>ItemReadListener</classname> and
+          <classname>ItemWriteListner</classname> provide a mechanism for
+          being notified of errors, but neither one will inform you that a
+          record has actually been skipped.
+          <methodname>onWriteError</methodname>, for example, will be called
+          even if an item is retried and successful. For this reason, there is
+          a separate interface for tracking skipped items:</para>
+
+          <programlisting>
+  public interface SkipListener extends StepListener {
+
+    void onSkipInRead(Throwable t);
+
+    void onSkipInWrite(Object item, Throwable t);
+  }
+
+</programlisting>
+
+          <para><methodname>onSkipInRead</methodname> will be called whenever
+          an item is skipped while reading. It should be noted that rollbacks
+          may cause the same item to be registered as skipped more than once.
+          <methodname>onSkipInWrite</methodname> will be called when an item
+          is skipped while writing. Because the item has been read
+          successfully (and not skipped), it is also provided the item itself
+          as an argument.</para>
         </section>
       </section>
     </section>
