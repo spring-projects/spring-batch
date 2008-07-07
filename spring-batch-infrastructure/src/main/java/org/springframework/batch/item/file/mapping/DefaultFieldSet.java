@@ -341,7 +341,7 @@ public class DefaultFieldSet implements FieldSet {
 			return (StringUtils.hasText(candidate)) ? new BigDecimal(candidate) : defaultValue;
 		}
 		catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Unparseable number: " + candidate);
+			throw new NumberFormatException("Unparseable number: " + candidate);
 		}
 	}
 
