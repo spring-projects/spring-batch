@@ -1182,28 +1182,18 @@
   <section>
     <title>Multi-File Input</title>
 
-    <para>It a is common requirement to process multiple files in a single
-    step (e.g. all files in given directory, or files matching given pattern).
-    <classname>MultiResourceItemReader</classname> supports multi-file input
-    by wrapping a delegate
-    <classname>ResourceAwareItemReaderItemStream</classname> (both
-    <classname>FlatFileItemReader</classname> and
-    <classname>StaxEventItemReader</classname> implement this interface).
-    <classname>MultiResourceItemReader</classname> uses the delegate to read
-    items from the resource and takes care of correct rollback functionality
-    (potentially spanning file boundaries) as well as efficient restart (skips
-    already processed files without re-reading them).</para>
+    <para>It is a common requirement to process multiple files within a single
+    Step. Assuming the files are all formatted the same, the
+    <classname>MultiResourceItemReader</classname> supports this type of input
+    for both XML and FlatFile processing. Consider the following files in a
+    directory:</para>
 
-    <para>To restart correctly file ordering needs to be preserved between job
-    runs, which may not be easy to guarantee. In such circumstances we suggest
-    to use <classname>SortedMultiResourceItemReader</classname> which first
-    sorts resources using injected <classname>Comparator</classname>. By
-    default resources are ordered alphabetically by filename.</para>
+    <programlisting>file-1.txt  file-2.txt  ignored.txt</programlisting>
 
-    <para>Below is an example configuration where the
-    <classname>SortedMultiResourceItemReader</classname> is configured to read
-    multiple flat files (note standard Spring syntax is used to specify the
-    resources):</para>
+    <para>file-1.txt and file-2.txt are formatted the same and for business
+    reasons should be processed together. The
+    <classname>MuliResourceItemReader</classname> can be used to read in both
+    files by using wildcards:</para>
 
     <programlisting>
   &lt;bean id="multiResourceReader" class="org.springframework.batch.item.SortedMultiResourceItemReader"&gt;
@@ -1212,6 +1202,14 @@
   &lt;/bean&gt;
 
 </programlisting>
+
+    <para>The referenced delegate is a simple
+    <classname>FlatFileItemReader</classname>. The above configuration will
+    read input from both files, handling rollback and restart scenarios. It
+    should be noted that, as with any ItemReader, adding extra input (in this
+    case a file) could cause potential issues when restarting. It is
+    recommended that batch jobs work with their own individual directories
+    until completed successfully. </para>
   </section>
 
   <section>
@@ -2225,7 +2223,7 @@
     &lt;property name="mapper"&gt;
       &lt;bean class="org.springframework.batch.sample.mapping.PlayerSummaryMapper" /&gt;
     &lt;/property&gt;
-    &lt;property name="saveState" value="false" /&gt;
+    <emphasis role="bold">&lt;property name="saveState" value="false" /&gt;</emphasis>
     &lt;property name="sql"&gt;
       &lt;value&gt;
       SELECT games.player_id, games.year_no, SUM(COMPLETES),
