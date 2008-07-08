@@ -109,7 +109,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	// current count of processed records
 	private long currentRecordCount = 0;
 
-	private boolean saveState = false;
+	private boolean saveState = true;
 
 	// holds the list of items for writing before they are actually written on
 	// #flush()

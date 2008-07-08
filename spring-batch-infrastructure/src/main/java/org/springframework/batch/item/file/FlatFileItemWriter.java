@@ -85,7 +85,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	private FieldSetCreator fieldSetCreator;
 
-	private boolean saveState = false;
+	private boolean saveState = true;
 
 	private boolean shouldDeleteIfExists = true;
 
