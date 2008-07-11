@@ -54,14 +54,26 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
+	/**
+	 * Public setter for the {@link DataSource}.
+	 * @param dataSource a {@link DataSource}
+	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
+	/**
+	 * Sets the database type.
+	 * @param dbType as specified by {@link DefaultDataFieldMaxValueIncrementerFactory}
+	 */
 	public void setDatabaseType(String dbType) {
 		this.databaseType = dbType;
 	}
 
+	/**
+	 * Sets the table prefix for all the batch meta-data tables.
+	 * @param tablePrefix
+	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
 	}
