@@ -28,6 +28,6 @@
 		</beans:property>
 	</beans:bean>
 
-	<handler-endpoint input-channel="requests" output-channel="replies" handler="chunkHandler" method="handleChunk" />
+	<service-activator input-channel="requests" output-channel="replies" ref="chunkHandler" method="handleChunk" />
 
 </beans:beans>

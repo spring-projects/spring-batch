@@ -22,10 +22,8 @@
 
 	<bean id="channelFactory" class="org.springframework.integration.dispatcher.DirectChannelFactory" />
 
-	<integration:handler-endpoint input-channel="requests" handler="jobLaunchingHandler" method="launch"
-		output-channel="null" return-address-overrides="true" />
-	<integration:handler-endpoint input-channel="none" output-channel="jobs" handler="jobRequestConverter"
-		method="convert" />
+	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" return-address-overrides="true" />
+	<integration:service-activator input-channel="none" output-channel="jobs" ref="jobRequestConverter" />
 
 	<bean id="jobRequestConverter" class="org.springframework.batch.integration.launch.JobRequestConverter" />
 

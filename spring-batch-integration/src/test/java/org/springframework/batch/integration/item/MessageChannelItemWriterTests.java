@@ -23,7 +23,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
-import org.springframework.batch.integration.item.MessageChannelItemWriter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.integration.channel.MessageChannel;
@@ -32,8 +31,7 @@ import org.springframework.integration.dispatcher.DirectChannel;
 import org.springframework.integration.endpoint.HandlerEndpoint;
 import org.springframework.integration.handler.MessageHandler;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.Target;
-import org.springframework.integration.util.ErrorHandler;
+import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -78,7 +76,7 @@ public class MessageChannelItemWriterTests {
 	@Test
 	public void testWriteWithRollback() throws Exception {
 		DirectChannel channel = new DirectChannel();
-		channel.subscribe(new Target() {
+		channel.subscribe(new MessageTarget() {
 			public boolean send(Message<?> message) {
 				throw new RuntimeException("Planned failure");
 			}
@@ -107,11 +105,11 @@ public class MessageChannelItemWriterTests {
 			}
 		});
 		// INT-184: this shouldn't be necessary?
-		endpoint.setErrorHandler(new ErrorHandler() {
-			public void handle(Throwable t) {
-				throw (RuntimeException)t;
-			}
-		});
+//		endpoint.setErrorHandler(new ErrorHandler() {
+//			public void handle(Throwable t) {
+//				throw (RuntimeException)t;
+//			}
+//		});
 		channel.subscribe(endpoint);
 		endpoint.start();
 		MessageChannelItemWriter writer = new MessageChannelItemWriter();

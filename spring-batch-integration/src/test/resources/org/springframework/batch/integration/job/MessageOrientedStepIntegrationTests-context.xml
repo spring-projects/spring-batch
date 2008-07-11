@@ -42,6 +42,6 @@
 		</property>
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
-	<integration:handler-endpoint handler="step" method="handle" input-channel="requests"
+	<integration:service-activator ref="step" method="handle" input-channel="requests"
 		 output-channel="replies" />
 </beans>

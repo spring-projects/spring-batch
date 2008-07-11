@@ -12,6 +12,9 @@ import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
@@ -26,14 +29,15 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 import org.springframework.context.Lifecycle;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.dispatcher.DirectChannel;
+import org.springframework.integration.endpoint.EndpointTrigger;
 import org.springframework.integration.endpoint.SourceEndpoint;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.Source;
-import org.springframework.integration.message.Target;
-import org.springframework.integration.scheduling.MessagingTaskScheduler;
+import org.springframework.integration.message.MessageSource;
+import org.springframework.integration.message.MessageTarget;
 import org.springframework.integration.scheduling.PollingSchedule;
-import org.springframework.integration.scheduling.SimpleMessagingTaskScheduler;
+import org.springframework.integration.scheduling.SimpleTaskScheduler;
+import org.springframework.integration.scheduling.TaskScheduler;
 import org.springframework.integration.util.ErrorHandler;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.StringUtils;
@@ -72,19 +76,21 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		Target handler = new Target() {
+		MessageTarget handler = new MessageTarget() {
 			public boolean send(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
 				return processed.add((String) payload);
 			}
 		};
-		Source<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		endpoint.setDispatchAdviceChain(Arrays.asList(new Advice[] { getTransactionInterceptor() }));
-		endpoint.initializeTask();
-		MessagingTaskScheduler scheduler = getSchedulerWithErrorHandler(endpoint);
+		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
+		endpoint.afterPropertiesSet();
+		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
+		trigger.addTarget(target);
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 40);
 
@@ -103,7 +109,7 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		Target handler = new Target() {
+		MessageTarget handler = new MessageTarget() {
 			public boolean send(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
@@ -111,10 +117,13 @@ public class PollableSourceRetryTests {
 				throw new RuntimeException("Planned failure: " + payload);
 			}
 		};
-		Source<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		MessagingTaskScheduler scheduler = getSchedulerWithErrorHandler(endpoint);
+		endpoint.afterPropertiesSet();
+		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
+		trigger.addTarget(endpoint);
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 20);
 
@@ -135,7 +144,7 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		Target handler = new Target() {
+		MessageTarget handler = new MessageTarget() {
 			public boolean send(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
@@ -143,12 +152,14 @@ public class PollableSourceRetryTests {
 				throw new RuntimeException("Planned failure: " + payload);
 			}
 		};
-		Source<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		endpoint.setTaskAdviceChain(Arrays.asList(new Advice[] { getTransactionInterceptor() }));
-		endpoint.initializeTask();
-		MessagingTaskScheduler scheduler = getSchedulerWithErrorHandler(endpoint);
+		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
+		endpoint.afterPropertiesSet();
+		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
+		trigger.addTarget(target);
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 20);
 
@@ -171,7 +182,7 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		Target handler = new Target() {
+		MessageTarget handler = new MessageTarget() {
 			public boolean send(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
@@ -183,12 +194,14 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		Source<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		endpoint.setTaskAdviceChain(Arrays.asList(new Advice[] { getTransactionInterceptor() }));
-		endpoint.initializeTask();
-		MessagingTaskScheduler scheduler = getSchedulerWithErrorHandler(endpoint);
+		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
+		endpoint.afterPropertiesSet();
+		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
+		trigger.addTarget(target);
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 5, 20);
 
@@ -214,7 +227,7 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		Target handler = new Target() {
+		MessageTarget handler = new MessageTarget() {
 			public boolean send(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
@@ -226,13 +239,15 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		Source<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		endpoint.setTaskAdviceChain(Arrays.asList(new Advice[] { getTransactionInterceptor(),
-				getRepeatOperationsInterceptor(3) }));
-		endpoint.initializeTask();
-		MessagingTaskScheduler scheduler = getSchedulerWithErrorHandler(endpoint);
+		// endpoint.addInterceptor(getTransactionInterceptor());
+		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getRepeatOperationsInterceptor(3), getTransactionInterceptor()}, "poll");
+		endpoint.afterPropertiesSet();
+		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
+		trigger.addTarget(target);
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 6, 100);
 
@@ -258,7 +273,7 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		Target handler = new Target() {
+		MessageTarget handler = new MessageTarget() {
 			public boolean send(Message<?> message) {
 				if (message == null) {
 					return false;
@@ -275,14 +290,17 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		Source<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		endpoint.setTaskAdviceChain(Arrays.asList(new Advice[] { getTransactionInterceptor() }));
-		endpoint
-				.setDispatchAdviceChain(Arrays.asList(new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }));
-		endpoint.initializeTask();
-		MessagingTaskScheduler scheduler = getSchedulerWithErrorHandler(endpoint);
+		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
+		// this was the old dispatch advice chain
+		channel = (MessageChannel) getProxy(channel, MessageChannel.class,
+				new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }, "send");
+		endpoint.afterPropertiesSet();
+		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
+		trigger.addTarget(target);
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 4, 20);
 
@@ -308,7 +326,7 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,fail,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		Target handler = new Target() {
+		MessageTarget handler = new MessageTarget() {
 			public boolean send(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
@@ -320,15 +338,17 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		Source<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		endpoint.setTaskAdviceChain(Arrays.asList(new Advice[] { getTransactionInterceptor(),
-				getRepeatOperationsInterceptor(3) }));
-		endpoint
-				.setDispatchAdviceChain(Arrays.asList(new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }));
-		endpoint.initializeTask();
-		MessagingTaskScheduler scheduler = getSchedulerWithErrorHandler(endpoint);
+		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getRepeatOperationsInterceptor(3), getTransactionInterceptor()}, "poll");
+		// this was the old dispatch advice chain
+		channel = (MessageChannel) getProxy(channel, MessageChannel.class,
+				new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }, "send");
+		endpoint.afterPropertiesSet();
+		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
+		trigger.addTarget(target);
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 6, 100);
 		System.err.println(processed);
@@ -352,10 +372,13 @@ public class PollableSourceRetryTests {
 	 * @param channel
 	 * @return
 	 */
-	private SourceEndpoint getSourceEndpoint(Source<Object> source, MessageChannel channel) {
+	private SourceEndpoint getSourceEndpoint(MessageSource<Object> source, MessageChannel channel) {
 		PollingSchedule schedule = new PollingSchedule(50);
 		schedule.setFixedRate(true); // used to be the default
-		return new SourceEndpoint(source, channel, schedule);
+		SourceEndpoint endpoint = new SourceEndpoint(source);
+		endpoint.setOutputChannel(channel);
+		endpoint.setSchedule(schedule);
+		return endpoint;
 	}
 
 	/**
@@ -363,7 +386,7 @@ public class PollableSourceRetryTests {
 	 * @param source
 	 * @return
 	 */
-	private DirectChannel getChannel(Target handler, Source<Object> source) {
+	private DirectChannel getChannel(MessageTarget handler, MessageSource<Object> source) {
 		DirectChannel channel = new DirectChannel(source);
 		channel.setName("input");
 		channel.subscribe(handler);
@@ -379,7 +402,7 @@ public class PollableSourceRetryTests {
 		lifecycle.stop();
 	}
 
-	private Source<Object> getPollableSource(List<String> list) {
+	private MessageSource<Object> getPollableSource(List<String> list) {
 		final ItemReader reader = new ListItemReader(list) {
 			public Object read() {
 				Object item = super.read();
@@ -387,7 +410,7 @@ public class PollableSourceRetryTests {
 				return item;
 			}
 		};
-		Source<Object> source = new Source<Object>() {
+		MessageSource<Object> source = new MessageSource<Object>() {
 			public Message<Object> receive() {
 				try {
 					return new GenericMessage<Object>(reader.read());
@@ -404,9 +427,8 @@ public class PollableSourceRetryTests {
 	}
 
 	// Workaround for INT-182
-	private MessagingTaskScheduler getSchedulerWithErrorHandler(Runnable task) {
-		SimpleMessagingTaskScheduler scheduler = new SimpleMessagingTaskScheduler(Executors
-				.newSingleThreadScheduledExecutor());
+	private TaskScheduler getSchedulerWithErrorHandler(Runnable task) {
+		SimpleTaskScheduler scheduler = new SimpleTaskScheduler(Executors.newSingleThreadScheduledExecutor());
 		scheduler.setErrorHandler(new ErrorHandler() {
 			public void handle(Throwable t) {
 				logger.error("Exception in scheduler", t);
@@ -444,8 +466,7 @@ public class PollableSourceRetryTests {
 	 * @return
 	 */
 	private TransactionInterceptor getTransactionInterceptor() {
-		return new TransactionInterceptor(new ResourcelessTransactionManager(), PropertiesConverter
-				.stringToProperties("*=PROPAGATION_REQUIRED"));
+		return new TransactionInterceptor(new ResourcelessTransactionManager(), PropertiesConverter.stringToProperties("*=PROPAGATION_REQUIRED"));
 	}
 
 	/**
@@ -459,4 +480,19 @@ public class PollableSourceRetryTests {
 		advice.setRepeatOperations(repeatTemplate);
 		return advice;
 	}
+
+	private Object getProxy(Object target, Class<?> intf, Advice[] advices, String methodName) {
+		ProxyFactory factory = new ProxyFactory(target);
+		for (int i = 0; i < advices.length; i++) {
+			DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advices[i]);
+			NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+			pointcut.addMethodName(methodName);
+			advisor.setPointcut(pointcut);
+			factory.addAdvisor(advisor);
+		}
+		factory.setProxyTargetClass(false);
+		factory.addInterface(intf);
+		return factory.getProxy();
+	}
+
 }

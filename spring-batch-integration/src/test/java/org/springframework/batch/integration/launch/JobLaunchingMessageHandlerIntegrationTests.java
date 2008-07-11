@@ -2,6 +2,7 @@ package org.springframework.batch.integration.launch;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
+import org.springframework.integration.message.MessageHandlingException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -44,7 +46,12 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	@SuppressWarnings("unchecked")
 	public void testNoReply() {
 		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job, new JobParameters()));
-		requestChannel.send(trigger);
+		try {
+			requestChannel.send(trigger);
+		} catch (MessageHandlingException e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: "+message, message.contains("reply channel"));
+		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
 		assertNull("JobExecution message received when no return address set", executionMessage);

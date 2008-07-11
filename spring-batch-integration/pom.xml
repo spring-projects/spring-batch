@@ -12,7 +12,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<properties>
-		<spring.integration.version>1.0.0.M4</spring.integration.version>
+		<spring.integration.version>1.0.0.CI-SNAPSHOT</spring.integration.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -83,6 +83,10 @@
 					<groupId>org.springframework</groupId>
 					<artifactId>org.springframework.aop</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>org.springframework.transaction</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -114,6 +118,14 @@
 				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>org.springframework.transaction</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>com.springsource.org.apache.commons.net</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.oro</groupId>
+					<artifactId>com.springsource.org.apache.oro</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

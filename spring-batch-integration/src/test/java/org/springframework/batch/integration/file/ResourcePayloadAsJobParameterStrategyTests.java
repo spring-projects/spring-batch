@@ -56,7 +56,7 @@ public class ResourcePayloadAsJobParameterStrategyTests {
 			fail("Expected ClassCastException");
 		} catch (ClassCastException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: "+message, message.contains("String cannot be cast"));
+			assertTrue("Wrong message: "+message, message.contains("String"));
 		}
 		
 	}

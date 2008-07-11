@@ -31,9 +31,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.integration.JobRepositorySupport;
-import org.springframework.batch.integration.job.JobExecutionRequest;
-import org.springframework.batch.integration.job.MessageOrientedStep;
-import org.springframework.batch.integration.job.StepExecutionTimeoutException;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.integration.channel.MessageChannel;
@@ -41,7 +38,7 @@ import org.springframework.integration.channel.ThreadLocalChannel;
 import org.springframework.integration.dispatcher.DirectChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.Target;
+import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -121,7 +118,7 @@ public class MessageOrientedStepTests {
 
 	@Test
 	public void testVanillaExecute() throws Exception {
-		requestChannel.subscribe(new Target() {
+		requestChannel.subscribe(new MessageTarget() {
 			public boolean send(Message<?> message) {
 				JobExecutionRequest jobExecution = (JobExecutionRequest) message.getPayload();
 				jobExecution.setStatus(BatchStatus.COMPLETED);
@@ -133,7 +130,7 @@ public class MessageOrientedStepTests {
 
 	@Test
 	public void testExecuteWithFailure() throws Exception {
-		requestChannel.subscribe(new Target() {
+		requestChannel.subscribe(new MessageTarget() {
 			public boolean send(Message<?> message) {
 				JobExecutionRequest jobExecution = (JobExecutionRequest) message.getPayload();
 				jobExecution.registerThrowable(new RuntimeException("Planned failure"));
