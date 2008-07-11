@@ -60,7 +60,9 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
 	public Job createJob() {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path }, parent);
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path }, false, parent);
+		context.setDisplayName("Job ApplicationContext "+beanName);
+		context.refresh();
 		Job job = (Job) context.getBean(beanName, Job.class);
 		return new ContextClosingJob(job, context);
 	}
