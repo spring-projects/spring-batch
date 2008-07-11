@@ -122,6 +122,18 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals(line.substring(15, 25).trim(), tokens.readString(2));
 		assertEquals(line.substring(25).trim(), tokens.readString(3));		
 	}
+	
+	public void testFillerAtEnd() throws Exception {
+		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,15),new Range(16,25),new Range(26,27),new Range(34)});
+		// test another type of record
+		line = "H2   123456    12345     12-123456";
+		FieldSet tokens = tokenizer.tokenize(line);
+		assertEquals(5, tokens.getFieldCount());
+		assertEquals(line.substring(0, 5).trim(), tokens.readString(0));
+		assertEquals(line.substring(5, 15).trim(), tokens.readString(1));
+		assertEquals(line.substring(15, 25).trim(), tokens.readString(2));
+		assertEquals(line.substring(25, 27).trim(), tokens.readString(3));		
+	}
 
 	public void testTokenizerInvalidSetup() {
 		tokenizer.setNames(new String[] {"a", "b"});

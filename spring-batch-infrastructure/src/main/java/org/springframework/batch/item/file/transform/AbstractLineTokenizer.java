@@ -65,10 +65,6 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @return the resulting tokens
 	 */
 	public FieldSet tokenize(String line) {
-
-//		if (line == null || line.length()==0) {
-//			return new DefaultFieldSet(new String[0]);
-//		}
 		
 		if(line == null){
 			line = "";

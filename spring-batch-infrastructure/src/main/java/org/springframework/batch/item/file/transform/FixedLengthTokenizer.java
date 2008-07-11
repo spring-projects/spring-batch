@@ -47,17 +47,30 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 		calculateMaxRange(ranges);
 	}
 	
+	/*
+	 * Calculate the highest value within an array of ranges.  The ranges aren't
+	 * necessarily in order.  For example: "5-10, 1-4,11-15".  Furthermore, there
+	 * isn't always a min and max, such as: "1,4-20, 22"
+	 */
 	private void calculateMaxRange(Range[] ranges){
 		if(ranges == null || ranges.length == 0){
 			maxRange = 0;
 			return;
 		}
 		
-		maxRange = ranges[0].getMax();
+		maxRange = ranges[0].getMin();
 		
 		for(int i = 0; i < ranges.length; i++){
-			if(ranges[i].getMax() > maxRange){
-				maxRange = ranges[i].getMax();
+			int upperBound;
+			if(ranges[i].hasMaxValue()){
+				upperBound = ranges[i].getMax();
+			}
+			else{
+				upperBound = ranges[i].getMin();
+			}
+			
+			if(upperBound > maxRange){
+				maxRange = upperBound;
 			}
 		}
 	}
