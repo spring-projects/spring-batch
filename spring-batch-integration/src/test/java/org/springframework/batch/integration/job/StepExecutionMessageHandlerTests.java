@@ -16,7 +16,6 @@
 package org.springframework.batch.integration.job;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -36,8 +35,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.JobRepositorySupport;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.batch.integration.StepSupport;
-import org.springframework.batch.integration.job.JobExecutionRequest;
-import org.springframework.batch.integration.job.StepExecutionMessageHandler;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.annotation.Required;
@@ -94,14 +91,13 @@ public class StepExecutionMessageHandlerTests {
 	public void testHandleWithInputs() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		handler.setInputKeys(new String[] { "foo" });
 		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution(
 				new JobSupport("job"), new JobParameters()));
-		jobExecutionRequest.setAttribute("foo", "bar");
+		jobExecutionRequest.getJobExecution().getExecutionContext().putString("foo", "bar");
 		JobExecutionRequest message = handler.handle(jobExecutionRequest);
 		assertEquals(1, message.getJobExecution().getStepExecutions().size());
-		StepExecution stepExecution = (StepExecution) message.getJobExecution().getStepExecutions().iterator().next();
-		assertTrue(stepExecution.getExecutionContext().containsKey("foo"));
+		JobExecution jobExecution = message.getJobExecution();
+		assertTrue(jobExecution .getExecutionContext().containsKey("foo"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -109,21 +105,20 @@ public class StepExecutionMessageHandlerTests {
 	public void testHandleWithInputsAndOutputs() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		handler.setInputKeys(new String[] { "foo" });
-		handler.setOutputKeys(new String[] { "bar" });
 		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution(
 				new JobSupport("job"), new JobParameters()));
-		jobExecutionRequest.setAttribute("foo", "bar");
+		jobExecutionRequest.getJobExecution().getExecutionContext().putString("foo", "bar");
 		// The step has to add the output attribute to the context
 		handler.setStep(new StepSupport("step") {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException {
-				stepExecution.getExecutionContext().putString("bar", "spam");
+				stepExecution.getJobExecution().getExecutionContext().putString("bar", "spam");
 			}
 		});
-		handler.handle(jobExecutionRequest);
-		assertFalse(jobExecutionRequest.hasAttribute("foo"));
-		assertTrue(jobExecutionRequest.hasAttribute("bar"));
+		JobExecutionRequest message = handler.handle(jobExecutionRequest);
+		JobExecution jobExecution = message.getJobExecution();
+		assertTrue(jobExecution .getExecutionContext().containsKey("foo"));
+		assertTrue(jobExecution .getExecutionContext().containsKey("bar"));
 	}
 
 	@SuppressWarnings("unchecked")

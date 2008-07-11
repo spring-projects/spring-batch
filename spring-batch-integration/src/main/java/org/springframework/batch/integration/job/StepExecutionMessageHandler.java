@@ -38,10 +38,6 @@ public class StepExecutionMessageHandler {
 
 	private JobRepository jobRepository;
 
-	private String[] inputKeys = new String[0];
-
-	private String[] outputKeys = new String[0];
-
 	/**
 	 * Public setter for the {@link Step}.
 	 * @param step the step to set
@@ -49,25 +45,6 @@ public class StepExecutionMessageHandler {
 	@Required
 	public void setStep(Step step) {
 		this.step = step;
-	}
-
-	/**
-	 * Public setter for the input keys. Attributes from the incoming request
-	 * will be added to the execution context for the step.
-	 * @param inputKeys the inputKeys to set
-	 */
-	public void setInputKeys(String[] inputKeys) {
-		this.inputKeys = inputKeys;
-	}
-
-	/**
-	 * Public setter for the output keys. Attributes from a successful step
-	 * execution context will be added to the request before it is handed on to
-	 * the next handler.
-	 * @param outputKeys the outputKeys to set
-	 */
-	public void setOutputKeys(String[] outputKeys) {
-		this.outputKeys = outputKeys;
 	}
 
 	/**
@@ -114,7 +91,7 @@ public class StepExecutionMessageHandler {
 						.getExitStatus().equals(ExitStatus.FINISHED)) ? true : false;
 
 				if (!isRestart || lastStepExecution == null) {
-					stepExecution.setExecutionContext(getExecutionContextWithInputs(request));
+					stepExecution.setExecutionContext(new ExecutionContext());
 				}
 
 				step.execute(stepExecution);
@@ -133,47 +110,8 @@ public class StepExecutionMessageHandler {
 			throw e;
 		}
 
-		// TODO: could a failure here could cause job to be in inconsistent
-		// state?
-		getMessageWithOutputs(request, stepExecution.getExecutionContext());
 		return request;
 
-	}
-
-	/**
-	 * Clear the message header of the input attributes and add in output
-	 * attributes from the execution context.
-	 * @param request
-	 * @param executionContext
-	 * @return
-	 */
-	private JobExecutionRequest getMessageWithOutputs(JobExecutionRequest request, ExecutionContext executionContext) {
-		for (int i = 0; i < inputKeys.length; i++) {
-			String key = inputKeys[i];
-			request.removeAttribute(key);
-		}
-		for (int i = 0; i < outputKeys.length; i++) {
-			String key = outputKeys[i];
-			request.setAttribute(key, executionContext.get(key));
-		}
-		// TODO: is this safe, or should we build a new message?
-		return request;
-	}
-
-	/**
-	 * Generate a new execution context with all the attributes requested from
-	 * the message (if they exist).
-	 * 
-	 * @return an {@link ExecutionContext}
-	 */
-	private ExecutionContext getExecutionContextWithInputs(JobExecutionRequest request) {
-		ExecutionContext executionContext = new ExecutionContext();
-		for (int i = 0; i < inputKeys.length; i++) {
-			String key = inputKeys[i];
-			Object value = request.getAttribute(key);
-			executionContext.put(key, value);
-		}
-		return executionContext;
 	}
 
 	/**

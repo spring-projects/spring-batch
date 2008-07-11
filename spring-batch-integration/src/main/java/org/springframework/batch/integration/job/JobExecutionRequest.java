@@ -17,7 +17,6 @@ package org.springframework.batch.integration.job;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.core.AttributeAccessorSupport;
 
 /**
  * Encapsulation of a request to execute a job execution through a message flow
@@ -35,7 +34,7 @@ import org.springframework.core.AttributeAccessorSupport;
  * @author Dave Syer
  * 
  */
-public class JobExecutionRequest extends AttributeAccessorSupport {
+public class JobExecutionRequest {
 
 	private JobExecution jobExecution;
 
