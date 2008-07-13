@@ -183,7 +183,7 @@ public class StepExecutionMessageHandlerTests {
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());
 		StepExecution stepExecution = (StepExecution) jobExecution.getStepExecutions().iterator().next();
-		assertEquals(BatchStatus.STARTING, stepExecution.getStatus());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		// We expect to get the context from the previous execution, even if we
 		// do not execute
 		assertTrue(stepExecution.getExecutionContext().containsKey("foo"));

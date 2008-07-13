@@ -346,7 +346,6 @@ public class SimpleJobTests extends TestCase {
 			assertSame(exception, e);
 		}
 		assertTrue(step1.passedInStepContext.isEmpty());
-		System.err.println(step2.passedInStepContext);
 		assertFalse(step2.passedInStepContext.isEmpty());
 
 	}
@@ -504,20 +503,24 @@ public class SimpleJobTests extends TestCase {
 
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
+				stepExecution.setStatus(BatchStatus.FAILED);
 				throw (RuntimeException) exception;
 			}
 			if (exception instanceof Error) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
+				stepExecution.setStatus(BatchStatus.FAILED);
 				throw (Error) exception;
 			}
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
+				stepExecution.setStatus(BatchStatus.FAILED);
 				throw (JobInterruptedException) exception;
 			}
 			if (runnable != null) {
 				runnable.run();
 			}
 			stepExecution.setExitStatus(ExitStatus.FINISHED);
+			stepExecution.setStatus(BatchStatus.COMPLETED);
 
 		}
 

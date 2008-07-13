@@ -24,7 +24,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.integration.annotation.Handler;
 
@@ -62,7 +61,6 @@ public class StepExecutionMessageHandler {
 	@Handler
 	public JobExecutionRequest handle(JobExecutionRequest request) {
 
-
 		// Hand off immediately if the job has already failed
 		if (isComplete(request)) {
 			return request;
@@ -87,14 +85,22 @@ public class StepExecutionMessageHandler {
 			// skipped
 			if (shouldStart(lastStepExecution, step)) {
 
-				boolean isRestart = (jobRepository.getStepExecutionCount(jobInstance, step) > 0 && !lastStepExecution
-						.getExitStatus().equals(ExitStatus.FINISHED)) ? true : false;
-
-				if (!isRestart || lastStepExecution == null) {
+				if (!isRestart(jobInstance, lastStepExecution)) {
 					stepExecution.setExecutionContext(new ExecutionContext());
 				}
 
 				step.execute(stepExecution);
+
+			}
+			else if (lastStepExecution != null) {
+
+				/*
+				 * We only set these if the step is not going to execute. They
+				 * might be needed by the next step to receive the request, but
+				 * they won't be persisted because the step is not executed.
+				 */
+				stepExecution.setStatus(lastStepExecution.getStatus());
+				stepExecution.setExitStatus(lastStepExecution.getExitStatus());
 
 			}
 
@@ -112,6 +118,15 @@ public class StepExecutionMessageHandler {
 
 		return request;
 
+	}
+
+	/**
+	 * @param jobInstance
+	 * @param lastStepExecution
+	 * @return
+	 */
+	private boolean isRestart(JobInstance jobInstance, StepExecution lastStepExecution) {
+		return (lastStepExecution != null && !lastStepExecution.getStatus().equals(BatchStatus.COMPLETED));
 	}
 
 	/**
@@ -151,7 +166,7 @@ public class StepExecutionMessageHandler {
 
 		if (stepStatus == BatchStatus.UNKNOWN) {
 			throw new JobExecutionException("Cannot restart step from UNKNOWN status.  "
-					+ "The last execution ended with a failure that could not be rolled back, "
+					+ "The last execution may have ended with a failure that could not be rolled back, "
 					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 

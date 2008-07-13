@@ -194,9 +194,9 @@ public class RetryTemplate implements RetryOperations {
 				}
 
 				/*
-				 * An external policy that can retry should have rethrown the
-				 * exception by now - i.e. we shouldn't get this far for an
-				 * external policy if it can retry.
+				 * A stateful policy that can retry should have rethrown the
+				 * exception by now - i.e. we shouldn't get this far for a
+				 * stateful policy if it can retry.
 				 */
 			}
 

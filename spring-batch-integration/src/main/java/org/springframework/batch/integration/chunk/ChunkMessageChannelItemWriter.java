@@ -14,7 +14,6 @@ import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.HibernateAwareItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.integration.channel.MessageChannel;
@@ -30,7 +29,7 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
-	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
+	private static final String ITEMS_PROCESSED = ChunkMessageChannelItemWriter.class.getName() + ".ITEMS_PROCESSED";
 
 	static final String ACTUAL = "ACTUAL";
 
@@ -47,6 +46,15 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 
 	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
 
+	/**
+	 * Public setter for the throttle limit. This limits the number of pending
+	 * requests for chunk processing to avoid overwhelming the receivers.
+	 * @param throttleLimit the throttle limit to set
+	 */
+	public void setThrottleLimit(long throttleLimit) {
+		this.throttleLimit = throttleLimit;
+	}
+
 	public void setReplyChannel(MessageChannel replyChannel) {
 		this.replyChannel = replyChannel;
 	}
@@ -62,7 +70,10 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 	}
 
 	/**
-	 * Flush the buffer.
+	 * Flush the buffer, sending the items as a chunk message to be processed by
+	 * a {@link ChunkHandler}. To avoid overwhelming the receivers, this method
+	 * will block until the number of chunks pending is less than the throttle
+	 * limit.
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#flush()
 	 */
@@ -71,7 +82,7 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 		bindTransactionResources(); // in case we are called outside a
 		// transaction
 
-		// Block until expecting < throttle limit - can Spring
+		// Block until expecting <= throttle limit - can Spring
 		// Integration do that for me?
 		while (localState.getExpecting() > throttleLimit) {
 			getNextResult(100);
@@ -83,7 +94,7 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 
 			logger.debug("Dispatching chunk: " + processed);
 			ChunkRequest request = new ChunkRequest(processed, localState.getJobId(), localState.getSkipCount());
-			GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(request );
+			GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(request);
 			requestChannel.send(message);
 			localState.expected++;
 
@@ -95,7 +106,7 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 		unbindTransactionResources();
 
 	}
-	
+
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		localState.setStepExecution(stepExecution);
@@ -169,8 +180,9 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 		if (message != null) {
 			ChunkResponse payload = (ChunkResponse) message.getPayload();
 			Long jobInstanceId = payload.getJobId();
-			Assert.state(jobInstanceId!=null, "Message did not contain job instance id.");
-			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["+jobInstanceId+"] should have been ["+localState.getJobId()+"].");
+			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
+			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
+					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
 			localState.actual++;
 			ExitStatus result = payload.getExitStatus();
 			// TODO: check it can never be ExitStatus.FINISHED?
