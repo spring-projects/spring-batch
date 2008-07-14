@@ -38,7 +38,7 @@ public class ExampleJobConfigurationTests extends AbstractDependencyInjectionSpr
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
 	 */
 	protected String[] getConfigLocations() {
-		return new String[] {"example/simpleJob.xml"};
+		return new String[] {"/META-INF/spring/module-context.xml"};
 	}
 	
 	public void testSimpleProperties() throws Exception {

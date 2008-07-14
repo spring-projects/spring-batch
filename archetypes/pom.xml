@@ -2,9 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-archetypes</artifactId>
-	<version>1.1.0.DEV-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Archetypes</name>
 	<description>
@@ -17,6 +15,13 @@
 	copy one into Eclipse and use Q4E to manage the dependencies. 
 ]]>
 	</description>
+
+	<parent>
+		<groupId>org.springframework.batch</groupId>
+		<artifactId>spring-batch</artifactId>
+		<version>1.1.0.DEV-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
 
 	<modules>
 		<module>simple-cli</module>

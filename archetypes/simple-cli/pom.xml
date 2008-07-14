@@ -19,8 +19,9 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.5</spring.framework.version>
+		<bundle.symbolic.name>${pom.groupId}.sample.archetype.cli</bundle.symbolic.name>
 	</properties>
-	
+
 	<profiles>
 		<profile>
 			<id>strict</id>
@@ -77,6 +78,13 @@
 	</dependencies>
 
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.springframework.aws</groupId>
+				<artifactId>spring-aws-maven</artifactId>
+				<version>1.2.2</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -99,7 +107,7 @@
 					<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
 					<arguments>
 						<!-- job configuration file -->
-						<argument>example/simpleJob.xml</argument>
+						<argument>classpath:/META-INF/spring/module-context.xml</argument>
 						<!-- job name -->
 						<argument>job1</argument>
 					</arguments>
@@ -114,5 +122,23 @@
 			<url>http://repository.codehaus.org/</url>
 		</pluginRepository>
 	</pluginRepositories>
+
+	<distributionManagement>
+		<downloadUrl>http://www.springframework.org/download</downloadUrl>
+		<site>
+			<id>staging</id>
+			<url>file:///${user.dir}/archetypes/simple-cli/target/staging</url>
+		</site>
+		<repository>
+			<id>spring-milestone</id>
+			<name>Spring Milestone Repository</name>
+			<url>s3://maven.springframework.org/milestone</url>
+		</repository>
+		<snapshotRepository>
+			<id>spring-snapshot</id>
+			<name>Spring Snapshot Repository</name>
+			<url>s3://maven.springframework.org/snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 </project>
