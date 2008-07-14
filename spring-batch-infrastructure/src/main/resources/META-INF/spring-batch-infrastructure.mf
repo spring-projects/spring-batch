@@ -1,5 +1,6 @@
 Bundle-SymbolicName: org.springframework.batch.infrastructure
-Bundle-Version: 1.0.0
+Bundle-Version: 1.1.0
+Bundle-ManifestVersion: 2
 Import-Template: 
  com.ibatis.sqlmap.*;version="[2.3.0, 3.0.0)";resolution:=optional,
  edu.emory.mathcs.backport.*;version="[3.0.0, 4.0.0)";resolution:=optional,
