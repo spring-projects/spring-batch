@@ -196,6 +196,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobExecutionIncrementer);
 		ecDao.setJdbcTemplate(getJdbcTemplate());
 		ecDao.setLobHandler(lobHandler);
+		ecDao.setTablePrefix(getTablePrefix());
 		ecDao.afterPropertiesSet();
 	}
 

@@ -247,6 +247,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
 		ecDao.setJdbcTemplate(getJdbcTemplate());
 		ecDao.setLobHandler(lobHandler);
+		ecDao.setTablePrefix(getTablePrefix());
 		ecDao.afterPropertiesSet();
 	}
 

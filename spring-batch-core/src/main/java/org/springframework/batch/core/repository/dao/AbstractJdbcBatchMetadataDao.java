@@ -25,6 +25,10 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
 	}
+	
+	protected String getTablePrefix() {
+		return tablePrefix;
+	}
 
 	/**
 	 * Public setter for the table prefix property. This will be prefixed to all
