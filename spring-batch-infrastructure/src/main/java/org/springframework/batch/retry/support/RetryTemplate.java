@@ -176,7 +176,7 @@ public class RetryTemplate implements RetryOperations {
 					retryPolicy.registerThrowable(context, throwable);
 
 					if (retryPolicy.shouldRethrow(context)) {
-						logger.debug("Abort retry for policy: count=" + context.getRetryCount());
+						logger.debug("Rethrow in retry for policy: count=" + context.getRetryCount());
 						rethrow(throwable);
 					}
 

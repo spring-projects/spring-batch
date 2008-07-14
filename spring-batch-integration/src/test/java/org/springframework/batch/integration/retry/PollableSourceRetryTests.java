@@ -19,6 +19,9 @@ import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatCallback;
+import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -31,6 +34,7 @@ import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.dispatcher.DirectChannel;
 import org.springframework.integration.endpoint.EndpointTrigger;
 import org.springframework.integration.endpoint.SourceEndpoint;
+import org.springframework.integration.endpoint.interceptor.EndpointInterceptorAdapter;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageSource;
@@ -38,7 +42,7 @@ import org.springframework.integration.message.MessageTarget;
 import org.springframework.integration.scheduling.PollingSchedule;
 import org.springframework.integration.scheduling.SimpleTaskScheduler;
 import org.springframework.integration.scheduling.TaskScheduler;
-import org.springframework.integration.util.ErrorHandler;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.StringUtils;
 
@@ -68,6 +72,8 @@ public class PollableSourceRetryTests {
 		}
 	};
 
+	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();;
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSimpleTransactionalPolling() throws Exception {
@@ -86,10 +92,10 @@ public class PollableSourceRetryTests {
 		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
+		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
 		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(target);
+		trigger.addTarget(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 40);
@@ -155,10 +161,10 @@ public class PollableSourceRetryTests {
 		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
+		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
 		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(target);
+		trigger.addTarget(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 20);
@@ -197,13 +203,13 @@ public class PollableSourceRetryTests {
 		MessageSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
+		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
 		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(target);
+		trigger.addTarget(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
-		waitForResults(scheduler, 5, 20);
+		waitForResults(scheduler, 5, 30);
 
 		assertEquals(5, processed.size());
 		assertFalse("No messages got to processor", processed.isEmpty());
@@ -243,10 +249,11 @@ public class PollableSourceRetryTests {
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
 		// endpoint.addInterceptor(getTransactionInterceptor());
-		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getRepeatOperationsInterceptor(3), getTransactionInterceptor()}, "poll");
+		addTransactionInterceptor(endpoint);
+		addRepeatInterceptor(endpoint, 3);
 		endpoint.afterPropertiesSet();
 		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(target);
+		trigger.addTarget(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 6, 100);
@@ -292,17 +299,17 @@ public class PollableSourceRetryTests {
 
 		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel channel = getChannel(handler, source);
-		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getTransactionInterceptor()}, "poll");
 		// this was the old dispatch advice chain
 		channel = (MessageChannel) getProxy(channel, MessageChannel.class,
 				new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }, "send");
+		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
+		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
 		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(target);
+		trigger.addTarget(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
-		waitForResults(scheduler, 4, 20);
+		waitForResults(scheduler, 4, 40);
 
 		assertEquals(4, processed.size());
 		assertEquals(1, recovered.size());
@@ -340,14 +347,15 @@ public class PollableSourceRetryTests {
 
 		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel channel = getChannel(handler, source);
-		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
-		MessageTarget target = (MessageTarget) getProxy(endpoint, MessageTarget.class, new Advice[] {getRepeatOperationsInterceptor(3), getTransactionInterceptor()}, "poll");
 		// this was the old dispatch advice chain
 		channel = (MessageChannel) getProxy(channel, MessageChannel.class,
 				new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }, "send");
+		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
+		addTransactionInterceptor(endpoint);
+		addRepeatInterceptor(endpoint, 3);
 		endpoint.afterPropertiesSet();
 		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(target);
+		trigger.addTarget(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 6, 100);
@@ -373,7 +381,7 @@ public class PollableSourceRetryTests {
 	 * @return
 	 */
 	private SourceEndpoint getSourceEndpoint(MessageSource<Object> source, MessageChannel channel) {
-		PollingSchedule schedule = new PollingSchedule(50);
+		PollingSchedule schedule = new PollingSchedule(100);
 		schedule.setFixedRate(true); // used to be the default
 		SourceEndpoint endpoint = new SourceEndpoint(source);
 		endpoint.setOutputChannel(channel);
@@ -426,15 +434,15 @@ public class PollableSourceRetryTests {
 		return source;
 	}
 
-	// Workaround for INT-182
 	private TaskScheduler getSchedulerWithErrorHandler(Runnable task) {
 		SimpleTaskScheduler scheduler = new SimpleTaskScheduler(Executors.newSingleThreadScheduledExecutor());
-		scheduler.setErrorHandler(new ErrorHandler() {
-			public void handle(Throwable t) {
-				logger.error("Exception in scheduler", t);
-				// throw (RuntimeException)t;
-			}
-		});
+		// Workaround for INT-182
+//		scheduler.setErrorHandler(new ErrorHandler() {
+//			public void handle(Throwable t) {
+//				logger.error("Exception in scheduler", t);
+//				// throw (RuntimeException)t;
+//			}
+//		});
 		scheduler.schedule(task);
 		return scheduler;
 	}
@@ -454,7 +462,9 @@ public class PollableSourceRetryTests {
 				if (data.getClass().isArray()) {
 					data = ((Object[]) data)[0];
 				}
-				recovered.add(((Message<String>) data).getPayload());
+				String payload = ((Message<String>) data).getPayload();
+				logger.debug("Recovering: "+payload);
+				recovered.add(payload);
 				return true;
 			}
 		});
@@ -463,10 +473,44 @@ public class PollableSourceRetryTests {
 	}
 
 	/**
+	 * @param endpoint
+	 */
+	private void addTransactionInterceptor(SourceEndpoint endpoint) {
+		org.springframework.integration.endpoint.interceptor.TransactionInterceptor transactionInterceptor = new org.springframework.integration.endpoint.interceptor.TransactionInterceptor(transactionManager);
+		transactionInterceptor.afterPropertiesSet();
+		endpoint.addInterceptor(transactionInterceptor);
+	}
+	
+	/**
 	 * @return
 	 */
 	private TransactionInterceptor getTransactionInterceptor() {
-		return new TransactionInterceptor(new ResourcelessTransactionManager(), PropertiesConverter.stringToProperties("*=PROPAGATION_REQUIRED"));
+		return new TransactionInterceptor(transactionManager, PropertiesConverter.stringToProperties("*=PROPAGATION_REQUIRED"));
+	}
+
+	/**
+	 * @param endpoint
+	 * @param commitInterval
+	 */
+	private void addRepeatInterceptor(SourceEndpoint endpoint, int commitInterval) {
+		final RepeatTemplate repeatTemplate = new RepeatTemplate();
+		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+		endpoint.addInterceptor(new EndpointInterceptorAdapter() {
+			private boolean value;
+			@Override
+			public boolean aroundSend(final Message<?> message, final MessageTarget endpoint) {
+				repeatTemplate.iterate(new RepeatCallback() {
+					public ExitStatus doInIteration(RepeatContext context) throws Exception {
+						doAroundSend(message, endpoint);
+						return ExitStatus.CONTINUABLE;
+					}
+				});
+				return value;
+			}
+			private void doAroundSend(Message<?> message, MessageTarget endpoint) {
+				value = super.aroundSend(message, endpoint);
+			}
+		});
 	}
 
 	/**
