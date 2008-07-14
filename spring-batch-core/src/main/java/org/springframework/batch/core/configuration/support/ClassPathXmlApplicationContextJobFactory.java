@@ -21,7 +21,9 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.configuration.JobFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -32,13 +34,30 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Dave Syer
  * 
  */
-public class ClassPathXmlApplicationContextJobFactory implements JobFactory {
+public class ClassPathXmlApplicationContextJobFactory implements JobFactory, ApplicationContextAware {
 
 	final private String beanName;
 
 	final private String path;
 
-	final private ApplicationContext parent;
+	private ApplicationContext parent;
+	
+	/**
+	 * Setter for the parent application context.
+	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+	 */
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		parent = applicationContext;
+	}
+
+	/**
+	 * @param beanName the id of the {@link Job} in the application context to
+	 * be created
+	 * @param path the path to the XML configuration containing the {@link Job}
+	 */
+	public ClassPathXmlApplicationContextJobFactory(String beanName, String path) {
+		this(beanName, path, null);
+	}
 
 	/**
 	 * @param beanName the id of the {@link Job} in the application context to

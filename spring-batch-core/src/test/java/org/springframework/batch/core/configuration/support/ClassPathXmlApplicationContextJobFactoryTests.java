@@ -25,7 +25,7 @@ import org.springframework.util.ClassUtils;
  */
 public class ClassPathXmlApplicationContextJobFactoryTests extends TestCase {
 	
-	private ClassPathXmlApplicationContextJobFactory factory = new ClassPathXmlApplicationContextJobFactory("test-job", ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"), null);
+	private ClassPathXmlApplicationContextJobFactory factory = new ClassPathXmlApplicationContextJobFactory("test-job", ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"));
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.configuration.support.ClassPathXmlApplicationContextJobFactory#createJob()}.
