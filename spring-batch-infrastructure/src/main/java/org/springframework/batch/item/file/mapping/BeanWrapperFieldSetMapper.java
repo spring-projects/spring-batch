@@ -42,18 +42,19 @@ import org.springframework.validation.ObjectError;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
- * {@link DefaultFieldSet} to be mapped should have field name meta data corresponding
- * to bean property paths in a prototype instance of the desired type. The
- * prototype instance is initialized either by referring to to object by bean
- * name in the enclosing BeanFactory, or by providing a class to instantiate
- * reflectively.<br/>
+ * {@link DefaultFieldSet} to be mapped should have field name meta data
+ * corresponding to bean property paths in a prototype instance of the desired
+ * type. The prototype instance is initialized either by referring to to object
+ * by bean name in the enclosing BeanFactory, or by providing a class to
+ * instantiate reflectively.<br/>
  * 
  * Nested property paths, including indexed properties in maps and collections,
- * can be referenced by the {@link DefaultFieldSet} names. They will be converted to
- * nested bean properties inside the prototype. The {@link DefaultFieldSet} and the
- * prototype are thus tightly coupled by the fields that are available and those
- * that can be initialized. If some of the nested properties are optional (e.g.
- * collection members) they need to be removed by a post processor.<br/>
+ * can be referenced by the {@link DefaultFieldSet} names. They will be
+ * converted to nested bean properties inside the prototype. The
+ * {@link DefaultFieldSet} and the prototype are thus tightly coupled by the
+ * fields that are available and those that can be initialized. If some of the
+ * nested properties are optional (e.g. collection members) they need to be
+ * removed by a post processor.<br/>
  * 
  * Property name matching is "fuzzy" in the sense that it tolerates close
  * matches, as long as the match is unique. For instance:
@@ -76,11 +77,12 @@ import org.springframework.validation.ObjectError;
  * @author Dave Syer
  * 
  */
-public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar implements FieldSetMapper, BeanFactoryAware, InitializingBean {
+public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar implements FieldSetMapper,
+		BeanFactoryAware, InitializingBean {
 
 	private String name;
 
-	private Class type;
+	private Class<?> type;
 
 	private BeanFactory beanFactory;
 
@@ -91,7 +93,9 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
+	 * @see
+	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
+	 * .springframework.beans.factory.BeanFactory)
 	 */
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
@@ -140,27 +144,27 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	}
 
 	/**
-	 * Map the {@link DefaultFieldSet} to an object retrieved from the enclosing Spring
-	 * context, or to a new instance of the required type if no prototype is
-	 * available.
+	 * Map the {@link DefaultFieldSet} to an object retrieved from the enclosing
+	 * Spring context, or to a new instance of the required type if no prototype
+	 * is available.
 	 * 
-	 * @throws NotWritablePropertyException if the {@link DefaultFieldSet} contains a
-	 * field that cannot be mapped to a bean property.
+	 * @throws NotWritablePropertyException if the {@link DefaultFieldSet}
+	 * contains a field that cannot be mapped to a bean property.
 	 * @throws BindingException if there is a type conversion or other error (if
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
 	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet)
 	 */
+	@SuppressWarnings("unchecked")
 	public Object mapLine(FieldSet fs) {
 		Object copy = getBean();
 		DataBinder binder = createBinder(copy);
 		binder.bind(new MutablePropertyValues(getBeanProperties(copy, fs.getProperties())));
 		if (binder.getBindingResult().hasErrors()) {
-			List errors = binder.getBindingResult().getAllErrors();
-			List messages = new ArrayList(errors.size());
-			for (Iterator iterator = errors.iterator(); iterator.hasNext();) {
-				ObjectError error = (ObjectError) iterator.next();
+			List<ObjectError> errors = binder.getBindingResult().getAllErrors();
+			List<String> messages = new ArrayList<String>(errors.size());
+			for (ObjectError error : errors) {
 				messages.add(error.getDefaultMessage());
 			}
 			throw new BindingException("" + messages);
@@ -189,9 +193,8 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 
 	/**
 	 * Initialize a new binder instance. This hook allows customization of
-	 * binder settings such as the
-	 * {@link DataBinder#initDirectFieldAccess() direct field access}. Called
-	 * by {@link #createBinder(Object)}.
+	 * binder settings such as the {@link DataBinder#initDirectFieldAccess()
+	 * direct field access}. Called by {@link #createBinder(Object)}.
 	 * <p>
 	 * Note that registration of custom property editors should be done in
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}, not here! This

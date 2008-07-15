@@ -48,22 +48,20 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 
 	private MultiResourceIndex index = new MultiResourceIndex();
 
-	private List itemBuffer = new ArrayList();
+	private List<Object> itemBuffer = new ArrayList<Object>();
 
-	private ListIterator itemBufferIterator = null;
+	private ListIterator<Object> itemBufferIterator = null;
 
 	private boolean shouldReadBuffer = false;
 
 	private boolean saveState = false;
 
-	private Comparator comparator = new Comparator() {
+	private Comparator<Resource> comparator = new Comparator<Resource>() {
 
 		/**
 		 * Compares resource filenames.
 		 */
-		public int compare(Object o1, Object o2) {
-			Resource r1 = (Resource) o1;
-			Resource r2 = (Resource) o2;
+		public int compare(Resource r1, Resource r2) {
 			return r1.getFilename().compareTo(r2.getFilename());
 		}
 
@@ -253,7 +251,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * @param comparator used to order the injected resources, by default
 	 * compares {@link Resource#getFilename()} values.
 	 */
-	public void setComparator(Comparator comparator) {
+	public void setComparator(Comparator<Resource> comparator) {
 		this.comparator = comparator;
 	}
 

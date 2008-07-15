@@ -25,7 +25,6 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.ClearFailedException;
@@ -93,12 +92,12 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	private int bufferSize = OutputState.DEFAULT_BUFFER_SIZE;
 
-	private List lineBuffer = new ArrayList();
+	private List<String> lineBuffer = new ArrayList<String>();
 
-	private List headerLines = new ArrayList();
+	private List<String> headerLines = new ArrayList<String>();
 
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
-	
+
 	public FlatFileItemWriter() {
 		setName(ClassUtils.getShortName(FlatFileItemWriter.class));
 	}
@@ -207,15 +206,15 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 * 
 	 * @param data Object (a String or Object that can be converted) to be
 	 * written to output stream
-	 * @throws Exception if the transformer or file output fail, WriterNotOpenException
-	 * if the writer has not been initialized.
+	 * @throws Exception if the transformer or file output fail,
+	 * WriterNotOpenException if the writer has not been initialized.
 	 */
 	public void write(Object data) throws Exception {
-		if(getOutputState().isInitialized()){
+		if (getOutputState().isInitialized()) {
 			FieldSet fieldSet = fieldSetCreator.mapItem(data);
 			lineBuffer.add(lineAggregator.aggregate(fieldSet) + lineSeparator);
 		}
-		else{
+		else {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");
 		}
 	}
@@ -231,19 +230,19 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	}
 
 	/**
-	 * Initialize the reader.  This method may be called multiple times before close is
-	 * called.
+	 * Initialize the reader. This method may be called multiple times before
+	 * close is called.
 	 * 
 	 * @see ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
-		if(!getOutputState().isInitialized()){
+		if (!getOutputState().isInitialized()) {
 			doOpen(executionContext);
 		}
 	}
-	
-	private void doOpen(ExecutionContext executionContext){
+
+	private void doOpen(ExecutionContext executionContext) {
 		OutputState outputState = getOutputState();
 		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
 			outputState.restoreFrom(executionContext);
@@ -255,8 +254,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 			throw new ItemStreamException("Failed to initialize writer", ioe);
 		}
 		if (outputState.lastMarkedByteOffsetPosition == 0) {
-			for (Iterator iterator = headerLines.iterator(); iterator.hasNext();) {
-				String line = (String) iterator.next();
+			for (String line : headerLines) {
 				lineBuffer.add(line + lineSeparator);
 			}
 		}
@@ -288,8 +286,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	public void flush() throws FlushFailedException {
 		OutputState state = getOutputState();
-		for (Iterator iterator = lineBuffer.listIterator(); iterator.hasNext();) {
-			String line = (String) iterator.next();
+		for (String line : lineBuffer) {
 			try {
 				state.write(line);
 			}
@@ -350,7 +347,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		long restartCount = 0;
 
 		boolean shouldDeleteIfExists = true;
-		
+
 		boolean initialized = false;
 
 		/**
@@ -460,8 +457,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 		 * @throws IOException
 		 */
 		private void initializeBufferedWriter() throws IOException {
-			
-			
+
 			File file = resource.getFile();
 
 			FileUtils.setUpOutputFile(file, restarted, shouldDeleteIfExists);
@@ -478,7 +474,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 			initialized = true;
 			linesWritten = 0;
 		}
-		
+
 		public boolean isInitialized() {
 			return initialized;
 		}

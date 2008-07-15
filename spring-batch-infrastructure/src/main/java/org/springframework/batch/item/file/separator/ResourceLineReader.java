@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -54,7 +53,7 @@ import org.springframework.util.Assert;
  */
 public class ResourceLineReader implements LineReader, ItemReader {
 
-	private static final Collection DEFAULT_COMMENTS = Collections.singleton("#");
+	private static final Collection<String> DEFAULT_COMMENTS = Collections.singleton("#");
 
 	private static final String DEFAULT_ENCODING = "ISO-8859-1";
 
@@ -64,7 +63,7 @@ public class ResourceLineReader implements LineReader, ItemReader {
 
 	private final String encoding;
 
-	private Collection comments = DEFAULT_COMMENTS;
+	private Collection<String> comments = DEFAULT_COMMENTS;
 
 	// Encapsulates the state of the reader.
 	private State state = null;
@@ -103,7 +102,7 @@ public class ResourceLineReader implements LineReader, ItemReader {
 	 * @param comments an array of comment line prefixes.
 	 */
 	public void setComments(String[] comments) {
-		this.comments = new HashSet(Arrays.asList(comments));
+		this.comments = new HashSet<String>(Arrays.asList(comments));
 	}
 
 	/**
@@ -202,8 +201,7 @@ public class ResourceLineReader implements LineReader, ItemReader {
 	}
 
 	private boolean isComment(String line) {
-		for (Iterator iter = comments.iterator(); iter.hasNext();) {
-			String prefix = (String) iter.next();
+		for (String prefix : comments) {
 			if (line.startsWith(prefix)) {
 				return true;
 			}

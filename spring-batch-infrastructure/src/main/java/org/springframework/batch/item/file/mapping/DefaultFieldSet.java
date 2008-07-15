@@ -44,7 +44,7 @@ public class DefaultFieldSet implements FieldSet {
 	 */
 	private String[] tokens;
 
-	private List names;
+	private List<String> names;
 
 	public DefaultFieldSet(String[] tokens) {
 		this.tokens = tokens == null ? null : (String[]) tokens.clone();
