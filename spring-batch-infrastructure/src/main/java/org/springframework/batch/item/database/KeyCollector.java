@@ -28,7 +28,7 @@ public interface KeyCollector {
 	 * that could potentially be used to retrieve the correct keys.
 	 * @return list of keys returned by the driving query (can be empty but not null)
 	 */
-	List retrieveKeys(ExecutionContext executionContext);
+	List<Object> retrieveKeys(ExecutionContext executionContext);
 	
 	/**
 	 * Given the provided key, store it in the provided ExecutionContext.  This

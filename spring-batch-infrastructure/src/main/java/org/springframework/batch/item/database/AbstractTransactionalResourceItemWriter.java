@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractTransactionalResourceItemWriter implements ItemWriter {
 
-	private Set failed = new HashSet();
+	private Set<Object> failed = new HashSet<Object>();
 
 	/**
 	 * Flushing delegated to subclass surrounded by binding and unbinding of
@@ -140,7 +140,7 @@ public abstract class AbstractTransactionalResourceItemWriter implements ItemWri
 		if (TransactionSynchronizationManager.hasResource(getResourceKey())) {
 			return;
 		}
-		TransactionSynchronizationManager.bindResource(getResourceKey(), new HashSet());
+		TransactionSynchronizationManager.bindResource(getResourceKey(), new HashSet<Object>());
 	}
 
 	/**
@@ -158,10 +158,11 @@ public abstract class AbstractTransactionalResourceItemWriter implements ItemWri
 	 * 
 	 * @return the processed
 	 */
-	protected Set getProcessed() {
+	@SuppressWarnings("unchecked")
+	protected Set<Object> getProcessed() {
 		Assert.state(TransactionSynchronizationManager.hasResource(getResourceKey()),
 				"Processed items not bound to transaction.");
-		Set processed = (Set) TransactionSynchronizationManager.getResource(getResourceKey());
+		Set<Object> processed = (Set<Object>) TransactionSynchronizationManager.getResource(getResourceKey());
 		return processed;
 	}
 }

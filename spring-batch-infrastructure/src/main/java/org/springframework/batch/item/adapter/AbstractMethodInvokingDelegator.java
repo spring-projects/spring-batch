@@ -130,7 +130,7 @@ public class AbstractMethodInvokingDelegator implements InitializingBean {
 
 		for (int i=0; i < methods.length; i++) {
 			if (methods[i].getName().equals(targetMethodName)) {
-				Class[] params = methods[i].getParameterTypes();
+				Class<?>[] params = methods[i].getParameterTypes();
 				if (arguments == null) {
 					return true;
 				} else if (arguments.length == params.length) {

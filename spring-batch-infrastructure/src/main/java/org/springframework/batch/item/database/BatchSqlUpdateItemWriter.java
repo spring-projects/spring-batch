@@ -18,7 +18,6 @@ package org.springframework.batch.item.database;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.ClearFailedException;
@@ -36,7 +35,8 @@ import org.springframework.util.Assert;
  * {@link PreparedStatement} if available and can take some rudimentary steps to
  * locate a failure during a flush, and identify the items that failed. When one
  * of those items is encountered again the batch is flushed aggressively so that
- * the bad item is eventually identified and can be dealt with in isolation.<br/>
+ * the bad item is eventually identified and can be dealt with in
+ * isolation.<br/>
  * 
  * The user must provide an SQL query and a special callback
  * {@link ItemPreparedStatementSetter}, which is responsible for mapping the
@@ -117,18 +117,19 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 
 	/**
 	 * Create and execute batch prepared statement.
-	 * @throws EmptyResultDataAccessException if any of the items does not cause an update
+	 * @throws EmptyResultDataAccessException if any of the items does not cause
+	 * an update
 	 */
 	protected void doFlush() throws EmptyResultDataAccessException {
 
-		final List processed = new ArrayList(getProcessed());
+		final List<Object> processed = new ArrayList<Object>(getProcessed());
 
 		if (!processed.isEmpty()) {
 
 			int[] values = (int[]) jdbcTemplate.execute(sql, new PreparedStatementCallback() {
 				public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
-					for (Iterator iterator = processed.iterator(); iterator.hasNext();) {
-						Object item = (Object) iterator.next();
+
+					for (Object item : processed) {
 						preparedStatementSetter.setValues(item, ps);
 						ps.addBatch();
 					}

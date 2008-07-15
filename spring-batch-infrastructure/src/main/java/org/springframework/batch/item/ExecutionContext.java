@@ -18,7 +18,6 @@ package org.springframework.batch.item;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -27,10 +26,9 @@ import java.util.Map.Entry;
 import org.springframework.util.Assert;
 
 /**
- * Object representing a context for an {@link ItemStream}. It is a thin
- * wrapper for a map that allows optionally for type safety on reads. It also
- * allows for dirty checking by setting a 'dirty' flag whenever any put is
- * called.
+ * Object representing a context for an {@link ItemStream}. It is a thin wrapper
+ * for a map that allows optionally for type safety on reads. It also allows for
+ * dirty checking by setting a 'dirty' flag whenever any put is called.
  * 
  * @author Lucas Ward
  * @author Douglas Kaminsky
@@ -39,14 +37,14 @@ public class ExecutionContext implements Serializable {
 
 	private boolean dirty = false;
 
-	private final Map map;
+	private final Map<Object, Object> map;
 
 	/**
 	 * Default constructor. Initializes a new execution context with an empty
 	 * internal map.
 	 */
 	public ExecutionContext() {
-		map = new HashMap();
+		map = new HashMap<Object, Object>();
 	}
 
 	/**
@@ -54,7 +52,7 @@ public class ExecutionContext implements Serializable {
 	 * 
 	 * @param map Initial contents of context.
 	 */
-	public ExecutionContext(Map map) {
+	public ExecutionContext(Map<Object, Object> map) {
 		this.map = map;
 	}
 
@@ -63,11 +61,10 @@ public class ExecutionContext implements Serializable {
 	 */
 	public ExecutionContext(ExecutionContext executionContext) {
 		this();
-		if (executionContext==null) {
+		if (executionContext == null) {
 			return;
 		}
-		for (Iterator iterator = executionContext.entrySet().iterator(); iterator.hasNext();) {
-			Entry entry = (Entry) iterator.next();
+		for (Entry<Object, Object> entry : executionContext.entrySet()) {
 			this.map.put(entry.getKey(), entry.getValue());
 		}
 	}
@@ -233,7 +230,7 @@ public class ExecutionContext implements Serializable {
 	 * @param type Class against which value should be validated
 	 * @return Value typed to the specified <code>Class</code>
 	 */
-	private Object readAndValidate(String key, Class type) {
+	private Object readAndValidate(String key, Class<?> type) {
 
 		Object value = map.get(key);
 
@@ -268,7 +265,7 @@ public class ExecutionContext implements Serializable {
 	 * @return A set representing the contents of the context
 	 * @see java.util.Map#entrySet()
 	 */
-	public Set entrySet() {
+	public Set<Entry<Object, Object>> entrySet() {
 		return map.entrySet();
 	}
 
@@ -305,8 +302,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public Properties getProperties() {
 		Properties props = new Properties();
-		for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
+		for (Entry<Object, Object> entry : map.entrySet()) {
 			props.setProperty(entry.getKey().toString(), entry.getValue().toString());
 		}
 
@@ -315,6 +311,7 @@ public class ExecutionContext implements Serializable {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
@@ -330,6 +327,7 @@ public class ExecutionContext implements Serializable {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode() {
@@ -338,6 +336,7 @@ public class ExecutionContext implements Serializable {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {

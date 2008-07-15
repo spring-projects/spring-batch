@@ -69,9 +69,9 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 
 	private boolean initialized = false;
 
-	private List keys;
+	private List<Object> keys;
 
-	private Iterator keysIterator;
+	private Iterator<Object> keysIterator;
 
 	private int currentIndex = 0;
 
@@ -90,7 +90,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	 * 
 	 * @param keys
 	 */
-	public DrivingQueryItemReader(List keys) {
+	public DrivingQueryItemReader(List<Object> keys) {
 		this.keys = keys;
 		this.keysIterator = keys.iterator();
 	}
