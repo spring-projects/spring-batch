@@ -83,7 +83,7 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
 	public RepeatContext start(RepeatContext context) {
-		List list = new ArrayList();
+		List<RepeatContext> list = new ArrayList<RepeatContext>();
 		for (int i = 0; i < policies.length; i++) {
 			list.add(policies[i].start(context));
 		}
@@ -121,9 +121,9 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 		// change).
 		private CompletionPolicy[] policies;
 
-		public CompositeBatchContext(RepeatContext context, List contexts) {
+		public CompositeBatchContext(RepeatContext context, List<RepeatContext> contexts) {
 			super(context);
-			this.contexts = (RepeatContext[]) contexts.toArray(new RepeatContext[contexts.size()]);
+			this.contexts = contexts.toArray(new RepeatContext[contexts.size()]);
 			this.policies = CompositeCompletionPolicy.this.policies;
 		}
 

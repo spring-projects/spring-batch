@@ -17,7 +17,6 @@ package org.springframework.batch.repeat.listener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.repeat.ExitStatus;
@@ -30,7 +29,7 @@ import org.springframework.batch.repeat.RepeatListener;
  */
 public class CompositeRepeatListener implements RepeatListener {
 
-	private List listeners = new ArrayList();
+	private List<RepeatListener> listeners = new ArrayList<RepeatListener>();
 
 	/**
 	 * Public setter for the listeners.
@@ -56,8 +55,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	 * @see org.springframework.batch.repeat.RepeatListener#after(org.springframework.batch.repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
 	 */
 	public void after(RepeatContext context, ExitStatus result) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			RepeatListener listener = (RepeatListener) iterator.next();
+		for (RepeatListener listener : listeners) {
 			listener.after(context, result);
 		}
 	}
@@ -66,8 +64,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	 * @see org.springframework.batch.repeat.RepeatListener#before(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void before(RepeatContext context) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			RepeatListener listener = (RepeatListener) iterator.next();
+		for (RepeatListener listener : listeners) {
 			listener.before(context);
 		}
 	}
@@ -76,8 +73,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	 * @see org.springframework.batch.repeat.RepeatListener#close(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void close(RepeatContext context) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			RepeatListener listener = (RepeatListener) iterator.next();
+		for (RepeatListener listener : listeners) {
 			listener.close(context);
 		}
 	}
@@ -86,8 +82,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	 * @see org.springframework.batch.repeat.RepeatListener#onError(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)
 	 */
 	public void onError(RepeatContext context, Throwable e) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			RepeatListener listener = (RepeatListener) iterator.next();
+		for (RepeatListener listener : listeners) {
 			listener.onError(context, e);
 		}
 	}
@@ -96,8 +91,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	 * @see org.springframework.batch.repeat.RepeatListener#open(org.springframework.batch.repeat.RepeatContext)
 	 */
 	public void open(RepeatContext context) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
-			RepeatListener listener = (RepeatListener) iterator.next();
+		for (RepeatListener listener : listeners) {
 			listener.open(context);
 		}
 	}

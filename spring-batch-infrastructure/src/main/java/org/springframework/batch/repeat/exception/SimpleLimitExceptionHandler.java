@@ -47,9 +47,9 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 
 	private RethrowOnThresholdExceptionHandler delegate = new RethrowOnThresholdExceptionHandler();
 
-	private Class[] exceptionClasses = new Class[] { Exception.class };
+	private Class<?>[] exceptionClasses = new Class[] { Exception.class };
 
-	private Class[] fatalExceptionClasses = new Class[] { Error.class };
+	private Class<?>[] fatalExceptionClasses = new Class[] { Error.class };
 
 	/**
 	 * Flag to indicate the the exception counters should be shared between
@@ -116,7 +116,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * @param limit
 	 */
 	public void setLimit(final int limit) {
-		delegate.setThresholds(new HashMap() {
+		delegate.setThresholds(new HashMap<Object, Integer>() {
 			{
 				put(ExceptionClassifierSupport.DEFAULT, new Integer(0));
 				put(TX_INVALID, new Integer(limit));
@@ -131,7 +131,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * handler uses single counter that is incremented when one of the
 	 * recognized exception exceptionClasses is handled.
 	 */
-	public void setExceptionClasses(Class[] classes) {
+	public void setExceptionClasses(Class<? extends Throwable>[] classes) {
 		this.exceptionClasses = classes;
 	}
 
@@ -142,7 +142,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @param fatalExceptionClasses defaults to {@link Error}
 	 */
-	public void setFatalExceptionClasses(Class[] fatalExceptionClasses) {
+	public void setFatalExceptionClasses(Class<?>[] fatalExceptionClasses) {
 		this.fatalExceptionClasses = fatalExceptionClasses;
 	}
 

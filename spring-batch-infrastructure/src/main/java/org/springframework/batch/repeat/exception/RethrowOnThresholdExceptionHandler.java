@@ -17,8 +17,8 @@
 package org.springframework.batch.repeat.exception;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,12 +39,11 @@ import org.springframework.util.Assert;
  */
 public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
-	protected final Log logger = LogFactory
-			.getLog(RethrowOnThresholdExceptionHandler.class);
+	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
 	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport();
 
-	private Map thresholds = new HashMap();
+	private Map<Object, Integer> thresholds = new HashMap<Object, Integer>();
 
 	private boolean useParent = false;
 
@@ -52,9 +51,8 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * Flag to indicate the the exception counters should be shared between
 	 * sibling contexts in a nested batch. Default is false.
 	 * 
-	 * @param useParent
-	 *            true if the parent context should be used to store the
-	 *            counters.
+	 * @param useParent true if the parent context should be used to store the
+	 * counters.
 	 */
 	public void setUseParent(boolean useParent) {
 		this.useParent = useParent;
@@ -75,21 +73,16 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * are usually String literals, depending on the {@link ExceptionClassifier}
 	 * implementation used.
 	 * 
-	 * @param thresholds
-	 *            the threshold value map.
+	 * @param thresholds the threshold value map.
 	 */
-	public void setThresholds(Map thresholds) {
-		for (Iterator iter = thresholds.entrySet().iterator(); iter.hasNext();) {
-			Map.Entry entry = (Map.Entry) iter.next();
+	public void setThresholds(Map<Object, Integer> thresholds) {
+		for (Entry<Object, Integer> entry : thresholds.entrySet()) {
+
 			if (!(entry.getKey() instanceof String)) {
-				logger.warn("Key in thresholds map is not of type String: "
-						+ entry.getKey());
+				logger.warn("Key in thresholds map is not of type String: " + entry.getKey());
 			}
-			Assert
-					.state(
-							entry.getValue() instanceof Integer,
-							"Threshold value must be of type Integer.  "
-									+ "Try using the value-type attribute if you care configuring this map via xml.");
+			Assert.state(entry.getValue() instanceof Integer, "Threshold value must be of type Integer.  "
+					+ "Try using the value-type attribute if you care configuring this map via xml.");
 		}
 		this.thresholds = thresholds;
 	}
@@ -114,14 +107,13 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * @throws Throwable
 	 * @see ExceptionHandler#handleException(RepeatContext, Throwable)
 	 */
-	public void handleException(RepeatContext context, Throwable throwable)
-			throws Throwable {
+	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
 		Object key = exceptionClassifier.classify(throwable);
 		RepeatContextCounter counter = getCounter(context, key);
 		counter.increment();
 		int count = counter.getCount();
-		Integer threshold = (Integer) thresholds.get(key);
+		Integer threshold = thresholds.get(key);
 		if (threshold == null || count > threshold.intValue()) {
 			throw throwable;
 		}
@@ -129,8 +121,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	}
 
 	private RepeatContextCounter getCounter(RepeatContext context, Object key) {
-		String attribute = RethrowOnThresholdExceptionHandler.class.getName() + "."
-				+ key.toString();
+		String attribute = RethrowOnThresholdExceptionHandler.class.getName() + "." + key.toString();
 		// Creates a new counter and stores it in the correct context:
 		return new RepeatContextCounter(context, attribute, useParent);
 	}
