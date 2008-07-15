@@ -1,7 +1,6 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.springframework.batch.item.transform.ItemTransformer;
 
@@ -10,8 +9,8 @@ import org.springframework.batch.item.transform.ItemTransformer;
  * specially if it is an array or collection. In this case it loops though,
  * calling itself on each member in turn, until it encounters a non collection.
  * At this point, if the item is a String, that is used, or else it is passed to
- * the delegate {@link ItemTransformer}. The transformed single item Strings
- * are all concatenated with line separators.
+ * the delegate {@link ItemTransformer}. The transformed single item Strings are
+ * all concatenated with line separators.
  * 
  * @author Dave Syer
  * 
@@ -45,7 +44,10 @@ public class RecursiveCollectionItemTransformer implements ItemTransformer {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.writer.ItemTransformer#transform(java.lang.Object)
+	 * 
+	 * @see
+	 * org.springframework.batch.item.writer.ItemTransformer#transform(java.
+	 * lang.Object)
 	 */
 	public Object transform(Object input) throws Exception {
 		TransformHolder holder = new TransformHolder();
@@ -67,8 +69,8 @@ public class RecursiveCollectionItemTransformer implements ItemTransformer {
 	private void transformRecursively(Object data, TransformHolder converted) throws Exception {
 
 		if (data instanceof Collection) {
-			for (Iterator iterator = ((Collection) data).iterator(); iterator.hasNext();) {
-				Object value = (Object) iterator.next();
+
+			for (Object value : (Collection<?>) data) {
 				// (recursive)
 				transformRecursively(value, new TransformHolder(converted.builder));
 			}

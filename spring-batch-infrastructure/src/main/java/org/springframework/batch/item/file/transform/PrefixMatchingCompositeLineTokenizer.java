@@ -17,7 +17,6 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,23 +25,23 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 
 public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
 
-	private Map tokenizers = new HashMap();
-	
-	public void setTokenizers(Map tokenizers) {
-		this.tokenizers = new LinkedHashMap(tokenizers);
+	private Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
+
+	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
+		this.tokenizers = new LinkedHashMap<String, LineTokenizer>(tokenizers);
 	}
-	
+
 	public FieldSet tokenize(String line) {
 
-		if (line==null) {
+		if (line == null) {
 			return new DefaultFieldSet(new String[0]);
 		}
 
 		LineTokenizer tokenizer = null;
 		LineTokenizer defaultTokenizer = null;
 
-		for (Iterator iter = tokenizers.keySet().iterator(); iter.hasNext();) {
-			String key = (String) iter.next();
+		for (String key : tokenizers.keySet()) {
+
 			if ("".equals(key)) {
 				defaultTokenizer = (LineTokenizer) tokenizers.get(key);
 				// don't break here or the tokenizer may not be found
@@ -53,13 +52,13 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
 				break;
 			}
 		}
-		
-		if (tokenizer==null) {
+
+		if (tokenizer == null) {
 			tokenizer = defaultTokenizer;
 		}
-		
-		if (tokenizer==null) {
-			throw new IllegalStateException("Could not match record to tokenizer for line=["+line+"]");
+
+		if (tokenizer == null) {
+			throw new IllegalStateException("Could not match record to tokenizer for line=[" + line + "]");
 		}
 
 		return tokenizer.tokenize(line);

@@ -97,11 +97,9 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		Range[] c = (Range[])ranges.clone();
 		
 		//sort array of Ranges
-		Arrays.sort(c, new Comparator() {
-				public int compare(Object o1, Object o2) {
-					Range c1 = (Range)o1;
-					Range c2 = (Range)o2;
-					return c1.getMin()-c2.getMin();
+		Arrays.sort(c, new Comparator<Range>() {
+				public int compare(Range r1, Range r2) {
+					return r1.getMin()-r2.getMin();
 				}								
 			}
 		);

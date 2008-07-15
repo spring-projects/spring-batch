@@ -70,7 +70,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 			line = "";
 		}
 
-		List tokens = new ArrayList(doTokenize(line));
+		List<String> tokens = new ArrayList<String>(doTokenize(line));
 
 		String[] values = (String[]) tokens.toArray(new String[tokens.size()]);
 		
@@ -83,6 +83,6 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 		return new DefaultFieldSet(values, names);
 	}
 	
-	protected abstract List doTokenize(String line);
+	protected abstract List<String> doTokenize(String line);
 
 }
