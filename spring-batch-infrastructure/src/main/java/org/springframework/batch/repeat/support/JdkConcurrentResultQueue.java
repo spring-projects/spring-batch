@@ -28,13 +28,13 @@ import java.util.concurrent.Semaphore;
 class JdkConcurrentResultQueue extends AbstractResultQueue implements RepeatInternalState {
 
 	// Accumulation of result objects as they finish.
-	private final BlockingQueue results;
+	private final BlockingQueue<ResultHolder> results;
 
 	// Accumulation of dummy objects flagging expected results in the future.
 	private final Semaphore waits;
 
 	JdkConcurrentResultQueue(int throttleLimit) {
-		results = new LinkedBlockingQueue();
+		results = new LinkedBlockingQueue<ResultHolder>();
 		waits = new Semaphore(throttleLimit);
 	}
 

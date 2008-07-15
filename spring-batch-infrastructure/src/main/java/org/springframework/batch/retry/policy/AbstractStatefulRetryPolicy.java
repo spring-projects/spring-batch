@@ -17,7 +17,6 @@
 package org.springframework.batch.retry.policy;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.springframework.batch.retry.ExhaustedRetryException;
@@ -42,7 +41,7 @@ import org.springframework.batch.retry.RetryPolicy;
  */
 public abstract class AbstractStatefulRetryPolicy implements RetryPolicy {
 
-	private volatile Set recoverableExceptionClasses = new HashSet();
+	private volatile Set<Class<?>> recoverableExceptionClasses = new HashSet<Class<?>>();
 
 	protected RetryContextCache retryContextCache = new MapRetryContextCache();
 
@@ -87,15 +86,15 @@ public abstract class AbstractStatefulRetryPolicy implements RetryPolicy {
 	 * 
 	 * @param retryableExceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setRecoverableExceptionClasses(Class[] retryableExceptionClasses) {
-		Set temp = new HashSet();
+	public final void setRecoverableExceptionClasses(Class<?>[] retryableExceptionClasses) {
+		Set<Class<?>> temp = new HashSet<Class<?>>();
 		for (int i = 0; i < retryableExceptionClasses.length; i++) {
 			addRecoverableExceptionClass(retryableExceptionClasses[i], temp);
 		}
 		this.recoverableExceptionClasses = temp;
 	}
 
-	private void addRecoverableExceptionClass(Class retryableExceptionClass, Set set) {
+	private void addRecoverableExceptionClass(Class<?> retryableExceptionClass, Set<Class<?>> set) {
 		if (!Throwable.class.isAssignableFrom(retryableExceptionClass)) {
 			throw new IllegalArgumentException("Class '" + retryableExceptionClass.getName()
 					+ "' is not a subtype of Throwable.");
@@ -111,14 +110,13 @@ public abstract class AbstractStatefulRetryPolicy implements RetryPolicy {
 			return false;
 		}
 
-		Class exceptionClass = ex.getClass();
+		Class<? extends Throwable> exceptionClass = ex.getClass();
 		if (recoverableExceptionClasses.contains(exceptionClass)) {
 			return true;
 		}
 
 		// check for subclasses
-		for (Iterator iterator = recoverableExceptionClasses.iterator(); iterator.hasNext();) {
-			Class cls = (Class) iterator.next();
+		for (Class<?> cls : recoverableExceptionClasses) {
 			if (cls.isAssignableFrom(exceptionClass)) {
 				addRecoverableExceptionClass(exceptionClass, this.recoverableExceptionClasses);
 				return true;

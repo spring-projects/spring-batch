@@ -23,12 +23,12 @@ import java.util.Set;
 public class RepeatInternalStateSupport implements RepeatInternalState {
 	
 	// Accumulation of failed results. 
-	Set throwables = new HashSet();
+	private Set<Throwable> throwables = new HashSet<Throwable>();
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.support.BatchInternalState#getThrowables()
 	 */
-	public Collection getThrowables() {
+	public Collection<Throwable> getThrowables() {
 		return throwables;
 	}
 

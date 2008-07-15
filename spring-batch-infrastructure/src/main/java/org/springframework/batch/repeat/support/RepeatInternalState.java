@@ -20,6 +20,6 @@ import java.util.Collection;
 
 public interface RepeatInternalState {
 
-	Collection getThrowables();
+	Collection<Throwable> getThrowables();
 
 }

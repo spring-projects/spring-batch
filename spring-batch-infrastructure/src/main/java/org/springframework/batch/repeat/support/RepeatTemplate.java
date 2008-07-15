@@ -88,7 +88,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @param listener
 	 */
 	public void registerListener(RepeatListener listener) {
-		List list = new ArrayList(Arrays.asList(listeners));
+		List<RepeatListener> list = new ArrayList<RepeatListener>(Arrays.asList(listeners));
 		list.add(listener);
 		listeners = (RepeatListener[]) list.toArray(new RepeatListener[list.size()]);
 	}
@@ -183,7 +183,7 @@ public class RepeatTemplate implements RepeatOperations {
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
 		RepeatInternalState state = createInternalState(context);
-		Collection throwables = state.getThrowables();
+		Collection<Throwable> throwables = state.getThrowables();
 
 		try {
 
