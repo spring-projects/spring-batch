@@ -16,7 +16,7 @@ class EventSequence {
 	
 	private static final int BEFORE_BEGINNING = -1;
 	
-	private List events;
+	private List<XMLEvent> events;
 	
 	private int currentIndex;
 	
@@ -42,7 +42,7 @@ class EventSequence {
 	 * If cache contains no more events, null is returned.
 	 */
 	public XMLEvent nextEvent() {
-		return (hasNext()) ? (XMLEvent)events.get(++currentIndex) :null;
+		return (hasNext()) ? events.get(++currentIndex) :null;
  	}
 	
 	/**
@@ -50,7 +50,7 @@ class EventSequence {
 	 * If cache contains no more events, null is returned.
 	 */
 	public XMLEvent peek() {
-		return (hasNext()) ? (XMLEvent)events.get(currentIndex+1) :null;
+		return (hasNext()) ? events.get(currentIndex+1) :null;
 	}
 	
 	/**
@@ -80,8 +80,8 @@ class EventSequence {
 	}
 	
 	private void init() {
-		events = (events != null) ? new ArrayList(events.size())
-			: new ArrayList(1000);
+		events = (events != null) ? new ArrayList<XMLEvent>(events.size())
+			: new ArrayList<XMLEvent>(1000);
 		
 		reset();
 	}

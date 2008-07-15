@@ -19,7 +19,6 @@ package org.springframework.batch.repeat.context;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,12 +35,12 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	private volatile boolean terminateOnly;
 
-	private Map callbacks = new HashMap();
+	private Map<String, Set<Runnable>> callbacks = new HashMap<String, Set<Runnable>>();
 
 	/**
-	 * Constructor for {@link RepeatContextSupport}. The parent can be null,
-	 * but should be set to the enclosing repeat context if there is one, e.g.
-	 * if this context is an inner loop.
+	 * Constructor for {@link RepeatContextSupport}. The parent can be null, but
+	 * should be set to the enclosing repeat context if there is one, e.g. if
+	 * this context is an inner loop.
 	 * @param parent
 	 */
 	public RepeatContextSupport(RepeatContext parent) {
@@ -51,6 +50,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#isCompleteOnly()
 	 */
 	public boolean isCompleteOnly() {
@@ -59,6 +59,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#setCompleteOnly()
 	 */
 	public void setCompleteOnly() {
@@ -67,6 +68,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#isTerminateOnly()
 	 */
 	public boolean isTerminateOnly() {
@@ -75,6 +77,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#setTerminateOnly()
 	 */
 	public void setTerminateOnly() {
@@ -84,6 +87,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#getParent()
 	 */
 	public RepeatContext getParent() {
@@ -99,6 +103,7 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#getStartedCount()
 	 */
 	public synchronized int getStartedCount() {
@@ -107,14 +112,16 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.repeat.RepeatContext#registerDestructionCallback(java.lang.String,
-	 * java.lang.Runnable)
+	 * 
+	 * @see
+	 * org.springframework.batch.repeat.RepeatContext#registerDestructionCallback
+	 * (java.lang.String, java.lang.Runnable)
 	 */
 	public void registerDestructionCallback(String name, Runnable callback) {
 		synchronized (callbacks) {
-			Set set = (Set) callbacks.get(name);
+			Set<Runnable> set = callbacks.get(name);
 			if (set == null) {
-				set = new HashSet();
+				set = new HashSet<Runnable>();
 				callbacks.put(name, set);
 			}
 			set.add(callback);
@@ -123,23 +130,22 @@ public class RepeatContextSupport extends SynchronizedAttributeAccessor implemen
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.RepeatContext#close()
 	 */
 	public void close() {
 
-		List errors = new ArrayList();
+		List<RuntimeException> errors = new ArrayList<RuntimeException>();
 
-		Set copy;
+		Set<Map.Entry<String, Set<Runnable>>> copy;
 
 		synchronized (callbacks) {
-			copy = new HashSet(callbacks.entrySet());
+			copy = new HashSet<Map.Entry<String, Set<Runnable>>>(callbacks.entrySet());
 		}
 
-		for (Iterator iter = copy.iterator(); iter.hasNext();) {
-			Map.Entry entry = (Map.Entry) iter.next();
-			Set set = (Set) entry.getValue();
-			for (Iterator iterator = set.iterator(); iterator.hasNext();) {
-				Runnable callback = (Runnable) iterator.next();
+		for (Map.Entry<String, Set<Runnable>> entry : copy) {
+
+			for (Runnable callback : entry.getValue()) {
 				/*
 				 * Potentially we could check here if there is an attribute with
 				 * the given name - if it has been removed, maybe the callback
