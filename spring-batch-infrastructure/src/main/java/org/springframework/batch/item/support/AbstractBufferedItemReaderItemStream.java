@@ -36,9 +36,9 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 
 	private boolean shouldReadBuffer = false;
 
-	private List itemBuffer = new ArrayList();
+	private List<Object> itemBuffer = new ArrayList<Object>();
 
-	private ListIterator itemBufferIterator = null;
+	private ListIterator<Object> itemBufferIterator = null;
 
 	private int lastMarkedBufferIndex = 0;
 

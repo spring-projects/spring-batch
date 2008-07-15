@@ -51,7 +51,7 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 
 	private JmsOperations jmsTemplate;
 
-	private Class itemType;
+	private Class<?> itemType;
 
 	private String errorDestinationName;
 
@@ -94,7 +94,7 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 	 * @throws IllegalStateException if the message payload is of the wrong
 	 * type.
 	 */
-	public void setItemType(Class itemType) {
+	public void setItemType(Class<?> itemType) {
 		this.itemType = itemType;
 	}
 

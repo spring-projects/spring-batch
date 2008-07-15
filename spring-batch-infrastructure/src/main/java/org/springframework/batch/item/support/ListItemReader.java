@@ -30,16 +30,16 @@ import org.springframework.batch.item.ItemReader;
  */
 public class ListItemReader extends AbstractItemReader {
 
-	private List list;
+	private List<?> list;
 
-	public ListItemReader(List list) {
+	public ListItemReader(List<?> list) {
 		// If it is a proxy we assume it knows how to deal with its own state.
 		// (It's probably transaction aware.)
 		if (AopUtils.isAopProxy(list)) {
 			this.list = list;
 		}
 		else {
-			this.list = new ArrayList(list);
+			this.list = new ArrayList<Object>(list);
 		}
 	}
 

@@ -106,7 +106,7 @@ public class AggregateItemReader extends DelegatingItemReader {
 	 * 
 	 */
 	private static class ResultHolder {
-		Collection records = new ArrayList();
+		Collection<Object> records = new ArrayList<Object>();
 		boolean exhausted = false;
 	}
 
