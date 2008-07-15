@@ -45,7 +45,8 @@ public class IbatisKeyCollector extends ExecutionContextUserSupport implements K
 	 * 
 	 * @see KeyCollector#retrieveKeys()
 	 */
-	public List retrieveKeys(ExecutionContext executionContext) {
+	@SuppressWarnings("unchecked")
+	public List<Object> retrieveKeys(ExecutionContext executionContext) {
 		if (executionContext.containsKey(getKey(RESTART_KEY))) {
 			Object key = executionContext.get(getKey(RESTART_KEY));
 			return sqlMapClientTemplate.queryForList(restartQueryId, key);

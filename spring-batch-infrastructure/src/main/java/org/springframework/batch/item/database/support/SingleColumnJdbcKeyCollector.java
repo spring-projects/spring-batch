@@ -85,7 +85,8 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	 * 
 	 * @see org.springframework.batch.io.driving.KeyGenerationStrategy#retrieveKeys()
 	 */
-	public List retrieveKeys(ExecutionContext executionContext) {
+	@SuppressWarnings("unchecked")
+	public List<Object> retrieveKeys(ExecutionContext executionContext) {
 
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 

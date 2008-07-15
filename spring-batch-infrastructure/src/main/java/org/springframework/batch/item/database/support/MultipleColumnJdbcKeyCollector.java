@@ -88,7 +88,8 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 	 * org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader
 	 * #retrieveKeys()
 	 */
-	public List retrieveKeys(ExecutionContext executionContext) {
+	@SuppressWarnings("unchecked")
+	public List<Object> retrieveKeys(ExecutionContext executionContext) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"
