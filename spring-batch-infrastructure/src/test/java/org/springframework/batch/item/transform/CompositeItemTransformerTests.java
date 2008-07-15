@@ -82,14 +82,5 @@ public class CompositeItemTransformerTests extends TestCase {
 			// expected
 		}
 		
-		// invalid list member
-		composite.setItemTransformers(new ArrayList() {{ add(new Object()); }});
-		try {
-			composite.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
 	}
 }

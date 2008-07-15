@@ -81,7 +81,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	private String rootTagName = DEFAULT_ROOT_TAG_NAME;
 
 	// root element attributes
-	private Map rootElementAttributes = null;
+	private Map<String, String> rootElementAttributes = null;
 
 	// signalizes that marshalling was restarted
 	private boolean restarted = false;
@@ -113,9 +113,9 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 
 	// holds the list of items for writing before they are actually written on
 	// #flush()
-	private List buffer = new ArrayList();
+	private List<Object> buffer = new ArrayList<Object>();
 
-	private List headers = new ArrayList();
+	private List<Object> headers = new ArrayList<Object>();
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -199,7 +199,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * 
 	 * @return attributes of the root element
 	 */
-	public Map getRootElementAttributes() {
+	public Map<String, String> getRootElementAttributes() {
 		return rootElementAttributes;
 	}
 
@@ -208,7 +208,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * 
 	 * @param rootElementAttributes attributes of the root element
 	 */
-	public void setRootElementAttributes(Map rootElementAttributes) {
+	public void setRootElementAttributes(Map<String, String> rootElementAttributes) {
 		this.rootElementAttributes = rootElementAttributes;
 	}
 
@@ -260,11 +260,11 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		}
 
 		open(startAtPosition);
-		
-		if (startAtPosition==0) {
-			for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
-				Object header = (Object) iterator.next();
-				write(header);				
+
+		if (startAtPosition == 0) {
+			for (Iterator<Object> iterator = headers.listIterator(); iterator.hasNext();) {
+				Object header = iterator.next();
+				write(header);
 			}
 		}
 	}
@@ -328,9 +328,8 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		// write root tag attributes
 		if (!CollectionUtils.isEmpty(getRootElementAttributes())) {
 
-			for (Iterator i = getRootElementAttributes().entrySet().iterator(); i.hasNext();) {
-				Map.Entry entry = (Map.Entry) i.next();
-				writer.add(factory.createAttribute((String) entry.getKey(), (String) entry.getValue()));
+			for (Map.Entry<String, String> entry : getRootElementAttributes().entrySet()) {
+				writer.add(factory.createAttribute(entry.getKey(), entry.getValue()));
 			}
 
 		}
@@ -455,7 +454,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 */
 	public void flush() throws FlushFailedException {
 
-		for (Iterator iterator = buffer.listIterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = buffer.listIterator(); iterator.hasNext();) {
 			Object item = iterator.next();
 			serializer.serializeObject(eventWriter, item);
 		}
