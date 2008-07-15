@@ -88,9 +88,9 @@ public class RetryTemplate implements RetryOperations {
 	 * @see #setListeners(RetryListener[])
 	 */
 	public void registerListener(RetryListener listener) {
-		List list = new ArrayList(Arrays.asList(listeners));
+		List<RetryListener> list = new ArrayList<RetryListener>(Arrays.asList(listeners));
 		list.add(listener);
-		listeners = (RetryListener[]) list.toArray(new RetryListener[list.size()]);
+		listeners = list.toArray(new RetryListener[list.size()]);
 	}
 
 	/**

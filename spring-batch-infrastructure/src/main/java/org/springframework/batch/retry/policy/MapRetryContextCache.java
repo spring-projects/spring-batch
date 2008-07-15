@@ -38,7 +38,7 @@ public class MapRetryContextCache implements RetryContextCache {
 	 */
 	public static final int DEFAULT_CAPACITY = 4096;
 
-	private Map map = Collections.synchronizedMap(new HashMap());
+	private Map<Object, RetryContext> map = Collections.synchronizedMap(new HashMap<Object, RetryContext>());
 
 	private int capacity;
 
@@ -80,9 +80,9 @@ public class MapRetryContextCache implements RetryContextCache {
 
 	public void put(Object key, RetryContext context) {
 		if (map.size() >= capacity) {
-			throw new RetryCacheCapacityExceededException("Retry cache capacity limit breached. " +
-					"Do you need to re-consider the implementation of the key generator, " +
-					"or the equals and hashCode of the items that failed?");
+			throw new RetryCacheCapacityExceededException("Retry cache capacity limit breached. "
+					+ "Do you need to re-consider the implementation of the key generator, "
+					+ "or the equals and hashCode of the items that failed?");
 		}
 		map.put(key, context);
 	}

@@ -17,8 +17,8 @@ package org.springframework.batch.support;
 
 import java.beans.PropertyEditor;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
@@ -35,7 +35,7 @@ import org.springframework.util.ClassUtils;
  */
 public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 
-	private Map customEditors;
+	private Map<Class<?>, PropertyEditor> customEditors;
 
 	/**
 	 * Register the custom editors with the given registry.
@@ -44,11 +44,8 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	 */
 	public void registerCustomEditors(PropertyEditorRegistry registry) {
 		if (this.customEditors != null) {
-			for (Iterator it = customEditors.entrySet().iterator(); it.hasNext();) {
-				Map.Entry entry = (Map.Entry) it.next();
-				Class key = (Class) entry.getKey();
-				PropertyEditor value = (PropertyEditor) entry.getValue();
-				registry.registerCustomEditor(key, value);
+			for (Entry<Class<?>, PropertyEditor> entry : customEditors.entrySet()) {
+				registry.registerCustomEditor(entry.getKey(), entry.getValue());
 			}
 		}
 	}
@@ -61,14 +58,13 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 	 * PropertyEditor).
 	 * @see CustomEditorConfigurer#setCustomEditors(Map)
 	 */
-	public void setCustomEditors(Map customEditors) {
-		this.customEditors = new HashMap();
-		for (Iterator it = customEditors.entrySet().iterator(); it.hasNext();) {
-			Map.Entry entry = (Map.Entry) it.next();
+	public void setCustomEditors(Map<? extends Object, ? extends PropertyEditor> customEditors) {
+		this.customEditors = new HashMap<Class<?>, PropertyEditor>();
+		for (Entry<? extends Object, ? extends PropertyEditor> entry : customEditors.entrySet()) {
 			Object key = entry.getKey();
-			Class requiredType = null;
+			Class<?> requiredType = null;
 			if (key instanceof Class) {
-				requiredType = (Class) key;
+				requiredType = (Class<?>) key;
 			}
 			else if (key instanceof String) {
 				String className = (String) key;
@@ -83,7 +79,7 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 				throw new IllegalArgumentException("Mapped value [" + value + "] for custom editor key [" + key
 						+ "] is not of required type [" + PropertyEditor.class.getName() + "]");
 			}
-			this.customEditors.put(requiredType, value);
+			this.customEditors.put(requiredType, (PropertyEditor) value);
 		}
 	}
 

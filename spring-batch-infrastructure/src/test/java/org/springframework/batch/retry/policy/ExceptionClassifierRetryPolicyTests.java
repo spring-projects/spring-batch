@@ -23,6 +23,7 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 
 public class ExceptionClassifierRetryPolicyTests extends TestCase {
@@ -35,7 +36,8 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 	}
 
 	public void testTrivialPolicies() throws Exception {
-		policy.setPolicyMap(Collections.singletonMap(ExceptionClassifierSupport.DEFAULT, new MockRetryPolicySupport()));
+		policy.setPolicyMap(Collections.singletonMap(ExceptionClassifierSupport.DEFAULT,
+				(RetryPolicy) new MockRetryPolicySupport()));
 		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
@@ -102,11 +104,12 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 	int count = 0;
 
 	public void testClose() throws Exception {
-		policy.setPolicyMap(Collections.singletonMap(ExceptionClassifierSupport.DEFAULT, new MockRetryPolicySupport() {
-			public void close(RetryContext context) {
-				count++;
-			}
-		}));
+		policy.setPolicyMap(Collections.singletonMap(ExceptionClassifierSupport.DEFAULT,
+				(RetryPolicy) new MockRetryPolicySupport() {
+					public void close(RetryContext context) {
+						count++;
+					}
+				}));
 		RetryContext context = policy.open(null, null);
 
 		// The mapped (child) policy hasn't been used yet, so if we close now

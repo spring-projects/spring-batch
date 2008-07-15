@@ -17,7 +17,6 @@
 package org.springframework.batch.retry.policy;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.springframework.batch.retry.RetryCallback;
@@ -40,7 +39,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport();
 
-	private Map policyMap = new HashMap();
+	private Map<String, RetryPolicy> policyMap = new HashMap<String, RetryPolicy>();
 
 	public ExceptionClassifierRetryPolicy() {
 		policyMap.put(ExceptionClassifierSupport.DEFAULT, new NeverRetryPolicy());
@@ -55,7 +54,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * applied to the result of the {@link ExceptionClassifier} to locate a
 	 * policy.
 	 */
-	public void setPolicyMap(Map policyMap) {
+	public void setPolicyMap(Map<String, RetryPolicy> policyMap) {
 		this.policyMap = policyMap;
 	}
 
@@ -93,7 +92,8 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * Create an active context that proxies a retry policy by chosing a target
 	 * from the policy map.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
+	 * RetryContext)
 	 */
 	public RetryContext open(RetryCallback callback, RetryContext parent) {
 		return new ExceptionClassifierRetryContext(parent, exceptionClassifier).open(callback, parent);
@@ -124,7 +124,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		// The same for the life of the context:
 		RetryCallback callback;
 
-		Map contexts = new HashMap();
+		Map<RetryPolicy, RetryContext> contexts = new HashMap<RetryPolicy, RetryContext>();
 
 		public ExceptionClassifierRetryContext(RetryContext parent, ExceptionClassifier exceptionClassifier) {
 			super(parent);
@@ -135,7 +135,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		}
 
 		public boolean canRetry(RetryContext context) {
-			if (this.context==null) {
+			if (this.context == null) {
 				// there was no error yet
 				return true;
 			}
@@ -148,8 +148,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 		public void close(RetryContext context) {
 			// Only close those policies that have been used (opened):
-			for (Iterator iter = contexts.keySet().iterator(); iter.hasNext();) {
-				RetryPolicy policy = (RetryPolicy) iter.next();
+			for (RetryPolicy policy : contexts.keySet()) {
 				policy.close(getContext(policy));
 			}
 		}

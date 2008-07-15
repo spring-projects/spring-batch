@@ -103,7 +103,7 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * 
 	 * @param retryableExceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setRetryableExceptionClasses(Class[] retryableExceptionClasses) {
+	public final void setRetryableExceptionClasses(Class<?>[] retryableExceptionClasses) {
 		retryableClassifier.setExceptionClasses(retryableExceptionClasses);
 	}
 
@@ -114,7 +114,7 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * 
 	 * @param fatalExceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setFatalExceptionClasses(Class[] fatalExceptionClasses) {
+	public final void setFatalExceptionClasses(Class<?>[] fatalExceptionClasses) {
 		fatalClassifier.setExceptionClasses(fatalExceptionClasses);
 	}
 

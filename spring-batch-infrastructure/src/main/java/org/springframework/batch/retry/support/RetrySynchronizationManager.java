@@ -38,7 +38,7 @@ public class RetrySynchronizationManager {
 
 	private RetrySynchronizationManager() {}
 
-	private static final ThreadLocal context = new ThreadLocal();
+	private static final ThreadLocal<RetryContext> context = new ThreadLocal<RetryContext>();
 
 	/**
 	 * Public accessor for the locally enclosing {@link RetryContext}.
