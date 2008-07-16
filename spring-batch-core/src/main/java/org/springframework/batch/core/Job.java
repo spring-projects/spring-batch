@@ -34,7 +34,7 @@ public interface Job {
 	 * @deprecated planned for removal in 2.0
 	 * @return the {@link Step}s executed as part of this job.
 	 */
-	List getSteps();
+	List<Step> getSteps();
 
 	boolean isRestartable();
 

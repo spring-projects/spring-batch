@@ -23,23 +23,23 @@ import org.springframework.util.Assert;
  */
 public class JobParametersBuilder {
 
-	private final Map stringMap;
+	private final Map<String, String> stringMap;
 
-	private final Map longMap;
+	private final Map<String, Long> longMap;
 	
-	private final Map doubleMap;
+	private final Map<String, Double> doubleMap;
 
-	private final Map dateMap;
+	private final Map<String, Date> dateMap;
 
 	/**
 	 * Default constructor. Initializes the builder
 	 */
 	public JobParametersBuilder() {
 
-		this.stringMap = new LinkedHashMap();
-		this.longMap = new LinkedHashMap();
-		this.doubleMap = new LinkedHashMap();
-		this.dateMap = new LinkedHashMap();
+		this.stringMap = new LinkedHashMap<String, String>();
+		this.longMap = new LinkedHashMap<String, Long>();
+		this.doubleMap = new LinkedHashMap<String, Double>();
+		this.dateMap = new LinkedHashMap<String, Date>();
 	}
 
 	/**

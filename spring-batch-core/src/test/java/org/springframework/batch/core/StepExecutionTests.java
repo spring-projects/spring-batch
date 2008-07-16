@@ -25,7 +25,6 @@ import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -37,11 +36,14 @@ public class StepExecutionTests extends TestCase {
 
 	private StepExecution blankExecution = newStepExecution(new StepSupport("blank"), null);
 	
-	private ExecutionContext foobarEc = new ExecutionContext() {
-		{
-			put("foo", "bar");
-		}
-	};
+	private ExecutionContext foobarEc = new ExecutionContext();
+	
+	
+
+	@Override
+	protected void setUp() throws Exception {
+		foobarEc.put("foo", "bar");
+	}
 
 	public void testStepExecution() {
 		assertNull(new StepExecution("step", null).getId());

@@ -29,13 +29,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public class JobParameters implements Serializable {
 
-	private final Map stringMap;
+	private final Map<String, String> stringMap;
 
-	private final Map longMap;
+	private final Map<String, Long> longMap;
 
-	private final Map doubleMap;
+	private final Map<String, Double> doubleMap;
 
-	private final Map dateMap;
+	private final Map<String, Date> dateMap;
 
 	/**
 	 * Default constructor. Creates a new empty JobRuntimeParameters. It should
@@ -43,10 +43,10 @@ public class JobParameters implements Serializable {
 	 * is needed, since JobRuntimeParameters is immutable.
 	 */
 	public JobParameters() {
-		this.stringMap = new LinkedHashMap();
-		this.longMap = new LinkedHashMap();
-		this.doubleMap = new LinkedHashMap();
-		this.dateMap = new LinkedHashMap();
+		this.stringMap = new LinkedHashMap<String, String>();
+		this.longMap = new LinkedHashMap<String, Long>();
+		this.doubleMap = new LinkedHashMap<String, Double>();
+		this.dateMap = new LinkedHashMap<String, Date>();
 	}
 
 	/**
@@ -54,16 +54,17 @@ public class JobParameters implements Serializable {
 	 * supported data types. See {@link JobParametersBuilder} for an easier way
 	 * to create parameters.
 	 */
-	public JobParameters(Map stringMap, Map longMap, Map doubleMap, Map dateMap) {
+	public JobParameters(Map<String, String> stringMap, Map<String, Long> longMap, Map<String, Double> doubleMap,
+			Map<String, Date> dateMap) {
 		super();
 
 		validateMap(stringMap, String.class);
 		validateMap(longMap, Long.class);
 		validateMap(doubleMap, Double.class);
 		validateMap(dateMap, Date.class);
-		this.stringMap = new LinkedHashMap(stringMap);
-		this.longMap = new LinkedHashMap(longMap);
-		this.doubleMap = new LinkedHashMap(doubleMap);
+		this.stringMap = new LinkedHashMap<String, String>(stringMap);
+		this.longMap = new LinkedHashMap<String, Long>(longMap);
+		this.doubleMap = new LinkedHashMap<String, Double>(doubleMap);
 		this.dateMap = copyDateMap(dateMap);
 	}
 
@@ -114,8 +115,8 @@ public class JobParameters implements Serializable {
 	 * 
 	 * @return an unmodifiable map containing all parameters.
 	 */
-	public Map getParameters() {
-		Map tempMap = new LinkedHashMap(stringMap);
+	public Map<String, Object> getParameters() {
+		Map<String, Object> tempMap = new LinkedHashMap<String, Object>(stringMap);
 		tempMap.putAll(longMap);
 		tempMap.putAll(doubleMap);
 		tempMap.putAll(dateMap);
@@ -127,7 +128,7 @@ public class JobParameters implements Serializable {
 	 * 
 	 * @return String parameters.
 	 */
-	public Map getStringParameters() {
+	public Map<String, String> getStringParameters() {
 		return Collections.unmodifiableMap(stringMap);
 	}
 
@@ -136,7 +137,7 @@ public class JobParameters implements Serializable {
 	 * 
 	 * @return long parameters.
 	 */
-	public Map getLongParameters() {
+	public Map<String, Long> getLongParameters() {
 		return Collections.unmodifiableMap(longMap);
 	}
 
@@ -145,7 +146,7 @@ public class JobParameters implements Serializable {
 	 * 
 	 * @return long parameters.
 	 */
-	public Map getDoubleParameters() {
+	public Map<String, Double> getDoubleParameters() {
 		return Collections.unmodifiableMap(doubleMap);
 	}
 
@@ -154,7 +155,7 @@ public class JobParameters implements Serializable {
 	 * 
 	 * @return date parameters.
 	 */
-	public Map getDateParameters() {
+	public Map<String, Date> getDateParameters() {
 		return Collections.unmodifiableMap(dateMap);
 	}
 
@@ -169,6 +170,8 @@ public class JobParameters implements Serializable {
 	 * Convenience method for validating that a the provided map only contains a
 	 * particular type as a value, with only a String as a key.
 	 */
+	
+	@SuppressWarnings("unchecked")
 	private void validateMap(Map map, Class type) {
 
 		for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
@@ -186,13 +189,11 @@ public class JobParameters implements Serializable {
 	/*
 	 * Convenience method for copying Date values to ensure immutability.
 	 */
-	private Map copyDateMap(Map dateMap) {
-		Map tempMap = new LinkedHashMap();
+	private Map<String, Date> copyDateMap(Map<String, Date> dateMap) {
+		Map<String, Date> tempMap = new LinkedHashMap<String, Date>();
 
-		for (Iterator it = dateMap.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
-			Date date = (Date) entry.getValue();
-			tempMap.put(entry.getKey(), new Date(date.getTime()));
+		for (Entry<String, Date> entry : dateMap.entrySet()) {
+			tempMap.put(entry.getKey(), new Date(entry.getValue().getTime()));
 		}
 
 		return tempMap;

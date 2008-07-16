@@ -31,5 +31,5 @@ public interface ListableJobRegistry extends JobRegistry {
 	 * 
 	 * @return a collection of String. Empty if none are registered.
 	 */
-	Collection getJobNames();
+	Collection<String> getJobNames();
 }

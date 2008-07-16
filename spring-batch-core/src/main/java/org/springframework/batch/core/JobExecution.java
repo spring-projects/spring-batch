@@ -19,7 +19,6 @@ package org.springframework.batch.core;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -34,7 +33,7 @@ public class JobExecution extends Entity {
 
 	private final JobInstance jobInstance;
 
-	private volatile transient Collection stepExecutions = new HashSet();
+	private volatile transient Collection<StepExecution> stepExecutions = new HashSet<StepExecution>();
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
@@ -131,7 +130,7 @@ public class JobExecution extends Entity {
 	 * 
 	 * @return the step executions that were registered
 	 */
-	public Collection getStepExecutions() {
+	public Collection<StepExecution> getStepExecutions() {
 		return stepExecutions;
 	}
 
@@ -177,8 +176,7 @@ public class JobExecution extends Entity {
 	 * 
 	 */
 	public void stop() {
-		for (Iterator it = stepExecutions.iterator(); it.hasNext();) {
-			StepExecution stepExecution = (StepExecution) it.next();
+		for (StepExecution stepExecution : stepExecutions) {
 			stepExecution.setTerminateOnly();
 		}
 		status = BatchStatus.STOPPING;
