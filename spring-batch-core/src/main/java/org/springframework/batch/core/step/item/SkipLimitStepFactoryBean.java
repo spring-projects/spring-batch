@@ -20,6 +20,7 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
+import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
@@ -53,9 +54,9 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	private int skipLimit = 0;
 
-	private Class[] skippableExceptionClasses = new Class[] { Exception.class };
+	private Class<?>[] skippableExceptionClasses = new Class[] { Exception.class };
 
-	private Class[] fatalExceptionClasses = new Class[] { Error.class };
+	private Class<?>[] fatalExceptionClasses = new Class[] { Error.class };
 
 	private ItemKeyGenerator itemKeyGenerator;
 
@@ -63,7 +64,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	private int retryLimit;
 
-	private Class[] retryableExceptionClasses = new Class[] {};
+	private Class<?>[] retryableExceptionClasses = new Class[] {};
 
 	private BackOffPolicy backOffPolicy;
 
@@ -103,7 +104,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	 * Public setter for the Class[].
 	 * @param retryableExceptionClasses the retryableExceptionClasses to set
 	 */
-	public void setRetryableExceptionClasses(Class[] retryableExceptionClasses) {
+	public void setRetryableExceptionClasses(Class<?>[] retryableExceptionClasses) {
 		this.retryableExceptionClasses = retryableExceptionClasses;
 	}
 
@@ -143,7 +144,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	 * 
 	 * @param exceptionClasses defaults to <code>Exception</code>
 	 */
-	public void setSkippableExceptionClasses(Class[] exceptionClasses) {
+	public void setSkippableExceptionClasses(Class<?>[] exceptionClasses) {
 		this.skippableExceptionClasses = exceptionClasses;
 	}
 
@@ -152,7 +153,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	 * 
 	 * @param fatalExceptionClasses {@link Error} by default
 	 */
-	public void setFatalExceptionClasses(Class[] fatalExceptionClasses) {
+	public void setFatalExceptionClasses(Class<?>[] fatalExceptionClasses) {
 		this.fatalExceptionClasses = fatalExceptionClasses;
 	}
 
@@ -188,13 +189,13 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 			ExceptionClassifierRetryPolicy retryPolicy = new ExceptionClassifierRetryPolicy();
 			SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
-			HashMap exceptionTypeMap = new HashMap();
+			HashMap<Class<?>, String> exceptionTypeMap = new HashMap<Class<?>, String>();
 			for (int i = 0; i < retryableExceptionClasses.length; i++) {
-				Class cls = retryableExceptionClasses[i];
+				Class<?> cls = retryableExceptionClasses[i];
 				exceptionTypeMap.put(cls, "retry");
 			}
 			exceptionClassifier.setTypeMap(exceptionTypeMap);
-			HashMap retryPolicyMap = new HashMap();
+			HashMap<String, RetryPolicy> retryPolicyMap = new HashMap<String, RetryPolicy>();
 			retryPolicyMap.put("retry", simpleRetryPolicy);
 			retryPolicyMap.put("default", new NeverRetryPolicy());
 			retryPolicy.setPolicyMap(retryPolicyMap);
@@ -222,7 +223,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 
-			List exceptions = new ArrayList(Arrays.asList(skippableExceptionClasses));
+			List<Class<?>> exceptions = new ArrayList<Class<?>>(Arrays.asList(skippableExceptionClasses));
 			ItemSkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions, Arrays
 					.asList(fatalExceptionClasses));
 			exceptions.addAll(Arrays.asList(retryableExceptionClasses));
@@ -242,8 +243,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	}
 
-	public void addFatalExceptionIfMissing(Class cls) {
-		List fatalExceptionList = new ArrayList(Arrays.asList(fatalExceptionClasses));
+	public void addFatalExceptionIfMissing(Class<?> cls) {
+		List<Class<?>> fatalExceptionList = new ArrayList<Class<?>>(Arrays.asList(fatalExceptionClasses));
 		if (!fatalExceptionList.contains(cls)) {
 			fatalExceptionList.add(cls);
 		}

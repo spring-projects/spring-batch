@@ -105,7 +105,7 @@ abstract class BatchListenerFactoryHelper {
 				}
 			}
 		};
-		
+
 		return itemWriter;
 
 	}
@@ -141,6 +141,7 @@ abstract class BatchListenerFactoryHelper {
 				public void open(RepeatContext context) {
 					multicaster.beforeChunk();
 				}
+
 				public void close(RepeatContext context) {
 					multicaster.afterChunk();
 				}
@@ -156,28 +157,28 @@ abstract class BatchListenerFactoryHelper {
 	 * @param listeners
 	 */
 	public static StepExecutionListener[] getStepListeners(StepListener[] listeners) {
-		List list = new ArrayList();
+		List<StepExecutionListener> list = new ArrayList<StepExecutionListener>();
 		for (int i = 0; i < listeners.length; i++) {
 			StepListener listener = listeners[i];
 			if (listener instanceof StepExecutionListener) {
-				list.add(listener);
+				list.add((StepExecutionListener) listener);
 			}
 		}
-		return (StepExecutionListener[]) list.toArray(new StepExecutionListener[list.size()]);
+		return list.toArray(new StepExecutionListener[list.size()]);
 	}
 
 	/**
 	 * @param listeners
 	 */
 	public static SkipListener[] getSkipListeners(StepListener[] listeners) {
-		List list = new ArrayList();
+		List<SkipListener> list = new ArrayList<SkipListener>();
 		for (int i = 0; i < listeners.length; i++) {
 			StepListener listener = listeners[i];
 			if (listener instanceof SkipListener) {
-				list.add(listener);
+				list.add((SkipListener) listener);
 			}
 		}
-		return (SkipListener[]) list.toArray(new SkipListener[list.size()]);
+		return list.toArray(new SkipListener[list.size()]);
 	}
 
 }

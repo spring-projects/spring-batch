@@ -18,7 +18,6 @@ package org.springframework.batch.core.step.skip;
 import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -77,8 +76,9 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * and none are fatal.
 	 * @param skipLimit the number of exceptions allowed to skip
 	 */
+	@SuppressWarnings("unchecked")
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
-		this(skipLimit, Collections.singletonList(Exception.class), Collections.EMPTY_LIST);
+		this(skipLimit, (List) Collections.singletonList(Exception.class), Collections.EMPTY_LIST);
 	}
 
 	/**
@@ -89,16 +89,14 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * (non-critical)
 	 * @param fatalExceptions exception classes that should never be skipped
 	 */
-	public LimitCheckingItemSkipPolicy(int skipLimit, List skippableExceptions, List fatalExceptions) {
+	public LimitCheckingItemSkipPolicy(int skipLimit, List<Class<?>> skippableExceptions, List<Class<?>>fatalExceptions) {
 		this.skipLimit = skipLimit;
 		SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
-		Map typeMap = new HashMap();
-		for (Iterator iterator = skippableExceptions.iterator(); iterator.hasNext();) {
-			Class throwable = (Class) iterator.next();
+		Map<Class<?>, String> typeMap = new HashMap<Class<?>, String>();
+		for (Class<?> throwable : skippableExceptions) {
 			typeMap.put(throwable, SKIP);
 		}
-		for (Iterator iterator = fatalExceptions.iterator(); iterator.hasNext();) {
-			Class throwable = (Class) iterator.next();
+		for (Class<?> throwable : fatalExceptions) {
 			typeMap.put(throwable, NEVER_SKIP);
 		}
 		exceptionClassifier.setTypeMap(typeMap);

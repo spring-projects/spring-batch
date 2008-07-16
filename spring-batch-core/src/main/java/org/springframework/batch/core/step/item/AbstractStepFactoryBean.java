@@ -270,6 +270,7 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public Class getObjectType() {
 		return Step.class;
 	}

@@ -17,7 +17,6 @@ package org.springframework.batch.core.step.item;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,14 +57,14 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * removed
 	 */
 	private static final String TO_BE_REMOVED = ItemSkipPolicyItemHandler.class.getName() + ".TO_BE_REMOVED";
-	
+
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
 	private int skipCacheCapacity = 1024;
 
-	private Map skippedExceptions = new HashMap();
+	private Map<Object, Throwable> skippedExceptions = new HashMap<Object, Throwable>();
 
-	private Class[] doNotRethrowExceptionClasses = new Class[] {};
+	private Class<?>[] doNotRethrowExceptionClasses = new Class[] {};
 
 	private static final ItemKeyGenerator defaultItemKeyGenerator = new ItemKeyGenerator() {
 		public Object getKey(Object item) {
@@ -162,7 +161,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 				while (item != null && throwable != null) {
 					logger.debug("Skipping item on input, previously failed on output; key=[" + key + "]");
 					scheduleForRemoval(key);
-					
+
 					item = doRead();
 					key = itemKeyGenerator.getKey(item);
 					throwable = getSkippedException(key);
@@ -175,9 +174,9 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 					if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						// increment skip count and try again
 						contribution.incrementTemporaryReadSkipCount();
-						
+
 						listener.onSkipInRead(e);
-						
+
 						logger.debug("Skipping failed input", e);
 					}
 					else {
@@ -225,12 +224,12 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 		catch (Exception e) {
 			if (itemSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 				contribution.incrementWriteSkipCount();
-				
+
 				addSkippedException(key, e);
 				logger.debug("Added item to skip list; key=" + key);
 
 				listener.onSkipInWrite(item, e);
-				
+
 				// return without re-throwing if exception shouldn't cause
 				// rollback
 				if (!shouldRethrow(e)) {
@@ -278,25 +277,25 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * 
 	 * @param key
 	 */
+	@SuppressWarnings("unchecked")
 	private void scheduleForRemoval(Object key) {
 		if (!TransactionSynchronizationManager.hasResource(TO_BE_REMOVED)) {
-			TransactionSynchronizationManager.bindResource(TO_BE_REMOVED, new HashSet());
+			TransactionSynchronizationManager.bindResource(TO_BE_REMOVED, new HashSet<Object>());
 		}
-		((Set) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).add(key);
+		((Set<Object>) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).add(key);
 	}
 
 	/**
 	 * Clear the map of skipped exception corresponding to key.
 	 * @param key the key to clear
 	 */
+	@SuppressWarnings("unchecked")
 	private void clearSkippedExceptions() {
 		if (!TransactionSynchronizationManager.hasResource(TO_BE_REMOVED)) {
 			return;
 		}
 		synchronized (skippedExceptions) {
-			for (Iterator iterator = ((Set) TransactionSynchronizationManager.getResource(TO_BE_REMOVED)).iterator(); iterator
-					.hasNext();) {
-				Object key = iterator.next();
+			for (Object key : ((Set<Object>) TransactionSynchronizationManager.getResource(TO_BE_REMOVED))) {
 				skippedExceptions.remove(key);
 			}
 			TransactionSynchronizationManager.unbindResource(TO_BE_REMOVED);
@@ -317,7 +316,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * doNotRethrowExceptionClasses will not be re-thrown when skipped.
 	 * @param doNotRethrowExceptionClasses empty by default
 	 */
-	public void setDoNotRethrowExceptionClasses(Class[] doNotRethrowExceptionClasses) {
+	public void setDoNotRethrowExceptionClasses(Class<?>[] doNotRethrowExceptionClasses) {
 		this.doNotRethrowExceptionClasses = doNotRethrowExceptionClasses;
 	}
 
