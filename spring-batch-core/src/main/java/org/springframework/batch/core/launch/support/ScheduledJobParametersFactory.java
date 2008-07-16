@@ -19,7 +19,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -51,8 +50,7 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 		JobParametersBuilder propertiesBuilder = new JobParametersBuilder();
 
-		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
+		for (Entry<Object, Object> entry : props.entrySet()) {
 			if (entry.getKey().equals(SCHEDULE_DATE_KEY)) {
 				Date scheduleDate;
 				try {
@@ -80,11 +78,10 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 			return new Properties();
 		}
 
-		Map parameters = params.getParameters();
+		Map<String, Object> parameters = params.getParameters();
 		Properties result = new Properties();
-		for (Iterator iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
-			Entry entry = (Entry) iterator.next();
-			String key = (String) entry.getKey();
+		for (Entry<String, Object> entry : parameters.entrySet()) {
+			String key = entry.getKey();
 			if (key.equals(SCHEDULE_DATE_KEY)) {
 				result.setProperty(key, dateFormat.format(entry.getValue()));
 			} else {

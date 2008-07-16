@@ -16,7 +16,6 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -46,12 +45,15 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 
 	private JobLocator jobLocator;
 
-	private Map registry = new HashMap();
+	private Map<String, JobExecution> registry = new HashMap<String, JobExecution>();
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(launcher, "JobLauncher must be provided.");
@@ -65,7 +67,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	public void setLauncher(JobLauncher launcher) {
 		this.launcher = launcher;
 	}
-	
+
 	/**
 	 * Public setter for the JobLocator.
 	 * @param jobLocator the jobLocator to set
@@ -73,7 +75,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	public void setJobLocator(JobLocator jobLocator) {
 		this.jobLocator = jobLocator;
 	}
-	
+
 	/**
 	 * Public setter for the JobParametersFactory.
 	 * @param jobParametersConverter the jobParametersFactory to set
@@ -84,13 +86,15 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher#getStatistics()
+	 * 
+	 * @see
+	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * #getStatistics()
 	 */
 	public Properties getStatistics() {
 		Properties result = new Properties();
 		int i = 0;
-		for (Iterator iterator = registry.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
+		for (String key : registry.keySet()) {
 			JobExecution execution = (JobExecution) registry.get(key);
 			addStatistics(result, execution, "job" + i + ".");
 			i++;
@@ -104,23 +108,23 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	 */
 	private void addStatistics(Properties result, JobExecution execution, String prefix) {
 		int i = 0;
-		for (Iterator iterator = execution.getStepExecutions().iterator(); iterator.hasNext();) {
-			StepExecution stepExecution = (StepExecution) iterator.next();
-			ExecutionContext statistics = stepExecution.getExecutionContext();
-			for (Iterator iter = statistics.entrySet().iterator(); iter.hasNext();) {
-				Entry entry = (Entry) iter.next();
-				result.setProperty(prefix + "step" + i + "." + entry.getKey(), ""+entry.getValue());
+		for (StepExecution stepExecution : execution.getStepExecutions()) {
+			ExecutionContext executionContext = stepExecution.getExecutionContext();
+			for (Entry<String, Object> entry : executionContext.entrySet()) {
+				result.setProperty(prefix + "step" + i + "." + entry.getKey(), "" + entry.getValue());
 			}
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher#isRunning()
+	 * 
+	 * @see
+	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * #isRunning()
 	 */
 	public boolean isRunning() {
-		for (Iterator iterator = registry.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
+		for (String key : registry.keySet()) {
 			JobExecution execution = (JobExecution) registry.get(key);
 			if (execution.isRunning()) {
 				return true;
@@ -131,7 +135,10 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher#run(java.lang.String)
+	 * 
+	 * @see
+	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * #run(java.lang.String)
 	 */
 	public String run(String name) {
 		return run(name, null);
@@ -139,8 +146,10 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher#run(java.lang.String,
-	 * java.lang.String)
+	 * 
+	 * @see
+	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * #run(java.lang.String, java.lang.String)
 	 */
 	public String run(String name, String params) {
 
@@ -172,11 +181,13 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher#stop()
+	 * 
+	 * @see
+	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * #stop()
 	 */
 	public void stop() {
-		for (Iterator iterator = registry.keySet().iterator(); iterator.hasNext();) {
-			String key = (String) iterator.next();
+		for (String key : registry.keySet()) {
 			JobExecution execution = (JobExecution) registry.get(key);
 			execution.stop();
 		}
