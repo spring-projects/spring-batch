@@ -17,7 +17,6 @@
 package org.springframework.batch.core.repository.support;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
@@ -106,8 +105,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * <ol>
 	 * <li>First we find all jobs which match the given {@link JobParameters}
 	 * and job name</li>
-	 * <li>What happens then depends on how many existing job instances we
-	 * find:
+	 * <li>What happens then depends on how many existing job instances we find:
 	 * <ul>
 	 * <li>If there are none, or the {@link Job} is marked restartable, then we
 	 * create a new {@link JobInstance}</li>
@@ -161,11 +159,10 @@ public class SimpleJobRepository implements JobRepository {
 				throw new JobRestartException("JobInstance already exists and is not restartable");
 			}
 
-			List executions = jobExecutionDao.findJobExecutions(jobInstance);
+			List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 
 			// check for running executions and find the last started
-			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
-				JobExecution execution = (JobExecution) iterator.next();
+			for (JobExecution execution : executions) {
 				if (execution.isRunning()) {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
@@ -199,8 +196,8 @@ public class SimpleJobRepository implements JobRepository {
 	 * Save or Update a JobExecution. A JobExecution is considered one
 	 * 'execution' of a particular job. Therefore, it must have it's jobId field
 	 * set before it is passed into this method. It also has it's own unique
-	 * identifier, because it must be updatable separately. If an id isn't found,
-	 * a new JobExecution is created, if one is found, the current row is
+	 * identifier, because it must be updatable separately. If an id isn't
+	 * found, a new JobExecution is created, if one is found, the current row is
 	 * updated.
 	 * 
 	 * @param jobExecution to be stored.
@@ -247,7 +244,10 @@ public class SimpleJobRepository implements JobRepository {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.domain.StepExecution)
+	 * 
+	 * @seeorg.springframework.batch.core.repository.JobRepository#
+	 * saveOrUpdateExecutionContext
+	 * (org.springframework.batch.core.domain.StepExecution)
 	 */
 	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 		// Until there is an interface change (
@@ -259,18 +259,16 @@ public class SimpleJobRepository implements JobRepository {
 	 * @return the last execution of the step within given job instance
 	 */
 	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
-		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		List stepExecutions = new ArrayList(jobExecutions.size());
-		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
-			JobExecution jobExecution = (JobExecution) iterator.next();
+		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
+		for (JobExecution jobExecution : jobExecutions) {
 			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, step);
 			if (stepExecution != null) {
 				stepExecutions.add(stepExecution);
 			}
 		}
 		StepExecution latest = null;
-		for (Iterator iterator = stepExecutions.iterator(); iterator.hasNext();) {
-			StepExecution stepExecution = (StepExecution) iterator.next();
+		for (StepExecution stepExecution : stepExecutions) {
 			if (latest == null) {
 				latest = stepExecution;
 			}
@@ -286,9 +284,8 @@ public class SimpleJobRepository implements JobRepository {
 	 */
 	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
 		int count = 0;
-		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
-			JobExecution jobExecution = (JobExecution) iterator.next();
+		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		for (JobExecution jobExecution : jobExecutions) {
 			if (stepExecutionDao.getStepExecution(jobExecution, step) != null) {
 				count++;
 			}

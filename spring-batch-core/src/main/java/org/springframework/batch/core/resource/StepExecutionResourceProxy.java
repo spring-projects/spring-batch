@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.Map.Entry;
 
@@ -259,8 +258,7 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
 
 		if (properties != null) {
-			for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
-				Entry entry = (Entry) iterator.next();
+			for (Entry<Object, Object> entry : properties.entrySet()) {
 				String key = (String) entry.getKey();
 				fileName = replacePattern(fileName, "%" + key + "%", (String) entry.getValue());
 			}

@@ -31,40 +31,42 @@ import org.springframework.jdbc.core.StatementCreatorUtils;
 import org.springframework.util.Assert;
 
 /**
- * Implementation of the {@link PreparedStatementSetter} interface that also implements
- * {@link StepExecutionListener} and uses {@link JobParameters} to set the parameters on a 
- * PreparedStatement.
+ * Implementation of the {@link PreparedStatementSetter} interface that also
+ * implements {@link StepExecutionListener} and uses {@link JobParameters} to
+ * set the parameters on a PreparedStatement.
  * 
  * @author Lucas Ward
- *
+ * 
  */
 public class StepExecutionPreparedStatementSetter extends StepExecutionListenerSupport implements
 		PreparedStatementSetter, InitializingBean {
 
-	private List parameterKeys;
+	private List<String> parameterKeys;
+
 	private JobParameters jobParameters;
-	
+
 	public void setValues(PreparedStatement ps) throws SQLException {
-		Map parameters = jobParameters.getParameters();
-		for(int i = 0; i < parameterKeys.size(); i++){
+		Map<String, Object> parameters = jobParameters.getParameters();
+		for (int i = 0; i < parameterKeys.size(); i++) {
 			Object arg = parameters.get(parameterKeys.get(i));
-			if(arg == null){
-				throw new IllegalStateException("No job parameter found for with key of: [" + parameterKeys.get(i) + "]");
+			if (arg == null) {
+				throw new IllegalStateException("No job parameter found for with key of: [" + parameterKeys.get(i)
+						+ "]");
 			}
 			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, arg);
 		}
 	}
-	
+
 	public void beforeStep(StepExecution stepExecution) {
 		this.jobParameters = stepExecution.getJobParameters();
 	}
-	
+
 	/**
-	 * The parameter names that will be pulled from the {@link JobParameters}.  It is
-	 * assumed that their order in the List is the order of the parameters in the 
-	 * PreparedStatement.
+	 * The parameter names that will be pulled from the {@link JobParameters}.
+	 * It is assumed that their order in the List is the order of the parameters
+	 * in the PreparedStatement.
 	 */
-	public void setParameterKeys(List parameterKeys) {
+	public void setParameterKeys(List<String> parameterKeys) {
 		this.parameterKeys = parameterKeys;
 	}
 
