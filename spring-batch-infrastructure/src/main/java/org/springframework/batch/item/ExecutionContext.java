@@ -37,14 +37,14 @@ public class ExecutionContext implements Serializable {
 
 	private boolean dirty = false;
 
-	private final Map<Object, Object> map;
+	private final Map<String, Object> map;
 
 	/**
 	 * Default constructor. Initializes a new execution context with an empty
 	 * internal map.
 	 */
 	public ExecutionContext() {
-		map = new HashMap<Object, Object>();
+		map = new HashMap<String, Object>();
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class ExecutionContext implements Serializable {
 	 * 
 	 * @param map Initial contents of context.
 	 */
-	public ExecutionContext(Map<Object, Object> map) {
+	public ExecutionContext(Map<String, Object> map) {
 		this.map = map;
 	}
 
@@ -64,7 +64,7 @@ public class ExecutionContext implements Serializable {
 		if (executionContext == null) {
 			return;
 		}
-		for (Entry<Object, Object> entry : executionContext.entrySet()) {
+		for (Entry<String, Object> entry : executionContext.entrySet()) {
 			this.map.put(entry.getKey(), entry.getValue());
 		}
 	}
@@ -265,7 +265,7 @@ public class ExecutionContext implements Serializable {
 	 * @return A set representing the contents of the context
 	 * @see java.util.Map#entrySet()
 	 */
-	public Set<Entry<Object, Object>> entrySet() {
+	public Set<Entry<String, Object>> entrySet() {
 		return map.entrySet();
 	}
 
@@ -302,8 +302,8 @@ public class ExecutionContext implements Serializable {
 	 */
 	public Properties getProperties() {
 		Properties props = new Properties();
-		for (Entry<Object, Object> entry : map.entrySet()) {
-			props.setProperty(entry.getKey().toString(), entry.getValue().toString());
+		for (Entry<String, Object> entry : map.entrySet()) {
+			props.setProperty(entry.getKey(), entry.getValue().toString());
 		}
 
 		return props;

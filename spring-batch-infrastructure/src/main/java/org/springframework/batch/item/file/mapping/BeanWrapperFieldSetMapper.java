@@ -19,7 +19,6 @@ package org.springframework.batch.item.file.mapping;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -86,7 +85,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 
 	private BeanFactory beanFactory;
 
-	private static Map propertiesMatched = new HashMap();
+	private static Map<Class<?>, Map<String, String>> propertiesMatched = new HashMap<Class<?>, Map<String, String>>();
 
 	private static int distanceLimit = 5;
 
@@ -126,7 +125,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * 
 	 * @param type the type to set
 	 */
-	public void setTargetType(Class type) {
+	public void setTargetType(Class<?> type) {
 		this.type = type;
 	}
 
@@ -227,23 +226,23 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * @param properties
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private Properties getBeanProperties(Object bean, Properties properties) {
 
-		Class cls = bean.getClass();
+		Class<?> cls = bean.getClass();
 
 		// Map from field names to property names
-		Map matches = (Map) propertiesMatched.get(cls);
+		Map<String, String> matches = propertiesMatched.get(cls);
 		if (matches == null) {
-			matches = new HashMap();
+			matches = new HashMap<String, String>();
 			propertiesMatched.put(cls, matches);
 		}
 
-		Set keys = new HashSet(properties.keySet());
-		for (Iterator iter = keys.iterator(); iter.hasNext();) {
-			String key = (String) iter.next();
+		Set<String> keys = new HashSet(properties.keySet());
+		for (String key : keys) {
 
 			if (matches.containsKey(key)) {
-				switchPropertyNames(properties, key, (String) matches.get(key));
+				switchPropertyNames(properties, key, matches.get(key));
 				continue;
 			}
 
@@ -260,7 +259,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 
 	private String findPropertyName(Object bean, String key) {
 
-		Class cls = bean.getClass();
+		Class<?> cls = bean.getClass();
 
 		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(key);
 		String prefix;

@@ -128,7 +128,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testRestoreFromEmptyData() throws Exception {
-		ExecutionContext streamContext = new ExecutionContext(new Properties());
+		ExecutionContext streamContext = new ExecutionContext(new ExecutionContext());
 
 		getAsItemStream(itemReader).open(streamContext);
 
@@ -201,11 +201,9 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		static final String RESTART_KEY = "restart.keys";
 
 		static {
-			Properties props = new Properties();
 			// restart data properties cannot be empty.
-			props.setProperty("", "");
-
-			streamContext = new ExecutionContext(props);
+			streamContext = new ExecutionContext();
+			streamContext.put("", "");
 		}
 
 		public MockKeyGenerator() {

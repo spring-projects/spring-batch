@@ -49,7 +49,8 @@ public class StepExecutionMessageHandlerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setStep(org.springframework.batch.core.Step)}.
+	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setStep(org.springframework.batch.core.Step)}
+	 * .
 	 */
 	@Test
 	public void testSetStep() {
@@ -63,7 +64,8 @@ public class StepExecutionMessageHandlerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setJobRepository(org.springframework.batch.core.repository.JobRepository)}.
+	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setJobRepository(org.springframework.batch.core.repository.JobRepository)}
+	 * .
 	 */
 	@Test
 	public void testSetJobRepository() {
@@ -97,7 +99,7 @@ public class StepExecutionMessageHandlerTests {
 		JobExecutionRequest message = handler.handle(jobExecutionRequest);
 		assertEquals(1, message.getJobExecution().getStepExecutions().size());
 		JobExecution jobExecution = message.getJobExecution();
-		assertTrue(jobExecution .getExecutionContext().containsKey("foo"));
+		assertTrue(jobExecution.getExecutionContext().containsKey("foo"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -117,8 +119,8 @@ public class StepExecutionMessageHandlerTests {
 		});
 		JobExecutionRequest message = handler.handle(jobExecutionRequest);
 		JobExecution jobExecution = message.getJobExecution();
-		assertTrue(jobExecution .getExecutionContext().containsKey("foo"));
-		assertTrue(jobExecution .getExecutionContext().containsKey("bar"));
+		assertTrue(jobExecution.getExecutionContext().containsKey("foo"));
+		assertTrue(jobExecution.getExecutionContext().containsKey("bar"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -140,14 +142,20 @@ public class StepExecutionMessageHandlerTests {
 			public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
 				StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 				stepExecution.setStatus(BatchStatus.FAILED);
-				stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter
-						.stringToProperties("foo=bar")));
+				stepExecution.setExecutionContext(new ExecutionContext() {
+					{
+						put("foo", "bar");
+					}
+				});
+
 				return stepExecution;
 			}
 
 			/*
 			 * (non-Javadoc)
-			 * @see org.springframework.integration.batch.JobRepositorySupport#getStepExecutionCount(org.springframework.batch.core.JobInstance,
+			 * 
+			 * @seeorg.springframework.integration.batch.JobRepositorySupport#
+			 * getStepExecutionCount(org.springframework.batch.core.JobInstance,
 			 * org.springframework.batch.core.Step)
 			 */
 			@Override
@@ -172,8 +180,11 @@ public class StepExecutionMessageHandlerTests {
 			public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
 				StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 				stepExecution.setStatus(BatchStatus.COMPLETED);
-				stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter
-						.stringToProperties("foo=bar")));
+				stepExecution.setExecutionContext(new ExecutionContext() {
+					{
+						put("foo", "bar");
+					}
+				});
 				return stepExecution;
 			}
 		};
