@@ -52,7 +52,7 @@ public class CompositeSkipListener implements SkipListener {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	public void onSkipInRead(Throwable t) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
 			SkipListener listener = (SkipListener) iterator.next();
 			listener.onSkipInRead(t);
 		}
@@ -65,7 +65,7 @@ public class CompositeSkipListener implements SkipListener {
 	 * java.lang.Throwable)
 	 */
 	public void onSkipInWrite(Object item, Throwable t) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
 			SkipListener listener = (SkipListener) iterator.next();
 			listener.onSkipInWrite(item, t);
 		}

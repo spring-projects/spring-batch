@@ -53,7 +53,7 @@ public class CompositeItemWriteListener implements ItemWriteListener {
 	 * @see org.springframework.batch.core.ItemWriteListener#afterWrite(java.lang.Object)
 	 */
 	public void afterWrite(Object item) {
-		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener listener = (ItemWriteListener) iterator.next();
 			listener.afterWrite(item);
 		}
@@ -65,7 +65,7 @@ public class CompositeItemWriteListener implements ItemWriteListener {
 	 * @see org.springframework.batch.core.ItemWriteListener#beforeWrite(java.lang.Object)
 	 */
 	public void beforeWrite(Object item) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemWriteListener listener = (ItemWriteListener) iterator.next();
 			listener.beforeWrite(item);
 		}
@@ -78,7 +78,7 @@ public class CompositeItemWriteListener implements ItemWriteListener {
 	 * java.lang.Object)
 	 */
 	public void onWriteError(Exception ex, Object item) {
-		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemWriteListener listener = (ItemWriteListener) iterator.next();
 			listener.onWriteError(ex, item);
 		}

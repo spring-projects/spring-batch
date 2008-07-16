@@ -53,7 +53,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @see org.springframework.batch.core.ItemReadListener#afterRead(java.lang.Object)
 	 */
 	public void afterRead(Object item) {
-		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.afterRead(item);
 		}
@@ -65,7 +65,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @see org.springframework.batch.core.ItemReadListener#beforeRead()
 	 */
 	public void beforeRead() {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.beforeRead();
 		}
@@ -77,7 +77,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @see org.springframework.batch.core.ItemReadListener#onReadError(java.lang.Exception)
 	 */
 	public void onReadError(Exception ex) {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.onReadError(ex);
 		}

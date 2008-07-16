@@ -53,7 +53,7 @@ public class CompositeChunkListener implements ChunkListener {
 	 * @see org.springframework.batch.core.ChunkListener#afterChunk()
 	 */
 	public void afterChunk() {
-		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
 			ChunkListener listener = (ChunkListener) iterator.next();
 			listener.afterChunk();
 		}
@@ -65,7 +65,7 @@ public class CompositeChunkListener implements ChunkListener {
 	 * @see org.springframework.batch.core.ChunkListener#beforeChunk()
 	 */
 	public void beforeChunk() {
-		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
 			ChunkListener listener = (ChunkListener) iterator.next();
 			listener.beforeChunk();
 		}

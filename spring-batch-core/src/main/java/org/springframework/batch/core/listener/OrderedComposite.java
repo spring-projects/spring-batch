@@ -31,11 +31,12 @@ import org.springframework.core.Ordered;
  */
 class OrderedComposite {
 
-	private List unordered = new ArrayList();
+	private List<Object> unordered = new ArrayList<Object>();
 
-	private Collection ordered = new TreeSet(new OrderComparator());
+	@SuppressWarnings("unchecked")
+	private Collection<Object> ordered = new TreeSet<Object>(new OrderComparator());
 
-	private List list = new ArrayList();
+	private List<Object> list = new ArrayList<Object>();
 
 	/**
 	 * Public setter for the listeners.
@@ -76,8 +77,8 @@ class OrderedComposite {
 	 * first, followed by any unordered ones.
 	 * @return an iterator over the list of items
 	 */
-	public Iterator iterator() {
-		return new ArrayList(list).iterator();
+	public Iterator<Object> iterator() {
+		return new ArrayList<Object>(list).iterator();
 	}
 
 	/**
@@ -85,8 +86,8 @@ class OrderedComposite {
 	 * last, after any unordered ones.
 	 * @return an iterator over the list of items
 	 */
-	public Iterator reverse() {
-		ArrayList result = new ArrayList(list);
+	public Iterator<Object> reverse() {
+		ArrayList<Object> result = new ArrayList<Object>(list);
 		Collections.reverse(result);
 		return result.iterator();
 	}
