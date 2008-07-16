@@ -170,7 +170,7 @@ public class FileToMessagesJobFactoryBean implements FactoryBean, BeanNameAware 
 	 * Always returns {@link Job}.
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
-	public Class<?> getObjectType() {
+	public Class<Job> getObjectType() {
 		return Job.class;
 	}
 

@@ -64,8 +64,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	 * @return JobRepository.class
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
-	@SuppressWarnings("unchecked")
-	public Class getObjectType() {
+	public Class<JobRepository> getObjectType() {
 		return JobRepository.class;
 	}
 
