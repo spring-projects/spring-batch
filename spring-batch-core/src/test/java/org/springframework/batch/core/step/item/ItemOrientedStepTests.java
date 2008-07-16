@@ -80,6 +80,12 @@ public class ItemOrientedStepTests extends TestCase {
 	private JobInstance jobInstance;
 
 	private ResourcelessTransactionManager transactionManager;
+	
+	private ExecutionContext foobarEc = new ExecutionContext() {
+		{
+			put("foo", "bar");
+		}
+	};
 
 	private ItemReader getReader(String[] args) {
 		return new ListItemReader(Arrays.asList(args));
@@ -529,7 +535,7 @@ public class ItemOrientedStepTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
 
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		stepExecution.setExecutionContext(foobarEc);
 
 		try {
 			itemOrientedStep.execute(stepExecution);
@@ -556,7 +562,7 @@ public class ItemOrientedStepTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
 
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
 		try {
@@ -583,7 +589,7 @@ public class ItemOrientedStepTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
 
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
 		try {
@@ -616,7 +622,7 @@ public class ItemOrientedStepTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
 
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
 		try {
@@ -644,7 +650,7 @@ public class ItemOrientedStepTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
 
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
 		try {
@@ -706,7 +712,7 @@ public class ItemOrientedStepTests extends TestCase {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
 
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
 		try {

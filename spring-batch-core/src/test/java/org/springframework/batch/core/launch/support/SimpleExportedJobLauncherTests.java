@@ -55,8 +55,11 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException {
 				JobExecution result = new JobExecution(null);
 				StepExecution stepExecution = result.createStepExecution(new StepSupport("stepName"));
-				stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter
-				        .stringToProperties("foo=bar")));
+				stepExecution.setExecutionContext(new ExecutionContext() {
+					{
+						put("foo", "bar");
+					}
+				});
 				list.add(jobParameters);
 				return result;
 			}
@@ -67,7 +70,8 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#afterPropertiesSet()}.
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#afterPropertiesSet()}
+	 * .
 	 * 
 	 * @throws Exception
 	 */
@@ -76,15 +80,18 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 		try {
 			launcher.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'launcher': " + message, contains(message.toLowerCase(), "joblauncher"));
+			assertTrue("Message does not contain 'launcher': " + message,
+					contains(message.toLowerCase(), "joblauncher"));
 		}
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#afterPropertiesSet()}.
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#afterPropertiesSet()}
+	 * .
 	 * 
 	 * @throws Exception
 	 */
@@ -98,14 +105,17 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 		try {
 			launcher.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			String message = e.getMessage();
 			assertTrue("Message does not contain 'locator': " + message, contains(message.toLowerCase(), "joblocator"));
 		}
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#getStatistics()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#getStatistics()}
+	 * .
 	 */
 	public void testGetStatistics() {
 		Properties props = launcher.getStatistics();
@@ -114,7 +124,9 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#getStatistics()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#getStatistics()}
+	 * .
 	 * 
 	 * @throws Exception
 	 */
@@ -127,7 +139,9 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#isRunning()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#isRunning()}
+	 * .
 	 * 
 	 * @throws Exception
 	 */
@@ -138,7 +152,9 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#isRunning()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#isRunning()}
+	 * .
 	 * 
 	 * @throws Exception
 	 */
@@ -150,12 +166,14 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 			}
 		});
 		String value = launcher.run("foo");
-		assertTrue("Return value was not an exception: " + value, contains(value, "JobExecutionAlreadyRunningException"));
+		assertTrue("Return value was not an exception: " + value,
+				contains(value, "JobExecutionAlreadyRunningException"));
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}.
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}
+	 * .
 	 */
 	public void testRunNonExistentJob() {
 		String value = launcher.run("foo");
@@ -164,7 +182,8 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}.
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}
+	 * .
 	 * 
 	 * @throws Exception
 	 */
@@ -177,7 +196,8 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}.
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#run(java.lang.String)}
+	 * .
 	 * 
 	 * @throws Exception
 	 */
@@ -198,7 +218,9 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#stop()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.launch.support.SimpleExportedJobLauncher#stop()}
+	 * .
 	 * 
 	 * @throws Exception
 	 */

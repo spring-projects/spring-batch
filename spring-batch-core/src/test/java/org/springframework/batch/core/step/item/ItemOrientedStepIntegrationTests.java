@@ -139,7 +139,11 @@ public class ItemOrientedStepIntegrationTests extends AbstractDependencyInjectio
 		JobExecution jobExecution = jobRepository.createJobExecution(job, new JobParameters());
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		stepExecution.setExecutionContext(new ExecutionContext() {
+			{
+				put("foo", "bar");
+			}
+		});
 		// step.setLastExecution(stepExecution);
 
 		try {

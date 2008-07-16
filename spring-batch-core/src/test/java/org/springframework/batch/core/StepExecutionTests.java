@@ -36,6 +36,12 @@ public class StepExecutionTests extends TestCase {
 	private StepExecution execution = newStepExecution(new StepSupport("stepName"), new Long(23));
 
 	private StepExecution blankExecution = newStepExecution(new StepSupport("blank"), null);
+	
+	private ExecutionContext foobarEc = new ExecutionContext() {
+		{
+			put("foo", "bar");
+		}
+	};
 
 	public void testStepExecution() {
 		assertNull(new StepExecution("step", null).getId());
@@ -206,7 +212,7 @@ public class StepExecutionTests extends TestCase {
 		Set set = new HashSet();
 		set.add(execution);
 		assertTrue(set.contains(execution));
-		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		execution.setExecutionContext(foobarEc);
 		assertTrue(set.contains(execution));
 	}
 	
@@ -214,7 +220,7 @@ public class StepExecutionTests extends TestCase {
 		
 		ExitStatus status = ExitStatus.NOOP;
 		execution.setExitStatus(status);
-		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		execution.setExecutionContext(foobarEc);
 		
 		byte[] serialized = SerializationUtils.serialize(execution);
 		StepExecution deserialized = (StepExecution) SerializationUtils.deserialize(serialized);
