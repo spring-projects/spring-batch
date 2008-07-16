@@ -72,7 +72,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		this.exitMessageLength = exitMessageLength;
 	}
 
-	public List findJobExecutions(final JobInstance job) {
+	@SuppressWarnings("unchecked")
+	public List<JobExecution> findJobExecutions(final JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
@@ -229,11 +230,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 
 		Long id = jobInstance.getId();
 
-		List executions = getJdbcTemplate().query(getQuery(GET_LAST_EXECUTION), new Object[] { id, id },
+		List<JobExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_EXECUTION), new Object[] { id, id },
 				new JobExecutionRowMapper(jobInstance));
 
 		Assert.state(executions.size() <= 1, "There must be at most one latest job execution");

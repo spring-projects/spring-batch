@@ -251,8 +251,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		ecDao.afterPropertiesSet();
 	}
 
+	@SuppressWarnings("unchecked")
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
-		List executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
+		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
 				new Object[] { step.getName(), jobExecution.getId() }, new StepExecutionRowMapper(jobExecution, step));
 
 		Assert.state(executions.size() <= 1,

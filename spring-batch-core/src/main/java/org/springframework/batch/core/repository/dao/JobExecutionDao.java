@@ -46,7 +46,7 @@ public interface JobExecutionDao {
 	 * @param jobInstance
 	 * @return list of jobExecutions.
 	 */
-	List findJobExecutions(JobInstance jobInstance);
+	List<JobExecution> findJobExecutions(JobInstance jobInstance);
 
 	/**
 	 * @return last JobExecution for given JobInstance.

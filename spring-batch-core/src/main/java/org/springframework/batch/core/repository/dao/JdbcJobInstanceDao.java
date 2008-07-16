@@ -4,7 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,8 +41,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private static final String FIND_JOBS_WITH_KEY = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
 
-	private static final String FIND_JOBS_WITH_EMPTY_KEY =
-			"SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
+	private static final String FIND_JOBS_WITH_EMPTY_KEY = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
 
@@ -62,13 +61,14 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
-		
+
 		Long jobId = new Long(jobIncrementer.nextLongValue());
-		
+
 		JobInstance jobInstance = new JobInstance(jobId, jobParameters, job.getName());
 		jobInstance.incrementVersion();
-		
-		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters), jobInstance.getVersion() };
+
+		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters),
+				jobInstance.getVersion() };
 		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,
 				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
 
@@ -79,10 +79,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private String createJobKey(JobParameters jobParameters) {
 
-		Map props = jobParameters.getParameters();
+		Map<String, Object> props = jobParameters.getParameters();
 		StringBuffer stringBuffer = new StringBuffer();
-		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
+		for (Entry<String, Object> entry : props.entrySet()) {
 			stringBuffer.append(entry.toString() + ";");
 		}
 
@@ -96,41 +95,22 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 */
 	private void insertJobParameters(Long jobId, JobParameters jobParameters) {
 
-		Map parameters = jobParameters.getStringParameters();
-
-		if (!parameters.isEmpty()) {
-			for (Iterator it = parameters.entrySet().iterator(); it.hasNext();) {
-				Entry entry = (Entry) it.next();
-				insertParameter(jobId, ParameterType.STRING, entry.getKey().toString(), entry.getValue());
-			}
+		for (Entry<String, String> entry : jobParameters.getStringParameters().entrySet()) {
+			insertParameter(jobId, ParameterType.STRING, entry.getKey().toString(), entry.getValue());
 		}
 
-		parameters = jobParameters.getLongParameters();
-
-		if (!parameters.isEmpty()) {
-			for (Iterator it = parameters.entrySet().iterator(); it.hasNext();) {
-				Entry entry = (Entry) it.next();
-				insertParameter(jobId, ParameterType.LONG, entry.getKey().toString(), entry.getValue());
-			}
-		}
-		
-		parameters = jobParameters.getDoubleParameters();
-		
-		if (!parameters.isEmpty()) {
-			for (Iterator it = parameters.entrySet().iterator(); it.hasNext();) {
-				Entry entry = (Entry) it.next();
-				insertParameter(jobId, ParameterType.DOUBLE, entry.getKey().toString(), entry.getValue());
-			}
+		for (Entry<String, Long> entry : jobParameters.getLongParameters().entrySet()) {
+			insertParameter(jobId, ParameterType.LONG, entry.getKey().toString(), entry.getValue());
 		}
 
-		parameters = jobParameters.getDateParameters();
-
-		if (!parameters.isEmpty()) {
-			for (Iterator it = parameters.entrySet().iterator(); it.hasNext();) {
-				Entry entry = (Entry) it.next();
-				insertParameter(jobId, ParameterType.DATE, entry.getKey().toString(), entry.getValue());
-			}
+		for (Entry<String, Double> entry : jobParameters.getDoubleParameters().entrySet()) {
+			insertParameter(jobId, ParameterType.DOUBLE, entry.getKey().toString(), entry.getValue());
 		}
+
+		for (Entry<String, Date> entry : jobParameters.getDateParameters().entrySet()) {
+			insertParameter(jobId, ParameterType.DATE, entry.getKey().toString(), entry.getValue());
+		}
+
 	}
 
 	/**
@@ -167,6 +147,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are
 	 * null.
 	 */
+	@SuppressWarnings("unchecked")
 	public JobInstance getJobInstance(final Job job, final JobParameters jobParameters) {
 
 		Assert.notNull(job, "Job must not be null.");
@@ -183,20 +164,21 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 				return jobInstance;
 			}
 		};
-		
-		List instances;
+
+		List<JobInstance> instances;
 		if (StringUtils.hasLength(jobKey)) {
 			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY), parameters, rowMapper);
 		}
 		else {
 			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_EMPTY_KEY), parameters, rowMapper);
 		}
-		
+
 		if (instances.isEmpty()) {
 			return null;
-		} else {
+		}
+		else {
 			Assert.state(instances.size() == 1);
-			return (JobInstance) instances.get(0);
+			return instances.get(0);
 		}
 	}
 
@@ -232,7 +214,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		public static final ParameterType DATE = new ParameterType("DATE");
 
 		public static final ParameterType LONG = new ParameterType("LONG");
-		
+
 		public static final ParameterType DOUBLE = new ParameterType("DOUBLE");
 
 		private static final ParameterType[] VALUES = { STRING, DATE, LONG, DOUBLE };

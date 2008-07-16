@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.SerializationUtils;
@@ -114,8 +113,8 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 	 */
 	private void saveOrUpdateExecutionContext(ExecutionContext ctx, Long executionId, String discriminator) {
 
-		for (Iterator it = ctx.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
+		for (Entry<String, Object> entry : ctx.entrySet()) {
+			
 			final String key = entry.getKey().toString();
 			final Object value = entry.getValue();
 

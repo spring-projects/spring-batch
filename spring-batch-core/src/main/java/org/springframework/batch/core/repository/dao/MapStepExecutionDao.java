@@ -31,16 +31,15 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private static Map executionsByJobExecutionId;
+	@SuppressWarnings("unchecked")
+	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
+			.createTransactionalMap();
 
-	private static Map contextsByStepExecutionId;
+	@SuppressWarnings("unchecked")
+	private static Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
+			.createTransactionalMap();
 
 	private static long currentId = 0;
-
-	static {
-		executionsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
-		contextsByStepExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
-	}
 
 	public static void clear() {
 		executionsByJobExecutionId.clear();
@@ -51,12 +50,13 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		return (ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void saveStepExecution(StepExecution stepExecution) {
 		Assert.isTrue(stepExecution.getId() == null);
 		Assert.isTrue(stepExecution.getVersion() == null);
 		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
 
-		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
 			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
@@ -70,7 +70,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Assert.notNull(stepExecution.getJobExecutionId());
 
-		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");
 
 		StepExecution persistedExecution = (StepExecution) executions.get(stepExecution.getStepName());
@@ -89,7 +89,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	}
 
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
-		Map executions = (Map) executionsByJobExecutionId.get(jobExecution.getId());
+		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
 		if (executions == null) {
 			return null;
 		}

@@ -1,7 +1,6 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +14,15 @@ import org.springframework.util.Assert;
  * In-memory implementation of {@link JobExecutionDao}.
  * 
  */
+
 public class MapJobExecutionDao implements JobExecutionDao {
 
-	private static Map executionsById = TransactionAwareProxyFactory.createTransactionalMap();
+	@SuppressWarnings("unchecked")
+	private static Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
 
-	private static Map contextsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
+	@SuppressWarnings("unchecked")
+	private static Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
+			.createTransactionalMap();
 
 	private static long currentId = 0;
 
@@ -30,9 +33,8 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	public int getJobExecutionCount(JobInstance jobInstance) {
 		int count = 0;
-		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
-			JobExecution exec = (JobExecution) iterator.next();
-			if (exec.getJobInstance().equals(jobInstance)) {
+		for (JobExecution execution : executionsById.values()) {
+			if (execution.getJobInstance().equals(jobInstance)) {
 				count++;
 			}
 		}
@@ -47,10 +49,9 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		executionsById.put(newId, jobExecution);
 	}
 
-	public List findJobExecutions(JobInstance jobInstance) {
-		List executions = new ArrayList();
-		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
-			JobExecution exec = (JobExecution) iterator.next();
+	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
+		List<JobExecution> executions = new ArrayList<JobExecution>();
+		for (JobExecution exec : executionsById.values()) {
 			if (exec.getJobInstance().equals(jobInstance)) {
 				executions.add(exec);
 			}
@@ -68,8 +69,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 		JobExecution lastExec = null;
-		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
-			JobExecution exec = (JobExecution) iterator.next();
+		for (JobExecution exec : executionsById.values()) {
 			if (!exec.getJobInstance().equals(jobInstance)) {
 				continue;
 			}
