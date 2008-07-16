@@ -78,8 +78,8 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 		JobParametersBuilder propertiesBuilder = new JobParametersBuilder();
 
-		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
+		for (Iterator<Entry<Object, Object>> it = props.entrySet().iterator(); it.hasNext();) {
+			Entry<Object, Object> entry = it.next();
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
 			if (key.endsWith(DATE_TYPE)) {
@@ -152,11 +152,11 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			return new Properties();
 		}
 
-		Map parameters = params.getParameters();
+		Map<String, Object> parameters = params.getParameters();
 		Properties result = new Properties();
-		for (Iterator iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
-			Entry entry = (Entry) iterator.next();
-			String key = (String) entry.getKey();
+		for (Entry<String, Object> entry : parameters.entrySet()) {
+			
+			String key = entry.getKey();
 			Object value = entry.getValue();
 			if (value instanceof Date) {
 				result.setProperty(key + DATE_TYPE, dateFormat.format(value));

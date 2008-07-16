@@ -17,7 +17,6 @@
 package org.springframework.batch.core.job;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
@@ -56,7 +55,7 @@ public class SimpleJob extends AbstractJob {
 
 		StepExecution currentStepExecution = null;
 		int startedCount = 0;
-		List steps = getSteps();
+		List<Step> steps = getSteps();
 
 		try {
 
@@ -71,13 +70,11 @@ public class SimpleJob extends AbstractJob {
 
 			getCompositeListener().beforeJob(execution);
 
-			for (Iterator i = steps.iterator(); i.hasNext();) {
+			for (Step step : steps) {
 
 				if (execution.getStatus() == BatchStatus.STOPPING) {
 					throw new JobInterruptedException("JobExecution interrupted.");
 				}
-
-				Step step = (Step) i.next();
 
 				if (shouldStart(jobInstance, step)) {
 

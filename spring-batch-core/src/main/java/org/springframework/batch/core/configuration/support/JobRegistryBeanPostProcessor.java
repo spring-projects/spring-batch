@@ -17,7 +17,6 @@ package org.springframework.batch.core.configuration.support;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.JobLocator;
@@ -45,7 +44,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	// It doesn't make sense for this to have a default value...
 	private JobRegistry jobConfigurationRegistry = null;
 
-	private Collection jobNames = new HashSet();
+	private Collection<String> jobNames = new HashSet<String>();
 
 	/**
 	 * Injection setter for {@link JobRegistry}.
@@ -71,8 +70,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
-		for (Iterator iter = jobNames.iterator(); iter.hasNext();) {
-			String name = (String) iter.next();
+		for (String name : jobNames) {
 			jobConfigurationRegistry.unregister(name);
 		}
 		jobNames.clear();

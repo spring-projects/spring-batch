@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  */
 public class MapJobRegistry implements ListableJobRegistry {
 
-	private Map map = new HashMap();
+	private Map<String, JobFactory> map = new HashMap<String, JobFactory>();
 
 	/*
 	 * (non-Javadoc)
@@ -86,9 +86,9 @@ public class MapJobRegistry implements ListableJobRegistry {
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.configuration.ListableJobConfigurationRegistry#getJobConfigurations()
 	 */
-	public Collection getJobNames() {
+	public Collection<String> getJobNames() {
 		synchronized (map) {
-			return Collections.unmodifiableCollection(new HashSet(map.keySet()));
+			return Collections.unmodifiableCollection(new HashSet<String>(map.keySet()));
 		}
 	}
 

@@ -23,6 +23,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
@@ -181,7 +182,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
 		step.setChunkOperations(chunkOperations);
 
-		job.setSteps(Collections.singletonList(step));
+		job.setSteps(Collections.singletonList((Step) step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 		job.execute(jobExecution);
@@ -202,7 +203,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 			}
 		});
 		AbstractStep step = (AbstractStep) factory.getObject();
-		job.setSteps(Collections.singletonList(step));
+		job.setSteps(Collections.singletonList((Step) step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 		try {
@@ -230,7 +231,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 			}
 		});
 		AbstractStep step = (AbstractStep) factory.getObject();
-		job.setSteps(Collections.singletonList(step));
+		job.setSteps(Collections.singletonList((Step) step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 		
@@ -263,7 +264,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 		AbstractStep step = (AbstractStep) factory.getObject();
 
-		job.setSteps(Collections.singletonList(step));
+		job.setSteps(Collections.singletonList((Step) step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
 		job.execute(jobExecution);

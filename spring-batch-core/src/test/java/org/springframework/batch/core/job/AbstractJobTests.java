@@ -21,6 +21,7 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.StepSupport;
 
 /**
@@ -73,7 +74,7 @@ public class AbstractJobTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setSteps(java.util.List)}.
 	 */
 	public void testSetSteps() {
-		job.setSteps(Collections.singletonList(new StepSupport("step")));
+		job.setSteps(Collections.singletonList((Step) new StepSupport("step")));
 		assertEquals(1, job.getSteps().size());
 	}
 
