@@ -96,7 +96,7 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 
 	public void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		final List list = new ArrayList();
+		final List<String> list = new ArrayList<String>();
 		((Advised) service).addAdvice(new MethodInterceptor() {
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				list.add("chain");
@@ -130,7 +130,7 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 			assertTrue("Wrong message: " + message, message.startsWith("Not enough calls"));
 		}
 		assertEquals(1, count);
-		Collection result = transformer.transform("foo");
+		Collection<String> result = transformer.transform("foo");
 		assertEquals(2, count);
 		assertEquals(1, result.size());
 	}
@@ -198,7 +198,7 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 				return Collections.singleton(data);
 			}
 		});
-		Collection result = transformer.transform("foo");
+		Collection<String> result = transformer.transform("foo");
 		assertEquals(2, count);
 		assertEquals(1, result.size());
 	}
@@ -219,12 +219,12 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 	}
 
 	public static interface Transformer {
-		Collection transform(String in) throws Exception;
+		Collection<String> transform(String in) throws Exception;
 	}
 
 	public static class TransformerImpl implements Transformer {
 
-		public Collection transform(String in) throws Exception {
+		public Collection<String> transform(String in) throws Exception {
 			count++;
 			if (count < 2) {
 				throw new Exception("Not enough calls: " + count);

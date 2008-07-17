@@ -44,7 +44,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 	}
 
 	public void testNullPolicies() throws Exception {
-		policy.setPolicyMap(new HashMap());
+		policy.setPolicyMap(new HashMap<String, RetryPolicy>());
 		try {
 			policy.open(null, null);
 			fail("Expected IllegalArgumentException");
@@ -55,7 +55,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 	}
 
 	public void testNullContext() throws Exception {
-		Map map = new HashMap();
+		Map<String, RetryPolicy> map = new HashMap<String, RetryPolicy>();
 		map.put(ExceptionClassifierSupport.DEFAULT, new NeverRetryPolicy());
 		policy.setPolicyMap(map);
 
@@ -67,7 +67,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 
 	public void testClassifierOperates() throws Exception {
 
-		Map map = new HashMap();
+		Map<String, RetryPolicy> map = new HashMap<String, RetryPolicy>();
 		map.put(ExceptionClassifierSupport.DEFAULT, new AlwaysRetryPolicy());
 		map.put("foo", new NeverRetryPolicy());
 		policy.setPolicyMap(map);

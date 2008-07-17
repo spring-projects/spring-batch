@@ -96,7 +96,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	public void testContextClosedOnNormalCompletion() throws Exception {
 
-		final List list = new ArrayList();
+		final List<String> list = new ArrayList<String>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
 			public void close() {
@@ -128,7 +128,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	public void testContextClosedOnAbnormalCompletion() throws Exception {
 
-		final List list = new ArrayList();
+		final List<String> list = new ArrayList<String>();
 
 		final RepeatContext context = new RepeatContextSupport(null) {
 			public void close() {
@@ -166,7 +166,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	public void testExceptionHandlerCalledOnAbnormalCompletion() throws Exception {
 
-		final List list = new ArrayList();
+		final List<Throwable> list = new ArrayList<Throwable>();
 
 		template.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {

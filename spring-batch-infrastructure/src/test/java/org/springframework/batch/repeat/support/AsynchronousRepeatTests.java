@@ -39,7 +39,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
 		final String threadName = Thread.currentThread().getName();
-		final Set threadNames = new HashSet();
+		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
@@ -75,7 +75,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		jobTemplate.setTaskExecutor(taskExecutor);
 
 		final String threadName = Thread.currentThread().getName();
-		final Set threadNames = new HashSet();
+		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback stepCallback = new ItemReaderRepeatCallback(provider, processor) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {

@@ -75,7 +75,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 	}
 
 	public void testNonTrivialPoliciesClose() throws Exception {
-		final List list = new ArrayList();
+		final List<String> list = new ArrayList<String>();
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
 		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport() {
 			public void close(RetryContext context) {
@@ -93,7 +93,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 	}
 
 	public void testExceptionOnPoliciesClose() throws Exception {
-		final List list = new ArrayList();
+		final List<String> list = new ArrayList<String>();
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
 		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport() {
 			public void close(RetryContext context) {

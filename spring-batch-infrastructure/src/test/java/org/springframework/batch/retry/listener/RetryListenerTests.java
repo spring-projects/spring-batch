@@ -34,7 +34,7 @@ public class RetryListenerTests extends TestCase {
 
 	int count = 0;
 
-	List list = new ArrayList();
+	List<String> list = new ArrayList<String>();
 
 	public void testOpenInterceptors() throws Exception {
 		template.setListeners(new RetryListener[] { new RetryListenerSupport() {

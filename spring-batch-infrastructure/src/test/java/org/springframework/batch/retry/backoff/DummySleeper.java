@@ -27,21 +27,21 @@ import java.util.List;
  */
 public class DummySleeper implements Sleeper {
 
-	private List backOffs = new ArrayList();
+	private List<Long> backOffs = new ArrayList<Long>();
 
 	/**
 	 * Public getter for the long.
 	 * @return the lastBackOff
 	 */
 	public long getLastBackOff() {
-		return ((Long) backOffs.get(backOffs.size()-1)).longValue();
+		return backOffs.get(backOffs.size()-1).longValue();
 	}
 	
 	public long[] getBackOffs() {
 		long[] result = new long[backOffs.size()];
 		int i = 0;
-		for (Iterator iterator = backOffs.iterator(); iterator.hasNext();) {
-			Long value = (Long) iterator.next();
+		for (Iterator<Long> iterator = backOffs.iterator(); iterator.hasNext();) {
+			Long value = iterator.next();
 			result[i++] =value.longValue(); 
 		}
 		return result ;

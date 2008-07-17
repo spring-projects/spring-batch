@@ -31,15 +31,16 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 
 	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
-	Map map;
+	Map<String, String> map;
 
+	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
-		Map seed = new HashMap();
+		Map<String, String> seed = new HashMap<String, String>();
 		seed.put("foo", "oof");
 		seed.put("bar", "bar");
 		seed.put("spam", "maps");
 		factory = new TransactionAwareProxyFactory(seed);
-		map = (Map) factory.createInstance();
+		map = (Map<String, String>) factory.createInstance();
 	}
 
 	public void testAdd() {

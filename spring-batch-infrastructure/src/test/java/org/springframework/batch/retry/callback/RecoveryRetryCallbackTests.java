@@ -32,7 +32,7 @@ import org.springframework.batch.retry.support.RetryTemplate;
 
 public class RecoveryRetryCallbackTests extends TestCase {
 
-	List calls = new ArrayList();
+	List<Object> calls = new ArrayList<Object>();
 
 	int count = 0;
 

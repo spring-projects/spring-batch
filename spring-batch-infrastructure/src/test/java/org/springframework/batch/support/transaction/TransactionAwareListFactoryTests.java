@@ -32,10 +32,11 @@ public class TransactionAwareListFactoryTests extends TestCase {
 
 	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
-	List list;
+	List<String> list;
 
+	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
-		list = (List) factory.createInstance();
+		list = (List<String>) factory.createInstance();
 	}
 
 	public void testAdd() {

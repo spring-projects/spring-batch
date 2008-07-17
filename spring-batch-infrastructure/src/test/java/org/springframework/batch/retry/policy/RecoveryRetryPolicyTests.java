@@ -37,7 +37,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 
 	private int count = 0;
 
-	private List list = new ArrayList();
+	private List<String> list = new ArrayList<String>();
 
 	public void testOpenSunnyDay() throws Exception {
 

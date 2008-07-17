@@ -69,7 +69,7 @@ public class SubclassExceptionClassifierTests extends TestCase {
 	}
 
 	public void testClassifyAncestorMatch() {
-		classifier.setTypeMap(new LinkedHashMap() {{
+		classifier.setTypeMap(new LinkedHashMap<Class<?>, String>() {{
 			put(Exception.class, "bar");
 			put(IllegalArgumentException.class, "foo");
 			put(RuntimeException.class, "bucket");

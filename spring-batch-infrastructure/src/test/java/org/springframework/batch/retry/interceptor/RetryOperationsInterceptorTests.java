@@ -67,7 +67,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 
 	public void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		final List list = new ArrayList();
+		final List<String> list = new ArrayList<String>();
 		((Advised) service).addAdvice(new MethodInterceptor() {
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				list.add("chain");

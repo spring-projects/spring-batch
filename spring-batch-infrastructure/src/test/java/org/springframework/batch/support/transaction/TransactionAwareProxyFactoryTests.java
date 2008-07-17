@@ -22,22 +22,23 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
+@SuppressWarnings("unchecked")
 public class TransactionAwareProxyFactoryTests extends TestCase {
-
+	
 	public void testCreateList() throws Exception {
-		List list = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> list = TransactionAwareProxyFactory.createTransactionalList();
 		list.add("foo");
 		assertEquals(1, list.size());
 	}
 
 	public void testCreateSet() throws Exception {
-		Set set = TransactionAwareProxyFactory.createTransactionalSet();
+		Set<String> set = TransactionAwareProxyFactory.createTransactionalSet();
 		set.add("foo");
 		assertEquals(1, set.size());
 	}
 	
 	public void testCreateMap() throws Exception {
-		Map map = TransactionAwareProxyFactory.createTransactionalMap();
+		Map<String, String> map = TransactionAwareProxyFactory.createTransactionalMap();
 		map.put("foo", "bar");
 		assertEquals(1, map.size());
 	}
