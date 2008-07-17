@@ -61,7 +61,6 @@
 					<instructions>
 						<Import-Package><![CDATA[
  com.ibatis.sqlmap.*;version="[2.3.0, 3.0.0)";resolution:=optional,
- edu.emory.mathcs.backport.*;version="[3.0.0, 4.0.0)";resolution:=optional,
  javax.jms.*;version=1.1.0;resolution:=optional,
  javax.xml.stream.*;version=1.2.0;resolution:=optional,
  org.aopalliance.*;version=1.0.0;resolution:=optional,
@@ -109,10 +108,6 @@
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>backport-util-concurrent</groupId>
-			<artifactId>backport-util-concurrent</artifactId>
 		</dependency>
 		<dependency>
 			<!-- This is just for the JMS spec - could use javax.jms -->

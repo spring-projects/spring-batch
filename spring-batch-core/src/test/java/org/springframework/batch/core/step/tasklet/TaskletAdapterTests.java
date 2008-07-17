@@ -15,16 +15,17 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.springframework.batch.core.step.tasklet.TaskletAdapter;
-import org.springframework.batch.repeat.ExitStatus;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
  *
  */
-public class TaskletAdapterTests extends TestCase {
+public class TaskletAdapterTests {
 	
 	private TaskletAdapter tasklet = new TaskletAdapter();
 	private Object result = null;
@@ -40,7 +41,8 @@ public class TaskletAdapterTests extends TestCase {
 	/* (non-Javadoc) 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		tasklet.setTargetObject(this);
 		tasklet.setTargetMethod("execute");
 	}
@@ -49,6 +51,7 @@ public class TaskletAdapterTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.core.step.tasklet.TaskletAdapter#execute()}.
 	 * @throws Exception 
 	 */
+	@Test
 	public void testExecuteWithExitStatus() throws Exception {
 		assertEquals(ExitStatus.NOOP, tasklet.execute());
 	}
@@ -56,6 +59,7 @@ public class TaskletAdapterTests extends TestCase {
 	/**
 	 * Test method for {@link org.springframework.batch.core.step.tasklet.TaskletAdapter#mapResult(java.lang.Object)}.
 	 */
+	@Test
 	public void testMapResultWithNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		assertEquals(ExitStatus.FINISHED, tasklet.execute());
@@ -63,7 +67,8 @@ public class TaskletAdapterTests extends TestCase {
 
 	/**
 	 * Test method for {@link org.springframework.batch.core.step.tasklet.TaskletAdapter#mapResult(java.lang.Object)}.
-	 */
+	 */	
+	@Test
 	public void testMapResultWithNonNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		this.result = "foo";
