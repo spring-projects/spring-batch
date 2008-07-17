@@ -25,25 +25,25 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  * @author Lucas Ward
- *
+ * 
  */
-public class ExecutionContextTests extends TestCase{
+public class ExecutionContextTests extends TestCase {
 
 	ExecutionContext context;
-	
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		
+
 		context = new ExecutionContext();
 	}
-	
-	public void testNormalUsage(){
-		
+
+	public void testNormalUsage() {
+
 		context.putString("1", "testString1");
 		context.putString("2", "testString2");
 		context.putLong("3", 3);
 		context.putDouble("4", 4.4);
-		
+
 		assertEquals("testString1", context.getString("1"));
 		assertEquals("testString2", context.getString("2"));
 		assertEquals("defaultString", context.getString("5", "defaultString"));
@@ -52,94 +52,106 @@ public class ExecutionContextTests extends TestCase{
 		assertEquals(3, context.getLong("3"));
 		assertEquals(5, context.getLong("5", 5));
 	}
-	
-	public void testInvalidCast(){
-		
+
+	public void testInvalidCast() {
+
 		context.putLong("1", 1);
-		try{
+		try {
 			context.getDouble("1");
 			fail();
 		}
-		catch(ClassCastException ex){
-			//expected
+		catch (ClassCastException ex) {
+			// expected
 		}
 	}
-	
-	public void testIsEmpty(){
+
+	public void testIsEmpty() {
 		assertTrue(context.isEmpty());
 		context.putString("1", "test");
 		assertFalse(context.isEmpty());
 	}
-	
-	public void testDirtyFlag(){
+
+	public void testDirtyFlag() {
 		assertFalse(context.isDirty());
 		context.putString("1", "test");
 		assertTrue(context.isDirty());
 		context.clearDirtyFlag();
 		assertFalse(context.isDirty());
 	}
-	
-	public void testContains(){
+
+	public void testContains() {
 		context.putString("1", "testString");
 		assertTrue(context.containsKey("1"));
 		assertTrue(context.containsValue("testString"));
 	}
-	
-	public void testEquals(){
+
+	public void testEquals() {
 		context.putString("1", "testString");
 		ExecutionContext tempContext = new ExecutionContext();
 		assertFalse(tempContext.equals(context));
 		tempContext.putString("1", "testString");
 		assertTrue(tempContext.equals(context));
 	}
-	
-	public void testSerializationCheck(){
-		//adding a non serializable object should cause an error.
-		try{
+
+	public void testSerializationCheck() {
+		// adding a non serializable object should cause an error.
+		try {
 			context.put("1", new Object());
 			fail();
 		}
-		catch(IllegalArgumentException ex){
-			//expected
+		catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testPutNull(){
-		//putting null should work
+
+	public void testPutNull() {
+		// putting null should work
 		context.put("1", null);
 	}
-	
+
 	public void testSerialization() {
-		
+
 		TestSerializable s = new TestSerializable();
 		s.value = 7;
-		
+
 		context.putString("1", "testString1");
 		context.putString("2", "testString2");
 		context.putLong("3", 3);
 		context.putDouble("4", 4.4);
 		context.put("5", s);
-		
+
 		byte[] serialized = SerializationUtils.serialize(context);
-		
+
 		ExecutionContext deserialized = (ExecutionContext) SerializationUtils.deserialize(serialized);
-		
+
 		assertEquals(context, deserialized);
-		assertEquals(7, ((TestSerializable)deserialized.get("5")).value);
+		assertEquals(7, ((TestSerializable) deserialized.get("5")).value);
 	}
-	
+
 	public void testCopyConstructor() throws Exception {
 		ExecutionContext context = new ExecutionContext();
 		context.put("foo", "bar");
 		ExecutionContext copy = new ExecutionContext(context);
 		assertEquals(copy, context);
 	}
-	
+
 	public void testCopyConstructorNullnNput() throws Exception {
-		ExecutionContext context = new ExecutionContext((ExecutionContext)null);
+		ExecutionContext context = new ExecutionContext((ExecutionContext) null);
 		assertTrue(context.isEmpty());
 	}
-	
+
+	public void testRemove() throws Exception {
+		ExecutionContext context = new ExecutionContext();
+		context.put("foo", "bar");
+
+		assertTrue(context.containsKey("foo"));
+		assertTrue(context.containsValue("bar"));
+
+		Object value = context.remove("foo");
+		assertFalse(context.containsKey("foo"));
+		assertEquals("bar", value);
+	}
+
 	/**
 	 * Value object for testing serialization
 	 */
@@ -154,9 +166,7 @@ public class ExecutionContextTests extends TestCase{
 		public int hashCode() {
 			return HashCodeBuilder.reflectionHashCode(this);
 		}
-		
-		
-		
+
 	}
-	
+
 }

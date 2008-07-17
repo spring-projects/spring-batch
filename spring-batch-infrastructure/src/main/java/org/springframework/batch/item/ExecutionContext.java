@@ -281,6 +281,15 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
+	 * Removes the mapping for a key from this context if it is present.
+	 * 
+	 * @see java.util.Map#remove(Object)
+	 */
+	public Object remove(String key) {
+		return map.remove(key);
+	}
+
+	/**
 	 * Indicates whether or not a value is represented in this context.
 	 * 
 	 * @param value Value to check existence for
