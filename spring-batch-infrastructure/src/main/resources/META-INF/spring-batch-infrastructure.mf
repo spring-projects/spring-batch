@@ -1,4 +1,5 @@
 Bundle-SymbolicName: org.springframework.batch.infrastructure
+Bundle-Name: Spring Batch Infrastructure
 Bundle-Version: 1.1.0
 Bundle-ManifestVersion: 2
 Import-Template: 
