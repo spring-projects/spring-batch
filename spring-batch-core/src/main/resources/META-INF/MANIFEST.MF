@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
+Bundle-Name: Spring Batch Core
 Archiver-Version: Plexus Archiver
 Build-Jdk: 1.5.0_13
 Built-By: tsweeney
