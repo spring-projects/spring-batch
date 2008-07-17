@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-infrastructure</artifactId>
 	<packaging>jar</packaging>
@@ -13,6 +14,9 @@
 		<version>2.0.0.CI-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
+	<properties>
+		<bundle.symbolic.name>${pom.groupId}.infrastructure</bundle.symbolic.name>
+	</properties>
 	<profiles>
 		<profile>
 			<id>clover</id>
@@ -49,6 +53,40 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Import-Package><![CDATA[
+ com.ibatis.sqlmap.*;version="[2.3.0, 3.0.0)";resolution:=optional,
+ edu.emory.mathcs.backport.*;version="[3.0.0, 4.0.0)";resolution:=optional,
+ javax.jms.*;version=1.1.0;resolution:=optional,
+ javax.xml.stream.*;version=1.2.0;resolution:=optional,
+ org.aopalliance.*;version=1.0.0;resolution:=optional,
+ org.apache.commons.logging.*;version="[1.1.0, 2.0.0)",
+ org.hibernate.*;version="[3.2.5.ga, 3.3.0.ga)";resolution:=optional,
+ org.springframework.aop.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.beans.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.core.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.dao.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.jdbc.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.jms.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.orm.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.transaction.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.util.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.validation.*;version="[2.0.0, 3.0.0)";resolution:=optional,
+ org.springframework.oxm.*;version="[1.0.0, 2.0.0)";resolution:=optional,
+ org.springframework.xml.*;version="[1.0.0, 2.0.0)";resolution:=optional,
+ org.springframework.batch.*,
+ org.springframework.*;version="[2.0.0, 3.0.0)",
+ javax.sql.*,
+ javax.xml.namespace.*,
+ javax.xml.transform.*
+ 						]]></Import-Package>
+					</instructions>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -165,7 +203,7 @@
 			<version>2.3.0</version>
 			<optional>true</optional>
 		</dependency>
-<!-- Spring Dependencies -->
+		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>

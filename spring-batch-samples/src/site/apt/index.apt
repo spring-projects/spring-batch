@@ -613,5 +613,5 @@ games.player_id group by games.player_id, games.year_no
   sample application you can execute the JUnit test
   <<<FootballJobFunctionalTests>>>, and you'll see an output showing
   each of the records as they are processed. Please keep in mind that
-  AoP is used to wrap the <<<ItemWriter>> and output each record as it
+  AoP is used to wrap the <<<ItemWriter>>> and output each record as it
   is processed to the logger, which may impact performance.

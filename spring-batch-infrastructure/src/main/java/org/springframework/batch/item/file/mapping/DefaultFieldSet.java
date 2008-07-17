@@ -60,7 +60,7 @@ public class DefaultFieldSet implements FieldSet {
 		this.tokens = (String[]) tokens.clone();
 		this.names = Arrays.asList(names);
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.file.mapping.IFieldSet#getNames()

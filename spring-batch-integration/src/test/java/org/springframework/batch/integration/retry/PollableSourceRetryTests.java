@@ -22,11 +22,9 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.interceptor.StatefulRetryOperationsInterceptor;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.context.Lifecycle;
@@ -43,7 +41,6 @@ import org.springframework.integration.scheduling.PollingSchedule;
 import org.springframework.integration.scheduling.SimpleTaskScheduler;
 import org.springframework.integration.scheduling.TaskScheduler;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.StringUtils;
 
 public class PollableSourceRetryTests {
@@ -484,9 +481,9 @@ public class PollableSourceRetryTests {
 	/**
 	 * @return
 	 */
-	private TransactionInterceptor getTransactionInterceptor() {
-		return new TransactionInterceptor(transactionManager, PropertiesConverter.stringToProperties("*=PROPAGATION_REQUIRED"));
-	}
+//	private TransactionInterceptor getTransactionInterceptor() {
+//		return new TransactionInterceptor(transactionManager, PropertiesConverter.stringToProperties("*=PROPAGATION_REQUIRED"));
+//	}
 
 	/**
 	 * @param endpoint
@@ -517,13 +514,13 @@ public class PollableSourceRetryTests {
 	 * @param commitInterval
 	 * @return
 	 */
-	private RepeatOperationsInterceptor getRepeatOperationsInterceptor(int commitInterval) {
-		RepeatOperationsInterceptor advice = new RepeatOperationsInterceptor();
-		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
-		advice.setRepeatOperations(repeatTemplate);
-		return advice;
-	}
+//	private RepeatOperationsInterceptor getRepeatOperationsInterceptor(int commitInterval) {
+//		RepeatOperationsInterceptor advice = new RepeatOperationsInterceptor();
+//		RepeatTemplate repeatTemplate = new RepeatTemplate();
+//		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+//		advice.setRepeatOperations(repeatTemplate);
+//		return advice;
+//	}
 
 	private Object getProxy(Object target, Class<?> intf, Advice[] advices, String methodName) {
 		ProxyFactory factory = new ProxyFactory(target);
