@@ -91,7 +91,7 @@ public class OrderItemReader extends DelegatingItemReader {
 		// start a new Order
 		if (Order.LINE_ID_HEADER.equals(lineId)) {
 			log.debug("STARTING NEW RECORD");
-			order = (Order) headerMapper.mapLine(fieldSet);
+			order = (Order) headerMapper.mapLine(fieldSet, -1);
 
 			return;
 		}
@@ -116,7 +116,7 @@ public class OrderItemReader extends DelegatingItemReader {
 			log.debug("MAPPING CUSTOMER");
 
 			if (order.getCustomer() == null) {
-				order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
+				order.setCustomer((Customer) customerMapper.mapLine(fieldSet, -1));
 				order.getCustomer().setBusinessCustomer(true);
 			}
 
@@ -127,7 +127,7 @@ public class OrderItemReader extends DelegatingItemReader {
 			log.debug("MAPPING CUSTOMER");
 
 			if (order.getCustomer() == null) {
-				order.setCustomer((Customer) customerMapper.mapLine(fieldSet));
+				order.setCustomer((Customer) customerMapper.mapLine(fieldSet, -1));
 				order.getCustomer().setBusinessCustomer(false);
 			}
 
@@ -136,25 +136,25 @@ public class OrderItemReader extends DelegatingItemReader {
 
 		if (Address.LINE_ID_BILLING_ADDR.equals(lineId)) {
 			log.debug("MAPPING BILLING ADDRESS");
-			order.setBillingAddress((Address) addressMapper.mapLine(fieldSet));
+			order.setBillingAddress((Address) addressMapper.mapLine(fieldSet, -1));
 			return;
 		}
 
 		if (Address.LINE_ID_SHIPPING_ADDR.equals(lineId)) {
 			log.debug("MAPPING SHIPPING ADDRESS");
-			order.setShippingAddress((Address) addressMapper.mapLine(fieldSet));
+			order.setShippingAddress((Address) addressMapper.mapLine(fieldSet, -1));
 			return;
 		}
 
 		if (BillingInfo.LINE_ID_BILLING_INFO.equals(lineId)) {
 			log.debug("MAPPING BILLING INFO");
-			order.setBilling((BillingInfo) billingMapper.mapLine(fieldSet));
+			order.setBilling((BillingInfo) billingMapper.mapLine(fieldSet, -1));
 			return;
 		}
 
 		if (ShippingInfo.LINE_ID_SHIPPING_INFO.equals(lineId)) {
 			log.debug("MAPPING SHIPPING INFO");
-			order.setShipping((ShippingInfo) shippingMapper.mapLine(fieldSet));
+			order.setShipping((ShippingInfo) shippingMapper.mapLine(fieldSet, -1));
 			return;
 		}
 
@@ -164,8 +164,7 @@ public class OrderItemReader extends DelegatingItemReader {
 			if (order.getLineItems() == null) {
 				order.setLineItems(new ArrayList<LineItem>());
 			}
-
-			order.getLineItems().add((LineItem) itemMapper.mapLine(fieldSet));
+			order.getLineItems().add((LineItem) itemMapper.mapLine(fieldSet, -1));
 
 			return;
 		}

@@ -35,7 +35,7 @@ public abstract class AbstractFieldSetMapperTests extends TestCase {
 	 * Assumes the domain object implements sensible <code>equals(Object other)</code>
 	 */
 	public void testRegularUse() {
-		assertEquals(expectedDomainObject(), fieldSetMapper().mapLine(fieldSet()));
+		assertEquals(expectedDomainObject(), fieldSetMapper().mapLine(fieldSet(), -1));
 	}
 	
 }

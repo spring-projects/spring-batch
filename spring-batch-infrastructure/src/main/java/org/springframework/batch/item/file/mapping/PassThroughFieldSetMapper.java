@@ -29,7 +29,7 @@ public class PassThroughFieldSetMapper implements FieldSetMapper, FieldSetCreato
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.file.FieldSetMapper#mapLine(org.springframework.batch.io.file.FieldSet)
 	 */
-	public Object mapLine(FieldSet fs) {
+	public Object mapLine(FieldSet fs, int lineNum) {
 		return fs;
 	}
 

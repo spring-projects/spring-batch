@@ -90,19 +90,19 @@ public class OrderItemReaderTests extends TestCase {
 		mapperControl = MockControl.createControl(FieldSetMapper.class);
 		mapper = (FieldSetMapper)mapperControl.getMock();
 		//set how mapper should respond - set return values for mapper
-		mapper.mapLine(headerFS);
+		mapper.mapLine(headerFS, -1);
 		mapperControl.setReturnValue(order);
-		mapper.mapLine(customerFS);
+		mapper.mapLine(customerFS, -1);
 		mapperControl.setReturnValue(customer);
-		mapper.mapLine(billingFS);
+		mapper.mapLine(billingFS, -1);
 		mapperControl.setReturnValue(billing);
-		mapper.mapLine(shippingFS);
+		mapper.mapLine(shippingFS, -1);
 		mapperControl.setReturnValue(shipping);
-		mapper.mapLine(billingInfoFS);
+		mapper.mapLine(billingInfoFS, -1);
 		mapperControl.setReturnValue(billingInfo);
-		mapper.mapLine(shippingInfoFS);
+		mapper.mapLine(shippingInfoFS, -1);
 		mapperControl.setReturnValue(shippingInfo);
-		mapper.mapLine(itemFS);
+		mapper.mapLine(itemFS, -1);
 		mapperControl.setReturnValue(item,3);
 		mapperControl.replay();
 

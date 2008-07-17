@@ -20,7 +20,7 @@ public class MultiResourceItemReaderFlatFileTests extends
 		FlatFileItemReader fileReader = new FlatFileItemReader();
 
 		fileReader.setFieldSetMapper(new FieldSetMapper() {
-			public Object mapLine(FieldSet fs) {
+			public Object mapLine(FieldSet fs, int lineNum) {
 				Foo foo = new Foo();
 				foo.setValue(fs.readInt(0));
 				return foo;

@@ -276,7 +276,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 			int lineCount = getReader().getPosition();
 			try {
 				FieldSet tokenizedLine = tokenizer.tokenize(line);
-				return fieldSetMapper.mapLine(tokenizedLine);
+				return fieldSetMapper.mapLine(tokenizedLine, lineCount);
 			}
 			catch (RuntimeException ex) {
 				// add current line count to message and re-throw

@@ -60,7 +60,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 	}
 
 	protected static class TradeMapper implements FieldSetMapper{
-		public Object mapLine(FieldSet fs) {
+		public Object mapLine(FieldSet fs, int lineNum) {
 			return new Trade(fs);
 		}
 	}

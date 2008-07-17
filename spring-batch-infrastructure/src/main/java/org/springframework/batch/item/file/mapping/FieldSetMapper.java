@@ -30,6 +30,7 @@ public interface FieldSetMapper {
 	 * Method used to map data obtained from a {@link FieldSet} into an object.
 	 * 
 	 * @param fs the {@link FieldSet} to map
+	 * @param lineNum the current line number (if known), or negative if not
 	 */
-	public Object mapLine(FieldSet fs);
+	public Object mapLine(FieldSet fs, int lineNum);
 }
