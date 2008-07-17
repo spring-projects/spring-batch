@@ -17,7 +17,6 @@
 package org.springframework.batch.sample.validation.valang.custom;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.sample.domain.LineItem;
@@ -41,11 +40,11 @@ public class ValidateShippingPricesFunction extends AbstractFunction {
     /**
      * @see org.springmodules.validation.valang.functions.AbstractFunction#doGetResult(java.lang.Object)
      */
-    protected Object doGetResult(Object target) throws Exception {
-        List lineItems = (List) getArguments()[0].getResult(target);
+    @SuppressWarnings("unchecked")
+	protected Object doGetResult(Object target) throws Exception {
+    	 List<LineItem> lineItems = (List<LineItem>) getArguments()[0].getResult(target);
 
-        for (Iterator i = lineItems.iterator(); i.hasNext();) {
-            LineItem item = (LineItem) i.next();
+         for (LineItem item : lineItems) {
 
             if ((BD_MIN.compareTo(item.getShippingPrice()) > 0)
                     || (BD_MAX.compareTo(item.getShippingPrice()) < 0)) {

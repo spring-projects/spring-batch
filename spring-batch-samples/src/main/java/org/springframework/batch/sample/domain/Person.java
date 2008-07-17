@@ -30,7 +30,7 @@ public class Person {
 	private String last_name = "";
 	private int age = 0;
 	private Address address = new Address();
-	private List children = new ArrayList();
+	private List<Child> children = new ArrayList<Child>();
 	
 	public Person(){
 		children.add(new Child());
@@ -76,13 +76,13 @@ public class Person {
 	/**
 	 * @return the children
 	 */
-	public List getChildren() {
+	public List<Child> getChildren() {
 		return children;
 	}
 	/**
 	 * @param children the children to set
 	 */
-	public void setChildren(List children) {
+	public void setChildren(List<Child> children) {
 		this.children = children;
 	}
 	/**

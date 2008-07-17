@@ -16,7 +16,6 @@
 
 package org.springframework.batch.sample.validation.valang.custom;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.sample.domain.LineItem;
@@ -39,11 +38,11 @@ public class ValidateQuantitiesFunction extends AbstractFunction {
     /**
      * @see org.springmodules.validation.valang.functions.AbstractFunction#doGetResult(java.lang.Object)
      */
-    protected Object doGetResult(Object target) throws Exception {
-        List lineItems = (List) getArguments()[0].getResult(target);
+    @SuppressWarnings("unchecked")
+	protected Object doGetResult(Object target) throws Exception {
+    	 List<LineItem> lineItems = (List<LineItem>) getArguments()[0].getResult(target);
 
-        for (Iterator i = lineItems.iterator(); i.hasNext();) {
-            LineItem item = (LineItem) i.next();
+         for (LineItem item : lineItems) {
 
             if ((item.getQuantity() <= 0) || (item.getQuantity() > MAX_QUANTITY)) {
                 return Boolean.FALSE;

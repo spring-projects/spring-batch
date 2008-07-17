@@ -40,7 +40,7 @@ public class OrderTransformer implements ItemTransformer {
 	/**
 	 * Aggregators for all types of lines in the output file
 	 */
-	private Map aggregators;
+	private Map<String, LineAggregator> aggregators;
 
 	/**
 	 * Converts information from an Order object to a collection of Strings for
@@ -49,19 +49,17 @@ public class OrderTransformer implements ItemTransformer {
 	public Object transform(Object data) {
 		Order order = (Order) data;
 
-		List result = new ArrayList();
+		List<String> result = new ArrayList<String>();
 
 		result.add(getAggregator("header").aggregate(OrderFormatterUtils.headerArgs(order)));
 		result.add(getAggregator("customer").aggregate(OrderFormatterUtils.customerArgs(order)));
 		result.add(getAggregator("address").aggregate(OrderFormatterUtils.billingAddressArgs(order)));
 		result.add(getAggregator("billing").aggregate(OrderFormatterUtils.billingInfoArgs(order)));
 
-		List items = order.getLineItems();
-		LineItem item;
+		List<LineItem> items = order.getLineItems();
 
-		for (int i = 0; i < items.size(); i++) {
-			item = (LineItem) items.get(i);
-			result.add(getAggregator("item").aggregate(OrderFormatterUtils.lineItemArgs(item)));
+		for (LineItem lineItem : items) {
+			result.add(getAggregator("item").aggregate(OrderFormatterUtils.lineItemArgs(lineItem)));
 		}
 
 		result.add(getAggregator("footer").aggregate(OrderFormatterUtils.footerArgs(order)));
@@ -69,7 +67,7 @@ public class OrderTransformer implements ItemTransformer {
 		return result;
 	}
 
-	public void setAggregators(Map aggregators) {
+	public void setAggregators(Map<String, LineAggregator> aggregators) {
 		this.aggregators = aggregators;
 	}
 

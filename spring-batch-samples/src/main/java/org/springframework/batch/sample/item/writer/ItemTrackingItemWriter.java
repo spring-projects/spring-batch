@@ -11,7 +11,7 @@ import org.springframework.batch.item.validator.ValidationException;
  */
 public class ItemTrackingItemWriter extends AbstractItemWriter {
 
-	private List items = new ArrayList();
+	private List<Object> items = new ArrayList<Object>();
 	
 	private int failure = -1;
 	
@@ -25,7 +25,7 @@ public class ItemTrackingItemWriter extends AbstractItemWriter {
 		}
 	}
 
-	public List getItems() {
+	public List<Object> getItems() {
 		return items;
 	}
 

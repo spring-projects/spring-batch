@@ -38,7 +38,8 @@ public class TotalOrderItemsFunction extends AbstractFunction {
     /**
      * @see org.springmodules.validation.valang.functions.AbstractFunction#doGetResult(java.lang.Object)
      */
-    protected Object doGetResult(Object target) throws Exception {
+    @SuppressWarnings("unchecked")
+	protected Object doGetResult(Object target) throws Exception {
         //get arguments
         int count = ((Integer) getArguments()[0].getResult(target)).intValue();
         Object value = getArguments()[1].getResult(target);
@@ -49,9 +50,8 @@ public class TotalOrderItemsFunction extends AbstractFunction {
         if (value instanceof List) {
             int totalItems = 0;
 
-            for (Iterator i = ((List) value).iterator(); i.hasNext();) {
-                LineItem item = (LineItem) i.next();
-                totalItems += item.getQuantity();
+            for (Iterator<LineItem> i = ((List<LineItem>) value).iterator(); i.hasNext();) {
+                totalItems += i.next().getQuantity();
             }
 
             result = (totalItems == count) ? Boolean.TRUE : Boolean.FALSE;

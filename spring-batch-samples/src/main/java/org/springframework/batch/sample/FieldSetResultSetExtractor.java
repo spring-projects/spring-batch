@@ -49,8 +49,8 @@ public final class FieldSetResultSetExtractor {
 
         FieldSet fs = null;
         
-        List tokens = new ArrayList();
-        List names = new ArrayList();
+        List<String> tokens = new ArrayList<String>();
+        List<String> names = new ArrayList<String>();
 
         for (int i = 1; i <= columnCount; i++) {
             tokens.add(rs.getString(i));

@@ -44,7 +44,7 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 
 	private volatile boolean initialized = false;
 
-	private volatile Iterator keys;
+	private volatile Iterator<Long> keys;
 
 	/**
 	 * Public setter for the {@link LobHandler}.
@@ -83,7 +83,8 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 		}
 	}
 
-	private List retrieveKeys() {
+	@SuppressWarnings("unchecked")
+	private List<Long> retrieveKeys() {
 
 		synchronized (lock) {
 
@@ -166,9 +167,9 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 
 	private static class StagingBuffer {
 
-		private List list = new ArrayList();
+		private List<Long> list = new ArrayList<Long>();
 
-		private Iterator iter = new ArrayList().iterator();
+		private Iterator<Long> iter = new ArrayList<Long>().iterator();
 
 		public Long next() {
 			if (iter.hasNext()) {
@@ -183,13 +184,13 @@ public class StagingItemReader extends JdbcDaoSupport implements ItemStream, Ite
 
 		public void rollback() {
 			logger.debug("Resetting buffer on rollback: " + list);
-			iter = new ArrayList(list).iterator();
+			iter = new ArrayList<Long>(list).iterator();
 		}
 
 		public void commit() {
 			logger.debug("Clearing buffer on commit: " + list);
 			list.clear();
-			iter = new ArrayList().iterator();
+			iter = new ArrayList<Long>().iterator();
 		}
 
 		public String toString() {

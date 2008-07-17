@@ -16,7 +16,6 @@
 package org.springframework.batch.sample.quartz;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -63,8 +62,9 @@ public class JobLauncherDetails extends QuartzJobBean {
 		this.jobLauncher = jobLauncher;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void executeInternal(JobExecutionContext context) {
-		Map jobDataMap = context.getMergedJobDataMap();
+		Map<String, Object> jobDataMap = context.getMergedJobDataMap();
 		String jobName = (String) jobDataMap.get(JOB_NAME);
 		log.info("Quartz trigger firing with Spring Batch jobName="+jobName);
 		JobParameters jobParameters = getJobParametersFromJobMap(jobDataMap);
@@ -82,13 +82,12 @@ public class JobLauncherDetails extends QuartzJobBean {
 	 * 
 	 * @return a {@link JobParameters} instance
 	 */
-	private JobParameters getJobParametersFromJobMap(Map jobDataMap) {
+	private JobParameters getJobParametersFromJobMap(Map<String, Object> jobDataMap) {
 
 		JobParametersBuilder builder = new JobParametersBuilder();
 
-		for (Iterator iterator = jobDataMap.entrySet().iterator(); iterator.hasNext();) {
-			Entry entry = (Entry) iterator.next();
-			String key = (String) entry.getKey();
+		for (Entry<String, Object> entry : jobDataMap.entrySet()) {
+			String key = entry.getKey();
 			Object value = entry.getValue();
 			if (value instanceof String && !key.equals(JOB_NAME)) {
 				builder.addString(key, (String) value);

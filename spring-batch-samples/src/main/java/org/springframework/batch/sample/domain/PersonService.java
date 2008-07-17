@@ -44,7 +44,7 @@ public class PersonService {
 		Person person = new Person();
 		Address address = new Address();
 		Child child = new Child();
-		List children = new ArrayList(1);
+		List<Child> children = new ArrayList<Child>(1);
 
 		children.add(child);
 

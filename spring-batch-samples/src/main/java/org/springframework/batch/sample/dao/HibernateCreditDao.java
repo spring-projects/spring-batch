@@ -33,14 +33,14 @@ public class HibernateCreditDao extends HibernateDaoSupport implements
 		CustomerCreditDao, RepeatListener {
 
 	private int failOnFlush = -1;
-	private List errors = new ArrayList();
+	private List<Throwable> errors = new ArrayList<Throwable>();
 
 	/**
 	 * Public accessor for the errors property.
 	 * 
 	 * @return the errors - a list of Throwable instances
 	 */
-	public List getErrors() {
+	public List<Throwable> getErrors() {
 		return errors;
 	}
 

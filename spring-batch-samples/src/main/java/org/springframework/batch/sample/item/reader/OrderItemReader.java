@@ -162,10 +162,10 @@ public class OrderItemReader extends DelegatingItemReader {
 			log.debug("MAPPING LINE ITEM");
 
 			if (order.getLineItems() == null) {
-				order.setLineItems(new ArrayList());
+				order.setLineItems(new ArrayList<LineItem>());
 			}
 
-			order.getLineItems().add(itemMapper.mapLine(fieldSet));
+			order.getLineItems().add((LineItem) itemMapper.mapLine(fieldSet));
 
 			return;
 		}

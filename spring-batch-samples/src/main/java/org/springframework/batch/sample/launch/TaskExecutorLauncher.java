@@ -42,7 +42,7 @@ public class TaskExecutorLauncher implements ResourceLoaderAware {
 
 	private ApplicationContext parentContext = null;
 
-	private static List errors = new ArrayList();
+	private static List<RuntimeException> errors = new ArrayList<RuntimeException>();
 
 	/**
 	 * Public setter for the {@link JobRegistry}.
@@ -64,7 +64,7 @@ public class TaskExecutorLauncher implements ResourceLoaderAware {
 	 * Public getter for the errors.
 	 * @return the errors
 	 */
-	public static List getErrors() {
+	public static List<RuntimeException> getErrors() {
 		return errors;
 	}
 

@@ -44,7 +44,7 @@ public class Order {
     private ShippingInfo shipping;
 
     //order items
-    private List lineItems;
+    private List<LineItem> lineItems;
 
     public BillingInfo getBilling() {
         return billing;
@@ -70,11 +70,11 @@ public class Order {
         this.customer = customer;
     }
 
-    public List getLineItems() {
+    public List<LineItem> getLineItems() {
         return lineItems;
     }
 
-    public void setLineItems(List lineItems) {
+    public void setLineItems(List<LineItem> lineItems) {
         this.lineItems = lineItems;
     }
 

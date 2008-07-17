@@ -4,7 +4,6 @@
 package org.springframework.batch.sample.launch;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.springframework.batch.core.Job;
@@ -18,15 +17,15 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.util.Assert;
 
-public class DefaultJobLoader implements JobLoader,
-		ApplicationContextAware {
+public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 
 	private ListableJobRegistry registry;
-	private ApplicationContext applicationContext;
-	private Map configurations = new HashMap();
 
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	private ApplicationContext applicationContext;
+
+	private Map<String, String> configurations = new HashMap<String, String>();
+
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
 
@@ -34,12 +33,11 @@ public class DefaultJobLoader implements JobLoader,
 		this.registry = registry;
 	}
 
-	public Map getConfigurations() {
-		Map result = new HashMap(configurations);
-		for (Iterator iterator = registry.getJobNames().iterator(); iterator
-				.hasNext();) {
+	public Map<String, String> getConfigurations() {
+		Map<String, String> result = new HashMap<String, String>(configurations);
+		for (String jobName : registry.getJobNames()) {
 			try {
-				Job configuration = (Job) registry.getJob((String) iterator.next());
+				Job configuration = (Job) registry.getJob(jobName);
 				String name = configuration.getName();
 				if (!configurations.containsKey(name)) {
 					result.put(name, "<unknown path>: " + configuration);
@@ -53,19 +51,20 @@ public class DefaultJobLoader implements JobLoader,
 	}
 
 	public void loadResource(String path) {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
-				new String[] { path }, applicationContext);
+		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path },
+				applicationContext);
 		String[] names = context.getBeanNamesForType(Job.class);
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
 			configurations.put(name, path);
 		}
 	}
-	
+
 	public Object getJobConfiguration(String name) {
 		try {
 			return registry.getJob(name);
-		} catch (NoSuchJobException e) {
+		}
+		catch (NoSuchJobException e) {
 			return null;
 		}
 	}
@@ -73,22 +72,22 @@ public class DefaultJobLoader implements JobLoader,
 	public Object getProperty(String path) {
 		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(path);
 		BeanWrapperImpl wrapper = createBeanWrapper(path, index);
-		String key = path.substring(index+1);
+		String key = path.substring(index + 1);
 		return wrapper.getPropertyValue(key);
 	}
 
 	public void setProperty(String path, String value) {
 		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(path);
 		BeanWrapperImpl wrapper = createBeanWrapper(path, index);
-		String key = path.substring(index+1);
+		String key = path.substring(index + 1);
 		wrapper.setPropertyValue(key, value);
 	}
 
 	private BeanWrapperImpl createBeanWrapper(String path, int index) {
-		Assert.state(index>0, "Path must be nested, e.g. bean.value");
-		String name = path.substring(0,index);
+		Assert.state(index > 0, "Path must be nested, e.g. bean.value");
+		String name = path.substring(0, index);
 		Object bean = getJobConfiguration(name);
-		Assert.notNull(bean, "No JobConfiguration exists with name="+name);
+		Assert.notNull(bean, "No JobConfiguration exists with name=" + name);
 		BeanWrapperImpl wrapper = new BeanWrapperImpl(bean);
 		return wrapper;
 	}
