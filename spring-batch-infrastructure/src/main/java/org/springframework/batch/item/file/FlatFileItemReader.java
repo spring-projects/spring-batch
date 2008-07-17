@@ -99,7 +99,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 		Object record = "";
 		int index = itemIndex + (firstLineIsHeader?1:0) + linesToSkip;
 		while (reader.getPosition() < index && record != null) {
-			readLine();
+			record = readLine();
 		}
 	}
 
