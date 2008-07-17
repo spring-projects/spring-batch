@@ -32,7 +32,7 @@ public class ValidateDiscountsFunctionTests extends TestCase {
 		item.setDiscountAmount(new BigDecimal(0.0));
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument
@@ -61,7 +61,7 @@ public class ValidateDiscountsFunctionTests extends TestCase {
 		item.setDiscountAmount(new BigDecimal(0.0));
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument
@@ -91,7 +91,7 @@ public class ValidateDiscountsFunctionTests extends TestCase {
 		item.setPrice(new BigDecimal(100.0));
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument
@@ -122,7 +122,7 @@ public class ValidateDiscountsFunctionTests extends TestCase {
 		item.setPrice(new BigDecimal(100.0));
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument
@@ -152,7 +152,7 @@ public class ValidateDiscountsFunctionTests extends TestCase {
 		item.setDiscountAmount(new BigDecimal(99.0));
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument

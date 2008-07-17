@@ -31,7 +31,7 @@ public class ValidateQuantitiesFunctionTests extends TestCase {
 		item.setQuantity(1);
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument
@@ -58,7 +58,7 @@ public class ValidateQuantitiesFunctionTests extends TestCase {
 		item.setQuantity(9999);
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument

@@ -32,7 +32,7 @@ public class ValidateShippingPricesFunctionTests extends TestCase {
 		item.setShippingPrice(new BigDecimal(1.0));
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument
@@ -59,7 +59,7 @@ public class ValidateShippingPricesFunctionTests extends TestCase {
 		item.setShippingPrice(new BigDecimal(99999999.0));
 		
 		//add it to line items list 
-		List items = new ArrayList();
+		List<LineItem> items = new ArrayList<LineItem>();
 		items.add(item);
 		
 		//set return value for mock argument

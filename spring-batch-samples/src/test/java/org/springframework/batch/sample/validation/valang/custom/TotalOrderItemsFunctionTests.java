@@ -52,7 +52,7 @@ public class TotalOrderItemsFunctionTests extends TestCase {
 		//create list with correct item count
 		LineItem item = new LineItem();
 		item.setQuantity(3);
-		List list = new ArrayList();
+		List<LineItem> list = new ArrayList<LineItem>();
 		list.add(item);
 		
 		argument2.getResult(null);
@@ -68,7 +68,7 @@ public class TotalOrderItemsFunctionTests extends TestCase {
 		//create list with incorrect item count
 		LineItem item = new LineItem();
 		item.setQuantity(99);
-		List list = new ArrayList();
+		List<LineItem> list = new ArrayList<LineItem>();
 		list.add(item);
 		
 		argument2.getResult(null);
