@@ -140,11 +140,37 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		this.name = name;
 	}
 
+	/**
+	 * Extension point for subclasses to execute business logic. 
+	 * 
+	 * @param stepExecution
+	 * @return {@link ExitStatus} to show whether the step is finished
+	 * processing.
+	 * @throws Exception
+	 */
 	protected abstract ExitStatus doExecute(StepExecution stepExecution) throws Exception;
 
-	protected abstract void open(ExecutionContext ctx) throws Exception;
+	/**
+	 * Extension point for subclasses to provide callbacks to their
+	 * collaborators at the beginning of a step, to open or acquire resources.
+	 * Does nothing by default.
+	 * 
+	 * @param ctx the {@link ExecutionContext} to use
+	 * @throws Exception
+	 */
+	protected void open(ExecutionContext ctx) throws Exception {
+	}
 
-	protected abstract void close(ExecutionContext ctx) throws Exception;
+	/**
+	 * Extension point for subclasses to provide callbacks to their
+	 * collaborators at the end of a step (right at the end of the finally
+	 * block), to close or release resources.  Does nothing by default.
+	 * 
+	 * @param ctx the {@link ExecutionContext} to use
+	 * @throws Exception
+	 */
+	protected void close(ExecutionContext ctx) throws Exception {
+	}
 
 	/**
 	 * Template method for step execution logic - calls abstract methods for

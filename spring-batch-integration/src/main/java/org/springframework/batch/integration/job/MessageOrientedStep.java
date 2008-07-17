@@ -121,24 +121,6 @@ public class MessageOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Do nothing.
-	 * 
-	 * @see org.springframework.batch.core.step.AbstractStep#open(org.springframework.batch.item.ExecutionContext)
-	 */
-	@Override
-	protected void open(ExecutionContext ctx) throws Exception {
-	}
-
-	/**
-	 * Do nothing.
-	 * 
-	 * @see org.springframework.batch.core.step.AbstractStep#close(org.springframework.batch.item.ExecutionContext)
-	 */
-	@Override
-	protected void close(ExecutionContext ctx) throws Exception {
-	}
-
-	/**
 	 * @param expectedJobId
 	 */
 	private void waitForReply(Long expectedJobId) {
