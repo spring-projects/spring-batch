@@ -17,7 +17,6 @@ package org.springframework.batch.core.step.item;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -37,9 +36,9 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		List skippableExceptions = new ArrayList();
+		List<Class<?>> skippableExceptions = new ArrayList<Class<?>>();
 		skippableExceptions.add(FlatFileParseException.class);
-		List fatalExceptions = Collections.EMPTY_LIST;
+		List<Class<?>> fatalExceptions = new ArrayList<Class<?>>();
 		
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
 	}

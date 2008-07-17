@@ -1,5 +1,6 @@
 package org.springframework.batch.core.step.tasklet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class TaskletStepTests extends TestCase {
 
 	private StepExecution stepExecution;
 
-	private List list = new ArrayList();
+	private List<Serializable> list = new ArrayList<Serializable>();
 
 	protected void setUp() throws Exception {
 		stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(0L),

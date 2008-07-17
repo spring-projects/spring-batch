@@ -40,7 +40,7 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 		StepExecution stepExecution = new StepExecution("taskletStep", jobExecution, new Long(3) );
 		pss.beforeStep(stepExecution);
 		
-		List parameterNames = new ArrayList();
+		List<String> parameterNames = new ArrayList<String>();
 		parameterNames.add("begin.id");
 		parameterNames.add("end.id");
 		pss.setParameterKeys(parameterNames);

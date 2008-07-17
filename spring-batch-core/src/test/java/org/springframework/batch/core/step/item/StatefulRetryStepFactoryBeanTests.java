@@ -59,9 +59,9 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 	private SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
 
-	private List recovered = new ArrayList();
+	private List<Object> recovered = new ArrayList<Object>();
 
-	private List processed = new ArrayList();
+	private List<String> processed = new ArrayList<String>();
 
 	int count = 0;
 
@@ -88,7 +88,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 		factory.setBeanName("step");
 
-		factory.setItemReader(new ListItemReader(new ArrayList()));
+		factory.setItemReader(new ListItemReader(new ArrayList<String>()));
 		factory.setItemWriter(processor);
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
@@ -119,8 +119,9 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@SuppressWarnings("unchecked")
 	public void testSuccessfulRetryWithReadFailure() throws Exception {
-		List items = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
 		ItemReader provider = new ListItemReader(items) {
 			public Object read() {
@@ -147,10 +148,11 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(3, stepExecution.getItemCount().intValue());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testSkipAndRetry() throws Exception {
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 		factory.setSkipLimit(2);
-		List items = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" }));
 		ItemReader provider = new ListItemReader(items) {
 			public Object read() {
@@ -175,6 +177,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(4, stepExecution.getItemCount().intValue());
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testSkipAndRetryWithWriteFailure() throws Exception {
 
 		factory.setSkippableExceptionClasses(new Class[] { RetryException.class });
@@ -185,7 +188,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 			}
 		} });
 		factory.setSkipLimit(2);
-		List items = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" }));
 		ItemReader provider = new ListItemReader(items) {
 			public Object read() {
@@ -221,11 +224,12 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(17, count);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testRetryWithNoSkip() throws Exception {
 		factory.setRetryableExceptionClasses(new Class[] { Exception.class });
 		factory.setRetryLimit(4);
 		factory.setSkipLimit(0);
-		List items = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "b" }));
 		ItemReader provider = new ListItemReader(items) {
 			public Object read() {

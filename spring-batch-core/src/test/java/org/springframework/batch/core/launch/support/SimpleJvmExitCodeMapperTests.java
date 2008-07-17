@@ -32,12 +32,12 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 	
 	protected void setUp() throws Exception {
 		ecm = new SimpleJvmExitCodeMapper();
-		Map ecmMap = new HashMap();
+		Map<String, Integer> ecmMap = new HashMap<String, Integer>();
 		ecmMap.put("MY_CUSTOM_CODE", new Integer(3));
 		ecm.setMapping(ecmMap);
 		
 		ecm2 = new SimpleJvmExitCodeMapper();
-		Map ecm2Map = new HashMap();
+		Map<String, Integer> ecm2Map = new HashMap<String, Integer>();
 		ecm2Map.put(ExitStatus.FINISHED.getExitCode(), new Integer(-1));
 		ecm2Map.put(ExitStatus.FAILED.getExitCode(), new Integer(-2));
 		ecm2Map.put(ExitCodeMapper.JOB_NOT_PROVIDED, new Integer(-3));

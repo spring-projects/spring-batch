@@ -72,7 +72,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	String databaseStep2;
 
-	List steps;
+	List<String> steps;
 
 
 	public void setUp() throws Exception {
@@ -93,7 +93,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		stepConfiguration2 = new StepSupport("TestStep2");
 
-		List stepConfigurations = new ArrayList();
+		List<Step> stepConfigurations = new ArrayList<Step>();
 		stepConfigurations.add(stepConfiguration1);
 		stepConfigurations.add(stepConfiguration2);
 
@@ -104,7 +104,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		databaseStep1 = "dbStep1";
 		databaseStep2 = "dbStep2";
 
-		steps = new ArrayList();
+		steps = new ArrayList<String>();
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 

@@ -78,7 +78,7 @@ public class SimpleJobLauncherTests extends TestCase {
 	}
 
 	public void testTaskExecutor() throws Exception {
-		final List list = new ArrayList();
+		final List<String> list = new ArrayList<String>();
 		jobLauncher.setTaskExecutor(new TaskExecutor() {
 			public void execute(Runnable task) {
 				list.add("execute");

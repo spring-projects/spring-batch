@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.step.item;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,16 +57,15 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
 public class ItemOrientedStepTests extends TestCase {
 
-	List processed = new ArrayList();
+	List<String> processed = new ArrayList<String>();
 
-	private List list = new ArrayList();
+	private List<Serializable> list = new ArrayList<Serializable>();
 
 	ItemWriter itemWriter = new AbstractItemWriter() {
 		public void write(Object data) throws Exception {

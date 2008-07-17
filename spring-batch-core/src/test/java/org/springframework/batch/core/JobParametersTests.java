@@ -5,13 +5,12 @@ package org.springframework.batch.core;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.SerializationUtils;
-
 import junit.framework.TestCase;
+
+import org.apache.commons.lang.SerializationUtils;
 
 /**
  * @author Lucas Ward
@@ -21,13 +20,13 @@ public class JobParametersTests extends TestCase {
 
 	JobParameters parameters;
 
-	Map stringMap;
+	Map<String, String> stringMap;
 
-	Map longMap;
+	Map<String, Long> longMap;
 
-	Map dateMap;
-	
-	Map doubleMap;
+	Map<String, Date> dateMap;
+
+	Map<String, Double> doubleMap;
 
 	Date date1 = new Date(4321431242L);
 
@@ -40,25 +39,26 @@ public class JobParametersTests extends TestCase {
 
 	private JobParameters getNewParameters() {
 
-		stringMap = new HashMap();
+		stringMap = new HashMap<String, String>();
 		stringMap.put("string.key1", "value1");
 		stringMap.put("string.key2", "value2");
 
-		longMap = new HashMap();
+		longMap = new HashMap<String, Long>();
 		longMap.put("long.key1", new Long(1));
 		longMap.put("long.key2", new Long(2));
-		
-		doubleMap = new HashMap();
+
+		doubleMap = new HashMap<String, Double>();
 		doubleMap.put("double.key1", new Double(1.1));
 		doubleMap.put("double.key2", new Double(2.2));
 
-		dateMap = new HashMap();
+		dateMap = new HashMap<String, Date>();
 		dateMap.put("date.key1", date1);
 		dateMap.put("date.key2", date2);
 
 		return new JobParameters(stringMap, longMap, doubleMap, dateMap);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testBadLongKeyException() throws Exception {
 
 		Map badLongMap = new HashMap();
@@ -73,6 +73,7 @@ public class JobParametersTests extends TestCase {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testBadLongConstructorException() throws Exception {
 
 		Map badLongMap = new HashMap();
@@ -86,7 +87,8 @@ public class JobParametersTests extends TestCase {
 			// expected
 		}
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	public void testBadDoubleConstructorException() throws Exception {
 
 		Map badDoubleMap = new HashMap();
@@ -101,6 +103,7 @@ public class JobParametersTests extends TestCase {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testBadStringConstructorException() throws Exception {
 
 		Map badMap = new HashMap();
@@ -115,6 +118,7 @@ public class JobParametersTests extends TestCase {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testBadDateConstructorException() throws Exception {
 
 		Map badMap = new HashMap();
@@ -148,12 +152,12 @@ public class JobParametersTests extends TestCase {
 		assertEquals(new Long(1), parameters.getLongParameters().get("long.key1"));
 		assertEquals(new Long(2), parameters.getLongParameters().get("long.key2"));
 	}
-	
+
 	public void testGetDouble() {
 		assertEquals(new Double(1.1), parameters.getDouble("double.key1"));
 		assertEquals(new Double(2.2), parameters.getDouble("double.key2"));
 	}
-	
+
 	public void testGetDoubleParameters() {
 		assertEquals(new Double(1.1), parameters.getDoubleParameters().get("double.key1"));
 		assertEquals(new Double(2.2), parameters.getDoubleParameters().get("double.key2"));
@@ -200,28 +204,27 @@ public class JobParametersTests extends TestCase {
 
 	public void testToStringOrder() {
 
-		Map props = parameters.getParameters();
+		Map<String, Object> props = parameters.getParameters();
 		StringBuffer stringBuilder = new StringBuffer();
-		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
+		for (Entry<?, ?> entry : props.entrySet()) {
 			stringBuilder.append(entry.toString() + ";");
 		}
 
 		String string1 = stringBuilder.toString();
 
-		stringMap = new HashMap();
+		stringMap = new HashMap<String, String>();
 		stringMap.put("string.key2", "value2");
 		stringMap.put("string.key1", "value1");
 
-		longMap = new HashMap();
+		longMap = new HashMap<String, Long>();
 		longMap.put("long.key2", new Long(2));
 		longMap.put("long.key1", new Long(1));
-		
-		doubleMap = new HashMap();
+
+		doubleMap = new HashMap<String, Double>();
 		doubleMap.put("double.key2", new Double(2.2));
 		doubleMap.put("double.key1", new Double(1.1));
 
-		dateMap = new HashMap();
+		dateMap = new HashMap<String, Date>();
 		dateMap.put("date.key2", date2);
 		dateMap.put("date.key1", date1);
 
@@ -229,8 +232,7 @@ public class JobParametersTests extends TestCase {
 
 		props = testProps.getParameters();
 		stringBuilder = new StringBuffer();
-		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
-			Entry entry = (Entry) it.next();
+		for (Entry<?, ?> entry : props.entrySet()) {
 			stringBuilder.append(entry.toString() + ";");
 		}
 		String string2 = stringBuilder.toString();
@@ -247,12 +249,12 @@ public class JobParametersTests extends TestCase {
 		int code = getNewParameters().hashCode();
 		assertEquals(code, parameters.hashCode());
 	}
-	
+
 	public void testSerialization() {
 		JobParameters params = getNewParameters();
-		
+
 		byte[] serialized = SerializationUtils.serialize(params);
-		
+
 		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}
 }

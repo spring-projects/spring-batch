@@ -40,11 +40,12 @@ public class EmptyItemWriter implements ItemWriter, InitializingBean {
 
 	protected Log logger = LogFactory.getLog(EmptyItemWriter.class);
 
-	List list;
+	List<Object> list;
 
+	@SuppressWarnings("unchecked")
 	public void afterPropertiesSet() throws Exception {
 		TransactionAwareProxyFactory factory = new TransactionAwareProxyFactory(new ArrayList());
-		list = (List) factory.createInstance();
+		list = (List<Object>) factory.createInstance();
 	}
 
 	public void setFailurePoint(int failurePoint) {
@@ -60,7 +61,7 @@ public class EmptyItemWriter implements ItemWriter, InitializingBean {
 		list.add(data);
 	}
 
-	public List getList() {
+	public List<Object> getList() {
 		return list;
 	}
 

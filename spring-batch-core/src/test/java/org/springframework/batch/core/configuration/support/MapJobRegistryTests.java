@@ -89,7 +89,7 @@ public class MapJobRegistryTests extends TestCase {
 		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
 		registry.register(jobFactory);
 		registry.register(new ReferenceJobFactory(new JobSupport("bar")));
-		Collection configurations = registry.getJobNames();
+		Collection<String> configurations = registry.getJobNames();
 		assertEquals(2, configurations.size());
 		assertTrue(configurations.contains(jobFactory.getJobName()));
 	}

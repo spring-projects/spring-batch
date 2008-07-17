@@ -151,7 +151,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		jobExecution.setEndTime(new Date(System.currentTimeMillis()));
 		jobExecutionDao.updateJobExecution(jobExecution);
 
-		List executions = jobExecutionDao.findJobExecutions(jobInstance);
+		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 		assertEquals(executions.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
 
@@ -159,7 +159,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 
 	public void testSaveJobExecution() {
 
-		List executions = jobExecutionDao.findJobExecutions(jobInstance);
+		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 		assertEquals(executions.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution) executions.get(0));
 	}
@@ -208,13 +208,14 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		assertEquals(jobExecutionDao.getJobExecutionCount(testJob), 0);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testJobWithSimpleJobIdentifier() throws Exception {
 
 		Job testJob = new JobSupport("test");
 		// Create job.
 		jobInstance = jobInstanceDao.createJobInstance(testJob, jobParameters);
 
-		List jobs = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?",
+		List<JobInstance> jobs = jdbcTemplate.queryForList("SELECT * FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?",
 				new Object[] { jobInstance.getId() });
 		assertEquals(1, jobs.size());
 		assertEquals("test", ((Map) jobs.get(0)).get("JOB_NAME"));
@@ -237,7 +238,7 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 
 	public void testFindJobExecutions() {
 
-		List results = jobExecutionDao.findJobExecutions(jobInstance);
+		List<JobExecution> results = jobExecutionDao.findJobExecutions(jobInstance);
 		assertEquals(results.size(), 1);
 		validateJobExecution(jobExecution, (JobExecution) results.get(0));
 	}

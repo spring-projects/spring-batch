@@ -103,7 +103,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 				"test-context.xml", getClass());
 		MapJobRegistry registry = (MapJobRegistry) context
 				.getBean("registry");
-		Collection configurations = registry.getJobNames();
+		Collection<String> configurations = registry.getJobNames();
 		// System.err.println(configurations);
 		String[] names = context.getBeanNamesForType(JobSupport.class);
 		int count = names.length;

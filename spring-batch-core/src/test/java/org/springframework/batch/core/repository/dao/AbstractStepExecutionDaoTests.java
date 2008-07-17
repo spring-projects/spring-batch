@@ -150,7 +150,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	public void testSaveAndFindContext() {
 		dao.saveStepExecution(stepExecution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
 			}
@@ -174,7 +174,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	public void testUpdateContext() {
 		dao.saveStepExecution(stepExecution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
 			}

@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.job;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +64,7 @@ public class SimpleJobTests extends TestCase {
 
 	private StepExecutionDao stepExecutionDao;
 
-	private List list = new ArrayList();
+	private List<Serializable> list = new ArrayList<Serializable>();
 
 	private JobInstance jobInstance;
 
@@ -109,7 +110,7 @@ public class SimpleJobTests extends TestCase {
 		step1.setJobRepository(jobRepository);
 		step2.setJobRepository(jobRepository);
 
-		List steps = new ArrayList();
+		List<Step> steps = new ArrayList<Step>();
 		steps.add(step1);
 		steps.add(step2);
 		job.setName("testJob");
@@ -146,7 +147,7 @@ public class SimpleJobTests extends TestCase {
 				return false;
 			}
 		};
-		List steps = new ArrayList();
+		List<Step> steps = new ArrayList<Step>();
 		steps.add(testStep);
 		job.setSteps(steps);
 		job.execute(jobExecution);
@@ -289,7 +290,7 @@ public class SimpleJobTests extends TestCase {
 	}
 
 	public void testNoSteps() throws Exception {
-		job.setSteps(new ArrayList());
+		job.setSteps(new ArrayList<Step>());
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();

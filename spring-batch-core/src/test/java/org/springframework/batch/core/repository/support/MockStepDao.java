@@ -27,9 +27,9 @@ import org.springframework.batch.item.ExecutionContext;
 
 public class MockStepDao implements StepExecutionDao {
 
-	private List newSteps;
+	private List<Step> newSteps;
 
-	public List findStepInstances(JobInstance job) {
+	public List<Step> findStepInstances(JobInstance job) {
 		return newSteps;
 	}
 
@@ -39,7 +39,7 @@ public class MockStepDao implements StepExecutionDao {
 	public void updateStepExecution(StepExecution stepExecution) {
 	}
 
-	public void setStepsToReturnOnCreate(List steps) {
+	public void setStepsToReturnOnCreate(List<Step> steps) {
 		this.newSteps = steps;
 	}
 

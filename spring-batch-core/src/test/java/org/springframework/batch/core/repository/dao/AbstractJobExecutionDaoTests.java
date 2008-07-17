@@ -35,7 +35,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 		dao.saveJobExecution(execution);
 
-		List executions = dao.findJobExecutions(jobInstance);
+		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
 		assertTrue(executions.size() == 1);
 		assertEquals(execution, executions.get(0));
 	}
@@ -111,7 +111,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 	public void testSaveAndFindContext() {
 		dao.saveJobExecution(execution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
 			}
@@ -135,7 +135,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 	public void testUpdateContext() {
 		dao.saveJobExecution(execution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
+		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
 			}

@@ -34,7 +34,7 @@ public class OrderedCompositeTests extends TestCase {
 	 */
 	public void testSetItems() {
 		list.setItems(new String[] {"1", "2"});
-		Iterator iterator = list.iterator();
+		Iterator<Object> iterator = list.iterator();
 		assertEquals("1", iterator.next());
 		assertEquals("2", iterator.next());
 	}
@@ -45,7 +45,7 @@ public class OrderedCompositeTests extends TestCase {
 	public void testAdd() {
 		list.setItems(new String[] {"1"});
 		list.add("3");
-		Iterator iterator = list.iterator();
+		Iterator<Object> iterator = list.iterator();
 		assertEquals("1", iterator.next());
 		assertEquals("3", iterator.next());
 	}
@@ -60,7 +60,7 @@ public class OrderedCompositeTests extends TestCase {
 				return 0;
 			}
 		});
-		Iterator iterator = list.iterator();
+		Iterator<Object> iterator = list.iterator();
 		iterator.next();
 		assertEquals("1", iterator.next());
 	}
@@ -80,7 +80,7 @@ public class OrderedCompositeTests extends TestCase {
 				return 0;
 			}
 		});
-		Iterator iterator = list.iterator();
+		Iterator<Object> iterator = list.iterator();
 		assertEquals(0, ((Ordered) iterator.next()).getOrder());
 		assertEquals(1, ((Ordered) iterator.next()).getOrder());
 		assertEquals("1", iterator.next());

@@ -39,7 +39,6 @@ import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -52,7 +51,7 @@ import org.springframework.util.ClassUtils;
  */
 public class ItemOrientedStepIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
 
-	private List processed = new ArrayList();
+	private List<String> processed = new ArrayList<String>();
 
 	private ItemOrientedStep step;
 

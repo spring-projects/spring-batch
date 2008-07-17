@@ -35,7 +35,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 
 	JdbcJobExecutionDao jobExecutionDao;
 
-	List list = new ArrayList();
+	List<String> list = new ArrayList<String>();
 
 	/*
 	 * (non-Javadoc)
@@ -73,7 +73,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 
 		jobExecutionDao.saveJobExecution(jobExecution);
 		assertEquals(1, list.size());
-		String query = (String) list.get(0);
+		String query = list.get(0);
 		assertTrue("Query did not contain FOO_:" + query, query.indexOf("FOO_") >= 0);
 	}
 

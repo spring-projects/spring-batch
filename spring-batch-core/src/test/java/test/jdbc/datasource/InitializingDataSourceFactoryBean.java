@@ -17,7 +17,6 @@
 package test.jdbc.datasource;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -99,6 +98,7 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
 		transactionTemplate.execute(new TransactionCallback() {
 
+			@SuppressWarnings("unchecked")
 			public Object doInTransaction(TransactionStatus status) {
 				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;
@@ -122,10 +122,9 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 
 	}
 
-	private String stripComments(List list) {
+	private String stripComments(List<String> list) {
 		StringBuffer buffer = new StringBuffer();
-		for (Iterator iter = list.iterator(); iter.hasNext();) {
-			String line = (String) iter.next();
+		for (String line : list) {
 			if (!line.startsWith("//") && !line.startsWith("--")) {
 				buffer.append(line + "\n");
 			}
@@ -133,7 +132,7 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 		return buffer.toString();
 	}
 
-	public Class getObjectType() {
+	public Class<DataSource> getObjectType() {
 		return DataSource.class;
 	}
 

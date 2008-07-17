@@ -32,7 +32,7 @@ public class JobParametersBuilderTests extends TestCase {
 		parametersBuilder.addDate("SCHEDULE_DATE", date);
 		parametersBuilder.addLong("LONG", new Long(1));
 		parametersBuilder.addString("STRING", "string value");
-		Iterator parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
+		Iterator<String> parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
 		assertEquals("STRING", parameters.next());
 		assertEquals("LONG", parameters.next());
 		assertEquals("SCHEDULE_DATE", parameters.next());
@@ -42,7 +42,7 @@ public class JobParametersBuilderTests extends TestCase {
 		parametersBuilder.addString("foo", "value foo");
 		parametersBuilder.addString("bar", "value bar");
 		parametersBuilder.addString("spam", "value spam");
-		Iterator parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
+		Iterator<String> parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
 		assertEquals("foo", parameters.next());
 		assertEquals("bar", parameters.next());
 		assertEquals("spam", parameters.next());

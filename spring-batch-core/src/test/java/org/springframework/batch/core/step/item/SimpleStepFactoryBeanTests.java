@@ -55,12 +55,12 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
  */
 public class SimpleStepFactoryBeanTests extends TestCase {
 
-	private List recovered = new ArrayList();
+	private List<Exception> recovered = new ArrayList<Exception>();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 			new MapStepExecutionDao());
 
-	private List written = new ArrayList();
+	private List<String> written = new ArrayList<String>();
 
 	private ItemWriter writer = new AbstractItemWriter() {
 		public void write(Object data) throws Exception {
@@ -92,10 +92,11 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		return getStepFactory(new String[] { arg0, arg1 });
 	}
 
+	@SuppressWarnings("unchecked")
 	private SimpleStepFactoryBean getStepFactory(String[] args) throws Exception {
 		SimpleStepFactoryBean factory = new SimpleStepFactoryBean();
 
-		List items = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
 		reader = new ListItemReader(items);
 
@@ -109,7 +110,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 	public void testSimpleJob() throws Exception {
 
-		job.setSteps(new ArrayList());
+		job.setSteps(new ArrayList<Step>());
 		AbstractStep step = (AbstractStep) getStepFactory("foo", "bar").getObject();
 		step.setName("step1");
 		job.addStep(step);
@@ -127,7 +128,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 	public void testSimpleConcurrentJob() throws Exception {
 
-		job.setSteps(new ArrayList());
+		job.setSteps(new ArrayList<Step>());
 		SimpleStepFactoryBean factory = getStepFactory("foo", "bar");
 		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		factory.setThrottleLimit(1);
@@ -146,7 +147,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 	public void testSimpleJobWithItemListeners() throws Exception {
 
-		final List throwables = new ArrayList();
+		final List<Throwable> throwables = new ArrayList<Throwable>();
 
 		RepeatTemplate chunkOperations = new RepeatTemplate();
 		// Always handle the exception a check it is the right one...

@@ -41,7 +41,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	private SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
 
-	private Class[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
+	private Class<?>[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
 
 	private final int SKIP_LIMIT = 2;
 
@@ -89,7 +89,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertTrue(reader.processed.contains("4"));
 		assertFalse(writer.written.contains("4"));
 
-		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
 		assertEquals(expectedOutput, writer.written);
 		
 		assertEquals(4, stepExecution.getItemCount().intValue());
@@ -171,7 +171,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertFalse(writer.written.contains("4"));
 
 		// failure on "4" tripped the skip limit so we never got to "5"
-		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3"));
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3"));
 		assertEquals(expectedOutput, writer.written);
 
 	}
@@ -179,6 +179,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@SuppressWarnings("unchecked")
 	public void testSkipOverLimitOnRead() throws Exception {
 
 		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
@@ -210,7 +211,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		// failure on "5" tripped the skip limit but "4" failed on write and was skipped and 
 		// RepeatSynchronizationManager.setCompleteOnly() was called in the retry policy to
 		// aggressively commit after a recovery ("1" was written at that point)
-		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
 		assertEquals(expectedOutput, writer.written);
 
 	}
@@ -218,6 +219,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@SuppressWarnings("unchecked")
 	public void testSkipOnReadNotDoubleCounted() throws Exception {
 
 		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
@@ -236,7 +238,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
 
 		// skipped 2,3,4,5
-		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
 		assertEquals(expectedOutput, writer.written);
 
 	}
@@ -244,6 +246,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@SuppressWarnings("unchecked")
 	public void testSkipOnWriteNotDoubleCounted() throws Exception {
 
 		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7"), StringUtils
@@ -267,15 +270,16 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertEquals(2, stepExecution.getWriteSkipCount().intValue());
 
 		// skipped 2,3,4,5
-		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
 		assertEquals(expectedOutput, writer.written);
 
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testDefaultSkipPolicy() throws Exception {
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 		factory.setSkipLimit(1);
-		List items = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
 		ItemReader provider = new ListItemReader(items) {
 			public Object read() {
@@ -307,19 +311,19 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		private final String[] items;
 
-		private Collection processed = new ArrayList();
+		private Collection<String> processed = new ArrayList<String>();
 
 		private int counter = -1;
 
 		private int marked = 0;
 
-		private final Collection failures;
+		private final Collection<String> failures;
 
 		public SkipReaderStub() {
 			this(new String[] { "1", "2", "3", "4", "5" }, Collections.singleton("2"));
 		}
 
-		public SkipReaderStub(String[] items, Collection failures) {
+		public SkipReaderStub(String[] items, Collection<String> failures) {
 			this.items = items;
 			this.failures = failures;
 		}
@@ -359,12 +363,13 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		protected final Log logger = LogFactory.getLog(getClass());
 
-		private List written = new ArrayList();
+		private List<Object> written = new ArrayList<Object>();
 
 		private int flushIndex = -1;
 
-		private final Collection failures;
+		private final Collection<String> failures;
 
+		@SuppressWarnings("unchecked")
 		public SkipWriterStub() {
 			this(StringUtils.commaDelimitedListToSet("4"));
 		}
@@ -372,7 +377,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		/**
 		 * @param failures commaDelimitedListToSet
 		 */
-		public SkipWriterStub(Collection failures) {
+		public SkipWriterStub(Collection<String> failures) {
 			this.failures = failures;
 		}
 

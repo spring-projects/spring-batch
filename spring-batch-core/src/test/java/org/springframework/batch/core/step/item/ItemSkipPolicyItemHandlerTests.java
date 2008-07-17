@@ -116,6 +116,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		assertEquals(new Holder("5"), handler.read(contribution));
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testWriteWithSkipAfterMark() throws Exception {
 		handler.setItemSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		try {
@@ -137,7 +138,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		assertEquals(2, contribution.getSkipCount());
 
 		assertEquals(1, TransactionSynchronizationManager.getResourceMap().size());
-		Set removed = (Set) TransactionSynchronizationManager.getResourceMap().values().iterator().next();
+		Set<Object> removed = (Set) TransactionSynchronizationManager.getResourceMap().values().iterator().next();
 		// one skipped item was detected on read
 		assertEquals(1, removed.size());
 		// mark() should remove the set of removed keys
@@ -274,7 +275,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 
 		final String[] values = { "1", "2", "3", "4", "5" };
 
-		Collection processed = new ArrayList();
+		Collection<Object> processed = new ArrayList<Object>();
 
 		int counter = -1;
 
@@ -310,7 +311,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 
 		boolean mutate = false;
 
-		List written = new ArrayList();
+		List<Object> written = new ArrayList<Object>();
 
 		int flushIndex = -1;
 

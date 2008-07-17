@@ -211,7 +211,7 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testHashCodeViaHashSet() throws Exception {
-		Set set = new HashSet();
+		Set<StepExecution> set = new HashSet<StepExecution>();
 		set.add(execution);
 		assertTrue(set.contains(execution));
 		execution.setExecutionContext(foobarEc);

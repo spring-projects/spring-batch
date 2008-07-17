@@ -30,7 +30,7 @@ public class AbstractStepTests extends TestCase {
 	/**
 	 * Sequence of events encountered during step execution.
 	 */
-	final List events = new ArrayList();
+	final List<String> events = new ArrayList<String>();
 
 	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(new Long(1),
 			new JobParameters(), "jobName")));

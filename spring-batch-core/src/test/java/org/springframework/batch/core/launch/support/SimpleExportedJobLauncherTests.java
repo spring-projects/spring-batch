@@ -31,11 +31,9 @@ import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.support.SimpleExportedJobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -47,7 +45,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 
 	private MapJobRegistry jobLocator;
 
-	private List list = new ArrayList();
+	private List<JobParameters> list = new ArrayList<JobParameters>();
 
 	protected void setUp() throws Exception {
 		super.setUp();
@@ -214,7 +212,7 @@ public class SimpleExportedJobLauncherTests extends TestCase {
 		});
 		launcher.run("foo", "bar=spam,bucket=crap");
 		assertEquals(1, list.size());
-		assertEquals("spam", ((JobParameters) list.get(0)).getString("foo"));
+		assertEquals("spam", list.get(0).getString("foo"));
 	}
 
 	/**

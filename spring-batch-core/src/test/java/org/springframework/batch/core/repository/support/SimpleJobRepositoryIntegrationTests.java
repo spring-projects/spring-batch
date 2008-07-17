@@ -47,22 +47,22 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 		job.setRestartable(true);
 
-		Map stringParams = new HashMap() {
+		Map<String, String> stringParams = new HashMap<String, String>() {
 			{
 				put("stringKey", "stringValue");
 			}
 		};
-		Map longParams = new HashMap() {
+		Map<String, Long> longParams = new HashMap<String, Long>() {
 			{
 				put("longKey", new Long(1));
 			}
 		};
-		Map doubleParams = new HashMap() {
+		Map<String, Double> doubleParams = new HashMap<String, Double>() {
 			{
 				put("doubleKey", new Double(1.1));
 			}
 		};
-		Map dateParams = new HashMap() {
+		Map<String, Date> dateParams = new HashMap<String, Date>() {
 			{
 				put("dateKey", new Date(1));
 			}

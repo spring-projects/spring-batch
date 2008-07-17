@@ -57,11 +57,11 @@ public class StepExecutionPreparedStatementSetterTests extends AbstractTransacti
 	
 	public void testSetValues(){
 		
-		List parameterNames = new ArrayList();
+		List<String> parameterNames = new ArrayList<String>();
 		parameterNames.add("begin.id");
 		parameterNames.add("end.id");
 		pss.setParameterKeys(parameterNames);
-		final List results = new ArrayList();
+		final List<String> results = new ArrayList<String>();
 		jdbcTemplate.query("SELECT NAME from T_FOOS where ID > ? and ID < ?", pss, new RowCallbackHandler(){
 
 			public void processRow(ResultSet rs) throws SQLException {
@@ -85,7 +85,7 @@ public class StepExecutionPreparedStatementSetterTests extends AbstractTransacti
 	
 	public void testNonExistentProperties(){
 		
-		List parameterNames = new ArrayList();
+		List<String> parameterNames = new ArrayList<String>();
 		parameterNames.add("badParameter");
 		parameterNames.add("end.id");
 		pss.setParameterKeys(parameterNames);

@@ -41,13 +41,13 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	private RepeatOperationsStepFactoryBean factory = new RepeatOperationsStepFactoryBean();
 
-	private List list;
+	private List<String> list;
 
 	private JobExecution jobExecution = new JobExecution(new JobInstance(new Long(0L), new JobParameters(), "job"));
 
 	protected void setUp() throws Exception {
 		factory.setBeanName("RepeatOperationsStep");
-		factory.setItemReader(new ListItemReader(new ArrayList()));
+		factory.setItemReader(new ListItemReader(new ArrayList<String>()));
 		factory.setItemWriter(new EmptyItemWriter());
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
@@ -63,7 +63,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	public void testStepOperationsWithoutChunkListener() throws Exception {
 
-		factory.setItemReader(new ListItemReader(new ArrayList()));
+		factory.setItemReader(new ListItemReader(new ArrayList<String>()));
 		factory.setItemWriter(new EmptyItemWriter());
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
@@ -71,7 +71,7 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 		factory.setStepOperations(new RepeatOperations() {
 
 			public ExitStatus iterate(RepeatCallback callback) {
-				list = new ArrayList();
+				list = new ArrayList<String>();
 				list.add("foo");
 				return ExitStatus.FINISHED;
 			}

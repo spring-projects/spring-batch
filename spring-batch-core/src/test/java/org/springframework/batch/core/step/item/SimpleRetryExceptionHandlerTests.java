@@ -125,7 +125,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 	 * @param ex
 	 * @return
 	 */
-	private SimpleRetryExceptionHandler getHandlerAfterRetry(RetryPolicy retryPolicy, RuntimeException ex, Class[] fatalExceptions) {
+	private SimpleRetryExceptionHandler getHandlerAfterRetry(RetryPolicy retryPolicy, RuntimeException ex, Class<?>[] fatalExceptions) {
 
 		// Always rethrow if the retry is exhausted
 		SimpleRetryExceptionHandler handler = new SimpleRetryExceptionHandler(retryPolicy,

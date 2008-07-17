@@ -3,6 +3,7 @@ package org.springframework.batch.core.repository.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
@@ -17,6 +18,7 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 		((JdbcJobExecutionDao) jobExecutionDao).setTablePrefix(AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX);
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testUpdateJobExecutionWithLongExitCode() {
 
 		assertTrue(LONG_STRING.length() > 250);
@@ -25,7 +27,7 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 				.addExitDescription(LONG_STRING));
 		jobExecutionDao.updateJobExecution(jobExecution);
 
-		List executions = jdbcTemplate.queryForList(
+		List<JobExecution> executions = jdbcTemplate.queryForList(
 				"SELECT * FROM BATCH_JOB_EXECUTION where JOB_INSTANCE_ID=?",
 				new Object[] { jobInstance.getId() });
 		assertEquals(1, executions.size());
