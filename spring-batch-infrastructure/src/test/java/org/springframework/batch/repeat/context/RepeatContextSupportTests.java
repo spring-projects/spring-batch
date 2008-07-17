@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  */
 public class RepeatContextSupportTests extends TestCase {
 
-	private List list = new ArrayList();
+	private List<String> list = new ArrayList<String>();
 
 	/**
 	 * Test method for {@link org.springframework.batch.repeat.context.RepeatContextSupport#registerDestructionCallback(java.lang.String, java.lang.Runnable)}.

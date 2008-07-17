@@ -40,8 +40,8 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
 
 		tested.setDelegate(itemReader);
-		tested.setComparator(new Comparator() {
-			public int compare(Object o1, Object o2) {
+		tested.setComparator(new Comparator<Resource>() {
+			public int compare(Resource o1, Resource o2) {
 				return 0; // do not change ordering
 			}});
 		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
@@ -155,12 +155,12 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		
 		Resource[] resources = new Resource[] {r1, r2, r3};
 		
-		Comparator comp = new Comparator() {
+		Comparator<Resource> comp = new Comparator<Resource>() {
 
 			/**
 			 * Reversed ordering by filename.
 			 */
-			public int compare(Object o1, Object o2) {
+			public int compare(Resource o1, Resource o2) {
 				Resource r1 = (Resource) o1;
 				Resource r2 = (Resource) o2;
 				return -r1.getDescription().compareTo(r2.getDescription());

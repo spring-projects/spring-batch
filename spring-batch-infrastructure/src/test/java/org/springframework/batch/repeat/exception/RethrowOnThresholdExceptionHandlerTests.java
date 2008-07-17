@@ -17,7 +17,6 @@
 package org.springframework.batch.repeat.exception;
 
 import java.util.Collections;
-import java.util.Map;
 
 import junit.framework.TestCase;
 

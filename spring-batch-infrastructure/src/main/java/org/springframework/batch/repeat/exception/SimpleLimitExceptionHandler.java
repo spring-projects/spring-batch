@@ -131,7 +131,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * handler uses single counter that is incremented when one of the
 	 * recognized exception exceptionClasses is handled.
 	 */
-	public void setExceptionClasses(Class<? extends Throwable>[] classes) {
+	public void setExceptionClasses(Class<?>[] classes) {
 		this.exceptionClasses = classes;
 	}
 

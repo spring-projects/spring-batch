@@ -46,7 +46,7 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 	}
 	
 	public void testEmptyKeyMatchesAnyLine() throws Exception {
-		Map map = new HashMap();
+		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
 		map.put("", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
@@ -60,7 +60,7 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 
 	public void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
 		
-		Map map = new LinkedHashMap();
+		Map<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
 		map.put("", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return null;

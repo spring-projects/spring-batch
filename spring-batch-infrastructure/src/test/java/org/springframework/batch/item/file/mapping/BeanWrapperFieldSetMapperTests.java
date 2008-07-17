@@ -255,7 +255,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 	public void testNestedList() {
 
 		TestNestedList nestedList = new TestNestedList();
-		List nestedC = new ArrayList();
+		List<Object> nestedC = new ArrayList<Object>();
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
@@ -320,13 +320,13 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 	private static class TestNestedList {
 
-		List nestedC;
+		List<Object> nestedC;
 
-		public List getNestedC() {
+		public List<Object> getNestedC() {
 			return nestedC;
 		}
 
-		public void setNestedC(List nestedC) {
+		public void setNestedC(List<Object> nestedC) {
 			this.nestedC = nestedC;
 		}
 

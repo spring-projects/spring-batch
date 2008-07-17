@@ -50,7 +50,7 @@ public class SynchronizedAttributeAccessorTests extends TestCase {
 	public void testAttributeNames() {
 		accessor.setAttribute("foo", "bar");
 		accessor.setAttribute("spam", "bucket");
-		List list = Arrays.asList(accessor.attributeNames());
+		List<String> list = Arrays.asList(accessor.attributeNames());
 		assertEquals(2, list.size());
 		assertTrue(list.contains("foo"));
 	}
@@ -69,7 +69,7 @@ public class SynchronizedAttributeAccessorTests extends TestCase {
 
 	public void testEqualsWrongType() {
 		accessor.setAttribute("foo", "bar");
-		Map another = Collections.singletonMap("foo", "bar");
+		Map<String, String> another = Collections.singletonMap("foo", "bar");
 		// Accessor and another are instances of unrelated classes, they should
 		// never be equal...
 		assertFalse(accessor.equals(another));

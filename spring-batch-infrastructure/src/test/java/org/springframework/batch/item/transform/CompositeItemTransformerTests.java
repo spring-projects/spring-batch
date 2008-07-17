@@ -25,7 +25,7 @@ public class CompositeItemTransformerTests extends TestCase {
 		transformer1 = (ItemTransformer) tControl1.getMock();
 		transformer2 = (ItemTransformer) tControl2 .getMock();
 		
-		composite.setItemTransformers(new ArrayList() {{ 
+		composite.setItemTransformers(new ArrayList<ItemTransformer>() {{ 
 			add(transformer1); add(transformer2); 
 		}});
 		
@@ -73,7 +73,7 @@ public class CompositeItemTransformerTests extends TestCase {
 		}
 		
 		// empty list
-		composite.setItemTransformers(new ArrayList());
+		composite.setItemTransformers(new ArrayList<ItemTransformer>());
 		try {
 			composite.afterPropertiesSet();
 			fail();

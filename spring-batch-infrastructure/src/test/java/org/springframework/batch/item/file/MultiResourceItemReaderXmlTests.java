@@ -51,8 +51,8 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 		multiReader.setDelegate(reader);
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
-		multiReader.setComparator(new Comparator() {
-			public int compare(Object arg0, Object arg1) {
+		multiReader.setComparator(new Comparator<Resource>() {
+			public int compare(Resource arg0, Resource arg1) {
 				return 0; // preserve original ordering
 			}
 		});

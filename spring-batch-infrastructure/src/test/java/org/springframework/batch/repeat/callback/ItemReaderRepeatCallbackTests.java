@@ -29,7 +29,7 @@ public class ItemReaderRepeatCallbackTests extends TestCase {
 
 	ItemReaderRepeatCallback callback;
 
-	List list = new ArrayList();
+	List<Object> list = new ArrayList<Object>();
 
 	public void testDoWithRepeat() throws Exception {
 		callback = new ItemReaderRepeatCallback(new ListItemReader(Arrays.asList(new String[] { "foo", "bar" })),

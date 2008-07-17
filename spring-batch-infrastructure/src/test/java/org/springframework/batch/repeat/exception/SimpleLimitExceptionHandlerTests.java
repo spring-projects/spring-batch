@@ -17,13 +17,11 @@
 package org.springframework.batch.repeat.exception;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 
 /**
  * Unit tests for {@link SimpleLimitExceptionHandler}
@@ -63,7 +61,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 
 		final int MORE_THAN_ZERO = 1;
 		handler.setLimit(MORE_THAN_ZERO);
-		handler.setExceptionClasses(new Class[] { IllegalArgumentException.class });
+		handler.setExceptionClasses(new Class<?>[] { IllegalArgumentException.class });
 
 		try {
 			handler.handleException(new RepeatContextSupport(null), throwable);
@@ -150,7 +148,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		final int EXCEPTION_LIMIT = 3;
 		handler.setLimit(EXCEPTION_LIMIT);
 
-		List throwables = new ArrayList() {
+		List<Throwable> throwables = new ArrayList<Throwable>() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
 					add(new RuntimeException("below exception limit"));
@@ -161,8 +159,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
 		try {
-			for (Iterator iterator = throwables.iterator(); iterator.hasNext();) {
-				Throwable throwable = (Throwable) iterator.next();
+			for (Throwable throwable : throwables) {
 
 				handler.handleException(context, throwable);
 				assertTrue("exceptions up to limit are swallowed", true);
@@ -183,7 +180,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		final int EXCEPTION_LIMIT = 3;
 		handler.setLimit(EXCEPTION_LIMIT);
 
-		List throwables = new ArrayList() {
+		List<Throwable> throwables = new ArrayList<Throwable>() {
 			{
 				for (int i = 0; i < (EXCEPTION_LIMIT); i++) {
 					add(new RuntimeException("below exception limit"));
@@ -196,8 +193,7 @@ public class SimpleLimitExceptionHandlerTests extends TestCase {
 		RepeatContextSupport context = new RepeatContextSupport(null);
 
 		try {
-			for (Iterator iterator = throwables.iterator(); iterator.hasNext();) {
-				Throwable throwable = (Throwable) iterator.next();
+			for (Throwable throwable : throwables) {
 
 				handler.handleException(context, throwable);
 				assertTrue("exceptions up to limit are swallowed", true);

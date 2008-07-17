@@ -44,10 +44,10 @@ public class AggregateItemReaderTests extends TestCase {
 
 		//it should be collection of 3 strings "line"
 		assertTrue(result instanceof Collection);
-		Collection lines = (Collection)result;
+		Collection<?> lines = (Collection<?>)result;
 		assertEquals(3, lines.size());
 
-		for (Iterator i = lines.iterator(); i.hasNext();) {
+		for (Iterator<?> i = lines.iterator(); i.hasNext();) {
 			assertEquals("line", i.next());
 		}
 

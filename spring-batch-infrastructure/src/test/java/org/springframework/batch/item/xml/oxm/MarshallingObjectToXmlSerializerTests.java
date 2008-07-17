@@ -82,6 +82,7 @@ public class MarshallingObjectToXmlSerializerTests extends TestCase {
 			marshalledObject = arg0;
 		}
 
+		@SuppressWarnings("unchecked")
 		public boolean supports(Class arg0) {
 			return false;
 		}

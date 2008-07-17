@@ -208,7 +208,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	 */
 	public void testOpenAndClose() throws Exception {
 		writer.setRootTagName("testroot");
-		writer.setRootElementAttributes(new HashMap() {
+		writer.setRootElementAttributes(new HashMap<String, String>() {
 			{
 				put("attribute", "value");
 			}
@@ -236,6 +236,7 @@ public class StaxEventItemWriterTests extends TestCase {
 			assertSame(item, graph);
 		}
 
+		@SuppressWarnings("unchecked")
 		public boolean supports(Class clazz) {
 			return true;
 		}
@@ -257,6 +258,7 @@ public class StaxEventItemWriterTests extends TestCase {
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		public boolean supports(Class clazz) {
 			return true;
 		}

@@ -111,17 +111,18 @@ public class StaxEventItemReaderTests extends TestCase {
 	/**
 	 * Save restart data and restore from it.
 	 */
+	@SuppressWarnings("unchecked")
 	public void testRestart() throws Exception {
 		source.open(executionContext);
 		source.read();
 		source.update(executionContext);
 		System.out.println(executionContext);
 		assertEquals(1, executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
-		List expectedAfterRestart = (List) source.read();
+		List<XMLEvent> expectedAfterRestart = (List<XMLEvent>) source.read();
 
 		source = createNewInputSouce();
 		source.open(executionContext);
-		List afterRestart = (List) source.read();
+		List<XMLEvent> afterRestart = (List<XMLEvent>) source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
 	}
 
@@ -149,12 +150,13 @@ public class StaxEventItemReaderTests extends TestCase {
 	/**
 	 * Rollback to last commited record.
 	 */
+	@SuppressWarnings("unchecked")
 	public void testRollback() throws Exception{
 		source.open(executionContext);
 		// rollback between deserializing records
-		List first = (List) source.read();
+		List<XMLEvent> first = (List<XMLEvent>) source.read();
 		source.mark();
-		List second = (List) source.read();
+		List<XMLEvent> second = (List<XMLEvent>) source.read();
 		assertFalse(first.equals(second));
 		source.reset();
 
@@ -289,7 +291,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		 * @return list of the events from fragment body
 		 */
 		public Object deserializeFragment(XMLEventReader eventReader) {
-			List fragmentContent;
+			List<XMLEvent> fragmentContent;
 			try {
 				// first event should be StartDocument
 				XMLEvent event1 = eventReader.nextEvent();
@@ -321,9 +323,9 @@ public class StaxEventItemReaderTests extends TestCase {
 		/**
 		 * Skips the XML fragment contents.
 		 */
-		private List readRecordsInsideFragment(XMLEventReader eventReader) throws XMLStreamException {
+		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader) throws XMLStreamException {
 			XMLEvent eventInsideFragment;
-			List events = new ArrayList();
+			List<XMLEvent> events = new ArrayList<XMLEvent>();
 			do {
 				eventInsideFragment = eventReader.peek();
 				if (eventInsideFragment instanceof EndElement

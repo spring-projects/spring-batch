@@ -35,29 +35,29 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 	// TransactionAwareListItemProvider provider = new
 	// TransactionAwareListItemProvider(Arrays.asList(new String[] { "a",
 	// "b", "c" }));
-	ListItemReader provider;
+	ListItemReader reader;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 		TransactionAwareProxyFactory factory = new TransactionAwareProxyFactory(Arrays.asList(new String[] { "a", "b",
 				"c" }));
-		provider = new ListItemReader((List) factory.createInstance());
+		reader = new ListItemReader((List<?>) factory.createInstance());
 	}
 
 	public void testNext() throws Exception {
-		assertEquals("a", provider.read());
-		assertEquals("b", provider.read());
-		assertEquals("c", provider.read());
-		assertEquals(null, provider.read());
+		assertEquals("a", reader.read());
+		assertEquals("b", reader.read());
+		assertEquals("c", reader.read());
+		assertEquals(null, reader.read());
 	}
 
 	public void testCommit() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		final List taken = new ArrayList();
+		final List<Object> taken = new ArrayList<Object>();
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 				public Object doInTransaction(TransactionStatus status) {
-					taken.add(provider.read());
+					taken.add(reader.read());
 					return null;
 				}
 			});
@@ -69,10 +69,10 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		assertEquals(1, taken.size());
 		assertEquals("a", taken.get(0));
 		taken.clear();
-		Object next = provider.read();
+		Object next = reader.read();
 		while (next != null) {
 			taken.add(next);
-			next = provider.read();
+			next = reader.read();
 		}
 		// System.err.println(taken);
 		assertFalse(taken.contains("a"));
@@ -80,13 +80,13 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 
 	public void testTransactionalExhausted() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		final List taken = new ArrayList();
+		final List<Object> taken = new ArrayList<Object>();
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				Object next = provider.read();
+				Object next = reader.read();
 				while (next != null) {
 					taken.add(next);
-					next = provider.read();
+					next = reader.read();
 				}
 				return null;
 			}
@@ -97,11 +97,11 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 
 	public void testRollback() throws Exception {
 		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
-		final List taken = new ArrayList();
+		final List<Object> taken = new ArrayList<Object>();
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 				public Object doInTransaction(TransactionStatus status) {
-					taken.add(provider.read());
+					taken.add(reader.read());
 					throw new RuntimeException("Rollback!");
 				}
 			});
@@ -113,10 +113,10 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 		assertEquals(1, taken.size());
 		assertEquals("a", taken.get(0));
 		taken.clear();
-		Object next = provider.read();
+		Object next = reader.read();
 		while (next != null) {
 			taken.add(next);
-			next = provider.read();
+			next = reader.read();
 		}
 		System.err.println(taken);
 		assertTrue(taken.contains("a"));

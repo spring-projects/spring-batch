@@ -110,6 +110,7 @@ public class SpringValidatorTests extends TestCase {
 
 		public static final TestBean REJECT_MULTI_VALUE = new TestBean("foo", "bar");
 
+		@SuppressWarnings("unchecked")
 		public boolean supports(Class clazz) {
 			return clazz.isAssignableFrom(TestBean.class);
 		}

@@ -44,7 +44,7 @@ public class ItemTransformerItemWriterFunctionalTests extends TestCase {
 	public void testComposite() throws Exception{
 		
 		CompositeItemTransformer compositeTransformer = new CompositeItemTransformer();
-		List itemTransformers = new ArrayList();
+		List<ItemTransformer> itemTransformers = new ArrayList<ItemTransformer>();
 		itemTransformers.add(new FooTransformer());
 		itemTransformers.add(new BarTransformer());
 		compositeTransformer.setItemTransformers(itemTransformers);

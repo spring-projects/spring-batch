@@ -36,7 +36,7 @@ public class ListItemReaderTests extends TestCase {
 	}
 
 	public void testChangeList() throws Exception {
-		List list = new ArrayList(Arrays.asList(new String[] { "a", "b", "c" }));
+		List<String> list = new ArrayList<String>(Arrays.asList(new String[] { "a", "b", "c" }));
 		provider = new ListItemReader(list);
 		assertEquals("a", provider.read());
 		list.clear();

@@ -1,14 +1,12 @@
 package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.CompositeItemWriter;
 
 /**
  * Tests for {@link CompositeItemWriter}
@@ -29,26 +27,25 @@ public class CompositeItemWriterTests extends TestCase {
 		final int NUMBER_OF_PROCESSORS = 10;
 		Object data = new Object();
 		
-		List controls = new ArrayList(NUMBER_OF_PROCESSORS);
-		List processors = new ArrayList(NUMBER_OF_PROCESSORS);
+		List<MockControl> controls = new ArrayList<MockControl>(NUMBER_OF_PROCESSORS);
+		List<ItemWriter> writers = new ArrayList<ItemWriter>(NUMBER_OF_PROCESSORS);
 		
 		for (int i = 0; i < NUMBER_OF_PROCESSORS; i++) {
 			MockControl control = MockControl.createStrictControl(ItemWriter.class);
-			ItemWriter processor = (ItemWriter) control.getMock();
+			ItemWriter writer = (ItemWriter) control.getMock();
 			
-			processor.write(data);
+			writer.write(data);
 			control.setVoidCallable();
 			control.replay();
 			
-			processors.add(processor);
+			writers.add(writer);
 			controls.add(control);
 		}
 		
-		itemProcessor.setDelegates(processors);
+		itemProcessor.setDelegates(writers);
 		itemProcessor.write(data);
 		
-		for (Iterator iterator = controls.iterator(); iterator.hasNext();) {
-			MockControl control = (MockControl) iterator.next();
+		for (MockControl control : controls) {
 			control.verify();
 		}
 	}
