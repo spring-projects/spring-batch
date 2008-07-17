@@ -19,11 +19,12 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 
 	private ColumnMapItemPreparedStatementSetter mapper;
 	
-	private Map key;
+	private Map<Object, Object> key;
 	
 	private MockControl psControl = MockControl.createControl(PreparedStatement.class);
 	private PreparedStatement ps;
 		
+	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
 		super.setUp();
 	
@@ -58,7 +59,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 		
 		psControl.replay();
-		mapper.setValues(new HashMap(), ps);
+		mapper.setValues(new HashMap<Object, Object>(), ps);
 		psControl.verify();
 	}
 	

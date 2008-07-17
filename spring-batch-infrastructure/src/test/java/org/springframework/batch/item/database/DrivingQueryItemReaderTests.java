@@ -2,7 +2,6 @@ package org.springframework.batch.item.database;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import junit.framework.TestCase;
 
@@ -162,8 +161,8 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 		itemReader.setKeyCollector(new KeyCollector() {
 
-			public List retrieveKeys(ExecutionContext executionContext) {
-				return new ArrayList();
+			public List<Object> retrieveKeys(ExecutionContext executionContext) {
+				return new ArrayList<Object>();
 			}
 
 			public void updateContext(Object key,
@@ -196,8 +195,8 @@ public class DrivingQueryItemReaderTests extends TestCase {
 	private static class MockKeyGenerator implements KeyCollector {
 
 		static ExecutionContext streamContext;
-		List keys;
-		List restartKeys;
+		List<Object> keys;
+		List<Object> restartKeys;
 		static final String RESTART_KEY = "restart.keys";
 
 		static {
@@ -208,14 +207,14 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 		public MockKeyGenerator() {
 
-			keys = new ArrayList();
+			keys = new ArrayList<Object>();
 			keys.add(new Foo(1, "1", 1));
 			keys.add(new Foo(2, "2", 2));
 			keys.add(new Foo(3, "3", 3));
 			keys.add(new Foo(4, "4", 4));
 			keys.add(new Foo(5, "5", 5));
 
-			restartKeys = new ArrayList();
+			restartKeys = new ArrayList<Object>();
 			restartKeys.add(new Foo(3, "3", 3));
 			restartKeys.add(new Foo(4, "4", 4));
 			restartKeys.add(new Foo(5, "5", 5));
@@ -225,7 +224,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			return streamContext;
 		}
 
-		public List retrieveKeys(ExecutionContext executionContext) {
+		public List<Object> retrieveKeys(ExecutionContext executionContext) {
 			if (executionContext.containsKey(RESTART_KEY)) {
 				return restartKeys;
 			} else {

@@ -45,7 +45,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 
 	private JdbcTemplate jdbcTemplate;
 
-	protected List list = new ArrayList();
+	protected List<Object> list = new ArrayList<Object>();
 
 	private RepeatContext context = new RepeatContextSupport(null);
 
@@ -77,7 +77,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 				list.add(item);
 			}
 		});
-		TransactionSynchronizationManager.bindResource(writer.getResourceKey(), new HashSet(
+		TransactionSynchronizationManager.bindResource(writer.getResourceKey(), new HashSet<Object>(
 				Collections.singleton("spam")));
 		RepeatSynchronizationManager.register(context);
 	}

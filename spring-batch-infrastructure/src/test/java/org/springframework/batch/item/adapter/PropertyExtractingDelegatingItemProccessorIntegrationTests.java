@@ -31,8 +31,8 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests extends
 			processor.write(foo);
 		}
 
-		List input = fooService.getGeneratedFoos();
-		List processed = fooService.getProcessedFooNameValuePairs();
+		List<Foo> input = fooService.getGeneratedFoos();
+		List<Foo> processed = fooService.getProcessedFooNameValuePairs();
 		assertEquals(input.size(), processed.size());
 		assertFalse(fooService.getProcessedFooNameValuePairs().isEmpty());
 

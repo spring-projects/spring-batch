@@ -60,7 +60,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 
 	HibernateAwareItemWriter writer = new HibernateAwareItemWriter();
 	
-	final List list = new ArrayList();
+	final List<Object> list = new ArrayList<Object>();
 
 	private RepeatContextSupport context;
 

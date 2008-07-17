@@ -31,8 +31,8 @@ public class ItemWriterAdapterTests extends AbstractDependencyInjectionSpringCon
 			processor.write(foo);
 		}
 
-		List input = fooService.getGeneratedFoos();
-		List processed = fooService.getProcessedFoos();
+		List<Foo> input = fooService.getGeneratedFoos();
+		List<Foo> processed = fooService.getProcessedFoos();
 		assertEquals(input.size(), processed.size());
 		assertFalse(fooService.getProcessedFoos().isEmpty());
 

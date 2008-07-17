@@ -35,7 +35,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testRetrieveKeys(){
 		
-		List keys = keyStrategy.retrieveKeys(new ExecutionContext());
+		List<Object> keys = keyStrategy.retrieveKeys(new ExecutionContext());
 		
 		for (int i = 0; i < keys.size(); i++) {
 			Long id = (Long)keys.get(i);
@@ -51,7 +51,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		
 		keyStrategy.updateContext(new Long(3), executionContext);
 		
-		List keys = keyStrategy.retrieveKeys(executionContext);
+		List<Object> keys = keyStrategy.retrieveKeys(executionContext);
 		
 		assertEquals(2, keys.size());
 		assertEquals(new Long(4), keys.get(0));

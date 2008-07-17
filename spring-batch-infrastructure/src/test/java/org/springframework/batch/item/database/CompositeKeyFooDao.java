@@ -38,7 +38,7 @@ public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 	 */
 	public Foo getFoo(Object key) {
 
-		Map keys = (Map)key;
+		Map<?,?> keys = (Map<?,?>)key;
 		Object[] args = keys.values().toArray();
 
 		RowMapper fooMapper = new RowMapper(){
