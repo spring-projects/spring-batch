@@ -77,7 +77,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		assertEquals(0, count);
 	}
 
-	List list = new ArrayList();
+	List<String> list = new ArrayList<String>();
 
 	public void testCommit() throws Exception {
 
@@ -129,7 +129,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		startNewTransaction();
 
 		String text = "";
-		List msgs = new ArrayList();
+		List<String> msgs = new ArrayList<String>();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
@@ -192,7 +192,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		startNewTransaction();
 
 		String text = "";
-		List msgs = new ArrayList();
+		List<String> msgs = new ArrayList<String>();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);

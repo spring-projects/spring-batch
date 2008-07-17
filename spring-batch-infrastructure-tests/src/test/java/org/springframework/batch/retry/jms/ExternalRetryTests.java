@@ -94,9 +94,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		assertEquals(0, count);
 	}
 
-	private List list = new ArrayList();
+	private List<String> list = new ArrayList<String>();
 
-	private List recovered = new ArrayList();
+	private List<Object> recovered = new ArrayList<Object>();
 
 	/**
 	 * Message processing is successful on the second attempt but must receive
@@ -168,7 +168,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 			}
 		});
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		// The database portion committed once...
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -234,7 +234,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		// Last attempt should return last item.
 		assertEquals("foo", result);
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		assertEquals(1, recovered.size());
 
@@ -247,9 +247,9 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 	}
 
-	private List getMessages() {
+	private List<String> getMessages() {
 		String next = "";
-		List msgs = new ArrayList();
+		List<String> msgs = new ArrayList<String>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

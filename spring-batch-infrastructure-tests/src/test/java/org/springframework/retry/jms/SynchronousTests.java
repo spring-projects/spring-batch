@@ -66,7 +66,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		assertEquals(0, count);
 	}
 
-	List list = new ArrayList();
+	List<Object> list = new ArrayList<Object>();
 
 	/**
 	 * Message processing is successful on the second attempt without having to
@@ -117,7 +117,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		startNewTransaction();
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		// The database portion committed once...
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -173,7 +173,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		startNewTransaction();
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		// The database portion committed once...
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -232,7 +232,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		startNewTransaction();
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
 		count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -284,7 +284,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		startNewTransaction();
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		// The database portion committed once...
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -342,7 +342,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		startNewTransaction();
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -352,9 +352,9 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		assertTrue(msgs.contains("foo"));
 	}
 
-	private List getMessages() {
+	private List<String> getMessages() {
 		String next = "";
-		List msgs = new ArrayList();
+		List<String> msgs = new ArrayList<String>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

@@ -46,15 +46,15 @@ public class MessagingTests extends AbstractDependencyInjectionSpringContextTest
 	}
 
 	public void testMessaging() throws Exception {
-		List list = getMessages();
+		List<String> list = getMessages();
 		System.err.println(list);
 		assertEquals(2, list.size());
 		assertTrue(list.contains("foo"));
 	}
 
-	private List getMessages() {
+	private List<String> getMessages() {
 		String next = "";
-		List msgs = new ArrayList();
+		List<String> msgs = new ArrayList<String>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

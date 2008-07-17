@@ -108,9 +108,9 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 		assertEquals(0, count);
 	}
 
-	private List list = new ArrayList();
+	private List<String> list = new ArrayList<String>();
 
-	private List recovered = new ArrayList();
+	private List<Object> recovered = new ArrayList<Object>();
 
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
@@ -181,7 +181,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 			}
 		}
 
-		List msgs = getMessages();
+		List<String> msgs = getMessages();
 
 		System.err.println(msgs);
 
@@ -198,9 +198,9 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 
 	}
 
-	private List getMessages() {
+	private List<String> getMessages() {
 		String next = "";
-		List msgs = new ArrayList();
+		List<String> msgs = new ArrayList<String>();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

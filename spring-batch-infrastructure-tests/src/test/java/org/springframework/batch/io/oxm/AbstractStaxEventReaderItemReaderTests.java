@@ -36,7 +36,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 
 	public void testRead() throws Exception {
 		Object result;
-		List results = new ArrayList();
+		List<Object> results = new ArrayList<Object>();
 		while ((result = source.read()) != null) {
 			results.add(result);
 		}
@@ -52,7 +52,7 @@ public abstract class AbstractStaxEventReaderItemReaderTests extends TestCase {
 	/**
 	 * @param results list of domain objects returned by input source
 	 */
-	protected void checkResults(List results){
+	protected void checkResults(List<Object> results){
 		assertEquals(3, results.size());
 
 		Trade trade1 = (Trade) results.get(0);

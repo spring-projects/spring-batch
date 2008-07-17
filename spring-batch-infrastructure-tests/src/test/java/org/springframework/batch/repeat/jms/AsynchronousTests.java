@@ -89,7 +89,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		}
 	}
 
-	List list = new ArrayList();
+	List<String> list = new ArrayList<String>();
 
 	private void assertInitialState() {
 		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -164,7 +164,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		logger.debug("T_FOOS: "+jdbcTemplate.queryForList("select * from T_FOOS"));
 
 		String text = "";
-		List msgs = new ArrayList();
+		List<String> msgs = new ArrayList<String>();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);

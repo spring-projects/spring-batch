@@ -31,7 +31,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 
 	protected Resource expected = new ClassPathResource("expected-output.xml", getClass());
 
-	protected List objects = new ArrayList() {
+	protected List<Trade> objects = new ArrayList<Trade>() {
 		{
 			add(new Trade("isin1", 1, new BigDecimal(1.0), "customer1"));
 			add(new Trade("isin2", 2, new BigDecimal(2.0), "customer2"));
@@ -43,7 +43,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 	 * Write list of domain objects and check the output file.
 	 */
 	public void testWrite() throws Exception {
-		for (Iterator iterator = objects.listIterator(); iterator.hasNext();) {
+		for (Iterator<?> iterator = objects.listIterator(); iterator.hasNext();) {
 			writer.write(iterator.next());
 		}
 		writer.close(null);
