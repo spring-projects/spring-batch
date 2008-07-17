@@ -1,14 +1,11 @@
 package org.springframework.batch.sample.tasklet;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.sample.tasklet.ConfigurableSystemProcessExitCodeMapper;
 
 /**
  * Tests for {@link ConfigurableSystemProcessExitCodeMapper}
@@ -21,7 +18,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests extends TestCase {
 	 * Regular usage scenario - mapping adheres to injected values
 	 */
 	public void testMapping() {
-		Map mappings = new HashMap() {{
+		Map<Object, ExitStatus> mappings = new HashMap<Object, ExitStatus>() {{
 			put(new Integer(0), ExitStatus.FINISHED);
 			put(new Integer(1), ExitStatus.FAILED);
 			put(new Integer(2), ExitStatus.CONTINUABLE);
@@ -33,8 +30,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests extends TestCase {
 		mapper.setMappings(mappings);
 		
 		//check explicitly defined values
-		for (Iterator iterator = mappings.entrySet().iterator(); iterator.hasNext();) {
-			Map.Entry entry = (Map.Entry) iterator.next();
+		for (Map.Entry<Object, ExitStatus> entry : mappings.entrySet()) {
 			if (entry.getKey().equals(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY)) continue;
 			
 			int exitCode = ((Integer)entry.getKey()).intValue();
@@ -50,7 +46,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests extends TestCase {
 	 * Else clause is required in the injected map - setter checks its presence.
 	 */
 	public void testSetMappingsMissingElseClause() {
-		Map missingElse = Collections.EMPTY_MAP;
+		Map<Object, ExitStatus> missingElse = new HashMap<Object, ExitStatus>();
 		try {
 			mapper.setMappings(missingElse);
 			fail();
@@ -59,7 +55,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests extends TestCase {
 			// expected
 		}
 		
-		Map containsElse = new HashMap() {{
+		Map<Object, ExitStatus> containsElse = new HashMap<Object, ExitStatus>() {{
 			put(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.FAILED);
 		}};
 		// no error expected now

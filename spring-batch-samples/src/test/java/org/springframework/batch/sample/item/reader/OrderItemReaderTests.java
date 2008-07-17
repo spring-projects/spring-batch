@@ -136,7 +136,7 @@ public class OrderItemReaderTests extends TestCase {
 		assertEquals(o.getShipping(), shippingInfo);
 		//there should be 3 line items
 		assertEquals(3, o.getLineItems().size());
-		for (Iterator i = o.getLineItems().iterator(); i.hasNext();) {
+		for (Iterator<?> i = o.getLineItems().iterator(); i.hasNext();) {
 			assertEquals(i.next(),item);
 		}
 

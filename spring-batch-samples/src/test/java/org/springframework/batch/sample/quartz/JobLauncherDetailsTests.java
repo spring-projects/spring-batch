@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.sample.quartz;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,7 +48,7 @@ public class JobLauncherDetailsTests extends TestCase {
 	
 	private TriggerFiredBundle firedBundle;
 	
-	private List list = new ArrayList();
+	private List<Serializable> list = new ArrayList<Serializable>();
 	
 	protected void setUp() throws Exception {
 		details.setJobLauncher(new JobLauncher() {

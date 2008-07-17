@@ -73,7 +73,7 @@ public class HibernateFailureJobFunctionalTests extends
 	 * 
 	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#checkMatches(java.util.List)
 	 */
-	protected void checkMatches(List matches) {
+	protected void checkMatches(List<BigDecimal> matches) {
 		assertFalse(matches.contains(new BigDecimal(2)));
 	}
 

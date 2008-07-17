@@ -16,17 +16,19 @@
 package org.springframework.batch.sample.dao;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
+import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;
+import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
 
 /**
@@ -38,7 +40,7 @@ public class OrderTransformerTests extends TestCase {
 	private OrderTransformer converter = new OrderTransformer();
 
 	public void testConvert() throws Exception {
-		converter.setAggregators(new HashMap() {
+		converter.setAggregators(new HashMap<String, LineAggregator>() {
 			{
 				put("header", new DelimitedLineAggregator());
 				put("customer", new DelimitedLineAggregator());
@@ -53,7 +55,7 @@ public class OrderTransformerTests extends TestCase {
 		order.setCustomer(new Customer());
 		order.setBillingAddress(new Address());
 		order.setBilling(new BillingInfo());
-		order.setLineItems(Collections.EMPTY_LIST);
+		order.setLineItems(new ArrayList<LineItem>());
 		order.setTotalPrice(new BigDecimal(10));
 		Object result = converter.transform(order);
 		assertTrue(result instanceof Collection);

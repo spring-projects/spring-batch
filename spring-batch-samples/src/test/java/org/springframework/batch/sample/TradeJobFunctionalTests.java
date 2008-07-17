@@ -38,12 +38,12 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER from TRADE order by ISIN";
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 	
-	private List customers;
-	private List trades;
+	private List<Customer> customers;
+	private List<Trade> trades;
 	private int activeRow = 0;
 	
 	private JdbcOperations jdbcTemplate;
-	private Map credits = new HashMap();
+	private Map<String, Double> credits = new HashMap<String, Double>();
 	
 	/**
 	 * @param jdbcTemplate the jdbcTemplate to set
@@ -55,13 +55,14 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	/* (non-Javadoc)
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#onSetUp()
 	 */
+	@SuppressWarnings("unchecked")
 	protected void onSetUp() throws Exception {
 		super.onSetUp();
 		jdbcTemplate.update("delete from TRADE");
-		List list = jdbcTemplate.queryForList("select name, CREDIT from customer");
-		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-			Map map = (Map) iterator.next();
-			credits.put(map.get("NAME"), new Double(((Number)map.get("CREDIT")).doubleValue()));
+		List<Map<?, ?>> list = jdbcTemplate.queryForList("select name, CREDIT from customer");
+		for (Iterator<Map<?,?>> iterator = list.iterator(); iterator.hasNext();) {
+			Map<?,?> map = iterator.next();
+			credits.put((String) map.get("NAME"), new Double(((Number)map.get("CREDIT")).doubleValue()));
 		}
 	}
 	
@@ -73,12 +74,12 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		
 		// assertTrue(((Resource)applicationContext.getBean("customerFileLocator")).exists());
 		
-		customers = new ArrayList() {{add(new Customer("customer1", (((Double)credits.get("customer1")).doubleValue() - 98.34)));
-			add(new Customer("customer2", (((Double)credits.get("customer2")).doubleValue() - 18.12 - 12.78)));
-			add(new Customer("customer3", (((Double)credits.get("customer3")).doubleValue() - 109.25)));
-			add(new Customer("customer4", (((Double)credits.get("customer4")).doubleValue() - 123.39)));}}; 
+		customers = new ArrayList<Customer>() {{add(new Customer("customer1", (credits.get("customer1").doubleValue() - 98.34)));
+			add(new Customer("customer2", (credits.get("customer2").doubleValue() - 18.12 - 12.78)));
+			add(new Customer("customer3", (credits.get("customer3").doubleValue() - 109.25)));
+			add(new Customer("customer4", (credits.get("customer4").doubleValue() - 123.39)));}}; 
 
-		trades = new ArrayList() {{add(new Trade("UK21341EAH45", 978, new BigDecimal("98.34"), "customer1"));
+		trades = new ArrayList<Trade>() {{add(new Trade("UK21341EAH45", 978, new BigDecimal("98.34"), "customer1"));
 			add(new Trade("UK21341EAH46", 112, new BigDecimal("18.12"), "customer2"));
 			add(new Trade("UK21341EAH47", 245, new BigDecimal("12.78"), "customer2"));
 			add(new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"));

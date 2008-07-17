@@ -21,7 +21,7 @@ import org.springframework.batch.sample.domain.Order;
 
 public class FlatFileOrderWriterTests extends TestCase {
 
-	List list = new ArrayList();
+	List<Object> list = new ArrayList<Object>();
 	
 	private ItemWriter output = new AbstractItemWriter() {
 		public void write(Object output) {
@@ -47,7 +47,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 		order.setCustomer(new Customer());
 		order.setBilling(new BillingInfo());
 		order.setBillingAddress(new Address());
-		List lineItems = new ArrayList();
+		List<LineItem> lineItems = new ArrayList<LineItem>();
 		LineItem item = new LineItem();
 		item.setPrice(BigDecimal.valueOf(0));
 		lineItems.add(item);
@@ -59,7 +59,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 		LineAggregator aggregator = new StubLineAggregator();
 		
 		//create map of aggregators and set it to writer
-		Map aggregators = new HashMap();
+		Map<String, LineAggregator> aggregators = new HashMap<String, LineAggregator>();
 		
 		OrderTransformer converter = new OrderTransformer();
 		aggregators.put("header", aggregator);
@@ -77,7 +77,7 @@ public class FlatFileOrderWriterTests extends TestCase {
 		//verify method calls
 		assertEquals(1, list.size());
 		assertTrue(list.get(0) instanceof List);
-		assertEquals("02007/06/01", ((List) list.get(0)).get(0));
+		assertEquals("02007/06/01", ((List<?>) list.get(0)).get(0));
 		
 	}
 

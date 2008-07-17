@@ -34,7 +34,7 @@ public class JobExecutionNotificationPublisherTests extends TestCase {
 	JobExecutionNotificationPublisher publisher = new JobExecutionNotificationPublisher();
 
 	public void testRepeatOperationsOpenUsed() throws Exception {
-		final List list = new ArrayList();
+		final List<Notification> list = new ArrayList<Notification>();
 		publisher.setNotificationPublisher(new NotificationPublisher() {
 			public void sendNotification(Notification notification) throws UnableToSendNotificationException {
 				list.add(notification);
@@ -42,7 +42,7 @@ public class JobExecutionNotificationPublisherTests extends TestCase {
 		});
 		publisher.onApplicationEvent(new SimpleMessageApplicationEvent(this, "foo"));
 		assertEquals(1, list.size());
-		String message = ((Notification) list.get(0)).getMessage();
+		String message = list.get(0).getMessage();
 		assertTrue("Message does not contain 'foo': ", message.indexOf("foo") > 0);
 	}
 

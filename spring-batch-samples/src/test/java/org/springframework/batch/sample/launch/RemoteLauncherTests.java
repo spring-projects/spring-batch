@@ -39,7 +39,7 @@ public class RemoteLauncherTests extends TestCase {
 	
 	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
 
-	private static List errors = new ArrayList();
+	private static List<Exception> errors = new ArrayList<Exception>();
 
 	private static Thread thread;
 
@@ -134,7 +134,7 @@ public class RemoteLauncherTests extends TestCase {
 	 * @param interfaceType 
 	 * @throws MalformedObjectNameException
 	 */
-	private static Object getMBean(MBeanServerConnectionFactoryBean connectionFactory, String objectName, Class interfaceType)
+	private static Object getMBean(MBeanServerConnectionFactoryBean connectionFactory, String objectName, Class<?> interfaceType)
 			throws MalformedObjectNameException {
 		MBeanProxyFactoryBean factory = new MBeanProxyFactoryBean();
 		factory.setObjectName(objectName);

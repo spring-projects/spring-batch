@@ -37,7 +37,7 @@ import org.springframework.util.ClassUtils;
  */
 public class JobSupport implements BeanNameAware, Job {
 
-	private List steps = new ArrayList();
+	private List<Step> steps = new ArrayList<Step>();
 
 	private String name;
 
@@ -98,11 +98,11 @@ public class JobSupport implements BeanNameAware, Job {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.IJob#getSteps()
 	 */
-	public List getSteps() {
+	public List<Step> getSteps() {
 		return steps;
 	}
 
-	public void setSteps(List steps) {
+	public void setSteps(List<Step> steps) {
 		this.steps.clear();
 		this.steps.addAll(steps);
 	}

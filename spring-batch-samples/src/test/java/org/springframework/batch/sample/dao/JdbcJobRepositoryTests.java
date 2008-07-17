@@ -1,5 +1,6 @@
 package org.springframework.batch.sample.dao;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,11 +24,11 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 	private JobSupport jobConfiguration;
 
-	private Set jobExecutionIds = new HashSet();
+	private Set<Long> jobExecutionIds = new HashSet<Long>();
 
-	private Set jobIds = new HashSet();
+	private Set<Long> jobIds = new HashSet<Long>();
 
-	private List list = new ArrayList();
+	private List<Serializable> list = new ArrayList<Serializable>();
 
 	public void setRepository(JobRepository repository) {
 		this.repository = repository;
@@ -55,18 +56,18 @@ public class JdbcJobRepositoryTests extends AbstractTransactionalDataSourceSprin
 
 	protected void onTearDownAfterTransaction() throws Exception {
 		startNewTransaction();
-		for (Iterator iterator = jobExecutionIds.iterator(); iterator.hasNext();) {
-			Long id = (Long) iterator.next();
+		for (Iterator<Long> iterator = jobExecutionIds.iterator(); iterator.hasNext();) {
+			Long id = iterator.next();
 			getJdbcTemplate().update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", new Object[] { id });
 		}
-		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
-			Long id = (Long) iterator.next();
+		for (Iterator<Long> iterator = jobIds.iterator(); iterator.hasNext();) {
+			Long id = iterator.next();
 			getJdbcTemplate().update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", new Object[] { id });
 		}
 		setComplete();
 		endTransaction();
-		for (Iterator iterator = jobIds.iterator(); iterator.hasNext();) {
-			Long id = (Long) iterator.next();
+		for (Iterator<Long> iterator = jobIds.iterator(); iterator.hasNext();) {
+			Long id = iterator.next();
 			int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", new Object[] { id });
 			assertEquals(0, count);
 		}

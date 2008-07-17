@@ -42,7 +42,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 	protected static final String ID_COLUMN = "ID";
 
-	private List creditsBeforeUpdate;
+	private List<BigDecimal> creditsBeforeUpdate;
 
 	/**
 	 * @param jdbcTemplate
@@ -62,10 +62,11 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	/**
 	 * All customers have the same credit
 	 */
+	@SuppressWarnings("unchecked")
 	protected void validatePreConditions() throws Exception {
 		super.validatePreConditions();
 		ensureState();
-		creditsBeforeUpdate = (List) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+		creditsBeforeUpdate = (List<BigDecimal>) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				
 				return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
@@ -100,7 +101,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	 */
 	protected void validatePostConditions() throws Exception {
 
-		final List matches = new ArrayList();
+		final List<BigDecimal> matches = new ArrayList<BigDecimal>();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
@@ -130,7 +131,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	/**
 	 * @param matches
 	 */
-	protected void checkMatches(List matches) {
+	protected void checkMatches(List<BigDecimal> matches) {
 		// no-op...
 	}
 

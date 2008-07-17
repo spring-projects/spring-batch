@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -47,7 +46,7 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 	}
 	
 	private void checkOutputTable() {
-		final List trades = new ArrayList() {{
+		final List<Trade> trades = new ArrayList<Trade>() {{
 				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
 				add(new Trade("UK21341EAH42", 212, new BigDecimal("32.11"), "customer2"));
 				add(new Trade("UK21341EAH43", 213, new BigDecimal("33.11"), "customer3"));
@@ -72,13 +71,13 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	private void checkOutputFile() throws FileNotFoundException, IOException {
-		List outputLines = IOUtils.readLines(
+		List<String> outputLines = IOUtils.readLines(
 				new FileInputStream("target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt"));
 		
 		String output = "";
-		for (Iterator iterator = outputLines.listIterator(); iterator.hasNext();) {
-			String line = (String) iterator.next();
+		for (String line : outputLines) {
 			output += line;
 		}
 		

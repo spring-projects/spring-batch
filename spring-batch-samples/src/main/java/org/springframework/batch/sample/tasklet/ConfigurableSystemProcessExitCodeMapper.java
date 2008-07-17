@@ -17,7 +17,7 @@ public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExi
 	
 	public static final String ELSE_KEY = "else";
 	
-	private Map<Integer, ExitStatus> mappings;
+	private Map<Object, ExitStatus> mappings;
 
 	public ExitStatus getExitStatus(int exitCode) {
 		ExitStatus exitStatus = (ExitStatus) mappings.get(new Integer(exitCode));
@@ -32,7 +32,7 @@ public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExi
 	 * @param mappings <code>Integer</code> exit code keys to 
 	 * {@link org.springframework.batch.repeat.ExitStatus} values.
 	 */
-	public void setMappings(Map<Integer, ExitStatus> mappings) {
+	public void setMappings(Map<Object, ExitStatus> mappings) {
 		Assert.notNull(mappings.get(ELSE_KEY));
 		this.mappings = mappings;
 	}
