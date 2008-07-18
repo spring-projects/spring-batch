@@ -6,7 +6,7 @@ import org.springframework.batch.item.support.AbstractItemReader;
 /**
  * {@link ItemReader} with hard-coded input data.
  */
-public class ExampleItemReader extends AbstractItemReader {
+public class ExampleItemReader extends AbstractItemReader<String> {
 	
 	private String[] input = {"Hello world!", null};
 	
@@ -15,7 +15,7 @@ public class ExampleItemReader extends AbstractItemReader {
 	/**
 	 * Reads next record from input
 	 */
-	public Object read() throws Exception {
+	public String read() throws Exception {
 		return input[index++];
 	}
 
