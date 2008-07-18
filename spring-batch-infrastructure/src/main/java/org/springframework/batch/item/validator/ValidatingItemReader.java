@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  *
  */
-public class ValidatingItemReader extends DelegatingItemReader {
+public class ValidatingItemReader<T> extends DelegatingItemReader<T> {
 
 	private Validator validator;
 
@@ -40,8 +40,8 @@ public class ValidatingItemReader extends DelegatingItemReader {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.reader.DelegatingItemReader#read()
 	 */
-	public Object read() throws Exception {
-		Object input = super.read();
+	public T read() throws Exception {
+		T input = super.read();
 		if(input != null){
 			validator.validate(input);
 		}

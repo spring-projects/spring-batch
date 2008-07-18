@@ -97,7 +97,7 @@ import org.springframework.util.ClassUtils;
  * @author Peter Zozom
  * @author Robert Kasanicky
  */
-public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream implements InitializingBean {
+public class JdbcCursorItemReader<T> extends AbstractBufferedItemReaderItemStream<T> implements InitializingBean {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
@@ -413,13 +413,14 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
-	protected Object doRead() throws Exception {
+	@SuppressWarnings("unchecked")
+	protected T doRead() throws Exception {
 		try {
 			if (!rs.next()) {
 				return null;
 			}
 			int currentRow = getCurrentItemCount();
-			Object item = mapper.mapRow(rs, currentRow);
+			T item = (T) mapper.mapRow(rs, currentRow);
 			verifyCursorPosition(currentRow);
 			return item;
 		}

@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractBufferedItemReaderItemStream implements ItemReader, ItemStream {
+public abstract class AbstractBufferedItemReaderItemStream<T> implements ItemReader<T>, ItemStream {
 
 	private static final String READ_COUNT = "read.count";
 
@@ -36,9 +36,9 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 
 	private boolean shouldReadBuffer = false;
 
-	private List<Object> itemBuffer = new ArrayList<Object>();
+	private List<T> itemBuffer = new ArrayList<T>();
 
-	private ListIterator<Object> itemBufferIterator = null;
+	private ListIterator<T> itemBufferIterator = null;
 
 	private int lastMarkedBufferIndex = 0;
 
@@ -51,7 +51,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 	 * @return item
 	 * @throws Exception
 	 */
-	protected abstract Object doRead() throws Exception;
+	protected abstract T doRead() throws Exception;
 	
 	/**
 	 * Open resources necessary to start reading input.
@@ -74,7 +74,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 		}
 	}
 
-	public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
+	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 
 		currentItemCount++;
 
@@ -89,7 +89,7 @@ public abstract class AbstractBufferedItemReaderItemStream implements ItemReader
 			}
 		}
 
-		Object item = doRead();
+		T item = doRead();
 		itemBuffer.add(item);
 
 		return item;

@@ -8,7 +8,7 @@ import javax.xml.stream.XMLEventReader;
  * 
  * @author Robert Kasanicky
  */
-public interface EventReaderDeserializer {
+public interface EventReaderDeserializer<T> {
 
-	Object deserializeFragment(XMLEventReader eventReader);
+	T deserializeFragment(XMLEventReader eventReader);
 }

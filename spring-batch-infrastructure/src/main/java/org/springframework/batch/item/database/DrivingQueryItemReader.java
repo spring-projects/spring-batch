@@ -65,19 +65,19 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  */
-public class DrivingQueryItemReader implements ItemReader, InitializingBean, ItemStream {
+public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBean, ItemStream {
 
 	private boolean initialized = false;
 
-	private List<Object> keys;
+	private List<T> keys;
 
-	private Iterator<Object> keysIterator;
+	private Iterator<T> keysIterator;
 
 	private int currentIndex = 0;
 
 	private int lastCommitIndex = 0;
 
-	private KeyCollector keyCollector;
+	private KeyCollector<T> keyCollector;
 
 	private boolean saveState = false;
 
@@ -90,7 +90,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	 * 
 	 * @param keys
 	 */
-	public DrivingQueryItemReader(List<Object> keys) {
+	public DrivingQueryItemReader(List<T> keys) {
 		this.keys = keys;
 		this.keysIterator = keys.iterator();
 	}
@@ -101,7 +101,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	 * @return next key in the list if not index is not at the last element,
 	 * null otherwise.
 	 */
-	public Object read() {
+	public T read() {
 
 		if (keysIterator.hasNext()) {
 			currentIndex++;
@@ -173,7 +173,7 @@ public class DrivingQueryItemReader implements ItemReader, InitializingBean, Ite
 	 * 
 	 * @param keyCollector
 	 */
-	public void setKeyCollector(KeyCollector keyCollector) {
+	public void setKeyCollector(KeyCollector<T> keyCollector) {
 		this.keyCollector = keyCollector;
 	}
 

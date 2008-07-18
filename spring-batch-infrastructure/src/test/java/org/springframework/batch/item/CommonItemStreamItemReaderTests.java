@@ -37,10 +37,10 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 		testedAsStream().update(executionContext);
 
-		Foo foo1 = (Foo) tested.read();
+		Foo foo1 = tested.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = (Foo) tested.read();
+		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
 
 		testedAsStream().update(executionContext);
@@ -50,7 +50,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 		testedAsStream().open(executionContext);
 
-		Foo fooAfterRestart = (Foo) tested.read();
+		Foo fooAfterRestart = tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 
@@ -63,15 +63,15 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 		testedAsStream().update(executionContext);
 
-		Foo foo1 = (Foo) tested.read();
+		Foo foo1 = tested.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = (Foo) tested.read();
+		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
 		
 		tested.mark();
 		
-		Foo foo3 = (Foo) tested.read();
+		Foo foo3 = tested.read();
 		assertEquals(3, foo3.getValue());
 		
 		tested.reset();
@@ -83,17 +83,17 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 		testedAsStream().open(executionContext);
 
-		Foo fooAfterRestart = (Foo) tested.read();
+		Foo fooAfterRestart = tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 
 	public void testReopen() throws Exception {
 		testedAsStream().update(executionContext);
 
-		Foo foo1 = (Foo) tested.read();
+		Foo foo1 = tested.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = (Foo) tested.read();
+		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
 
 		testedAsStream().update(executionContext);
@@ -103,7 +103,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 		testedAsStream().open(executionContext);
 
-		Foo fooAfterRestart = (Foo) tested.read();
+		Foo fooAfterRestart = tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 

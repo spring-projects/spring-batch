@@ -23,13 +23,13 @@ package org.springframework.batch.item.file.mapping;
  * @author Lucas Ward
  * 
  */
-public class PassThroughFieldSetMapper implements FieldSetMapper, FieldSetCreator {
+public class PassThroughFieldSetMapper implements FieldSetMapper<FieldSet>, FieldSetCreator {
 
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.io.file.FieldSetMapper#mapLine(org.springframework.batch.io.file.FieldSet)
 	 */
-	public Object mapLine(FieldSet fs, int lineNum) {
+	public FieldSet mapLine(FieldSet fs, int lineNum) {
 		return fs;
 	}
 

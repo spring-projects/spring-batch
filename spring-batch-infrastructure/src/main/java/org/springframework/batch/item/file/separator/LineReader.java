@@ -21,7 +21,7 @@ import org.springframework.batch.item.ItemReader;
  * @author Dave Syer
  *
  */
-public interface LineReader extends ItemReader {
+public interface LineReader extends ItemReader<String> {
 
 	/**
 	 * @return position

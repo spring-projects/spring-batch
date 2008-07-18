@@ -10,12 +10,12 @@ import org.springframework.batch.item.sample.Foo;
  */
 public abstract class CommonItemReaderTests extends TestCase {
 
-	protected ItemReader tested;
+	protected ItemReader<Foo> tested;
 
 	/**
 	 * @return configured ItemReader ready for use.
 	 */
-	protected abstract ItemReader getItemReader() throws Exception;
+	protected abstract ItemReader<Foo> getItemReader() throws Exception;
 
 	protected void setUp() throws Exception {
 		tested = getItemReader();
@@ -26,19 +26,19 @@ public abstract class CommonItemReaderTests extends TestCase {
 	 */
 	public void testRead() throws Exception {
 
-		Foo foo1 = (Foo) tested.read();
+		Foo foo1 = tested.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = (Foo) tested.read();
+		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
 
-		Foo foo3 = (Foo) tested.read();
+		Foo foo3 = tested.read();
 		assertEquals(3, foo3.getValue());
 
-		Foo foo4 = (Foo) tested.read();
+		Foo foo4 = tested.read();
 		assertEquals(4, foo4.getValue());
 
-		Foo foo5 = (Foo) tested.read();
+		Foo foo5 = tested.read();
 		assertEquals(5, foo5.getValue());
 
 		assertNull(tested.read());
@@ -49,15 +49,15 @@ public abstract class CommonItemReaderTests extends TestCase {
 	 * interval can change dynamically.
 	 */
 	public void testReset() throws Exception {
-		Foo foo1 = (Foo) tested.read();
+		Foo foo1 = tested.read();
 		assertEquals(1, foo1.getValue());
 
 		tested.mark();
 
-		Foo foo2 = (Foo) tested.read();
+		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
 
-		Foo foo3 = (Foo) tested.read();
+		Foo foo3 = tested.read();
 		assertEquals(3, foo3.getValue());
 
 		tested.reset();
@@ -72,12 +72,12 @@ public abstract class CommonItemReaderTests extends TestCase {
 
 		assertEquals(foo3, tested.read());
 
-		Foo foo4 = (Foo) tested.read();
+		Foo foo4 = tested.read();
 		assertEquals(4, foo4.getValue());
 
 		tested.mark();
 
-		Foo foo5 = (Foo) tested.read();
+		Foo foo5 = tested.read();
 		assertEquals(5, foo5.getValue());
 
 		tested.reset();
@@ -104,7 +104,7 @@ public abstract class CommonItemReaderTests extends TestCase {
 	 * @param tested
 	 *            the reader
 	 */
-	protected abstract void pointToEmptyInput(ItemReader tested)
+	protected abstract void pointToEmptyInput(ItemReader<Foo> tested)
 			throws Exception;
 
 }

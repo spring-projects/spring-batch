@@ -35,7 +35,7 @@ package org.springframework.batch.item;
  * @author Lucas Ward
  * @since 1.0
  */
-public interface ItemReader {
+public interface ItemReader<T> {
 
 	/**
 	 * Reads a piece of input data and advance to the next one. Implementations
@@ -46,7 +46,7 @@ public interface ItemReader {
 	 * 
 	 * @throws Exception if an underlying resource is unavailable.
 	 */
-	Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException;
+	T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException;
 
 	/**
 	 * Mark the stream so that it can be reset later and the items backed

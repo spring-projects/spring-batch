@@ -26,7 +26,7 @@ import org.springframework.batch.item.ResetFailedException;
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemReader implements ItemReader {
+public abstract class AbstractItemReader<T> implements ItemReader<T> {
 
 	public void mark() throws MarkFailedException {
 	}

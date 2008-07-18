@@ -10,7 +10,7 @@ import org.springframework.batch.item.ExecutionContext;
  * @author Lucas Ward
  * @see DrivingQueryItemReader
  */
-public interface KeyCollector {
+public interface KeyCollector<T> {
 
 	/**
 	 * <p>Retrieve the keys to be iterated over.  If the ExecutionContext
@@ -28,7 +28,7 @@ public interface KeyCollector {
 	 * that could potentially be used to retrieve the correct keys.
 	 * @return list of keys returned by the driving query (can be empty but not null)
 	 */
-	List<Object> retrieveKeys(ExecutionContext executionContext);
+	List<T> retrieveKeys(ExecutionContext executionContext);
 	
 	/**
 	 * Given the provided key, store it in the provided ExecutionContext.  This

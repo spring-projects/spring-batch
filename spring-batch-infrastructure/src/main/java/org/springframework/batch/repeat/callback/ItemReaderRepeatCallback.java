@@ -29,15 +29,15 @@ import org.springframework.batch.repeat.RepeatContext;
  * @author Dave Syer
  * 
  */
-public class ItemReaderRepeatCallback implements RepeatCallback {
+public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 
-	ItemReader provider;
+	ItemReader<T> reader;
 
 	ItemWriter writer;
 
-	public ItemReaderRepeatCallback(ItemReader provider, ItemWriter writer) {
+	public ItemReaderRepeatCallback(ItemReader<T> reader, ItemWriter writer) {
 		super();
-		this.provider = provider;
+		this.reader = reader;
 		this.writer = writer;
 	}
 
@@ -47,7 +47,7 @@ public class ItemReaderRepeatCallback implements RepeatCallback {
 	 * provider by calling next().
 	 * @param provider
 	 */
-	public ItemReaderRepeatCallback(ItemReader provider) {
+	public ItemReaderRepeatCallback(ItemReader<T> provider) {
 		this(provider, null);
 	}
 
@@ -61,7 +61,7 @@ public class ItemReaderRepeatCallback implements RepeatCallback {
 	public ExitStatus doInIteration(RepeatContext context) throws Exception {
 
 		ExitStatus result = ExitStatus.FINISHED;
-		Object item = provider.read();
+		T item = reader.read();
 
 		if (writer != null) {
 			if (item != null) {

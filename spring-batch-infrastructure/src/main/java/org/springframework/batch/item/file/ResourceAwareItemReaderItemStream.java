@@ -10,7 +10,7 @@ import org.springframework.core.io.Resource;
  * 
  * @author Robert Kasanicky
  */
-public interface ResourceAwareItemReaderItemStream extends ItemReader, ItemStream {
+public interface ResourceAwareItemReaderItemStream<T> extends ItemReader<T>, ItemStream {
 
 	void setResource(Resource resource);
 }

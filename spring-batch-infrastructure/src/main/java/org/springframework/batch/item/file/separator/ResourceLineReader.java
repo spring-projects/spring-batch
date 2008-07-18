@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.MarkFailedException;
@@ -51,7 +50,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Rob Harrop
  */
-public class ResourceLineReader implements LineReader, ItemReader {
+public class ResourceLineReader implements LineReader {
 
 	private static final Collection<String> DEFAULT_COMMENTS = Collections.singleton("#");
 
@@ -112,7 +111,7 @@ public class ResourceLineReader implements LineReader, ItemReader {
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public synchronized Object read() {
+	public synchronized String read() {
 		// Make a copy of the recordSeparatorPolicy reference, in case it is
 		// changed during a read operation (unlikely, but you never know)...
 		RecordSeparatorPolicy recordSeparatorPolicy = this.recordSeparatorPolicy;

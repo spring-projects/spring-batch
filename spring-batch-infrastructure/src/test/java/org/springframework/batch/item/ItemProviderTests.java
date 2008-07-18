@@ -23,8 +23,8 @@ import junit.framework.TestCase;
 
 public class ItemProviderTests extends TestCase {
 
-	ItemReader provider = new AbstractItemReader() {
-		public Object read() {
+	ItemReader<String> provider = new AbstractItemReader<String>() {
+		public String read() {
 			return "foo";
 		}
 	};

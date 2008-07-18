@@ -16,7 +16,7 @@ import org.springframework.xml.transform.StaxSource;
  * @author Robert Kasanicky
  * @author Lucas Ward
  */
-public class UnmarshallingEventReaderDeserializer implements EventReaderDeserializer {
+public class UnmarshallingEventReaderDeserializer<T> implements EventReaderDeserializer<T> {
 
 	private Unmarshaller unmarshaller;
 
@@ -25,10 +25,11 @@ public class UnmarshallingEventReaderDeserializer implements EventReaderDeserial
 		this.unmarshaller = unmarshaller;
 	}
 
-	public Object deserializeFragment(XMLEventReader eventReader) {
-		Object item = null;
+	@SuppressWarnings("unchecked")
+	public T deserializeFragment(XMLEventReader eventReader) {
+		T item = null;
 		try {
-			item = unmarshaller.unmarshal(new StaxSource(eventReader));
+			item = (T) unmarshaller.unmarshal(new StaxSource(eventReader));
 		}
 		catch (IOException e) {
 			throw new DataAccessResourceFailureException("IO error during unmarshalling", e);

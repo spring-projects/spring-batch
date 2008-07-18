@@ -30,14 +30,14 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream implements
-		ResourceAwareItemReaderItemStream, InitializingBean {
+public class StaxEventItemReader<T> extends AbstractBufferedItemReaderItemStream<T> implements
+		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private FragmentEventReader fragmentReader;
 
 	private XMLEventReader eventReader;
 
-	private EventReaderDeserializer eventReaderDeserializer;
+	private EventReaderDeserializer<T> eventReaderDeserializer;
 
 	private Resource resource;
 
@@ -57,7 +57,7 @@ public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream im
 	 * @param eventReaderDeserializer maps xml fragments corresponding to
 	 * records to objects
 	 */
-	public void setFragmentDeserializer(EventReaderDeserializer eventReaderDeserializer) {
+	public void setFragmentDeserializer(EventReaderDeserializer<T> eventReaderDeserializer) {
 		this.eventReaderDeserializer = eventReaderDeserializer;
 	}
 
@@ -146,8 +146,8 @@ public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream im
 	/**
 	 * Move to next fragment and map it to item.
 	 */
-	protected Object doRead() throws Exception {
-		Object item = null;
+	protected T doRead() throws Exception {
+		T item = null;
 
 		if (moveCursorToNextFragment(fragmentReader)) {
 			fragmentReader.markStartFragment();

@@ -29,9 +29,9 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class DelegatingItemReader extends AbstractItemReader implements InitializingBean {
+public class DelegatingItemReader<T> extends AbstractItemReader<T> implements InitializingBean {
 
-	private ItemReader itemReader;
+	private ItemReader<T> itemReader;
 	
 	/**
 	 * Default constructor.
@@ -43,7 +43,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Initiali
 	/**
 	 * Convenience constructor for setting mandatory property.
 	 */
-	public DelegatingItemReader(ItemReader itemReader) {
+	public DelegatingItemReader(ItemReader<T> itemReader) {
 		this();
 		this.itemReader = itemReader;
 	}
@@ -57,7 +57,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Initiali
 	 * @throws Exception
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public Object read() throws Exception {
+	public T read() throws Exception {
 		return itemReader.read();
 	}
 
@@ -65,7 +65,7 @@ public class DelegatingItemReader extends AbstractItemReader implements Initiali
 	 * Setter for input source.
 	 * @param source
 	 */
-	public void setItemReader(ItemReader source) {
+	public void setItemReader(ItemReader<T> source) {
 		this.itemReader = source;
 	}
 	

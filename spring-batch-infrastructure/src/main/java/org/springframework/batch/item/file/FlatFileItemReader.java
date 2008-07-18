@@ -61,8 +61,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream implements
-		ResourceAwareItemReaderItemStream, InitializingBean {
+public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<T> implements
+		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);
 
@@ -83,7 +83,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
-	private FieldSetMapper fieldSetMapper;
+	private FieldSetMapper<T> fieldSetMapper;
 
 	/**
 	 * Encapsulates the state of the input source. If it is null then we are
@@ -186,7 +186,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 	 * 
 	 * @param fieldSetMapper
 	 */
-	public void setFieldSetMapper(FieldSetMapper fieldSetMapper) {
+	public void setFieldSetMapper(FieldSetMapper<T> fieldSetMapper) {
 		this.fieldSetMapper = fieldSetMapper;
 	}
 
@@ -270,7 +270,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	protected Object doRead() throws Exception {
+	protected T doRead() throws Exception {
 		String line = readLine();
 
 		if (line != null) {
