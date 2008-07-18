@@ -29,7 +29,7 @@ import org.springframework.batch.item.support.DelegatingItemReader;
  * @author Lucas Ward
  *
  */
-public class ExceptionThrowingItemReaderProxy extends DelegatingItemReader {
+public class ExceptionThrowingItemReaderProxy extends DelegatingItemReader<Object> {
 
 	private int counter = 0;
 	private int throwExceptionOnRecordNumber = 4;

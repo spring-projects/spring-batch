@@ -13,7 +13,7 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class GeneratingItemReader implements ItemReader, ItemRecoverer {
+public class GeneratingItemReader implements ItemReader<Trade>, ItemRecoverer {
 
 	private int limit = 1;
 	
@@ -21,7 +21,7 @@ public class GeneratingItemReader implements ItemReader, ItemRecoverer {
 
 	private int marked;
 	
-	public Object read() throws Exception {
+	public Trade read() throws Exception {
 		if (counter < limit) {
 			counter++;
 			return new Trade(

@@ -22,7 +22,7 @@ import org.springframework.batch.sample.domain.Address;
 
 
 
-public class AddressFieldSetMapper implements FieldSetMapper {
+public class AddressFieldSetMapper implements FieldSetMapper<Address> {
 	
 	public static final String ADDRESSEE_COLUMN = "ADDRESSEE";
 	public static final String ADDRESS_LINE1_COLUMN = "ADDR_LINE1";
@@ -33,7 +33,7 @@ public class AddressFieldSetMapper implements FieldSetMapper {
 	public static final String COUNTRY_COLUMN = "COUNTRY";
 	
 	
-    public Object mapLine(FieldSet fieldSet, int lineNum) {
+    public Address mapLine(FieldSet fieldSet, int lineNum) {
         Address address = new Address();
 
         address.setAddressee(fieldSet.readString(ADDRESSEE_COLUMN));

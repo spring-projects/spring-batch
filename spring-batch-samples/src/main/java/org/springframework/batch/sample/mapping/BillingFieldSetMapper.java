@@ -22,12 +22,12 @@ import org.springframework.batch.sample.domain.BillingInfo;
 
 
 
-public class BillingFieldSetMapper implements FieldSetMapper {
+public class BillingFieldSetMapper implements FieldSetMapper<BillingInfo> {
 	
 	public static final String PAYMENT_TYPE_ID_COLUMN = "PAYMENT_TYPE_ID";
 	public static final String PAYMENT_DESC_COLUMN = "PAYMENT_DESC";
 	
-    public Object mapLine(FieldSet fieldSet, int lineNum) {
+    public BillingInfo mapLine(FieldSet fieldSet, int lineNum) {
         BillingInfo info = new BillingInfo();
 
         info.setPaymentId(fieldSet.readString(PAYMENT_TYPE_ID_COLUMN));

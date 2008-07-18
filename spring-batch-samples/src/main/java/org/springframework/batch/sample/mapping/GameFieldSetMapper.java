@@ -4,9 +4,9 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Game;
 
-public class GameFieldSetMapper implements FieldSetMapper {
+public class GameFieldSetMapper implements FieldSetMapper<Game> {
 
-	public Object mapLine(FieldSet fs, int lineNum) {
+	public Game mapLine(FieldSet fs, int lineNum) {
 		
 		if(fs == null){
 			return null;
