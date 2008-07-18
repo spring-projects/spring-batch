@@ -15,6 +15,7 @@ public class AggregateItemReaderTests extends TestCase {
 	private ItemReader<Object> input;
 	private AggregateItemReader provider;
 
+	@SuppressWarnings("unchecked")
 	public void setUp() {
 
 		//create mock for input

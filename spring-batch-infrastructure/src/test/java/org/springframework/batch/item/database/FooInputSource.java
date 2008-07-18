@@ -10,15 +10,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, InitializingBean {
 
-	DrivingQueryItemReader<Foo> itemReader;
+	DrivingQueryItemReader<?> itemReader;
 
-	public void setItemReader(DrivingQueryItemReader<Foo> itemReader) {
+	public void setItemReader(DrivingQueryItemReader<?> itemReader) {
 		this.itemReader = itemReader;
 	}
 
 	FooDao fooDao = new SingleKeyFooDao();
 
-	public FooItemReader(DrivingQueryItemReader<Foo> inputSource, JdbcTemplate jdbcTemplate) {
+	public FooItemReader(DrivingQueryItemReader<?> inputSource, JdbcTemplate jdbcTemplate) {
 		this.itemReader = inputSource;
 		fooDao.setJdbcTemplate(jdbcTemplate);
 	}

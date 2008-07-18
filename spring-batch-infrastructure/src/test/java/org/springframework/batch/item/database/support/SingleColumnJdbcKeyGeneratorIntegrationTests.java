@@ -13,7 +13,7 @@ import org.springframework.util.ClassUtils;
  */
 public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	SingleColumnJdbcKeyCollector keyStrategy;
+	SingleColumnJdbcKeyCollector<Long> keyStrategy;
 	
 	ExecutionContext executionContext;
 	
@@ -25,7 +25,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	protected void onSetUpBeforeTransaction() throws Exception {
 		super.onSetUpBeforeTransaction();
 		
-		keyStrategy = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
+		keyStrategy = new SingleColumnJdbcKeyCollector<Long>(getJdbcTemplate(),
 		"SELECT ID from T_FOOS order by ID");
 		
 		keyStrategy.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");
@@ -35,7 +35,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 	
 	public void testRetrieveKeys(){
 		
-		List<Object> keys = keyStrategy.retrieveKeys(new ExecutionContext());
+		List<Long> keys = keyStrategy.retrieveKeys(new ExecutionContext());
 		
 		for (int i = 0; i < keys.size(); i++) {
 			Long id = (Long)keys.get(i);
@@ -51,7 +51,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransa
 		
 		keyStrategy.updateContext(new Long(3), executionContext);
 		
-		List<Object> keys = keyStrategy.retrieveKeys(executionContext);
+		List<Long> keys = keyStrategy.retrieveKeys(executionContext);
 		
 		assertEquals(2, keys.size());
 		assertEquals(new Long(4), keys.get(0));

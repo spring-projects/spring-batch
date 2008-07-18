@@ -15,8 +15,11 @@
  */
 package org.springframework.batch.item.database;
 
+import java.util.Map;
+
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyCollector;
+import org.springframework.batch.item.sample.Foo;
 
 /**
  * @author Lucas Ward
@@ -25,14 +28,14 @@ import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyColl
 public class MultipleColumnJdbcDrivingQueryItemReaderIntegrationTests extends
 		AbstractJdbcItemReaderIntegrationTests {
 
-	protected ItemReader createItemReader() throws Exception {
+	protected ItemReader<Foo> createItemReader() throws Exception {
 
-		MultipleColumnJdbcKeyCollector keyGenerator =
-			new MultipleColumnJdbcKeyCollector(getJdbcTemplate(),
+		MultipleColumnJdbcKeyCollector<Map<?,?>> keyGenerator =
+			new MultipleColumnJdbcKeyCollector<Map<?,?>>(getJdbcTemplate(),
 					"SELECT ID, VALUE from T_FOOS order by ID, VALUE");
 
 		keyGenerator.setRestartSql("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
-		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
+		DrivingQueryItemReader<Map<?,?>> inputSource = new DrivingQueryItemReader<Map<?,?>>();
 		inputSource.setSaveState(true);
 		inputSource.setKeyCollector(keyGenerator);
 		FooItemReader fooItemReader = new FooItemReader(inputSource, getJdbcTemplate());
