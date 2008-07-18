@@ -48,7 +48,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		provider.open(new ExecutionContext());
 	}
 
-	protected static class TradeItemReader extends FlatFileItemReader {
+	protected static class TradeItemReader extends FlatFileItemReader<Trade> {
 
 		protected TradeItemReader(Resource resource) throws Exception {
 			super();
@@ -59,8 +59,8 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 
 	}
 
-	protected static class TradeMapper implements FieldSetMapper{
-		public Object mapLine(FieldSet fs, int lineNum) {
+	protected static class TradeMapper implements FieldSetMapper<Trade> {
+		public Trade mapLine(FieldSet fs, int lineNum) {
 			return new Trade(fs);
 		}
 	}

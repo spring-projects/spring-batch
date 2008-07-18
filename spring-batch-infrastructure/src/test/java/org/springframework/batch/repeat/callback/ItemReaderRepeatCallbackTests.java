@@ -27,12 +27,12 @@ import org.springframework.batch.item.support.ListItemReader;
 
 public class ItemReaderRepeatCallbackTests extends TestCase {
 
-	ItemReaderRepeatCallback callback;
+	ItemReaderRepeatCallback<String> callback;
 
 	List<Object> list = new ArrayList<Object>();
 
 	public void testDoWithRepeat() throws Exception {
-		callback = new ItemReaderRepeatCallback(new ListItemReader(Arrays.asList(new String[] { "foo", "bar" })),
+		callback = new ItemReaderRepeatCallback<String>(new ListItemReader<String>(Arrays.asList(new String[] { "foo", "bar" })),
 				new AbstractItemWriter() {
 					public void write(Object data) {
 						list.add(data);
@@ -44,8 +44,8 @@ public class ItemReaderRepeatCallbackTests extends TestCase {
 	}
 
 	public void testDoWithRepeatNullProcessor() throws Exception {
-		ListItemReader provider = new ListItemReader(Arrays.asList(new String[] { "foo", "bar" }));
-		callback = new ItemReaderRepeatCallback(provider);
+		ListItemReader<String> provider = new ListItemReader<String>(Arrays.asList(new String[] { "foo", "bar" }));
+		callback = new ItemReaderRepeatCallback<String>(provider);
 		callback.doInIteration(null);
 		assertEquals(0, list.size());
 		assertEquals("bar", provider.read());

@@ -46,7 +46,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	}
 
 	public void testExecute() throws Exception {
-		template.iterate(new ItemReaderRepeatCallback(provider, processor));
+		template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 	}
 
@@ -59,7 +59,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
-		template.iterate(new ItemReaderRepeatCallback(provider, processor));
+		template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
 
 		assertEquals(2, processor.count);
 
@@ -199,7 +199,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	public void testEarlyCompletionWithContext() throws Exception {
 
-		ExitStatus result = template.iterate(new ItemReaderRepeatCallback(provider, processor) {
+		ExitStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				ExitStatus result = super.doInIteration(context);
@@ -227,7 +227,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 */
 	public void testEarlyCompletionWithContextTerminated() throws Exception {
 
-		ExitStatus result = template.iterate(new ItemReaderRepeatCallback(provider, processor) {
+		ExitStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				ExitStatus result = super.doInIteration(context);
@@ -317,7 +317,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * @throws Exception
 	 */
 	public void testResult() throws Exception {
-		ExitStatus result = template.iterate(new ItemReaderRepeatCallback(provider, processor));
+		ExitStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		// We are complete - do not expect to be called again
 		assertFalse(result.isContinuable());
@@ -356,7 +356,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		ExitStatus result = ExitStatus.FINISHED;
 
 		try {
-			result = template.iterate(new ItemReaderRepeatCallback(provider, processor) {
+			result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
 
 				public ExitStatus doInIteration(RepeatContext context) throws Exception {
 					ExitStatus result = super.doInIteration(context);
@@ -419,7 +419,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 				called = true;
 				assertSame(exception, throwable);
 				throw throwable; // re-throw so that repeat template
-									// terminates iteration
+				// terminates iteration
 			}
 		}
 		ExceptionHandlerStub exHandler = new ExceptionHandlerStub();

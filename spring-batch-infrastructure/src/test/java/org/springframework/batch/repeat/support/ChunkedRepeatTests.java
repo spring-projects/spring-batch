@@ -46,7 +46,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	public void testChunkedBatchWithTerminationPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemReaderRepeatCallback(provider, processor);
+		final RepeatCallback callback = new ItemReaderRepeatCallback<Trade>(provider, processor);
 
 		final RepeatTemplate chunkTemplate = new RepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency
@@ -80,7 +80,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
-		final RepeatCallback callback = new ItemReaderRepeatCallback(provider, processor);
+		final RepeatCallback callback = new ItemReaderRepeatCallback<Trade>(provider, processor);
 
 		final TaskExecutorRepeatTemplate chunkTemplate = new TaskExecutorRepeatTemplate();
 		// The policy is resettable so we only have to resolve this dependency
@@ -148,17 +148,17 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		while (!chunker.ready()) {
 
-			ItemReader truncated = new AbstractItemReader() {
+			ItemReader<Trade> truncated = new AbstractItemReader<Trade>() {
 				int count = 0;
 
-				public Object read() throws Exception {
+				public Trade read() throws Exception {
 					if (count++ < 2)
 						return provider.read();
 					return null;
 				}
 			};
 			chunker.reset();
-			template.iterate(new ItemReaderRepeatCallback(truncated, processor) {
+			template.iterate(new ItemReaderRepeatCallback<Trade>(truncated, processor) {
 
 				public ExitStatus doInIteration(RepeatContext context) throws Exception {
 					ExitStatus result = super.doInIteration(context);

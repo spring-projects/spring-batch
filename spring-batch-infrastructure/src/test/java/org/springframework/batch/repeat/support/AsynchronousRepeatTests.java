@@ -77,7 +77,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final String threadName = Thread.currentThread().getName();
 		final Set<String> threadNames = new HashSet<String>();
 
-		final RepeatCallback stepCallback = new ItemReaderRepeatCallback(provider, processor) {
+		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
