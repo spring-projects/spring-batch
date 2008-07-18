@@ -18,13 +18,13 @@ import org.springframework.util.Assert;
 public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		AbstractTransactionalDataSourceSpringContextTests {
 
-	protected ItemReader reader;
+	protected ItemReader<Foo> reader;
 	protected ExecutionContext executionContext;
 
 	/**
 	 * @return configured input source ready for use
 	 */
-	protected abstract ItemReader createItemReader() throws Exception;
+	protected abstract ItemReader<Foo> createItemReader() throws Exception;
 
 	protected String[] getConfigLocations() {
 		return new String[] { "org/springframework/batch/item/database/data-source-context.xml" };
@@ -245,11 +245,11 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		reader.reset();
 	}
 
-	private ItemStream getAsItemStream(ItemReader source) {
+	private ItemStream getAsItemStream(ItemReader<Foo> source) {
 		return (ItemStream) source;
 	}
 
-	private InitializingBean getAsInitializingBean(ItemReader source) {
+	private InitializingBean getAsInitializingBean(ItemReader<Foo> source) {
 		return (InitializingBean) source;
 	}
 

@@ -26,7 +26,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * @author Lucas Ward
  * @see DrivingQueryItemReader
  */
-public class IbatisKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
+public class IbatisKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
 
 	private static final String RESTART_KEY = "key.index";
 
@@ -46,7 +46,7 @@ public class IbatisKeyCollector extends ExecutionContextUserSupport implements K
 	 * @see KeyCollector#retrieveKeys()
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> retrieveKeys(ExecutionContext executionContext) {
+	public List<T> retrieveKeys(ExecutionContext executionContext) {
 		if (executionContext.containsKey(getKey(RESTART_KEY))) {
 			Object key = executionContext.get(getKey(RESTART_KEY));
 			return sqlMapClientTemplate.queryForList(restartQueryId, key);

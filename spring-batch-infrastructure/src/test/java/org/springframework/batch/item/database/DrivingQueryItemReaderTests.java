@@ -15,7 +15,7 @@ import org.springframework.util.Assert;
 
 public class DrivingQueryItemReaderTests extends TestCase {
 
-	DrivingQueryItemReader itemReader;
+	DrivingQueryItemReader<Foo> itemReader;
 
 	static {
 		TransactionSynchronizationManager.initSynchronization();
@@ -27,9 +27,9 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		itemReader = createItemReader();
 	}
 
-	private DrivingQueryItemReader createItemReader() throws Exception {
+	private DrivingQueryItemReader<Foo> createItemReader() throws Exception {
 
-		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
+		DrivingQueryItemReader<Foo> inputSource = new DrivingQueryItemReader<Foo>();
 		inputSource.setKeyCollector(new MockKeyGenerator());
 		inputSource.setSaveState(true);
 
@@ -159,10 +159,10 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 	public void testRetriveZeroKeys() {
 
-		itemReader.setKeyCollector(new KeyCollector() {
+		itemReader.setKeyCollector(new KeyCollector<Foo>() {
 
-			public List<Object> retrieveKeys(ExecutionContext executionContext) {
-				return new ArrayList<Object>();
+			public List<Foo> retrieveKeys(ExecutionContext executionContext) {
+				return new ArrayList<Foo>();
 			}
 
 			public void updateContext(Object key,
@@ -184,19 +184,19 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		itemReader.reset();
 	}
 
-	private InitializingBean getAsInitializingBean(ItemReader source) {
+	private InitializingBean getAsInitializingBean(ItemReader<Foo> source) {
 		return (InitializingBean) source;
 	}
 
-	private ItemStream getAsItemStream(ItemReader source) {
+	private ItemStream getAsItemStream(ItemReader<Foo> source) {
 		return (ItemStream) source;
 	}
 
-	private static class MockKeyGenerator implements KeyCollector {
+	private static class MockKeyGenerator implements KeyCollector<Foo> {
 
 		static ExecutionContext streamContext;
-		List<Object> keys;
-		List<Object> restartKeys;
+		List<Foo> keys;
+		List<Foo> restartKeys;
 		static final String RESTART_KEY = "restart.keys";
 
 		static {
@@ -207,14 +207,14 @@ public class DrivingQueryItemReaderTests extends TestCase {
 
 		public MockKeyGenerator() {
 
-			keys = new ArrayList<Object>();
+			keys = new ArrayList<Foo>();
 			keys.add(new Foo(1, "1", 1));
 			keys.add(new Foo(2, "2", 2));
 			keys.add(new Foo(3, "3", 3));
 			keys.add(new Foo(4, "4", 4));
 			keys.add(new Foo(5, "5", 5));
 
-			restartKeys = new ArrayList<Object>();
+			restartKeys = new ArrayList<Foo>();
 			restartKeys.add(new Foo(3, "3", 3));
 			restartKeys.add(new Foo(4, "4", 4));
 			restartKeys.add(new Foo(5, "5", 5));
@@ -224,7 +224,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			return streamContext;
 		}
 
-		public List<Object> retrieveKeys(ExecutionContext executionContext) {
+		public List<Foo> retrieveKeys(ExecutionContext executionContext) {
 			if (executionContext.containsKey(RESTART_KEY)) {
 				return restartKeys;
 			} else {

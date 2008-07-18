@@ -17,14 +17,14 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	protected ItemReader itemReader;
+	protected ItemReader<Foo> itemReader;
 
 	protected ExecutionContext executionContext;
 	
 	/**
 	 * @return input source with all necessary dependencies set
 	 */
-	protected abstract ItemReader createItemReader() throws Exception;
+	protected abstract ItemReader<Foo> createItemReader() throws Exception;
 
 	protected String[] getConfigLocations(){
 		return new String[] { "org/springframework/batch/item/database/data-source-context.xml"};
@@ -160,15 +160,15 @@ public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTra
 		itemReader.reset();
 	}
 
-	private ItemStream getAsItemStream(ItemReader source) {
+	private ItemStream getAsItemStream(ItemReader<Foo> source) {
 		return (ItemStream) source;
 	}
 
-	private InitializingBean getAsInitializingBean(ItemReader source) {
+	private InitializingBean getAsInitializingBean(ItemReader<Foo> source) {
 		return (InitializingBean) source;
 	}
 
-	private DisposableBean getAsDisposableBean(ItemReader source) {
+	private DisposableBean getAsDisposableBean(ItemReader<Foo> source) {
 		return (DisposableBean) source;
 	}
 

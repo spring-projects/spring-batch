@@ -3,26 +3,27 @@ package org.springframework.batch.item.database;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-class FooItemReader implements ItemStream, ItemReader, DisposableBean, InitializingBean {
+class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, InitializingBean {
 
-	DrivingQueryItemReader itemReader;
+	DrivingQueryItemReader<Foo> itemReader;
 
-	public void setItemReader(DrivingQueryItemReader itemReader) {
+	public void setItemReader(DrivingQueryItemReader<Foo> itemReader) {
 		this.itemReader = itemReader;
 	}
 
 	FooDao fooDao = new SingleKeyFooDao();
 
-	public FooItemReader(DrivingQueryItemReader inputSource, JdbcTemplate jdbcTemplate) {
+	public FooItemReader(DrivingQueryItemReader<Foo> inputSource, JdbcTemplate jdbcTemplate) {
 		this.itemReader = inputSource;
 		fooDao.setJdbcTemplate(jdbcTemplate);
 	}
 
-	public Object read() {
+	public Foo read() {
 		Object key = itemReader.read();
 		if (key != null) {
 			return fooDao.getFoo(key);

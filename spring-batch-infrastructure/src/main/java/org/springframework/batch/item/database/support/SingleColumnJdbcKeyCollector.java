@@ -29,25 +29,30 @@ import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Jdbc {@link KeyCollector} implementation that only works for a single column key. A sql query must be passed in which
- * will be used to return a list of keys. Each key will be mapped by a {@link RowMapper} that returns a mapped key. By
- * default, the {@link SingleColumnRowMapper} is used, and will convert keys into well known types at runtime. It is
- * extremely important to note that only one column should be mapped to an object and returned as a key. If multiple
- * columns are returned as a key in this strategy, then restart will not function properly. Instead a strategy that
- * supports keys comprised of multiple columns should be used.
+ * Jdbc {@link KeyCollector} implementation that only works for a single column
+ * key. A sql query must be passed in which will be used to return a list of
+ * keys. Each key will be mapped by a {@link RowMapper} that returns a mapped
+ * key. By default, the {@link SingleColumnRowMapper} is used, and will convert
+ * keys into well known types at runtime. It is extremely important to note that
+ * only one column should be mapped to an object and returned as a key. If
+ * multiple columns are returned as a key in this strategy, then restart will
+ * not function properly. Instead a strategy that supports keys comprised of
+ * multiple columns should be used.
  * </p>
  * 
  * <p>
- * Restartability: Because the key is only one column, restart is made much more simple. Before each commit, the last
- * processed key is returned to be stored as restart data. Upon restart, that same key is given back to restore from,
- * using a separate 'RestartQuery'. This means that only the keys remaining to be processed are returned, rather than
- * returning the original list of keys and iterating forward to that last committed point.
+ * Restartability: Because the key is only one column, restart is made much more
+ * simple. Before each commit, the last processed key is returned to be stored
+ * as restart data. Upon restart, that same key is given back to restore from,
+ * using a separate 'RestartQuery'. This means that only the keys remaining to
+ * be processed are returned, rather than returning the original list of keys
+ * and iterating forward to that last committed point.
  * </p>
  * 
  * @author Lucas Ward
  * @see SingleColumnRowMapper
  */
-public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
+public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
 
 	private static final String RESTART_KEY = "key";
 
@@ -64,8 +69,8 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	}
 
 	/**
-	 * Constructs a new instance using the provided jdbcTemplate and string representing the sql statement that should
-	 * be used to retrieve keys.
+	 * Constructs a new instance using the provided jdbcTemplate and string
+	 * representing the sql statement that should be used to retrieve keys.
 	 * 
 	 * @param jdbcTemplate
 	 * @param sql
@@ -83,18 +88,21 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.io.driving.KeyGenerationStrategy#retrieveKeys()
+	 * @see
+	 * org.springframework.batch.io.driving.KeyGenerationStrategy#retrieveKeys()
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> retrieveKeys(ExecutionContext executionContext) {
+	public List<T> retrieveKeys(ExecutionContext executionContext) {
 
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 
 		if (executionContext.containsKey(getKey(RESTART_KEY))) {
 			Assert.state(StringUtils.hasText(restartSql), "The restart sql query must not be null or empty"
-			        + " in order to restart.");
-			return jdbcTemplate.query(restartSql, new Object[] { executionContext.get(getKey(RESTART_KEY)) }, keyMapper);
-		} else {
+					+ " in order to restart.");
+			return jdbcTemplate
+					.query(restartSql, new Object[] { executionContext.get(getKey(RESTART_KEY)) }, keyMapper);
+		}
+		else {
 			return jdbcTemplate.query(sql, keyMapper);
 		}
 	}
@@ -113,7 +121,8 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see
+	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null.");
@@ -130,7 +139,8 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	}
 
 	/**
-	 * Set the SQL query to be used to return the remaining keys to be processed.
+	 * Set the SQL query to be used to return the remaining keys to be
+	 * processed.
 	 * 
 	 * @param restartSql
 	 */
@@ -146,7 +156,7 @@ public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport im
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
-	
+
 	/**
 	 * Set the {@link JdbcTemplate} to be used.
 	 * 

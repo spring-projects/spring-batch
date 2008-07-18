@@ -3,13 +3,14 @@ package org.springframework.batch.item.database;
 import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
 public class HibernateCursorItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
-	protected ItemReader getItemReader() throws Exception {
+	protected ItemReader<Foo> getItemReader() throws Exception {
 		
 		SessionFactory sessionFactory = createSessionFactory();
 

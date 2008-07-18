@@ -49,7 +49,7 @@ import org.springframework.util.StringUtils;
  * @see DrivingQueryItemReader
  * @see ItemPreparedStatementSetter
  */
-public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
+public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
 
 	private static final String CURRENT_KEY = "current.key";
 
@@ -89,7 +89,7 @@ public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport 
 	 * #retrieveKeys()
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Object> retrieveKeys(ExecutionContext executionContext) {
+	public List<T> retrieveKeys(ExecutionContext executionContext) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"
