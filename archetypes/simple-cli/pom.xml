@@ -6,7 +6,8 @@
 	<artifactId>simple-cli-archetype</artifactId>
 	<version>2.0.0.CI-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Spring Batch Simple Commandline Archetype</name>
+	<name>Commandline</name>
+	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
 
 	<description>
 		<![CDATA[
@@ -92,6 +93,32 @@
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<manifestLocation>target/generated-resources/META-INF</manifestLocation>
+					<instructions>
+						<Bundle-SymbolicName>${bundle.symbolic.name}</Bundle-SymbolicName>
+						<Export-Package>!example,!test.*</Export-Package>
+						<Import-Package><![CDATA[
+ org.apache.commons.logging.*;version="[1.1.0, 2.0.0)",
+ org.springframework.batch.*;version="[2.0.0,3.0.0)",
+ org.springframework.*;version="[2.5.5, 3.0.0)"
+ 						]]></Import-Package>
+					</instructions>
 				</configuration>
 			</plugin>
 			<plugin>

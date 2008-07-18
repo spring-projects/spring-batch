@@ -1,0 +1,28 @@
+Manifest-Version: 1.0
+Import-Library: org.springframework.spring;version="[2.5.4.A,3.0.0)"
+Import-Bundle: org.springframework.batch.core;version="[2.0.0,3.0.0)",
+ org.springframework.batch.infrastructure;version="[2.0.0,3.0.0)"
+Created-By: 1.5.0_09 (Sun Microsystems Inc.)
+Import-Package: org.apache.commons.logging;version="[1.1.0, 2.0.0)",or
+ g.springframework.batch.item.support;version="[2.0.0,3.0.0)"
+Bnd-LastModified: 1216037156921
+Export-Package: example;uses:="org.springframework.batch.item.support,
+ org.apache.commons.logging";version="2.0.0.CI",test.jdbc.da
+ tasource;uses:="org.apache.commons.logging,org.springframework.jdbc.c
+ ore,org.springframework.transaction,org.springframework.beans.factory
+ .config,org.springframework.jdbc.datasource,org.springframework.core.
+ io,org.springframework.util,org.springframework.beans.factory,org.spr
+ ingframework.transaction.support";version="2.0.0.CI"
+Bundle-Version: 2.0.0.CI-SNAPSHOT
+Ignore-Package: example,test.jdbc.datasource
+Bundle-Name: Spring Batch Simple Commandline Archetype
+Bundle-Description: This project is a minimal command line batch sampl
+ e from      Spring Batch.  Once installed you can use "mvn exec:java"
+  to       see the job run.
+Private-Package: example;version="1.1.0.DEV-SNAPSHOT",test.jdbc.dataso
+ urce;version="1.1.0.DEV-SNAPSHOT"
+Originally-Created-By: 1.5.0_09 (Sun Microsystems Inc.)
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.batch.sample.archetype.cli
+Tool: Bnd-0.0.255
+
