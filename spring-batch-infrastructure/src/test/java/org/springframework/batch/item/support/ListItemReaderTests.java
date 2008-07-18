@@ -26,21 +26,21 @@ import junit.framework.TestCase;
 
 public class ListItemReaderTests extends TestCase {
 
-	ListItemReader provider = new ListItemReader(Arrays.asList(new String[] { "a", "b", "c" }));
+	ListItemReader<String> reader = new ListItemReader<String>(Arrays.asList(new String[] { "a", "b", "c" }));
 
 	public void testNext() throws Exception {
-		assertEquals("a", provider.read());
-		assertEquals("b", provider.read());
-		assertEquals("c", provider.read());
-		assertEquals(null, provider.read());
+		assertEquals("a", reader.read());
+		assertEquals("b", reader.read());
+		assertEquals("c", reader.read());
+		assertEquals(null, reader.read());
 	}
 
 	public void testChangeList() throws Exception {
 		List<String> list = new ArrayList<String>(Arrays.asList(new String[] { "a", "b", "c" }));
-		provider = new ListItemReader(list);
-		assertEquals("a", provider.read());
+		reader = new ListItemReader<String>(list);
+		assertEquals("a", reader.read());
 		list.clear();
 		assertEquals(0, list.size());
-		assertEquals("b", provider.read());
+		assertEquals("b", reader.read());
 	}
 }

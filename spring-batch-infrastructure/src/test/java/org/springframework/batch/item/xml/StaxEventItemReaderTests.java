@@ -29,12 +29,12 @@ import org.springframework.util.ClassUtils;
 public class StaxEventItemReaderTests extends TestCase {
 
 	// object under test
-	private StaxEventItemReader source;
+	private StaxEventItemReader<List<XMLEvent>> source;
 
 	// test xml input
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
-	private EventReaderDeserializer deserializer = new MockFragmentDeserializer();
+	private EventReaderDeserializer<List<XMLEvent>> deserializer = new MockFragmentDeserializer();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
 
@@ -111,18 +111,17 @@ public class StaxEventItemReaderTests extends TestCase {
 	/**
 	 * Save restart data and restore from it.
 	 */
-	@SuppressWarnings("unchecked")
 	public void testRestart() throws Exception {
 		source.open(executionContext);
 		source.read();
 		source.update(executionContext);
 		System.out.println(executionContext);
 		assertEquals(1, executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
-		List<XMLEvent> expectedAfterRestart = (List<XMLEvent>) source.read();
+		List<XMLEvent> expectedAfterRestart = source.read();
 
 		source = createNewInputSouce();
 		source.open(executionContext);
-		List<XMLEvent> afterRestart = (List<XMLEvent>) source.read();
+		List<XMLEvent> afterRestart = source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
 	}
 
@@ -150,13 +149,12 @@ public class StaxEventItemReaderTests extends TestCase {
 	/**
 	 * Rollback to last commited record.
 	 */
-	@SuppressWarnings("unchecked")
 	public void testRollback() throws Exception{
 		source.open(executionContext);
 		// rollback between deserializing records
-		List<XMLEvent> first = (List<XMLEvent>) source.read();
+		List<XMLEvent> first = source.read();
 		source.mark();
-		List<XMLEvent> second = (List<XMLEvent>) source.read();
+		List<XMLEvent> second = source.read();
 		assertFalse(first.equals(second));
 		source.reset();
 
@@ -265,10 +263,10 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.read();
 	}
 
-	private StaxEventItemReader createNewInputSouce() {
+	private StaxEventItemReader<List<XMLEvent>> createNewInputSouce() {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 
-		StaxEventItemReader newSource = new StaxEventItemReader();
+		StaxEventItemReader<List<XMLEvent>> newSource = new StaxEventItemReader<List<XMLEvent>>();
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
@@ -282,7 +280,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * A simple XMLEvent deserializer mock - check for the start and end document events for the fragment root & end
 	 * tags + skips the fragment contents.
 	 */
-	private static class MockFragmentDeserializer implements EventReaderDeserializer {
+	private static class MockFragmentDeserializer implements EventReaderDeserializer<List<XMLEvent>> {
 
 		/**
 		 * A simple mapFragment implementation checking the StaxEventReaderItemReader basic read functionality.
@@ -290,7 +288,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		 * @param eventReader
 		 * @return list of the events from fragment body
 		 */
-		public Object deserializeFragment(XMLEventReader eventReader) {
+		public List<XMLEvent> deserializeFragment(XMLEventReader eventReader) {
 			List<XMLEvent> fragmentContent;
 			try {
 				// first event should be StartDocument
@@ -340,7 +338,7 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	}
 
-	private static class MockStaxEventItemReader extends StaxEventItemReader {
+	private static class MockStaxEventItemReader extends StaxEventItemReader<List<XMLEvent>> {
 
 		private boolean openCalled = false;
 

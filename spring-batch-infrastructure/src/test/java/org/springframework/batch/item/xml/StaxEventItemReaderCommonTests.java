@@ -15,12 +15,12 @@ public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTe
 
 	private final String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
 
-	protected ItemReader getItemReader() throws Exception {
-		StaxEventItemReader reader = new StaxEventItemReader();
+	protected ItemReader<Foo> getItemReader() throws Exception {
+		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
 		reader.setResource(new ByteArrayResource(FOOS.getBytes()));
 		reader.setFragmentRootElementName("foo");
-		reader.setFragmentDeserializer(new EventReaderDeserializer() {
-			public Object deserializeFragment(XMLEventReader eventReader) {
+		reader.setFragmentDeserializer(new EventReaderDeserializer<Foo>() {
+			public Foo deserializeFragment(XMLEventReader eventReader) {
 				Attribute attr;
 				try {
 					assertTrue(eventReader.nextEvent().isStartDocument());
@@ -41,8 +41,8 @@ public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTe
 		return reader;
 	}
 
-	protected void pointToEmptyInput(ItemReader tested) throws Exception {
-		StaxEventItemReader reader = (StaxEventItemReader) tested;
+	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+		StaxEventItemReader<Foo> reader = (StaxEventItemReader<Foo>) tested;
 		reader.close(new ExecutionContext());
 		
 		reader.setResource(new ByteArrayResource("<foos />".getBytes()));

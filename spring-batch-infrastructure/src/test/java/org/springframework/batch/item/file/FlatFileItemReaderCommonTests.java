@@ -13,12 +13,12 @@ public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTes
 
 	private static final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n"; 
 	
-	protected ItemReader getItemReader() throws Exception {
-		FlatFileItemReader tested = new FlatFileItemReader();
+	protected ItemReader<Foo> getItemReader() throws Exception {
+		FlatFileItemReader<Foo> tested = new FlatFileItemReader<Foo>();
 		Resource resource = new ByteArrayResource(FOOS.getBytes());
 		tested.setResource(resource);
-		tested.setFieldSetMapper(new FieldSetMapper() {
-			public Object mapLine(FieldSet fs, int lineNum) {
+		tested.setFieldSetMapper(new FieldSetMapper<Foo>() {
+			public Foo mapLine(FieldSet fs, int lineNum) {
 				Foo foo = new Foo();
 				foo.setValue(fs.readInt(0));
 				return foo;
@@ -30,8 +30,8 @@ public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTes
 		return tested;
 	}
 
-	protected void pointToEmptyInput(ItemReader tested) throws Exception {
-		FlatFileItemReader reader = (FlatFileItemReader) tested;
+	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+		FlatFileItemReader<Foo> reader = (FlatFileItemReader<Foo>) tested;
 		reader.close(new ExecutionContext());
 		
 		reader.setResource(new ByteArrayResource("".getBytes()));

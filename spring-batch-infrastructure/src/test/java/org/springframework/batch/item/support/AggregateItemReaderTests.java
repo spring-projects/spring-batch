@@ -12,14 +12,14 @@ import org.springframework.batch.item.support.AggregateItemReader;
 public class AggregateItemReaderTests extends TestCase {
 
 	private MockControl inputControl;
-	private ItemReader input;
+	private ItemReader<Object> input;
 	private AggregateItemReader provider;
 
 	public void setUp() {
 
 		//create mock for input
 		inputControl = MockControl.createControl(ItemReader.class);
-		input = (ItemReader) inputControl.getMock();
+		input = (ItemReader<Object>) inputControl.getMock();
 
 		//create provider
 		provider = new AggregateItemReader();

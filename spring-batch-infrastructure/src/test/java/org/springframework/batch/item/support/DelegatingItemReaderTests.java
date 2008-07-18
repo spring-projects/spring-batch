@@ -20,7 +20,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 
 /**
  * Unit test for {@link DelegatingItemReader}
@@ -30,28 +29,28 @@ import org.springframework.batch.item.ItemStream;
 public class DelegatingItemReaderTests extends TestCase {
 
 	// object under test
-	private DelegatingItemReader itemProvider = new DelegatingItemReader();
+	private DelegatingItemReader<Object> itemReader = new DelegatingItemReader<Object>();
 
-	private ItemReader source;
+	private ItemReader<Object> delegateReader;
 	
 	private ExecutionContext executionContext;
 
 	// create input template and inject it to data provider
 	protected void setUp() throws Exception {
 		executionContext = new ExecutionContext();
-		source = new MockItemReader(this, executionContext);
-		itemProvider.setItemReader(source);
+		delegateReader = new MockItemReader(this, executionContext);
+		itemReader.setItemReader(delegateReader);
 	}
 
 	public void testAfterPropertiesSet() throws Exception {
 		// shouldn't throw an exception since the input source is set
-		itemProvider.afterPropertiesSet();
+		itemReader.afterPropertiesSet();
 	}
 
 	public void testNullItemReader() {
 		try {
-			itemProvider.setItemReader(null);
-			itemProvider.afterPropertiesSet();
+			itemReader.setItemReader(null);
+			itemReader.afterPropertiesSet();
 			fail();
 		}
 		catch (Exception ex) {
@@ -64,11 +63,11 @@ public class DelegatingItemReaderTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testNext() throws Exception {
-		Object result = itemProvider.read();
+		Object result = itemReader.read();
 		assertSame("domain object is provided by the input template", this, result);
 	}
 
-	private static class MockItemReader extends AbstractItemReader implements ItemReader, ItemStream {
+	private static class MockItemReader extends AbstractItemStreamItemReader<Object> {
 
 		private Object value;
 

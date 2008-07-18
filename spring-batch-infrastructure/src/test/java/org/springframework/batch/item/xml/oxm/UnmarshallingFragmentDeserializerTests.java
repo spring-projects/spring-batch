@@ -21,7 +21,7 @@ import org.springframework.oxm.Unmarshaller;
 public class UnmarshallingFragmentDeserializerTests extends TestCase {
 
 	// object under test
-	private UnmarshallingEventReaderDeserializer deserializer;
+	private UnmarshallingEventReaderDeserializer<?> deserializer;
 	
 	private XMLEventReader eventReader;
 	private String xml = "<root> </root>";
@@ -36,7 +36,7 @@ public class UnmarshallingFragmentDeserializerTests extends TestCase {
 		eventReader = XMLInputFactory.newInstance().createXMLEventReader(input.getInputStream());
 		unmarshaller = (Unmarshaller) unmarshallerControl.getMock();
 		unmarshallerControl.setDefaultMatcher(MockControl.ALWAYS_MATCHER);
-		deserializer = new UnmarshallingEventReaderDeserializer(unmarshaller);
+		deserializer = new UnmarshallingEventReaderDeserializer<Object>(unmarshaller);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class UnmarshallingFragmentDeserializerTests extends TestCase {
 	 */
 	public void testExceptionOnNullUnmarshaller() {
 		try {
-			deserializer = new UnmarshallingEventReaderDeserializer(null);
+			deserializer = new UnmarshallingEventReaderDeserializer<Object>(null);
 			fail("Exception expected");
 		}
 		catch (IllegalArgumentException e) {

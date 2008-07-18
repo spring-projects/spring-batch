@@ -35,13 +35,14 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 	// TransactionAwareListItemProvider provider = new
 	// TransactionAwareListItemProvider(Arrays.asList(new String[] { "a",
 	// "b", "c" }));
-	ListItemReader reader;
+	ListItemReader<String> reader;
 
+	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
 		super.setUp();
 		TransactionAwareProxyFactory factory = new TransactionAwareProxyFactory(Arrays.asList(new String[] { "a", "b",
 				"c" }));
-		reader = new ListItemReader((List<?>) factory.createInstance());
+		reader = new ListItemReader<String>((List<String>) factory.createInstance());
 	}
 
 	public void testNext() throws Exception {

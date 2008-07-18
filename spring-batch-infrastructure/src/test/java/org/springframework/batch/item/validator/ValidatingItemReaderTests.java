@@ -27,8 +27,8 @@ import org.springframework.batch.item.support.AbstractItemReader;
  */
 public class ValidatingItemReaderTests extends TestCase {
 
-	ItemReader inputSource;
-	ValidatingItemReader itemProvider;
+	ItemReader<Object> inputSource;
+	ValidatingItemReader<Object> itemProvider;
 	Validator validator;
 	MockControl validatorControl = MockControl.createControl(Validator.class);
 
@@ -40,7 +40,7 @@ public class ValidatingItemReaderTests extends TestCase {
 
 		inputSource = new MockItemReader(this);
 		validator = (Validator)validatorControl.getMock();
-		itemProvider = new ValidatingItemReader();
+		itemProvider = new ValidatingItemReader<Object>();
 		itemProvider.setItemReader(inputSource);
 		itemProvider.setValidator(validator);
 	}
@@ -98,7 +98,7 @@ public class ValidatingItemReaderTests extends TestCase {
 		validatorControl.verify();
 	}
 
-	private static class MockItemReader extends AbstractItemReader {
+	private static class MockItemReader extends AbstractItemReader<Object> {
 
 		Object value;
 

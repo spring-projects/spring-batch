@@ -24,6 +24,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -37,7 +38,7 @@ import org.springframework.util.ClassUtils;
 public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	// object under test
-	private FlatFileItemReader reader = new FlatFileItemReader();
+	private FlatFileItemReader<FieldSet> reader = new FlatFileItemReader<FieldSet>();
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
@@ -51,11 +52,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		}
 	};
 
-	private FieldSetMapper fieldSetMapper = new FieldSetMapper() {
-		public Object mapLine(FieldSet fs, int lineNum) {
-			return fs;
-		}
-	};
+	private FieldSetMapper<FieldSet> fieldSetMapper = new PassThroughFieldSetMapper();
 
 	/**
 	 * Create inputFile, inject mock/stub dependencies for tested object, initialize the tested object
