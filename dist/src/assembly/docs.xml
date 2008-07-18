@@ -6,7 +6,6 @@
 				<include>license.txt</include>
 				<include>notice.txt</include>
 			</includes>
-			<lineEnding>unix</lineEnding>
 		</fileSet>
 	 	<fileSet>
 			<directory>target</directory>

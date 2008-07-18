@@ -201,6 +201,6 @@
     </dependency>
   </dependencies>
   <properties>
-    <spring.integration.version>1.0.0.CI-SNAPSHOT</spring.integration.version>
+    <spring.integration.version>1.0.0.M5</spring.integration.version>
   </properties>
 </project>
