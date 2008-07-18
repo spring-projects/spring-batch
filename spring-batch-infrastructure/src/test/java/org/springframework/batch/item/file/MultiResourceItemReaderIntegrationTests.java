@@ -15,9 +15,9 @@ import org.springframework.core.io.Resource;
  */
 public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
-	private MultiResourceItemReader tested = new MultiResourceItemReader();
+	private MultiResourceItemReader<FieldSet> tested = new MultiResourceItemReader<FieldSet>();
 
-	private FlatFileItemReader itemReader = new FlatFileItemReader();
+	private FlatFileItemReader<FieldSet> itemReader = new FlatFileItemReader<FieldSet>();
 
 	private ExecutionContext ctx = new ExecutionContext();
 

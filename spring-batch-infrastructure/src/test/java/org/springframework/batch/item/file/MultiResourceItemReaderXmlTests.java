@@ -18,14 +18,14 @@ import org.springframework.core.io.Resource;
 
 public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderTests {
 
-	protected ItemReader getItemReader() throws Exception {
-		MultiResourceItemReader multiReader = new MultiResourceItemReader();
+	protected ItemReader<Foo> getItemReader() throws Exception {
+		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
 
-		StaxEventItemReader reader = new StaxEventItemReader();
+		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
 
 		reader.setFragmentRootElementName("foo");
-		reader.setFragmentDeserializer(new EventReaderDeserializer() {
-			public Object deserializeFragment(XMLEventReader eventReader) {
+		reader.setFragmentDeserializer(new EventReaderDeserializer<Foo>() {
+			public Foo deserializeFragment(XMLEventReader eventReader) {
 				Attribute attr;
 				try {
 					assertTrue(eventReader.nextEvent().isStartDocument());
@@ -61,8 +61,8 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 		return multiReader;
 	}
 	
-	protected void pointToEmptyInput(ItemReader tested) throws Exception {
-		MultiResourceItemReader multiReader = (MultiResourceItemReader) tested;
+	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
 		multiReader.close(new ExecutionContext());
 		multiReader.setResources(new Resource[] { new ByteArrayResource("<foos />"
 				.getBytes()) });

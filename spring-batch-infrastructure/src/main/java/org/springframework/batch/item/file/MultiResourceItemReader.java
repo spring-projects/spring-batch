@@ -34,7 +34,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
+public class MultiResourceItemReader<T> extends ExecutionContextUserSupport implements ItemReader<T>, ItemStream,
 		InitializingBean {
 
 	/**
@@ -42,7 +42,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	private static final Object END_OF_RESOURCE_MARKER = new Object();
 
-	private ResourceAwareItemReaderItemStream delegate;
+	private ResourceAwareItemReaderItemStream<T> delegate;
 
 	private Resource[] resources;
 
@@ -74,9 +74,9 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
-	public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
+	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 
-		Object item;
+		T item;
 		if (shouldReadBuffer) {
 			item = readBufferedItem();
 		}
@@ -94,9 +94,9 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * one is exhausted. Items are appended to the buffer.
 	 * @return next item from input
 	 */
-	private Object readNextItem() throws Exception {
+	private T readNextItem() throws Exception {
 
-		Object item = delegate.read();
+		T item = delegate.read();
 
 		while (item == null) {
 
@@ -124,7 +124,8 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * input for possible restart.
 	 * @return next item from buffer
 	 */
-	private Object readBufferedItem() {
+	@SuppressWarnings("unchecked")
+	private T readBufferedItem() {
 
 		Object buffered = itemBufferIterator.next();
 		while (buffered == END_OF_RESOURCE_MARKER) {
@@ -137,7 +138,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 			shouldReadBuffer = false;
 			itemBufferIterator = null;
 		}
-		return buffered;
+		return (T) buffered;
 	}
 
 	/**
@@ -228,7 +229,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	/**
 	 * @param delegate reads items from single {@link Resource}.
 	 */
-	public void setDelegate(ResourceAwareItemReaderItemStream delegate) {
+	public void setDelegate(ResourceAwareItemReaderItemStream<T> delegate) {
 		this.delegate = delegate;
 	}
 

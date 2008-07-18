@@ -14,13 +14,13 @@ import org.springframework.core.io.Resource;
 public class MultiResourceItemReaderFlatFileTests extends
 		CommonItemStreamItemReaderTests {
 
-	protected ItemReader getItemReader() throws Exception {
+	protected ItemReader<Foo> getItemReader() throws Exception {
 
-		MultiResourceItemReader multiReader = new MultiResourceItemReader();
-		FlatFileItemReader fileReader = new FlatFileItemReader();
+		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<Foo>();
 
-		fileReader.setFieldSetMapper(new FieldSetMapper() {
-			public Object mapLine(FieldSet fs, int lineNum) {
+		fileReader.setFieldSetMapper(new FieldSetMapper<Foo>() {
+			public Foo mapLine(FieldSet fs, int lineNum) {
 				Foo foo = new Foo();
 				foo.setValue(fs.readInt(0));
 				return foo;
@@ -48,8 +48,8 @@ public class MultiResourceItemReaderFlatFileTests extends
 		return multiReader;
 	}
 
-	protected void pointToEmptyInput(ItemReader tested) throws Exception {
-		MultiResourceItemReader multiReader = (MultiResourceItemReader) tested;
+	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
 		multiReader.close(new ExecutionContext());
 		multiReader.setResources(new Resource[] { new ByteArrayResource(""
 				.getBytes()) });
