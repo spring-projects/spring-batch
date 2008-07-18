@@ -381,7 +381,7 @@ public class PollableSourceRetryTests {
 		PollingSchedule schedule = new PollingSchedule(100);
 		schedule.setFixedRate(true); // used to be the default
 		SourceEndpoint endpoint = new SourceEndpoint(source);
-		endpoint.setOutputChannel(channel);
+		endpoint.setTarget(channel);
 		endpoint.setSchedule(schedule);
 		return endpoint;
 	}

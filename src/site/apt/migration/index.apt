@@ -5,14 +5,25 @@
                                     ------
                                     March 2008
 
+  See the changes report generated from {{{issue-tracking.html}JIRA}}.
+  
+  There is a pre-built {{{http://opensource.atlassian.com/projects/spring/secure/IssueNavigator.jspa?reset=true&mode=hide&pid=10090&status=5&status=6&updated:previous=-1w&sorter/field=updated&sorter/order=DESC}Resolved Recently}} query that might be useful.
+  
+  You can also browse the upcoming releases and look at the {{{http://opensource.atlassian.com/projects/spring/browse/BATCH?report=com.atlassian.jira.plugin.system.project:roadmap-panel}Road Map}} query.
+
   Links:
 
-    * {{{1.0-m2-m3.html}1.0 m2 to m3}}
+    * {{{1.0.1-1.1.html}1.0.1 to 1.1}}
 
-    * {{{1.0-m3-m4.html}1.0 m3 to m4}}
+    * {{{1.0.0-1.0.1.html}1.0.0 to 1.0.1}}
 
-    * {{{1.0-m4-m5.html}1.0 m4 to m5}}
+    * {{{1.0-rc1-final.html}1.0 rc1 to final}}
 
     * {{{1.0-m5-rc1.html}1.0 m5 to rc1}}
 
-    * {{{1.0-rc1-final.html}1.0 rc1 to final}}
+    * {{{1.0-m4-m5.html}1.0 m4 to m5}}
+
+    * {{{1.0-m3-m4.html}1.0 m3 to m4}}
+
+    * {{{1.0-m2-m3.html}1.0 m2 to m3}}
+

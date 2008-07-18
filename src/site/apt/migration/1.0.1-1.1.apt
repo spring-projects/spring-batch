@@ -1,6 +1,5 @@
 Spring Batch 1.1 Release Notes
 
-
 * Notable new features:
 
   * Job-level execution context (shared among all steps)

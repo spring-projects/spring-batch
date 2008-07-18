@@ -104,14 +104,7 @@ public class MessageChannelItemWriterTests {
 				throw new RuntimeException("Planned failure");
 			}
 		});
-		// INT-184: this shouldn't be necessary?
-//		endpoint.setErrorHandler(new ErrorHandler() {
-//			public void handle(Throwable t) {
-//				throw (RuntimeException)t;
-//			}
-//		});
 		channel.subscribe(endpoint);
-		endpoint.start();
 		MessageChannelItemWriter writer = new MessageChannelItemWriter();
 		writer.setChannel(channel);
 		try {
