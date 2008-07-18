@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
@@ -15,7 +16,7 @@ import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
  */
 public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
 
-	protected ItemReader createItemReader() throws Exception {
+	protected ItemReader<Foo> createItemReader() throws Exception {
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(super.getJdbcTemplate().getDataSource());
 		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("Foo.hbm.xml", getClass()) });
