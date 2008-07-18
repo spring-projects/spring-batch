@@ -15,12 +15,9 @@
  */
 package org.springframework.batch.core.configuration.support;
 
-import java.util.List;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -136,14 +133,6 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory, App
 		 */
 		public String getName() {
 			return delegate.getName();
-		}
-
-		/**
-		 * @deprecated planned for removal in 2.0
-		 * @see org.springframework.batch.core.Job#getSteps()
-		 */
-		public List<Step> getSteps() {
-			return delegate.getSteps();
 		}
 
 		/**

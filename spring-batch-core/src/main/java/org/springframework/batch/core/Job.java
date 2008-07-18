@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import java.util.List;
 
 /**
  * Batch domain object representing a job. Job is an explicit abstraction
@@ -29,12 +28,6 @@ import java.util.List;
 public interface Job {
 
 	String getName();
-
-	/**
-	 * @deprecated planned for removal in 2.0
-	 * @return the {@link Step}s executed as part of this job.
-	 */
-	List<Step> getSteps();
 
 	boolean isRestartable();
 

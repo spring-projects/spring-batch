@@ -95,13 +95,6 @@ public class JobSupport implements BeanNameAware, Job {
 		return name;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.IJob#getSteps()
-	 */
-	public List<Step> getSteps() {
-		return steps;
-	}
-
 	public void setSteps(List<Step> steps) {
 		this.steps.clear();
 		this.steps.addAll(steps);

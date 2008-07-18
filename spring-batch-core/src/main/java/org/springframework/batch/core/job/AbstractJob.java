@@ -103,7 +103,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.IJob#getSteps()
 	 */
-	public List<Step> getSteps() {
+	protected List<Step> getSteps() {
 		return steps;
 	}
 
