@@ -1,6 +1,7 @@
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.sample.Foo;
 
 /**
  * Tests for {@link JdbcCursorItemReader}
@@ -9,8 +10,8 @@ import org.springframework.batch.item.ItemReader;
  */
 public class JdbcCursorItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
 
-	protected ItemReader createItemReader() throws Exception {
-		JdbcCursorItemReader result = new JdbcCursorItemReader();
+	protected ItemReader<Foo> createItemReader() throws Exception {
+		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<Foo>();
 		result.setDataSource(super.getJdbcTemplate().getDataSource());
 		result.setSql("select ID, NAME, VALUE from T_FOOS");
 		result.setIgnoreWarnings(true);

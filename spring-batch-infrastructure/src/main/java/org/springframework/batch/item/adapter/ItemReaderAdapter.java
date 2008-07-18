@@ -26,12 +26,12 @@ import org.springframework.batch.item.ResetFailedException;
  * 
  * @author Robert Kasanicky
  */
-public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implements ItemReader {
+public class ItemReaderAdapter<T> extends AbstractMethodInvokingDelegator<T> implements ItemReader<T> {
 
 	/**
 	 * @return return value of the target method.
 	 */
-	public Object read() throws Exception {
+	public T read() throws Exception {
 		return invokeDelegateMethod();
 	}
 

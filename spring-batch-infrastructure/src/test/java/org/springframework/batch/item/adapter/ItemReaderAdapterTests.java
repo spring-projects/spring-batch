@@ -14,7 +14,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  */
 public class ItemReaderAdapterTests extends AbstractDependencyInjectionSpringContextTests {
 
-	private ItemReaderAdapter provider;
+	private ItemReaderAdapter<Foo> provider;
 
 	private FooService fooService;
 
@@ -41,7 +41,7 @@ public class ItemReaderAdapterTests extends AbstractDependencyInjectionSpringCon
 		}
 	}
 
-	public void setProvider(ItemReaderAdapter provider) {
+	public void setProvider(ItemReaderAdapter<Foo> provider) {
 		this.provider = provider;
 	}
 

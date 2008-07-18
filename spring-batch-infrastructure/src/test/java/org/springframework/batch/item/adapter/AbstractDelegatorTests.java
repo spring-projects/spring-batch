@@ -15,10 +15,10 @@ import org.springframework.util.Assert;
  */
 public class AbstractDelegatorTests extends TestCase {
 
-	private static class ConcreteDelegator extends AbstractMethodInvokingDelegator {
+	private static class ConcreteDelegator extends AbstractMethodInvokingDelegator<Foo> {
 	}
 
-	private AbstractMethodInvokingDelegator delegator = new ConcreteDelegator();
+	private AbstractMethodInvokingDelegator<Foo> delegator = new ConcreteDelegator();
 
 	private Foo foo = new Foo(0, "foo", 1);
 

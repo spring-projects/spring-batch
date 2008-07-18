@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvokingDelegator implements ItemWriter {
+public class PropertyExtractingDelegatingItemWriter extends AbstractMethodInvokingDelegator<Object> implements ItemWriter {
 	
 	private String[] fieldsUsedAsTargetMethodArguments;
 	

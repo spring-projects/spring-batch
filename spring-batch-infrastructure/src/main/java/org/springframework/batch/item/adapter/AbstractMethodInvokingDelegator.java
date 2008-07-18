@@ -31,7 +31,7 @@ import org.springframework.util.MethodInvoker;
  * 
  * @author Robert Kasanicky
  */
-public class AbstractMethodInvokingDelegator implements InitializingBean {
+public class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 	
 	private Object targetObject;
 	
@@ -44,7 +44,7 @@ public class AbstractMethodInvokingDelegator implements InitializingBean {
 	 * @return object returned by invoked method
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
 	 */
-	protected Object invokeDelegateMethod() {
+	protected T invokeDelegateMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(arguments);
 		return doInvoke(invoker);
@@ -56,7 +56,7 @@ public class AbstractMethodInvokingDelegator implements InitializingBean {
 	 * @return object returned by target method
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
 	 */
-	protected Object invokeDelegateMethodWithArgument(Object object) {
+	protected T invokeDelegateMethodWithArgument(Object object) {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(new Object[]{object});
 		return doInvoke(invoker);
@@ -68,7 +68,7 @@ public class AbstractMethodInvokingDelegator implements InitializingBean {
 	 * @return object returned by invoked method
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
 	 */
-	protected Object invokeDelegateMethodWithArguments(Object[] args) {
+	protected T invokeDelegateMethodWithArguments(Object[] args) {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(args);
 		return doInvoke(invoker);
@@ -90,7 +90,8 @@ public class AbstractMethodInvokingDelegator implements InitializingBean {
 	 * @param invoker configured invoker
 	 * @return return value of the invoked method
 	 */
-	private Object doInvoke(MethodInvoker invoker) {
+	@SuppressWarnings("unchecked")
+	private T doInvoke(MethodInvoker invoker) {
 		try {
 			invoker.prepare();
 		}
@@ -102,7 +103,7 @@ public class AbstractMethodInvokingDelegator implements InitializingBean {
 		}
 		
 		try {
-			return invoker.invoke();
+			return (T) invoker.invoke();
 		}
 		catch (InvocationTargetException e) {
 			throw new DynamicMethodInvocationException(e);
