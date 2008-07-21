@@ -274,20 +274,6 @@ public class ItemOrientedStep extends AbstractStep {
 					// only if chunk was successful
 					stepExecution.apply(contribution);
 
-					// Attempt to flush before the step execution and stream
-					// state are updated
-					try {
-						itemHandler.flush();
-					} catch (Error e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-					} catch (Exception e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}						
-					}
-
 					try {
 						stream.update(stepExecution.getExecutionContext());
 					} catch (Error e) {
@@ -358,6 +344,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 * @return true if there is more data to process.
 	 */
 	protected ExitStatus processChunk(final StepExecution execution, final StepContribution contribution) {
+
 		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 				if (execution.isTerminateOnly()) {
@@ -371,6 +358,11 @@ public class ItemOrientedStep extends AbstractStep {
 				return exitStatus;
 			}
 		});
+
+		// Attempt to flush before the step execution and stream
+		// state are updated
+		itemHandler.flush();
+
 		return result;
 	}
 

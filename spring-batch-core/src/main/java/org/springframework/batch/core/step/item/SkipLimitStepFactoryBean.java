@@ -41,8 +41,8 @@ import org.springframework.batch.support.SubclassExceptionClassifier;
  * to be exclusive.
  * 
  * Skippable exceptions on write will by default cause transaction rollback - to
- * avoid rollback for specific exception class include it in the
- * transaction attribute as "no rollback for".
+ * avoid rollback for specific exception class include it in the transaction
+ * attribute as "no rollback for".
  * 
  * @see SimpleStepFactoryBean
  * 
@@ -62,13 +62,26 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	private int cacheCapacity = 0;
 
-	private int retryLimit;
+	private int retryLimit = 0;
 
 	private Class<?>[] retryableExceptionClasses = new Class[] {};
 
 	private BackOffPolicy backOffPolicy;
 
 	private RetryListener[] retryListeners;
+
+	private RetryPolicy retryPolicy;
+
+	/**
+	 * Setter for the retry policy. If this is specified the other retry
+	 * properties are ignored (retryLimit, backOffPolicy,
+	 * retryableExceptionClasses).
+	 * 
+	 * @param retryPolicy a stateless {@link RetryPolicy}
+	 */
+	public void setRetryPolicy(RetryPolicy retryPolicy) {
+		this.retryPolicy = retryPolicy;
+	}
 
 	/**
 	 * Public setter for the retry limit. Each item can be retried up to this
@@ -175,31 +188,37 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 		super.applyConfiguration(step);
 
-		if (retryLimit > 0 || skipLimit > 0) {
+		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
 
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
 			addFatalExceptionIfMissing(RetryException.class);
 
-			SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
-			if (retryableExceptionClasses.length > 0) { // otherwise we retry
-				// all exceptions
-				simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
-			}
-			simpleRetryPolicy.setFatalExceptionClasses(fatalExceptionClasses);
+			if (retryPolicy == null) {
 
-			ExceptionClassifierRetryPolicy retryPolicy = new ExceptionClassifierRetryPolicy();
-			SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
-			HashMap<Class<?>, String> exceptionTypeMap = new HashMap<Class<?>, String>();
-			for (int i = 0; i < retryableExceptionClasses.length; i++) {
-				Class<?> cls = retryableExceptionClasses[i];
-				exceptionTypeMap.put(cls, "retry");
+				SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
+				if (retryableExceptionClasses.length > 0) { // otherwise we
+															// retry
+					// all exceptions
+					simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
+				}
+				simpleRetryPolicy.setFatalExceptionClasses(fatalExceptionClasses);
+
+				ExceptionClassifierRetryPolicy classifierRetryPolicy = new ExceptionClassifierRetryPolicy();
+				SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
+				HashMap<Class<?>, String> exceptionTypeMap = new HashMap<Class<?>, String>();
+				for (int i = 0; i < retryableExceptionClasses.length; i++) {
+					Class<?> cls = retryableExceptionClasses[i];
+					exceptionTypeMap.put(cls, "retry");
+				}
+				exceptionClassifier.setTypeMap(exceptionTypeMap);
+				HashMap<String, RetryPolicy> retryPolicyMap = new HashMap<String, RetryPolicy>();
+				retryPolicyMap.put("retry", simpleRetryPolicy);
+				retryPolicyMap.put("default", new NeverRetryPolicy());
+				classifierRetryPolicy.setPolicyMap(retryPolicyMap);
+				classifierRetryPolicy.setExceptionClassifier(exceptionClassifier);
+				retryPolicy = classifierRetryPolicy;
+
 			}
-			exceptionClassifier.setTypeMap(exceptionTypeMap);
-			HashMap<String, RetryPolicy> retryPolicyMap = new HashMap<String, RetryPolicy>();
-			retryPolicyMap.put("retry", simpleRetryPolicy);
-			retryPolicyMap.put("default", new NeverRetryPolicy());
-			retryPolicy.setPolicyMap(retryPolicyMap);
-			retryPolicy.setExceptionClassifier(exceptionClassifier);
 
 			// Co-ordinate the retry policy with the exception handler:
 			getStepOperations().setExceptionHandler(
@@ -219,7 +238,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 				retryTemplate.setListeners(retryListeners);
 			}
 			retryTemplate.setRetryPolicy(recoveryCallbackRetryPolicy);
-			if (backOffPolicy != null) {
+			if (retryPolicy == null && backOffPolicy != null) {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 
