@@ -259,11 +259,8 @@ public class JdbcCursorItemReader<T> extends AbstractBufferedItemReaderItemStrea
 	private void moveCursorToRow(int row) {
 		try {
 			int count = 0;
-			while (rs.next()) {
+			while (row!=count && rs.next()) {
 				count++;
-				if (count == row) {
-					break;
-				}
 			}
 		}
 		catch (SQLException se) {
