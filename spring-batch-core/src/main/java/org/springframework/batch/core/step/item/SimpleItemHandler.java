@@ -38,19 +38,19 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class SimpleItemHandler implements ItemHandler {
+public class SimpleItemHandler<T> implements ItemHandler {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private ItemReader itemReader;
+	private ItemReader<T> itemReader;
 
-	private ItemWriter itemWriter;
+	private ItemWriter<T> itemWriter;
 
 	/**
 	 * @param itemReader
 	 * @param itemWriter
 	 */
-	public SimpleItemHandler(ItemReader itemReader, ItemWriter itemWriter) {
+	public SimpleItemHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
 		super();
 		this.itemReader = itemReader;
 		this.itemWriter = itemWriter;
@@ -63,7 +63,7 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @see org.springframework.batch.core.step.item.ItemHandler#handle(org.springframework.batch.core.StepContribution)
 	 */
 	public ExitStatus handle(StepContribution contribution) throws Exception {
-		Object item = read(contribution);
+		T item = read(contribution);
 		if (item == null) {
 			return ExitStatus.FINISHED;
 		}
@@ -76,7 +76,7 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @param contribution current context
 	 * @return next item for writing
 	 */
-	protected Object read(StepContribution contribution) throws Exception {
+	protected T read(StepContribution contribution) throws Exception {
 		return doRead();
 	}
 
@@ -84,7 +84,7 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @return item
 	 * @throws Exception
 	 */
-	protected final Object doRead() throws Exception {
+	protected final T doRead() throws Exception {
 		return itemReader.read();
 	}
 
@@ -93,7 +93,7 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @param item the item to write
 	 * @param contribution current context
 	 */
-	protected void write(Object item, StepContribution contribution) throws Exception {
+	protected void write(T item, StepContribution contribution) throws Exception {
 		doWrite(item);
 	}
 
@@ -101,7 +101,7 @@ public class SimpleItemHandler implements ItemHandler {
 	 * @param item
 	 * @throws Exception
 	 */
-	protected final void doWrite(Object item) throws Exception {
+	protected final void doWrite(T item) throws Exception {
 		itemWriter.write(item);
 	}
 

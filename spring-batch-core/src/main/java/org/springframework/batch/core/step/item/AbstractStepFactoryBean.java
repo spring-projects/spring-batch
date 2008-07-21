@@ -50,9 +50,9 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 
 	private boolean allowStartIfComplete;
 
-	private ItemReader itemReader;
+	private ItemReader<?> itemReader;
 
-	private ItemWriter itemWriter;
+	private ItemWriter<?> itemWriter;
 
 	private PlatformTransactionManager transactionManager;
 	
@@ -114,14 +114,14 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	/**
 	 * @param itemReader the itemReader to set
 	 */
-	public void setItemReader(ItemReader itemReader) {
+	public void setItemReader(ItemReader<?> itemReader) {
 		this.itemReader = itemReader;
 	}
 
 	/**
 	 * @param itemWriter the itemWriter to set
 	 */
-	public void setItemWriter(ItemWriter itemWriter) {
+	public void setItemWriter(ItemWriter<?> itemWriter) {
 		this.itemWriter = itemWriter;
 	}
 
@@ -159,7 +159,7 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	 * Protected getter for the {@link ItemReader} for subclasses to use.
 	 * @return the itemReader
 	 */
-	protected ItemReader getItemReader() {
+	protected ItemReader<?> getItemReader() {
 		return itemReader;
 	}
 
@@ -167,7 +167,7 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	 * Protected getter for the {@link ItemWriter} for subclasses to use
 	 * @return the itemWriter
 	 */
-	protected ItemWriter getItemWriter() {
+	protected ItemWriter<?> getItemWriter() {
 		return itemWriter;
 	}
 
@@ -238,8 +238,8 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 
 		step.setStreams(streams);
 
-		ItemReader itemReader = getItemReader();
-		ItemWriter itemWriter = getItemWriter();
+		ItemReader<?> itemReader = getItemReader();
+		ItemWriter<?> itemWriter = getItemWriter();
 
 		// Since we are going to wrap these things with listener callbacks we
 		// need to register them here because the step will not know we did
@@ -266,6 +266,7 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 		setItemWriter(itemWriter);
 
 		step.setStepExecutionListeners(stepListeners);
+		//TODO: Why is setItemHandler called twice?
 		step.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
 
 	}

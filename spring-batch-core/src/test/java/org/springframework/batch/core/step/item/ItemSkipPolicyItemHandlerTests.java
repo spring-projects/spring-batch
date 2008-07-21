@@ -271,7 +271,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 	/**
 	 * Simple item reader that supports skip functionality.
 	 */
-	private static class SkipReaderStub implements ItemReader {
+	private static class SkipReaderStub implements ItemReader<Holder> {
 
 		final String[] values = { "1", "2", "3", "4", "5" };
 
@@ -281,7 +281,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 
 		int marked = 0;
 
-		public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
+		public Holder read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 			counter++;
 			if (counter == 1) {
 				throw new SkippableException("exception in reader");
@@ -289,7 +289,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 			if (counter >= values.length) {
 				return null;
 			}
-			Object item = new Holder(values[counter]);
+			Holder item = new Holder(values[counter]);
 			processed.add(item);
 			return item;
 		}
@@ -307,7 +307,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 	/**
 	 * Simple item writer that supports skip functionality.
 	 */
-	private static class SkipWriterStub implements ItemWriter {
+	private static class SkipWriterStub implements ItemWriter<Holder> {
 
 		boolean mutate = false;
 
@@ -325,11 +325,11 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 			flushIndex = written.size() - 1;
 		}
 
-		public void write(Object item) throws Exception {
-			String value = ((Holder) item).value;
+		public void write(Holder item) throws Exception {
+			String value = item.value;
 			written.add(item);
 			if (mutate) {
-				((Holder) item).value = "done";
+				item.value = "done";
 			}
 			if (value.equals("4")) {
 				throw new SkippableException("exception in writer");
@@ -364,5 +364,4 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 			return "[holder:" + value + "]";
 		}
 	}
-
 }
