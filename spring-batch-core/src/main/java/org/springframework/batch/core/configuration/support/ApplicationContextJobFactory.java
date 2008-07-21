@@ -19,9 +19,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.configuration.JobFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -32,44 +30,22 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Dave Syer
  * 
  */
-public class ClassPathXmlApplicationContextJobFactory implements JobFactory, ApplicationContextAware {
+public class ApplicationContextJobFactory implements JobFactory {
 
-	final private String beanName;
+	final private String jobName;
 
-	final private String path;
-
-	private ApplicationContext parent;
+	final private ApplicationContextFactory applicationContextFactory;
 	
 	/**
-	 * Setter for the parent application context.
-	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
-	 */
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		parent = applicationContext;
-	}
-
-	/**
-	 * @param beanName the id of the {@link Job} in the application context to
+	 * @param jobName the id of the {@link Job} in the application context to
 	 * be created
-	 * @param path the path to the XML configuration containing the {@link Job}
 	 */
-	public ClassPathXmlApplicationContextJobFactory(String beanName, String path) {
-		this(beanName, path, null);
-	}
-
-	/**
-	 * @param beanName the id of the {@link Job} in the application context to
-	 * be created
-	 * @param path the path to the XML configuration containing the {@link Job}
-	 * @param parent the application context to use as a parent (or null)
-	 */
-	public ClassPathXmlApplicationContextJobFactory(String beanName, String path, ApplicationContext parent) {
+	public ApplicationContextJobFactory(ApplicationContextFactory applicationContextFactory, String jobName) {
 		super();
-		this.beanName = beanName;
-		this.path = path;
-		this.parent = parent;
+		this.jobName = jobName;
+		this.applicationContextFactory = applicationContextFactory;
 	}
-
+	
 	/**
 	 * Create a {@link ClassPathXmlApplicationContext} from the path provided
 	 * and pull out a bean with the name given during initialization.
@@ -77,10 +53,8 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory, App
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
 	public Job createJob() {
-		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path }, false, parent);
-		context.setDisplayName("Job ApplicationContext "+beanName);
-		context.refresh();
-		Job job = (Job) context.getBean(beanName, Job.class);
+		ConfigurableApplicationContext context = applicationContextFactory.createApplicationContext();
+		Job job = (Job) context.getBean(jobName, Job.class);
 		return new ContextClosingJob(job, context);
 	}
 
@@ -92,7 +66,7 @@ public class ClassPathXmlApplicationContextJobFactory implements JobFactory, App
 	 * @see org.springframework.batch.core.configuration.JobFactory#getJobName()
 	 */
 	public String getJobName() {
-		return beanName;
+		return jobName;
 	}
 
 	/**

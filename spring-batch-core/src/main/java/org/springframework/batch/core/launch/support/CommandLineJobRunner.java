@@ -48,17 +48,16 @@ import org.springframework.util.StringUtils;
  * 
  * <p>
  * With any launch of a batch job within Spring Batch, a Spring context
- * containing the Job and the 'Execution Environment' has to be created. This
- * command line launcher can be used to load that context from a single
- * location. It can also load the job as well All dependencies of the launcher
- * will then be satisfied by autowiring by type from the combined application
- * context. Default values are provided for all fields except the
- * {@link JobLauncher} and {@link JobLocator}. Therefore, if autowiring fails
- * to set it (it should be noted that dependency checking is disabled because
- * most of the fields have default values and thus don't require dependencies to
- * be fulfilled via autowiring) then an exception will be thrown. It should also
- * be noted that even if an exception is thrown by this class, it will be mapped
- * to an integer and returned.
+ * containing the {@link Job} and some execution context has to be created. This
+ * command line launcher can be used to load the job and its context from a
+ * single location. All dependencies of the launcher will then be satisfied by
+ * autowiring by type from the combined application context. Default values are
+ * provided for all fields except the {@link JobLauncher} and {@link JobLocator}.
+ * Therefore, if autowiring fails to set it (it should be noted that dependency
+ * checking is disabled because most of the fields have default values and thus
+ * don't require dependencies to be fulfilled via autowiring) then an exception
+ * will be thrown. It should also be noted that even if an exception is thrown
+ * by this class, it will be mapped to an integer and returned.
  * </p>
  * 
  * <p>
@@ -89,7 +88,7 @@ import org.springframework.util.StringUtils;
  * </p>
  * 
  * <p>
- * The combined application context must only contain one instance of a
+ * The combined application context must contain only one instance of
  * {@link JobLauncher}. The job parameters passed in to the command line will
  * be converted to {@link Properties} by assuming that each individual element
  * is one parameter that is separated by an equals sign. For example,

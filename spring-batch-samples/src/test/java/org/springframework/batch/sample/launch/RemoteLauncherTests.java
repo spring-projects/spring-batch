@@ -15,17 +15,22 @@
  */
 package org.springframework.batch.sample.launch;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.launch.support.ExportedJobLauncher;
+import org.springframework.batch.core.launch.support.JobRegistryBackgroundJobRunner;
 import org.springframework.jmx.MBeanServerNotFoundException;
 import org.springframework.jmx.access.InvalidInvocationException;
 import org.springframework.jmx.access.MBeanProxyFactoryBean;
@@ -35,7 +40,7 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
  * @author Dave Syer
  * 
  */
-public class RemoteLauncherTests extends TestCase {
+public class RemoteLauncherTests {
 	
 	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
 
@@ -47,11 +52,14 @@ public class RemoteLauncherTests extends TestCase {
 
 	private static JobLoader loader;
 
+	@Test
 	public void testConnect() throws Exception {
-		assertEquals(0, errors.size());
+		String message = errors.isEmpty() ? "" : errors.get(0).getMessage();
+		assertEquals(message, 0, errors.size());
 		assertTrue(isConnected());
 	}
 
+	@Test
 	public void testLaunchBadJob() throws Exception {
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
@@ -59,6 +67,7 @@ public class RemoteLauncherTests extends TestCase {
 		assertTrue("Should contain 'NoSuchJobException': " + result, result.indexOf("NoSuchJobException") >= 0);
 	}
 
+	@Test
 	public void testLaunchAndStopRealJob() throws Exception {
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
@@ -74,7 +83,8 @@ public class RemoteLauncherTests extends TestCase {
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		if (launcher != null) {
 			return;
 		}
@@ -82,7 +92,7 @@ public class RemoteLauncherTests extends TestCase {
 		thread = new Thread(new Runnable() {
 			public void run() {
 				try {
-					TaskExecutorLauncher.main(new String[0]);
+					JobRegistryBackgroundJobRunner.main("adhoc-job-launcher-context.xml", "jobs/adhocLoopJob.xml");
 				}
 				catch (Exception e) {
 					errors.add(e);
@@ -102,8 +112,8 @@ public class RemoteLauncherTests extends TestCase {
 	 */
 	private static boolean isConnected() throws Exception {
 		boolean connected = false;
-		if (!TaskExecutorLauncher.getErrors().isEmpty()) {
-			throw (RuntimeException) TaskExecutorLauncher.getErrors().get(0);
+		if (!JobRegistryBackgroundJobRunner.getErrors().isEmpty()) {
+			throw (RuntimeException) JobRegistryBackgroundJobRunner.getErrors().get(0);
 		}
 		if (launcher == null) {
 			MBeanServerConnectionFactoryBean connectionFactory = new MBeanServerConnectionFactoryBean();
