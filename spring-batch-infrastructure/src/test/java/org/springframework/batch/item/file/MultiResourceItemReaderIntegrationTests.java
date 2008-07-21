@@ -45,7 +45,6 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 				return 0; // do not change ordering
 			}});
 		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
-		tested.afterPropertiesSet();
 	}
 
 	/**

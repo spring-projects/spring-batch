@@ -50,20 +50,14 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	public void testAfterPropertesSetException() throws Exception {
-		source.setResource(null);
-		try {
-			source.afterPropertiesSet();
-			fail();
-		} catch (IllegalArgumentException e) {
-			// expected;
-		}
 
 		source = createNewInputSouce();
 		source.setFragmentRootElementName("");
 		try {
 			source.afterPropertiesSet();
 			fail();
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 
@@ -72,14 +66,15 @@ public class StaxEventItemReaderTests extends TestCase {
 		try {
 			source.afterPropertiesSet();
 			fail();
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
 		}
 	}
 
 	/**
-	 * Regular usage scenario. ItemReader should pass XML fragments to deserializer wrapped with StartDocument and
-	 * EndDocument events.
+	 * Regular usage scenario. ItemReader should pass XML fragments to
+	 * deserializer wrapped with StartDocument and EndDocument events.
 	 */
 	public void testFragmentWrapping() throws Exception {
 		source.afterPropertiesSet();
@@ -125,21 +120,24 @@ public class StaxEventItemReaderTests extends TestCase {
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
 	}
 
-//	/**
-//	 * Restore point must not exceed end of file, input source must not be already initialised when restoring.
-//	 */
-//	public void testInvalidRestore() {
-//		ExecutionContext context = new ExecutionContext();
-//		context.putLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".item.count", 100000);
-//		try {
-//			source.open(context);
-//			fail("Expected StreamException");
-//		} catch (Exception e) {
-//			// expected
-//			String message = e.getMessage();
-//			assertTrue("Wrong message: " + message, contains(message, "must be before"));
-//		}
-//	}
+	// /**
+	// * Restore point must not exceed end of file, input source must not be
+	// already initialised when restoring.
+	// */
+	// public void testInvalidRestore() {
+	// ExecutionContext context = new ExecutionContext();
+	// context.putLong(ClassUtils.getShortName(StaxEventItemReader.class) +
+	// ".item.count", 100000);
+	// try {
+	// source.open(context);
+	// fail("Expected StreamException");
+	// } catch (Exception e) {
+	// // expected
+	// String message = e.getMessage();
+	// assertTrue("Wrong message: " + message, contains(message,
+	// "must be before"));
+	// }
+	// }
 
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close(executionContext);
@@ -149,7 +147,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	/**
 	 * Rollback to last commited record.
 	 */
-	public void testRollback() throws Exception{
+	public void testRollback() throws Exception {
 		source.open(executionContext);
 		// rollback between deserializing records
 		List<XMLEvent> first = source.read();
@@ -163,9 +161,10 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	/**
-	 * Statistics return the current record count. Calling read after end of input does not increase the counter.
+	 * Statistics return the current record count. Calling read after end of
+	 * input does not increase the counter.
 	 */
-	public void testExecutionContext() throws Exception{
+	public void testExecutionContext() throws Exception {
 		final int NUMBER_OF_RECORDS = 2;
 		source.open(executionContext);
 		source.update(executionContext);
@@ -211,7 +210,8 @@ public class StaxEventItemReaderTests extends TestCase {
 		try {
 			newSource.read();
 			fail("Expected ReaderNotOpenException");
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// expected
 		}
 	}
@@ -234,7 +234,8 @@ public class StaxEventItemReaderTests extends TestCase {
 
 		try {
 			source.open(executionContext);
-		} catch (ItemStreamException ex) {
+		}
+		catch (ItemStreamException ex) {
 			// expected
 		}
 
@@ -248,7 +249,8 @@ public class StaxEventItemReaderTests extends TestCase {
 		try {
 			source.open(executionContext);
 			fail();
-		} catch (ItemStreamException ex) {
+		}
+		catch (ItemStreamException ex) {
 			// expected
 		}
 	}
@@ -277,13 +279,15 @@ public class StaxEventItemReaderTests extends TestCase {
 	}
 
 	/**
-	 * A simple XMLEvent deserializer mock - check for the start and end document events for the fragment root & end
-	 * tags + skips the fragment contents.
+	 * A simple XMLEvent deserializer mock - check for the start and end
+	 * document events for the fragment root & end tags + skips the fragment
+	 * contents.
 	 */
 	private static class MockFragmentDeserializer implements EventReaderDeserializer<List<XMLEvent>> {
 
 		/**
-		 * A simple mapFragment implementation checking the StaxEventReaderItemReader basic read functionality.
+		 * A simple mapFragment implementation checking the
+		 * StaxEventReaderItemReader basic read functionality.
 		 * 
 		 * @param eventReader
 		 * @return list of the events from fragment body
@@ -312,7 +316,8 @@ public class StaxEventItemReaderTests extends TestCase {
 				XMLEvent event4 = eventReader.nextEvent();
 				assertTrue(event4.isEndDocument());
 
-			} catch (XMLStreamException e) {
+			}
+			catch (XMLStreamException e) {
 				throw new RuntimeException("Error occured in FragmentDeserializer", e);
 			}
 			return fragmentContent;
@@ -327,7 +332,7 @@ public class StaxEventItemReaderTests extends TestCase {
 			do {
 				eventInsideFragment = eventReader.peek();
 				if (eventInsideFragment instanceof EndElement
-				        && ((EndElement) eventInsideFragment).getName().getLocalPart().equals(FRAGMENT_ROOT_ELEMENT)) {
+						&& ((EndElement) eventInsideFragment).getName().getLocalPart().equals(FRAGMENT_ROOT_ELEMENT)) {
 					break;
 				}
 				events.add(eventReader.nextEvent());

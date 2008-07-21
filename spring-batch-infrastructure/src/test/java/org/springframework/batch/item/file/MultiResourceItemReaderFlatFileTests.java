@@ -43,7 +43,6 @@ public class MultiResourceItemReaderFlatFileTests extends
 			}
 			
 		});
-		multiReader.afterPropertiesSet();
 
 		return multiReader;
 	}
@@ -53,9 +52,7 @@ public class MultiResourceItemReaderFlatFileTests extends
 		multiReader.close(new ExecutionContext());
 		multiReader.setResources(new Resource[] { new ByteArrayResource(""
 				.getBytes()) });
-		multiReader.afterPropertiesSet();
 		multiReader.open(new ExecutionContext());
-		
 	}
 
 }

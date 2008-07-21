@@ -79,7 +79,6 @@ public class StaxEventItemReader<T> extends AbstractBufferedItemReaderItemStream
 	 * @throws IllegalStateException if the Resource does not exist.
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(resource, "The Resource must not be null.");
 		Assert.notNull(eventReaderDeserializer, "The FragmentDeserializer must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
 	}
@@ -135,6 +134,7 @@ public class StaxEventItemReader<T> extends AbstractBufferedItemReaderItemStream
 	}
 
 	protected void doOpen() throws Exception {
+		Assert.notNull(resource, "The Resource must not be null.");
 		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
 
 		inputStream = resource.getInputStream();

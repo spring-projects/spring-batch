@@ -240,7 +240,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(resource);
 		Assert.notNull(serializer);
 	}
 
@@ -250,6 +249,9 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
+		
+		Assert.notNull(resource, "The resource must be set");
+		
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset
