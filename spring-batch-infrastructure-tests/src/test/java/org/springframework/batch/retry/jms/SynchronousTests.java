@@ -144,7 +144,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 		assertInitialState();
 
-		JmsItemReader provider = new JmsItemReader();
+		JmsItemReader<Object> provider = new JmsItemReader<Object>();
 		// provider.setItemType(Message.class);
 		provider.setJmsTemplate(jmsTemplate);
 		jmsTemplate.setDefaultDestinationName("queue");
