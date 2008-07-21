@@ -5,19 +5,14 @@ import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.Game;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.util.Assert;
 
-public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter {
+public class JdbcGameDao extends JdbcDaoSupport implements ItemWriter<Game> {
 
 	private static final String INSERT_GAME = "INSERT into GAMES(player_id,year_no,team,week,opponent,"
 			+ "completes,attempts,passing_yards,passing_td,interceptions,rushes,rush_yards,"
 			+ "receptions,receptions_yards,total_td) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-	public void write(Object output) {
-		Assert.isTrue(output instanceof Game,
-				"Only Game objects can be written out" + "using this Dao");
-
-		Game game = (Game) output;
+	public void write(Game game) {
 
 		Object[] args = new Object[] { game.getId(),
 				new Integer(game.getYear()), game.getTeam(),

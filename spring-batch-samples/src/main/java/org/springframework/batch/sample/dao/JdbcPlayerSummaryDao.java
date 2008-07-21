@@ -5,20 +5,14 @@ import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.PlayerSummary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.util.Assert;
 
-public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter {
+public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter<PlayerSummary> {
 
 	private static final String INSERT_SUMMARY = "INSERT into PLAYER_SUMMARY(ID,YEAR_NO,COMPLETES,ATTEMPTS," +
 			"PASSING_YARDS,PASSING_TD,INTERCEPTIONS,RUSHES,RUSH_YARDS,RECEPTIONS,RECEPTIONS_YARDS," +
 			"TOTAL_TD) values(?,?,?,?,?,?,?,?,?,?,?,?)";
 	
-	public void write(Object output) {
-		
-		Assert.isInstanceOf(PlayerSummary.class, output, JdbcPlayerSummaryDao.class.getName() + " only " +
-				"supports outputing " + PlayerSummary.class.getName() + " instances.");
-		
-		PlayerSummary summary = (PlayerSummary)output;
+	public void write(PlayerSummary summary) {
 		
 		Object[] args = new Object[]{summary.getId(), new Integer(summary.getYear()),
 				new Integer(summary.getCompletes()), new Integer(summary.getAttempts()),
