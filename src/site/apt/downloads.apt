@@ -19,15 +19,25 @@ Spring Batch Downloads
 
 * Maven Artifacts
 
-  Final releases are published on Maven central repo, and also in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}.  You can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.  Source code is packaged in a separate jar file in the same directory, and the samples are also bundled in the same way.
+  Final releases are published on Maven central repo, and also in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}:
 
-Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
++---------------
+<repository>
+    <id>spring-s3</id>
+    <name>Spring Portfolio Maven RELEASE Repository</name>
+    <url>http://s3.amazonaws.com/maven.springframework.org/release</url>
+</repository>
++---------------
+
+  You can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files and also in the dependency reports for each module on this website.  You will probably need <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.  Source code is packaged in a separate jar file in the same directory, and the samples are also bundled in the same way.
+
+  Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
 
 +---------------
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>1.1.0.RELEASE</version>
+    <version>1.0.0</version>
 </dependency>
 +---------------
 
