@@ -259,7 +259,7 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 	private void moveCursorToRow(int row) {
 		try {
 			int count = 0;
-			while (rs.next()) {
+			while (count!=row && rs.next()) {
 				count++;
 				if (count == row) {
 					break;

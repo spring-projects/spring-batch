@@ -196,6 +196,36 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests extends
 		assertEquals(foo3, reader.read());
 	}
 	
+	/**
+	 * Rollback scenario with restart - input source rollbacks to last
+	 * commit point.
+	 * @throws Exception
+	 */
+	public void testRollbackOnFirstChunkAndRestart() throws Exception {
+
+		getAsItemStream(reader).open(executionContext);
+		
+		Foo foo1 = (Foo) reader.read();
+
+		Foo foo2 = (Foo) reader.read();
+		Assert.state(!foo2.equals(foo1));
+
+		Foo foo3 = (Foo) reader.read();
+		Assert.state(!foo2.equals(foo3));
+
+		rollback();
+
+		getAsItemStream(reader).update(executionContext);
+
+		// create new input source
+		reader = createItemReader();
+
+		getAsItemStream(reader).open(executionContext);
+
+		assertEquals(foo1, reader.read());
+		assertEquals(foo2, reader.read());
+	}
+	
 	public void testMultipleRestarts() throws Exception {
 		
 		getAsItemStream(reader).open(executionContext);
