@@ -11,6 +11,34 @@ Spring Batch Getting Started
 
 * Using the .Zip Distribution
 
+** With Maven and Eclipse
+
+  * Download the "no-dependencies" version of the distribution and unzip to create a directory <<<spring-batch-<versionId>>>>.
+
+  * Get the Q4E Eclipse-plugin
+  (http://q4e.googlecode.com/svn/trunk/updatesite).  If you can't or
+  don't want to install this plugin, you can use the
+  {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}Maven
+  Eclipse Plugin}} to create the classpath entries you need.
+
+  * Open Eclipse and create a workspace as for the non-Mavenized version.
+
+  * Import the samples project as above.
+
+  * The project should build cleanly without having to fix the dependencies.  If it doesn't, make sure you are online, and maybe try building on the command line first to make sure all the dependencies are downloaded.  See the {{{building.html}building instructions}} if you run into difficulty.
+
+** With Maven on the Command Line
+
+  * Download the distribution as above.
+
+  * Then run Maven in the spring-batch-samples directory, e.g.
+
++---
+$ cd spring-batch-samples
+$ mvn test
+...
++---
+
 ** With Eclipse and without Maven
 
   Similar instructions would apply to other IDEs.
@@ -31,43 +59,15 @@ Spring Batch Getting Started
 
   To launch a job from the command line instead of a unit test use the <<<CommandLineJobRunner.main()>>> method (see Javadocs included in that class).
 
-** With Maven on the Command Line
-
-  * Download the distribution as above.
-
-  * Then run Maven in the spring-batch-samples directory, e.g.
-
-+---
-$ cd spring-batch-samples
-$ mvn test
-...
-+---
-
-** With Maven and Eclipse
-
-  * Download the distribution as above.
-
-  * Get the Q4E Eclipse-plugin
-  (http://q4e.googlecode.com/svn/trunk/updatesite).  If you can't or
-  don't want to install this plugin, you can use the
-  {{{http://maven.apache.org/plugins/maven-eclipse-plugin/}Maven
-  Eclipse Plugin}} to create the classpath entries you need.
-
-  * Open Eclipse and create a workspace as for the non-Mavenized version.
-
-  * Import the samples project as above.
-
-  * The project should build cleanly without having to fix the dependencies.  If it doesn't, make sure you are online, and maybe try building on the command line first to make sure all the dependencies are downloaded.  See the {{{building.html}building instructions}} if you run into difficulty.
-
 * Using Maven and Subversion
 
   * Check out the Spring Batch project from Subversion (instructions are available {{{source-repository.html}here}}).
 
   * Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong {{{building.html}here}}.
 
-The Original {m3} Distribution
+The Original 1.0-{m3} Distribution
 
-  The original "m3" release had some issues like missing dependencies, so if you are using that either get the newer release, or see below.  (The m3a release is just an update of the .Zip packages - there is no corresponding update of the jar files, which did not change.)
+  The original "1.0-m3" release had some issues like missing dependencies, so if you are using that either get the newer release, or see below.  (The m3a release is just an update of the .Zip packages - there is no corresponding update of the jar files, which did not change.)
 
   If you are using not using Maven you will need some dependencies that were missing from the distro, so get these jar files from somewhere else:
 
