@@ -30,7 +30,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class TaskletAdapter extends AbstractMethodInvokingDelegator implements Tasklet {
+public class TaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
 
 	/**
 	 * Delegate execution to the target object and translate the return value to

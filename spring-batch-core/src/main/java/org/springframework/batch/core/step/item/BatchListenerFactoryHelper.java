@@ -49,7 +49,7 @@ abstract class BatchListenerFactoryHelper {
 	 * @param itemReader
 	 * @param listeners
 	 */
-	public static ItemReader getItemReader(ItemReader itemReader, StepListener[] listeners) {
+	public static ItemReader<?> getItemReader(ItemReader<?> itemReader, StepListener[] listeners) {
 
 		final CompositeItemReadListener multicaster = new CompositeItemReadListener();
 
@@ -82,7 +82,7 @@ abstract class BatchListenerFactoryHelper {
 	 * @param itemWriter
 	 * @param listeners
 	 */
-	public static ItemWriter getItemWriter(ItemWriter itemWriter, StepListener[] listeners) {
+	public static ItemWriter<?> getItemWriter(ItemWriter<?> itemWriter, StepListener[] listeners) {
 		final CompositeItemWriteListener multicaster = new CompositeItemWriteListener();
 
 		for (int i = 0; i < listeners.length; i++) {
