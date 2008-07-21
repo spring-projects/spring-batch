@@ -45,6 +45,7 @@ import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.policy.RetryCacheCapacityExceededException;
+import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -224,6 +225,43 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 	public void testRetryWithNoSkip() throws Exception {
 		factory.setRetryableExceptionClasses(new Class[] { Exception.class });
 		factory.setRetryLimit(4);
+		factory.setSkipLimit(0);
+		List items = TransactionAwareProxyFactory.createTransactionalList();
+		items.addAll(Arrays.asList(new String[] { "b" }));
+		ItemReader provider = new ListItemReader(items) {
+			public Object read() {
+				Object item = super.read();
+				count++;
+				return item;
+			}
+		};
+		ItemWriter itemWriter = new AbstractItemWriter() {
+			public void write(Object item) throws Exception {
+				logger.debug("Write Called! Item: [" + item + "]");
+				throw new RuntimeException("Write error - planned but retryable.");
+			}
+		};
+		factory.setItemReader(provider);
+		factory.setItemWriter(itemWriter);
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipLimitExceededException");
+		}
+		catch (SkipLimitExceededException e) {
+			// expected
+		}
+
+		assertEquals(0, stepExecution.getSkipCount());
+		// b is processed 4 times plus the null at end
+		assertEquals(5, count);
+		assertEquals(0, stepExecution.getItemCount().intValue());
+	}
+
+	public void testRetryPolicy() throws Exception {
+		factory.setRetryPolicy(new SimpleRetryPolicy(4));
 		factory.setSkipLimit(0);
 		List items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(new String[] { "b" }));
