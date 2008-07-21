@@ -9,7 +9,7 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-	<version>1.1.0.RELEASE</version>
+	<version>1.1.1.CI-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-infrastructure</module>
