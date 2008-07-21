@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.support.DelegatingItemReader;
+import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;
@@ -35,7 +36,7 @@ import org.springframework.batch.sample.domain.ShippingInfo;
  * @author peter.zozom
  * 
  */
-public class OrderItemReader extends DelegatingItemReader<Order> {
+public class OrderItemReader extends AbstractItemReader<Order> {
 	private static Log log = LogFactory.getLog(OrderItemReader.class);
 
 	private Order order;
@@ -53,6 +54,8 @@ public class OrderItemReader extends DelegatingItemReader<Order> {
 	private FieldSetMapper<LineItem> itemMapper;
 
 	private FieldSetMapper<ShippingInfo> shippingMapper;
+	
+	private ItemReader<FieldSet> fieldSetReader;
 
 	/**
 	 * @throws Exception
@@ -62,7 +65,7 @@ public class OrderItemReader extends DelegatingItemReader<Order> {
 		recordFinished = false;
 
 		while (!recordFinished) {
-			process((FieldSet) super.read());
+			process((FieldSet) fieldSetReader.read());
 		}
 
 		log.info("Mapped: " + order);
@@ -171,6 +174,13 @@ public class OrderItemReader extends DelegatingItemReader<Order> {
 
 		log.debug("Could not map LINE_ID=" + lineId);
 
+	}
+	
+	/**
+	 * @param fieldSetReader reads lines from the file converting them to {@link FieldSet}.
+	 */
+	public void setFieldSetReader(ItemReader<FieldSet> fieldSetReader) {
+		this.fieldSetReader = fieldSetReader;
 	}
 
 	public void setAddressMapper(FieldSetMapper<Address> addressMapper) {

@@ -26,7 +26,7 @@
 						<property name="itemReader">
 							<bean
 								class="org.springframework.batch.sample.item.reader.OrderItemReader">
-								<property name="itemReader"
+								<property name="fieldSetReader"
 									ref="fileItemReader" />
 								<property name="headerMapper"
 									ref="headerFieldSetMapper" />
