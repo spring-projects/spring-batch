@@ -5,7 +5,7 @@
 
 	<description>Example job to get you started. It provides a skeleton for a typical batch application.</description>
 	
-	<import resource="classpath:/simple-job-launcher-context.xml"/>
+	<import resource="classpath:/org/springframework/batch/sample/config/common-context.xml" />
 
 	<bean id="job1" parent="simpleJob">
 		<property name="steps">

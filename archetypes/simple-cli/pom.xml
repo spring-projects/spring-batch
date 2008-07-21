@@ -142,7 +142,7 @@
 					<mainClass>org.springframework.batch.core.launch.support.CommandLineJobRunner</mainClass>
 					<arguments>
 						<!-- job configuration file -->
-						<argument>classpath:/META-INF/spring/module-context.xml</argument>
+						<argument>classpath:/launch-context.xml</argument>
 						<!-- job name -->
 						<argument>job1</argument>
 					</arguments>

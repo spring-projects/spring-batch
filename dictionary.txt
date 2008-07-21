@@ -72,3 +72,6 @@ tokenizer
 tokenizes
 interceptions
 immutable
+stateless
+autowiring
+strategizing
