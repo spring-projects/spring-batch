@@ -9,8 +9,6 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<import resource="test-environment.xml" />
-
 	<bean id="test-job"
 		class="org.springframework.batch.core.job.SimpleJob">
 		<property name="jobRepository">

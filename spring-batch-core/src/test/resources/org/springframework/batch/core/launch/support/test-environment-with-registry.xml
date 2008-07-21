@@ -7,14 +7,8 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="simpleContainerLauncher"
-		class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubJobLauncher"
-		destroy-method="destroy" />
+	<import resource="test-environment.xml" />
 
-	<bean class="org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper" />
-
-	<bean class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubSystemExiter" />
-
-	<bean class="org.springframework.batch.core.launch.support.CommandLineJobRunnerTests$StubJobParametersConverter" />
+	<bean class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 
 </beans>

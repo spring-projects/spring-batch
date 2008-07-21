@@ -15,10 +15,14 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -33,10 +37,10 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * 
  */
-public class CommandLineJobRunnerTests extends TestCase {
+public class CommandLineJobRunnerTests {
 
 	private static final String JOB = ClassUtils.addResourcePathToPackagePath(CommandLineJobRunnerTests.class,
-			"job.xml");
+			"job-with-environment.xml");
 
 	private static final String JOB_NAME = "test-job";
 
@@ -52,24 +56,22 @@ public class CommandLineJobRunnerTests extends TestCase {
 
 	private String[] args = new String[] { jobPath, jobName, jobKey, scheduleDate, vendorId };
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 		JobExecution jobExecution = new JobExecution(null, new Long(1));
 		ExitStatus exitStatus = ExitStatus.FINISHED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
 	}
 
+	@Test
 	public void testMain() {
 		CommandLineJobRunner.main(args);
-		assertTrue("injected JobParametersConverter used instead of default", StubJobParametersConverter.called);
+		assertTrue("Injected JobParametersConverter not used instead of default", StubJobParametersConverter.called);
 		assertEquals(0, StubSystemExiter.getStatus());
 	}
 
+	@Test
 	public void testJobAlreadyRunning() throws Throwable {
 		StubJobLauncher.throwExecutionRunningException = true;
 		CommandLineJobRunner.main(args);
@@ -83,6 +85,7 @@ public class CommandLineJobRunnerTests extends TestCase {
 	// CommandLineJobRunner.main(args);
 	// }
 
+	@Test
 	public void testWithNoParameters() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		CommandLineJobRunner.main(args);
@@ -90,15 +93,15 @@ public class CommandLineJobRunnerTests extends TestCase {
 		assertEquals(new JobParameters(), StubJobLauncher.jobParameters);
 	}
 
+	@Test
 	public void testDestroyCallback() throws Throwable {
 		String[] args = new String[] { jobPath, jobName };
 		CommandLineJobRunner.main(args);
 		assertTrue(StubJobLauncher.destroyed);
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-
+	@After
+	public void tearDown() throws Exception {
 		StubJobLauncher.tearDown();
 	}
 

@@ -42,7 +42,7 @@ public class JobRegistryBackgroundJobRunnerTests {
 		JobRegistryBackgroundJobRunner.getErrors().clear();
 		System.setProperty(JobRegistryBackgroundJobRunner.EMBEDDED, "");
 		JobRegistryBackgroundJobRunner.main(
-				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment.xml"), ClassUtils
+				ClassUtils.addResourcePathToPackagePath(getClass(), "test-environment-with-registry.xml"), ClassUtils
 						.addResourcePathToPackagePath(getClass(), "job.xml"));
 	}
 
