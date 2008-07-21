@@ -209,7 +209,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 		return msgs;
 	}
 
-	private abstract class ItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
+	private abstract class ItemReaderRecoverer extends AbstractItemReader<Object> implements ItemRecoverer {
 
 	}
 }

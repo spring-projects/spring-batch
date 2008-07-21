@@ -46,7 +46,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 	private RetryTemplate retryTemplate;
 
-	private ItemReaderRecoverer provider;
+	private ItemReaderRecoverer<String> provider;
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -74,8 +74,8 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		getMessages(); // drain queue
 		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
-		provider = new ItemReaderRecoverer() {
-			public Object read() {
+		provider = new ItemReaderRecoverer<String>() {
+			public String read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
@@ -110,7 +110,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
 
-		final AbstractItemWriter writer = new AbstractItemWriter() {
+		final AbstractItemWriter<Object> writer = new AbstractItemWriter<Object>() {
 			public void write(final Object text) {
 				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
 						new Integer(list.size()), text });
@@ -258,7 +258,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		return msgs;
 	}
 
-	private abstract class ItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
+	private abstract class ItemReaderRecoverer<T> extends AbstractItemReader<T> implements ItemRecoverer {
 
 	}
 
