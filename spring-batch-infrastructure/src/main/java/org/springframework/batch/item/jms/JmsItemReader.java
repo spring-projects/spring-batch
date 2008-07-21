@@ -45,13 +45,14 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, ItemKeyGenerator, NewItemIdentifier {
+public class JmsItemReader<T> extends AbstractItemReader<T> implements ItemRecoverer, ItemKeyGenerator,
+		NewItemIdentifier {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
 	private JmsOperations jmsTemplate;
 
-	private Class<?> itemType;
+	private Class<? extends T> itemType;
 
 	private String errorDestinationName;
 
@@ -89,25 +90,27 @@ public class JmsItemReader extends AbstractItemReader implements ItemRecoverer, 
 	 * Set the expected type of incoming message payloads. Set this to
 	 * {@link Message} to receive the raw underlying message.
 	 * 
-	 * @param itemType the java class of the items to be delivered.
+	 * @param itemType the java class of the items to be delivered. Typically
+	 * the same as the class parameter
 	 * 
 	 * @throws IllegalStateException if the message payload is of the wrong
 	 * type.
 	 */
-	public void setItemType(Class<?> itemType) {
+	public void setItemType(Class<? extends T> itemType) {
 		this.itemType = itemType;
 	}
 
-	public Object read() {
+	@SuppressWarnings("unchecked")
+	public T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
-			return jmsTemplate.receive();
+			return (T) jmsTemplate.receive();
 		}
 		Object result = jmsTemplate.receiveAndConvert();
 		if (itemType != null && result != null) {
 			Assert.state(itemType.isAssignableFrom(result.getClass()),
 					"Received message payload of wrong type: expected [" + itemType + "]");
 		}
-		return result;
+		return (T) result;
 	}
 
 	/**

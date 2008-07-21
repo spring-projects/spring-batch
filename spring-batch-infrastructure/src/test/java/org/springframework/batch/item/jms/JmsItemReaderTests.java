@@ -30,7 +30,7 @@ import org.springframework.jms.core.JmsOperations;
 
 public class JmsItemReaderTests extends TestCase {
 
-	JmsItemReader itemProvider = new JmsItemReader();
+	JmsItemReader<Object> itemProvider = new JmsItemReader<Object>();
 
 	public void testNoItemTypeSunnyDay() {
 		MockControl templateControl = MockControl.createControl(JmsOperations.class);
