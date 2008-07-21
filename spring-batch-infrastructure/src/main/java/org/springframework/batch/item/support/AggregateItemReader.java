@@ -17,19 +17,22 @@
 package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 
 /**
  * An {@link ItemReader} that delivers a list as its item, storing up objects
- * from the injected {@link ItemReader} until they are ready to be packed out
- * as a collection. The {@link ItemReader} should mark the beginning and end of
- * records with the constant values in {@link FieldSetMapper} ({@link AggregateItemReader#BEGIN_RECORD}
- * and {@link AggregateItemReader#END_RECORD}).<br/>
+ * from the injected {@link ItemReader} until they are ready to be packed out as
+ * a collection. The {@link ItemReader} should mark the beginning and end of
+ * records with the constant values in {@link FieldSetMapper} (
+ * {@link AggregateItemReader#BEGIN_RECORD} and
+ * {@link AggregateItemReader#END_RECORD}).<br/>
  * 
  * This class is thread safe (it can be used concurrently by multiple threads)
  * as long as the {@link ItemReader} is also thread safe.
@@ -37,10 +40,9 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
  * @author Dave Syer
  * 
  */
-public class AggregateItemReader extends DelegatingItemReader {
+public class AggregateItemReader implements ItemReader<List<?>> {
 
-	private static final Log log = LogFactory
-			.getLog(AggregateItemReader.class);
+	private static final Log log = LogFactory.getLog(AggregateItemReader.class);
 
 	/**
 	 * Marker for the end of a multi-object record.
@@ -52,22 +54,25 @@ public class AggregateItemReader extends DelegatingItemReader {
 	 */
 	public static final Object BEGIN_RECORD = new Object();
 
+	private ItemReader<?> itemReader;
+
 	/**
 	 * Get the next list of records.
-	 * @throws Exception 
+	 * @throws Exception
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public Object read() throws Exception {
+	public List<?> read() throws Exception {
 		ResultHolder holder = new ResultHolder();
 
-		while (process(super.read(), holder)) {
+		while (process(itemReader.read(), holder)) {
 			continue;
 		}
 
 		if (!holder.exhausted) {
 			return holder.records;
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
@@ -98,6 +103,18 @@ public class AggregateItemReader extends DelegatingItemReader {
 		return true;
 	}
 
+	public void mark() throws MarkFailedException {
+		itemReader.mark();
+	}
+
+	public void reset() throws ResetFailedException {
+		itemReader.reset();
+	}
+
+	public void setItemReader(ItemReader<?> itemReader) {
+		this.itemReader = itemReader;
+	}
+
 	/**
 	 * Private class for temporary state management while item is being
 	 * collected.
@@ -105,8 +122,9 @@ public class AggregateItemReader extends DelegatingItemReader {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class ResultHolder {
-		Collection<Object> records = new ArrayList<Object>();
+	private class ResultHolder {
+		List<Object> records = new ArrayList<Object>();
+
 		boolean exhausted = false;
 	}
 
