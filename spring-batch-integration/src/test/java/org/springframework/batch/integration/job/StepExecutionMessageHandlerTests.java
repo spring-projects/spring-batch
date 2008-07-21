@@ -36,7 +36,6 @@ import org.springframework.batch.integration.JobRepositorySupport;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.batch.integration.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;

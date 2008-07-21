@@ -4,6 +4,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +19,7 @@ import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageHandlingException;
+import org.springframework.integration.message.MessageHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -45,12 +48,14 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
 	public void testNoReply() {
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job, new JobParameters()));
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job,
+				new JobParameters()));
 		try {
 			requestChannel.send(trigger);
-		} catch (MessageHandlingException e) {
+		}
+		catch (MessageHandlingException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: "+message, message.contains("reply channel"));
+			assertTrue("Wrong message: " + message, message.contains("reply channel"));
 		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
@@ -63,8 +68,10 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	public void testReply() {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("dontclash", "12");
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job, builder.toJobParameters()));
-		trigger.getHeader().setReturnAddress("response");
+		MessageHeaders headers = new MessageHeaders(new HashMap<String, Object>());
+		headers.put(MessageHeaders.RETURN_ADDRESS, "response");
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job,
+				builder.toJobParameters()), headers);
 		requestChannel.send(trigger);
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
