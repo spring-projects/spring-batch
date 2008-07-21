@@ -65,12 +65,12 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		}
 	}
 
-	protected static class TradeWriter extends AbstractItemWriter {
+	protected static class TradeWriter extends AbstractItemWriter<Trade> {
 		int count = 0;
 
 		// This has to be synchronized because we are going to test the state
 		// (count) at the end of a concurrent batch run.
-		public synchronized void write(Object data) {
+		public synchronized void write(Trade data) {
 			count++;
 			System.out.println("Executing trade '" + data + "'");
 		}

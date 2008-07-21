@@ -51,7 +51,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader extends AbstractBufferedItemReaderItemStream implements ItemStream,
+public class HibernateCursorItemReader<T> extends AbstractBufferedItemReaderItemStream<T> implements ItemStream,
 		InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -150,7 +150,8 @@ public class HibernateCursorItemReader extends AbstractBufferedItemReaderItemStr
 		this.fetchSize = fetchSize;
 	}
 
-	protected Object doRead() throws Exception {
+	@SuppressWarnings("unchecked")
+	protected T doRead() throws Exception {
 		if (cursor.next()) {
 			Object[] data = cursor.get();
 			Object item;
@@ -162,7 +163,7 @@ public class HibernateCursorItemReader extends AbstractBufferedItemReaderItemStr
 				item = data[0];
 			}
 
-			return item;
+			return (T)item;
 		}
 		return null;
 	}

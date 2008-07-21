@@ -26,7 +26,7 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourc
 
 		String hsqlQuery = "from Foo";
 
-		HibernateCursorItemReader inputSource = new HibernateCursorItemReader();
+		HibernateCursorItemReader<Foo> inputSource = new HibernateCursorItemReader<Foo>();
 		inputSource.setQueryString(hsqlQuery);
 		inputSource.setSessionFactory(sessionFactory);
 		inputSource.setUseStatelessSession(isUseStatelessSession());
@@ -47,7 +47,7 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourc
 	 * called only in uninitialized state.
 	 */
 	public void testSetUseStatelessSession() {
-		HibernateCursorItemReader inputSource = ((HibernateCursorItemReader) reader);
+		HibernateCursorItemReader<Foo> inputSource = (HibernateCursorItemReader<Foo>)reader;
 
 		// initialize and call setter => error
 		inputSource.open(new ExecutionContext());

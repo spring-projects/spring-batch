@@ -25,7 +25,7 @@ import org.springframework.batch.item.ItemWriter;
  * 
  * @author Lucas Ward
  */
-public abstract class AbstractItemWriter implements ItemWriter {
+public abstract class AbstractItemWriter<T> implements ItemWriter<T> {
 
 	public void flush() throws FlushFailedException {
 	}

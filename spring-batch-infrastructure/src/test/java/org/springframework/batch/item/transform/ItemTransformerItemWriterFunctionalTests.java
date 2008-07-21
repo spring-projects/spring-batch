@@ -85,9 +85,9 @@ public class ItemTransformerItemWriterFunctionalTests extends TestCase {
 		}
 	}
 	
-	private static class BarWriter implements ItemWriter{
+	private static class BarWriter implements ItemWriter<Bar>{
 
-		public void write(Object item) throws Exception {
+		public void write(Bar item) throws Exception {
 		  assertTrue(item instanceof Bar);
 		}
 		
@@ -99,9 +99,9 @@ public class ItemTransformerItemWriterFunctionalTests extends TestCase {
 		
 	}
 	
-	private static class FoobarWriter implements ItemWriter{
+	private static class FoobarWriter implements ItemWriter<Foobar>{
 
-		public void write(Object item) throws Exception {
+		public void write(Foobar item) throws Exception {
 		  assertTrue(item instanceof Foobar);
 		}
 		

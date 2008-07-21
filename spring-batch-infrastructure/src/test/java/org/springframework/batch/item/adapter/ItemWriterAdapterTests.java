@@ -14,7 +14,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
  */
 public class ItemWriterAdapterTests extends AbstractDependencyInjectionSpringContextTests {
 
-	private ItemWriter processor;
+	private ItemWriter<Foo> processor;
 
 	private FooService fooService;
 
@@ -43,7 +43,7 @@ public class ItemWriterAdapterTests extends AbstractDependencyInjectionSpringCon
 	}
 
 	// setter for auto-injection
-	public void setProcessor(ItemWriter processor) {
+	public void setProcessor(ItemWriter<Foo> processor) {
 		this.processor = processor;
 	}
 

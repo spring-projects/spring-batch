@@ -29,9 +29,9 @@ import org.springframework.batch.item.ItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class ItemWriterAdapter extends AbstractMethodInvokingDelegator<Object> implements ItemWriter {
+public class ItemWriterAdapter<T> extends AbstractMethodInvokingDelegator<T> implements ItemWriter<T> {
 	
-    public void write(Object item) throws Exception {
+    public void write(T item) throws Exception {
     	invokeDelegateMethodWithArgument(item);
     }
 

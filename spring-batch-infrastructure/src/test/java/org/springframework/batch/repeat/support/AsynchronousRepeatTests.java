@@ -46,7 +46,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
-				Object item = provider.read();
+				Trade item = provider.read();
 				if (item!=null) {
 					processor.write(item);
 				}

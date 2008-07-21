@@ -14,7 +14,7 @@ import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 public class PropertyExtractingDelegatingItemProccessorIntegrationTests extends
         AbstractDependencyInjectionSpringContextTests {
 
-	private PropertyExtractingDelegatingItemWriter processor;
+	private PropertyExtractingDelegatingItemWriter<Foo> processor;
 
 	private FooService fooService;
 
@@ -46,7 +46,7 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests extends
 
 	}
 
-	public void setProcessor(PropertyExtractingDelegatingItemWriter processor) {
+	public void setProcessor(PropertyExtractingDelegatingItemWriter<Foo> processor) {
 		this.processor = processor;
 	}
 

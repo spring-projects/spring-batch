@@ -35,7 +35,7 @@ package org.springframework.batch.item;
  * @author Dave Syer
  * @author Lucas Ward
  */
-public interface ItemWriter {
+public interface ItemWriter<T> {
 
 	/**
 	 * Process the supplied data element. Will be called multiple times during a
@@ -46,7 +46,7 @@ public interface ItemWriter {
 	 * retry or a batch the framework will catch the exception and convert or
 	 * rethrow it as appropriate.
 	 */
-	void write(Object item) throws Exception;
+	void write(T item) throws Exception;
 
 	/**
 	 * Flush any buffers that are being held. This will usually be performed

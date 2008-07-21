@@ -15,14 +15,14 @@ public class ItemTransformerItemWriterTests extends TestCase {
 	private ItemTransformerItemWriter processor = new ItemTransformerItemWriter();
 
 	private ItemTransformer transformer;
-	private ItemWriter itemWriter;
+	private ItemWriter<Object> itemWriter;
 
 	private MockControl tControl = MockControl.createControl(ItemTransformer.class);
 	private MockControl outControl = MockControl.createControl(ItemWriter.class);
 
 	protected void setUp() throws Exception {
 		transformer = (ItemTransformer) tControl.getMock();
-		itemWriter = (ItemWriter) outControl.getMock();
+		itemWriter = (ItemWriter<Object>) outControl.getMock();
 		
 		processor.setItemTransformer(transformer);
 		processor.setDelegate(itemWriter);
