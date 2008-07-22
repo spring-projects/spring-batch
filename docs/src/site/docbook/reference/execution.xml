@@ -1421,6 +1421,12 @@
   &lt;property name="jobRepository" ref="repository" /&gt;
 &lt;/bean&gt;</programlisting>
 
+		<note>
+          <para>TaskletStep will automatically register the tasklet as
+          <classname>StepExecutionListener</classname> if it implements
+          this interface</para>
+        </note>
+
       <section>
         <title>TaskletAdapter</title>
 
