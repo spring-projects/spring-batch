@@ -46,6 +46,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("unchecked")
 public class TransactionAwareProxyFactory {
 
 	private Object target;

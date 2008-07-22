@@ -76,12 +76,12 @@ import org.springframework.validation.ObjectError;
  * @author Dave Syer
  * 
  */
-public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar implements FieldSetMapper,
+public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar implements FieldSetMapper<T>,
 		BeanFactoryAware, InitializingBean {
 
 	private String name;
 
-	private Class<?> type;
+	private Class<? extends T> type;
 
 	private BeanFactory beanFactory;
 
@@ -125,7 +125,7 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * 
 	 * @param type the type to set
 	 */
-	public void setTargetType(Class<?> type) {
+	public void setTargetType(Class<? extends T> type) {
 		this.type = type;
 	}
 
@@ -156,8 +156,8 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet, int)
 	 */
 	@SuppressWarnings("unchecked")
-	public Object mapLine(FieldSet fs, int lineNum) {
-		Object copy = getBean();
+	public T mapLine(FieldSet fs, int lineNum) {
+		T copy = getBean();
 		DataBinder binder = createBinder(copy);
 		binder.bind(new MutablePropertyValues(getBeanProperties(copy, fs.getProperties())));
 		if (binder.getBindingResult().hasErrors()) {
@@ -204,9 +204,10 @@ public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar im
 	protected void initBinder(DataBinder binder) {
 	}
 
-	private Object getBean() {
+	@SuppressWarnings("unchecked")
+	private T getBean() {
 		if (name != null) {
-			return beanFactory.getBean(name);
+			return (T) beanFactory.getBean(name);
 		}
 		try {
 			return type.newInstance();

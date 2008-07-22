@@ -29,8 +29,9 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("unchecked")
 public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
-
+	
 	private Map classified = new HashMap();
 
 	/**
