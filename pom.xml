@@ -16,7 +16,7 @@
 		<module>spring-batch-infrastructure-tests</module>
 		<module>spring-batch-core</module>
 		<module>spring-batch-samples</module>
-<!--		<module>spring-batch-integration</module>-->
+		<!--		<module>spring-batch-integration</module>-->
 		<module>docs</module>
 		<module>archetypes</module>
 	</modules>
@@ -635,27 +635,35 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<links>
-						<link>http://java.sun.com/j2ee/1.4/docs/api</link>
-						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
-						<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/logging/api/</link>
-						<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-						<link>http://www.junit.org/junit/javadoc/</link>
-						<link>http://logging.apache.org/log4j/docs/api/</link>
-						<link>http://jakarta.apache.org/regexp/apidocs/</link>
-						<link>http://jakarta.apache.org/velocity/api/</link>
-						<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
-						<link>http://static.springframework.org/spring-batch/apidocs/</link>
-						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
-					</links>
-					<aggregate>true</aggregate>
-					<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
-				</configuration>
+				<reportSets>
+					<reportSet>
+						<id>html</id>
+						<configuration>
+							<links>
+								<link>http://java.sun.com/javaee/5/docs/api</link>
+								<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+								<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+								<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
+								<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+								<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+								<link>http://commons.apache.org/logging/commons-logging-1.1.1/apidocs/</link>
+								<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+								<link>http://www.junit.org/junit/javadoc/</link>
+								<link>http://logging.apache.org/log4j/docs/api/</link>
+								<link>http://jakarta.apache.org/regexp/apidocs/</link>
+								<link>http://jakarta.apache.org/velocity/api/</link>
+								<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
+								<link>http://static.springframework.org/spring-batch/apidocs/</link>
+								<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
+							</links>
+							<aggregate>true</aggregate>
+							<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
+						</configuration>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
 	</reporting>
