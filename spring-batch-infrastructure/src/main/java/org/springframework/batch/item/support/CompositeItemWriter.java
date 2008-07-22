@@ -13,31 +13,31 @@ import org.springframework.batch.item.ItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemWriter implements ItemWriter {
+public class CompositeItemWriter<T> implements ItemWriter<T> {
 
-	private List<ItemWriter> delegates;
+	private List<ItemWriter<? super T>> delegates;
 
-	public void setDelegates(List<ItemWriter> delegates) {
+	public void setDelegates(List<ItemWriter<? super T>> delegates) {
 		this.delegates = delegates;
 	}
 
 	/**
 	 * Calls injected ItemProcessors in order.
 	 */
-	public void write(Object item) throws Exception {
-		for (ItemWriter writer : delegates) {
+	public void write(T item) throws Exception {
+		for (ItemWriter<? super T> writer : delegates) {
 			writer.write(item);
 		}
 	}
 
 	public void clear() throws ClearFailedException {
-		for (ItemWriter writer : delegates) {
+		for (ItemWriter<? super T> writer : delegates) {
 			writer.clear();
 		}
 	}
 
 	public void flush() throws FlushFailedException {
-		for (ItemWriter writer : delegates) {
+		for (ItemWriter<? super T> writer : delegates) {
 			writer.flush();
 		}
 	}

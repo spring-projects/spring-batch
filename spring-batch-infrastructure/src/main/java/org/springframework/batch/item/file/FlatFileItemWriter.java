@@ -66,7 +66,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream, InitializingBean {
+public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream, InitializingBean {
 
 	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -82,7 +82,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 
 	private LineAggregator lineAggregator = new DelimitedLineAggregator();
 
-	private FieldSetCreator fieldSetCreator;
+	private FieldSetCreator<T> fieldSetCreator;
 
 	private boolean saveState = true;
 
@@ -137,7 +137,7 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 * 
 	 * @param fieldSetCreator the {@link FieldSetCreator} to set
 	 */
-	public void setFieldSetCreator(FieldSetCreator fieldSetCreator) {
+	public void setFieldSetCreator(FieldSetCreator<T> fieldSetCreator) {
 		this.fieldSetCreator = fieldSetCreator;
 	}
 
@@ -203,14 +203,14 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 * line (recursively calling this method for each value). If no converter is
 	 * supplied the input object's toString method will be used.<br/>
 	 * 
-	 * @param data Object (a String or Object that can be converted) to be
+	 * @param item Object (a String or Object that can be converted) to be
 	 * written to output stream
 	 * @throws Exception if the transformer or file output fail,
 	 * WriterNotOpenException if the writer has not been initialized.
 	 */
-	public void write(Object data) throws Exception {
+	public void write(T item) throws Exception {
 		if (getOutputState().isInitialized()) {
-			FieldSet fieldSet = fieldSetCreator.mapItem(data);
+			FieldSet fieldSet = fieldSetCreator.mapItem(item);
 			lineBuffer.add(lineAggregator.aggregate(fieldSet) + lineSeparator);
 		}
 		else {

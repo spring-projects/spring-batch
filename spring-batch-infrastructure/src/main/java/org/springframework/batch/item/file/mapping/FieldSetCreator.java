@@ -25,12 +25,12 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
  * @author Dave Syer
  * 
  */
-public interface FieldSetCreator {
+public interface FieldSetCreator<T> {
 
 	/**
 	 * @param data an Object to convert.
 	 * @return a {@link FieldSet} created from the input.
 	 */
-	FieldSet mapItem(Object data);
+	FieldSet mapItem(T data);
 
 }

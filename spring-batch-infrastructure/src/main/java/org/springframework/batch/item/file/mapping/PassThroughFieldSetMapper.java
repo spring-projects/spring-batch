@@ -23,7 +23,7 @@ package org.springframework.batch.item.file.mapping;
  * @author Lucas Ward
  * 
  */
-public class PassThroughFieldSetMapper implements FieldSetMapper<FieldSet>, FieldSetCreator {
+public class PassThroughFieldSetMapper implements FieldSetMapper<FieldSet>, FieldSetCreator<Object> {
 
 	/*
 	 * (non-Javadoc)
