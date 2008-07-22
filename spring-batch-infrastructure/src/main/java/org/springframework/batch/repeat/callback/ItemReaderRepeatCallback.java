@@ -33,9 +33,9 @@ public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 
 	ItemReader<T> reader;
 
-	ItemWriter writer;
+	ItemWriter<T> writer;
 
-	public ItemReaderRepeatCallback(ItemReader<T> reader, ItemWriter writer) {
+	public ItemReaderRepeatCallback(ItemReader<T> reader, ItemWriter<T> writer) {
 		super();
 		this.reader = reader;
 		this.writer = writer;

@@ -16,7 +16,7 @@ import org.springframework.xml.transform.StaxResult;
  * @author Lucas Ward
  * 
  */
-public class MarshallingEventWriterSerializer implements EventWriterSerializer {
+public class MarshallingEventWriterSerializer<T> implements EventWriterSerializer<T> {
 
 	private Marshaller marshaller;
 
@@ -24,7 +24,7 @@ public class MarshallingEventWriterSerializer implements EventWriterSerializer {
 		this.marshaller = marshaller;
 	}
 
-	public void serializeObject(XMLEventWriter writer, Object output) {
+	public void serializeObject(XMLEventWriter writer, T output) {
 		Result result = new StaxResult(writer);
 		try {
 			marshaller.marshal(output, result);

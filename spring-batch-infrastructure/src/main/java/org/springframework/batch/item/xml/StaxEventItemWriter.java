@@ -47,7 +47,7 @@ import org.springframework.util.CollectionUtils;
  * @author Robert Kasanicky
  * 
  */
-public class StaxEventItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream,
+public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream,
 		InitializingBean {
 
 	// default encoding
@@ -69,7 +69,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	private Resource resource;
 
 	// xml serializer
-	private EventWriterSerializer serializer;
+	private EventWriterSerializer<T> serializer;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -113,9 +113,9 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 
 	// holds the list of items for writing before they are actually written on
 	// #flush()
-	private List<Object> buffer = new ArrayList<Object>();
+	private List<T> buffer = new ArrayList<T>();
 
-	private List<Object> headers = new ArrayList<Object>();
+	private List<? extends T> headers = new ArrayList<T>();
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -135,7 +135,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * 
 	 * @param serializer the Object to XML serializer
 	 */
-	public void setSerializer(EventWriterSerializer serializer) {
+	public void setSerializer(EventWriterSerializer<T> serializer) {
 		this.serializer = serializer;
 	}
 
@@ -227,7 +227,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * any calls to {@link #write(Object)}.
 	 * @param headers
 	 */
-	public void setHeaderItems(Object[] headers) {
+	public void setHeaderItems(T[] headers) {
 		this.headers = Arrays.asList(headers);
 	}
 
@@ -264,9 +264,8 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		open(startAtPosition);
 
 		if (startAtPosition == 0) {
-			for (Iterator<Object> iterator = headers.listIterator(); iterator.hasNext();) {
-				Object header = iterator.next();
-				write(header);
+			for (Iterator<? extends T> iterator = headers.listIterator(); iterator.hasNext();) {
+				write(iterator.next());
 			}
 		}
 	}
@@ -391,7 +390,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @param item the value object
 	 * @see #flush()
 	 */
-	public void write(Object item) {
+	public void write(T item) {
 
 		currentRecordCount++;
 		buffer.add(item);
@@ -456,8 +455,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 */
 	public void flush() throws FlushFailedException {
 
-		for (Iterator<Object> iterator = buffer.listIterator(); iterator.hasNext();) {
-			Object item = iterator.next();
+		for (T item : buffer) {
 			serializer.serializeObject(eventWriter, item);
 		}
 		try {
