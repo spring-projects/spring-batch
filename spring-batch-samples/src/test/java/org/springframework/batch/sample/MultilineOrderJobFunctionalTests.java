@@ -16,15 +16,21 @@
 
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class MultilineOrderJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
-	//private static final Log log = LogFactory.getLog(MultilineOrderJobFunctionalTests.class);
 
 	private static final String EXPECTED_OUTPUT = 
 	"BEGIN_ORDER:13100345  2007/02/15                    "+

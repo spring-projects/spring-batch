@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,41 @@
  */
 package org.springframework.batch.sample.dao;
 
-
+import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.PlayerSummary;
 import org.springframework.batch.sample.mapping.PlayerSummaryMapper;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 
 /**
  * @author Lucas Ward
  * 
  */
-public class JdbcPlayerSummaryDaoIntegrationTests extends
-		AbstractTransactionalDataSourceSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/data-source-context.xml"})
+public class JdbcPlayerSummaryDaoIntegrationTests {
 
-	JdbcPlayerSummaryDao playerSummaryDao;
-	PlayerSummary summary;
+	private JdbcPlayerSummaryDao playerSummaryDao;
 
-	protected String[] getConfigLocations() {
-		return new String[] { "data-source-context.xml" };
-	}
+	private PlayerSummary summary;
 
-	protected void onSetUpBeforeTransaction() throws Exception {
-		super.onSetUpBeforeTransaction();
+	private JdbcTemplate jdbcTemplate;
 
+	@Autowired
+	public void init(DataSource dataSource) {
+
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		playerSummaryDao = new JdbcPlayerSummaryDao();
-		playerSummaryDao.setJdbcTemplate(getJdbcTemplate());
+		playerSummaryDao.setJdbcTemplate(this.jdbcTemplate);
 
 		summary = new PlayerSummary();
 		summary.setId("AikmTr00");
@@ -54,21 +64,22 @@ public class JdbcPlayerSummaryDaoIntegrationTests extends
 		summary.setReceptions(0);
 		summary.setReceptionYards(0);
 		summary.setTotalTd(0);
+
 	}
 
-	protected void onSetUpInTransaction() throws Exception {
-		super.onSetUpInTransaction();
+	@Before
+	public void onSetUpInTransaction() throws Exception {
 
 		jdbcTemplate.execute("delete from PLAYER_SUMMARY");
 
 	}
 	
+	@Transactional @Test
 	public void testWrite() {
 
 		playerSummaryDao.write(summary);
 
-		PlayerSummary testSummary = (PlayerSummary) getJdbcTemplate()
-				.queryForObject("SELECT * FROM PLAYER_SUMMARY",
+		PlayerSummary testSummary = (PlayerSummary) jdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
 						new PlayerSummaryMapper());
 
 		assertEquals(testSummary, summary);

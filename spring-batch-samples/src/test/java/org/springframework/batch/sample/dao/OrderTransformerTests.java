@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 package org.springframework.batch.sample.dao;
+
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -35,10 +38,11 @@ import org.springframework.batch.sample.domain.Order;
  * @author Dave Syer
  * 
  */
-public class OrderTransformerTests extends TestCase {
+public class OrderTransformerTests {
 
 	private OrderTransformer converter = new OrderTransformer();
 
+	@Test
 	public void testConvert() throws Exception {
 		converter.setAggregators(new HashMap<String, LineAggregator>() {
 			{

@@ -1,7 +1,19 @@
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.io.IOUtils;
+import org.junit.runner.RunWith;
+import org.springframework.batch.sample.domain.Trade;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.sql.DataSource;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -9,12 +21,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.springframework.batch.sample.domain.Trade;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.RowCallbackHandler;
 
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class CompositeItemWriterSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM trade order by isin";
@@ -32,6 +41,11 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 	
 	private int before;
 	
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.sample.AbstractLifecycleSpringContextTests#validatePreConditions()
 	 */
@@ -60,7 +74,7 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 		
 		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
-				Trade trade = (Trade)trades.get(activeRow++);
+				Trade trade = trades.get(activeRow++);
 				
 				assertEquals(trade.getIsin(), rs.getString(1));
 				assertEquals(trade.getQuantity(), rs.getLong(2));
@@ -72,7 +86,7 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 	}
 
 	@SuppressWarnings("unchecked")
-	private void checkOutputFile() throws FileNotFoundException, IOException {
+	private void checkOutputFile() throws IOException {
 		List<String> outputLines = IOUtils.readLines(
 				new FileInputStream("target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt"));
 		

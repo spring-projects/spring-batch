@@ -18,6 +18,11 @@ package org.springframework.batch.sample.dao;
 
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.sql.DataSource;
 
 
 /**
@@ -29,15 +34,15 @@ public class JdbcCustomerDebitDao implements CustomerDebitDao {
 	
     private static final String UPDATE_CREDIT = "UPDATE customer SET credit= credit-? WHERE name=?";
     
-    private JdbcOperations jdbcTemplate;
+    private SimpleJdbcOperations simpleJdbcTemplate;
 
     public void write(CustomerDebit customerDebit) {
-        jdbcTemplate.update(UPDATE_CREDIT,
-            new Object[] { customerDebit.getDebit(), customerDebit.getName() });
+        simpleJdbcTemplate.update(UPDATE_CREDIT, customerDebit.getDebit(), customerDebit.getName());
     }
 
-    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    @Autowired
+	public void setDataSource(DataSource dataSource) {
+        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
 
 }

@@ -1,25 +1,62 @@
+/*
+ * Copyright 2006-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.sample.dao;
 
+import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.junit.runner.RunWith;
+import org.junit.Test;
 
-public class JdbcTradeWriterTests extends AbstractTransactionalDataSourceSpringContextTests {
+import javax.sql.DataSource;
 
-	protected String[] getConfigLocations() {
-		return new String[] { "data-source-context.xml" };
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/data-source-context.xml"})
+public class JdbcTradeWriterTests {
+
+	private JdbcTemplate jdbcTemplate;
+
+	private AbstractDataFieldMaxValueIncrementer incrementer;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
+	@Autowired
+	public void setIncrementer(AbstractDataFieldMaxValueIncrementer incrementer) {
+		this.incrementer = incrementer;
+	}
+
+	@Transactional @Test
 	public void testWrite() {
 		
 		JdbcTradeDao writer = new JdbcTradeDao();
 		
-		AbstractDataFieldMaxValueIncrementer incrementer = (AbstractDataFieldMaxValueIncrementer)applicationContext.getBean("incrementerParent");
 		incrementer.setIncrementerName("TRADE_SEQ");
 		
 		writer.setIncrementer(incrementer);

@@ -16,19 +16,24 @@
 
 package org.springframework.batch.sample;
 
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.junit.Test;
 
 /**
  * Abstract TestCase that automatically starts a Spring (@link Lifecycle) after
- * obtaining it automatically via autowiring by type. It should be noted the
- * getConfigLocations must be implemented for dependency injection to work
- * properly.
- * 
+ * obtaining it automatically via autowiring by type.
+ *
+ * This implemenation is based on JUnit4 and SpringJUnit4ClassRunner being used
+ * to provide autowiring. It should be noted that @ContextConfiguration must be
+ * specified for dependency injection to work properly.
+ *
  * @author Lucas Ward
- * @see AbstractDependencyInjectionSpringContextTests
+ * @author Thomas Risberg
+ *
+ * @see org.springframework.test.context.junit4.SpringJUnit4ClassRunner
  */
 public abstract class AbstractValidatingBatchLauncherTests extends AbstractBatchLauncherTests {
 
+	@Test
 	public void testLaunchJob() throws Exception {
 		validatePreConditions();
 		super.testLaunchJob();
@@ -37,12 +42,14 @@ public abstract class AbstractValidatingBatchLauncherTests extends AbstractBatch
 
 	/**
 	 * Make sure input data meets expectations
+	 * @throws Exception any exception thrown
 	 */
 	protected void validatePreConditions() throws Exception {
 	}
 
 	/**
 	 * Make sure job did what it was expected to do.
+	 * @throws Exception any exception thrown
 	 */
 	protected abstract void validatePostConditions() throws Exception;
 

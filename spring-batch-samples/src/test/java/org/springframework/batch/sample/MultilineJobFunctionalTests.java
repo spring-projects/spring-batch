@@ -16,11 +16,18 @@
 
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.*;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.junit.runner.RunWith;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class MultilineJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	// The output is grouped together in two lines, instead of all the

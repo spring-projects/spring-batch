@@ -4,27 +4,29 @@ import java.io.File;
 
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.runner.RunWith;
+import org.junit.Before;
 
 /**
  * Deletes files in the given directory.
  * 
  * @author Robert Kasanicky
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
+	@Autowired
 	private Resource directory;
 	
 	/**
-	 * Setter for auto-injection.
-	 */ 
-	public void setDirectory(Resource directory) {
-		this.directory = directory;
-	}
-
-	/**
 	 * Create the directory and some files in it.
 	 */
-	protected void onSetUp() throws Exception {
+	@Before
+	public void onSetUp() throws Exception {
 		File dir = directory.getFile();
 		dir.mkdirs();
 		new File(dir, "file1").createNewFile();
@@ -34,6 +36,7 @@ public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTe
 	/**
 	 * We have directory with some files in it.
 	 */
+	@Override
 	protected void validatePreConditions() throws Exception {
 		Assert.state(directory.getFile().isDirectory());
 		Assert.state(directory.getFile().listFiles().length > 0);
@@ -42,6 +45,7 @@ public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTe
 	/**
 	 * Directory still exists but contains no files.
 	 */
+	@Override
 	protected void validatePostConditions() throws Exception {
 		Assert.state(directory.getFile().isDirectory());
 		Assert.state(directory.getFile().listFiles().length == 0);

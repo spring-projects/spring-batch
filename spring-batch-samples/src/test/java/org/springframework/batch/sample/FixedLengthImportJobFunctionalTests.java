@@ -16,6 +16,8 @@
 
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.*;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.sql.ResultSet;
@@ -30,7 +32,17 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.junit.Before;
+import org.junit.runner.RunWith;
 
+import javax.sql.DataSource;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	//expected line length in input file (sum of pattern lengths + 2, because the counter is appended twice)
@@ -42,8 +54,19 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	private FlatFileItemReader inputSource;
 	private LineTokenizer lineTokenizer;
 
-	protected void onSetUp() throws Exception {
-		super.onSetUp();
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
+	@Autowired
+	public void setLineTokenizer(LineTokenizer lineTokenizer) {
+		this.lineTokenizer = lineTokenizer;
+	}
+
+
+	@Before
+	public void onSetUp() throws Exception {
 		jdbcTemplate.update("delete from TRADE");
 		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
 		inputSource = new FlatFileItemReader();
@@ -92,14 +115,6 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 		while ((line = reader.readLine()) != null) {
 			assertEquals (LINE_LENGTH, line.length());
 		}
-	}
-
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
-	
-	public void setLineTokenizer(LineTokenizer lineTokenizer) {
-		this.lineTokenizer = lineTokenizer;
 	}
 
 }

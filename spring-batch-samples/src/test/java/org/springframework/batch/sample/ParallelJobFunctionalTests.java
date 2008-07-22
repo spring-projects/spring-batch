@@ -1,16 +1,24 @@
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.*;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.runner.RunWith;
 
-public class ParallelJobFunctionalTests extends
-		AbstractValidatingBatchLauncherTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
+public class ParallelJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private JdbcOperations jdbcTemplate;
 
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}

@@ -1,17 +1,27 @@
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+
 import org.springframework.batch.sample.item.reader.GeneratingItemReader;
 import org.springframework.batch.sample.item.writer.RetrySampleItemWriter;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Checks that expected number of items have been processed.
  * 
  * @author Robert Kasanicky
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class RetrySampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
+	@Autowired
 	private GeneratingItemReader itemGenerator;
 	
+	@Autowired
 	private RetrySampleItemWriter itemProcessor;
 	
 	protected void validatePostConditions() throws Exception {
@@ -19,12 +29,4 @@ public class RetrySampleFunctionalTests extends AbstractValidatingBatchLauncherT
 		assertEquals(itemGenerator.getLimit()+2, itemProcessor.getCounter());
 	}
 	
-	public void setItemGenerator(GeneratingItemReader itemGenerator) {
-		this.itemGenerator = itemGenerator;
-	}
-
-	public void setItemProcessor(RetrySampleItemWriter itemProcessor) {
-		this.itemProcessor = itemProcessor;
-	}
-
 }

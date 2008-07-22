@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,46 @@
  */
 package org.springframework.batch.sample.dao;
 
+import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.batch.sample.domain.Game;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import org.springframework.batch.sample.domain.Game;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
  * @author Lucas Ward
  * 
  */
-public class JdbcGameDaoIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/data-source-context.xml"})
+public class JdbcGameDaoIntegrationTests {
 
 	private JdbcGameDao gameDao;
 
 	private Game game = new Game();
 
-	protected String[] getConfigLocations() {
-		return new String[] { "data-source-context.xml" };
+	private SimpleJdbcTemplate simpleJdbcTemplate;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		gameDao = new JdbcGameDao();
+		gameDao.setDataSource(dataSource);
+		gameDao.afterPropertiesSet();
 	}
 
-	protected void onSetUpBeforeTransaction() throws Exception {
-		super.onSetUpBeforeTransaction();
-
-		gameDao = new JdbcGameDao();
-		gameDao.setJdbcTemplate(getJdbcTemplate());
+	@Before
+	public void onSetUpBeforeTransaction() throws Exception {
 
 		game.setId("XXXXX00");
 		game.setYear(1996);
@@ -57,20 +71,22 @@ public class JdbcGameDaoIntegrationTests extends AbstractTransactionalDataSource
 		game.setReceptions(1);
 		game.setReceptionYards(16);
 		game.setTotalTd(2);
+
 	}
 
+	@Transactional @Test
 	public void testWrite() {
 
 		gameDao.write(game);
 
-		Game tempGame = (Game) getJdbcTemplate().queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
-				new Object[] { "XXXXX00 ", new Integer(game.getYear()) }, new GameRowMapper());
+		Game tempGame = simpleJdbcTemplate.queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
+				new GameRowMapper(), "XXXXX00 ", game.getYear());
 		assertEquals(tempGame, game);
 	}
 
-	public static class GameRowMapper implements RowMapper {
+	private static class GameRowMapper implements ParameterizedRowMapper<Game> {
 
-		public Object mapRow(ResultSet rs, int arg1) throws SQLException {
+		public Game mapRow(ResultSet rs, int arg1) throws SQLException {
 
 			if (rs == null) {
 				return null;

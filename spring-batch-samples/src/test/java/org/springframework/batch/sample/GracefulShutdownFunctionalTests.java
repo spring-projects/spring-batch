@@ -16,9 +16,16 @@
 
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.*;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+import org.junit.runner.RunWith;
+import org.junit.Test;
 
 /**
  * Functional test for graceful shutdown.  A batch container is started in a new thread,
@@ -27,8 +34,11 @@ import org.springframework.batch.core.JobParameters;
  * @author Lucas Ward
  *
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests {
 
+	@Transactional @Test
 	public void testLaunchJob() throws Exception {
 
 		final JobParameters jobParameters = new JobParameters();

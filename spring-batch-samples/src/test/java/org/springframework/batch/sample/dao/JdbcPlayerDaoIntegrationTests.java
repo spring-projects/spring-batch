@@ -1,35 +1,62 @@
-/**
- * 
+/*
+ * Copyright 2006-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.springframework.batch.sample.dao;
 
+import static org.junit.Assert.assertEquals;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.batch.sample.domain.Player;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.junit.runner.RunWith;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.sql.DataSource;
 
 /**
  * @author Lucas Ward
  *
  */
-public class JdbcPlayerDaoIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = {"/data-source-context.xml"})
+public class JdbcPlayerDaoIntegrationTests {
 	
 	private JdbcPlayerDao playerDao;
+
 	private Player player;
+
 	private static final String GET_PLAYER = "SELECT * from PLAYERS";
 	
-	protected String[] getConfigLocations() {
-		return new String[] {"data-source-context.xml"};
-	}
+	private JdbcTemplate jdbcTemplate;
 
-	protected void onSetUpBeforeTransaction() throws Exception {
-		super.onSetUpBeforeTransaction();
-		
+	@Autowired
+	public void init(DataSource dataSource) {
+
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		playerDao = new JdbcPlayerDao();
-		playerDao.setJdbcTemplate(this.jdbcTemplate);
-		
+		playerDao.setJdbcTemplate(this.jdbcTemplate);		
+
 		player = new Player();
 		player.setID("AKFJDL00");
 		player.setFirstName("John");
@@ -37,21 +64,23 @@ public class JdbcPlayerDaoIntegrationTests extends AbstractTransactionalDataSour
 		player.setPosition("QB");
 		player.setBirthYear(1975);
 		player.setDebutYear(1998);
+		
 	}
 
 
-	protected void onSetUpInTransaction() throws Exception {
-		super.onSetUpInTransaction();
+	@Before
+	public void onSetUpInTransaction() throws Exception {
 
 		jdbcTemplate.execute("delete from PLAYERS");
 
 	}
 
+	@Transactional @Test
 	public void testSavePlayer(){
 		
 		playerDao.savePlayer(player);
 		
-		getJdbcTemplate().query(GET_PLAYER, new RowCallbackHandler(){
+		jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler(){
 
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals(rs.getString("PLAYER_ID"), "AKFJDL00");

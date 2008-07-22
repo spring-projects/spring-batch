@@ -133,8 +133,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>easymock</groupId>
+			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
+			<version>2.4</version>
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>

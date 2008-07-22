@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,27 @@
  */
 package org.springframework.batch.sample.advice;
 
-import java.util.ArrayList;
-import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import javax.management.Notification;
-
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.jmx.export.notification.NotificationPublisher;
 import org.springframework.jmx.export.notification.UnableToSendNotificationException;
 
+import javax.management.Notification;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Dave Syer
- * 
+ * @author Thomas Risberg
+ *
  */
-public class JobExecutionNotificationPublisherTests extends TestCase {
+public class JobExecutionNotificationPublisherTests {
 
 	JobExecutionNotificationPublisher publisher = new JobExecutionNotificationPublisher();
 
+	@Test
 	public void testRepeatOperationsOpenUsed() throws Exception {
 		final List<Notification> list = new ArrayList<Notification>();
 		publisher.setNotificationPublisher(new NotificationPublisher() {

@@ -21,6 +21,12 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.util.ClassUtils;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
+import org.junit.Test;
 
 /**
  * Abstract unit test for running functional tests by getting context locations
@@ -31,42 +37,34 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * 
  */
-public abstract class AbstractBatchLauncherTests extends
-		AbstractDependencyInjectionSpringContextTests {
+public abstract class AbstractBatchLauncherTests implements ApplicationContextAware {
 
-//	private static final String CONTAINER_DEFINITION_LOCATION = "simple-container-definition.xml";
+	/** Logger  */
+	protected final Log logger = LogFactory.getLog(getClass());
 
-	public AbstractBatchLauncherTests() {
-		setDependencyCheck(false);
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
-	 */
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), ClassUtils.getShortName(getClass())
-				+ "-context.xml") };
-	}
+	protected ApplicationContext applicationContext;
 
-	JobLauncher launcher;
+	protected JobLauncher launcher;
+
 	private Job job;
-	
+
 	private JobParameters jobParameters = new JobParameters();
 
+
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
+
+	@Autowired
 	public void setLauncher(JobLauncher bootstrap) {
 		this.launcher = bootstrap;
 	}
 
-	/**
-	 * Public setter for the {@link Job} property.
-	 * 
-	 * @param job the job to set
-	 */
+	@Autowired
 	public void setJob(Job job) {
 		this.job = job;
 	}
-	
+
 	public Job getJob() {
 		return job;
 	}
@@ -79,10 +77,7 @@ public abstract class AbstractBatchLauncherTests extends
 		this.jobParameters = jobParameters;
 	}
 
-	/**
-	 * @throws Exception
-	 * 
-	 */
+	@Test
 	public void testLaunchJob() throws Exception {
 		launcher.run(job, jobParameters);
 	}

@@ -18,7 +18,6 @@ package org.springframework.batch.sample.item.writer;
 
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.dao.CustomerDebitDao;
-import org.springframework.batch.sample.dao.JdbcCustomerDebitDao;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
 
@@ -29,7 +28,8 @@ import org.springframework.batch.sample.domain.Trade;
  * @author Robert Kasanicky
  */
 public class CustomerUpdateWriter extends AbstractItemWriter {
-    private CustomerDebitDao dao;
+
+	private CustomerDebitDao dao;
 
     public void write(Object data) {
         Trade trade = (Trade) data;
@@ -39,7 +39,7 @@ public class CustomerUpdateWriter extends AbstractItemWriter {
         dao.write(customerDebit);
     }
 
-    public void setDao(JdbcCustomerDebitDao outputSource) {
+    public void setDao(CustomerDebitDao outputSource) {
         this.dao = outputSource;
     }
 }

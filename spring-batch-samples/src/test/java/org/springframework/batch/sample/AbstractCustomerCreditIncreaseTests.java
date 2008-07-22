@@ -1,5 +1,6 @@
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,10 +10,14 @@ import java.util.List;
 import org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.sql.DataSource;
 
 /**
  * Test case for jobs that are expected to update customer credit value by fixed
@@ -44,17 +49,12 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 	private List<BigDecimal> creditsBeforeUpdate;
 
-	/**
-	 * @param jdbcTemplate
-	 */
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-	
-	/**
-	 * Public setter for the PlatformTransactionManager.
-	 * @param transactionManager the transactionManager to set
-	 */
+
+	@Autowired
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
@@ -87,8 +87,8 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 			public Object doInTransaction(TransactionStatus status) {
 				jdbcTemplate.update(DELETE_CUSTOMERS);
-				for(int i = 0; i < customers.length;i++){
-					jdbcTemplate.update(customers[i]);
+				for (String customer : customers) {
+					jdbcTemplate.update(customer);
 				}
 				return null;
 			}
@@ -108,7 +108,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 				jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
 
 					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-						final BigDecimal creditBeforeUpdate = (BigDecimal) creditsBeforeUpdate.get(rowNum);
+						final BigDecimal creditBeforeUpdate = creditsBeforeUpdate.get(rowNum);
 						System.out.print("BEFORE:" + creditBeforeUpdate);
 						final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
 						System.out.print(" EXPECTED:" + expectedCredit);
@@ -128,9 +128,6 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 		checkMatches(matches);		
 	}
 
-	/**
-	 * @param matches
-	 */
 	protected void checkMatches(List<BigDecimal> matches) {
 		// no-op...
 	}

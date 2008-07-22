@@ -253,7 +253,8 @@ public class JobParametersTests extends TestCase {
 	public void testSerialization() {
 		JobParameters params = getNewParameters();
 
-		byte[] serialized = SerializationUtils.serialize(params);
+		byte[] serialized =
+		SerializationUtils.serialize(params);
 
 		assertEquals(params, SerializationUtils.deserialize(serialized));
 	}

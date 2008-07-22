@@ -16,6 +16,8 @@
 
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,9 +32,20 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.junit.Before;
+
+import javax.sql.DataSource;
 
 
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
 public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER from TRADE order by ISIN";
@@ -44,20 +57,16 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	
 	private JdbcOperations jdbcTemplate;
 	private Map<String, Double> credits = new HashMap<String, Double>();
-	
-	/**
-	 * @param jdbcTemplate the jdbcTemplate to set
-	 */
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#onSetUp()
-	 */
 	@SuppressWarnings("unchecked")
-	protected void onSetUp() throws Exception {
-		super.onSetUp();
+	@Before
+	public void onSetUp() throws Exception {
+//		super.onSetUp();
 		jdbcTemplate.update("delete from TRADE");
 		List<Map<?, ?>> list = jdbcTemplate.queryForList("select name, CREDIT from customer");
 		for (Iterator<Map<?,?>> iterator = list.iterator(); iterator.hasNext();) {
@@ -66,6 +75,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		}
 	}
 	
+	@Transactional @Test
 	public void testLaunchJob() throws Exception{
 		super.testLaunchJob();
 	}
@@ -123,7 +133,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	protected void validatePreConditions() {
 		assertTrue(((Resource)applicationContext.getBean("fileLocator")).exists());
 	}
-	
+
 	private static class Customer {
 		private String name;
 		private double credit;

@@ -1,13 +1,21 @@
 package org.springframework.batch.sample;
 
-import java.math.BigDecimal;
-import java.util.List;
+import static org.junit.Assert.*;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.sample.dao.HibernateCreditDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Test for HibernateJob - checks that customer credit has been updated to
@@ -15,8 +23,9 @@ import org.springframework.orm.hibernate3.HibernateJdbcException;
  * 
  * @author Dave Syer
  */
-public class HibernateFailureJobFunctionalTests extends
-		HibernateJobFunctionalTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
+public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIncreaseTests {
 
 	private HibernateCreditDao writer;
 
@@ -26,25 +35,12 @@ public class HibernateFailureJobFunctionalTests extends
 	 * @param writer
 	 *            the writer to set
 	 */
+	@Autowired
 	public void setWriter(HibernateCreditDao writer) {
 		this.writer = writer;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
-	 */
-	protected void onTearDown() throws Exception {
-		super.onTearDown();
-		writer.setFailOnFlush(-1);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.sample.AbstractValidatingBatchLauncherTests#testLaunchJob()
-	 */
+	@Transactional @Test
 	public void testLaunchJob() throws Exception {
 		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();
 		setJobParameters(params);
