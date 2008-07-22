@@ -84,7 +84,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.io.file.mapping.IFieldSet#getValues()
 	 */
 	public String[] getValues() {
-		return tokens;
+		return (String[]) tokens.clone();
 	}
 
 	/*
