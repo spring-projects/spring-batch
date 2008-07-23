@@ -31,7 +31,7 @@ import org.springframework.beans.factory.DisposableBean;
 public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 		DisposableBean {
 
-	private ItemWriter itemWriter;
+	private ItemWriter<String> itemWriter;
 
 	private String separator = "\t";
 
@@ -53,7 +53,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 		this.separator = separator;
 	}
 
-	public void setItemWriter(ItemWriter itemWriter) {
+	public void setItemWriter(ItemWriter<String> itemWriter) {
 		this.itemWriter = itemWriter;
 	}
 

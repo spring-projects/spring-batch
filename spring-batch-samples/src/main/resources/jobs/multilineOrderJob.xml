@@ -56,9 +56,9 @@
 	</bean>
 
 	<bean id="orderWriter"
-		class="org.springframework.batch.sample.dao.FlatFileOrderWriter">
+		class="org.springframework.batch.item.transform.ItemTransformerItemWriter">
 		<property name="delegate" ref="flatFileTransformerWriter" />
-		<property name="transformer">
+		<property name="itemTransformer">
 			<bean
 				class="org.springframework.batch.sample.dao.OrderTransformer">
 				<property name="aggregators" ref="outputAggregators" />

@@ -30,6 +30,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.transform.ItemTransformerItemWriter;
 import org.springframework.batch.sample.StubLineAggregator;
 import org.springframework.batch.sample.domain.Address;
 import org.springframework.batch.sample.domain.BillingInfo;
@@ -49,12 +50,12 @@ public class FlatFileOrderWriterTests {
 		}
 	};
 
-	private FlatFileOrderWriter writer;
+	private ItemTransformerItemWriter writer;
 	
 	@Before
 	public void setUp() throws Exception {
 		//create new writer
-		writer = new FlatFileOrderWriter();
+		writer = new ItemTransformerItemWriter();
 		writer.setDelegate(output);
 	}
 
@@ -90,7 +91,7 @@ public class FlatFileOrderWriterTests {
 		aggregators.put("item", aggregator);
 		aggregators.put("footer", aggregator);
 		converter.setAggregators(aggregators);
-		writer.setTransformer(converter);
+		writer.setItemTransformer(converter);
 				
 		//call tested method
 		writer.write(order);
