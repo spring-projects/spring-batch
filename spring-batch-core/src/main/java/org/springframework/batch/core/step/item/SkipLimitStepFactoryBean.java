@@ -50,7 +50,7 @@ import org.springframework.batch.support.SubclassExceptionClassifier;
  * @author Robert Kasanicky
  * 
  */
-public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
+public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 
 	private int skipLimit = 0;
 
@@ -248,7 +248,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 			exceptions.addAll(Arrays.asList(retryableExceptionClasses));
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions, Arrays
 					.asList(fatalExceptionClasses));
-			StatefulRetryItemHandler itemHandler = new StatefulRetryItemHandler(getItemReader(), getItemWriter(),
+			StatefulRetryItemHandler<T> itemHandler = new StatefulRetryItemHandler<T>(getItemReader(), getItemWriter(),
 					retryTemplate, itemKeyGenerator, readSkipPolicy, writeSkipPolicy);
 			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
 
@@ -257,7 +257,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		}
 		else {
 			// This is the default in ItemOrientedStep anyway...
-			step.setItemHandler(new SimpleItemHandler(getItemReader(), getItemWriter()));
+			step.setItemHandler(new SimpleItemHandler<T>(getItemReader(), getItemWriter()));
 		}
 
 	}
@@ -283,7 +283,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class StatefulRetryItemHandler extends SimpleItemHandler {
+	private static class StatefulRetryItemHandler<T> extends SimpleItemHandler<T> {
 
 		final private RetryOperations retryOperations;
 
@@ -301,7 +301,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		 * @param retryTemplate
 		 * @param itemKeyGenerator
 		 */
-		public StatefulRetryItemHandler(ItemReader itemReader, ItemWriter itemWriter, RetryOperations retryTemplate,
+		public StatefulRetryItemHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter, RetryOperations retryTemplate,
 				ItemKeyGenerator itemKeyGenerator, ItemSkipPolicy readSkipPolicy, ItemSkipPolicy writeSkipPolicy) {
 			super(itemReader, itemWriter);
 			this.retryOperations = retryTemplate;
@@ -341,7 +341,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		 * count
 		 * @return next item for processing
 		 */
-		protected Object read(StepContribution contribution) throws Exception {
+		protected T read(StepContribution contribution) throws Exception {
 
 			while (true) {
 				try {
@@ -383,7 +383,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object,
 		 * org.springframework.batch.core.StepContribution)
 		 */
-		protected void write(final Object item, final StepContribution contribution) throws Exception {
+		protected void write(final T item, final StepContribution contribution) throws Exception {
 			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
 				public Object doWithRetry(RetryContext context) throws Throwable {
 					doWrite(item);

@@ -50,7 +50,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
+public class ItemSkipPolicyItemHandler<T> extends SimpleItemHandler<T> {
 
 	/**
 	 * Key for transaction resource that holds skipped keys until they can be
@@ -117,7 +117,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * @param itemReader
 	 * @param itemWriter
 	 */
-	public ItemSkipPolicyItemHandler(ItemReader itemReader, ItemWriter itemWriter) {
+	public ItemSkipPolicyItemHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
 		super(itemReader, itemWriter);
 	}
 
@@ -149,13 +149,13 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * @param contribution current StepContribution holding skipped items count
 	 * @return next item for processing
 	 */
-	protected Object read(StepContribution contribution) throws Exception {
+	protected T read(StepContribution contribution) throws Exception {
 
 		while (true) {
 
 			try {
 
-				Object item = doRead();
+				T item = doRead();
 				Object key = itemKeyGenerator.getKey(item);
 				Throwable throwable = getSkippedException(key);
 				while (item != null && throwable != null) {
@@ -205,7 +205,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * @param item item to write
 	 * @param contribution current StepContribution holding skipped items count
 	 */
-	protected void write(Object item, StepContribution contribution) throws Exception {
+	protected void write(T item, StepContribution contribution) throws Exception {
 		doWriteWithSkip(item, contribution);
 	}
 
@@ -214,7 +214,7 @@ public class ItemSkipPolicyItemHandler extends SimpleItemHandler {
 	 * @param contribution
 	 * @throws Exception
 	 */
-	protected final void doWriteWithSkip(Object item, StepContribution contribution) throws Exception {
+	protected final void doWriteWithSkip(T item, StepContribution contribution) throws Exception {
 		// Get the key as early as possible, otherwise it might change in
 		// doWrite()
 		Object key = itemKeyGenerator.getKey(item);

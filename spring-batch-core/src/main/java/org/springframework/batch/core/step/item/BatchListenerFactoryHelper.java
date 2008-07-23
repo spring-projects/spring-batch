@@ -49,7 +49,7 @@ abstract class BatchListenerFactoryHelper {
 	 * @param itemReader
 	 * @param listeners
 	 */
-	public static ItemReader<?> getItemReader(ItemReader<?> itemReader, StepListener[] listeners) {
+	public static <T> ItemReader<T> getItemReader(ItemReader<T> itemReader, StepListener[] listeners) {
 
 		final CompositeItemReadListener multicaster = new CompositeItemReadListener();
 
@@ -60,11 +60,11 @@ abstract class BatchListenerFactoryHelper {
 			}
 		}
 
-		itemReader = new DelegatingItemReader(itemReader) {
-			public Object read() throws Exception {
+		itemReader = new DelegatingItemReader<T>(itemReader) {
+			public T read() throws Exception {
 				try {
 					multicaster.beforeRead();
-					Object item = super.read();
+					T item = super.read();
 					multicaster.afterRead(item);
 					return item;
 				}
@@ -82,7 +82,7 @@ abstract class BatchListenerFactoryHelper {
 	 * @param itemWriter
 	 * @param listeners
 	 */
-	public static ItemWriter<?> getItemWriter(ItemWriter<?> itemWriter, StepListener[] listeners) {
+	public static <T> ItemWriter<T> getItemWriter(ItemWriter<T> itemWriter, StepListener[] listeners) {
 		final CompositeItemWriteListener multicaster = new CompositeItemWriteListener();
 
 		for (int i = 0; i < listeners.length; i++) {
@@ -92,8 +92,8 @@ abstract class BatchListenerFactoryHelper {
 			}
 		}
 
-		itemWriter = new DelegatingItemWriter(itemWriter) {
-			public void write(Object item) throws Exception {
+		itemWriter = new DelegatingItemWriter<T,T>(itemWriter) {
+			public void write(T item) throws Exception {
 				try {
 					multicaster.beforeWrite(item);
 					super.write(item);
