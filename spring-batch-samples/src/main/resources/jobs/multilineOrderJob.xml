@@ -45,12 +45,7 @@
 						<property name="validator" ref="validator" />
 					</bean>
 				</property>
-				<property name="itemWriter">
-					<bean
-						class="org.springframework.batch.item.transform.ItemTransformerItemWriter">
-						<property name="delegate" ref="orderWriter" />
-					</bean>
-				</property>
+				<property name="itemWriter" ref="orderWriter" />
 			</bean>
 		</property>
 	</bean>
