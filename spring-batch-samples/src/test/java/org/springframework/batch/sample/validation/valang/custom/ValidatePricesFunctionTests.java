@@ -1,30 +1,33 @@
 package org.springframework.batch.sample.validation.valang.custom;
 
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.batch.sample.domain.LineItem;
+import org.springmodules.validation.valang.functions.Function;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.MockControl;
-
-import org.springframework.batch.sample.domain.LineItem;
-
-import org.springmodules.validation.valang.functions.Function;
-import junit.framework.TestCase;
-
-public class ValidatePricesFunctionTests extends TestCase {
+public class ValidatePricesFunctionTests {
 
 	private ValidatePricesFunction function;
-	private MockControl argumentControl;
 	private Function argument;
 
+	@Before
 	public void setUp() {
-		argumentControl = MockControl.createControl(Function.class);
-		argument = (Function) argumentControl.getMock();
+
+		argument = createMock(Function.class);
 
 		//create function
 		function = new ValidatePricesFunction(new Function[] {argument}, 0, 0);
+		
 	}
 	
+	@Test
 	public void testItemPriceMin() throws Exception {
 	
 		//create line item with correct item price
@@ -36,12 +39,11 @@ public class ValidatePricesFunctionTests extends TestCase {
 		items.add(item);
 		
 		//set return value for mock argument
-		argument.getResult(null);
-		argumentControl.setReturnValue(items,2);
-		argumentControl.replay();
-		
+		expect(argument.getResult(null)).andReturn(items).times(2);
+		replay(argument);
+
 		//verify result - should be true - all item prices are correct
-		assertTrue(((Boolean)function.doGetResult(null)).booleanValue());
+		assertTrue((Boolean) function.doGetResult(null));
 		
 		//now add line item with negative item price
 		item = new LineItem();
@@ -49,9 +51,10 @@ public class ValidatePricesFunctionTests extends TestCase {
 		items.add(item);
 		
 		//verify result - should be false - second item has invalid item price
-		assertFalse(((Boolean)function.doGetResult(null)).booleanValue());
+		assertFalse((Boolean) function.doGetResult(null));
 	}
-	
+
+	@Test
 	public void testItemPriceMax() throws Exception {
 
 		//create line item with correct item price
@@ -63,12 +66,11 @@ public class ValidatePricesFunctionTests extends TestCase {
 		items.add(item);
 		
 		//set return value for mock argument
-		argument.getResult(null);
-		argumentControl.setReturnValue(items,2);
-		argumentControl.replay();
-		
+		expect(argument.getResult(null)).andReturn(items).times(2);
+		replay(argument);
+
 		//verify result - should be true - all item prices are correct
-		assertTrue(((Boolean)function.doGetResult(null)).booleanValue());
+		assertTrue((Boolean) function.doGetResult(null));
 		
 		//now add line item with item price above allowed max 
 		item = new LineItem();
@@ -76,7 +78,7 @@ public class ValidatePricesFunctionTests extends TestCase {
 		items.add(item);
 		
 		//verify result - should be false - second item has invalid item price
-		assertFalse(((Boolean)function.doGetResult(null)).booleanValue());
+		assertFalse((Boolean) function.doGetResult(null));
 	}
 
 }

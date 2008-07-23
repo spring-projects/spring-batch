@@ -1,29 +1,31 @@
 package org.springframework.batch.sample.tasklet;
 
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+import org.junit.Test;
+import org.springframework.batch.repeat.ExitStatus;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import junit.framework.TestCase;
-
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Tests for {@link ConfigurableSystemProcessExitCodeMapper}
  */
-public class ConfigurableSystemProcessExitCodeMapperTests extends TestCase {
+public class ConfigurableSystemProcessExitCodeMapperTests {
 
 	private ConfigurableSystemProcessExitCodeMapper mapper = new ConfigurableSystemProcessExitCodeMapper();
 	
 	/**
 	 * Regular usage scenario - mapping adheres to injected values
 	 */
+	@Test
 	public void testMapping() {
 		Map<Object, ExitStatus> mappings = new HashMap<Object, ExitStatus>() {{
-			put(new Integer(0), ExitStatus.FINISHED);
-			put(new Integer(1), ExitStatus.FAILED);
-			put(new Integer(2), ExitStatus.CONTINUABLE);
-			put(new Integer(3), ExitStatus.NOOP);
-			put(new Integer(4), ExitStatus.UNKNOWN);
+			put(0, ExitStatus.FINISHED);
+			put(1, ExitStatus.FAILED);
+			put(2, ExitStatus.CONTINUABLE);
+			put(3, ExitStatus.NOOP);
+			put(4, ExitStatus.UNKNOWN);
 			put(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.UNKNOWN);
 		}};
 		
@@ -33,7 +35,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests extends TestCase {
 		for (Map.Entry<Object, ExitStatus> entry : mappings.entrySet()) {
 			if (entry.getKey().equals(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY)) continue;
 			
-			int exitCode = ((Integer)entry.getKey()).intValue();
+			int exitCode = (Integer) entry.getKey();
 			assertSame(entry.getValue(), mapper.getExitStatus(exitCode));
 		}
 		
@@ -45,6 +47,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests extends TestCase {
 	/**
 	 * Else clause is required in the injected map - setter checks its presence.
 	 */
+	@Test
 	public void testSetMappingsMissingElseClause() {
 		Map<Object, ExitStatus> missingElse = new HashMap<Object, ExitStatus>();
 		try {

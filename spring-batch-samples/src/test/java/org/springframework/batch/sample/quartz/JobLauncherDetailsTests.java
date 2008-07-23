@@ -15,14 +15,11 @@
  */
 package org.springframework.batch.sample.quartz;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.junit.Assert.assertEquals;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
+import org.junit.Before;
+import org.junit.Test;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -38,11 +35,16 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.sample.tasklet.JobSupport;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 /**
  * @author Dave Syer
  * 
  */
-public class JobLauncherDetailsTests extends TestCase {
+public class JobLauncherDetailsTests {
 
 	private JobLauncherDetails details = new JobLauncherDetails();
 	
@@ -50,7 +52,8 @@ public class JobLauncherDetailsTests extends TestCase {
 	
 	private List<Serializable> list = new ArrayList<Serializable>();
 	
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		details.setJobLauncher(new JobLauncher() {
 			public JobExecution run(org.springframework.batch.core.Job job, JobParameters jobParameters)
 					throws JobExecutionAlreadyRunningException, JobRestartException {
@@ -66,10 +69,6 @@ public class JobLauncherDetailsTests extends TestCase {
 		});
 	}
 
-	/**
-	 * @return 
-	 * 
-	 */
 	private JobExecutionContext createContext(JobDetail jobDetail) {
 		firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTrigger(), null, false, new Date(), new Date(), new Date(), new Date());
 		return new StubJobExecutionContext();
@@ -79,6 +78,7 @@ public class JobLauncherDetailsTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
+	@Test
 	public void testExecuteWithNoJobParameters() {
 		JobDetail jobDetail = new JobDetail();
 		JobExecutionContext context = createContext(jobDetail);
@@ -92,6 +92,7 @@ public class JobLauncherDetailsTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
+	@Test
 	public void testExecuteWithJobName() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
@@ -105,6 +106,7 @@ public class JobLauncherDetailsTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
+	@Test
 	public void testExecuteWithSomeJobParameters() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put("foo", "bar");
@@ -119,6 +121,7 @@ public class JobLauncherDetailsTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
+	@Test
 	public void testExecuteWithJobNameAndParameters() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
@@ -135,6 +138,7 @@ public class JobLauncherDetailsTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
+	@Test
 	public void testExecuteWithJobNameAndComplexParameters() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
@@ -149,15 +153,11 @@ public class JobLauncherDetailsTests extends TestCase {
 	}
 
 	private final class StubJobExecutionContext extends JobExecutionContext {
-		/**
-		 * @param scheduler
-		 * @param firedBundle
-		 * @param job
-		 */
+
 		private StubJobExecutionContext() {
-			super((Scheduler) MockControl.createNiceControl(Scheduler.class).getMock(), firedBundle, (Job) MockControl.createNiceControl(Job.class)
-					.getMock());
+			super(createNiceMock(Scheduler.class), firedBundle, createNiceMock(Job.class));
 		}
+
 	}
 
 }

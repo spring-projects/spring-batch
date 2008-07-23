@@ -76,9 +76,6 @@ public class OrderItemReader extends AbstractItemReader<Order> {
 		return result;
 	}
 
-	/**
-	 * @see org.springframework.batch.execution.io.FieldSetCallback#execute(StepExecution)
-	 */
 	private void process(FieldSet fieldSet) {
 		// finish processing if we hit the end of file
 		if (fieldSet == null) {

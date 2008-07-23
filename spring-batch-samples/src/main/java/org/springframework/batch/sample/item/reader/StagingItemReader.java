@@ -41,7 +41,7 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 
 	private LobHandler lobHandler = new DefaultLobHandler();
 
-	private Object lock = new Object();
+	private final Object lock = new Object();
 
 	private volatile boolean initialized = false;
 
@@ -97,7 +97,7 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 
 			new RowMapper() {
 				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-					return new Long(rs.getLong(1));
+					return rs.getLong(1);
 				}
 			}
 
@@ -142,7 +142,7 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 				if (keys.hasNext()) {
 					Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
 							"Transaction not active for this thread.");
-					Long next = (Long) keys.next();
+					Long next = keys.next();
 					getBuffer().add(next);
 					key = next;
 					logger.debug("Retrieved key from list: " + key);
@@ -175,7 +175,7 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 
 		public Long next() {
 			if (iter.hasNext()) {
-				return (Long) iter.next();
+				return iter.next();
 			}
 			return null;
 		}

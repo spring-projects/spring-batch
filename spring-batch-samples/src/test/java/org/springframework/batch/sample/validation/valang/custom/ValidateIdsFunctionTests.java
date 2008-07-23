@@ -1,29 +1,30 @@
 package org.springframework.batch.sample.validation.valang.custom;
 
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.batch.sample.domain.LineItem;
+import org.springmodules.validation.valang.functions.Function;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-import org.easymock.MockControl;
-
-import org.springframework.batch.sample.domain.LineItem;
-
-import org.springmodules.validation.valang.functions.Function;
-
-public class ValidateIdsFunctionTests extends TestCase {
+public class ValidateIdsFunctionTests {
 
 	private ValidateIdsFunction function;
-	private MockControl argumentControl;
 	private Function argument;
 
+	@Before
 	public void setUp() {
-		argumentControl = MockControl.createControl(Function.class);
-		argument = (Function) argumentControl.getMock();
+		argument = createMock(Function.class);
 
 		//create function
 		function = new ValidateIdsFunction(new Function[] {argument}, 0, 0);
 	}
 	
+	@Test
 	public void testIdMin() throws Exception {
 	
 		//create line item with correct item id
@@ -35,12 +36,11 @@ public class ValidateIdsFunctionTests extends TestCase {
 		items.add(item);
 		
 		//set return value for mock argument
-		argument.getResult(null);
-		argumentControl.setReturnValue(items,2);
-		argumentControl.replay();
+		expect(argument.getResult(null)).andReturn(items).times(2);
+		replay(argument);
 		
 		//verify result - should be true - all ids are correct
-		assertTrue(((Boolean)function.doGetResult(null)).booleanValue());
+		assertTrue((Boolean) function.doGetResult(null));
 		
 		//now add line item with negative id
 		item = new LineItem();
@@ -48,9 +48,11 @@ public class ValidateIdsFunctionTests extends TestCase {
 		items.add(item);
 		
 		//verify result - should be false - second item has invalid id
-		assertFalse(((Boolean)function.doGetResult(null)).booleanValue());
+		assertFalse((Boolean) function.doGetResult(null));
+		
 	}
 	
+	@Test
 	public void testIdMax() throws Exception {
 
 		//create line item with correct item id
@@ -62,12 +64,11 @@ public class ValidateIdsFunctionTests extends TestCase {
 		items.add(item);
 		
 		//set return value for mock argument
-		argument.getResult(null);
-		argumentControl.setReturnValue(items,2);
-		argumentControl.replay();
+		expect(argument.getResult(null)).andReturn(items).times(2);
+		replay(argument);
 		
 		//verify result - should be true - all item ids are correct
-		assertTrue(((Boolean)function.doGetResult(null)).booleanValue());
+		assertTrue((Boolean) function.doGetResult(null));
 		
 		//now add line item with item id above allowed max 
 		item = new LineItem();
@@ -75,6 +76,8 @@ public class ValidateIdsFunctionTests extends TestCase {
 		items.add(item);
 		
 		//verify result - should be false - second item has invalid item id
-		assertFalse(((Boolean)function.doGetResult(null)).booleanValue());
+		assertFalse((Boolean) function.doGetResult(null));
+
 	}
+
 }

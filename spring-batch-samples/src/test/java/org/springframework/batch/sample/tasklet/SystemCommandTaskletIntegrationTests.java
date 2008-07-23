@@ -1,35 +1,34 @@
 package org.springframework.batch.sample.tasklet;
 
-import java.io.File;
-
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.sample.tasklet.SystemCommandException;
-import org.springframework.batch.sample.tasklet.SystemCommandTasklet;
-import org.springframework.batch.sample.tasklet.SystemProcessExitCodeMapper;
 import org.springframework.util.Assert;
+
+import java.io.File;
 
 /**
  * Tests for {@link SystemCommandTasklet}.
  */
-public class SystemCommandTaskletIntegrationTests extends TestCase {
+public class SystemCommandTaskletIntegrationTests {
 
 	private static final Log log = LogFactory.getLog(SystemCommandTaskletIntegrationTests.class);
 
 	private SystemCommandTasklet tasklet = new SystemCommandTasklet();
 
 	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(
-			new Long(1), new JobParameters(), "systemCommandJob")));
+			1L, new JobParameters(), "systemCommandJob")));
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		tasklet.setEnvironmentParams(null); // inherit from parent process
 		tasklet.setWorkingDirectory(null); // inherit from parent process
 		tasklet.setSystemProcessExitCodeMapper(new TestExitCodeMapper());
@@ -41,9 +40,10 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		tasklet.beforeStep(stepExecution);
 	}
 
-	/**
+	/*
 	 * Regular usage scenario - successful execution of system command.
 	 */
+	@Test
 	public void testExecute() throws Exception {
 		String command = "java -version";
 		tasklet.setCommand(command);
@@ -55,9 +55,10 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		assertEquals(ExitStatus.FINISHED, exitStatus);
 	}
 
-	/**
+	/*
 	 * Failed execution scenario - error exit code returned by system command.
 	 */
+	@Test
 	public void testExecuteFailure() throws Exception {
 		String command = "java org.springframework.batch.sample.tasklet.UnknownClass";
 		tasklet.setCommand(command);
@@ -69,9 +70,10 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		assertEquals(ExitStatus.FAILED, exitStatus);
 	}
 
-	/**
+	/*
 	 * Failed execution scenario - execution time exceeds timeout.
 	 */
+	@Test
 	public void testExecuteTimeout() throws Exception {
 		String command = "sleep 3";
 		tasklet.setCommand(command);
@@ -88,9 +90,10 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		}
 	}
 
-	/**
+	/*
 	 * Job interrupted scenario.
 	 */
+	@Test
 	public void testInterruption() throws Exception {
 		String command = "sleep 5";
 		tasklet.setCommand(command);
@@ -109,9 +112,10 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		}
 	}
 
-	/**
+	/*
 	 * Command property value is required to be set.
 	 */
+	@Test
 	public void testCommandNotSet() throws Exception {
 		tasklet.setCommand(null);
 		try {
@@ -132,9 +136,10 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		}
 	}
 
-	/**
+	/*
 	 * Timeout must be set to non-zero value.
 	 */
+	@Test
 	public void testTimeoutNotSet() throws Exception {
 		tasklet.setCommand("not-empty placeholder");
 		tasklet.setTimeout(0);
@@ -147,10 +152,11 @@ public class SystemCommandTaskletIntegrationTests extends TestCase {
 		}
 	}
 
-	/**
+	/*
 	 * Working directory property must point to an existing location and it must
 	 * be a directory
 	 */
+	@Test
 	public void testWorkingDirectory() throws Exception {
 		File notExistingFile = new File("not-existing-path");
 		Assert.state(!notExistingFile.exists());

@@ -1,29 +1,33 @@
 package org.springframework.batch.sample.tasklet;
 
-import java.util.ArrayList;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import java.util.ArrayList;
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.sample.item.reader.ExceptionThrowingItemReaderProxy;
+import org.junit.After;
+import org.junit.Test;
 
-public class ExceptionThrowingItemReaderProxyTests extends TestCase {
+public class ExceptionThrowingItemReaderProxyTests {
 
 	//expected call count before exception is thrown (exception should be thrown in next iteration)
 	private static final int ITER_COUNT = 5;
 	
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		RepeatSynchronizationManager.clear();
 	}
 	
+	@Test
 	public void testProcess() throws Exception {
 				
 		//create module and set item processor and iteration count
-		ExceptionThrowingItemReaderProxy itemReader = new ExceptionThrowingItemReaderProxy();
-		itemReader.setItemReader(new ListItemReader(new ArrayList<String>() {{
+		ExceptionThrowingItemReaderProxy<String> itemReader = new ExceptionThrowingItemReaderProxy<String>();
+		itemReader.setItemReader(new ListItemReader<String>(new ArrayList<String>() {{
 			add("a");
 			add("b");
 			add("c");

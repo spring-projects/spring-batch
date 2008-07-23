@@ -1,42 +1,40 @@
 package org.springframework.batch.sample.validation.valang.custom;
 
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
+import org.springframework.batch.sample.domain.LineItem;
+import org.springmodules.validation.valang.functions.Function;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.sample.domain.LineItem;
-
-import org.easymock.MockControl;
-import org.springmodules.validation.valang.functions.Function;
-import junit.framework.TestCase;
-
-public class TotalOrderItemsFunctionTests extends TestCase {
+public class TotalOrderItemsFunctionTests {
 
 	private TotalOrderItemsFunction function;
-	private MockControl argument1Control;
-	private Function argument1;
-	private MockControl argument2Control;
 	private Function argument2;
 	
+	@Before
 	public void setUp() {
 		//create mock for first argument - set count to 3
-		argument1Control = MockControl.createControl(Function.class);
-		argument1 = (Function) argument1Control.getMock();
-		argument1.getResult(null);
-		argument1Control.setReturnValue(new Integer(3));
-		argument1Control.replay();
+		Function argument1 = createMock(Function.class);
+		expect(argument1.getResult(null)).andReturn(3);
+		replay(argument1);
 		
-		argument2Control = MockControl.createControl(Function.class);
-		argument2 = (Function) argument2Control.getMock();
+		argument2 = createMock(Function.class);
 
 		//create function
 		function = new TotalOrderItemsFunction(new Function[] {argument1, argument2}, 0, 0);
+
 	}
 	
+	@Test
 	public void testFunctionWithNonListValue() {
 		
-		argument2.getResult(null);
-		argument2Control.setReturnValue(this);
-		argument2Control.replay();
+		expect(argument2.getResult(null)).andReturn(this);
+		replay(argument2);
 		
 		//call tested method - exception is expected because non list value
 		try {
@@ -45,8 +43,10 @@ public class TotalOrderItemsFunctionTests extends TestCase {
 		} catch (Exception e) {
 			assertTrue(true);
 		}
+
 	}
 	
+	@Test
 	public void testFunctionWithCorrectItemCount() throws Exception {
 
 		//create list with correct item count
@@ -55,14 +55,15 @@ public class TotalOrderItemsFunctionTests extends TestCase {
 		List<LineItem> list = new ArrayList<LineItem>();
 		list.add(item);
 		
-		argument2.getResult(null);
-		argument2Control.setReturnValue(list);
-		argument2Control.replay();
+		expect(argument2.getResult(null)).andReturn(list);
+		replay(argument2);
 
 		//vefify result
-		assertTrue(((Boolean)function.doGetResult(null)).booleanValue());
+		assertTrue((Boolean) function.doGetResult(null));
+
 	}
 
+	@Test
 	public void testFunctionWithIncorrectItemCount() throws Exception {
 
 		//create list with incorrect item count
@@ -71,12 +72,12 @@ public class TotalOrderItemsFunctionTests extends TestCase {
 		List<LineItem> list = new ArrayList<LineItem>();
 		list.add(item);
 		
-		argument2.getResult(null);
-		argument2Control.setReturnValue(list);
-		argument2Control.replay();
+		expect(argument2.getResult(null)).andReturn(list);
+		replay(argument2);
 
 		//vefify result
-		assertFalse(((Boolean)function.doGetResult(null)).booleanValue());
+		assertFalse((Boolean) function.doGetResult(null));
+
 	}
 
 }

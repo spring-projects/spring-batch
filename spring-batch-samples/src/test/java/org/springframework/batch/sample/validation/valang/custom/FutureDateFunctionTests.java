@@ -1,31 +1,34 @@
 package org.springframework.batch.sample.validation.valang.custom;
 
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springmodules.validation.valang.functions.Function;
+
 import java.util.Date;
 
-import org.easymock.MockControl;
-import org.springmodules.validation.valang.functions.Function;
-import junit.framework.TestCase;
-
-public class FutureDateFunctionTests extends TestCase {
+public class FutureDateFunctionTests {
 
 	private FutureDateFunction function;
-	private MockControl argumentControl;
 	private Function argument;
 	
+	@Before
 	public void setUp() {
-		argumentControl = MockControl.createControl(Function.class);
-		argument = (Function) argumentControl.getMock();
+		argument = createMock(Function.class);
 
 		//create function
 		function = new FutureDateFunction(new Function[] {argument}, 0, 0);
+
 	}
 	
+	@Test
 	public void testFunctionWithNonDateValue() {
 		
 		//set-up mock argument - set return value to non Date value
-		argument.getResult(null);
-		argumentControl.setReturnValue(this);
-		argumentControl.replay();
+		expect(argument.getResult(null)).andReturn(this);
+		replay(argument);
 				
 		//call tested method - exception is expected because non date value
 		try {
@@ -34,28 +37,31 @@ public class FutureDateFunctionTests extends TestCase {
 		} catch (Exception e) {
 			assertTrue(true);
 		}
+
 	}
 	
+	@Test
 	public void testFunctionWithFutureDate() throws Exception {
 
 		//set-up mock argument - set return value to future Date
-		argument.getResult(null);
-		argumentControl.setReturnValue(new Date(Long.MAX_VALUE));
-		argumentControl.replay();
-		
+		expect(argument.getResult(null)).andReturn(new Date(Long.MAX_VALUE));
+		replay(argument);
+
 		//vefify result - should be true because of future date
-		assertTrue(((Boolean)function.doGetResult(null)).booleanValue());
+		assertTrue((Boolean) function.doGetResult(null));
+
 	}
-	
+
+	@Test
 	public void testFunctionWithPastDate() throws Exception {
 
 		//set-up mock argument - set return value to future Date
-		argument.getResult(null);
-		argumentControl.setReturnValue(new Date(0));
-		argumentControl.replay();
-		
+		expect(argument.getResult(null)).andReturn(new Date(0));
+		replay(argument);
+
 		//vefify result - should be false because of past date
-		assertFalse(((Boolean)function.doGetResult(null)).booleanValue());
+		assertFalse((Boolean) function.doGetResult(null));
 		
 	}
+
 }
