@@ -63,7 +63,7 @@ public class BatchSqlCustomerCreditIncreaseWriterTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.sample.item.writer.BatchSqlCustomerCreditIncreaseWriter#write(java.lang.Object)}.
+	 * {@link org.springframework.batch.sample.item.writer.BatchSqlCustomerCreditIncreaseWriter#write(CustomerCredit)}.
 	 * @throws Exception
 	 */
 	@Test

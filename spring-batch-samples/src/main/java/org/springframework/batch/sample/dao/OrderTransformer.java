@@ -35,7 +35,7 @@ import org.springframework.batch.sample.domain.Order;
  * Converts <code>Order</code> object to a String.
  * @author Dave Syer
  */
-public class OrderTransformer implements ItemTransformer {
+public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 
 	/**
 	 * Aggregators for all types of lines in the output file
@@ -46,8 +46,7 @@ public class OrderTransformer implements ItemTransformer {
 	 * Converts information from an Order object to a collection of Strings for
 	 * output.
 	 */
-	public Object transform(Object data) {
-		Order order = (Order) data;
+	public List<String> transform(Order order) {
 
 		List<String> result = new ArrayList<String>();
 

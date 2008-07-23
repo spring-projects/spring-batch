@@ -23,6 +23,7 @@ import org.springframework.batch.sample.domain.Trade;
 
 
 
+@SuppressWarnings("unchecked")
 public class TradeFieldSetMapper implements FieldSetMapper {
 	
 	public static final int ISIN_COLUMN = 0;

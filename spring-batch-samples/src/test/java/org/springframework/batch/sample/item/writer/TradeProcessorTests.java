@@ -40,12 +40,4 @@ public class TradeProcessorTests {
 		writerControl.verify();
 	}
 	
-	@Test
-	public void testProcessNonTradeObject() {
-		
-		writerControl.replay();
-		//call tested method
-		processor.write(this);
-		writerControl.verify();
-	}
 }

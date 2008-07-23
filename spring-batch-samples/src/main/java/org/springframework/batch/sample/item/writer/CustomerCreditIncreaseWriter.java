@@ -11,7 +11,7 @@ import org.springframework.batch.sample.domain.CustomerCredit;
  * 
  * @author Robert Kasanicky
  */
-public class CustomerCreditIncreaseWriter extends AbstractItemWriter {
+public class CustomerCreditIncreaseWriter extends AbstractItemWriter<CustomerCredit> {
 
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("1000");
 	
@@ -28,9 +28,9 @@ public class CustomerCreditIncreaseWriter extends AbstractItemWriter {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.processor.DelegatingItemWriter#doProcess(java.lang.Object)
 	 */
-	public void write(Object data) throws Exception {
-		CustomerCredit customerCredit = ((CustomerCredit) data).increaseCreditBy(FIXED_AMOUNT);
-		customerCreditDao.writeCredit(customerCredit);
+	public void write(CustomerCredit customerCredit) throws Exception {
+		CustomerCredit result = customerCredit.increaseCreditBy(FIXED_AMOUNT);
+		customerCreditDao.writeCredit(result);
 	}
 
 }

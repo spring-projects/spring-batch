@@ -23,10 +23,10 @@ import org.springframework.batch.sample.domain.Person;
 
 
 
-public class PersonWriter extends AbstractItemWriter {
+public class PersonWriter extends AbstractItemWriter<Person> {
     private static Log log = LogFactory.getLog(PersonWriter.class);
  
-    public void write(Object data) {
+    public void write(Person data) {
         if (!(data instanceof Person)) {
             log.warn("PersonProcessor can process only Person objects, skipping record");
 

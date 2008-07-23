@@ -22,7 +22,7 @@ import org.springframework.util.ClassUtils;
 /**
  * Database {@link ItemWriter} implementing the process indicator pattern.
  */
-public class StagingItemWriter extends JdbcDaoSupport implements StepExecutionListener, ItemWriter {
+public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutionListener, ItemWriter<T> {
 
 	public static final String NEW = "N";
 
@@ -70,7 +70,7 @@ public class StagingItemWriter extends JdbcDaoSupport implements StepExecutionLi
 	 * 
 	 * @see ItemWriter#write(java.lang.Object)
 	 */
-	public void write(Object data) {
+	public void write(T data) {
 		final long id = incrementer.nextLongValue();
 		final long jobId = stepExecution.getJobExecution().getJobId().longValue();
 		final byte[] blob = SerializationUtils.serialize((Serializable) data);

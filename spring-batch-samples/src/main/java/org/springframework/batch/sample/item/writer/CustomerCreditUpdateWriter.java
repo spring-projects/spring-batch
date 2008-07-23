@@ -22,12 +22,11 @@ import org.springframework.batch.sample.domain.CustomerCredit;
 
 
 
-public class CustomerCreditUpdateWriter extends AbstractItemWriter {
+public class CustomerCreditUpdateWriter extends AbstractItemWriter<CustomerCredit> {
     private double creditFilter = 800;
     private CustomerCreditDao dao;
 
-    public void write(Object data) throws Exception {
-        CustomerCredit customerCredit = (CustomerCredit) data;
+    public void write(CustomerCredit customerCredit) throws Exception {
 
         if (customerCredit.getCredit().doubleValue() > creditFilter) {
             dao.writeCredit(customerCredit);

@@ -8,11 +8,11 @@ import org.springframework.batch.item.support.AbstractItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class RetrySampleItemWriter extends AbstractItemWriter {
+public class RetrySampleItemWriter<T> extends AbstractItemWriter<T> {
 
 	private int counter = 0;
 	
-	public void write(Object data) throws Exception {
+	public void write(T data) throws Exception {
 		counter++;
 		if (counter == 2 || counter == 3) {
 			throw new RuntimeException("Temporary error");

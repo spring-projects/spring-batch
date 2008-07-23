@@ -27,12 +27,11 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class CustomerUpdateWriter extends AbstractItemWriter {
+public class CustomerUpdateWriter extends AbstractItemWriter<Trade> {
 
 	private CustomerDebitDao dao;
 
-    public void write(Object data) {
-        Trade trade = (Trade) data;
+    public void write(Trade trade) {
         CustomerDebit customerDebit = new CustomerDebit();
         customerDebit.setName(trade.getCustomer());
         customerDebit.setDebit(trade.getPrice());

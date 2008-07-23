@@ -21,7 +21,7 @@ import org.springframework.batch.item.support.AbstractItemWriter;
  * @author Dave Syer
  *
  */
-public class DummyItemWriter extends AbstractItemWriter {
+public class DummyItemWriter extends AbstractItemWriter<Object> {
 
 	public void write(Object item) throws Exception {
 		// NO-OP

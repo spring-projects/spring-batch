@@ -17,9 +17,9 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class BatchSqlCustomerCreditIncreaseWriter implements ItemWriter, InitializingBean {
+public class BatchSqlCustomerCreditIncreaseWriter implements ItemWriter<CustomerCredit>, InitializingBean {
 
-	private ItemWriter delegate;
+	private ItemWriter<CustomerCredit> delegate;
 
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal(1000);
 
@@ -28,7 +28,7 @@ public class BatchSqlCustomerCreditIncreaseWriter implements ItemWriter, Initial
 	 * {@link BatchSqlUpdateItemWriter}.
 	 * @param delegate the delegate to set
 	 */
-	public void setDelegate(ItemWriter delegate) {
+	public void setDelegate(ItemWriter<CustomerCredit> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -44,23 +44,14 @@ public class BatchSqlCustomerCreditIncreaseWriter implements ItemWriter, Initial
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.processor.DelegatingItemWriter#doProcess(java.lang.Object)
 	 */
-	public void write(Object data) throws Exception {
-		CustomerCredit customerCredit = ((CustomerCredit) data).increaseCreditBy(FIXED_AMOUNT);
+	public void write(CustomerCredit customerCredit) throws Exception {
 		delegate.write(customerCredit);
 	}
 
-	/**
-	 * @throws ClearFailedException
-	 * @see org.springframework.batch.item.database.BatchSqlUpdateItemWriter#clear()
-	 */
 	public void clear() throws ClearFailedException {
 		delegate.clear();
 	}
 
-	/**
-	 * @throws FlushFailedException
-	 * @see org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()
-	 */
 	public void flush() throws FlushFailedException {
 		delegate.flush();
 	}

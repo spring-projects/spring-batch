@@ -9,15 +9,15 @@ import org.springframework.batch.item.validator.ValidationException;
 /**
  * Remembers all items written - useful for testing.
  */
-public class ItemTrackingItemWriter extends AbstractItemWriter {
+public class ItemTrackingItemWriter<T> extends AbstractItemWriter<T> {
 
-	private List<Object> items = new ArrayList<Object>();
+	private List<T> items = new ArrayList<T>();
 	
 	private int failure = -1;
 	
 	private int counter = 0;
 	
-	public void write(Object item) throws Exception {
+	public void write(T item) throws Exception {
 		
 		items.add(item);
 		if (++counter == failure) {
@@ -25,7 +25,7 @@ public class ItemTrackingItemWriter extends AbstractItemWriter {
 		}
 	}
 
-	public List<Object> getItems() {
+	public List<T> getItems() {
 		return items;
 	}
 

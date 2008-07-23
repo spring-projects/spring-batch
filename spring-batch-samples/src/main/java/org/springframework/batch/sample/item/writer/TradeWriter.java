@@ -26,7 +26,7 @@ import org.springframework.batch.sample.domain.Trade;
  * Delegates the actual writing to custom DAO delegate. Allows configurable
  * exception raising for testing skip and restart.
  */
-public class TradeWriter extends AbstractItemWriter {
+public class TradeWriter extends AbstractItemWriter<Trade> {
 	private static Log log = LogFactory.getLog(TradeWriter.class);
 
 	private TradeDao dao;
@@ -44,17 +44,10 @@ public class TradeWriter extends AbstractItemWriter {
 		this.failure = failure;
 	}
 
-	public void write(Object data) {
-		if (!(data instanceof Trade)) {
-			log.warn("TradeProcessor can process only Trade objects, skipping record");
+	public void write(Trade trade) {
 
-			return;
-		}
+		log.debug(trade);
 
-		Trade trade = (Trade) data;
-		log.debug(data);
-
-		// TODO put some processing of the trade object here
 		dao.writeTrade(trade);
 
 		if (index++ == failure) {
