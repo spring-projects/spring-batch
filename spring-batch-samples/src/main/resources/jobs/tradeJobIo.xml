@@ -32,7 +32,7 @@
 				<property name="resource" ref="customerFileLocator" />
 				<property name="fieldSetCreator">
 					<bean
-						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetCreator" />
 				</property>
 			</bean>
 		</property>

@@ -24,7 +24,7 @@
 						<property name="resource"
 							value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
 							<property name="fieldSetCreator">
-								<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper"/>
+								<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetCreator"/>
 							</property>
 					</bean>
 				</property>
