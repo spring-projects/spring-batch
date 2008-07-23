@@ -13,7 +13,6 @@ import org.springframework.util.Assert;
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
-	@SuppressWarnings("unchecked")
 	private static Collection<JobInstance> jobInstances = TransactionAwareProxyFactory.createTransactionalList();
 
 	private long currentId = 0;

@@ -17,10 +17,8 @@ import org.springframework.util.Assert;
 
 public class MapJobExecutionDao implements JobExecutionDao {
 
-	@SuppressWarnings("unchecked")
 	private static Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
 
-	@SuppressWarnings("unchecked")
 	private static Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 

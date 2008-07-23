@@ -31,11 +31,9 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	@SuppressWarnings("unchecked")
 	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 
-	@SuppressWarnings("unchecked")
 	private static Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 
@@ -50,7 +48,6 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		return (ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId());
 	}
 
-	@SuppressWarnings("unchecked")
 	public void saveStepExecution(StepExecution stepExecution) {
 		Assert.isTrue(stepExecution.getId() == null);
 		Assert.isTrue(stepExecution.getVersion() == null);
