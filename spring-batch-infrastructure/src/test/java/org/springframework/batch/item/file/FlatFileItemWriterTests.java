@@ -299,6 +299,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
 		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
 		writer.setResource(file);
+		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
 		file.getFile().setReadOnly();
 		writer.afterPropertiesSet();
