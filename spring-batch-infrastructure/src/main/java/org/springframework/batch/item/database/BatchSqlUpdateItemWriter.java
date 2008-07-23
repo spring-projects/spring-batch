@@ -56,7 +56,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemWriter implements InitializingBean {
+public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceItemWriter<T> implements InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
@@ -122,7 +122,7 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 	 */
 	protected void doFlush() throws EmptyResultDataAccessException {
 
-		final List<Object> processed = new ArrayList<Object>(getProcessed());
+		final List<T> processed = new ArrayList<T>(getProcessed());
 
 		if (!processed.isEmpty()) {
 
@@ -158,7 +158,7 @@ public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemW
 	/**
 	 * No-op.
 	 */
-	protected void doWrite(Object output) {
+	protected void doWrite(T item) {
 	}
 
 	/**

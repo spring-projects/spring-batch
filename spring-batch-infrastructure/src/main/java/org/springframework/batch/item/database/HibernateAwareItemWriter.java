@@ -44,14 +44,14 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter extends AbstractTransactionalResourceItemWriter implements InitializingBean {
+public class HibernateAwareItemWriter<T> extends AbstractTransactionalResourceItemWriter<T> implements InitializingBean {
 
 	/**
 	 * Key for items processed in the current transaction {@link RepeatContext}.
 	 */
 	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
 
-	private ItemWriter delegate;
+	private ItemWriter<? super T> delegate;
 
 	private HibernateOperations hibernateTemplate;
 
@@ -60,7 +60,7 @@ public class HibernateAwareItemWriter extends AbstractTransactionalResourceItemW
 	 * 
 	 * @param delegate the delegate to set
 	 */
-	public void setDelegate(ItemWriter delegate) {
+	public void setDelegate(ItemWriter<? super T> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -114,8 +114,8 @@ public class HibernateAwareItemWriter extends AbstractTransactionalResourceItemW
 		return ITEMS_PROCESSED;
 	}
 
-	protected void doWrite(Object output) throws Exception {
-		delegate.write(output);
+	protected void doWrite(T item) throws Exception {
+		delegate.write(item);
 	}
 
 }

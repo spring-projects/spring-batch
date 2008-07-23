@@ -37,9 +37,9 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public abstract class AbstractTransactionalResourceItemWriter implements ItemWriter {
+public abstract class AbstractTransactionalResourceItemWriter<T> implements ItemWriter<T> {
 
-	private Set<Object> failed = new HashSet<Object>();
+	private Set<T> failed = new HashSet<T>();
 
 	/**
 	 * Flushing delegated to subclass surrounded by binding and unbinding of
@@ -73,7 +73,7 @@ public abstract class AbstractTransactionalResourceItemWriter implements ItemWri
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(Object)
 	 */
-	public void write(Object output) throws Exception {
+	public void write(T output) throws Exception {
 		bindTransactionResources();
 		getProcessed().add(output);
 		doWrite(output);
@@ -123,7 +123,7 @@ public abstract class AbstractTransactionalResourceItemWriter implements ItemWri
 	/**
 	 * Callback method of {@link #write(Object)}.
 	 */
-	protected abstract void doWrite(Object output) throws Exception;
+	protected abstract void doWrite(T item) throws Exception;
 
 	/**
 	 * @return Key for items processed in the current transaction
@@ -159,10 +159,10 @@ public abstract class AbstractTransactionalResourceItemWriter implements ItemWri
 	 * @return the processed
 	 */
 	@SuppressWarnings("unchecked")
-	protected Set<Object> getProcessed() {
+	protected Set<T> getProcessed() {
 		Assert.state(TransactionSynchronizationManager.hasResource(getResourceKey()),
 				"Processed items not bound to transaction.");
-		Set<Object> processed = (Set<Object>) TransactionSynchronizationManager.getResource(getResourceKey());
+		Set<T> processed = (Set<T>) TransactionSynchronizationManager.getResource(getResourceKey());
 		return processed;
 	}
 }
