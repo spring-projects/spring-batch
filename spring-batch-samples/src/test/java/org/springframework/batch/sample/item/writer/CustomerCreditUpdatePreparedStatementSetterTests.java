@@ -19,16 +19,16 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import junit.framework.TestCase;
-
 import org.easymock.MockControl;
 import org.springframework.batch.sample.domain.CustomerCredit;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Dave Syer
  *
  */
-public class CustomerCreditUpdatePreparedStatementSetterTests extends TestCase {
+public class CustomerCreditUpdatePreparedStatementSetterTests {
 	
 	private CustomerCreditUpdatePreparedStatementSetter setter = new CustomerCreditUpdatePreparedStatementSetter();
 
@@ -38,10 +38,8 @@ public class CustomerCreditUpdatePreparedStatementSetterTests extends TestCase {
 
 	private MockControl control = MockControl.createControl(PreparedStatement.class);
 
-	/* (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		ps = (PreparedStatement) control.getMock();
 		credit = new CustomerCredit();
 		credit.setId(13);
@@ -52,6 +50,7 @@ public class CustomerCreditUpdatePreparedStatementSetterTests extends TestCase {
 	 * Test method for {@link org.springframework.batch.sample.item.writer.CustomerCreditUpdatePreparedStatementSetter#setValues(java.lang.Object, java.sql.PreparedStatement)}.
 	 * @throws SQLException 
 	 */
+	@Test
 	public void testSetValues() throws SQLException {
 		ps.setBigDecimal(1, credit.getCredit());
 		control.setVoidCallable();

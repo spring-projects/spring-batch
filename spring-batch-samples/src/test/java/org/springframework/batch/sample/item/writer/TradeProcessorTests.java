@@ -1,18 +1,19 @@
 package org.springframework.batch.sample.item.writer;
 
-import junit.framework.TestCase;
-
 import org.easymock.MockControl;
 import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.item.writer.TradeWriter;
+import org.junit.Before;
+import org.junit.Test;
 
-public class TradeProcessorTests extends TestCase {
+public class TradeProcessorTests {
 
 	private MockControl writerControl;
 	private TradeDao writer;
 	private TradeWriter processor;
 	
+	@Before
 	public void setUp() {
 		
 		//create mock writer
@@ -24,6 +25,7 @@ public class TradeProcessorTests extends TestCase {
 		processor.setDao(writer);
 	}
 		
+	@Test
 	public void testProcess() {
 		
 		Trade trade = new Trade();
@@ -38,6 +40,7 @@ public class TradeProcessorTests extends TestCase {
 		writerControl.verify();
 	}
 	
+	@Test
 	public void testProcessNonTradeObject() {
 		
 		writerControl.replay();

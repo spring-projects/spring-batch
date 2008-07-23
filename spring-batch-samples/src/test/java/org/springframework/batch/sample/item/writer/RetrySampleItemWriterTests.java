@@ -1,19 +1,21 @@
 package org.springframework.batch.sample.item.writer;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests for {@link RetrySampleItemWriter}.
  * 
  * @author Robert Kasanicky
  */
-public class RetrySampleItemWriterTests extends TestCase {
+public class RetrySampleItemWriterTests {
 
 	private RetrySampleItemWriter processor = new RetrySampleItemWriter();
 
 	/**
 	 * Processing throws exception on 2nd and 3rd call.
 	 */
+	@Test
 	public void testProcess() throws Exception {
 		Object item = null;
 		processor.write(item);

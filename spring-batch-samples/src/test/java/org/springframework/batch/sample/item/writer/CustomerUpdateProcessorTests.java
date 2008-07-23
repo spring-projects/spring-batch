@@ -1,17 +1,17 @@
 package org.springframework.batch.sample.item.writer;
 
+import static org.junit.Assert.*;
+import org.junit.Test;
+
 import java.math.BigDecimal;
 
-import junit.framework.TestCase;
-
-import org.springframework.batch.sample.dao.JdbcCustomerDebitDao;
 import org.springframework.batch.sample.dao.CustomerDebitDao;
 import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.batch.sample.domain.Trade;
-import org.springframework.batch.sample.item.writer.CustomerUpdateWriter;
 
-public class CustomerUpdateProcessorTests extends TestCase {
+public class CustomerUpdateProcessorTests {
 
+	@Test
 	public void testProcess() {
 		
 		//create trade object

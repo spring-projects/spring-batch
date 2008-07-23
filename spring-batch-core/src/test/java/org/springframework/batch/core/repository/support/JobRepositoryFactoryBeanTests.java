@@ -174,7 +174,7 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 			// wrong meta data
 			fail("Expected IllegalArgumentException");
 		}
-		catch (AssertionFailedError e) {
+		catch (AssertionError e) {
 			// expected exception from txControl - wrong isolation level used in
 			// comparison
 			assertEquals("Unexpected method call", e.getMessage().substring(3, 25));
@@ -188,8 +188,14 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_SERIALIZABLE);
 		txControl.expectAndReturn(transactionManager.getTransaction(transactionDefinition), null);
-		dataSourceControl.expectAndReturn(dataSource.getConnection(), MockControl.createControl(Connection.class)
-				.getMock());
+		MockControl connectionControl = MockControl.createControl(Connection.class);
+		Connection conn = (Connection) connectionControl.getMock();
+		conn.prepareStatement("SELECT JOB_INSTANCE_ID from TEST_BATCH_PREFIX_JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)");
+		connectionControl.setReturnValue(null);
+		conn.close();
+		connectionControl.setVoidCallable();
+		dataSourceControl.expectAndReturn(dataSource.getConnection(), conn);
+		connectionControl.replay();
 		dataSourceControl.replay();
 		txControl.replay();
 		try {
@@ -200,6 +206,9 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 		}
 		catch (IllegalArgumentException e) {
 			// expected exception from DataSourceUtils
+			System.out.println("******* " + e);
+			System.out.println("******* " + e);
+			System.out.println("******* " + e);
 			assertEquals("No Statement specified", e.getMessage());
 		}
 	}
@@ -212,8 +221,14 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_READ_UNCOMMITTED);
 		txControl.expectAndReturn(transactionManager.getTransaction(transactionDefinition), null);
-		dataSourceControl.expectAndReturn(dataSource.getConnection(), MockControl.createControl(Connection.class)
-				.getMock());
+		MockControl connectionControl = MockControl.createControl(Connection.class);
+		Connection conn = (Connection) connectionControl.getMock();
+		conn.prepareStatement("SELECT JOB_INSTANCE_ID from TEST_BATCH_PREFIX_JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)");
+		connectionControl.setReturnValue(null);
+		conn.close();
+		connectionControl.setVoidCallable();
+		dataSourceControl.expectAndReturn(dataSource.getConnection(), conn);
+		connectionControl.replay();
 		dataSourceControl.replay();
 		txControl.replay();
 		try {

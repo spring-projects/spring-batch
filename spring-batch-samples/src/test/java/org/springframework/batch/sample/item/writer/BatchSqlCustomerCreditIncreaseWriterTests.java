@@ -15,19 +15,21 @@
  */
 package org.springframework.batch.sample.item.writer;
 
-import java.math.BigDecimal;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import java.math.BigDecimal;
 
 import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.CustomerCredit;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Dave Syer
  * 
  */
-public class BatchSqlCustomerCreditIncreaseWriterTests extends TestCase {
+public class BatchSqlCustomerCreditIncreaseWriterTests {
 
 	private BatchSqlCustomerCreditIncreaseWriter writer = new BatchSqlCustomerCreditIncreaseWriter();
 
@@ -37,11 +39,8 @@ public class BatchSqlCustomerCreditIncreaseWriterTests extends TestCase {
 
 	private CustomerCredit customerCredit;
 
-	/*
-	 * (non-Javadoc)
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		delegate = (ItemWriter) control.getMock();
 		writer.setDelegate(delegate);
 		customerCredit = new CustomerCredit();
@@ -50,6 +49,7 @@ public class BatchSqlCustomerCreditIncreaseWriterTests extends TestCase {
 		customerCredit.setName("foo");
 	}
 	
+	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		try {
 			writer.afterPropertiesSet();
@@ -66,6 +66,7 @@ public class BatchSqlCustomerCreditIncreaseWriterTests extends TestCase {
 	 * {@link org.springframework.batch.sample.item.writer.BatchSqlCustomerCreditIncreaseWriter#write(java.lang.Object)}.
 	 * @throws Exception
 	 */
+	@Test
 	public void testWrite() throws Exception {
 		delegate.write(customerCredit);
 		control.setVoidCallable();
@@ -78,6 +79,7 @@ public class BatchSqlCustomerCreditIncreaseWriterTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.item.writer.BatchSqlCustomerCreditIncreaseWriter#clear()}.
 	 */
+	@Test
 	public void testClear() {
 		delegate.clear();
 		control.setVoidCallable();
@@ -90,6 +92,7 @@ public class BatchSqlCustomerCreditIncreaseWriterTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.item.writer.BatchSqlCustomerCreditIncreaseWriter#flush()}.
 	 */
+	@Test
 	public void testFlush() {
 		delegate.flush();
 		control.setVoidCallable();

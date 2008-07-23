@@ -1,13 +1,14 @@
 package org.springframework.batch.sample.item.reader;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  * Tests for {@link GeneratingItemReader}.
  * 
  * @author Robert Kasanicky
  */
-public class GeneratingItemReaderTests extends TestCase {
+public class GeneratingItemReaderTests {
 
 	private GeneratingItemReader reader = new GeneratingItemReader();
 	
@@ -15,6 +16,7 @@ public class GeneratingItemReaderTests extends TestCase {
 	 * Generates a given number of not-null records,
 	 * consecutive calls return null.
 	 */
+	@Test
 	public void testRead() throws Exception {
 		int counter = 0;
 		int limit = 10;

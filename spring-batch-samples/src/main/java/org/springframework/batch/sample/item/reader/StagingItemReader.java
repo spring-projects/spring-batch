@@ -18,6 +18,7 @@ import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -107,7 +108,7 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 	}
 
 	@SuppressWarnings("unchecked")
-	public T read() throws Exception {
+	public T read() throws DataAccessException {
 		Long id = doRead();
 
 		if (id == null) {

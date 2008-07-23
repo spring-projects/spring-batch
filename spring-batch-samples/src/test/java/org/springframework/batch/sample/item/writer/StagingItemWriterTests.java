@@ -15,36 +15,53 @@
  */
 package org.springframework.batch.sample.item.writer;
 
+import static org.junit.Assert.assertEquals;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.ClassUtils;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.junit.runner.RunWith;
+import org.junit.Before;
+import org.junit.Test;
 
-public class StagingItemWriterTests extends AbstractTransactionalDataSourceSpringContextTests {
+import javax.sql.DataSource;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration()
+public class StagingItemWriterTests {
+
+	private JdbcOperations jdbcTemplate;
+
+	@Autowired
 	private StagingItemWriter writer;
 
-	public void setWriter(StagingItemWriter processor) {
-		this.writer = processor;
+	public JdbcOperations getJdbcTemplate() {
+		return jdbcTemplate;
 	}
 
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(StagingItemWriter.class,
-				"staging-test-context.xml") };
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpBeforeTransaction()
-	 */
-	protected void onSetUpBeforeTransaction() throws Exception {
+	@Before
+	public void onSetUpBeforeTransaction() throws Exception {
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(new Long(12L),
 				new JobParameters(), "testJob")));
 		writer.beforeStep(stepExecution);
 	}
 
+	@Transactional
+	@Test
 	public void testProcessInsertsNewItem() throws Exception {
 		int before = getJdbcTemplate().queryForInt("SELECT COUNT(*) from BATCH_STAGING");
 		writer.write("FOO");

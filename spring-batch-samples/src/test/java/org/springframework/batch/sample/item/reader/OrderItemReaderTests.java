@@ -1,10 +1,11 @@
 package org.springframework.batch.sample.item.reader;
 
+import static org.junit.Assert.*;
+
+import static org.easymock.EasyMock.*;
+
 import java.util.Iterator;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
@@ -15,25 +16,20 @@ import org.springframework.batch.sample.domain.Customer;
 import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
 import org.springframework.batch.sample.domain.ShippingInfo;
+import org.junit.Before;
+import org.junit.Test;
 
-public class OrderItemReaderTests extends TestCase {
+public class OrderItemReaderTests {
 
 	private OrderItemReader provider;
 
-	private MockControl inputControl;
-
 	private ItemReader<FieldSet> input;
 
-	private MockControl mapperControl;
-
 	@SuppressWarnings("unchecked")
-	private FieldSetMapper mapper;
-
-	@SuppressWarnings("unchecked")
+	@Before
 	public void setUp() {
 
-		inputControl = MockControl.createControl(ItemReader.class);
-		input = (ItemReader<FieldSet>) inputControl.getMock();
+		input = (ItemReader<FieldSet>) createMock(ItemReader.class);
 
 		provider = new OrderItemReader();
 		provider.setFieldSetReader(input);
@@ -50,6 +46,7 @@ public class OrderItemReaderTests extends TestCase {
 	 * need create mock objects for input source, mapper and validator.
 	 */
 	@SuppressWarnings("unchecked")
+	@Test
 	public void testNext() throws Exception {
 
 		// create fieldsets and set return values for input source
@@ -63,25 +60,16 @@ public class OrderItemReaderTests extends TestCase {
 		FieldSet footerFS = new DefaultFieldSet(new String[] { Order.LINE_ID_FOOTER, "100", "3", "3" }, new String[] {
 				"ID", "TOTAL_PRICE", "TOTAL_LINE_ITEMS", "TOTAL_ITEMS" });
 
-		input.read();
-		inputControl.setReturnValue(headerFS);
-		input.read();
-		inputControl.setReturnValue(customerFS);
-		input.read();
-		inputControl.setReturnValue(billingFS);
-		input.read();
-		inputControl.setReturnValue(shippingFS);
-		input.read();
-		inputControl.setReturnValue(billingInfoFS);
-		input.read();
-		inputControl.setReturnValue(shippingInfoFS);
-		input.read();
-		inputControl.setReturnValue(itemFS, 3);
-		input.read();
-		inputControl.setReturnValue(footerFS);
-		input.read();
-		inputControl.setReturnValue(null);
-		inputControl.replay();
+		expect(input.read()).andReturn(headerFS);
+		expect(input.read()).andReturn(customerFS);
+		expect(input.read()).andReturn(billingFS);
+		expect(input.read()).andReturn(shippingFS);
+		expect(input.read()).andReturn(billingInfoFS);
+		expect(input.read()).andReturn(shippingInfoFS);
+		expect(input.read()).andReturn(itemFS).times(3);
+		expect(input.read()).andReturn(footerFS);
+		expect(input.read()).andReturn(null);
+		replay(input);
 
 		// create value objects
 		Order order = new Order();
@@ -93,24 +81,16 @@ public class OrderItemReaderTests extends TestCase {
 		LineItem item = new LineItem();
 
 		// create mock mapper
-		mapperControl = MockControl.createControl(FieldSetMapper.class);
-		mapper = (FieldSetMapper) mapperControl.getMock();
+		FieldSetMapper mapper = createMock(FieldSetMapper.class);
 		// set how mapper should respond - set return values for mapper
-		mapper.mapLine(headerFS, -1);
-		mapperControl.setReturnValue(order);
-		mapper.mapLine(customerFS, -1);
-		mapperControl.setReturnValue(customer);
-		mapper.mapLine(billingFS, -1);
-		mapperControl.setReturnValue(billing);
-		mapper.mapLine(shippingFS, -1);
-		mapperControl.setReturnValue(shipping);
-		mapper.mapLine(billingInfoFS, -1);
-		mapperControl.setReturnValue(billingInfo);
-		mapper.mapLine(shippingInfoFS, -1);
-		mapperControl.setReturnValue(shippingInfo);
-		mapper.mapLine(itemFS, -1);
-		mapperControl.setReturnValue(item, 3);
-		mapperControl.replay();
+		expect(mapper.mapLine(headerFS, -1)).andReturn(order);
+		expect(mapper.mapLine(customerFS, -1)).andReturn(customer);
+		expect(mapper.mapLine(billingFS, -1)).andReturn(billing);
+		expect(mapper.mapLine(shippingFS, -1)).andReturn(shipping);
+		expect(mapper.mapLine(billingInfoFS, -1)).andReturn(billingInfo);
+		expect(mapper.mapLine(shippingInfoFS, -1)).andReturn(shippingInfo);
+		expect(mapper.mapLine(itemFS, -1)).andReturn(item).times(3);
+		replay(mapper);
 
 		// set-up provider: set mappers
 		provider.setAddressMapper(mapper);
@@ -149,8 +129,8 @@ public class OrderItemReaderTests extends TestCase {
 		assertNull(provider.read());
 
 		// verify method calls on input source, mapper and validator
-		inputControl.verify();
-		mapperControl.verify();
+		verify(input);
+		verify(mapper);
 	}
 
 }

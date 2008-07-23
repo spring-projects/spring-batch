@@ -2,20 +2,20 @@ package org.springframework.batch.sample.item.writer;
 
 import java.math.BigDecimal;
 
-import junit.framework.TestCase;
-
 import org.easymock.MockControl;
 import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.domain.CustomerCredit;
-import org.springframework.batch.sample.item.writer.CustomerCreditUpdateWriter;
+import org.junit.Before;
+import org.junit.Test;
 
-public class CustomerCreditUpdateProcessorTests extends TestCase {
+public class CustomerCreditUpdateProcessorTests {
 
 	private MockControl daoControl;
 	private CustomerCreditDao dao;
 	private CustomerCreditUpdateWriter writer;
 	private static final double CREDIT_FILTER = 355.0;
 	
+	@Before
 	public void setUp() {
 		//create mock writer
 		daoControl = MockControl.createControl(CustomerCreditDao.class);
@@ -26,6 +26,7 @@ public class CustomerCreditUpdateProcessorTests extends TestCase {
 		writer.setCreditFilter(CREDIT_FILTER);
 	}
 	
+	@Test
 	public void testProcess() throws Exception {
 		
 		//set-up mock writer - no writer's method should be called 
