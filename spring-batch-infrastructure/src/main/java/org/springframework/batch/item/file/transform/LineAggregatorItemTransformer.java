@@ -26,7 +26,7 @@ import org.springframework.batch.item.transform.ItemTransformer;
  * @author Dave Syer
  * 
  */
-public class LineAggregatorItemTransformer implements ItemTransformer {
+public class LineAggregatorItemTransformer<T> implements ItemTransformer<T, String> {
 
 	private LineAggregator aggregator = new DelimitedLineAggregator();
 
@@ -44,7 +44,7 @@ public class LineAggregatorItemTransformer implements ItemTransformer {
 	 * 
 	 * @see org.springframework.batch.item.transform.ItemTransformer#transform(java.lang.Object)
 	 */
-	public Object transform(Object item) throws Exception {
+	public String transform(T item) throws Exception {
 		return aggregator.aggregate(createFieldSet(item));
 	}
 
@@ -58,7 +58,7 @@ public class LineAggregatorItemTransformer implements ItemTransformer {
 	 * 
 	 * @throws ConversionException if the field set cannot be created
 	 */
-	protected FieldSet createFieldSet(Object item) throws ConversionException {
+	protected FieldSet createFieldSet(T item) throws ConversionException {
 		try {
 			return new DefaultFieldSet((String[]) item);
 		}

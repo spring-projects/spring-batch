@@ -15,6 +15,7 @@ import org.springframework.batch.item.transform.ItemTransformer;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("unchecked")
 public class RecursiveCollectionItemTransformer implements ItemTransformer {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");

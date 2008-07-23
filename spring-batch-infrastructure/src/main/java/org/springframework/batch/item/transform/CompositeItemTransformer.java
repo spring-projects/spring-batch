@@ -11,18 +11,22 @@ import org.springframework.util.Assert;
  * injected <code>ItemTransformer</code>s (return value of previous
  * transformation is the entry value of the next).
  * 
+ * Note the user is responsible for injecting a chain of {@link ItemTransformer}
+ * s that conforms to declared input and output types.
+ * 
  * @author Robert Kasanicky
  */
-public class CompositeItemTransformer implements ItemTransformer, InitializingBean {
+@SuppressWarnings("unchecked")
+public class CompositeItemTransformer<I, O> implements ItemTransformer<I, O>, InitializingBean {
 
 	private List<ItemTransformer> itemTransformers;
 
-	public Object transform(Object item) throws Exception {
+	public O transform(I item) throws Exception {
 		Object result = item;
 		for (Iterator<ItemTransformer> iterator = itemTransformers.listIterator(); iterator.hasNext();) {
 			result = iterator.next().transform(result);
 		}
-		return result;
+		return (O) result;
 	}
 
 	public void afterPropertiesSet() throws Exception {
