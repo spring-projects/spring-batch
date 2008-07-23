@@ -124,6 +124,9 @@ public abstract class AbstractTransactionalResourceItemWriter<T> implements Item
 			// failed item (from a failed chunk but we don't know which one was
 			// the problem).
 			RepeatSynchronizationManager.setCompleteOnly();
+			// Remove the failed item from the cache, otherwise it could grow
+			// unnecessarily large.
+			failed.remove(output);
 			// Flush now, so that if there is a failure this record can be
 			// skipped.
 			flush();
