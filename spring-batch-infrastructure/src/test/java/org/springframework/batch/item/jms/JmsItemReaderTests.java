@@ -31,7 +31,7 @@ import org.springframework.jms.core.JmsOperations;
 
 public class JmsItemReaderTests {
 
-	JmsItemReader<Object> itemProvider = new JmsItemReader<Object>();
+	JmsItemReader<String> itemReader = new JmsItemReader<String>();
 
 	@Test
 	public void testNoItemTypeSunnyDay() {
@@ -39,8 +39,8 @@ public class JmsItemReaderTests {
 		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
 		EasyMock.replay(jmsTemplate);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		assertEquals("foo", itemProvider.read());
+		itemReader.setJmsTemplate(jmsTemplate);
+		assertEquals("foo", itemReader.read());
 		EasyMock.verify(jmsTemplate);
 	}
 
@@ -50,9 +50,9 @@ public class JmsItemReaderTests {
 		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
 		EasyMock.replay(jmsTemplate);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		itemProvider.setItemType(String.class);
-		assertEquals("foo", itemProvider.read());
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(String.class);
+		assertEquals("foo", itemReader.read());
 		EasyMock.verify(jmsTemplate);
 	}
 
@@ -64,9 +64,11 @@ public class JmsItemReaderTests {
 		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn(date);
 		EasyMock.replay(jmsTemplate);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		itemProvider.setItemType(Date.class);
-		assertEquals(date, itemProvider.read());
+		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(Date.class);
+		assertEquals(date, itemReader.read());
+
 		EasyMock.verify(jmsTemplate);
 	}
 
@@ -76,10 +78,11 @@ public class JmsItemReaderTests {
 		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
 		EasyMock.replay(jmsTemplate);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		itemProvider.setItemType(Date.class);
+		JmsItemReader<Date> itemReader = new JmsItemReader<Date>();
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(Date.class);
 		try {
-			itemProvider.read();
+			itemReader.read();
 			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
@@ -96,9 +99,10 @@ public class JmsItemReaderTests {
 		EasyMock.expect(jmsTemplate.receive()).andReturn(message);
 		EasyMock.replay(jmsTemplate, message);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		itemProvider.setItemType(Message.class);
-		assertEquals(message, itemProvider.read());
+		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(Message.class);
+		assertEquals(message, itemReader.read());
 		EasyMock.verify(jmsTemplate);
 	}
 
@@ -107,9 +111,9 @@ public class JmsItemReaderTests {
 		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
 		EasyMock.replay(jmsTemplate);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		itemProvider.setItemType(String.class);
-		itemProvider.recover("foo", null);
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(String.class);
+		itemReader.recover("foo", null);
 
 		EasyMock.verify(jmsTemplate);
 	}
@@ -121,10 +125,10 @@ public class JmsItemReaderTests {
 		EasyMock.expectLastCall();
 		EasyMock.replay(jmsTemplate);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		itemProvider.setItemType(String.class);
-		itemProvider.setErrorDestinationName("queue");
-		itemProvider.recover("foo", null);
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(String.class);
+		itemReader.setErrorDestinationName("queue");
+		itemReader.recover("foo", null);
 
 		EasyMock.verify(jmsTemplate);
 	}
@@ -137,10 +141,10 @@ public class JmsItemReaderTests {
 		EasyMock.expectLastCall();
 		EasyMock.replay(jmsTemplate, queue);
 
-		itemProvider.setJmsTemplate(jmsTemplate);
-		itemProvider.setItemType(String.class);
-		itemProvider.setErrorDestination(queue);
-		itemProvider.recover("foo", null);
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.setItemType(String.class);
+		itemReader.setErrorDestination(queue);
+		itemReader.recover("foo", null);
 
 		EasyMock.verify(jmsTemplate, queue);
 	}
@@ -151,16 +155,17 @@ public class JmsItemReaderTests {
 		EasyMock.expect(message.getJMSMessageID()).andReturn("foo");
 		EasyMock.replay(message);
 
-		itemProvider.setItemType(Message.class);
-		assertEquals("foo", itemProvider.getKey(message));
+		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
+		itemReader.setItemType(Message.class);
+		assertEquals("foo", itemReader.getKey(message));
 
 		EasyMock.verify(message);
 	}
 
 	@Test
 	public void testGetKeyFromNonMessage() throws Exception {
-		itemProvider.setItemType(String.class);
-		assertEquals("foo", itemProvider.getKey("foo"));
+		itemReader.setItemType(String.class);
+		assertEquals("foo", itemReader.getKey("foo"));
 	}
 
 	@Test
@@ -169,15 +174,16 @@ public class JmsItemReaderTests {
 		EasyMock.expect(message.getJMSRedelivered()).andReturn(true);
 		EasyMock.replay(message);
 
-		itemProvider.setItemType(Message.class);
-		assertEquals(false, itemProvider.isNew(message));
+		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
+		itemReader.setItemType(Message.class);
+		assertEquals(false, itemReader.isNew(message));
 		
 		EasyMock.verify(message);
 	}
 
 	@Test
 	public void testIsNewForNonMessage() throws Exception {
-		itemProvider.setItemType(String.class);
-		assertEquals(false, itemProvider.isNew("foo"));
+		itemReader.setItemType(String.class);
+		assertEquals(false, itemReader.isNew("foo"));
 	}
 }
