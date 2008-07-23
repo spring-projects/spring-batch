@@ -69,7 +69,7 @@ public class DefaultFieldSet implements FieldSet {
 		if (names == null) {
 			throw new IllegalStateException("Field names are not known");
 		}
-		return (String[]) names.toArray();
+		return names.toArray(new String[names.size()]);
 	}
 	
 	/* (non-Javadoc)
