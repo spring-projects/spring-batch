@@ -16,64 +16,65 @@
 
 package org.springframework.batch.item.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.Date;
 
-import javax.jms.Destination;
 import javax.jms.Message;
 import javax.jms.Queue;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
-import org.springframework.batch.item.jms.JmsItemReader;
+import org.easymock.EasyMock;
+import org.junit.Test;
 import org.springframework.jms.core.JmsOperations;
 
-public class JmsItemReaderTests extends TestCase {
+public class JmsItemReaderTests {
 
 	JmsItemReader<Object> itemProvider = new JmsItemReader<Object>();
 
+	@Test
 	public void testNoItemTypeSunnyDay() {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
-		templateControl.expectAndReturn(jmsTemplate.receiveAndConvert(), "foo");
-		templateControl.replay();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
+		EasyMock.replay(jmsTemplate);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		assertEquals("foo", itemProvider.read());
-		templateControl.verify();
+		EasyMock.verify(jmsTemplate);
 	}
 
+	@Test
 	public void testSetItemTypeSunnyDay() {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
-		templateControl.expectAndReturn(jmsTemplate.receiveAndConvert(), "foo");
-		templateControl.replay();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
+		EasyMock.replay(jmsTemplate);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		itemProvider.setItemType(String.class);
 		assertEquals("foo", itemProvider.read());
-		templateControl.verify();
+		EasyMock.verify(jmsTemplate);
 	}
 
+	@Test
 	public void testSetItemSubclassTypeSunnyDay() {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
 
 		Date date = new java.sql.Date(0L);
-		templateControl.expectAndReturn(jmsTemplate.receiveAndConvert(), date);
-		templateControl.replay();
+		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn(date);
+		EasyMock.replay(jmsTemplate);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		itemProvider.setItemType(Date.class);
 		assertEquals(date, itemProvider.read());
-		templateControl.verify();
+		EasyMock.verify(jmsTemplate);
 	}
 
+	@Test
 	public void testSetItemTypeMismatch() {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
-		templateControl.expectAndReturn(jmsTemplate.receiveAndConvert(), "foo");
-		templateControl.replay();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		EasyMock.expect(jmsTemplate.receiveAndConvert()).andReturn("foo");
+		EasyMock.replay(jmsTemplate);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		itemProvider.setItemType(Date.class);
@@ -85,96 +86,96 @@ public class JmsItemReaderTests extends TestCase {
 			// expected
 			assertTrue(e.getMessage().indexOf("wrong type") >= 0);
 		}
-		templateControl.verify();
+		EasyMock.verify(jmsTemplate);
 	}
 
+	@Test
 	public void testNextMessageSunnyDay() {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		MockControl messageControl = MockControl.createControl(Message.class);
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
-		Message message = (Message) messageControl.getMock();
-		templateControl.expectAndReturn(jmsTemplate.receive(), message);
-		templateControl.replay();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		Message message = EasyMock.createMock(Message.class);
+		EasyMock.expect(jmsTemplate.receive()).andReturn(message);
+		EasyMock.replay(jmsTemplate, message);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		itemProvider.setItemType(Message.class);
 		assertEquals(message, itemProvider.read());
-		templateControl.verify();
+		EasyMock.verify(jmsTemplate);
 	}
 
+	@Test
 	public void testRecoverWithNoDestination() throws Exception {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
-		templateControl.replay();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		EasyMock.replay(jmsTemplate);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		itemProvider.setItemType(String.class);
 		itemProvider.recover("foo", null);
 
-		templateControl.verify();
+		EasyMock.verify(jmsTemplate);
 	}
 
+	@Test
 	public void testErrorQueueWithDestinationName() throws Exception {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
 		jmsTemplate.convertAndSend("queue", "foo");
-		templateControl.setVoidCallable();
-		templateControl.replay();
+		EasyMock.expectLastCall();
+		EasyMock.replay(jmsTemplate);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		itemProvider.setItemType(String.class);
 		itemProvider.setErrorDestinationName("queue");
 		itemProvider.recover("foo", null);
-		templateControl.verify();
+
+		EasyMock.verify(jmsTemplate);
 	}
 
+	@Test
 	public void testErrorQueueWithDestination() throws Exception {
-		MockControl templateControl = MockControl.createControl(JmsOperations.class);
-		MockControl queueControl = MockControl.createControl(Queue.class);
-
-		Destination queue = (Destination) queueControl.getMock();
-		queueControl.replay();
-
-		JmsOperations jmsTemplate = (JmsOperations) templateControl.getMock();
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		Queue queue = EasyMock.createMock(Queue.class);
 		jmsTemplate.convertAndSend(queue, "foo");
-		templateControl.setVoidCallable();
-		templateControl.replay();
+		EasyMock.expectLastCall();
+		EasyMock.replay(jmsTemplate, queue);
 
 		itemProvider.setJmsTemplate(jmsTemplate);
 		itemProvider.setItemType(String.class);
 		itemProvider.setErrorDestination(queue);
 		itemProvider.recover("foo", null);
-		templateControl.verify();
+
+		EasyMock.verify(jmsTemplate, queue);
 	}
 
+	@Test
 	public void testGetKeyFromMessage() throws Exception {
-		MockControl messageControl = MockControl.createControl(Message.class);
-		Message message = (Message) messageControl.getMock();
-		messageControl.expectAndReturn(message.getJMSMessageID(), "foo");
-		messageControl.replay();
+		Message message = EasyMock.createMock(Message.class);
+		EasyMock.expect(message.getJMSMessageID()).andReturn("foo");
+		EasyMock.replay(message);
 
 		itemProvider.setItemType(Message.class);
 		assertEquals("foo", itemProvider.getKey(message));
-		messageControl.verify();
 
+		EasyMock.verify(message);
 	}
 
+	@Test
 	public void testGetKeyFromNonMessage() throws Exception {
 		itemProvider.setItemType(String.class);
 		assertEquals("foo", itemProvider.getKey("foo"));
 	}
 
+	@Test
 	public void testIsNewForMessage() throws Exception {
-		MockControl messageControl = MockControl.createControl(Message.class);
-		Message message = (Message) messageControl.getMock();
-		messageControl.expectAndReturn(message.getJMSRedelivered(), true);
-		messageControl.replay();
+		Message message = EasyMock.createMock(Message.class);
+		EasyMock.expect(message.getJMSRedelivered()).andReturn(true);
+		EasyMock.replay(message);
 
 		itemProvider.setItemType(Message.class);
 		assertEquals(false, itemProvider.isNew(message));
-		messageControl.verify();
+		
+		EasyMock.verify(message);
 	}
 
+	@Test
 	public void testIsNewForNonMessage() throws Exception {
 		itemProvider.setItemType(String.class);
 		assertEquals(false, itemProvider.isNew("foo"));
