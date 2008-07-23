@@ -47,7 +47,7 @@
 				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.sample.item.writer.OrderWriter">
+						class="org.springframework.batch.item.transform.ItemTransformerItemWriter">
 						<property name="delegate" ref="orderWriter" />
 					</bean>
 				</property>
