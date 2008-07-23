@@ -165,7 +165,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 				return new ArrayList<Foo>();
 			}
 
-			public void updateContext(Object key,
+			public void updateContext(Foo key,
 					ExecutionContext executionContext) {
 			}
 		});
@@ -232,7 +232,7 @@ public class DrivingQueryItemReaderTests extends TestCase {
 			}
 		}
 
-		public void updateContext(Object key, ExecutionContext executionContext) {
+		public void updateContext(Foo key, ExecutionContext executionContext) {
 			executionContext.put(RESTART_KEY, restartKeys);
 		}
 

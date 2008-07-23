@@ -44,8 +44,9 @@ public class CustomerCreditUpdatePreparedStatementSetterTests {
 		credit.setCredit(new BigDecimal(12000));
 		credit.setName("foo");
 	}
+	
 	/**
-	 * Test method for {@link org.springframework.batch.sample.item.writer.CustomerCreditUpdatePreparedStatementSetter#setValues(java.lang.Object, java.sql.PreparedStatement)}.
+	 * Test method for {@link org.springframework.batch.sample.item.writer.CustomerCreditUpdatePreparedStatementSetter#setValues(CustomerCredit, PreparedStatement) }
 	 * @throws SQLException 
 	 */
 	@Test

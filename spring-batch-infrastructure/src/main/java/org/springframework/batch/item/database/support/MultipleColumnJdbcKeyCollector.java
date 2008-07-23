@@ -112,7 +112,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 	 * org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext
 	 * (java.lang.Object)
 	 */
-	public void updateContext(Object key, ExecutionContext executionContext) {
+	public void updateContext(T key, ExecutionContext executionContext) {
 		Assert.notNull(key, "The key must not be null");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 		executionContext.put(getKey(CURRENT_KEY), key);

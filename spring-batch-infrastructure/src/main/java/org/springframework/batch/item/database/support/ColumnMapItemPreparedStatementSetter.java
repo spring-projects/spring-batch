@@ -29,7 +29,6 @@ import org.springframework.util.Assert;
  */
 public class ColumnMapItemPreparedStatementSetter implements ItemPreparedStatementSetter {
 
-	@SuppressWarnings("unchecked")
 	public void setValues(Object item, PreparedStatement ps) throws SQLException {
 		Assert.isInstanceOf(Map.class, item, "Input to map PreparedStatement parameters must be of type Map.");
 		Set keySet = ((Map)item).entrySet();

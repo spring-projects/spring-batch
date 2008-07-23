@@ -26,15 +26,14 @@ import org.springframework.batch.sample.domain.CustomerCredit;
  * @author Dave Syer
  *
  */
-public class CustomerCreditUpdatePreparedStatementSetter implements ItemPreparedStatementSetter {
+public class CustomerCreditUpdatePreparedStatementSetter implements ItemPreparedStatementSetter<CustomerCredit> {
 
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal(1000);
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.support.ItemPreparedStatementSetter#setValues(java.lang.Object, java.sql.PreparedStatement)
 	 */
-	public void setValues(Object item, PreparedStatement ps) throws SQLException {
-		CustomerCredit customerCredit = (CustomerCredit) item;
+	public void setValues(CustomerCredit customerCredit, PreparedStatement ps) throws SQLException {
 		ps.setBigDecimal(1, customerCredit.getCredit().add(FIXED_AMOUNT));
 		ps.setLong(2, customerCredit.getId());
 	}

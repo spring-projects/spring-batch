@@ -112,7 +112,7 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	 * 
 	 * @throws IllegalArgumentException if key is null.
 	 */
-	public void updateContext(Object key, ExecutionContext executionContext) {
+	public void updateContext(T key, ExecutionContext executionContext) {
 		Assert.notNull(key, "The key must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 		executionContext.put(getKey(RESTART_KEY), key);

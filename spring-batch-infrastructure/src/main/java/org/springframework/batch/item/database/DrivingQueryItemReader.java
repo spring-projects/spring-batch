@@ -118,7 +118,7 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 	 * 
 	 * @return the current key.
 	 */
-	protected Object getCurrentKey() {
+	protected T getCurrentKey() {
 		if (initialized && currentIndex > 0) {
 			return keys.get(currentIndex - 1);
 		}

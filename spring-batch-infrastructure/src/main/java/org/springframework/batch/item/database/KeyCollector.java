@@ -42,5 +42,5 @@ public interface KeyCollector<T> {
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	void updateContext(Object key, ExecutionContext executionContext);
+	void updateContext(T key, ExecutionContext executionContext);
 }
