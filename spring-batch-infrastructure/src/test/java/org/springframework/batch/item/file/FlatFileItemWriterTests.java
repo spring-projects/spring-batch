@@ -29,7 +29,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetCreator;
-import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
+import org.springframework.batch.item.file.mapping.PassThroughFieldSetCreator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.ClassUtils;
@@ -39,14 +39,14 @@ import org.springframework.util.ClassUtils;
  * in separate TestCase classes with different <code>setUp</code> and
  * <code>tearDown</code> methods
  * 
- * @author robert.kasanicky
+ * @author Robert Kasanicky
  * @author Dave Syer
  * 
  */
 public class FlatFileItemWriterTests extends TestCase {
 
 	// object under test
-	private FlatFileItemWriter writer = new FlatFileItemWriter();
+	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -73,7 +73,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		outputFile = File.createTempFile("flatfile-output-", ".tmp");
 
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
+		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		executionContext = new ExecutionContext();
@@ -143,38 +143,18 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverter() throws Exception {
-		writer.setFieldSetCreator(new FieldSetCreator() {
-			public FieldSet mapItem(Object data) {
+		writer.setFieldSetCreator(new FieldSetCreator<String>() {
+			public FieldSet mapItem(String data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
-		Object data = new Object();
+		String data = "string";
 		writer.open(executionContext);
 		writer.write(data);
 		writer.flush();
 		String lineFromFile = readLine();
 		// converter not used if input is String
-		assertEquals("FOO:" + data.toString(), lineFromFile);
-	}
-
-	/**
-	 * Regular usage of <code>write(String)</code> method
-	 * 
-	 * @throws Exception
-	 */
-	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
-		writer.setFieldSetCreator(new FieldSetCreator() {
-			public FieldSet mapItem(Object data) {
-				return new DefaultFieldSet(new String[] { "FOO:" + data });
-			}
-		});
-		Object data = new Object();
-		writer.open(executionContext);
-		writer.write(data);
-		writer.flush();
-		String lineFromFile = readLine();
-		// converter not used if input is String
-		assertEquals("FOO:" + data.toString(), lineFromFile);
+		assertEquals("FOO:" + data, lineFromFile);
 	}
 
 	/**
@@ -183,8 +163,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		writer.setFieldSetCreator(new FieldSetCreator() {
-			public FieldSet mapItem(Object data) {
+		writer.setFieldSetCreator(new FieldSetCreator<String>() {
+			public FieldSet mapItem(String data) {
 				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
@@ -295,8 +275,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 	
 	public void testOpenWithNonWritableFile() throws Exception {
-		writer = new FlatFileItemWriter();
-		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
+		writer = new FlatFileItemWriter<String>();
+		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
 		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
@@ -313,7 +293,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
-		writer = new FlatFileItemWriter();
+		writer = new FlatFileItemWriter<String>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -324,9 +304,9 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testDefaultStreamContext() throws Exception {
-		writer = new FlatFileItemWriter();
+		writer = new FlatFileItemWriter<String>();
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
+		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.open(executionContext);
