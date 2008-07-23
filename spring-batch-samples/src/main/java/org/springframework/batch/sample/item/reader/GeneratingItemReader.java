@@ -3,7 +3,6 @@ package org.springframework.batch.sample.item.reader;
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.sample.domain.Trade;
@@ -13,7 +12,7 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class GeneratingItemReader implements ItemReader<Trade>, ItemRecoverer {
+public class GeneratingItemReader implements ItemReader<Trade> {
 
 	private int limit = 1;
 	
@@ -49,13 +48,6 @@ public class GeneratingItemReader implements ItemReader<Trade>, ItemRecoverer {
 		return limit;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemRecoverer#recover(java.lang.Object, java.lang.Throwable)
-	 */
-	public Object recover(Object data, Throwable cause) {
-		return data;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemStream#mark()
 	 */

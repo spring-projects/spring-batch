@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Robert Kasanicky
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
+@ContextConfiguration
 public class BatchSqlUpdateJobFunctionalTests extends AbstractCustomerCreditIncreaseTests {
 
 }

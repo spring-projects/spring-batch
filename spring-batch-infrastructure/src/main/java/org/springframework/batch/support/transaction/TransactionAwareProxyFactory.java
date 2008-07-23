@@ -125,16 +125,16 @@ public class TransactionAwareProxyFactory {
 		return factory.getProxy();
 	}
 	
-	public static Map createTransactionalMap() {
-		return (Map) new TransactionAwareProxyFactory(new HashMap()).createInstance();
+	public static <K,V> Map<K,V> createTransactionalMap() {
+		return (Map<K,V>) new TransactionAwareProxyFactory(new HashMap<K,V>()).createInstance();
 	}
 
-	public static Set createTransactionalSet() {
-		return (Set) new TransactionAwareProxyFactory(new HashSet()).createInstance();
+	public static <T> Set<T> createTransactionalSet() {
+		return (Set<T>) new TransactionAwareProxyFactory(new HashSet<T>()).createInstance();
 	}
 
-	public static List createTransactionalList() {
-		return (List) new TransactionAwareProxyFactory(new ArrayList()).createInstance();
+	public static <T> List<T> createTransactionalList() {
+		return (List<T>) new TransactionAwareProxyFactory(new ArrayList<T>()).createInstance();
 	}
 
 	private class TargetSynchronization extends TransactionSynchronizationAdapter {

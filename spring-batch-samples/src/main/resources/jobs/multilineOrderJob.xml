@@ -50,7 +50,7 @@
 		</property>
 	</bean>
 
-	<bean id="orderWriter"
+	<bean id="orderWriter" 
 		class="org.springframework.batch.item.transform.ItemTransformerItemWriter">
 		<property name="delegate" ref="flatFileTransformerWriter" />
 		<property name="itemTransformer">
@@ -60,7 +60,6 @@
 			</bean>
 		</property>
 	</bean>
-
 
 	<bean id="headerFieldSetMapper"
 		class="org.springframework.batch.sample.mapping.HeaderFieldSetMapper" />
