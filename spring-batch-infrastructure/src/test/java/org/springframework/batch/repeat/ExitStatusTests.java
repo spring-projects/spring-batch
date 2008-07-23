@@ -110,8 +110,8 @@ public class ExitStatusTests extends TestCase {
 	public void testAndExitStatusStillContinuable() {
 		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).isContinuable());
 		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED).isContinuable());
-		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).getExitCode() == ExitStatus.CONTINUABLE
-				.getExitCode());
+		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).getExitCode().equals(
+				ExitStatus.CONTINUABLE.getExitCode()));
 	}
 
 	/**
@@ -144,8 +144,8 @@ public class ExitStatusTests extends TestCase {
 	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}.
 	 */
 	public void testAndExitStatusWhenCustomContinuableAddedToFinished() {
-		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(ExitStatus.CONTINUABLE.replaceExitCode("CUSTOM"))
-				.getExitCode());
+		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(
+				ExitStatus.CONTINUABLE.replaceExitCode("CUSTOM")).getExitCode());
 	}
 
 	public void testAddExitCode() throws Exception {

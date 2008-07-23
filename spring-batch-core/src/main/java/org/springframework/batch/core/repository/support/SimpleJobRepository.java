@@ -64,7 +64,7 @@ public class SimpleJobRepository implements JobRepository {
 
 	/**
 	 * Provide default constructor with low visibility in case user wants to use
-	 * use aop:proxy-target-class="true" for transaction interceptor.
+	 * use aop:proxy-target-class="true" for AOP interceptor.
 	 */
 	SimpleJobRepository() {
 	}

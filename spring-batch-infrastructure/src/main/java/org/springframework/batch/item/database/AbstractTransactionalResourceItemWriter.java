@@ -47,7 +47,7 @@ public abstract class AbstractTransactionalResourceItemWriter<T> implements Item
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#flush()
 	 */
-	public void flush() throws FlushFailedException {
+	public final void flush() throws FlushFailedException {
 		bindTransactionResources();
 		try {
 			doFlush();
@@ -73,35 +73,18 @@ public abstract class AbstractTransactionalResourceItemWriter<T> implements Item
 	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(Object)
 	 */
-	public void write(T output) throws Exception {
+	public final void write(T output) throws Exception {
 		bindTransactionResources();
 		getProcessed().add(output);
 		doWrite(output);
 		flushIfNecessary(output);
 	}
 
-	private void flushIfNecessary(Object output) {
-		boolean flush;
-		synchronized (failed) {
-			flush = failed.contains(output);
-		}
-		if (flush) {
-			// Force early completion to commit aggressively if we encounter a
-			// failed item (from a failed chunk but we don't know which one was
-			// the problem).
-			RepeatSynchronizationManager.setCompleteOnly();
-			// Flush now, so that if there is a failure this record can be
-			// skipped.
-			flush();
-		}
-
-	}
-
 	/**
 	 * Delegate to subclass and unbind transactional resources, effectively
 	 * clearing the item buffer.
 	 */
-	public void clear() throws ClearFailedException {
+	public final void clear() throws ClearFailedException {
 		try {
 			doClear();
 		}
@@ -130,6 +113,23 @@ public abstract class AbstractTransactionalResourceItemWriter<T> implements Item
 	 * {@link RepeatContext}.
 	 */
 	protected abstract String getResourceKey();
+
+	private void flushIfNecessary(Object output) {
+		boolean flush;
+		synchronized (failed) {
+			flush = failed.contains(output);
+		}
+		if (flush) {
+			// Force early completion to commit aggressively if we encounter a
+			// failed item (from a failed chunk but we don't know which one was
+			// the problem).
+			RepeatSynchronizationManager.setCompleteOnly();
+			// Flush now, so that if there is a failure this record can be
+			// skipped.
+			flush();
+		}
+
+	}
 
 	/**
 	 * Set up the {@link RepeatContext} as a transaction resource.

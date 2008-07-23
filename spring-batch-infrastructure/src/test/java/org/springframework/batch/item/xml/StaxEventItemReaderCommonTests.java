@@ -13,7 +13,7 @@ import org.springframework.core.io.ByteArrayResource;
 
 public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTests {
 
-	private final String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
+	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
