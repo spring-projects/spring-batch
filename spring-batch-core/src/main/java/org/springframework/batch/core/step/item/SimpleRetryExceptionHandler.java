@@ -25,6 +25,10 @@ import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
+ * An {@link ExceptionHandler} that is aware of the retry context so that it can
+ * distinguish between a fatal exception and one that can be retried. Delegates
+ * the actual exception handling to another {@link ExceptionHandler}.
+ * 
  * @author Dave Syer
  * 
  */
@@ -42,20 +46,27 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	final private BinaryExceptionClassifier fatalExceptionClassifier;
 
 	/**
-	 * @param retryPolicy
-	 * @param exceptionHandler
-	 * @param classes 
+	 * Create an exception handler from its mandatory properties.
+	 * 
+	 * @param retryPolicy the retry policy that will be under effect when an
+	 * exception is encountered
+	 * @param exceptionHandler the delegate to use if an exception actually
+	 * needs to be handled
+	 * @param classes
 	 */
 	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Class<?>[] classes) {
 		this.retryPolicy = retryPolicy;
 		this.exceptionHandler = exceptionHandler;
-		this.fatalExceptionClassifier =  new BinaryExceptionClassifier();
+		this.fatalExceptionClassifier = new BinaryExceptionClassifier();
 		fatalExceptionClassifier.setExceptionClasses(classes);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
+	/**
+	 * Check if the exception is going to be retried, and veto the handling if
+	 * it is. If retry is exhausted or the exception is on the fatal list, then
+	 * handle using the delegate.
+	 * 
+	 * @see ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * java.lang.Throwable)
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
@@ -66,8 +77,10 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * If retry is exhausted set up some state in the context that can be used
+	 * to signal that the exception should be handled.
+	 * 
 	 * @see org.springframework.batch.retry.RetryListener#close(org.springframework.batch.retry.RetryContext,
 	 * org.springframework.batch.retry.RetryCallback, java.lang.Throwable)
 	 */
