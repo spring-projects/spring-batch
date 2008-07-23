@@ -41,7 +41,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class BatchSqlUpdateItemWriterTests extends TestCase {
 
-	private BatchSqlUpdateItemWriter writer = new BatchSqlUpdateItemWriter();
+	private BatchSqlUpdateItemWriter<String> writer = new BatchSqlUpdateItemWriter<String>();
 
 	private JdbcTemplate jdbcTemplate;
 

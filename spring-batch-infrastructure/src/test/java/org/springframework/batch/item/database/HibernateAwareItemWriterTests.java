@@ -44,7 +44,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		};
 	}
 
-	private class StubItemWriter implements ItemWriter {
+	private class StubItemWriter implements ItemWriter<Object> {
 		public void write(Object item) {
 			list.add(item);
 		}
@@ -58,7 +58,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		}
 	}
 
-	HibernateAwareItemWriter writer = new HibernateAwareItemWriter();
+	HibernateAwareItemWriter<Object> writer = new HibernateAwareItemWriter<Object>();
 	
 	final List<Object> list = new ArrayList<Object>();
 
@@ -95,7 +95,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testAfterPropertiesSet() throws Exception {
-		writer = new HibernateAwareItemWriter();
+		writer = new HibernateAwareItemWriter<Object>();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");

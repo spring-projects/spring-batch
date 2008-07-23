@@ -5,6 +5,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.sample.Foo;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using standard hibernate {@link Session}.
@@ -20,13 +21,13 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends Hibernate
 	//Ensure close is called on the stateful session correctly.
 	public void testStatfulClose(){
 		
-		MockControl sessionFactoryControl = MockControl.createControl(SessionFactory.class);
-		SessionFactory sessionFactory = (SessionFactory) sessionFactoryControl.getMock();
-		MockControl sessionControl = MockControl.createControl(Session.class);
-		Session session = (Session) sessionControl.getMock();
-		MockControl resultsControl = MockControl.createNiceControl(Query.class);
-		Query scrollableResults = (Query) resultsControl.getMock();
-		HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
+		MockControl<SessionFactory> sessionFactoryControl = MockControl.createControl(SessionFactory.class);
+		SessionFactory sessionFactory = sessionFactoryControl.getMock();
+		MockControl<Session> sessionControl = MockControl.createControl(Session.class);
+		Session session = sessionControl.getMock();
+		MockControl<Query> resultsControl = MockControl.createNiceControl(Query.class);
+		Query scrollableResults = resultsControl.getMock();
+		HibernateCursorItemReader<Foo> itemReader = new HibernateCursorItemReader<Foo>();
 		itemReader.setSessionFactory(sessionFactory);
 		itemReader.setQueryString("testQuery");
 		itemReader.setUseStatelessSession(false);

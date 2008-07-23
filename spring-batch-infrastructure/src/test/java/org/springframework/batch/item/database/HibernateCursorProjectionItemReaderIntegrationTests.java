@@ -18,7 +18,7 @@ import org.springframework.test.AbstractTransactionalDataSourceSpringContextTest
  */
 public class HibernateCursorProjectionItemReaderIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	protected ItemReader reader;
+	protected ItemReader<?> reader;
 	protected ExecutionContext executionContext;
 
 	protected String[] getConfigLocations() {
@@ -36,7 +36,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests extends Abstrac
 	}
 
 	
-	protected ItemReader createItemReader() throws Exception {
+	protected ItemReader<?> createItemReader() throws Exception {
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(super.getJdbcTemplate().getDataSource());
 		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("Foo.hbm.xml", getClass()) });
@@ -46,7 +46,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests extends Abstrac
 
 		String hsqlQuery = "select f.value, f.name from Foo f";
 
-		HibernateCursorItemReader inputSource = new HibernateCursorItemReader();
+		HibernateCursorItemReader<Object> inputSource = new HibernateCursorItemReader<Object>();
 		inputSource.setQueryString(hsqlQuery);
 		inputSource.setSessionFactory(sessionFactory);
 		inputSource.afterPropertiesSet();

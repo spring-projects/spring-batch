@@ -16,7 +16,7 @@ public class HibernateCursorItemReaderCommonTests extends CommonDatabaseItemStre
 
 		String hsqlQuery = "from Foo";
 
-		HibernateCursorItemReader reader = new HibernateCursorItemReader();
+		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReader<Foo>();
 		reader.setQueryString(hsqlQuery);
 		reader.setSessionFactory(sessionFactory);
 		reader.setUseStatelessSession(true);
@@ -36,8 +36,8 @@ public class HibernateCursorItemReaderCommonTests extends CommonDatabaseItemStre
 
 	}
 
-	protected void pointToEmptyInput(ItemReader tested) throws Exception {
-		HibernateCursorItemReader reader = (HibernateCursorItemReader) tested;
+	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+		HibernateCursorItemReader<Foo> reader = (HibernateCursorItemReader<Foo>) tested;
 		reader.close(new ExecutionContext());
 		reader.setQueryString("from Foo foo where foo.id = -1");
 		reader.afterPropertiesSet();

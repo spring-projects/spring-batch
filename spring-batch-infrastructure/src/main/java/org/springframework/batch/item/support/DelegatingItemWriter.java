@@ -11,24 +11,28 @@ import org.springframework.util.Assert;
  * 
  * The implementation is thread-safe if the delegate is thread-safe.
  * 
+ * <code>I</code> is the type of item expected as input, <code>O</code> it the
+ * type of item after transformation that is passed to
+ * {@link #setDelegate(ItemWriter)}.
+ * 
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class DelegatingItemWriter implements ItemWriter, InitializingBean {
+public class DelegatingItemWriter<I, O> implements ItemWriter<I>, InitializingBean {
 
-	private ItemWriter delegate;
-	
+	private ItemWriter<O> delegate;
+
 	/**
 	 * Default constructor.
 	 */
 	public DelegatingItemWriter() {
 		super();
 	}
-	
+
 	/**
 	 * @param itemWriter
 	 */
-	public DelegatingItemWriter(ItemWriter itemWriter) {
+	public DelegatingItemWriter(ItemWriter<O> itemWriter) {
 		this();
 		this.delegate = itemWriter;
 	}
@@ -36,28 +40,29 @@ public class DelegatingItemWriter implements ItemWriter, InitializingBean {
 	/**
 	 * Calls {@link #doProcess(Object)} and then writes the result to the
 	 * delegate {@link ItemWriter}.
-	 * @throws Exception 
+	 * @throws Exception
 	 * 
 	 * @see ItemWriter#write(Object)
 	 */
-	public void write(Object item) throws Exception {
-		Object result = doProcess(item);
+	public void write(I item) throws Exception {
+		O result = doProcess(item);
 		delegate.write(result);
 	}
 
 	/**
 	 * By default returns the argument. This method is an extension point meant
 	 * to be overridden by subclasses that implement processing logic.
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	protected Object doProcess(Object item) throws Exception {
-		return item;
+	@SuppressWarnings("unchecked")
+	protected O doProcess(I item) throws Exception {
+		return (O) item;
 	}
 
 	/**
 	 * Setter for {@link ItemWriter}.
 	 */
-	public void setDelegate(ItemWriter writer) {
+	public void setDelegate(ItemWriter<O> writer) {
 		this.delegate = writer;
 	}
 
