@@ -27,9 +27,9 @@ import org.springframework.batch.item.support.DelegatingItemWriter;
  */
 public class DelegatingItemWriterTests extends TestCase {
 
-	MockControl writerControl = MockControl.createControl(ItemWriter.class);
-	ItemWriter itemWriter;
-	DelegatingItemWriter delegatingWriter;
+	MockControl<ItemWriter> writerControl = MockControl.createControl(ItemWriter.class);
+	ItemWriter<Object> itemWriter;
+	DelegatingItemWriter<Object, Object> delegatingWriter;
 	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -37,8 +37,8 @@ public class DelegatingItemWriterTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		itemWriter = (ItemWriter)writerControl.getMock();
-		delegatingWriter = new DelegatingItemWriter();
+		itemWriter = writerControl.getMock();
+		delegatingWriter = new DelegatingItemWriter<Object, Object>();
 		delegatingWriter.setDelegate(itemWriter);
 	}
 

@@ -38,7 +38,7 @@ import org.springframework.oxm.XmlMappingException;
  */
 public class MarshallingObjectToXmlSerializerTests extends TestCase {
 
-	MarshallingEventWriterSerializer xmlSerializer;
+	MarshallingEventWriterSerializer<Object> xmlSerializer;
 
 	MockMarshaller mockMarshaller = new MockMarshaller();
 
@@ -47,7 +47,7 @@ public class MarshallingObjectToXmlSerializerTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		xmlSerializer = new MarshallingEventWriterSerializer(mockMarshaller);
+		xmlSerializer = new MarshallingEventWriterSerializer<Object>(mockMarshaller);
 		writer = new StubXmlEventWriter();
 	}
 

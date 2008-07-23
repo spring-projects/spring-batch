@@ -33,8 +33,8 @@ public class ItemReaderRepeatCallbackTests extends TestCase {
 
 	public void testDoWithRepeat() throws Exception {
 		callback = new ItemReaderRepeatCallback<String>(new ListItemReader<String>(Arrays.asList(new String[] { "foo", "bar" })),
-				new AbstractItemWriter() {
-					public void write(Object data) {
+				new AbstractItemWriter<String>() {
+					public void write(String data) {
 						list.add(data);
 					}
 				});

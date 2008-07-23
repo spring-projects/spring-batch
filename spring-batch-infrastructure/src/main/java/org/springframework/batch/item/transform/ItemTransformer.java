@@ -5,7 +5,7 @@ package org.springframework.batch.item.transform;
  * 
  * @author Robert Kasanicky
  */
-public interface ItemTransformer {
+public interface ItemTransformer<I,O> {
 
-	Object transform(Object item) throws Exception;
+	O transform(I item) throws Exception;
 }

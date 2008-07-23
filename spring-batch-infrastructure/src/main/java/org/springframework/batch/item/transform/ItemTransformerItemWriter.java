@@ -10,14 +10,14 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class ItemTransformerItemWriter extends DelegatingItemWriter {
+public class ItemTransformerItemWriter<I,O> extends DelegatingItemWriter<I,O> {
 
-	private ItemTransformer itemTransformer;
+	private ItemTransformer<I,O> itemTransformer;
 
 	/**
 	 * Transform the item using the {@link #setItemTransformer(ItemTransformer)}.
 	 */
-	protected Object doProcess(Object item) throws Exception {
+	protected O doProcess(I item) throws Exception {
 		return itemTransformer.transform(item);
 	}
 
@@ -25,7 +25,7 @@ public class ItemTransformerItemWriter extends DelegatingItemWriter {
 	 * @param itemTransformer will transform the item before
 	 * it is passed to {@link ItemWriter}.
 	 */
-	public void setItemTransformer(ItemTransformer itemTransformer) {
+	public void setItemTransformer(ItemTransformer<I,O> itemTransformer) {
 		this.itemTransformer = itemTransformer;
 	}
 

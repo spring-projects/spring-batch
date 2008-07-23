@@ -16,7 +16,7 @@ import org.springframework.batch.item.ItemWriter;
 public class CompositeItemWriterTests extends TestCase {
 
 	// object under test
-	private CompositeItemWriter itemProcessor = new CompositeItemWriter();
+	private CompositeItemWriter<Object> itemProcessor = new CompositeItemWriter<Object>();
 	
 	/**
 	 * Regular usage scenario.
@@ -24,13 +24,13 @@ public class CompositeItemWriterTests extends TestCase {
 	 */
 	public void testProcess() throws Exception {
 		
-		final int NUMBER_OF_PROCESSORS = 10;
+		final int NUMBER_OF_WRITERS = 10;
 		Object data = new Object();
 		
-		List<MockControl> controls = new ArrayList<MockControl>(NUMBER_OF_PROCESSORS);
-		List<ItemWriter> writers = new ArrayList<ItemWriter>(NUMBER_OF_PROCESSORS);
+		List<MockControl> controls = new ArrayList<MockControl>(NUMBER_OF_WRITERS);
+		List<ItemWriter<Object>> writers = new ArrayList<ItemWriter<Object>>(NUMBER_OF_WRITERS);
 		
-		for (int i = 0; i < NUMBER_OF_PROCESSORS; i++) {
+		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			MockControl control = MockControl.createStrictControl(ItemWriter.class);
 			ItemWriter writer = (ItemWriter) control.getMock();
 			

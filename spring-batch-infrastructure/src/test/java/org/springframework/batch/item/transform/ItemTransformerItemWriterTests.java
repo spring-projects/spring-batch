@@ -12,17 +12,17 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class ItemTransformerItemWriterTests extends TestCase {
 
-	private ItemTransformerItemWriter processor = new ItemTransformerItemWriter();
+	private ItemTransformerItemWriter<Object, Object> processor = new ItemTransformerItemWriter<Object, Object>();
 
-	private ItemTransformer transformer;
+	private ItemTransformer<Object, Object> transformer;
 	private ItemWriter<Object> itemWriter;
 
-	private MockControl tControl = MockControl.createControl(ItemTransformer.class);
-	private MockControl outControl = MockControl.createControl(ItemWriter.class);
+	private MockControl<ItemTransformer> tControl = MockControl.createControl(ItemTransformer.class);
+	private MockControl<ItemWriter> outControl = MockControl.createControl(ItemWriter.class);
 
 	protected void setUp() throws Exception {
-		transformer = (ItemTransformer) tControl.getMock();
-		itemWriter = (ItemWriter<Object>) outControl.getMock();
+		transformer = tControl.getMock();
+		itemWriter = outControl.getMock();
 		
 		processor.setItemTransformer(transformer);
 		processor.setDelegate(itemWriter);

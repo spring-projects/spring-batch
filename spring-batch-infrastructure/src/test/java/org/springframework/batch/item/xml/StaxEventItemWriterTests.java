@@ -27,7 +27,7 @@ import org.springframework.xml.transform.StaxResult;
 public class StaxEventItemWriterTests extends TestCase {
 
 	// object under test
-	private StaxEventItemWriter writer;
+	private StaxEventItemWriter<Object> writer;
 
 	// output file
 	private Resource resource;
@@ -58,7 +58,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	public void testFlush() throws Exception {
 		writer.open(executionContext);
 		InputCheckMarshaller marshaller = new InputCheckMarshaller();
-		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
+		MarshallingEventWriterSerializer<Object> serializer = new MarshallingEventWriterSerializer<Object>(marshaller);
 		writer.setSerializer(serializer);
 
 		// see asserts in the marshaller
@@ -274,12 +274,12 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * @return new instance of fully configured writer
 	 */
-	private StaxEventItemWriter createItemWriter() throws Exception {
-		StaxEventItemWriter source = new StaxEventItemWriter();
+	private StaxEventItemWriter<Object> createItemWriter() throws Exception {
+		StaxEventItemWriter<Object> source = new StaxEventItemWriter<Object>();
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();
-		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
+		MarshallingEventWriterSerializer<Object> serializer = new MarshallingEventWriterSerializer<Object>(marshaller);
 		source.setSerializer(serializer);
 
 		source.setEncoding("UTF-8");
