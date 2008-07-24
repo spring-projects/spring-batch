@@ -1,6 +1,5 @@
 package org.springframework.batch.item.transform;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -23,8 +22,9 @@ public class CompositeItemTransformer<I, O> implements ItemTransformer<I, O>, In
 
 	public O transform(I item) throws Exception {
 		Object result = item;
-		for (Iterator<ItemTransformer> iterator = itemTransformers.listIterator(); iterator.hasNext();) {
-			result = iterator.next().transform(result);
+	
+		for(ItemTransformer transformer: itemTransformers){
+			result = transformer.transform(result);
 		}
 		return (O) result;
 	}

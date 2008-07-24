@@ -1,29 +1,34 @@
 package org.springframework.batch.item.transform;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests for {@link CompositeItemTransformer}.
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemTransformerTests extends TestCase {
+public class CompositeItemTransformerTests {
 
 	private CompositeItemTransformer<Object, Object> composite = new CompositeItemTransformer<Object, Object>();
 	
 	private ItemTransformer<Object, Object> transformer1;
 	private ItemTransformer<Object, Object> transformer2;
-
-	private MockControl<ItemTransformer> tControl1 = MockControl.createControl(ItemTransformer.class);
-	private MockControl<ItemTransformer> tControl2 = MockControl.createControl(ItemTransformer.class);
 	
-	protected void setUp() throws Exception {
-		transformer1 = tControl1.getMock();
-		transformer2 = tControl2 .getMock();
+	@SuppressWarnings("unchecked")
+	@Before
+	public void setUp() throws Exception {
+		transformer1 = createMock(ItemTransformer.class);
+		transformer2 = createMock(ItemTransformer.class);
 		
 		composite.setItemTransformers(new ArrayList<ItemTransformer>() {{ 
 			add(transformer1); add(transformer2); 
@@ -36,30 +41,31 @@ public class CompositeItemTransformerTests extends TestCase {
 	 * Regular usage scenario - item is passed through the processing chain,
 	 * return value of the of the last transformation is returned by the composite.
 	 */
+	@Test
 	public void testTransform() throws Exception {
 		Object item = new Object();
 		Object itemAfterFirstTransfromation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 
-		transformer1.transform(item);
-		tControl1.setReturnValue(itemAfterFirstTransfromation);
+		expect(transformer1.transform(item)).andReturn(itemAfterFirstTransfromation);
 		
-		transformer2.transform(itemAfterFirstTransfromation);
-		tControl2.setReturnValue(itemAfterSecondTransformation);
+		expect(transformer2.transform(itemAfterFirstTransfromation)).andReturn(itemAfterSecondTransformation);
 		
-		tControl1.replay();
-		tControl2.replay();
-
+		replay(transformer1);
+		replay(transformer2);
+		
 		assertSame(itemAfterSecondTransformation, composite.transform(item));
 
-		tControl1.verify();
-		tControl2.verify();
+		verify(transformer1);
+		verify(transformer2);
 	}
 	
 	/**
 	 * The list of transformers must not be null or empty and 
 	 * can contain only instances of {@link ItemTransformer}.
 	 */
+	@SuppressWarnings("unchecked")
+	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		
 		// value not set
