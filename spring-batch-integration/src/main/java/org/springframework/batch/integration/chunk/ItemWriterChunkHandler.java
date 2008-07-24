@@ -11,11 +11,11 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.integration.annotation.Handler;
 import org.springframework.transaction.annotation.Transactional;
 
-public class ItemWriterChunkHandler implements ChunkHandler {
+public class ItemWriterChunkHandler<T> implements ChunkHandler<T> {
 
 	private static final Log logger = LogFactory.getLog(ItemWriterChunkHandler.class);
 
-	private ItemWriter itemWriter;
+	private ItemWriter<? super T> itemWriter;
 
 	private ItemSkipPolicy itemSkipPolicy = new NeverSkipItemSkipPolicy();
 
@@ -25,7 +25,7 @@ public class ItemWriterChunkHandler implements ChunkHandler {
 		this.itemSkipPolicy = itemSkipPolicy;
 	}
 
-	public void setItemWriter(ItemWriter itemWriter) {
+	public void setItemWriter(ItemWriter<? super T> itemWriter) {
 		this.itemWriter = itemWriter;
 	}
 
@@ -45,7 +45,7 @@ public class ItemWriterChunkHandler implements ChunkHandler {
 	 */
 	@Handler
 	@Transactional
-	public ChunkResponse handleChunk(ChunkRequest chunk) {
+	public ChunkResponse handleChunk(ChunkRequest<? extends T> chunk) {
 
 		logger.debug("Handling chunk: " + chunk);
 
@@ -53,7 +53,7 @@ public class ItemWriterChunkHandler implements ChunkHandler {
 		int skipCount = 0;
 
 		try {
-			for (Object item : chunk.getItems()) {
+			for (T item : chunk.getItems()) {
 				try {
 					itemWriter.write(item);
 				}

@@ -24,7 +24,7 @@ import org.springframework.integration.message.GenericMessage;
  * @author Dave Syer
  * 
  */
-public class MessageChannelItemWriter extends AbstractItemWriter {
+public class MessageChannelItemWriter<T> extends AbstractItemWriter<T> {
 
 	private MessageChannel channel;
 
@@ -41,8 +41,8 @@ public class MessageChannelItemWriter extends AbstractItemWriter {
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.ItemWriter#write(java.lang.Object)
 	 */
-	public void write(Object item) throws Exception {
-		channel.send(new GenericMessage<Object>(item));
+	public void write(T item) throws Exception {
+		channel.send(new GenericMessage<T>(item));
 	}
 
 }

@@ -39,7 +39,7 @@ public class MessageChannelItemWriterIntegrationTests {
 	private MessageChannel channel;
 	
 	@Autowired
-	private ItemWriter itemWriter;
+	private ItemWriter<String> itemWriter;
 	
 	@Test
 	public void testSend() throws Exception {

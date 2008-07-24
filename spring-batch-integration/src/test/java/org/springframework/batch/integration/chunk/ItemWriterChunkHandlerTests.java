@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 
 public class ItemWriterChunkHandlerTests {
 
-	private ItemWriterChunkHandler handler = new ItemWriterChunkHandler();
+	private ItemWriterChunkHandler<Object> handler = new ItemWriterChunkHandler<Object>();
 
 	protected int count = 0;
 

@@ -51,11 +51,11 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class FileToMessagesJobFactoryBean implements FactoryBean, BeanNameAware {
+public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAware {
 
 	private String name = "fileToMessageJob";
 
-	private ItemReader itemReader;
+	private ItemReader<? extends T> itemReader;
 
 	private MessageChannel channel;
 
@@ -80,7 +80,7 @@ public class FileToMessagesJobFactoryBean implements FactoryBean, BeanNameAware 
 	 * @param itemReader the itemReader to set
 	 */
 	@Required
-	public void setItemReader(ItemReader itemReader) {
+	public void setItemReader(ItemReader<? extends T> itemReader) {
 		this.itemReader = itemReader;
 	}
 
@@ -125,7 +125,7 @@ public class FileToMessagesJobFactoryBean implements FactoryBean, BeanNameAware 
 		job.setName(name);
 		job.setJobRepository(jobRepository);
 
-		SimpleStepFactoryBean stepFactory = new SimpleStepFactoryBean();
+		SimpleStepFactoryBean<T> stepFactory = new SimpleStepFactoryBean<T>();
 		stepFactory.setBeanName("step");
 
 		Assert.state((itemReader instanceof FlatFileItemReader) || (itemReader instanceof StaxEventItemReader),
@@ -139,7 +139,7 @@ public class FileToMessagesJobFactoryBean implements FactoryBean, BeanNameAware 
 		Assert.notNull(channel, "A channel must be provided");
 		Assert.state(channel instanceof DirectChannel,
 				"The channel must be a DirectChannel (otherwise failures can not be recovered from)");
-		MessageChannelItemWriter itemWriter = new MessageChannelItemWriter();
+		MessageChannelItemWriter<? super T> itemWriter = new MessageChannelItemWriter<T>();
 		itemWriter.setChannel(channel);
 		stepFactory.setItemWriter(itemWriter);
 
@@ -157,12 +157,12 @@ public class FileToMessagesJobFactoryBean implements FactoryBean, BeanNameAware 
 	 * @param itemReader
 	 * @param resource
 	 */
-	private void setResource(ItemReader itemReader, Resource resource) {
+	private void setResource(ItemReader<? extends T> itemReader, Resource resource) {
 		if (itemReader instanceof FlatFileItemReader) {
-			((FlatFileItemReader) itemReader).setResource(resource);
+			((FlatFileItemReader<? extends T>) itemReader).setResource(resource);
 		}
 		else {
-			((StaxEventItemReader) itemReader).setResource(resource);
+			((StaxEventItemReader<? extends T>) itemReader).setResource(resource);
 		}
 	}
 

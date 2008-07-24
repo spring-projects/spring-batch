@@ -22,7 +22,7 @@ import org.springframework.integration.message.Message;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
-public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport implements ItemWriter, ItemStream {
+public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>, ItemStream {
 
 	private static final Log logger = LogFactory.getLog(ChunkMessageChannelItemWriter.class);
 
@@ -63,7 +63,7 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 		this.requestChannel = requestChannel;
 	}
 
-	public void write(Object item) throws Exception {
+	public void write(T item) throws Exception {
 		bindTransactionResources();
 		getProcessed().add(item);
 		logger.debug("Added item to chunk: " + item);
@@ -88,13 +88,13 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 			getNextResult(100);
 		}
 
-		List<Object> processed = getProcessed();
+		List<T> processed = getProcessed();
 
 		if (!processed.isEmpty()) {
 
 			logger.debug("Dispatching chunk: " + processed);
-			ChunkRequest request = new ChunkRequest(processed, localState.getJobId(), localState.getSkipCount());
-			GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(request);
+			ChunkRequest<T> request = new ChunkRequest<T>(processed, localState.getJobId(), localState.getSkipCount());
+			GenericMessage<ChunkRequest<T>> message = new GenericMessage<ChunkRequest<T>>(request);
 			requestChannel.send(message);
 			localState.expected++;
 
@@ -197,11 +197,11 @@ public class ChunkMessageChannelItemWriter extends StepExecutionListenerSupport 
 	 * 
 	 * @return the processed
 	 */
-	@SuppressWarnings("unchecked")
-	private List<Object> getProcessed() {
+	private List<T> getProcessed() {
 		Assert.state(TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED),
 				"Processed items not bound to transaction.");
-		List<Object> processed = (List<Object>) TransactionSynchronizationManager.getResource(ITEMS_PROCESSED);
+		@SuppressWarnings("unchecked")
+		List<T> processed = (List<T>) TransactionSynchronizationManager.getResource(ITEMS_PROCESSED);
 		return processed;
 	}
 

@@ -6,7 +6,7 @@ import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestItemWriter extends AbstractItemWriter {
+public class TestItemWriter<T> extends AbstractItemWriter<T> {
 
 	private static final Log logger = LogFactory.getLog(TestItemWriter.class);
 
@@ -25,7 +25,7 @@ public class TestItemWriter extends AbstractItemWriter {
 	 */
 	public static final String WAIT_ON = "wait";
 
-	public void write(Object item) throws Exception {
+	public void write(T item) throws Exception {
 		
 		count++;
 		

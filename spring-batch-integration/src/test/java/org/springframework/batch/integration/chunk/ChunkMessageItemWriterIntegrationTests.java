@@ -42,7 +42,7 @@ import org.springframework.util.StringUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ChunkMessageItemWriterIntegrationTests {
 
-	private ChunkMessageChannelItemWriter writer = new ChunkMessageChannelItemWriter();
+	private ChunkMessageChannelItemWriter<Object> writer = new ChunkMessageChannelItemWriter<Object>();
 
 	@Autowired
 	@Qualifier("requests")
@@ -52,7 +52,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Qualifier("replies")
 	private MessageChannel replies;
 
-	private SimpleStepFactoryBean factory;
+	private SimpleStepFactoryBean<Object> factory;
 
 	private SimpleJobRepository jobRepository;
 
@@ -61,7 +61,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Before
 	public void setUp() {
 
-		factory = new SimpleStepFactoryBean();
+		factory = new SimpleStepFactoryBean<Object>();
 		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(),
 				new MapJobExecutionDao(), new MapStepExecutionDao());
 		factory.setJobRepository(jobRepository);
@@ -114,7 +114,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testVanillaIteration() throws Exception {
 
-		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -132,7 +132,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testSimulatedRestart() throws Exception {
 
-		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -159,7 +159,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testSimulatedRestartWithBadMessagesFromAnotherJob() throws Exception {
 
-		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -204,7 +204,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testEarlyCompletionSignalledInHandler() throws Exception {
 
-		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,bad,3,4,5,6"))));
 		factory.setCommitInterval(2);
 
@@ -232,7 +232,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testSimulatedRestartWithNoBacklog() throws Exception {
 
-		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -272,7 +272,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testFailureInStepListener() throws Exception {
 
-		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("wait,bad,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();

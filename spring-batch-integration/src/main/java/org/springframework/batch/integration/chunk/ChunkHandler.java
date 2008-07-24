@@ -1,8 +1,8 @@
 package org.springframework.batch.integration.chunk;
 
 
-public interface ChunkHandler {
+public interface ChunkHandler<T> {
 
-	ChunkResponse handleChunk(ChunkRequest chunk);
+	ChunkResponse handleChunk(ChunkRequest<? extends T> chunk);
 
 }

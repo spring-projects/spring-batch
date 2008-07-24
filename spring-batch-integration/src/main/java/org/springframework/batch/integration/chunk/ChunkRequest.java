@@ -3,13 +3,13 @@ package org.springframework.batch.integration.chunk;
 import java.io.Serializable;
 import java.util.Collection;
 
-public class ChunkRequest implements Serializable {
+public class ChunkRequest<T> implements Serializable {
 
 	private final int skipCount;
 	private final Long jobId;
-	private final Collection<Object> items;
+	private final Collection<? extends T> items;
 
-	public ChunkRequest(Collection<Object> items, Long jobId, int skipCount) {
+	public ChunkRequest(Collection<? extends T> items, Long jobId, int skipCount) {
 		this.items = items;
 		this.jobId = jobId;
 		this.skipCount = skipCount;
@@ -23,7 +23,7 @@ public class ChunkRequest implements Serializable {
 		return jobId;
 	}
 
-	public Collection<Object> getItems() {
+	public Collection<? extends T> getItems() {
 		return items;
 	}
 	

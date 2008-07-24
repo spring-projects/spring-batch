@@ -71,7 +71,6 @@ public class PollableSourceRetryTests {
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();;
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testSimpleTransactionalPolling() throws Exception {
 
@@ -104,7 +103,6 @@ public class PollableSourceRetryTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testNonTransactionalPollingWithRollback() throws Exception {
 
@@ -139,7 +137,6 @@ public class PollableSourceRetryTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testTransactionalHandlingWithUnconditionalRollback() throws Exception {
 
@@ -177,7 +174,6 @@ public class PollableSourceRetryTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testTransactionalHandlingWithRollback() throws Exception {
 
@@ -222,7 +218,6 @@ public class PollableSourceRetryTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testTransactionalHandlingWithRepeat() throws Exception {
 
@@ -269,7 +264,6 @@ public class PollableSourceRetryTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testTransactionalHandlingWithRetry() throws Exception {
 
@@ -322,7 +316,6 @@ public class PollableSourceRetryTests {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testTransactionalHandlingWithRepeatAndRetry() throws Exception {
 
@@ -408,9 +401,9 @@ public class PollableSourceRetryTests {
 	}
 
 	private MessageSource<Object> getPollableSource(List<String> list) {
-		final ItemReader reader = new ListItemReader(list) {
-			public Object read() {
-				Object item = super.read();
+		final ItemReader<String> reader = new ListItemReader<String>(list) {
+			public String read() {
+				String item = super.read();
 				logger.debug("Reading: " + item);
 				return item;
 			}

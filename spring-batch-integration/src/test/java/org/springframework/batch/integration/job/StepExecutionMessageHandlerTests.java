@@ -76,7 +76,6 @@ public class StepExecutionMessageHandlerTests {
 		assertEquals(Required.class, annotations[0].annotationType());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testVanillaHandle() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
@@ -87,7 +86,6 @@ public class StepExecutionMessageHandlerTests {
 		assertEquals(BatchStatus.COMPLETED, message.getStatus());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleWithInputs() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
@@ -101,7 +99,6 @@ public class StepExecutionMessageHandlerTests {
 		assertTrue(jobExecution.getExecutionContext().containsKey("foo"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleWithInputsAndOutputs() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
@@ -122,7 +119,6 @@ public class StepExecutionMessageHandlerTests {
 		assertTrue(jobExecution.getExecutionContext().containsKey("bar"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleFailedJob() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
@@ -133,7 +129,6 @@ public class StepExecutionMessageHandlerTests {
 		assertEquals(0, message.getJobExecution().getStepExecutions().size());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleRestart() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport() {
@@ -171,7 +166,6 @@ public class StepExecutionMessageHandlerTests {
 		assertTrue(stepExecution.getExecutionContext().containsKey("foo"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleRestartAlreadyComplete() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport() {
@@ -199,7 +193,6 @@ public class StepExecutionMessageHandlerTests {
 		assertTrue(stepExecution.getExecutionContext().containsKey("foo"));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleRestartStartLimitExceeded() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport() {

@@ -54,7 +54,7 @@ import org.springframework.util.ReflectionUtils;
 public class FileToMessagesJobFactoryBeanTests {
 
 	private static final String FILE_INPUT_PATH = ResourcePayloadAsJobParameterStrategy.FILE_INPUT_PATH;
-	private FileToMessagesJobFactoryBean factory = new FileToMessagesJobFactoryBean();
+	private FileToMessagesJobFactoryBean<FieldSet> factory = new FileToMessagesJobFactoryBean<FieldSet>();
 	private ThreadLocalChannel receiver = new ThreadLocalChannel();
 	private JobRepositorySupport jobRepository;
 
@@ -63,7 +63,7 @@ public class FileToMessagesJobFactoryBeanTests {
 		jobRepository = new JobRepositorySupport();
 		factory.setJobRepository(jobRepository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
-		FlatFileItemReader itemReader = new FlatFileItemReader();
+		FlatFileItemReader<FieldSet> itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
 		factory.setItemReader(itemReader);
 		DirectChannel channel = new DirectChannel();
@@ -158,7 +158,7 @@ public class FileToMessagesJobFactoryBeanTests {
 	 */
 	@Test
 	public void testGetObjectType() {
-		FileToMessagesJobFactoryBean factory = new FileToMessagesJobFactoryBean();
+		FileToMessagesJobFactoryBean<?> factory = new FileToMessagesJobFactoryBean<Object>();
 		assertEquals(Job.class, factory.getObjectType());
 	}
 
@@ -168,7 +168,7 @@ public class FileToMessagesJobFactoryBeanTests {
 	 */
 	@Test
 	public void testIsSingleton() {
-		FileToMessagesJobFactoryBean factory = new FileToMessagesJobFactoryBean();
+		FileToMessagesJobFactoryBean<?> factory = new FileToMessagesJobFactoryBean<Object>();
 		assertEquals(true, factory.isSingleton());
 	}
 	

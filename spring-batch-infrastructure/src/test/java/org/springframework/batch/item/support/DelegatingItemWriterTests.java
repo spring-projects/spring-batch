@@ -69,7 +69,7 @@ public class DelegatingItemWriterTests extends TestCase {
 	
 	public void testWrite() throws Exception{
 		
-		ProcessingWriter writer = new ProcessingWriter();
+		ProcessingWriter<Object, Object> writer = new ProcessingWriter<Object, Object>();
 		writer.setDelegate(itemWriter);
 		Object item = new Object();
 		itemWriter.write(item);

@@ -61,7 +61,7 @@ public class MessageChannelItemWriterTests {
 		DirectChannel channel = new DirectChannel();
 		ThreadLocalChannel receiver = new ThreadLocalChannel();
 		channel.subscribe(receiver);
-		MessageChannelItemWriter writer = new MessageChannelItemWriter();
+		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
 		writer.setChannel(channel);
 		writer.write("foo");
 		Message<?> message = receiver.receive(10);
@@ -81,7 +81,7 @@ public class MessageChannelItemWriterTests {
 				throw new RuntimeException("Planned failure");
 			}
 		});
-		MessageChannelItemWriter writer = new MessageChannelItemWriter();
+		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
 		writer.setChannel(channel);
 		try {
 			writer.write("foo");
@@ -105,7 +105,7 @@ public class MessageChannelItemWriterTests {
 			}
 		});
 		channel.subscribe(endpoint);
-		MessageChannelItemWriter writer = new MessageChannelItemWriter();
+		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
 		writer.setChannel(channel);
 		try {
 			writer.write("foo");
