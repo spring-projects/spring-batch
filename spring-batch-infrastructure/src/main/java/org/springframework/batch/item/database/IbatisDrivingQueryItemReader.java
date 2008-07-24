@@ -27,9 +27,13 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * The writer is thread safe after its properties are set (normal singleton
  * behaviour).
  * 
+ * TODO remove this class? It does not return keys so it shouldn't extend 
+ * DrivingQueryItemReader
+ * 
  * @author Lucas Ward
  * @see IbatisKeyCollector
  */
+@SuppressWarnings("unchecked")
 public class IbatisDrivingQueryItemReader extends DrivingQueryItemReader {
 
 	private String detailsQueryId;

@@ -5,12 +5,12 @@ package org.springframework.batch.item.database.support;
 
 import java.sql.PreparedStatement;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.core.CollectionFactory;
 
 /**
  * @author Lucas Ward
@@ -19,7 +19,7 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 
 	private ColumnMapItemPreparedStatementSetter mapper;
 	
-	private Map<Object, Object> key;
+	private Map<String, Object> key;
 	
 	private MockControl psControl = MockControl.createControl(PreparedStatement.class);
 	private PreparedStatement ps;
@@ -31,35 +31,15 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 		ps = (PreparedStatement)psControl.getMock();
 		mapper = new ColumnMapItemPreparedStatementSetter();
 		
-		key = CollectionFactory.createLinkedCaseInsensitiveMapIfPossible(2);
+		key = new LinkedHashMap<String, Object>(2);
 		key.put("1", new Integer(1));
 		key.put("2", new Integer(2));
-	}
-	
-	public void testSetValuesWithInvalidType() throws Exception {
-		
-		try{
-			mapper.setValues(new Object(), ps);
-			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
-		}
-	}
-	
-	public void testCreateExecutionContextWithNull() throws Exception{
-		
-		try{
-			mapper.setValues(ps, null);
-			fail();
-		}catch(IllegalArgumentException ex){
-			//expected
-		}
 	}
 	
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 		
 		psControl.replay();
-		mapper.setValues(new HashMap<Object, Object>(), ps);
+		mapper.setValues(new HashMap<String, Object>(), ps);
 		psControl.verify();
 	}
 	

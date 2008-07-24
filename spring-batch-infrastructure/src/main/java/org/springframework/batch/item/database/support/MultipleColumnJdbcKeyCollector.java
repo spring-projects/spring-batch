@@ -44,10 +44,14 @@ import org.springframework.util.StringUtils;
  * {@link #setPreparedStatementSetter(ItemPreparedStatementSetter)} and
  * {@link #setKeyMapper(RowMapper)} are thread-safe (true for default values).
  * 
+ * 
  * @author Lucas Ward
  * 
  * @see DrivingQueryItemReader
  * @see ItemPreparedStatementSetter
+ * 
+ * TODO this class has nothing to do with "multiple columns" other than default
+ * values form keyMapper and preparedStatementSetter. This should be sorted out for 2.0
  */
 public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
 
@@ -57,6 +61,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 
 	private RowMapper keyMapper = new ColumnMapRowMapper();
 
+	@SuppressWarnings("unchecked")
 	private ItemPreparedStatementSetter preparedStatementSetter = new ColumnMapItemPreparedStatementSetter();
 
 	private String sql;
@@ -96,7 +101,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 				+ " in order to restart.");
 
 		if (executionContext.size() > 0) {
-			Object key = executionContext.get(getKey(CURRENT_KEY));
+			T key = (T) executionContext.get(getKey(CURRENT_KEY));
 			return jdbcTemplate.query(restartSql, new PreparedStatementSetterKeyWrapper(key, preparedStatementSetter),
 					keyMapper);
 		}
@@ -162,17 +167,17 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public void setPreparedStatementSetter(ItemPreparedStatementSetter preparedStatementSetter) {
+	public void setPreparedStatementSetter(ItemPreparedStatementSetter<T> preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
 	}
 
-	private static class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter {
+	private class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter {
 
-		private Object key;
+		private T key;
 
-		private ItemPreparedStatementSetter pss;
+		private ItemPreparedStatementSetter<T> pss;
 
-		public PreparedStatementSetterKeyWrapper(Object key, ItemPreparedStatementSetter pss) {
+		public PreparedStatementSetterKeyWrapper(T key, ItemPreparedStatementSetter<T> pss) {
 			this.key = key;
 			this.pss = pss;
 		}

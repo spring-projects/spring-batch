@@ -65,7 +65,7 @@ public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceIt
 
 	private JdbcOperations jdbcTemplate;
 
-	private ItemPreparedStatementSetter preparedStatementSetter;
+	private ItemPreparedStatementSetter<T> preparedStatementSetter;
 
 	private String sql;
 
@@ -95,7 +95,7 @@ public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceIt
 	 * @param preparedStatementSetter the {@link ItemPreparedStatementSetter} to
 	 * set
 	 */
-	public void setItemPreparedStatementSetter(ItemPreparedStatementSetter preparedStatementSetter) {
+	public void setItemPreparedStatementSetter(ItemPreparedStatementSetter<T> preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
 	}
 
@@ -129,7 +129,7 @@ public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceIt
 			int[] values = (int[]) jdbcTemplate.execute(sql, new PreparedStatementCallback() {
 				public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 
-					for (Object item : processed) {
+					for (T item : processed) {
 						preparedStatementSetter.setValues(item, ps);
 						ps.addBatch();
 					}
