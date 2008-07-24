@@ -17,12 +17,12 @@ import org.springframework.util.ClassUtils;
 public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 	AbstractTransactionalDataSourceSpringContextTests {
 
-	JdbcCursorItemReader itemReader;
+	JdbcCursorItemReader<Foo> itemReader;
 	
 	protected void onSetUpInTransaction() throws Exception {
 		super.onSetUpInTransaction();
 		
-		itemReader = new JdbcCursorItemReader();
+		itemReader = new JdbcCursorItemReader<Foo>();
 		itemReader.setDataSource(super.getJdbcTemplate().getDataSource());
 		itemReader.setSql("select ID, NAME, VALUE from T_FOOS where ID > ? and ID < ?");
 		itemReader.setIgnoreWarnings(true);
@@ -50,9 +50,9 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
 	
 	public void testRead() throws Exception{
 		itemReader.open(new ExecutionContext());
-		Foo foo = (Foo)itemReader.read();
+		Foo foo = itemReader.read();
 		assertEquals(2, foo.getId());
-		foo = (Foo)itemReader.read();
+		foo = itemReader.read();
 		assertEquals(3, foo.getId());
 		assertNull(itemReader.read());
 	}

@@ -39,7 +39,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SkipLimitStepFactoryBean factory = new SkipLimitStepFactoryBean();
+	private SkipLimitStepFactoryBean<String> factory = new SkipLimitStepFactoryBean<String>();
 
 	private Class<?>[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
 
@@ -129,7 +129,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	public void testFatalException() throws Exception {
 		factory.setFatalExceptionClasses(new Class[] { FatalRuntimeException.class });
 		factory.setItemWriter(new SkipWriterStub() {
-			public void write(Object item) {
+			public void write(String item) {
 				throw new FatalRuntimeException("Ouch!");
 			}
 		});
@@ -305,7 +305,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Simple item reader that supports skip functionality.
 	 */
-	private static class SkipReaderStub implements ItemReader {
+	private static class SkipReaderStub implements ItemReader<String> {
 
 		protected final Log logger = LogFactory.getLog(getClass());
 
@@ -328,7 +328,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			this.failures = failures;
 		}
 
-		public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
+		public String read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 			counter++;
 			if (counter >= items.length) {
 				logger.debug("Returning null at count=" + counter);
@@ -359,7 +359,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Simple item writer that supports skip functionality.
 	 */
-	private static class SkipWriterStub implements ItemWriter {
+	private static class SkipWriterStub implements ItemWriter<String> {
 
 		protected final Log logger = LogFactory.getLog(getClass());
 
@@ -391,7 +391,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			flushIndex = written.size() - 1;
 		}
 
-		public void write(Object item) throws Exception {
+		public void write(String item) throws Exception {
 			if (failures.contains(item)) {
 				logger.debug("Throwing write exception on [" + item + "]");
 				throw new SkippableRuntimeException("exception in writer");

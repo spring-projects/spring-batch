@@ -62,13 +62,13 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 	private List<String> written = new ArrayList<String>();
 
-	private ItemWriter writer = new AbstractItemWriter() {
-		public void write(Object data) throws Exception {
-			written.add((String) data);
+	private ItemWriter<String> writer = new AbstractItemWriter<String>() {
+		public void write(String data) throws Exception {
+			written.add(data);
 		}
 	};
 
-	private ItemReader reader;
+	private ItemReader<String> reader;
 
 	private AbstractJob job = new SimpleJob() {
 		{
@@ -84,21 +84,20 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		MapStepExecutionDao.clear();
 	}
 
-	private SimpleStepFactoryBean getStepFactory(String arg) throws Exception {
+	private SimpleStepFactoryBean<String> getStepFactory(String arg) throws Exception {
 		return getStepFactory(new String[] { arg });
 	}
 
-	private SimpleStepFactoryBean getStepFactory(String arg0, String arg1) throws Exception {
+	private SimpleStepFactoryBean<String> getStepFactory(String arg0, String arg1) throws Exception {
 		return getStepFactory(new String[] { arg0, arg1 });
 	}
 
-	@SuppressWarnings("unchecked")
-	private SimpleStepFactoryBean getStepFactory(String[] args) throws Exception {
-		SimpleStepFactoryBean factory = new SimpleStepFactoryBean();
+	private SimpleStepFactoryBean<String> getStepFactory(String[] args) throws Exception {
+		SimpleStepFactoryBean<String> factory = new SimpleStepFactoryBean<String>();
 
 		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
-		reader = new ListItemReader(items);
+		reader = new ListItemReader<String>(items);
 
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
@@ -129,7 +128,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	public void testSimpleConcurrentJob() throws Exception {
 
 		job.setSteps(new ArrayList<Step>());
-		SimpleStepFactoryBean factory = getStepFactory("foo", "bar");
+		SimpleStepFactoryBean<String> factory = getStepFactory("foo", "bar");
 		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		factory.setThrottleLimit(1);
 
@@ -163,10 +162,10 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		SimpleStepFactoryBean factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		factory.setItemWriter(new AbstractItemWriter() {
-			public void write(Object data) throws Exception {
+		factory.setItemWriter(new AbstractItemWriter<String>() {
+			public void write(String data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
 		});
@@ -196,10 +195,10 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	}
 
 	public void testExceptionTerminates() throws Exception {
-		SimpleStepFactoryBean factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
-		factory.setItemWriter(new AbstractItemWriter() {
-			public void write(Object data) throws Exception {
+		factory.setItemWriter(new AbstractItemWriter<String>() {
+			public void write(String data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
 		});
@@ -219,13 +218,13 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	}
 
 	public void testExceptionHandler() throws Exception {
-		SimpleStepFactoryBean factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setExceptionHandler(new SimpleLimitExceptionHandler(1));
-		factory.setItemWriter(new AbstractItemWriter() {
+		factory.setItemWriter(new AbstractItemWriter<String>() {
 			int count = 0;
 
-			public void write(Object data) throws Exception {
+			public void write(String data) throws Exception {
 				if (count++ == 0) {
 					throw new RuntimeException("Foo");
 				}
@@ -245,7 +244,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
 		int commitInterval = 3;
 
-		SimpleStepFactoryBean factory = getStepFactory(items);
+		SimpleStepFactoryBean<String> factory = getStepFactory(items);
 		class CountingChunkListener implements ChunkListener {
 			int beforeCount = 0;
 
@@ -284,7 +283,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testCommitIntervalMustBeGreaterThanZero() throws Exception {
-		SimpleStepFactoryBean factory = getStepFactory("foo");
+		SimpleStepFactoryBean<String> factory = getStepFactory("foo");
 		// nothing wrong here
 		factory.getObject();
 
@@ -304,7 +303,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testCommitIntervalAndCompletionPolicyBothSet() throws Exception {
-		SimpleStepFactoryBean factory = getStepFactory("foo");
+		SimpleStepFactoryBean<String> factory = getStepFactory("foo");
 
 		// but exception expected after setting commit interval and completion
 		// policy

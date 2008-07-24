@@ -72,8 +72,8 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		};
 		writer.setSql("SQL");
 		writer.setJdbcTemplate(jdbcTemplate);
-		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter() {
-			public void setValues(Object item, PreparedStatement ps) throws SQLException {
+		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 			}
 		});
@@ -193,8 +193,8 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
-		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter() {
-			public void setValues(Object item, PreparedStatement ps) throws SQLException {
+		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 				throw ex;
 			}
@@ -213,8 +213,8 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		}
 		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(2, list.size());
-		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter() {
-			public void setValues(Object item, PreparedStatement ps) throws SQLException {
+		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
+			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 			}
 		});

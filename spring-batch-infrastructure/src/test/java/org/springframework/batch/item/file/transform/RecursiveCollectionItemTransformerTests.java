@@ -16,6 +16,7 @@
 package org.springframework.batch.item.file.transform;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 
 import junit.framework.TestCase;
@@ -39,8 +40,8 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testSetDelegate() throws Exception {
-		transformer.setDelegate(new ItemTransformer() {
-			public Object transform(Object item) throws Exception {
+		transformer.setDelegate(new ItemTransformer<Object, String>() {
+			public String transform(Object item) throws Exception {
 				return "bar";
 			}
 		});
@@ -53,8 +54,8 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testSetDelegateAndPassInString() throws Exception {
-		transformer.setDelegate(new ItemTransformer() {
-			public Object transform(Object item) throws Exception {
+		transformer.setDelegate(new ItemTransformer<Object, String>() {
+			public String transform(Object item) throws Exception {
 				return "bar";
 			}
 		});
@@ -67,8 +68,8 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testSetDelegateReturnsList() throws Exception {
-		transformer.setDelegate(new ItemTransformer() {
-			public Object transform(Object item) throws Exception {
+		transformer.setDelegate(new ItemTransformer<Object, Collection<String>>() {
+			public Collection<String> transform(Object item) throws Exception {
 				return Collections.singletonList("bar");
 			}
 		});

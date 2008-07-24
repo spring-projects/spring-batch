@@ -44,7 +44,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobExecution jobExecution;
 
-	private AbstractItemWriter itemWriter;
+	private AbstractItemWriter<Object> itemWriter;
 
 	private StepExecution stepExecution;
 
@@ -63,11 +63,11 @@ public class StepExecutorInterruptionTests extends TestCase {
 		jobExecution = jobRepository.createJobExecution(jobConfiguration, new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
-		itemWriter = new AbstractItemWriter() {
+		itemWriter = new AbstractItemWriter<Object>() {
 			public void write(Object item) throws Exception {
 			}
 		};
-		step.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
+		step.setItemHandler(new SimpleItemHandler<Object>(new AbstractItemReader<Object>() {
 			public Object read() throws Exception {
 				return null;
 			}
@@ -107,7 +107,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		Thread processingThread = createThread(stepExecution);
 
-		step.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
+		step.setItemHandler(new SimpleItemHandler<Object>(new AbstractItemReader<Object>() {
 			public Object read() throws Exception {
 				return null;
 			}
@@ -145,7 +145,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 	 * @return
 	 */
 	private Thread createThread(final StepExecution stepExecution) {
-		step.setItemHandler(new SimpleItemHandler(new AbstractItemReader() {
+		step.setItemHandler(new SimpleItemHandler<Object>(new AbstractItemReader<Object>() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;

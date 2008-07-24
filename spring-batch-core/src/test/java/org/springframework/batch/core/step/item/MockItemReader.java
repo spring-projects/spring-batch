@@ -19,7 +19,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 
-public class MockItemReader implements ItemReader {
+public class MockItemReader implements ItemReader<String> {
 
 	private final int returnItemCount;
 
@@ -42,7 +42,7 @@ public class MockItemReader implements ItemReader {
 	public void close() {
 	}
 
-	public Object read() {
+	public String read() {
 		if(fail) {
 			fail = false;
 			throw new RuntimeException();

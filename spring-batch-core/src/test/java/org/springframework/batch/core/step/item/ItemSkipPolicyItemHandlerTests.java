@@ -51,7 +51,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 
 	private final SkipWriterStub writer = new SkipWriterStub();
 
-	private ItemSkipPolicyItemHandler handler = new ItemSkipPolicyItemHandler(new SkipReaderStub(), writer);
+	private ItemSkipPolicyItemHandler<Holder> handler = new ItemSkipPolicyItemHandler<Holder>(new SkipReaderStub(), writer);
 
 	private StepContribution contribution = new StepContribution(new JobExecution(new JobInstance(new Long(11),
 			new JobParameters(), "jobName")).createStepExecution(new StepSupport("foo")));
@@ -138,7 +138,7 @@ public class ItemSkipPolicyItemHandlerTests extends TestCase {
 		assertEquals(2, contribution.getSkipCount());
 
 		assertEquals(1, TransactionSynchronizationManager.getResourceMap().size());
-		Set<Object> removed = (Set) TransactionSynchronizationManager.getResourceMap().values().iterator().next();
+		Set<Object> removed = (Set<Object>) TransactionSynchronizationManager.getResourceMap().values().iterator().next();
 		// one skipped item was detected on read
 		assertEquals(1, removed.size());
 		// mark() should remove the set of removed keys

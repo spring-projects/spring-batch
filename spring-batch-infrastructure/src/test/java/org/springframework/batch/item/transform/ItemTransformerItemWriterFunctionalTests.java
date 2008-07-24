@@ -35,20 +35,22 @@ public class ItemTransformerItemWriterFunctionalTests extends TestCase {
 	
 	public void testTransform() throws Exception{
 		
-		ItemTransformerItemWriter itemTransformerItemWriter = new ItemTransformerItemWriter();
+		ItemTransformerItemWriter<Foo, Bar> itemTransformerItemWriter = new ItemTransformerItemWriter<Foo, Bar>();
 		itemTransformerItemWriter.setItemTransformer(new FooTransformer());
 		itemTransformerItemWriter.setDelegate(new BarWriter());
 		itemTransformerItemWriter.write(new Foo());
 	}
 	
+	
 	public void testComposite() throws Exception{
 		
-		CompositeItemTransformer compositeTransformer = new CompositeItemTransformer();
-		List<ItemTransformer> itemTransformers = new ArrayList<ItemTransformer>();
+		CompositeItemTransformer<Foo, Foobar> compositeTransformer = new CompositeItemTransformer<Foo, Foobar>();
+		
+		@SuppressWarnings("unchecked") List<ItemTransformer> itemTransformers = new ArrayList<ItemTransformer>();
 		itemTransformers.add(new FooTransformer());
 		itemTransformers.add(new BarTransformer());
 		compositeTransformer.setItemTransformers(itemTransformers);
-		ItemTransformerItemWriter itemTransformerItemWriter = new ItemTransformerItemWriter();
+		ItemTransformerItemWriter<Foo, Foobar> itemTransformerItemWriter = new ItemTransformerItemWriter<Foo, Foobar>();
 		itemTransformerItemWriter.setItemTransformer(compositeTransformer);
 		itemTransformerItemWriter.setDelegate(new FoobarWriter());
 		itemTransformerItemWriter.write(new Foo());
@@ -67,21 +69,18 @@ public class ItemTransformerItemWriterFunctionalTests extends TestCase {
 		public Foobar(Bar bar){}
 	}
 	
-	public class FooTransformer implements ItemTransformer{
+	public class FooTransformer implements ItemTransformer<Foo, Bar>{
 
 		//Preform simple transformation, convert a Foo to a Barr
-		public Object transform(Object item) throws Exception {
-			assertTrue(item instanceof Foo);
-			Foo foo = (Foo)item;
+		public Bar transform(Foo foo) throws Exception {
 			return new Bar(foo);
 		}
 	}
 	
-	public class BarTransformer implements ItemTransformer{
+	public class BarTransformer implements ItemTransformer<Bar, Foobar>{
 
-		public Object transform(Object item) throws Exception {
-			assertTrue(item instanceof Bar);
-			return new Foobar((Bar)item);
+		public Foobar transform(Bar bar) throws Exception {
+			return new Foobar(bar);
 		}
 	}
 	

@@ -79,11 +79,11 @@ public class DelegatingItemWriterTests extends TestCase {
 		assertTrue(writer.isDoProcessCalled());
 	}
 	
-	private class ProcessingWriter extends DelegatingItemWriter{
+	private class ProcessingWriter<I,O> extends DelegatingItemWriter<I,O>{
 		
 		boolean doProcessCalled = false;
 		
-		protected Object doProcess(Object item) throws Exception {
+		protected O doProcess(I item) throws Exception {
 			doProcessCalled = true;
 			return super.doProcess(item);
 		}

@@ -31,7 +31,7 @@ import org.springframework.beans.factory.InitializingBean;
  * Mock {@link ItemWriter} that will throw an exception when a certain
  * number of items have been written. 
  */
-public class EmptyItemWriter implements ItemWriter, InitializingBean {
+public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private boolean failed = false;
 
@@ -52,7 +52,7 @@ public class EmptyItemWriter implements ItemWriter, InitializingBean {
 		this.failurePoint = failurePoint;
 	}
 
-	public void write(Object data) {
+	public void write(T data) {
 		if (!failed && list.size() == failurePoint) {
 			failed = true;
 			throw new RuntimeException("Failed processing: [" + data + "]");

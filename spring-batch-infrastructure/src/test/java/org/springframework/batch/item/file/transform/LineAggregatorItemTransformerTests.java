@@ -25,7 +25,7 @@ import org.springframework.batch.item.file.mapping.FieldSet;
  */
 public class LineAggregatorItemTransformerTests extends TestCase {
 	
-	private LineAggregatorItemTransformer transformer = new LineAggregatorItemTransformer();
+	private LineAggregatorItemTransformer<String[]> transformer = new LineAggregatorItemTransformer<String[]>();
 
 	/**
 	 * Test method for {@link org.springframework.batch.item.file.transform.LineAggregatorItemTransformer#setAggregator(org.springframework.batch.item.file.transform.LineAggregator)}.
@@ -50,17 +50,4 @@ public class LineAggregatorItemTransformerTests extends TestCase {
 		assertTrue("Wrong value: "+value, value.startsWith("a,b"));
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.item.file.transform.LineAggregatorItemTransformer#transform(java.lang.Object)}.
-	 * @throws Exception 
-	 */
-	public void testTransformWrongType() throws Exception {
-		try {
-			transformer.transform("foo");
-			fail("Expected ConversionException");
-		} catch (ConversionException e) {
-			// Expected
-		}
-
-	}
 }

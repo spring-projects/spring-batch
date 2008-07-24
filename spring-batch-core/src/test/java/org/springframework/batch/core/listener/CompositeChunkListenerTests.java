@@ -27,7 +27,7 @@ import junit.framework.TestCase;
  */
 public class CompositeChunkListenerTests extends TestCase {
 
-	MockControl listenerControl = MockControl.createControl(ChunkListener.class);
+	MockControl<ChunkListener> listenerControl = MockControl.createControl(ChunkListener.class);
 	
 	ChunkListener listener;
 	CompositeChunkListener compositeListener;
@@ -35,7 +35,7 @@ public class CompositeChunkListenerTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	
-		listener = (ChunkListener)listenerControl.getMock();
+		listener = listenerControl.getMock();
 		compositeListener = new CompositeChunkListener();
 		compositeListener.register(listener);
 	}

@@ -39,7 +39,7 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	private SimpleJobLauncher jobLauncher;
 
-	private MockControl repositoryControl = MockControl.createControl(JobRepository.class);
+	private MockControl<JobRepository> repositoryControl = MockControl.createControl(JobRepository.class);
 
 	private Job job = new JobSupport("foo") {
 		public void execute(JobExecution execution) {
@@ -56,7 +56,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		super.setUp();
 
 		jobLauncher = new SimpleJobLauncher();
-		jobRepository = (JobRepository) repositoryControl.getMock();
+		jobRepository = repositoryControl.getMock();
 		jobLauncher.setJobRepository(jobRepository);
 
 	}

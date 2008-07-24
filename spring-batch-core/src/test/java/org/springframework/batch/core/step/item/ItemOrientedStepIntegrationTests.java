@@ -79,8 +79,8 @@ public class ItemOrientedStepIntegrationTests extends AbstractDependencyInjectio
 		this.dataSource = dataSource;
 	}
 
-	private ItemReader getReader(String[] args) {
-		return new ListItemReader(Arrays.asList(args));
+	private ItemReader<String> getReader(String[] args) {
+		return new ListItemReader<String>(Arrays.asList(args));
 	}
 
 	protected void onSetUp() throws Exception {
@@ -124,8 +124,8 @@ public class ItemOrientedStepIntegrationTests extends AbstractDependencyInjectio
 
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setItemHandler(new SimpleItemHandler(getReader(new String[] { "a", "b", "c" }), new AbstractItemWriter() {
-			public void write(Object data) throws Exception {
+		step.setItemHandler(new SimpleItemHandler<String>(getReader(new String[] { "a", "b", "c" }), new AbstractItemWriter<String>() {
+			public void write(String data) throws Exception {
 				processed.add((String) data);
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 					public void beforeCommit(boolean readOnly) {

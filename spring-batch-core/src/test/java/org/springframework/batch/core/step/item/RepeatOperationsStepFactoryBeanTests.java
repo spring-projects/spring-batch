@@ -39,7 +39,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
  */
 public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
-	private RepeatOperationsStepFactoryBean factory = new RepeatOperationsStepFactoryBean();
+	private RepeatOperationsStepFactoryBean<String> factory = new RepeatOperationsStepFactoryBean<String>();
 
 	private List<String> list;
 
@@ -47,8 +47,8 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	protected void setUp() throws Exception {
 		factory.setBeanName("RepeatOperationsStep");
-		factory.setItemReader(new ListItemReader(new ArrayList<String>()));
-		factory.setItemWriter(new EmptyItemWriter());
+		factory.setItemReader(new ListItemReader<String>(new ArrayList<String>()));
+		factory.setItemWriter(new EmptyItemWriter<String>());
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 	}
@@ -63,8 +63,8 @@ public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
 	public void testStepOperationsWithoutChunkListener() throws Exception {
 
-		factory.setItemReader(new ListItemReader(new ArrayList<String>()));
-		factory.setItemWriter(new EmptyItemWriter());
+		factory.setItemReader(new ListItemReader<String>(new ArrayList<String>()));
+		factory.setItemWriter(new EmptyItemWriter<String>());
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 

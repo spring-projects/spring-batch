@@ -354,8 +354,8 @@ public class SimpleJobTests extends TestCase {
 	public void testInterruptWithListener() throws Exception {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
-		MockControl control = MockControl.createStrictControl(JobExecutionListener.class);
-		JobExecutionListener listener = (JobExecutionListener) control.getMock();
+		MockControl<JobExecutionListener> control = MockControl.createStrictControl(JobExecutionListener.class);
+		JobExecutionListener listener = control.getMock();
 		listener.beforeJob(jobExecution);
 		control.setVoidCallable();
 		listener.onInterrupt(jobExecution);

@@ -26,7 +26,7 @@ import org.springframework.batch.core.ItemWriteListener;
  */
 public class CompositeItemWriteListenerTests extends TestCase {
 
-	MockControl listenerControl = MockControl.createControl(ItemWriteListener.class);
+	MockControl<ItemWriteListener> listenerControl = MockControl.createControl(ItemWriteListener.class);
 	
 	ItemWriteListener listener;
 	CompositeItemWriteListener compositeListener;
@@ -34,7 +34,7 @@ public class CompositeItemWriteListenerTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	
-		listener = (ItemWriteListener)listenerControl.getMock();
+		listener = listenerControl.getMock();
 		compositeListener = new CompositeItemWriteListener();
 		compositeListener.register(listener);
 	}

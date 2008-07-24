@@ -13,17 +13,17 @@ import org.easymock.MockControl;
  */
 public class CompositeItemTransformerTests extends TestCase {
 
-	private CompositeItemTransformer composite = new CompositeItemTransformer();
+	private CompositeItemTransformer<Object, Object> composite = new CompositeItemTransformer<Object, Object>();
 	
-	private ItemTransformer transformer1;
-	private ItemTransformer transformer2;
+	private ItemTransformer<Object, Object> transformer1;
+	private ItemTransformer<Object, Object> transformer2;
 
-	private MockControl tControl1 = MockControl.createControl(ItemTransformer.class);
-	private MockControl tControl2 = MockControl.createControl(ItemTransformer.class);
+	private MockControl<ItemTransformer> tControl1 = MockControl.createControl(ItemTransformer.class);
+	private MockControl<ItemTransformer> tControl2 = MockControl.createControl(ItemTransformer.class);
 	
 	protected void setUp() throws Exception {
-		transformer1 = (ItemTransformer) tControl1.getMock();
-		transformer2 = (ItemTransformer) tControl2 .getMock();
+		transformer1 = tControl1.getMock();
+		transformer2 = tControl2 .getMock();
 		
 		composite.setItemTransformers(new ArrayList<ItemTransformer>() {{ 
 			add(transformer1); add(transformer2); 

@@ -22,7 +22,6 @@ import java.util.Set;
 
 import junit.framework.TestCase;
 
-@SuppressWarnings("unchecked")
 public class TransactionAwareProxyFactoryTests extends TestCase {
 	
 	public void testCreateList() throws Exception {
