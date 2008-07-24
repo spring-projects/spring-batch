@@ -15,14 +15,8 @@
  */
 package org.springframework.batch.core.repository.support;
 
-import java.sql.Connection;
-
-import javax.sql.DataSource;
-
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
+import static junit.framework.Assert.*;
+import static org.easymock.EasyMock.*;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
@@ -31,16 +25,19 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
 
 /**
  * @author Lucas Ward
  * 
  */
-public class JobRepositoryFactoryBeanTests extends TestCase {
+public class JobRepositoryFactoryBeanTests {
 
 	private JobRepositoryFactoryBean factory;
-
-	private MockControl incrementerControl = MockControl.createControl(DataFieldMaxValueIncrementerFactory.class);
 
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
 
@@ -50,33 +47,27 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 
 	private String tablePrefix = "TEST_BATCH_PREFIX_";
 
-	private MockControl txControl;
-
-	private MockControl dataSourceControl;
-
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
 		factory = new JobRepositoryFactoryBean();
-		dataSourceControl = MockControl.createControl(DataSource.class);
-		dataSource = (DataSource) dataSourceControl.getMock();
-		txControl = MockControl.createControl(PlatformTransactionManager.class);
-		transactionManager = (PlatformTransactionManager) txControl.getMock();
+		dataSource = createMock(DataSource.class);
+		transactionManager = createMock(PlatformTransactionManager.class);
 		factory.setDataSource(dataSource);
 		factory.setTransactionManager(transactionManager);
-		incrementerFactory = (DataFieldMaxValueIncrementerFactory) incrementerControl.getMock();
+		incrementerFactory = createMock(DataFieldMaxValueIncrementerFactory.class);
 		factory.setIncrementerFactory(incrementerFactory);
 		factory.setTablePrefix(tablePrefix);
+
 	}
 
+	@Test
 	public void testNoDatabaseType() throws Exception {
 
 		try {
-			incrementerFactory.isSupportedIncrementerType(null);
-			incrementerControl.setReturnValue(false);
-			incrementerFactory.getSupportedIncrementerTypes();
-			incrementerControl.setReturnValue(new String[0]);
-			incrementerControl.replay();
+			expect(incrementerFactory.isSupportedIncrementerType(null)).andReturn(false);
+			expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
+			replay(incrementerFactory);
 			factory.afterPropertiesSet();
 			fail();
 		}
@@ -85,8 +76,10 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 			String message = ex.getMessage();
 			assertTrue("Wrong message: " + message, message.indexOf("unsupported database type") >= 0);
 		}
+
 	}
 
+	@Test
 	public void testMissingDataSource() throws Exception {
 
 		factory.setDataSource(null);
@@ -99,17 +92,17 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 			String message = ex.getMessage();
 			assertTrue("Wrong message: " + message, message.indexOf("DataSource") >= 0);
 		}
+
 	}
 
+	@Test
 	public void testMissingTransactionManager() throws Exception {
 
 		factory.setTransactionManager(null);
 		try {
-			incrementerFactory.isSupportedIncrementerType(null);
-			incrementerControl.setReturnValue(true);
-			incrementerFactory.getSupportedIncrementerTypes();
-			incrementerControl.setReturnValue(new String[0]);
-			incrementerControl.replay();
+			expect(incrementerFactory.isSupportedIncrementerType(null)).andReturn(true);
+			expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
+			replay(incrementerFactory);
 			factory.afterPropertiesSet();
 			fail();
 		}
@@ -118,17 +111,17 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 			String message = ex.getMessage();
 			assertTrue("Wrong message: " + message, message.indexOf("TransactionManager") >= 0);
 		}
+
 	}
 
+	@Test
 	public void testInvalidDatabaseType() throws Exception {
 
 		factory.setDatabaseType("foo");
 		try {
-			incrementerFactory.isSupportedIncrementerType("foo");
-			incrementerControl.setReturnValue(false);
-			incrementerFactory.getSupportedIncrementerTypes();
-			incrementerControl.setReturnValue(new String[0]);
-			incrementerControl.replay();
+			expect(incrementerFactory.isSupportedIncrementerType("foo")).andReturn(false);
+			expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
+			replay(incrementerFactory);
 			factory.afterPropertiesSet();
 			fail();
 		}
@@ -137,37 +130,36 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 			String message = ex.getMessage();
 			assertTrue("Wrong message: " + message, message.indexOf("foo") >= 0);
 		}
+
 	}
 
+	@Test
 	public void testCreateRepository() throws Exception {
 		String databaseType = "foo";
 		factory.setDatabaseType(databaseType);
 
-		incrementerFactory.isSupportedIncrementerType("foo");
-		incrementerControl.setReturnValue(true);
-		incrementerFactory.getSupportedIncrementerTypes();
-		incrementerControl.setReturnValue(new String[0]);
-		incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ");
-		incrementerControl.setReturnValue(new StubIncrementer());
-		incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ");
-		incrementerControl.setReturnValue(new StubIncrementer());
-		incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ");
-		incrementerControl.setReturnValue(new StubIncrementer());
-		incrementerControl.replay();
+		expect(incrementerFactory.isSupportedIncrementerType("foo")).andReturn(true);
+		expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		replay(incrementerFactory);
 
 		factory.afterPropertiesSet();
 		factory.getObject();
 
-		incrementerControl.verify();
+		verify(incrementerFactory);
+
 	}
 
+	@Test
 	public void testTransactionAttributesForCreateMethodNullHypothesis() throws Exception {
 		testCreateRepository();
 		JobRepository repository = (JobRepository) factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		txControl.expectAndReturn(transactionManager.getTransaction(transactionDefinition), null);
-		txControl.replay();
+		expect(transactionManager.getTransaction(transactionDefinition)).andReturn(null);
+		replay(transactionManager);
 		try {
 			repository.createJobExecution(new JobSupport("job"), new JobParameters());
 			// we expect an exception from the txControl because we provided the
@@ -179,25 +171,22 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 			// comparison
 			assertEquals("Unexpected method call", e.getMessage().substring(3, 25));
 		}
+
 	}
 
+	@Test
 	public void testTransactionAttributesForCreateMethod() throws Exception {
+
 		testCreateRepository();
 		JobRepository repository = (JobRepository) factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_SERIALIZABLE);
-		txControl.expectAndReturn(transactionManager.getTransaction(transactionDefinition), null);
-		MockControl connectionControl = MockControl.createControl(Connection.class);
-		Connection conn = (Connection) connectionControl.getMock();
-		conn.prepareStatement("SELECT JOB_INSTANCE_ID from TEST_BATCH_PREFIX_JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)");
-		connectionControl.setReturnValue(null);
-		conn.close();
-		connectionControl.setVoidCallable();
-		dataSourceControl.expectAndReturn(dataSource.getConnection(), conn);
-		connectionControl.replay();
-		dataSourceControl.replay();
-		txControl.replay();
+		expect(transactionManager.getTransaction(transactionDefinition)).andReturn(null);
+		Connection conn = createNiceMock(Connection.class);
+		expect(dataSource.getConnection()).andReturn(conn);
+		replay(dataSource);
+		replay(transactionManager);
 		try {
 			repository.createJobExecution(new JobSupport("job"), new JobParameters());
 			// we expect an exception but not from the txControl because we
@@ -206,31 +195,25 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 		}
 		catch (IllegalArgumentException e) {
 			// expected exception from DataSourceUtils
-			System.out.println("******* " + e);
-			System.out.println("******* " + e);
-			System.out.println("******* " + e);
 			assertEquals("No Statement specified", e.getMessage());
 		}
+
 	}
 
+	@Test
 	public void testSetTransactionAttributesForCreateMethod() throws Exception {
+
 		factory.setIsolationLevelForCreate("ISOLATION_READ_UNCOMMITTED");
 		testCreateRepository();
 		JobRepository repository = (JobRepository) factory.getObject();
 		DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
 				DefaultTransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionDefinition.setIsolationLevel(DefaultTransactionDefinition.ISOLATION_READ_UNCOMMITTED);
-		txControl.expectAndReturn(transactionManager.getTransaction(transactionDefinition), null);
-		MockControl connectionControl = MockControl.createControl(Connection.class);
-		Connection conn = (Connection) connectionControl.getMock();
-		conn.prepareStatement("SELECT JOB_INSTANCE_ID from TEST_BATCH_PREFIX_JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)");
-		connectionControl.setReturnValue(null);
-		conn.close();
-		connectionControl.setVoidCallable();
-		dataSourceControl.expectAndReturn(dataSource.getConnection(), conn);
-		connectionControl.replay();
-		dataSourceControl.replay();
-		txControl.replay();
+		expect(transactionManager.getTransaction(transactionDefinition)).andReturn(null);
+		Connection conn = createNiceMock(Connection.class);
+		expect(dataSource.getConnection()).andReturn(conn);
+		replay(dataSource);
+		replay(transactionManager);
 		try {
 			repository.createJobExecution(new JobSupport("job"), new JobParameters());
 			// we expect an exception but not from the txControl because we
@@ -241,6 +224,7 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 			// expected exception from DataSourceUtils
 			assertEquals("No Statement specified", e.getMessage());
 		}
+
 	}
 
 	private static class StubIncrementer implements DataFieldMaxValueIncrementer {
@@ -258,4 +242,5 @@ public class JobRepositoryFactoryBeanTests extends TestCase {
 		}
 
 	}
+
 }
