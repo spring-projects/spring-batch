@@ -16,17 +16,15 @@
 
 package org.springframework.batch.sample;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
-import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import org.junit.Test;
 
 /**
  * Abstract unit test for running functional tests by getting context locations

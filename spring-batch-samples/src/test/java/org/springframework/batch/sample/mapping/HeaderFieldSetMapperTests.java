@@ -34,7 +34,7 @@ public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 
-	protected FieldSetMapper fieldSetMapper() {
+	protected FieldSetMapper<Order> fieldSetMapper() {
 		return new HeaderFieldSetMapper();
 	}
 

@@ -22,7 +22,7 @@ public class RetrySampleFunctionalTests extends AbstractValidatingBatchLauncherT
 	private GeneratingItemReader itemGenerator;
 	
 	@Autowired
-	private RetrySampleItemWriter itemProcessor;
+	private RetrySampleItemWriter<?> itemProcessor;
 	
 	protected void validatePostConditions() throws Exception {
 		//items processed = items read + 2 exceptions

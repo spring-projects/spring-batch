@@ -16,23 +16,22 @@
 package org.springframework.batch.sample.dao;
 
 import static org.junit.Assert.assertEquals;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.Player;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
-import org.junit.runner.RunWith;
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.sql.DataSource;
+import org.junit.runner.RunWith;
+import org.springframework.batch.sample.domain.Player;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Lucas Ward

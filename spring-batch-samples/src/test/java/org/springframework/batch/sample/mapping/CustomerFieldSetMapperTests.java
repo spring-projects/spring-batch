@@ -50,7 +50,7 @@ public class CustomerFieldSetMapperTests extends AbstractFieldSetMapperTests {
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 
-	protected FieldSetMapper fieldSetMapper() {
+	protected FieldSetMapper<Customer> fieldSetMapper() {
 		return new CustomerFieldSetMapper();
 	}
 

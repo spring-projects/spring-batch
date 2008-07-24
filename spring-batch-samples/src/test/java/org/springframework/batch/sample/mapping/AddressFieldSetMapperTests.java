@@ -47,7 +47,7 @@ public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {
 		return  new DefaultFieldSet(tokens, columnNames);
 	}
 
-	protected FieldSetMapper fieldSetMapper() {
+	protected FieldSetMapper<Address> fieldSetMapper() {
 		return new AddressFieldSetMapper();
 	}
 }

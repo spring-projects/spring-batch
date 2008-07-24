@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractItemWriter;
@@ -37,25 +37,23 @@ import org.springframework.batch.sample.domain.BillingInfo;
 import org.springframework.batch.sample.domain.Customer;
 import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
-import org.junit.Before;
-import org.junit.Test;
 
 public class FlatFileOrderWriterTests {
 
 	List<Object> list = new ArrayList<Object>();
 	
-	private ItemWriter output = new AbstractItemWriter() {
+	private ItemWriter<Object> output = new AbstractItemWriter<Object>() {
 		public void write(Object output) {
 			list.add(output);
 		}
 	};
 
-	private ItemTransformerItemWriter writer;
+	private ItemTransformerItemWriter<Order, Object> writer;
 	
 	@Before
 	public void setUp() throws Exception {
 		//create new writer
-		writer = new ItemTransformerItemWriter();
+		writer = new ItemTransformerItemWriter<Order, Object>();
 		writer.setDelegate(output);
 	}
 

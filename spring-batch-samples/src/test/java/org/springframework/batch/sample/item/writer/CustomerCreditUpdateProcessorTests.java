@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class CustomerCreditUpdateProcessorTests {
 
-	private MockControl daoControl;
+	private MockControl<CustomerCreditDao> daoControl;
 	private CustomerCreditDao dao;
 	private CustomerCreditUpdateWriter writer;
 	private static final double CREDIT_FILTER = 355.0;
@@ -19,7 +19,7 @@ public class CustomerCreditUpdateProcessorTests {
 	public void setUp() {
 		//create mock writer
 		daoControl = MockControl.createControl(CustomerCreditDao.class);
-		dao = (CustomerCreditDao) daoControl.getMock();
+		dao = daoControl.getMock();
 		//create processor, set writer and credit filter
 		writer = new CustomerCreditUpdateWriter();
 		writer.setDao(dao);

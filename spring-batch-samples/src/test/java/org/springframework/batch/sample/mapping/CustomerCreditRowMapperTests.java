@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import org.easymock.MockControl;
 import org.springframework.batch.sample.domain.CustomerCredit;
-import org.springframework.batch.sample.mapping.CustomerCreditRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 
 public class CustomerCreditRowMapperTests extends AbstractRowMapperTests {

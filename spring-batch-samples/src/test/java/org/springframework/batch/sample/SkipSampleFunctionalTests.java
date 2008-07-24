@@ -26,7 +26,7 @@ public class SkipSampleFunctionalTests extends AbstractValidatingBatchLauncherTe
 	JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	ItemTrackingItemWriter writer;
+	ItemTrackingItemWriter<?> writer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {

@@ -17,23 +17,21 @@ package org.springframework.batch.sample.item.writer;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import org.junit.runner.RunWith;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.sql.DataSource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
@@ -42,7 +40,7 @@ public class StagingItemWriterTests {
 	private JdbcOperations jdbcTemplate;
 
 	@Autowired
-	private StagingItemWriter writer;
+	private StagingItemWriter<String> writer;
 
 	public JdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;

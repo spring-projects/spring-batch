@@ -25,6 +25,7 @@ import java.sql.SQLException;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.sample.domain.Trade;
 import org.springframework.batch.sample.mapping.TradeFieldSetMapper;
@@ -51,7 +52,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	//auto-injected attributes
 	private JdbcOperations jdbcTemplate;
 	private Resource fileLocator;
-	private FlatFileItemReader inputSource;
+	private FlatFileItemReader<Trade> inputSource;
 	private LineTokenizer lineTokenizer;
 
 	@Autowired
@@ -69,8 +70,12 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	public void onSetUp() throws Exception {
 		jdbcTemplate.update("delete from TRADE");
 		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
-		inputSource = new FlatFileItemReader();
-		inputSource.setFieldSetMapper(new TradeFieldSetMapper());
+		inputSource = new FlatFileItemReader<Trade>();
+		
+		@SuppressWarnings("unchecked")
+		FieldSetMapper<Trade> mapper = new TradeFieldSetMapper();
+		inputSource.setFieldSetMapper(mapper);
+		
 		inputSource.setLineTokenizer(lineTokenizer);
 		inputSource.setResource(fileLocator);
 	}

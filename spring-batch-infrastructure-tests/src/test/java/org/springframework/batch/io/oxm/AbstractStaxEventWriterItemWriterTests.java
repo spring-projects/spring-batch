@@ -23,7 +23,7 @@ import org.springframework.util.ClassUtils;
 
 public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 
-	private StaxEventItemWriter writer = new StaxEventItemWriter();
+	private StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<Trade>();
 
 	private Resource resource;
 
@@ -43,7 +43,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 	 * Write list of domain objects and check the output file.
 	 */
 	public void testWrite() throws Exception {
-		for (Iterator<?> iterator = objects.listIterator(); iterator.hasNext();) {
+		for (Iterator<Trade> iterator = objects.listIterator(); iterator.hasNext();) {
 			writer.write(iterator.next());
 		}
 		writer.close(null);
@@ -58,7 +58,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 		resource = new FileSystemResource(outputFile);
 		writer.setResource(resource);
 
-		MarshallingEventWriterSerializer mapper = new MarshallingEventWriterSerializer(getMarshaller());
+		MarshallingEventWriterSerializer<Trade> mapper = new MarshallingEventWriterSerializer<Trade>(getMarshaller());
 		writer.setSerializer(mapper);
 
 		writer.open(new ExecutionContext());

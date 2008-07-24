@@ -19,8 +19,8 @@ public abstract class AbstractRowMapperTests extends TestCase {
 	private static final int IGNORED_ROW_NUMBER = 0;
 	
 	//mock result set
-	private MockControl rsControl = MockControl.createControl(ResultSet.class);
-	private ResultSet rs = (ResultSet) rsControl.getMock();
+	private MockControl<ResultSet> rsControl = MockControl.createControl(ResultSet.class);
+	private ResultSet rs = rsControl.getMock();
 	
 	/**
 	 * @return Expected result of mapping the mock <code>ResultSet</code> by
@@ -36,7 +36,7 @@ public abstract class AbstractRowMapperTests extends TestCase {
 	/**
 	 * Define the behaviour of mock <code>ResultSet</code>.
 	 */
-	abstract protected void setUpResultSetMock(ResultSet rs, MockControl rsControl) throws SQLException;
+	abstract protected void setUpResultSetMock(ResultSet rs, MockControl<ResultSet> rsControl) throws SQLException;
 	
 	
 	/**

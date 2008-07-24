@@ -46,13 +46,13 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		MockControl sessionControl = MockControl.createNiceControl(Session.class);
-		MockControl consumerControl = MockControl.createControl(MessageConsumer.class);
-		MockControl messageControl = MockControl.createControl(Message.class);
+		MockControl<Session> sessionControl = MockControl.createNiceControl(Session.class);
+		MockControl<MessageConsumer> consumerControl = MockControl.createControl(MessageConsumer.class);
+		MockControl<Message> messageControl = MockControl.createControl(Message.class);
 
-		Session session = (Session) sessionControl.getMock();
-		MessageConsumer consumer = (MessageConsumer) consumerControl.getMock();
-		Message message = (Message) messageControl.getMock();
+		Session session = sessionControl.getMock();
+		MessageConsumer consumer = consumerControl.getMock();
+		Message message = messageControl.getMock();
 
 		// Expect two calls to consumer (chunk size)...
 		consumerControl.expectAndReturn(consumer.receive(1000), message);
@@ -76,11 +76,11 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		MockControl sessionControl = MockControl.createNiceControl(Session.class);
-		MockControl consumerControl = MockControl.createControl(MessageConsumer.class);
+		MockControl<Session> sessionControl = MockControl.createNiceControl(Session.class);
+		MockControl<MessageConsumer> consumerControl = MockControl.createControl(MessageConsumer.class);
 
-		Session session = (Session) sessionControl.getMock();
-		MessageConsumer consumer = (MessageConsumer) consumerControl.getMock();
+		Session session = sessionControl.getMock();
+		MessageConsumer consumer = consumerControl.getMock();
 		Message message = null;
 
 		// Expect one call to consumer (chunk size is 2 but terminates on
@@ -137,8 +137,8 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	}
 
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
-		MockControl connectionFactoryControl = MockControl.createControl(ConnectionFactory.class);
-		ConnectionFactory connectionFactory = (ConnectionFactory) connectionFactoryControl.getMock();
+		MockControl<ConnectionFactory> connectionFactoryControl = MockControl.createControl(ConnectionFactory.class);
+		ConnectionFactory connectionFactory = connectionFactoryControl.getMock();
 		// Yuck: we need to turn these method in base class to no-ops because the invoker is a private class
 		// we can't create for test purposes...
 		BatchMessageListenerContainer container = new BatchMessageListenerContainer() {
@@ -168,13 +168,13 @@ public class BatchMessageListenerContainerTests extends TestCase {
 			}
 		});
 
-		MockControl sessionControl = MockControl.createNiceControl(Session.class);
-		MockControl consumerControl = MockControl.createNiceControl(MessageConsumer.class);
-		MockControl messageControl = MockControl.createNiceControl(Message.class);
+		MockControl<Session> sessionControl = MockControl.createNiceControl(Session.class);
+		MockControl<MessageConsumer> consumerControl = MockControl.createNiceControl(MessageConsumer.class);
+		MockControl<Message> messageControl = MockControl.createNiceControl(Message.class);
 
-		Session session = (Session) sessionControl.getMock();
-		MessageConsumer consumer = (MessageConsumer) consumerControl.getMock();
-		Message message = (Message) messageControl.getMock();
+		Session session = sessionControl.getMock();
+		MessageConsumer consumer = consumerControl.getMock();
+		Message message = messageControl.getMock();
 
 		sessionControl.expectAndReturn(session.getTransacted(), true, expectGetTransactionCount);
 

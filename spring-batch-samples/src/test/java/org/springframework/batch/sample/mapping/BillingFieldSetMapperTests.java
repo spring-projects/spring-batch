@@ -27,7 +27,7 @@ public class BillingFieldSetMapperTests extends AbstractFieldSetMapperTests{
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 
-	protected FieldSetMapper fieldSetMapper() {
+	protected FieldSetMapper<BillingInfo> fieldSetMapper() {
 		return new BillingFieldSetMapper();
 	}
 

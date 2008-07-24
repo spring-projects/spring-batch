@@ -36,10 +36,10 @@ public class StagingItemReaderTests {
 	private PlatformTransactionManager transactionManager;
 	
 	@Autowired
-	private StagingItemWriter writer;
+	private StagingItemWriter<String> writer;
 
 	@Autowired
-	private StagingItemReader reader;
+	private StagingItemReader<String> reader;
 
 	private Long jobId = 11L;
 
@@ -81,7 +81,7 @@ public class StagingItemReaderTests {
 				new Object[] { id }, String.class);
 		assertEquals(StagingItemWriter.NEW, before);
 
-		Object item = reader.read();
+		String item = reader.read();
 		assertEquals("FOO", item);
 
 		String after = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",

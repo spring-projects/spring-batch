@@ -55,7 +55,7 @@ public class OrderItemFieldSetMapperTests extends AbstractFieldSetMapperTests{
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 
-	protected FieldSetMapper fieldSetMapper() {
+	protected FieldSetMapper<LineItem> fieldSetMapper() {
 		return new OrderItemFieldSetMapper();
 	}
 

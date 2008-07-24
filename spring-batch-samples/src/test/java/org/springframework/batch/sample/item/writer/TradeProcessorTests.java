@@ -1,15 +1,14 @@
 package org.springframework.batch.sample.item.writer;
 
 import org.easymock.MockControl;
-import org.springframework.batch.sample.dao.TradeDao;
-import org.springframework.batch.sample.domain.Trade;
-import org.springframework.batch.sample.item.writer.TradeWriter;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.sample.dao.TradeDao;
+import org.springframework.batch.sample.domain.Trade;
 
 public class TradeProcessorTests {
 
-	private MockControl writerControl;
+	private MockControl<TradeDao> writerControl;
 	private TradeDao writer;
 	private TradeWriter processor;
 	
@@ -18,7 +17,7 @@ public class TradeProcessorTests {
 		
 		//create mock writer
 		writerControl = MockControl.createControl(TradeDao.class);
-		writer = (TradeDao)writerControl.getMock();
+		writer = writerControl.getMock();
 		
 		//create processor
 		processor = new TradeWriter();

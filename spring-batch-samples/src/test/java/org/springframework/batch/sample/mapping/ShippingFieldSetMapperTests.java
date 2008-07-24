@@ -30,7 +30,7 @@ public class ShippingFieldSetMapperTests extends AbstractFieldSetMapperTests{
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 
-	protected FieldSetMapper fieldSetMapper() {
+	protected FieldSetMapper<ShippingInfo> fieldSetMapper() {
 		return new ShippingFieldSetMapper();
 	}
 

@@ -94,7 +94,7 @@ public class FlatFileCustomerCreditDaoTests {
 		verify(output);
 	}
 	
-	private interface ResourceLifecycleItemWriter extends ItemWriter, ItemStream{
+	private interface ResourceLifecycleItemWriter extends ItemWriter<String>, ItemStream{
 		
 	}
 }

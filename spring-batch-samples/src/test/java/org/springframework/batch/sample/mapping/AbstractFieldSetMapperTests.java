@@ -27,7 +27,7 @@ public abstract class AbstractFieldSetMapperTests {
 	 * @return mapper which takes <code>this.fieldSet()</code> and maps it to
 	 * domain object.
 	 */
-	protected abstract FieldSetMapper fieldSetMapper();
+	protected abstract FieldSetMapper<?> fieldSetMapper();
 	
 	
 	/**

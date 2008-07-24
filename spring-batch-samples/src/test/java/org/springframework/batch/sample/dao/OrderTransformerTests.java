@@ -16,7 +16,6 @@
 package org.springframework.batch.sample.dao;
 
 import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,8 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.sample.domain.Address;
