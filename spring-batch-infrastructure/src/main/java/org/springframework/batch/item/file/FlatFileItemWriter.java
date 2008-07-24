@@ -82,7 +82,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private LineAggregator lineAggregator = new DelimitedLineAggregator();
 
-	private FieldSetCreator<T> fieldSetCreator;
+	private FieldSetCreator<? super T> fieldSetCreator;
 
 	private boolean saveState = true;
 
@@ -137,7 +137,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @param fieldSetCreator the {@link FieldSetCreator} to set
 	 */
-	public void setFieldSetCreator(FieldSetCreator<T> fieldSetCreator) {
+	public void setFieldSetCreator(FieldSetCreator<? super T> fieldSetCreator) {
 		this.fieldSetCreator = fieldSetCreator;
 	}
 

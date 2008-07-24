@@ -37,7 +37,7 @@ public class StaxEventItemReader<T> extends AbstractBufferedItemReaderItemStream
 
 	private XMLEventReader eventReader;
 
-	private EventReaderDeserializer<T> eventReaderDeserializer;
+	private EventReaderDeserializer<? extends T> eventReaderDeserializer;
 
 	private Resource resource;
 
@@ -57,7 +57,7 @@ public class StaxEventItemReader<T> extends AbstractBufferedItemReaderItemStream
 	 * @param eventReaderDeserializer maps xml fragments corresponding to
 	 * records to objects
 	 */
-	public void setFragmentDeserializer(EventReaderDeserializer<T> eventReaderDeserializer) {
+	public void setFragmentDeserializer(EventReaderDeserializer<? extends T> eventReaderDeserializer) {
 		this.eventReaderDeserializer = eventReaderDeserializer;
 	}
 

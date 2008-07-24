@@ -83,7 +83,7 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 
 	private LineTokenizer tokenizer = new DelimitedLineTokenizer();
 
-	private FieldSetMapper<T> fieldSetMapper;
+	private FieldSetMapper<? extends T> fieldSetMapper;
 
 	/**
 	 * Encapsulates the state of the input source. If it is null then we are
@@ -186,7 +186,7 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 	 * 
 	 * @param fieldSetMapper
 	 */
-	public void setFieldSetMapper(FieldSetMapper<T> fieldSetMapper) {
+	public void setFieldSetMapper(FieldSetMapper<? extends T> fieldSetMapper) {
 		this.fieldSetMapper = fieldSetMapper;
 	}
 

@@ -69,7 +69,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	private Resource resource;
 
 	// xml serializer
-	private EventWriterSerializer<T> serializer;
+	private EventWriterSerializer<? super T> serializer;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -135,7 +135,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * 
 	 * @param serializer the Object to XML serializer
 	 */
-	public void setSerializer(EventWriterSerializer<T> serializer) {
+	public void setSerializer(EventWriterSerializer<? super T> serializer) {
 		this.serializer = serializer;
 	}
 
