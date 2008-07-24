@@ -42,15 +42,15 @@ public class SimpleItemHandler<T> implements ItemHandler {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private ItemReader<T> itemReader;
+	private ItemReader<? extends T> itemReader;
 
-	private ItemWriter<T> itemWriter;
+	private ItemWriter<? super T> itemWriter;
 
 	/**
 	 * @param itemReader
 	 * @param itemWriter
 	 */
-	public SimpleItemHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
+	public SimpleItemHandler(ItemReader<? extends T> itemReader, ItemWriter<? super T> itemWriter) {
 		super();
 		this.itemReader = itemReader;
 		this.itemWriter = itemWriter;

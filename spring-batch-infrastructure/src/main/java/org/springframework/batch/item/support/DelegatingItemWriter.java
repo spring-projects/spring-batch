@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
  */
 public class DelegatingItemWriter<I, O> implements ItemWriter<I>, InitializingBean {
 
-	private ItemWriter<O> delegate;
+	private ItemWriter<? super O> delegate;
 
 	/**
 	 * Default constructor.
@@ -32,7 +32,7 @@ public class DelegatingItemWriter<I, O> implements ItemWriter<I>, InitializingBe
 	/**
 	 * @param itemWriter
 	 */
-	public DelegatingItemWriter(ItemWriter<O> itemWriter) {
+	public DelegatingItemWriter(ItemWriter<? super O> itemWriter) {
 		this();
 		this.delegate = itemWriter;
 	}
@@ -62,7 +62,7 @@ public class DelegatingItemWriter<I, O> implements ItemWriter<I>, InitializingBe
 	/**
 	 * Setter for {@link ItemWriter}.
 	 */
-	public void setDelegate(ItemWriter<O> writer) {
+	public void setDelegate(ItemWriter<? super O> writer) {
 		this.delegate = writer;
 	}
 

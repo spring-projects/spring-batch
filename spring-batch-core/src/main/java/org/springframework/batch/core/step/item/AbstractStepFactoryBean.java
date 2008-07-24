@@ -50,9 +50,9 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 
 	private boolean allowStartIfComplete;
 
-	private ItemReader<T> itemReader;
+	private ItemReader<? extends T> itemReader;
 
-	private ItemWriter<T> itemWriter;
+	private ItemWriter<? super T> itemWriter;
 
 	private PlatformTransactionManager transactionManager;
 	
@@ -114,14 +114,14 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 	/**
 	 * @param itemReader the itemReader to set
 	 */
-	public void setItemReader(ItemReader<T> itemReader) {
+	public void setItemReader(ItemReader<? extends T> itemReader) {
 		this.itemReader = itemReader;
 	}
 
 	/**
 	 * @param itemWriter the itemWriter to set
 	 */
-	public void setItemWriter(ItemWriter<T> itemWriter) {
+	public void setItemWriter(ItemWriter<? super T> itemWriter) {
 		this.itemWriter = itemWriter;
 	}
 
@@ -159,7 +159,7 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 	 * Protected getter for the {@link ItemReader} for subclasses to use.
 	 * @return the itemReader
 	 */
-	protected ItemReader<T> getItemReader() {
+	protected ItemReader<? extends T> getItemReader() {
 		return itemReader;
 	}
 
@@ -167,7 +167,7 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 	 * Protected getter for the {@link ItemWriter} for subclasses to use
 	 * @return the itemWriter
 	 */
-	protected ItemWriter<T> getItemWriter() {
+	protected ItemWriter<? super T> getItemWriter() {
 		return itemWriter;
 	}
 
@@ -238,8 +238,8 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 
 		step.setStreams(streams);
 
-		ItemReader<T> itemReader = getItemReader();
-		ItemWriter<T> itemWriter = getItemWriter();
+		ItemReader<? extends T> itemReader = getItemReader();
+		ItemWriter<? super T> itemWriter = getItemWriter();
 
 		// Since we are going to wrap these things with listener callbacks we
 		// need to register them here because the step will not know we did

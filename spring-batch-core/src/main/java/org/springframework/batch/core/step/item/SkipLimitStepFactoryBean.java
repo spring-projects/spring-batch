@@ -301,7 +301,7 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 		 * @param retryTemplate
 		 * @param itemKeyGenerator
 		 */
-		public StatefulRetryItemHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter, RetryOperations retryTemplate,
+		public StatefulRetryItemHandler(ItemReader<? extends T> itemReader, ItemWriter<? super T> itemWriter, RetryOperations retryTemplate,
 				ItemKeyGenerator itemKeyGenerator, ItemSkipPolicy readSkipPolicy, ItemSkipPolicy writeSkipPolicy) {
 			super(itemReader, itemWriter);
 			this.retryOperations = retryTemplate;
