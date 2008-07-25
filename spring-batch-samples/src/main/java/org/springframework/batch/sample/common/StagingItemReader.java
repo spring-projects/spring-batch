@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.reader;
+package org.springframework.batch.sample.common;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +16,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.sample.item.writer.StagingItemWriter;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;

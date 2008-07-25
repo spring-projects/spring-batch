@@ -11,6 +11,9 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.sample.common.SystemCommandException;
+import org.springframework.batch.sample.common.SystemCommandTasklet;
+import org.springframework.batch.sample.common.SystemProcessExitCodeMapper;
 import org.springframework.util.Assert;
 
 import java.io.File;

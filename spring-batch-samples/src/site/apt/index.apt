@@ -143,7 +143,7 @@ xmlStaxJob               |  |  | x |  |  |  |  |  | x |  |  |  |  |  |  |  |
 			<bean id="executeSystemCommand" parent="taskletStep">
 				<property name="tasklet">
 					<bean
-			class="org.springframework.batch.sample.tasklet.SystemCommandTasklet">
+			class="org.springframework.batch.sample.common.SystemCommandTasklet">
 						<property name="command" value="echo hello" />
 						<!-- 5 second timeout for the command to complete -->
 						<property name="timeout" value="5000" />

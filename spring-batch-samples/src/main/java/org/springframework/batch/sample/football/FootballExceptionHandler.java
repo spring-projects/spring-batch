@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.exception.handler;
+package org.springframework.batch.sample.football;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

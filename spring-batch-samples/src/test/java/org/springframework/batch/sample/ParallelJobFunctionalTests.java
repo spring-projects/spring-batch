@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.item.writer.StagingItemWriter;
+import org.springframework.batch.sample.common.StagingItemWriter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;

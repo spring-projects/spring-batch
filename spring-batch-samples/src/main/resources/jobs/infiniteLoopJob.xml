@@ -30,7 +30,7 @@
 					</bean>
 				</property>
 				<property name="itemWriter">
-					<bean id="writer" class="org.springframework.batch.sample.item.writer.DummyItemWriter" />
+					<bean id="writer" class="org.springframework.batch.sample.common.DummyItemWriter" />
 				</property>
 			</bean>
 		</property>

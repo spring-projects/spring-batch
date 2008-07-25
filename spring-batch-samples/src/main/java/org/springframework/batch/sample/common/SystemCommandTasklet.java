@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.tasklet;
+package org.springframework.batch.sample.common;
 
 import java.io.File;
 import java.io.IOException;

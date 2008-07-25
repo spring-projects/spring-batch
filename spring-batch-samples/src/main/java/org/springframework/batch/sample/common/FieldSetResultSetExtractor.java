@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample;
+package org.springframework.batch.sample.common;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

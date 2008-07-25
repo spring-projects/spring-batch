@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.common;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
