@@ -26,6 +26,6 @@
 
 	<bean id="logAdvice" class="org.springframework.batch.sample.common.LogAdvice" />
 
-	<bean id="eventAdvice" class="org.springframework.batch.sample.advice.StepExecutionApplicationEventAdvice" />
+	<bean id="eventAdvice" class="org.springframework.batch.sample.jmx.StepExecutionApplicationEventAdvice" />
 
 </beans>

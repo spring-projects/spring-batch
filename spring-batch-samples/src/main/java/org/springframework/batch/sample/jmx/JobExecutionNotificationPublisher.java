@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.advice;
+package org.springframework.batch.sample.jmx;
 
 import javax.management.Notification;
 

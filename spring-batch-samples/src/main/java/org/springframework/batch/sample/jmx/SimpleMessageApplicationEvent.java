@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.advice;
+package org.springframework.batch.sample.jmx;
 
 import org.springframework.context.ApplicationEvent;
 

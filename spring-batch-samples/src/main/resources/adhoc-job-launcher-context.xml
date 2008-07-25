@@ -44,7 +44,7 @@
 			</bean>
 		</property>
 	</bean>
-	<bean id="notificationPublisher" class="org.springframework.batch.sample.advice.JobExecutionNotificationPublisher" />
+	<bean id="notificationPublisher" class="org.springframework.batch.sample.jmx.JobExecutionNotificationPublisher" />
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
