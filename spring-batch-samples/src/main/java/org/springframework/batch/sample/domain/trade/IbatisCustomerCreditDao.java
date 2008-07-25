@@ -27,7 +27,7 @@ public class IbatisCustomerCreditDao extends SqlMapClientDaoSupport
 	String statementId;
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.sample.dao.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
+	 * @see org.springframework.batch.sample.domain.trade.CustomerCreditWriter#write(org.springframework.batch.sample.domain.CustomerCredit)
 	 */
 	public void writeCredit(CustomerCredit customerCredit) {
 

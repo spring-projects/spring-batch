@@ -13,84 +13,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.domain.trade;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.domain.football.JdbcPlayerDao;
-import org.springframework.batch.sample.domain.football.Player;
+import org.springframework.batch.sample.domain.trade.JdbcTradeDao;
+import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * @author Lucas Ward
- *
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/data-source-context.xml"})
-public class JdbcPlayerDaoIntegrationTests {
-	
-	private JdbcPlayerDao playerDao;
+public class JdbcTradeWriterTests {
 
-	private Player player;
-
-	private static final String GET_PLAYER = "SELECT * from PLAYERS";
-	
 	private JdbcTemplate jdbcTemplate;
 
+	private AbstractDataFieldMaxValueIncrementer incrementer;
+
 	@Autowired
-	public void init(DataSource dataSource) {
-
+	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
-		playerDao = new JdbcPlayerDao();
-		playerDao.setJdbcTemplate(this.jdbcTemplate);		
-
-		player = new Player();
-		player.setID("AKFJDL00");
-		player.setFirstName("John");
-		player.setLastName("Doe");
-		player.setPosition("QB");
-		player.setBirthYear(1975);
-		player.setDebutYear(1998);
-		
 	}
 
-
-	@Before
-	public void onSetUpInTransaction() throws Exception {
-
-		jdbcTemplate.execute("delete from PLAYERS");
-
+	@Autowired
+	public void setIncrementer(AbstractDataFieldMaxValueIncrementer incrementer) {
+		this.incrementer = incrementer;
 	}
 
 	@Transactional @Test
-	public void testSavePlayer(){
+	public void testWrite() {
 		
-		playerDao.savePlayer(player);
+		JdbcTradeDao writer = new JdbcTradeDao();
 		
-		jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler(){
-
+		incrementer.setIncrementerName("TRADE_SEQ");
+		
+		writer.setIncrementer(incrementer);
+		writer.setJdbcTemplate(jdbcTemplate);
+		
+		Trade trade = new Trade();
+		trade.setCustomer("testCustomer");
+		trade.setIsin("5647238492");
+		trade.setPrice(new BigDecimal(Double.toString(99.69)));
+		trade.setQuantity(5);
+		
+		writer.writeTrade(trade);
+		
+		jdbcTemplate.query("SELECT * FROM TRADE WHERE ISIN = '5647238492'", new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
-				assertEquals(rs.getString("PLAYER_ID"), "AKFJDL00");
-				assertEquals(rs.getString("LAST_NAME"), "Doe");
-				assertEquals(rs.getString("FIRST_NAME"), "John");
-				assertEquals(rs.getString("POS"), "QB");
-				assertEquals(rs.getInt("YEAR_OF_BIRTH"), 1975);
-				assertEquals(rs.getInt("YEAR_DRAFTED"), 1998);
-			}	
+				assertEquals("testCustomer", rs.getString("CUSTOMER"));
+				assertEquals(new BigDecimal(Double.toString(99.69)), rs.getBigDecimal("PRICE"));
+				assertEquals(5,rs.getLong("QUANTITY"));
+			}
 		});
 	}
-	
 }

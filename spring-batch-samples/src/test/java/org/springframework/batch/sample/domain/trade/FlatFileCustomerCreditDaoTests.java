@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.domain.trade;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
