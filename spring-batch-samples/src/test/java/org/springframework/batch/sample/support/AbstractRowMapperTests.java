@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.support;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.tasklet;
+package org.springframework.batch.sample.support;
 
 import java.util.ArrayList;
 import java.util.List;

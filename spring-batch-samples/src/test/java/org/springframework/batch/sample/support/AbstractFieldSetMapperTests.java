@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.support;
 
 import static org.junit.Assert.assertEquals;
 

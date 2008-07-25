@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.reader;
+package org.springframework.batch.sample.common;
 
 import static org.junit.Assert.assertEquals;
 

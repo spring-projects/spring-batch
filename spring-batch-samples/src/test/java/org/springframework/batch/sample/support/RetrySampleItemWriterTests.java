@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

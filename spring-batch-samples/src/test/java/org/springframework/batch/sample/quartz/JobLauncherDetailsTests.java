@@ -38,7 +38,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.NoSuchJobException;
-import org.springframework.batch.sample.tasklet.JobSupport;
+import org.springframework.batch.sample.support.JobSupport;
 
 /**
  * @author Dave Syer
