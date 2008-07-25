@@ -1,11 +1,19 @@
 package org.springframework.batch.sample.item.reader;
 
-import static org.junit.Assert.*;
-
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
@@ -16,8 +24,6 @@ import org.springframework.batch.sample.domain.Customer;
 import org.springframework.batch.sample.domain.LineItem;
 import org.springframework.batch.sample.domain.Order;
 import org.springframework.batch.sample.domain.ShippingInfo;
-import org.junit.Before;
-import org.junit.Test;
 
 public class OrderItemReaderTests {
 

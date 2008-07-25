@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain;
+package org.springframework.batch.sample.trade;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

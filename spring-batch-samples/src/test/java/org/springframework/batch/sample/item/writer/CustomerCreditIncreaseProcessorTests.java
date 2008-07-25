@@ -6,7 +6,8 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 import org.springframework.batch.sample.dao.CustomerCreditDao;
-import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCreditIncreaseWriter;
 
 /**
  * Tests for {@link CustomerCreditIncreaseWriter}.

@@ -2,6 +2,7 @@ package org.springframework.batch.sample.item.reader;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import org.springframework.batch.sample.trade.GeneratingTradeItemReader;
 
 /**
  * Tests for {@link GeneratingTradeItemReader}.

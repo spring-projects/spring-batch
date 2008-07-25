@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcOperations;

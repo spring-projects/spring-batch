@@ -1,10 +1,9 @@
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.trade;
 
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.dao.CustomerCreditDao;
-import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**
  * Increases customer's credit by fixed amount.

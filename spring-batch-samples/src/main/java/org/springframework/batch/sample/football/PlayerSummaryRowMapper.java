@@ -18,7 +18,6 @@ package org.springframework.batch.sample.football;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.PlayerSummary;
 import org.springframework.jdbc.core.RowMapper;
 
 /**

@@ -3,8 +3,8 @@ package org.springframework.batch.sample;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 
-import org.springframework.batch.sample.item.reader.GeneratingTradeItemReader;
 import org.springframework.batch.sample.item.writer.RetrySampleItemWriter;
+import org.springframework.batch.sample.trade.GeneratingTradeItemReader;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;

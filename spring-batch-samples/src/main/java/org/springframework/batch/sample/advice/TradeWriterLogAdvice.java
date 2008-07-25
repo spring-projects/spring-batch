@@ -19,7 +19,7 @@ package org.springframework.batch.sample.advice;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.aspectj.lang.JoinPoint;
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
 
 
 /**

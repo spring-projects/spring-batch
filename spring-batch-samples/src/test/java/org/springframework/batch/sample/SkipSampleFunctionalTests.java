@@ -3,7 +3,7 @@ package org.springframework.batch.sample;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.item.writer.ItemTrackingItemWriter;
+import org.springframework.batch.sample.common.ItemTrackingItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;

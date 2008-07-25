@@ -3,7 +3,6 @@ package org.springframework.batch.sample.football;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.domain.PlayerSummary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 
 public class JdbcPlayerSummaryDao extends JdbcDaoSupport implements ItemWriter<PlayerSummary> {

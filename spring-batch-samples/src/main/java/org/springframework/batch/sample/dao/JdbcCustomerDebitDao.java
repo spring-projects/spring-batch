@@ -18,7 +18,7 @@ package org.springframework.batch.sample.dao;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.domain.CustomerDebit;
+import org.springframework.batch.sample.trade.CustomerDebit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;

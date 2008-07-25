@@ -33,7 +33,7 @@
 	</bean>
 
 	<bean id="hibernateCreditWriter"
-		class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
+		class="org.springframework.batch.sample.trade.CustomerCreditIncreaseWriter">
 		<property name="customerCreditDao" ref="customerCreditDao" />
 	</bean>
 

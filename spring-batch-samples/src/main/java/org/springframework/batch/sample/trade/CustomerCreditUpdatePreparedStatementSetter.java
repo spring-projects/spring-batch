@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.trade;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
-import org.springframework.batch.sample.domain.CustomerCredit;
 
 /**
  * @author Dave Syer

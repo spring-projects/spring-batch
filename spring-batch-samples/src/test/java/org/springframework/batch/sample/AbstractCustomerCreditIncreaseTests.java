@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter;
+import org.springframework.batch.sample.trade.CustomerCreditIncreaseWriter;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -2,7 +2,6 @@ package org.springframework.batch.sample.football;
 
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.sample.domain.Player;
 
 public class PlayerFieldSetMapper implements FieldSetMapper<Player> {
 

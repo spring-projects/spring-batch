@@ -28,7 +28,7 @@
 			<value><![CDATA[UPDATE CUSTOMER SET CREDIT=? WHERE ID=?]]></value>
 		</property>
 		<property name="itemPreparedStatementSetter">
-			<bean class="org.springframework.batch.sample.item.writer.CustomerCreditUpdatePreparedStatementSetter" />
+			<bean class="org.springframework.batch.sample.trade.CustomerCreditUpdatePreparedStatementSetter" />
 		</property>
 	</bean>
 
@@ -36,7 +36,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql" value="SELECT id, name, credit FROM customer " />
 		<property name="mapper">
-			<bean class="org.springframework.batch.sample.mapping.CustomerCreditRowMapper" />
+			<bean class="org.springframework.batch.sample.trade.CustomerCreditRowMapper" />
 		</property>
 	</bean>
 

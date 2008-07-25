@@ -21,7 +21,7 @@ import java.util.List;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
-import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCredit;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**

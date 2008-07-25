@@ -17,7 +17,7 @@
 				<property name="itemReader" ref="ibatisItemReader" />
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter">
+						class="org.springframework.batch.sample.trade.CustomerCreditIncreaseWriter">
 						<property name="customerCreditDao">
 							<bean
 								class="org.springframework.batch.sample.dao.IbatisCustomerCreditDao">

@@ -19,7 +19,7 @@
 		</property>
 	</bean>
 
-	<bean id="itemGenerator" class="org.springframework.batch.sample.item.reader.GeneratingTradeItemReader">
+	<bean id="itemGenerator" class="org.springframework.batch.sample.trade.GeneratingTradeItemReader">
 		<property name="limit" value="10" />
 	</bean>
 

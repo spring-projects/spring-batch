@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCredit;
 
 /**
  * Interface for writing customer's credit information to output.

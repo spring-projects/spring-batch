@@ -4,7 +4,8 @@ import org.easymock.MockControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.sample.dao.TradeDao;
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
+import org.springframework.batch.sample.trade.TradeWriter;
 
 public class TradeProcessorTests {
 

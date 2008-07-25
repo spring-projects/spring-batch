@@ -18,7 +18,7 @@ package org.springframework.batch.sample.dao;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.domain.CustomerDebit;
+import org.springframework.batch.sample.trade.CustomerDebit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;

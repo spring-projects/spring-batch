@@ -6,7 +6,8 @@ import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.support.AggregateItemReader;
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
+import org.springframework.batch.sample.trade.TradeFieldSetMapper;
 
 import java.math.BigDecimal;
 

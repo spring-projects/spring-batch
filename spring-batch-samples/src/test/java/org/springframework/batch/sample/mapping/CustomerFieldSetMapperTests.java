@@ -4,7 +4,6 @@ import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.Customer;
-import org.springframework.batch.sample.mapping.CustomerFieldSetMapper;
 
 public class CustomerFieldSetMapperTests extends AbstractFieldSetMapperTests {
 

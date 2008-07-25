@@ -14,34 +14,32 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain;
+package org.springframework.batch.sample.trade;
 
 import java.math.BigDecimal;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
-public class CustomerCredit {
-	private int id;
+
+public class CustomerDebit {
     private String name;
-    private BigDecimal credit;
+    private BigDecimal debit;
 
-    public String toString() {
-        return "CustomerCredit [id=" + id +",name=" + name + ", credit=" + credit + "]";
+    public CustomerDebit() {
     }
 
-    public BigDecimal getCredit() {
-        return credit;
+    CustomerDebit(String name, BigDecimal debit) {
+        this.name = name;
+        this.debit = debit;
     }
 
-    public int getId() {
-		return id;
-	}
+    public BigDecimal getDebit() {
+        return debit;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public void setCredit(BigDecimal credit) {
-        this.credit = credit;
+    public void setDebit(BigDecimal debit) {
+        this.debit = debit;
     }
 
     public String getName() {
@@ -51,21 +49,16 @@ public class CustomerCredit {
     public void setName(String name) {
         this.name = name;
     }
-    
-    public CustomerCredit increaseCreditBy(BigDecimal sum) {
-    	CustomerCredit newCredit = new CustomerCredit();
-    	newCredit.credit = this.credit.add(sum);
-    	newCredit.name = this.name;
-    	newCredit.id = this.id;
-    	return newCredit;
+
+    public String toString() {
+        return "CustomerDebit [name=" + name + ", debit=" + debit + "]";
     }
     
     public boolean equals(Object o) {
-		return (o instanceof CustomerCredit) && ((CustomerCredit)o).id==id;
+		return EqualsBuilder.reflectionEquals(this, o);
 	}
 
 	public int hashCode() {
-		return id;
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
-	
 }

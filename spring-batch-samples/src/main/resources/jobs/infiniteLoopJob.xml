@@ -25,7 +25,7 @@
 			</bean-->
 			<bean id="infiniteStep" parent="simpleStep">
 				<property name="itemReader">
-					<bean id="reader" class="org.springframework.batch.sample.item.reader.GeneratingTradeItemReader">
+					<bean id="reader" class="org.springframework.batch.sample.trade.GeneratingTradeItemReader">
 						<property name="limit" value="1000000" />
 					</bean>
 				</property>

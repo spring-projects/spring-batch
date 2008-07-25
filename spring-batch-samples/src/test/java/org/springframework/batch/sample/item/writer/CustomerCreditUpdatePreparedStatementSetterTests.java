@@ -22,7 +22,8 @@ import java.sql.SQLException;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCreditUpdatePreparedStatementSetter;
 
 /**
  * @author Dave Syer
@@ -46,7 +47,7 @@ public class CustomerCreditUpdatePreparedStatementSetterTests {
 	}
 	
 	/**
-	 * Test method for {@link org.springframework.batch.sample.item.writer.CustomerCreditUpdatePreparedStatementSetter#setValues(CustomerCredit, PreparedStatement) }
+	 * Test method for {@link org.springframework.batch.sample.trade.CustomerCreditUpdatePreparedStatementSetter#setValues(CustomerCredit, PreparedStatement) }
 	 * @throws SQLException 
 	 */
 	@Test

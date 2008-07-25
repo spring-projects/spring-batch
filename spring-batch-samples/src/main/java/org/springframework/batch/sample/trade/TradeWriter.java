@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.trade;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.dao.TradeDao;
-import org.springframework.batch.sample.domain.Trade;
 
 /**
  * Delegates the actual writing to custom DAO delegate. Allows configurable

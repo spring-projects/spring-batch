@@ -1,11 +1,10 @@
-package org.springframework.batch.sample.item.reader;
+package org.springframework.batch.sample.trade;
 
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.sample.domain.Trade;
 
 /**
  * Generates configurable number of {@link Trade} items.

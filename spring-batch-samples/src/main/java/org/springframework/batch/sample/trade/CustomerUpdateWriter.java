@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.trade;
 
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.dao.CustomerDebitDao;
-import org.springframework.batch.sample.domain.CustomerDebit;
-import org.springframework.batch.sample.domain.Trade;
 
 
 /**

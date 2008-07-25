@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCredit;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 /**

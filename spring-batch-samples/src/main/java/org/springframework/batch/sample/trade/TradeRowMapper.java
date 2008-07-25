@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.trade;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.CustomerDebit;
 import org.springframework.jdbc.core.RowMapper;
 
-
-public class CustomerDebitRowMapper implements RowMapper {
+public class TradeRowMapper implements RowMapper {
 	
-	public static final String CUSTOMER_COLUMN = "customer";
-	public static final String PRICE_COLUMN = "price";
-	
-    public Object mapRow(ResultSet rs, int ignoredRowNumber)
-        throws SQLException {
-        CustomerDebit customerDebit = new CustomerDebit();
+	public static final int ISIN_COLUMN = 1;
+	public static final int QUANTITY_COLUMN = 2;
+	public static final int PRICE_COLUMN = 3;
+	public static final int CUSTOMER_COLUMN = 4;
 
-        customerDebit.setName(rs.getString(CUSTOMER_COLUMN));
-        customerDebit.setDebit(rs.getBigDecimal(PRICE_COLUMN));
+	public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+		Trade trade = new Trade();
+		
+		trade.setIsin(rs.getString(ISIN_COLUMN));
+		trade.setQuantity(rs.getLong(QUANTITY_COLUMN));
+		trade.setPrice(rs.getBigDecimal(PRICE_COLUMN));
+		trade.setCustomer(rs.getString(CUSTOMER_COLUMN));
+		
+		return trade;
+	}
 
-        return customerDebit;
-    }
 }

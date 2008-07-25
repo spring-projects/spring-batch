@@ -5,7 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.easymock.MockControl;
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
+import org.springframework.batch.sample.trade.TradeRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 
 public class TradeRowMapperTests extends AbstractRowMapperTests {

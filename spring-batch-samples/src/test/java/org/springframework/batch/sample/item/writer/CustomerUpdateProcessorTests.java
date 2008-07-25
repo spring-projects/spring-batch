@@ -6,8 +6,9 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 import org.springframework.batch.sample.dao.CustomerDebitDao;
-import org.springframework.batch.sample.domain.CustomerDebit;
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.CustomerDebit;
+import org.springframework.batch.sample.trade.CustomerUpdateWriter;
+import org.springframework.batch.sample.trade.Trade;
 
 public class CustomerUpdateProcessorTests {
 

@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.domain.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCredit;
 
 import java.math.BigDecimal;
 

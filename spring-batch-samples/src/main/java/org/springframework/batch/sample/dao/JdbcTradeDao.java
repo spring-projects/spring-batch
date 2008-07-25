@@ -18,7 +18,7 @@ package org.springframework.batch.sample.dao;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.JdbcTemplate;

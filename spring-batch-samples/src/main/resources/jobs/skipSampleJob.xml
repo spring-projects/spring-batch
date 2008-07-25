@@ -27,7 +27,7 @@
 					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.item.writer.TradeWriter"
+							class="org.springframework.batch.sample.trade.TradeWriter"
 							p:dao-ref="tradeDao" p:failure="3" />
 					</property>
 				</bean>
@@ -47,7 +47,7 @@
 	</bean>
 
 	<bean id="itemTrackingWriter"
-		class="org.springframework.batch.sample.item.writer.ItemTrackingItemWriter"
+		class="org.springframework.batch.sample.common.ItemTrackingItemWriter"
 		p:validationFailure="2" />
 
 	<bean id="tradeSqlItemReader"
@@ -57,7 +57,7 @@
 			value="SELECT id, quantity, price, customer from TRADE" />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.TradeRowMapper" />
+				class="org.springframework.batch.sample.trade.TradeRowMapper" />
 		</property>
 	</bean>
 
@@ -68,7 +68,7 @@
 			value="SELECT id, name, credit FROM customer " />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.CustomerCreditRowMapper" />
+				class="org.springframework.batch.sample.trade.CustomerCreditRowMapper" />
 		</property>
 	</bean>
 

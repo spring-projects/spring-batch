@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.item.reader;
+package org.springframework.batch.sample.common;
 
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;

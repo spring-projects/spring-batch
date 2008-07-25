@@ -16,7 +16,7 @@
 
 package org.springframework.batch.sample.dao;
 
-import org.springframework.batch.sample.domain.Trade;
+import org.springframework.batch.sample.trade.Trade;
 
 /**
  * Interface for writing a Trade object to an arbitrary output.

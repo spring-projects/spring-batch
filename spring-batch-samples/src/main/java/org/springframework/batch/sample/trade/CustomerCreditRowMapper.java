@@ -1,9 +1,8 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.trade;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.springframework.batch.sample.domain.CustomerCredit;
 import org.springframework.jdbc.core.RowMapper;
 
 public class CustomerCreditRowMapper implements RowMapper {

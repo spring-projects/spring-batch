@@ -44,7 +44,7 @@
 		<property name="lineTokenizer" ref="tradeFileDescriptor" />
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+				class="org.springframework.batch.sample.trade.TradeFieldSetMapper" />
 		</property>
 	</bean>
 

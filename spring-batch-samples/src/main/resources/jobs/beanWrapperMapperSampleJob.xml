@@ -25,7 +25,7 @@
 					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.item.writer.TradeWriter">
+							class="org.springframework.batch.sample.trade.TradeWriter">
 							<property name="dao" ref="tradeDao" />
 						</bean>
 					</property>
@@ -111,7 +111,7 @@
 	</bean>
 
 	<bean id="trade"
-		class="org.springframework.batch.sample.domain.Trade"
+		class="org.springframework.batch.sample.trade.Trade"
 		scope="prototype" />
 
 	<bean id="person"

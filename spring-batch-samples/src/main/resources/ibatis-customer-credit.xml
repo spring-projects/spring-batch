@@ -4,7 +4,7 @@
 
 <sqlMap namespace="Customer">
 
-  <resultMap id="result" class="org.springframework.batch.sample.domain.CustomerCredit">
+  <resultMap id="result" class="org.springframework.batch.sample.trade.CustomerCredit">
     <result property="name" column="NAME" />
     <result property="credit" column="CREDIT" />
   </resultMap>
@@ -17,7 +17,7 @@
   	select NAME, CREDIT from CUSTOMER where ID = #value#
   </select>
   
-  <update id="updateCredit" parameterClass="org.springframework.batch.sample.domain.CustomerCredit" >
+  <update id="updateCredit" parameterClass="org.springframework.batch.sample.trade.CustomerCredit" >
   	update CUSTOMER set CREDIT = #credit# where NAME = #name#
   </update>
 

@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.trade;
 
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.support.AggregateItemReader;
-import org.springframework.batch.sample.domain.Trade;
 
 
 

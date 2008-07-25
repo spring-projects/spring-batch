@@ -23,7 +23,7 @@
 				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.sample.item.writer.TradeWriter">
+						class="org.springframework.batch.sample.trade.TradeWriter">
 						<property name="dao" ref="tradeDao" />
 					</bean>
 				</property>
@@ -86,6 +86,6 @@
 	</bean>
 
 	<bean id="fieldSetMapper"
-		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
+		class="org.springframework.batch.sample.trade.TradeFieldSetMapper" />
 
 </beans>

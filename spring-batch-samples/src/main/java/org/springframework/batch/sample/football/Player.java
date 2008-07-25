@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.domain;
+package org.springframework.batch.sample.football;
 
 import java.io.Serializable;
 
