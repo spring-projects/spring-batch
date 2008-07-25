@@ -19,10 +19,10 @@
 						ref="playerFileItemReader" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.football.PlayerItemWriter">
+							class="org.springframework.batch.sample.domain.football.PlayerItemWriter">
 							<property name="playerDao">
 								<bean
-									class="org.springframework.batch.sample.football.JdbcPlayerDao">
+									class="org.springframework.batch.sample.domain.football.JdbcPlayerDao">
 									<property name="dataSource"
 										ref="dataSource" />
 								</bean>
@@ -35,7 +35,7 @@
 						ref="gameFileItemReader" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.football.JdbcGameDao">
+							class="org.springframework.batch.sample.domain.football.JdbcGameDao">
 							<property name="dataSource"
 								ref="dataSource" />
 						</bean>
@@ -48,7 +48,7 @@
 						ref="playerSummarizationSource" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.football.JdbcPlayerSummaryDao">
+							class="org.springframework.batch.sample.domain.football.JdbcPlayerSummaryDao">
 							<property name="dataSource"
 								ref="dataSource" />
 						</bean>
@@ -71,7 +71,7 @@
 		</property>
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.football.PlayerFieldSetMapper" />
+				class="org.springframework.batch.sample.domain.football.PlayerFieldSetMapper" />
 		</property>
 	</bean>
 
@@ -88,7 +88,7 @@
 		</property>
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.football.GameFieldSetMapper" />
+				class="org.springframework.batch.sample.domain.football.GameFieldSetMapper" />
 		</property>
 	</bean>
 
@@ -97,7 +97,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.football.PlayerSummaryMapper" />
+				class="org.springframework.batch.sample.domain.football.PlayerSummaryMapper" />
 		</property>
 		<property name="sql">
 			<value>

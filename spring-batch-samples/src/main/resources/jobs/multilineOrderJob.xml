@@ -25,7 +25,7 @@
 						class="org.springframework.batch.item.validator.ValidatingItemReader">
 						<property name="itemReader">
 							<bean
-								class="org.springframework.batch.sample.order.OrderItemReader">
+								class="org.springframework.batch.sample.domain.order.OrderItemReader">
 								<property name="fieldSetReader"
 									ref="fileItemReader" />
 								<property name="headerMapper"
@@ -55,24 +55,24 @@
 		<property name="delegate" ref="flatFileTransformerWriter" />
 		<property name="itemTransformer">
 			<bean
-				class="org.springframework.batch.sample.order.OrderTransformer">
+				class="org.springframework.batch.sample.domain.order.OrderTransformer">
 				<property name="aggregators" ref="outputAggregators" />
 			</bean>
 		</property>
 	</bean>
 
 	<bean id="headerFieldSetMapper"
-		class="org.springframework.batch.sample.order.HeaderFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.order.HeaderFieldSetMapper" />
 	<bean id="customerFieldSetMapper"
-		class="org.springframework.batch.sample.order.CustomerFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.order.CustomerFieldSetMapper" />
 	<bean id="addressFieldSetMapper"
-		class="org.springframework.batch.sample.order.AddressFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.order.AddressFieldSetMapper" />
 	<bean id="billingFieldSetMapper"
-		class="org.springframework.batch.sample.order.BillingFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.order.BillingFieldSetMapper" />
 	<bean id="orderItemFieldSetMapper"
-		class="org.springframework.batch.sample.order.OrderItemFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.order.OrderItemFieldSetMapper" />
 	<bean id="shippingFieldSetMapper"
-		class="org.springframework.batch.sample.order.ShippingFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.order.ShippingFieldSetMapper" />
 
 	<bean id="validator"
 		class="org.springframework.batch.item.validator.SpringValidator">
@@ -131,23 +131,23 @@
 				<property name="customFunctions">
 					<map>
 						<entry key="isFutureDate"
-							value="org.springframework.batch.sample.order.valang.FutureDateFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.FutureDateFunction" />
 						<entry key="validateTotalItemsCount"
-							value="org.springframework.batch.sample.order.valang.TotalOrderItemsFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.TotalOrderItemsFunction" />
 						<entry key="validateIds"
-							value="org.springframework.batch.sample.order.valang.ValidateIdsFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.ValidateIdsFunction" />
 						<entry key="validatePrices"
-							value="org.springframework.batch.sample.order.valang.ValidatePricesFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.ValidatePricesFunction" />
 						<entry key="validateDiscounts"
-							value="org.springframework.batch.sample.order.valang.ValidateDiscountsFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.ValidateDiscountsFunction" />
 						<entry key="validateShippingPrices"
-							value="org.springframework.batch.sample.order.valang.ValidateShippingPricesFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.ValidateShippingPricesFunction" />
 						<entry key="validateHandlingPrices"
-							value="org.springframework.batch.sample.order.valang.ValidateHandlingPricesFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.ValidateHandlingPricesFunction" />
 						<entry key="validateQuantities"
-							value="org.springframework.batch.sample.order.valang.ValidateQuantitiesFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.ValidateQuantitiesFunction" />
 						<entry key="validateTotalPrices"
-							value="org.springframework.batch.sample.order.valang.ValidateTotalPricesFunction" />
+							value="org.springframework.batch.sample.domain.order.valang.ValidateTotalPricesFunction" />
 					</map>
 				</property>
 			</bean>

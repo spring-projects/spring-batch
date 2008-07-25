@@ -425,10 +425,10 @@ AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
     ref="playerFileItemReader" />
   <property name="itemWriter">
     <bean
-      class="org.springframework.batch.sample.football.PlayerItemWriter">
+      class="org.springframework.batch.sample.domain.football.PlayerItemWriter">
       <property name="playerDao">
         <bean
-          class="org.springframework.batch.sample.football.JdbcPlayerDao">
+          class="org.springframework.batch.sample.domain.football.JdbcPlayerDao">
           <property name="dataSource"
             ref="dataSource" />
         </bean>
@@ -504,7 +504,7 @@ AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
   </property>
   <property name="fieldSetMapper">
     <bean
-      class="org.springframework.batch.sample.football.PlayerFieldSetMapper" />
+      class="org.springframework.batch.sample.domain.football.PlayerFieldSetMapper" />
   </property>
 </bean>
 +---
@@ -581,7 +581,7 @@ public class
   <property name="dataSource" ref="dataSource" />
   <property name="mapper">
   <bean
-      class="org.springframework.batch.sample.football.PlayerSummaryMapper" />
+      class="org.springframework.batch.sample.domain.football.PlayerSummaryMapper" />
   </property>
   <property name="sql">
     <value>

@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-	<class name="org.springframework.batch.sample.trade.CustomerCredit"
+	<class name="org.springframework.batch.sample.domain.trade.CustomerCredit"
 		table="CUSTOMER">
 		<id name="id">
 			<!-- To make the job fail on flush we need assigned IDs -->

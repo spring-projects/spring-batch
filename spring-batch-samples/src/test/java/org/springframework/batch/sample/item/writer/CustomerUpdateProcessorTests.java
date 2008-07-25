@@ -5,10 +5,10 @@ import static org.junit.Assert.assertEquals;
 import java.math.BigDecimal;
 
 import org.junit.Test;
-import org.springframework.batch.sample.trade.CustomerDebit;
-import org.springframework.batch.sample.trade.CustomerDebitDao;
-import org.springframework.batch.sample.trade.CustomerUpdateWriter;
-import org.springframework.batch.sample.trade.Trade;
+import org.springframework.batch.sample.domain.trade.CustomerDebit;
+import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
+import org.springframework.batch.sample.domain.trade.CustomerUpdateWriter;
+import org.springframework.batch.sample.domain.trade.Trade;
 
 public class CustomerUpdateProcessorTests {
 

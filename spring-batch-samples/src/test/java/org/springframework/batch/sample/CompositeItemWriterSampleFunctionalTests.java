@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.trade.Trade;
+import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;

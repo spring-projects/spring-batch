@@ -3,8 +3,8 @@ package org.springframework.batch.sample.mapping;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.sample.order.Customer;
-import org.springframework.batch.sample.order.CustomerFieldSetMapper;
+import org.springframework.batch.sample.domain.order.Customer;
+import org.springframework.batch.sample.domain.order.CustomerFieldSetMapper;
 
 public class CustomerFieldSetMapperTests extends AbstractFieldSetMapperTests {
 

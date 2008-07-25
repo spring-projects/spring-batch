@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.trade.CustomerCreditIncreaseWriter;
+import org.springframework.batch.sample.domain.trade.CustomerCreditIncreaseWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.JdbcTemplate;

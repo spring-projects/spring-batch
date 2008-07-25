@@ -18,13 +18,13 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.sample.order.Address;
-import org.springframework.batch.sample.order.BillingInfo;
-import org.springframework.batch.sample.order.Customer;
-import org.springframework.batch.sample.order.LineItem;
-import org.springframework.batch.sample.order.Order;
-import org.springframework.batch.sample.order.OrderItemReader;
-import org.springframework.batch.sample.order.ShippingInfo;
+import org.springframework.batch.sample.domain.order.Address;
+import org.springframework.batch.sample.domain.order.BillingInfo;
+import org.springframework.batch.sample.domain.order.Customer;
+import org.springframework.batch.sample.domain.order.LineItem;
+import org.springframework.batch.sample.domain.order.Order;
+import org.springframework.batch.sample.domain.order.OrderItemReader;
+import org.springframework.batch.sample.domain.order.ShippingInfo;
 
 public class OrderItemReaderTests {
 

@@ -25,7 +25,7 @@
 					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.trade.TradeWriter">
+							class="org.springframework.batch.sample.domain.trade.TradeWriter">
 							<property name="dao" ref="tradeDao" />
 						</bean>
 					</property>
@@ -35,7 +35,7 @@
 						ref="personFileItemReader" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.person.PersonWriter" />
+							class="org.springframework.batch.sample.domain.person.PersonWriter" />
 					</property>
 				</bean>
 
@@ -91,7 +91,7 @@
 	</bean>
 
 	<bean id="tradeDao"
-		class="org.springframework.batch.sample.trade.JdbcTradeDao">
+		class="org.springframework.batch.sample.domain.trade.JdbcTradeDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
@@ -111,11 +111,11 @@
 	</bean>
 
 	<bean id="trade"
-		class="org.springframework.batch.sample.trade.Trade"
+		class="org.springframework.batch.sample.domain.trade.Trade"
 		scope="prototype" />
 
 	<bean id="person"
-		class="org.springframework.batch.sample.person.Person"
+		class="org.springframework.batch.sample.domain.person.Person"
 		scope="prototype" />
 
 </beans>

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.springframework.batch.sample.retry.RetrySampleItemWriter;
+import org.springframework.batch.sample.support.RetrySampleItemWriter;
 
 /**
  * Tests for {@link RetrySampleItemWriter}.

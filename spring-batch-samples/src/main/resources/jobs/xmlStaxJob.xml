@@ -62,7 +62,7 @@
 
 	<util:map id="aliases">
 		<entry key="trade"
-			value="org.springframework.batch.sample.trade.Trade" />
+			value="org.springframework.batch.sample.domain.trade.Trade" />
 		<entry key="isin" value="java.lang.String" />
 		<entry key="quantity" value="long" />
 		<entry key="price" value="java.math.BigDecimal" />

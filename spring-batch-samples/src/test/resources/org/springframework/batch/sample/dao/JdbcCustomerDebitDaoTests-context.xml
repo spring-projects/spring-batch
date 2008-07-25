@@ -6,6 +6,6 @@
 
 	<import resource="classpath:data-source-context.xml"/>
 
-	<bean class="org.springframework.batch.sample.trade.JdbcCustomerDebitDao"/>
+	<bean class="org.springframework.batch.sample.domain.trade.JdbcCustomerDebitDao"/>
 
 </beans>

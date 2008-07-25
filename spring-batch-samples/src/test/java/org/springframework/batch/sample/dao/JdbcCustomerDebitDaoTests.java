@@ -25,8 +25,8 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.trade.CustomerDebit;
-import org.springframework.batch.sample.trade.JdbcCustomerDebitDao;
+import org.springframework.batch.sample.domain.trade.CustomerDebit;
+import org.springframework.batch.sample.domain.trade.JdbcCustomerDebitDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;

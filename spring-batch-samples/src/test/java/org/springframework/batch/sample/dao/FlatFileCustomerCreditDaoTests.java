@@ -26,8 +26,8 @@ import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.trade.CustomerCredit;
-import org.springframework.batch.sample.trade.FlatFileCustomerCreditDao;
+import org.springframework.batch.sample.domain.trade.CustomerCredit;
+import org.springframework.batch.sample.domain.trade.FlatFileCustomerCreditDao;
 
 public class FlatFileCustomerCreditDaoTests {
 

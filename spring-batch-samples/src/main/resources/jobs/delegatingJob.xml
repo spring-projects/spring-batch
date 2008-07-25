@@ -47,6 +47,6 @@
 	</bean>
 
 	<bean id="delegateObject"
-		class="org.springframework.batch.sample.person.PersonService" />
+		class="org.springframework.batch.sample.domain.person.PersonService" />
 
 </beans>
