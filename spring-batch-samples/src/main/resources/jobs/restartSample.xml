@@ -34,7 +34,7 @@
 	<!-- INFRASTRUCTURE SETUP -->
 
 	<bean id="itemReader"
-		class="org.springframework.batch.sample.common.ExceptionThrowingItemReaderProxy">
+		class="org.springframework.batch.sample.support.ExceptionThrowingItemReaderProxy">
 		<property name="itemReader" ref="fileItemReader" />
 	</bean>
 

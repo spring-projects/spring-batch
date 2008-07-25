@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.advice;
+package org.springframework.batch.sample.common;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

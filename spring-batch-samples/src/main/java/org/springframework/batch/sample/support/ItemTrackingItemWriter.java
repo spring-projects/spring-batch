@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.common;
+package org.springframework.batch.sample.support;
 
 import java.util.ArrayList;
 import java.util.List;

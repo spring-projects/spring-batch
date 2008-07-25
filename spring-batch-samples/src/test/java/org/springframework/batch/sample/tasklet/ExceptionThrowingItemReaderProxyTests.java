@@ -11,7 +11,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
-import org.springframework.batch.sample.common.ExceptionThrowingItemReaderProxy;
+import org.springframework.batch.sample.support.ExceptionThrowingItemReaderProxy;
 
 public class ExceptionThrowingItemReaderProxyTests {
 

@@ -6,7 +6,7 @@ import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.common.ItemTrackingItemWriter;
+import org.springframework.batch.sample.support.ItemTrackingItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;

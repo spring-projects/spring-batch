@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.common;
+package org.springframework.batch.sample.support;
 
 
 import org.springframework.batch.core.UnexpectedJobExecutionException;

@@ -47,7 +47,7 @@
 	</bean>
 
 	<bean id="itemTrackingWriter"
-		class="org.springframework.batch.sample.common.ItemTrackingItemWriter"
+		class="org.springframework.batch.sample.support.ItemTrackingItemWriter"
 		p:validationFailure="2" />
 
 	<bean id="tradeSqlItemReader"
