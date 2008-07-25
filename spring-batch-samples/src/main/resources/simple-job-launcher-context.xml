@@ -24,7 +24,7 @@
 		<property name="dataSource" ref="dataSource" />
 	</bean>
 
-	<bean id="logAdvice" class="org.springframework.batch.sample.advice.ProcessorLogAdvice" />
+	<bean id="logAdvice" class="org.springframework.batch.sample.advice.LogAdvice" />
 
 	<bean id="eventAdvice" class="org.springframework.batch.sample.advice.StepExecutionApplicationEventAdvice" />
 

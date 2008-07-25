@@ -27,9 +27,9 @@ import org.aspectj.lang.JoinPoint;
  * 
  * @author Lucas Ward
  */
-public class ProcessorLogAdvice {
+public class LogAdvice {
     
-    private static Log log = LogFactory.getLog(ProcessorLogAdvice.class);
+    private static Log log = LogFactory.getLog(LogAdvice.class);
 
     /**
      * Wraps original method and adds logging both before and after method
