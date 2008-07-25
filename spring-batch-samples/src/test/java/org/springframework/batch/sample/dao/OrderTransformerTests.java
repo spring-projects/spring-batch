@@ -26,11 +26,12 @@ import java.util.HashMap;
 import org.junit.Test;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.sample.domain.Address;
-import org.springframework.batch.sample.domain.BillingInfo;
-import org.springframework.batch.sample.domain.Customer;
-import org.springframework.batch.sample.domain.LineItem;
-import org.springframework.batch.sample.domain.Order;
+import org.springframework.batch.sample.order.Address;
+import org.springframework.batch.sample.order.BillingInfo;
+import org.springframework.batch.sample.order.Customer;
+import org.springframework.batch.sample.order.LineItem;
+import org.springframework.batch.sample.order.Order;
+import org.springframework.batch.sample.order.OrderTransformer;
 
 /**
  * @author Dave Syer

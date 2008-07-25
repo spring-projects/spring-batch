@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.sample.order.Address;
+import org.springframework.batch.sample.order.Child;
 
 /**
  * Custom class that contains logic that would normally be be contained in

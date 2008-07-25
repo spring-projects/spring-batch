@@ -3,8 +3,8 @@ package org.springframework.batch.sample.mapping;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.sample.domain.ShippingInfo;
-import org.springframework.batch.sample.mapping.ShippingFieldSetMapper;
+import org.springframework.batch.sample.order.ShippingFieldSetMapper;
+import org.springframework.batch.sample.order.ShippingInfo;
 
 public class ShippingFieldSetMapperTests extends AbstractFieldSetMapperTests{
 

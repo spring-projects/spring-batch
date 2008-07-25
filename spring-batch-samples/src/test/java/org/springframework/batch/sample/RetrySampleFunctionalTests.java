@@ -1,13 +1,13 @@
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.runner.RunWith;
 import org.springframework.batch.sample.item.writer.RetrySampleItemWriter;
 import org.springframework.batch.sample.trade.GeneratingTradeItemReader;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Checks that expected number of items have been processed.

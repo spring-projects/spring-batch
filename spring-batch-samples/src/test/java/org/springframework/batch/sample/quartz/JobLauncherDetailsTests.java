@@ -18,6 +18,11 @@ package org.springframework.batch.sample.quartz;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.quartz.Job;
@@ -34,11 +39,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.sample.tasklet.JobSupport;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Dave Syer

@@ -1,8 +1,13 @@
 package org.springframework.batch.sample.tasklet;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
@@ -15,8 +20,6 @@ import org.springframework.batch.sample.common.SystemCommandException;
 import org.springframework.batch.sample.common.SystemCommandTasklet;
 import org.springframework.batch.sample.common.SystemProcessExitCodeMapper;
 import org.springframework.util.Assert;
-
-import java.io.File;
 
 /**
  * Tests for {@link SystemCommandTasklet}.

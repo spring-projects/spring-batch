@@ -15,10 +15,10 @@
  */
 package org.springframework.batch.sample.tasklet;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**

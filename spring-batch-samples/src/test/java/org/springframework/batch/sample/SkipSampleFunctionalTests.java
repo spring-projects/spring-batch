@@ -1,6 +1,9 @@
 package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
+
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.common.ItemTrackingItemWriter;
@@ -8,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.sql.DataSource;
 
 /**
  * Error is encountered during writing - transaction is rolled back and the

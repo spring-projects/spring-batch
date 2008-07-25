@@ -3,8 +3,8 @@ package org.springframework.batch.sample.mapping;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.sample.domain.Address;
-import org.springframework.batch.sample.mapping.AddressFieldSetMapper;
+import org.springframework.batch.sample.order.Address;
+import org.springframework.batch.sample.order.AddressFieldSetMapper;
 
 
 public class AddressFieldSetMapperTests extends AbstractFieldSetMapperTests {

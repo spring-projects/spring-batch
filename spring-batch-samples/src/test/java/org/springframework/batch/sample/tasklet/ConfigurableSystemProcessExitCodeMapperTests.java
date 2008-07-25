@@ -2,12 +2,13 @@ package org.springframework.batch.sample.tasklet;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
-import org.junit.Test;
-import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.sample.common.ConfigurableSystemProcessExitCodeMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Test;
+import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.sample.common.ConfigurableSystemProcessExitCodeMapper;
 
 /**
  * Tests for {@link ConfigurableSystemProcessExitCodeMapper}

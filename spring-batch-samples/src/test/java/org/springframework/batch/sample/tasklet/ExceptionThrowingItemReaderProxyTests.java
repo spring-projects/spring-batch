@@ -1,16 +1,17 @@
 package org.springframework.batch.sample.tasklet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import org.junit.After;
+import org.junit.Test;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.sample.common.ExceptionThrowingItemReaderProxy;
-import org.junit.After;
-import org.junit.Test;
 
 public class ExceptionThrowingItemReaderProxyTests {
 

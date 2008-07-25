@@ -1,6 +1,7 @@
 package org.springframework.batch.sample.mapping;
 
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;

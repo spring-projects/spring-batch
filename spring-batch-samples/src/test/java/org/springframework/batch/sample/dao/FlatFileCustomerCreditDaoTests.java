@@ -15,7 +15,11 @@
  */
 package org.springframework.batch.sample.dao;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
+import java.math.BigDecimal;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +27,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.trade.CustomerCredit;
-
-import java.math.BigDecimal;
 
 public class FlatFileCustomerCreditDaoTests {
 

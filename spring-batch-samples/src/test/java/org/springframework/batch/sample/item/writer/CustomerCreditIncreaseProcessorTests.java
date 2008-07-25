@@ -1,10 +1,10 @@
 package org.springframework.batch.sample.item.writer;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
+import org.junit.Test;
 import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.trade.CustomerCredit;
 import org.springframework.batch.sample.trade.CustomerCreditIncreaseWriter;
