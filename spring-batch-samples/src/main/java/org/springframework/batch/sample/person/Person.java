@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain;
+package org.springframework.batch.sample.person;
 
 import java.util.ArrayList;
 import java.util.List;

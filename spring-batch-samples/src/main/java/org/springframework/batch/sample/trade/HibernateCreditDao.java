@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.trade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,6 @@ import java.util.List;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
-import org.springframework.batch.sample.trade.CustomerCredit;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 /**

@@ -38,7 +38,7 @@
 	</bean>
 
 	<bean id="customerCreditDao"
-		class="org.springframework.batch.sample.dao.HibernateCreditDao">
+		class="org.springframework.batch.sample.trade.HibernateCreditDao">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 

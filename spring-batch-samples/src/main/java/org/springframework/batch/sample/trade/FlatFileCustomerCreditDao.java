@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.trade;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.sample.trade.CustomerCredit;
 import org.springframework.beans.factory.DisposableBean;
 
 /**

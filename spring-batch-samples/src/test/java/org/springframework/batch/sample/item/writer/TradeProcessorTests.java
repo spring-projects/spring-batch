@@ -3,8 +3,8 @@ package org.springframework.batch.sample.item.writer;
 import org.easymock.MockControl;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.sample.dao.TradeDao;
 import org.springframework.batch.sample.trade.Trade;
+import org.springframework.batch.sample.trade.TradeDao;
 import org.springframework.batch.sample.trade.TradeWriter;
 
 public class TradeProcessorTests {

@@ -17,7 +17,6 @@
 package org.springframework.batch.sample.trade;
 
 import org.springframework.batch.item.support.AbstractItemWriter;
-import org.springframework.batch.sample.dao.CustomerDebitDao;
 
 
 /**

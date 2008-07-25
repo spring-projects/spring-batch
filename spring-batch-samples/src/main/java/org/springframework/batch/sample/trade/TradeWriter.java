@@ -19,7 +19,6 @@ package org.springframework.batch.sample.trade;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.support.AbstractItemWriter;
-import org.springframework.batch.sample.dao.TradeDao;
 
 /**
  * Delegates the actual writing to custom DAO delegate. Allows configurable

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.trade;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.sample.trade.Trade;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 

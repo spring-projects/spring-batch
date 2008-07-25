@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.person;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.support.AbstractItemWriter;
-import org.springframework.batch.sample.domain.Person;
 
 
 

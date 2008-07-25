@@ -23,6 +23,6 @@
 		<property name="limit" value="10" />
 	</bean>
 
-	<bean id="itemWriter" class="org.springframework.batch.sample.item.writer.RetrySampleItemWriter" />
+	<bean id="itemWriter" class="org.springframework.batch.sample.retry.RetrySampleItemWriter" />
 
 </beans>

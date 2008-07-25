@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.retry;
 
 import org.springframework.batch.item.support.AbstractItemWriter;
 

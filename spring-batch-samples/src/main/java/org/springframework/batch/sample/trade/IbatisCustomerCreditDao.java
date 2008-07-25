@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.trade;
 
-import org.springframework.batch.sample.trade.CustomerCredit;
 import org.springframework.orm.ibatis.support.SqlMapClientDaoSupport;
 
 /**

@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.trade;
 
-import org.springframework.batch.sample.trade.CustomerDebit;
 
 /**
  * Interface for writing {@link CustomerDebitDao} object to arbitrary output.

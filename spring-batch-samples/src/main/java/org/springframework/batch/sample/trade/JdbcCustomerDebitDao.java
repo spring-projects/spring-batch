@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.trade;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.trade.CustomerDebit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;

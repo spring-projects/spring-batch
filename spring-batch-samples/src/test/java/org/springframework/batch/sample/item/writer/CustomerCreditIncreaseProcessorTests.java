@@ -5,8 +5,8 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 
 import org.junit.Test;
-import org.springframework.batch.sample.dao.CustomerCreditDao;
 import org.springframework.batch.sample.trade.CustomerCredit;
+import org.springframework.batch.sample.trade.CustomerCreditDao;
 import org.springframework.batch.sample.trade.CustomerCreditIncreaseWriter;
 
 /**

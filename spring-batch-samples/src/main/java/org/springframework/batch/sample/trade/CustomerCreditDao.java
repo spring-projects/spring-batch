@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.trade;
 
-import org.springframework.batch.sample.trade.Trade;
 
 /**
- * Interface for writing a Trade object to an arbitrary output.
- * 
+ * Interface for writing customer's credit information to output.
+ *
  * @author Robert Kasanicky
  */
-public interface TradeDao {
-	/**
-	 * Write a trade object to some kind of output, different implementations
-	 * can write to file, database etc.
-	 */
-	void writeTrade(Trade trade);
+public interface CustomerCreditDao {
+
+	void writeCredit(CustomerCredit customerCredit) throws Exception;
 
 }

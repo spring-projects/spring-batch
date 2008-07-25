@@ -9,7 +9,7 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 
 
-	<bean class="org.springframework.batch.sample.dao.JdbcTradeDao"
+	<bean class="org.springframework.batch.sample.trade.JdbcTradeDao"
 		id="tradeDao" p:jdbcTemplate-ref="jdbcTemplate">
 		<property name="incrementer">
 			<bean parent="incrementerParent">
@@ -19,11 +19,11 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.sample.dao.JdbcCustomerDebitDao"
+		class="org.springframework.batch.sample.trade.JdbcCustomerDebitDao"
 		id="customerDao" p:dataSource-ref="dataSource" />
 
 	<bean
-		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditDao"
+		class="org.springframework.batch.sample.trade.FlatFileCustomerCreditDao"
 		id="customerReportItemWriter">
 		<property name="itemWriter">
 			<bean
