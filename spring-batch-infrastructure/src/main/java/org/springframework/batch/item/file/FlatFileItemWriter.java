@@ -72,8 +72,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private static final String WRITTEN_STATISTICS_NAME = "written";
 
-	private static final String RESTART_COUNT_STATISTICS_NAME = "restart.count";
-
 	private static final String RESTART_DATA_NAME = "current.count";
 
 	private Resource resource;
@@ -281,7 +279,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			}
 
 			executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
-			executionContext.putLong(getKey(RESTART_COUNT_STATISTICS_NAME), state.restartCount);
 		}
 	}
 
@@ -344,8 +341,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		long lastMarkedByteOffsetPosition = 0;
 
 		long linesWritten = 0;
-
-		long restartCount = 0;
 
 		boolean shouldDeleteIfExists = true;
 

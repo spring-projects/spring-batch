@@ -223,6 +223,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testRestart() throws Exception {
 		
 		writer.open(executionContext);
+
 		// write some lines
 		writer.write("testLine1");
 		writer.write("testLine2");
@@ -251,7 +252,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		// init with correct data
 		writer.open(executionContext);
-
+		
 		// write more lines
 		writer.write("testLine6");
 		writer.write("testLine7");
@@ -312,7 +313,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		writer.open(executionContext);
 		writer.update(executionContext);
 		assertNotNull(executionContext);
-		assertEquals(3, executionContext.entrySet().size());
+		assertEquals(2, executionContext.entrySet().size());
 		assertEquals(0, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".current.count"));
 	}
 
