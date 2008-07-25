@@ -3,8 +3,8 @@ package org.springframework.batch.sample.domain.order;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.sample.domain.order.BillingFieldSetMapper;
 import org.springframework.batch.sample.domain.order.BillingInfo;
+import org.springframework.batch.sample.domain.order.internal.BillingFieldSetMapper;
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class BillingFieldSetMapperTests extends AbstractFieldSetMapperTests{

@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.sample.domain.trade.HibernateCreditDao;
+import org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.orm.hibernate3.HibernateJdbcException;

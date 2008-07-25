@@ -22,13 +22,13 @@
   </type-aliases>
   <field-aliases>
     <field-alias>
-      <alias-name>org.springframework.batch.sample.domain.order.xml.Customer</alias-name>
-      <type>org.springframework.batch.sample.domain.order.xml.Order</type>
+      <alias-name>org.springframework.batch.sample.domain.order.internal.xml.Customer</alias-name>
+      <type>org.springframework.batch.sample.domain.order.internal.xml.Order</type>
       <field-name>customer</field-name>
     </field-alias>
     <field-alias>
-      <alias-name>org.springframework.batch.sample.domain.order.xml.Shipper</alias-name>
-      <type>org.springframework.batch.sample.domain.order.xml.Order</type>
+      <alias-name>org.springframework.batch.sample.domain.order.internal.xml.Shipper</alias-name>
+      <type>org.springframework.batch.sample.domain.order.internal.xml.Order</type>
       <field-name>shipper</field-name>
     </field-alias>
   </field-aliases>
@@ -51,25 +51,25 @@
       <namespaceURI>http://adsj.accenture.com/purchaseorders</namespaceURI>
       <localPart>order</localPart>
       <prefix></prefix>
-      <class-name>org.springframework.batch.sample.domain.order.xml.Order</class-name>
+      <class-name>org.springframework.batch.sample.domain.order.internal.xml.Order</class-name>
     </mapping>
     <mapping>
       <namespaceURI>http://adsj.accenture.com/purchaseorders</namespaceURI>
       <localPart>customer</localPart>
       <prefix></prefix>
-       <class-name>org.springframework.batch.sample.domain.order.xml.Customer</class-name>
+       <class-name>org.springframework.batch.sample.domain.order.internal.xml.Customer</class-name>
     </mapping>
     <mapping>
       <namespaceURI>http://adsj.accenture.com/purchaseorders</namespaceURI>
       <localPart>shipper</localPart>
       <prefix></prefix>
-       <class-name>org.springframework.batch.sample.domain.order.xml.Shipper</class-name>
+       <class-name>org.springframework.batch.sample.domain.order.internal.xml.Shipper</class-name>
     </mapping>
     <mapping>
       <namespaceURI>http://adsj.accenture.com/purchaseorders</namespaceURI>
       <localPart>lineItem</localPart>
       <prefix></prefix>
-       <class-name>org.springframework.batch.sample.domain.order.xml.LineItem</class-name>
+       <class-name>org.springframework.batch.sample.domain.order.internal.xml.LineItem</class-name>
     </mapping>
   </mappings>
 </configuration>

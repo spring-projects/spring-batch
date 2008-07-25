@@ -22,7 +22,7 @@
 				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.sample.domain.trade.TradeWriter">
+						class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
 						<property name="dao" ref="tradeDao" />
 					</bean>
 				</property>
@@ -70,7 +70,7 @@
 	</bean>
 
 	<bean id="tradeDao"
-		class="org.springframework.batch.sample.domain.trade.JdbcTradeDao">
+		class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
@@ -81,6 +81,6 @@
 	</bean>
 
 	<bean id="fieldSetMapper"
-		class="org.springframework.batch.sample.domain.trade.TradeFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 
 </beans>

@@ -31,7 +31,7 @@ import org.springframework.batch.sample.domain.order.BillingInfo;
 import org.springframework.batch.sample.domain.order.Customer;
 import org.springframework.batch.sample.domain.order.LineItem;
 import org.springframework.batch.sample.domain.order.Order;
-import org.springframework.batch.sample.domain.order.OrderTransformer;
+import org.springframework.batch.sample.domain.order.internal.OrderTransformer;
 
 /**
  * @author Dave Syer

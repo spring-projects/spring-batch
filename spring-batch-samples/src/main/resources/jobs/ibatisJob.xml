@@ -17,10 +17,10 @@
 				<property name="itemReader" ref="ibatisItemReader" />
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.sample.domain.trade.CustomerCreditIncreaseWriter">
+						class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseWriter">
 						<property name="customerCreditDao">
 							<bean
-								class="org.springframework.batch.sample.domain.trade.IbatisCustomerCreditDao">
+								class="org.springframework.batch.sample.domain.trade.internal.IbatisCustomerCreditDao">
 								<property name="sqlMapClient"
 									ref="sqlMapClient" />
 								<property name="statementId"

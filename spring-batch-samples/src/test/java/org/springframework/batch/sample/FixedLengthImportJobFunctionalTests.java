@@ -33,7 +33,7 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.batch.sample.domain.trade.TradeFieldSetMapper;
+import org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;

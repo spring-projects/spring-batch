@@ -9,7 +9,7 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
 
 
-	<bean class="org.springframework.batch.sample.domain.trade.JdbcTradeDao"
+	<bean class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao"
 		id="tradeDao" p:jdbcTemplate-ref="jdbcTemplate">
 		<property name="incrementer">
 			<bean parent="incrementerParent">
@@ -19,11 +19,11 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.sample.domain.trade.JdbcCustomerDebitDao"
+		class="org.springframework.batch.sample.domain.trade.internal.JdbcCustomerDebitDao"
 		id="customerDao" p:dataSource-ref="dataSource" />
 
 	<bean
-		class="org.springframework.batch.sample.domain.trade.FlatFileCustomerCreditDao"
+		class="org.springframework.batch.sample.domain.trade.internal.FlatFileCustomerCreditDao"
 		id="customerReportItemWriter">
 		<property name="itemWriter">
 			<bean
@@ -44,7 +44,7 @@
 		<property name="lineTokenizer" ref="tradeFileDescriptor" />
 		<property name="fieldSetMapper">
 			<bean
-				class="org.springframework.batch.sample.domain.trade.TradeFieldSetMapper" />
+				class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 		</property>
 	</bean>
 

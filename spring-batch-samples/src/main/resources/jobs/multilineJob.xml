@@ -42,7 +42,7 @@
 	</bean>
 
 	<bean id="tradeLineMapper"
-		class="org.springframework.batch.sample.domain.trade.TradeFieldSetMapper" />
+		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 
 	<bean id="fixedFileDescriptor"
 		class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">

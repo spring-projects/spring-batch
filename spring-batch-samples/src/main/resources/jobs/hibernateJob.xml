@@ -33,12 +33,12 @@
 	</bean>
 
 	<bean id="hibernateCreditWriter"
-		class="org.springframework.batch.sample.domain.trade.CustomerCreditIncreaseWriter">
+		class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseWriter">
 		<property name="customerCreditDao" ref="customerCreditDao" />
 	</bean>
 
 	<bean id="customerCreditDao"
-		class="org.springframework.batch.sample.domain.trade.HibernateCreditDao">
+		class="org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao">
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 

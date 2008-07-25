@@ -4,7 +4,7 @@ import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.order.Address;
-import org.springframework.batch.sample.domain.order.AddressFieldSetMapper;
+import org.springframework.batch.sample.domain.order.internal.AddressFieldSetMapper;
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 

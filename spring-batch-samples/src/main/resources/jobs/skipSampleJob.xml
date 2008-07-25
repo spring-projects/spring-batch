@@ -27,7 +27,7 @@
 					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.trade.TradeWriter"
+							class="org.springframework.batch.sample.domain.trade.internal.TradeWriter"
 							p:dao-ref="tradeDao" p:failure="3" />
 					</property>
 				</bean>
@@ -57,7 +57,7 @@
 			value="SELECT id, quantity, price, customer from TRADE" />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.domain.trade.TradeRowMapper" />
+				class="org.springframework.batch.sample.domain.trade.internal.TradeRowMapper" />
 		</property>
 	</bean>
 
@@ -68,7 +68,7 @@
 			value="SELECT id, name, credit FROM customer " />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.domain.trade.CustomerCreditRowMapper" />
+				class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>
 	</bean>
 

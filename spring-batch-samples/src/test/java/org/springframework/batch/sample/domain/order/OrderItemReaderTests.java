@@ -23,8 +23,8 @@ import org.springframework.batch.sample.domain.order.BillingInfo;
 import org.springframework.batch.sample.domain.order.Customer;
 import org.springframework.batch.sample.domain.order.LineItem;
 import org.springframework.batch.sample.domain.order.Order;
-import org.springframework.batch.sample.domain.order.OrderItemReader;
 import org.springframework.batch.sample.domain.order.ShippingInfo;
+import org.springframework.batch.sample.domain.order.internal.OrderItemReader;
 
 public class OrderItemReaderTests {
 
