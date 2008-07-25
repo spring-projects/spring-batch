@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.writer;
+package org.springframework.batch.sample.domain.trade;
 
 import org.easymock.MockControl;
 import org.junit.Before;

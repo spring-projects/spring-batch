@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.domain.trade;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,6 +11,7 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.support.AggregateItemReader;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeFieldSetMapper;
+import org.springframework.batch.sample.mapping.AbstractFieldSetMapperTests;
 
 public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests {
 

@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.domain.trade;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import org.easymock.MockControl;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeRowMapper;
+import org.springframework.batch.sample.mapping.AbstractRowMapperTests;
 import org.springframework.jdbc.core.RowMapper;
 
 public class TradeRowMapperTests extends AbstractRowMapperTests {
