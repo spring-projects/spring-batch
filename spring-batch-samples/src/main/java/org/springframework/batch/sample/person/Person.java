@@ -23,7 +23,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.springframework.batch.sample.order.Address;
-import org.springframework.batch.sample.order.Child;
 
 public class Person {
 
