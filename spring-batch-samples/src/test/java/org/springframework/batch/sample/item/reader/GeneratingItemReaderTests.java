@@ -4,13 +4,13 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * Tests for {@link GeneratingItemReader}.
+ * Tests for {@link GeneratingTradeItemReader}.
  * 
  * @author Robert Kasanicky
  */
 public class GeneratingItemReaderTests {
 
-	private GeneratingItemReader reader = new GeneratingItemReader();
+	private GeneratingTradeItemReader reader = new GeneratingTradeItemReader();
 	
 	/**
 	 * Generates a given number of not-null records,

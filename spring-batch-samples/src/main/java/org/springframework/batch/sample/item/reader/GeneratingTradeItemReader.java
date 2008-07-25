@@ -12,7 +12,7 @@ import org.springframework.batch.sample.domain.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class GeneratingItemReader implements ItemReader<Trade> {
+public class GeneratingTradeItemReader implements ItemReader<Trade> {
 
 	private int limit = 1;
 	

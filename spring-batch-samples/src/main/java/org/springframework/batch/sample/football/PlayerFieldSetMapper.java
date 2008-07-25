@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.football;
 
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;

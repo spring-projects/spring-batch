@@ -3,7 +3,7 @@ package org.springframework.batch.sample;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 
-import org.springframework.batch.sample.item.reader.GeneratingItemReader;
+import org.springframework.batch.sample.item.reader.GeneratingTradeItemReader;
 import org.springframework.batch.sample.item.writer.RetrySampleItemWriter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RetrySampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	@Autowired
-	private GeneratingItemReader itemGenerator;
+	private GeneratingTradeItemReader itemGenerator;
 	
 	@Autowired
 	private RetrySampleItemWriter<?> itemProcessor;

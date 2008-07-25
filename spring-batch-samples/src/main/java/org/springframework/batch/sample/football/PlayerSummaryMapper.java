@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.football;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +27,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Lucas Ward
  *
  */
-public class PlayerSummaryRowMapper implements RowMapper {
+public class PlayerSummaryMapper implements RowMapper {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.jdbc.core.RowMapper#mapRow(java.sql.ResultSet, int)

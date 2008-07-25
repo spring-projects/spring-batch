@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.dao;
+package org.springframework.batch.sample.football;
 
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
