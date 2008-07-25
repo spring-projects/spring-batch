@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.item.reader;
+package org.springframework.batch.sample.domain.order;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;

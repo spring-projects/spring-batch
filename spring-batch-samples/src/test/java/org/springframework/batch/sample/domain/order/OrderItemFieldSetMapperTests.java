@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.domain.order;
 
 import java.math.BigDecimal;
 
@@ -7,6 +7,7 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.order.LineItem;
 import org.springframework.batch.sample.domain.order.OrderItemFieldSetMapper;
+import org.springframework.batch.sample.mapping.AbstractFieldSetMapperTests;
 
 public class OrderItemFieldSetMapperTests extends AbstractFieldSetMapperTests{
 

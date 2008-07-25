@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.mapping;
+package org.springframework.batch.sample.domain.order;
 
 import java.util.Calendar;
 
@@ -7,6 +7,7 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.sample.domain.order.HeaderFieldSetMapper;
 import org.springframework.batch.sample.domain.order.Order;
+import org.springframework.batch.sample.mapping.AbstractFieldSetMapperTests;
 
 public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
 
