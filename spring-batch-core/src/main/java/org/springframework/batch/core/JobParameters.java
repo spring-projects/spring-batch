@@ -75,7 +75,7 @@ public class JobParameters implements Serializable {
 	 * @return The <code>String</code> value
 	 */
 	public String getString(String key) {
-		return (String) stringMap.get(key);
+		return stringMap.get(key);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class JobParameters implements Serializable {
 	 * @return The <code>Long</code> value
 	 */
 	public Long getLong(String key) {
-		return (Long) longMap.get(key);
+		return longMap.get(key);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class JobParameters implements Serializable {
 	 * @return The <code>Double</code> value
 	 */
 	public Double getDouble(String key) {
-		return (Double) doubleMap.get(key);
+		return doubleMap.get(key);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class JobParameters implements Serializable {
 	 * @return The <code>java.util.Date</code> value
 	 */
 	public Date getDate(String key) {
-		return (Date) dateMap.get(key);
+		return dateMap.get(key);
 	}
 
 	/**
