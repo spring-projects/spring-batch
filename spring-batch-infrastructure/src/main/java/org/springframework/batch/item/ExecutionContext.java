@@ -19,7 +19,6 @@ package org.springframework.batch.item;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -298,24 +297,6 @@ public class ExecutionContext implements Serializable {
 	 */
 	public boolean containsValue(Object value) {
 		return map.containsValue(value);
-	}
-
-	/**
-	 * Returns a <code>Properties</code> object containing <code>String</code>
-	 * versions of the contents of the context.
-	 * 
-	 * @return Contents of context as a {@link java.util.Properties}
-	 * 
-	 * @deprecated to be removed with no replacement in 2.0. Should not be part
-	 * of public API (test purposes only)
-	 */
-	public Properties getProperties() {
-		Properties props = new Properties();
-		for (Entry<String, Object> entry : map.entrySet()) {
-			props.setProperty(entry.getKey(), entry.getValue().toString());
-		}
-
-		return props;
 	}
 
 	/*
