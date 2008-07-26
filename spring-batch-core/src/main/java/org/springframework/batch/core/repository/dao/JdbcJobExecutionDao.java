@@ -221,7 +221,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.setId(new Long(rs.getLong(1)));
 			jobExecution.setStartTime(rs.getTimestamp(2));
 			jobExecution.setEndTime(rs.getTimestamp(3));
-			jobExecution.setStatus(BatchStatus.getStatus(rs.getString(4)));
+			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(4)));
 			jobExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(5)), rs.getString(6), rs.getString(7)));
 			jobExecution.setCreateTime(rs.getDate(8));
 			jobExecution.setExecutionContext(findExecutionContext(jobExecution));

@@ -221,7 +221,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			StepExecution stepExecution = new StepExecution(step.getName(), jobExecution, new Long(rs.getLong(1)));
 			stepExecution.setStartTime(rs.getTimestamp(3));
 			stepExecution.setEndTime(rs.getTimestamp(4));
-			stepExecution.setStatus(BatchStatus.getStatus(rs.getString(5)));
+			stepExecution.setStatus(BatchStatus.valueOf(rs.getString(5)));
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setItemCount(rs.getInt(7));
 			stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(8)), rs.getString(9), rs.getString(10)));

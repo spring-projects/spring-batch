@@ -4,14 +4,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -79,9 +80,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	private String createJobKey(JobParameters jobParameters) {
 
-		Map<String, Object> props = jobParameters.getParameters();
+		Map<String, JobParameter> props = jobParameters.getParameters();
 		StringBuffer stringBuffer = new StringBuffer();
-		for (Entry<String, Object> entry : props.entrySet()) {
+		for (Entry<String, JobParameter> entry : props.entrySet()) {
 			stringBuffer.append(entry.toString() + ";");
 		}
 
@@ -95,22 +96,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 */
 	private void insertJobParameters(Long jobId, JobParameters jobParameters) {
 
-		for (Entry<String, String> entry : jobParameters.getStringParameters().entrySet()) {
-			insertParameter(jobId, ParameterType.STRING, entry.getKey().toString(), entry.getValue());
+		for(Entry<String,JobParameter> entry : jobParameters.getParameters().entrySet()){
+			JobParameter jobParameter = entry.getValue();
+			insertParameter(jobId, jobParameter.getType(), entry.getKey(), jobParameter.getValue());
 		}
-
-		for (Entry<String, Long> entry : jobParameters.getLongParameters().entrySet()) {
-			insertParameter(jobId, ParameterType.LONG, entry.getKey().toString(), entry.getValue());
-		}
-
-		for (Entry<String, Double> entry : jobParameters.getDoubleParameters().entrySet()) {
-			insertParameter(jobId, ParameterType.DOUBLE, entry.getKey().toString(), entry.getValue());
-		}
-
-		for (Entry<String, Date> entry : jobParameters.getDateParameters().entrySet()) {
-			insertParameter(jobId, ParameterType.DATE, entry.getKey().toString(), entry.getValue());
-		}
-
 	}
 
 	/**
@@ -195,39 +184,5 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobIncrementer);
-	}
-
-	private static class ParameterType {
-
-		private final String type;
-
-		private ParameterType(String type) {
-			this.type = type;
-		}
-
-		public String toString() {
-			return type;
-		}
-
-		public static final ParameterType STRING = new ParameterType("STRING");
-
-		public static final ParameterType DATE = new ParameterType("DATE");
-
-		public static final ParameterType LONG = new ParameterType("LONG");
-
-		public static final ParameterType DOUBLE = new ParameterType("DOUBLE");
-
-		private static final ParameterType[] VALUES = { STRING, DATE, LONG, DOUBLE };
-
-		public static ParameterType getType(String typeAsString) {
-
-			for (int i = 0; i < VALUES.length; i++) {
-				if (VALUES[i].toString().equals(typeAsString)) {
-					return (ParameterType) VALUES[i];
-				}
-			}
-
-			return null;
-		}
 	}
 }

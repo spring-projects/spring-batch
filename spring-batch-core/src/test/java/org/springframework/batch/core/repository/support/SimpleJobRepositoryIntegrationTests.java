@@ -1,12 +1,11 @@
 package org.springframework.batch.core.repository.support;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
@@ -47,27 +46,9 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 		job.setRestartable(true);
 
-		Map<String, String> stringParams = new HashMap<String, String>() {
-			{
-				put("stringKey", "stringValue");
-			}
-		};
-		Map<String, Long> longParams = new HashMap<String, Long>() {
-			{
-				put("longKey", new Long(1));
-			}
-		};
-		Map<String, Double> doubleParams = new HashMap<String, Double>() {
-			{
-				put("doubleKey", new Double(1.1));
-			}
-		};
-		Map<String, Date> dateParams = new HashMap<String, Date>() {
-			{
-				put("dateKey", new Date(1));
-			}
-		};
-		JobParameters jobParams = new JobParameters(stringParams, longParams, doubleParams, dateParams);
+		JobParametersBuilder builder = new JobParametersBuilder();
+		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1).addDate("dateKey", new Date(1L));
+		JobParameters jobParams = builder.toJobParameters();
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParams);
 		firstExecution.setStartTime(new Date());

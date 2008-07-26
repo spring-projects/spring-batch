@@ -23,23 +23,14 @@ import org.springframework.util.Assert;
  */
 public class JobParametersBuilder {
 
-	private final Map<String, String> stringMap;
-
-	private final Map<String, Long> longMap;
-	
-	private final Map<String, Double> doubleMap;
-
-	private final Map<String, Date> dateMap;
+	private final Map<String, JobParameter> parameterMap;
 
 	/**
 	 * Default constructor. Initializes the builder
 	 */
 	public JobParametersBuilder() {
 
-		this.stringMap = new LinkedHashMap<String, String>();
-		this.longMap = new LinkedHashMap<String, Long>();
-		this.doubleMap = new LinkedHashMap<String, Double>();
-		this.dateMap = new LinkedHashMap<String, Date>();
+		this.parameterMap = new LinkedHashMap<String, JobParameter>();
 	}
 
 	/**
@@ -51,7 +42,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addString(String key, String parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		stringMap.put(key, parameter);
+		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
 
@@ -64,7 +55,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addDate(String key, Date parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		dateMap.put(key, new Date(parameter.getTime()));
+		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
 
@@ -77,7 +68,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addLong(String key, Long parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		longMap.put(key, parameter);
+		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
 	
@@ -90,7 +81,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addDouble(String key, Double parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		doubleMap.put(key, parameter);
+		parameterMap.put(key, new JobParameter(parameter));
 		return this;
 	}
 
@@ -98,9 +89,9 @@ public class JobParametersBuilder {
 	 * Conversion method that takes the current state of this builder and
 	 * returns it as a JobruntimeParameters object.
 	 * 
-	 * @return a valid JobRuntimeParameters object.
+	 * @return a valid JobParameters object.
 	 */
 	public JobParameters toJobParameters() {
-		return new JobParameters(stringMap, longMap, doubleMap, dateMap);
+		return new JobParameters(parameterMap);
 	}
 }

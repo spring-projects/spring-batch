@@ -24,7 +24,7 @@ public class JobParametersBuilderTests extends TestCase {
 		parametersBuilder.addString("STRING", "string value");
 		JobParameters parameters = parametersBuilder.toJobParameters();
 		assertEquals(date, parameters.getDate("SCHEDULE_DATE"));
-		assertEquals(new Long(1), parameters.getLong("LONG"));
+		assertEquals(1L, parameters.getLong("LONG"));
 		assertEquals("string value", parameters.getString("STRING"));
 	}
 
@@ -33,9 +33,9 @@ public class JobParametersBuilderTests extends TestCase {
 		parametersBuilder.addLong("LONG", new Long(1));
 		parametersBuilder.addString("STRING", "string value");
 		Iterator<String> parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
-		assertEquals("STRING", parameters.next());
-		assertEquals("LONG", parameters.next());
 		assertEquals("SCHEDULE_DATE", parameters.next());
+		assertEquals("LONG", parameters.next());
+		assertEquals("STRING", parameters.next());
 	}
 
 	public void testOrderedStrings(){	

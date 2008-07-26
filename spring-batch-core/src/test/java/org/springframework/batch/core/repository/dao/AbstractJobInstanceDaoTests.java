@@ -43,8 +43,8 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 		assertEquals(fooJob.getName(), retrievedInstance.getJobName());
 		assertEquals(fooParams, retrievedParams);
 		
-		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey").longValue());
-		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey").doubleValue(), 0.001);
+		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey"));
+		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
 		assertEquals("stringValue", retrievedParams.getString("stringKey"));
 		assertEquals(new Date(DATE), retrievedParams.getDate("dateKey"));
 	}

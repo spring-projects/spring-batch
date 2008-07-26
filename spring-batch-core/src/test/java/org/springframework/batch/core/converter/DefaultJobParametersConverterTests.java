@@ -49,7 +49,7 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
 		assertEquals("myKey", props.getString("job.key"));
-		assertEquals(new Long(33243243L), props.getLong("vendor.id"));
+		assertEquals(33243243L, props.getLong("vendor.id"));
 		Date date = dateFormat.parse("01/23/2008");
 		assertEquals(date, props.getDate("schedule.date"));
 	}
@@ -85,7 +85,7 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		factory.setNumberFormat(new DecimalFormat("#,###"));
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertEquals(1000L, props.getLong("value").longValue());
+		assertEquals(1000L, props.getLong("value"));
 	}
 
 	public void testGetParametersWithBogusLong() throws Exception {
@@ -134,7 +134,7 @@ public class DefaultJobParametersConverterTests extends TestCase {
 
 		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
 		assertNotNull(props);
-		assertEquals(1.38, props.getDouble("value").doubleValue(), Double.MIN_VALUE);
+		assertEquals(1.38, props.getDouble("value"), Double.MIN_VALUE);
 	}
 
 	public void testGetProperties() throws Exception {

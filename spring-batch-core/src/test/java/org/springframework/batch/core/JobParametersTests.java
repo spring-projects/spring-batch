@@ -20,14 +20,6 @@ public class JobParametersTests extends TestCase {
 
 	JobParameters parameters;
 
-	Map<String, String> stringMap;
-
-	Map<String, Long> longMap;
-
-	Map<String, Date> dateMap;
-
-	Map<String, Double> doubleMap;
-
 	Date date1 = new Date(4321431242L);
 
 	Date date2 = new Date(7809089900L);
@@ -39,118 +31,28 @@ public class JobParametersTests extends TestCase {
 
 	private JobParameters getNewParameters() {
 
-		stringMap = new HashMap<String, String>();
-		stringMap.put("string.key1", "value1");
-		stringMap.put("string.key2", "value2");
+		Map<String, JobParameter> parameterMap = new HashMap<String, JobParameter>();
+		parameterMap.put("string.key1", new JobParameter("value1"));
+		parameterMap.put("string.key2", new JobParameter("value2"));
+		parameterMap.put("long.key1", new JobParameter(1L));
+		parameterMap.put("long.key2", new JobParameter(2L));
+		parameterMap.put("double.key1", new JobParameter(1.1));
+		parameterMap.put("double.key2", new JobParameter(2.2));
+		parameterMap.put("date.key1", new JobParameter(date1));
+		parameterMap.put("date.key2", new JobParameter(date2));
 
-		longMap = new HashMap<String, Long>();
-		longMap.put("long.key1", new Long(1));
-		longMap.put("long.key2", new Long(2));
-
-		doubleMap = new HashMap<String, Double>();
-		doubleMap.put("double.key1", new Double(1.1));
-		doubleMap.put("double.key2", new Double(2.2));
-
-		dateMap = new HashMap<String, Date>();
-		dateMap.put("date.key1", date1);
-		dateMap.put("date.key2", date2);
-
-		return new JobParameters(stringMap, longMap, doubleMap, dateMap);
+		return new JobParameters(parameterMap);
 	}
 
-	@SuppressWarnings("unchecked")
-	public void testBadLongKeyException() throws Exception {
-
-		Map badLongMap = new HashMap();
-		badLongMap.put(new Long(0), new Long(1));
-
-		try {
-			new JobParameters(stringMap, badLongMap, doubleMap, dateMap);
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public void testBadLongConstructorException() throws Exception {
-
-		Map badLongMap = new HashMap();
-		badLongMap.put("key", "bad long");
-
-		try {
-			new JobParameters(stringMap, badLongMap, doubleMap, dateMap);
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public void testBadDoubleConstructorException() throws Exception {
-
-		Map badDoubleMap = new HashMap();
-		badDoubleMap.put("key", "bad double");
-
-		try {
-			new JobParameters(stringMap, longMap, badDoubleMap, dateMap);
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public void testBadStringConstructorException() throws Exception {
-
-		Map badMap = new HashMap();
-		badMap.put("key", new Integer(2));
-
-		try {
-			new JobParameters(badMap, longMap, doubleMap, dateMap);
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public void testBadDateConstructorException() throws Exception {
-
-		Map badMap = new HashMap();
-		badMap.put("key", new java.sql.Date(System.currentTimeMillis()));
-
-		try {
-			new JobParameters(stringMap, longMap, doubleMap, badMap);
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-		}
-	}
 
 	public void testGetString() {
 		assertEquals("value1", parameters.getString("string.key1"));
 		assertEquals("value2", parameters.getString("string.key2"));
 	}
 
-	public void testGetStringParameters() {
-		assertEquals("value1", parameters.getStringParameters().get("string.key1"));
-		assertEquals("value2", parameters.getStringParameters().get("string.key2"));
-	}
-
 	public void testGetLong() {
-		assertEquals(new Long(1), parameters.getLong("long.key1"));
-		assertEquals(new Long(2), parameters.getLong("long.key2"));
-	}
-
-	public void testGetLongParameters() {
-		assertEquals(new Long(1), parameters.getLongParameters().get("long.key1"));
-		assertEquals(new Long(2), parameters.getLongParameters().get("long.key2"));
+		assertEquals(1L, parameters.getLong("long.key1"));
+		assertEquals(2L, parameters.getLong("long.key2"));
 	}
 
 	public void testGetDouble() {
@@ -158,19 +60,9 @@ public class JobParametersTests extends TestCase {
 		assertEquals(new Double(2.2), parameters.getDouble("double.key2"));
 	}
 
-	public void testGetDoubleParameters() {
-		assertEquals(new Double(1.1), parameters.getDoubleParameters().get("double.key1"));
-		assertEquals(new Double(2.2), parameters.getDoubleParameters().get("double.key2"));
-	}
-
 	public void testGetDate() {
 		assertEquals(date1, parameters.getDate("date.key1"));
 		assertEquals(date2, parameters.getDate("date.key2"));
-	}
-
-	public void testGetDateParameters() {
-		assertEquals(date1, parameters.getDateParameters().get("date.key1"));
-		assertEquals(date2, parameters.getDateParameters().get("date.key2"));
 	}
 
 	public void testIsEmptyWhenEmpty() throws Exception {
@@ -204,35 +96,29 @@ public class JobParametersTests extends TestCase {
 
 	public void testToStringOrder() {
 
-		Map<String, Object> props = parameters.getParameters();
+		Map<String, JobParameter> props = parameters.getParameters();
 		StringBuffer stringBuilder = new StringBuffer();
-		for (Entry<?, ?> entry : props.entrySet()) {
+		for (Entry<String, JobParameter> entry : props.entrySet()) {
 			stringBuilder.append(entry.toString() + ";");
 		}
 
 		String string1 = stringBuilder.toString();
 
-		stringMap = new HashMap<String, String>();
-		stringMap.put("string.key2", "value2");
-		stringMap.put("string.key1", "value1");
-
-		longMap = new HashMap<String, Long>();
-		longMap.put("long.key2", new Long(2));
-		longMap.put("long.key1", new Long(1));
-
-		doubleMap = new HashMap<String, Double>();
-		doubleMap.put("double.key2", new Double(2.2));
-		doubleMap.put("double.key1", new Double(1.1));
-
-		dateMap = new HashMap<String, Date>();
-		dateMap.put("date.key2", date2);
-		dateMap.put("date.key1", date1);
-
-		JobParameters testProps = new JobParameters(stringMap, longMap, doubleMap, dateMap);
+		Map<String, JobParameter> parameterMap = new HashMap<String, JobParameter>();
+		parameterMap.put("string.key2", new JobParameter("value2"));
+		parameterMap.put("string.key1", new JobParameter("value1"));
+		parameterMap.put("long.key2", new JobParameter(2L));
+		parameterMap.put("long.key1", new JobParameter(1L));
+		parameterMap.put("double.key2", new JobParameter(2.2));
+		parameterMap.put("double.key1", new JobParameter(1.1));
+		parameterMap.put("date.key2", new JobParameter(date2));
+		parameterMap.put("date.key1", new JobParameter(date1));
+		
+		JobParameters testProps = new JobParameters(parameterMap);
 
 		props = testProps.getParameters();
 		stringBuilder = new StringBuffer();
-		for (Entry<?, ?> entry : props.entrySet()) {
+		for (Entry<String, JobParameter> entry : props.entrySet()) {
 			stringBuilder.append(entry.toString() + ";");
 		}
 		String string2 = stringBuilder.toString();

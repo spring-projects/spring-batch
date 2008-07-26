@@ -26,8 +26,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.util.StringUtils;
 
 /**
@@ -152,16 +154,17 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			return new Properties();
 		}
 
-		Map<String, Object> parameters = params.getParameters();
+		Map<String, JobParameter> parameters = params.getParameters();
 		Properties result = new Properties();
-		for (Entry<String, Object> entry : parameters.entrySet()) {
+		for (Entry<String, JobParameter> entry : parameters.entrySet()) {
 			
 			String key = entry.getKey();
-			Object value = entry.getValue();
-			if (value instanceof Date) {
+			JobParameter jobParameter = entry.getValue();
+			Object value = jobParameter.getValue();
+			if (jobParameter.getType() == ParameterType.DATE) {
 				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
 			}
-			else if (value instanceof Long) {
+			else if (jobParameter.getType() == ParameterType.LONG) {
 				result.setProperty(key + LONG_TYPE, numberFormat.format(value));
 			}
 			else {

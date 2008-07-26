@@ -15,42 +15,39 @@
  */
 package org.springframework.batch.core;
 
+import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * @author Dave Syer
  * 
  */
-public class BatchStatusTests extends TestCase {
+public class BatchStatusTests {
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.core.BatchStatus#toString()}.
 	 */
+	@Test
 	public void testToString() {
 		assertEquals("FAILED", BatchStatus.FAILED.toString());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
-	 */
+	@Test
 	public void testGetStatus() {
-		assertEquals(BatchStatus.FAILED, BatchStatus.getStatus(BatchStatus.FAILED.toString()));
+		assertEquals(BatchStatus.FAILED, BatchStatus.valueOf(BatchStatus.FAILED.toString()));
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
-	 */
+	@Test
 	public void testGetStatusWrongCode() {
 		try {
-			BatchStatus.getStatus("foo");
+			BatchStatus.valueOf("foo");
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
@@ -58,14 +55,12 @@ public class BatchStatusTests extends TestCase {
 		}
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
-	 */
+	@Test(expected=NullPointerException.class)
 	public void testGetStatusNullCode() {
-		assertNull(BatchStatus.getStatus(null));
+		assertNull(BatchStatus.valueOf(null));
 	}
 
+	@Test
 	public void testSerialization() throws Exception {
 
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();

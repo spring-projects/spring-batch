@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -46,14 +47,14 @@ public class StepExecutionPreparedStatementSetter extends StepExecutionListenerS
 	private JobParameters jobParameters;
 
 	public void setValues(PreparedStatement ps) throws SQLException {
-		Map<String, Object> parameters = jobParameters.getParameters();
+		Map<String, JobParameter> parameters = jobParameters.getParameters();
 		for (int i = 0; i < parameterKeys.size(); i++) {
-			Object arg = parameters.get(parameterKeys.get(i));
+			JobParameter arg = parameters.get(parameterKeys.get(i));
 			if (arg == null) {
 				throw new IllegalStateException("No job parameter found for with key of: [" + parameterKeys.get(i)
 						+ "]");
 			}
-			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, arg);
+			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, arg.getValue());
 		}
 	}
 
