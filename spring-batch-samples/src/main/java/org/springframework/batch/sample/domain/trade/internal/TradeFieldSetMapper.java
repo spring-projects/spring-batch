@@ -18,32 +18,19 @@ package org.springframework.batch.sample.domain.trade.internal;
 
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.support.AggregateItemReader;
 import org.springframework.batch.sample.domain.trade.Trade;
 
 
 
-@SuppressWarnings("unchecked")
-/**
- * TODO type safety
- */
-public class TradeFieldSetMapper implements FieldSetMapper {
+public class TradeFieldSetMapper implements FieldSetMapper<Trade> {
 	
 	public static final int ISIN_COLUMN = 0;
 	public static final int QUANTITY_COLUMN = 1;
 	public static final int PRICE_COLUMN = 2;
 	public static final int CUSTOMER_COLUMN = 3;
 	
-    public Object mapLine(FieldSet fieldSet, int lineNum) {
+    public Trade mapLine(FieldSet fieldSet, int lineNum) {
     	
-    	if ("BEGIN".equals(fieldSet.readString(0))) {
-    		return AggregateItemReader.BEGIN_RECORD;
-    	}
-    	
-    	if ("END".equals(fieldSet.readString(0))) {
-    		return AggregateItemReader.END_RECORD;
-    	}
-
     	Trade trade = new Trade();
     	trade.setIsin(fieldSet.readString(0));
         trade.setQuantity(fieldSet.readLong(1));

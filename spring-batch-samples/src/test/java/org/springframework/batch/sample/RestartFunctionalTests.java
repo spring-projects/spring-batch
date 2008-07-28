@@ -52,7 +52,6 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
@@ -76,7 +75,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		try {
-			runJob();
+			runJobForRestartTest();
 			fail("First run of the job is expected to fail.");
 		}
 		catch (UnexpectedJobExecutionException expected) {
@@ -89,7 +88,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
-		runJob();
+		runJobForRestartTest();
 
 		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
@@ -97,9 +96,11 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	}
 
 	// load the application context and launch the job
-	private void runJob() throws Exception {
+	private void runJobForRestartTest() throws Exception {
+		// The second time we run the job it needs to be a new instance so we
+		// need to make the parameters unique...
 		launcher.run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
-				.stringToProperties("restart=true")));
+				.stringToProperties("force.new.job.parameters=true")));
 	}
 
 }

@@ -41,10 +41,6 @@ public class ExceptionThrowingItemReaderProxy<T> extends DelegatingItemReader<T>
 		this.throwExceptionOnRecordNumber = throwExceptionOnRecordNumber;
 	}
 	
-	public int getThrowExceptionOnRecordNumber() {
-		return throwExceptionOnRecordNumber;
-	}
-
 	public T read() throws Exception {
 		
 		counter++;

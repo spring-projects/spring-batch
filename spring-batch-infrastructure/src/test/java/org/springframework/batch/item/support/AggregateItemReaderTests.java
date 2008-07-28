@@ -12,27 +12,27 @@ import org.springframework.batch.item.ItemReader;
 
 public class AggregateItemReaderTests {
 
-	private ItemReader<Object> input;
+	private ItemReader<AggregateItem<String>> input;
 
-	private AggregateItemReader provider;
+	private AggregateItemReader<String> provider;
 
 	@Before
 	public void setUp() {
 		// create mock for input
-		input = new AbstractItemReader<Object>() {
+		input = new AbstractItemReader<AggregateItem<String>>() {
 
 			private int count = 0;
 
-			public Object read() {
+			public AggregateItem<String> read() {
 				switch (count++) {
 				case 0:
-					return AggregateItemReader.BEGIN_RECORD;
+					return AggregateItem.getHeader();
 				case 1:
 				case 2:
 				case 3:
-					return "line";
+					return new AggregateItem<String>("line");
 				case 4:
-					return AggregateItemReader.END_RECORD;
+					return AggregateItem.getFooter();
 				default:
 					return null;
 				}
@@ -40,7 +40,7 @@ public class AggregateItemReaderTests {
 
 		};
 		// create provider
-		provider = new AggregateItemReader();
+		provider = new AggregateItemReader<String>();
 		provider.setItemReader(input);
 	}
 

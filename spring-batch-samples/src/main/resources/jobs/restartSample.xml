@@ -61,8 +61,8 @@
 				<property name="valang">
 					<value>
 						<![CDATA[
-										      { isin : length(?) < 13 : 'ISIN too long' : 'isin_length' : 12}
-										    ]]>
+						{ isin : length(?) < 13 : 'ISIN too long' : 'isin_length' : 12}
+						]]>
 					</value>
 				</property>
 			</bean>

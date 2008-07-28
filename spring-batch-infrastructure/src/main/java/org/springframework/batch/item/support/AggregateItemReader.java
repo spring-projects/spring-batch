@@ -28,32 +28,26 @@ import org.springframework.batch.item.ResetFailedException;
 /**
  * An {@link ItemReader} that delivers a list as its item, storing up objects
  * from the injected {@link ItemReader} until they are ready to be packed out as
- * a collection. Usually this class will be used as a wrapper for a custom
+ * a collection. This class must be used as a wrapper for a custom
  * {@link ItemReader} that can identify the record boundaries. The custom reader
- * should mark the beginning and end of records with the constant values ({@link AggregateItemReader#BEGIN_RECORD}
- * and {@link AggregateItemReader#END_RECORD}).<br/>
+ * should mark the beginning and end of records by returning an
+ * {@link AggregateItem} which responds true to its query methods
+ * <code>is*()</code>.<br/><br/>
  * 
  * This class is thread safe (it can be used concurrently by multiple threads)
  * as long as the {@link ItemReader} is also thread safe.
  * 
+ * @see AggregateItem#isHeader()
+ * @see AggregateItem#isFooter()
+ * 
  * @author Dave Syer
  * 
  */
-public class AggregateItemReader implements ItemReader<List<?>> {
+public class AggregateItemReader<T> implements ItemReader<List<T>> {
 
 	private static final Log log = LogFactory.getLog(AggregateItemReader.class);
 
-	/**
-	 * Marker for the end of a multi-object record.
-	 */
-	public static final Object END_RECORD = new Object();
-
-	/**
-	 * Marker for the beginning of a multi-object record.
-	 */
-	public static final Object BEGIN_RECORD = new Object();
-
-	private ItemReader<?> itemReader;
+	private ItemReader<AggregateItem<T>> itemReader;
 
 	/**
 	 * Get the next list of records.
@@ -61,7 +55,7 @@ public class AggregateItemReader implements ItemReader<List<?>> {
 	 * 
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
-	public List<?> read() throws Exception {
+	public List<T> read() throws Exception {
 		ResultHolder holder = new ResultHolder();
 
 		while (process(itemReader.read(), holder)) {
@@ -76,7 +70,7 @@ public class AggregateItemReader implements ItemReader<List<?>> {
 		}
 	}
 
-	private boolean process(Object value, ResultHolder holder) {
+	private boolean process(AggregateItem<T> value, ResultHolder holder) {
 		// finish processing if we hit the end of file
 		if (value == null) {
 			log.debug("Exhausted ItemReader");
@@ -85,20 +79,20 @@ public class AggregateItemReader implements ItemReader<List<?>> {
 		}
 
 		// start a new collection
-		if (value == AggregateItemReader.BEGIN_RECORD) {
+		if (value.isHeader()) {
 			log.debug("Start of new record detected");
 			return true;
 		}
 
 		// mark we are finished with current collection
-		if (value == AggregateItemReader.END_RECORD) {
+		if (value.isFooter()) {
 			log.debug("End of record detected");
 			return false;
 		}
 
 		// add a simple record to the current collection
 		log.debug("Mapping: " + value);
-		holder.records.add(value);
+		holder.records.add(value.getItem());
 		return true;
 	}
 
@@ -110,7 +104,7 @@ public class AggregateItemReader implements ItemReader<List<?>> {
 		itemReader.reset();
 	}
 
-	public void setItemReader(ItemReader<?> itemReader) {
+	public void setItemReader(ItemReader<AggregateItem<T>> itemReader) {
 		this.itemReader = itemReader;
 	}
 
@@ -122,7 +116,8 @@ public class AggregateItemReader implements ItemReader<List<?>> {
 	 * 
 	 */
 	private class ResultHolder {
-		List<Object> records = new ArrayList<Object>();
+		List<T> records = new ArrayList<T>();
+
 		boolean exhausted = false;
 	}
 
