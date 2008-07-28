@@ -57,7 +57,7 @@ public class JdbcPlayerDaoIntegrationTests {
 		playerDao.setDataSource(dataSource);		
 
 		player = new Player();
-		player.setID("AKFJDL00");
+		player.setId("AKFJDL00");
 		player.setFirstName("John");
 		player.setLastName("Doe");
 		player.setPosition("QB");

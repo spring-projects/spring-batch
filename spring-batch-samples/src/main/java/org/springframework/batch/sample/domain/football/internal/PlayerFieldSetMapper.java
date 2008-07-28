@@ -13,7 +13,7 @@ public class PlayerFieldSetMapper implements FieldSetMapper<Player> {
 		}
 		
 		Player player = new Player();
-		player.setID(fs.readString("ID"));
+		player.setId(fs.readString("ID"));
 		player.setLastName(fs.readString("lastName"));
 		player.setFirstName(fs.readString("firstName"));
 		player.setPosition(fs.readString("position"));

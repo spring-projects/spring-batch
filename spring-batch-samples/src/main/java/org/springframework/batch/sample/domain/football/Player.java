@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Player implements Serializable {
 	
-	private String ID; 
+	private String id; 
 	private String lastName; 
 	private String firstName; 
 	private String position; 
@@ -13,14 +13,14 @@ public class Player implements Serializable {
 	
 	public String toString() {
 		
-		return "PLAYER:ID=" + ID + ",Last Name=" + lastName + 
+		return "PLAYER:id=" + id + ",Last Name=" + lastName +
 		",First Name=" + firstName + ",Position=" + position + 
 		",Birth Year=" + birthYear + ",DebutYear=" + 
 		debutYear;
 	}
 	
-	public String getID() {
-		return ID;
+	public String getId() {
+		return id;
 	}
 	public String getLastName() {
 		return lastName;
@@ -37,8 +37,8 @@ public class Player implements Serializable {
 	public int getDebutYear() {
 		return debutYear;
 	}
-	public void setID(String id) {
-		ID = id;
+	public void setId(String id) {
+		this.id = id;
 	}
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
