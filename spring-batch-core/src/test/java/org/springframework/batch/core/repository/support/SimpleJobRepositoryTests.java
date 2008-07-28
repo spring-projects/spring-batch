@@ -16,12 +16,13 @@
 
 package org.springframework.batch.core.repository.support;
 
+import static org.easymock.EasyMock.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -53,12 +54,6 @@ public class SimpleJobRepositoryTests extends TestCase {
 	Step stepConfiguration1;
 
 	Step stepConfiguration2;
-
-	MockControl jobExecutionDaoControl = MockControl.createControl(JobExecutionDao.class);
-	
-	MockControl jobInstanceDaoControl = MockControl.createControl(JobInstanceDao.class);
-
-	MockControl stepExecutionDaoControl = MockControl.createControl(StepExecutionDao.class);
 	
 	JobExecutionDao jobExecutionDao;
 	
@@ -77,9 +72,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 	public void setUp() throws Exception {
 
-		jobExecutionDao = (JobExecutionDao) jobExecutionDaoControl.getMock();
-		jobInstanceDao = (JobInstanceDao) jobInstanceDaoControl.getMock();
-		stepExecutionDao = (StepExecutionDao) stepExecutionDaoControl.getMock();
+		jobExecutionDao = createMock(JobExecutionDao.class);
+		jobInstanceDao = createMock(JobInstanceDao.class);
+		stepExecutionDao = createMock(StepExecutionDao.class);
 
 		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 
@@ -130,10 +125,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		// new execution - call update on job dao
 		jobExecutionDao.updateJobExecution(jobExecution);
-		jobExecutionDaoControl.replay();
+		replay(jobExecutionDao);
 		jobRepository.update(jobExecution);
-		jobExecutionDaoControl.verify();
-		
+		verify(jobExecutionDao);
 	}
 
 	public void testSaveOrUpdateStepExecutionException() {

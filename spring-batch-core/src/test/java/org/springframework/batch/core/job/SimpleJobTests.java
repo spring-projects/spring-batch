@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.job;
 
+import static org.easymock.EasyMock.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +25,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -354,13 +355,10 @@ public class SimpleJobTests extends TestCase {
 	public void testInterruptWithListener() throws Exception {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
-		MockControl<JobExecutionListener> control = MockControl.createStrictControl(JobExecutionListener.class);
-		JobExecutionListener listener = control.getMock();
+		JobExecutionListener listener = createMock(JobExecutionListener.class);
 		listener.beforeJob(jobExecution);
-		control.setVoidCallable();
 		listener.onInterrupt(jobExecution);
-		control.setVoidCallable();
-		control.replay();
+		replay(listener);
 
 		job.setJobExecutionListeners(new JobExecutionListener[] { listener });
 
@@ -372,7 +370,7 @@ public class SimpleJobTests extends TestCase {
 			// expected
 		}
 
-		control.verify();
+		verify(listener);
 	}
 
 	/**

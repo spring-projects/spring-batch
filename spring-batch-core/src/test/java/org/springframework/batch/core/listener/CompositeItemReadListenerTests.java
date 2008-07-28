@@ -15,9 +15,10 @@
  */
 package org.springframework.batch.core.listener;
 
-import junit.framework.TestCase;
+import static org.easymock.EasyMock.*;
 
-import org.easymock.MockControl;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.listener.CompositeItemReadListener;
 
@@ -25,52 +26,54 @@ import org.springframework.batch.core.listener.CompositeItemReadListener;
  * @author Lucas Ward
  *
  */
-public class CompositeItemReadListenerTests extends TestCase {
-
-	MockControl<ItemReadListener> listenerControl = MockControl.createControl(ItemReadListener.class);
+public class CompositeItemReadListenerTests {
 	
 	ItemReadListener listener;
 	CompositeItemReadListener compositeListener;
 	
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 	
-		listener = listenerControl.getMock();
+		listener = createMock(ItemReadListener.class);
 		compositeListener = new CompositeItemReadListener();
 		compositeListener.register(listener);
 	}
 	
+	@Test
 	public void testBeforeRead(){
 		
 		listener.beforeRead();
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.beforeRead();
-		listenerControl.verify();
+		verify(listener);
 	}
 	
+	@Test
 	public void testAfterRead(){
 		Object item = new Object();
 		listener.afterRead(item);
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.afterRead(item);
-		listenerControl.verify();
+		verify(listener);
 	}
 	
+	@Test
 	public void testOnReadError(){
 		
 		Exception ex = new Exception();
 		listener.onReadError(ex);
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.onReadError(ex);
-		listenerControl.verify();
+		verify(listener);
 	}
 
+	@Test
 	public void testSetListners() throws Exception {
 		compositeListener.setListeners(new ItemReadListener[] {listener});
 		listener.beforeRead();
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.beforeRead();
-		listenerControl.verify();
+		verify(listener);
 	}
 	
 }

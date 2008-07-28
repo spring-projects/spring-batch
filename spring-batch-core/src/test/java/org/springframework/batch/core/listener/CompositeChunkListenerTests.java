@@ -15,44 +15,44 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
+
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
-
-import junit.framework.TestCase;
 
 /**
  * @author Lucas Ward
  *
  */
-public class CompositeChunkListenerTests extends TestCase {
+public class CompositeChunkListenerTests {
 
-	MockControl<ChunkListener> listenerControl = MockControl.createControl(ChunkListener.class);
-	
 	ChunkListener listener;
 	CompositeChunkListener compositeListener;
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-	
-		listener = listenerControl.getMock();
+	@Before
+	public void setUp() throws Exception {
+		listener = createMock(ChunkListener.class);
 		compositeListener = new CompositeChunkListener();
 		compositeListener.register(listener);
 	}
 	
+	@Test
 	public void testBeforeChunk(){
 		
 		listener.beforeChunk();
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.beforeChunk();
-		listenerControl.verify();
+		verify(listener);
 	}
 	
+	@Test
 	public void testAfterChunk(){
 		
 		listener.afterChunk();
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.afterChunk();
-		listenerControl.verify();
+		verify(listener);
 	}
 }

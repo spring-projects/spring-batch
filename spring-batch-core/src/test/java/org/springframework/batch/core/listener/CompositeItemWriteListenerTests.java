@@ -15,62 +15,65 @@
  */
 package org.springframework.batch.core.listener;
 
-import junit.framework.TestCase;
+import static org.easymock.EasyMock.*;
 
-import org.easymock.MockControl;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.ItemWriteListener;
 
 /**
  * @author Lucas Ward
  *
  */
-public class CompositeItemWriteListenerTests extends TestCase {
+public class CompositeItemWriteListenerTests {
 
-	MockControl<ItemWriteListener> listenerControl = MockControl.createControl(ItemWriteListener.class);
-	
 	ItemWriteListener listener;
 	CompositeItemWriteListener compositeListener;
 	
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 	
-		listener = listenerControl.getMock();
+		listener = createMock(ItemWriteListener.class);
 		compositeListener = new CompositeItemWriteListener();
 		compositeListener.register(listener);
 	}
 	
+	@Test
 	public void testBeforeWrite(){
 		Object item = new Object();
 		listener.beforeWrite(item);
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.beforeWrite(item);
-		listenerControl.verify();
+		verify(listener);
 	}
 	
+	@Test
 	public void testAfterWrite(){
 		Object item = new Object();
 		listener.afterWrite(item);
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.afterWrite(item);
-		listenerControl.verify();
+		verify(listener);
 	}
 	
+	@Test
 	public void testOnWriteError(){
 		Object item = new Object();
 		Exception ex = new Exception();
 		listener.onWriteError(ex, item);
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.onWriteError(ex, item);
-		listenerControl.verify();
+		verify(listener);
 	}
 
+	@Test
 	public void testSetListners() throws Exception {
 		compositeListener.setListeners(new ItemWriteListener[] {listener});
 		Object item = new Object();
 		listener.beforeWrite(item);
-		listenerControl.replay();
+		replay(listener);
 		compositeListener.beforeWrite(item);
-		listenerControl.verify();
+		verify(listener);
 	}
 
 }

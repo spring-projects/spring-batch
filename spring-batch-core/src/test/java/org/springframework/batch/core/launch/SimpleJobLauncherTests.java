@@ -16,12 +16,14 @@
 
 package org.springframework.batch.core.launch;
 
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -35,11 +37,9 @@ import org.springframework.core.task.TaskExecutor;
  * @author Lucas Ward
  * 
  */
-public class SimpleJobLauncherTests extends TestCase {
+public class SimpleJobLauncherTests {
 
 	private SimpleJobLauncher jobLauncher;
-
-	private MockControl<JobRepository> repositoryControl = MockControl.createControl(JobRepository.class);
 
 	private Job job = new JobSupport("foo") {
 		public void execute(JobExecution execution) {
@@ -52,31 +52,32 @@ public class SimpleJobLauncherTests extends TestCase {
 
 	private JobRepository jobRepository;
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
 		jobLauncher = new SimpleJobLauncher();
-		jobRepository = repositoryControl.getMock();
+		jobRepository = createMock(JobRepository.class);
 		jobLauncher.setJobRepository(jobRepository);
 
 	}
 
+	@Test
 	public void testRun() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(null);
 
-		jobRepository.createJobExecution(job, jobParameters);
-		repositoryControl.setReturnValue(jobExecution);
+		expect(jobRepository.createJobExecution(job, jobParameters)).andReturn(jobExecution);
 
-		repositoryControl.replay();
+		replay(jobRepository);
 
 		jobLauncher.afterPropertiesSet();
 		jobLauncher.run(job, jobParameters);
 		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
 
-		repositoryControl.verify();
+		verify(jobRepository);
 	}
 
+	@Test
 	public void testTaskExecutor() throws Exception {
 		final List<String> list = new ArrayList<String>();
 		jobLauncher.setTaskExecutor(new TaskExecutor() {
@@ -89,6 +90,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testRunWithException() throws Exception {
 		job = new JobSupport() {
 			public void execute(JobExecution execution) {
@@ -104,6 +106,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testRunWithError() throws Exception {
 		job = new JobSupport() {
 			public void execute(JobExecution execution) {
@@ -119,6 +122,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testInitialiseWithoutRepository() throws Exception {
 		try {
 			new SimpleJobLauncher().afterPropertiesSet();
@@ -130,6 +134,7 @@ public class SimpleJobLauncherTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testInitialiseWithRepository() throws Exception {
 		jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
