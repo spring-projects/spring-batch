@@ -24,15 +24,14 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
 
 /**
  * An {@link ItemReader} that delivers a list as its item, storing up objects
  * from the injected {@link ItemReader} until they are ready to be packed out as
- * a collection. The {@link ItemReader} should mark the beginning and end of
- * records with the constant values in {@link FieldSetMapper} (
- * {@link AggregateItemReader#BEGIN_RECORD} and
- * {@link AggregateItemReader#END_RECORD}).<br/>
+ * a collection. Usually this class will be used as a wrapper for a custom
+ * {@link ItemReader} that can identify the record boundaries. The custom reader
+ * should mark the beginning and end of records with the constant values ({@link AggregateItemReader#BEGIN_RECORD}
+ * and {@link AggregateItemReader#END_RECORD}).<br/>
  * 
  * This class is thread safe (it can be used concurrently by multiple threads)
  * as long as the {@link ItemReader} is also thread safe.
@@ -124,7 +123,6 @@ public class AggregateItemReader implements ItemReader<List<?>> {
 	 */
 	private class ResultHolder {
 		List<Object> records = new ArrayList<Object>();
-
 		boolean exhausted = false;
 	}
 

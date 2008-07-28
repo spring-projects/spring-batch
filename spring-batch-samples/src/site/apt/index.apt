@@ -46,37 +46,43 @@ Spring Batch Samples
   Here is a list of samples with checks to indicate which features each one demonstrates:
 
 *----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
-|<<Job / Feature>> | <<delimited input>> | <<fixed-length input>> | <<xml input>> | <<multiline input>> | <<db driving query input>> | <<db cursor input>> | <<delimited output>> | <<fixed-length output>> | <<xml output>> | <<multiline output>> | <<db output>> | <<skip>> | <<restart>> | <<automatic mapping>> | <<JMX>> | <<validation>> | <<delegation>>
+|<<Job / Feature>> | <<delimited input>> | <<fixed-length input>> | <<xml input>> | <<multiline input>> | <<db driving query input>> | <<db cursor input>> | <<delimited output>> | <<fixed-length output>> | <<xml output>> | <<multiline output>> | <<db output>> | <<skip>> | <<restart>> | <<automatic mapping>> | <<asynch launch>> | <<validation>> | <<delegation>> | <<write behind>> |
 *----
-adhocLoopJob             |  |  |  |  |  |  |  |  |  |  |  |  |  |  | x |  | 
+{{adhocLoop}}                |  |  |  |  |  |  |  |  |  |  |  |  |  |  |x |  |  |  |
 *----
-beanWrapperMapperSample  |  | x |  |  |  |  |  |  |  |  | x |  |  | x |  | x | 
+{{batchUpdate}}              |  |  |  |  |  |x |  |  |  |  |  |  |  |  |  |  |  |x |
 *----
-compositeProcessorSample |  |  |  |  |  |  |  | x |  |  | x |  |  |  |  | x | 
+{{beanWrapperMapperSample}}  |  |x |  |  |  |  |  |  |  |  |x |  |  |x |  |x |  |  |
 *----
-delegatingJob            |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | x
+{{compositeItemWriterSample}}|  |  |  |  |  |  |  |x |  |  |x |  |  |  |  |x |  |  |
 *----
-fixedLengthImportJob     |  | x |  |  |  |  |  |  |  |  | x |  |  |  |  | x | 
+{{delegating}}               |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |x |  |
 *----
-hibernateJob             |  |  |  |  |  | x |  |  |  |  | x |  |  |  |  |  | 
+{{fixedLengthImport}}        |  |x |  |  |  |  |  |  |  |  |x |  |  |  |  |x |  |  |
 *----
-ibatisJob                |  |  |  |  | x |  |  |  |  |  | x |  |  |  |  |  | 
+{{football}}                 |x |  |  |  |  |x |  |  |  |  |x |  |  |  |  |  |  |  |
 *----
-infiniteLoopJob          |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+{{hibernate}}                |  |  |  |  |  |x |  |  |  |  |x |  |  |  |  |  |  |x |
 *----
-multilineJob             |  | x |  | x |  |  |  |  |  |  |  |  |  |  |  |  | 
+{{ibatis}}                   |  |  |  |  |x |  |  |  |  |  |x |  |  |  |  |  |  |  |
 *----
-multilineOrderJob        | x |  |  | x |  |  |  | x |  | x |  |  |  |  |  |  | 
+{{multiline}}                |  |x |  |x |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
 *----
-fotballlJob              | x |  |  |  |  | x |  |  |  |  | x |  |  |  |  |  | 
+{{multilineOrder}}           |x |  |  |x |  |  |  |x |  |x |  |  |  |  |  |  |  |  |
 *----
-restartSample            |  | x |  |  |  |  |  |  |  |  | x |  | x |  |  | x | 
+{{quartzSample}}             |x |  |  |  |  |x |  |  |  |  |x |  |  |  |x |  |  |  |
 *----
-simpleTaskletJob         |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  | 
+{{restartSample}}            |  |x |  |  |  |  |  |  |  |  |x |  |x |  |  |x |  |  |
 *----
-tradeJob                 | x |  |  |  | x |  | x |  |  |  | x |  |  |  |  | x | 
+{{retrySample}}              |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |x |  |  |
 *----
-xmlStaxJob               |  |  | x |  |  |  |  |  | x |  |  |  |  |  |  |  | 
+{{skipSample}}               |x |  |  |  |x |  |x |  |  |  |x |x |  |  |  |x |  |  |
+*----
+{{tasklet}}                  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+*----
+{{trade}}                    |x |  |  |  |x |  |x |  |  |  |x |  |  |  |  |x |  |  |
+*----
+{{xmlStax}}                  |  |  |x |  |  |  |  |  |x |  |  |  |  |  |  |  |  |  |
 *----
 
 * Common Sample Source Structures
@@ -102,84 +108,93 @@ xmlStaxJob               |  |  | x |  |  |  |  |  | x |  |  |  |  |  |  |  |
   Each job consists of several steps, these steps are defined in steps
   property.
 
-** Tasklet Job
+* Adhoc Loop and JMX Demo ({adhocLoop})
 
-  The goal is to show the simplest use of the batch framework with a
-  single job with a single step, which cleans up a directory and runs
-  a system command.
+  This job is simply an infinite loop.  It runs forever so it is
+  useful for testing features to do with stopping and starting jobs.
+  It is used, for instance, as one of the jobs that can be run from
+  JMX using the Eclipse launch configuration "jmxLauncher".
 
-  <Description:> This job is defined by <<<taskletJob.xml>>> file. The
-  <<<Job>>> itself is defined by the bean definition with
-  <<<id="taskletJob">>>. In this example we have two steps. 
+  The JMX launcher uses an additional XML configuration file
+  (adhoc-job-launcher-context.xml) to set up a <<<JobLauncher>>> for
+  running jobs asynchronously (i.e. in a backgound thread).  This
+  follows the same pattern as the {{{quartzSample}Quartz sample}}, so
+  see that section for more details of the <<<JobLauncher>>>
+  configuration.
 
-    * The first step defines a tasklet that is responsible for
-    clearing out a directory though a custom <<<Tasklet>>>.  Each
-    tasklet has an <<<execute()>>> method which is called by the
-    step. All processing of business data should be handled by this
-    method.
+  The rest of the configuration for this demo consists of exposing
+  some components from the application context as JMX managed beans.
+  The <<<JobLauncher>>> is exposed as a stripped down interface
+  <<<ExportedJobLauncher>>>, so that it can be controlled from a
+  remote client (such as JConsole from the JDK) which does not have
+  Spring Batch on the classpath.  See the Spring Core Reference Guide
+  for more details on how to customize the JMX configuration.
 
-    * The second step uses another tasklet to execute a system (OS)
-      command line.
+* Batch Update ({batchUpdate})
 
-  <XML definition:> taskletJob.xml
+  The purpose of this sample is to show to usage of the
+  <<<BatchSqlUpdateItemWriter>>> to make efficient updates to a
+  database table.
 
-  You can visualize the Spring configuration of a job through
-  Spring-IDE.  See {{{http://springide.org/blog/}Spring IDE}}.  The
-  source view of the configuration is as follows:
+  The <<<BatchSqlUpdateItemWriter>>> accepts a special form of
+  <<<PreparedStatementSetter>>> as a (mandatory) dependency.  This is
+  responsible for copying fields from the item to be written to a
+  <<<PreparedStatement>>> matching the SQL query that has been
+  injected.  The implementation of the
+  <<<CustomerCreditUpdatePreparedStatementSetter>>> shows best
+  practice of keeping all the information needed for the execution in
+  one place, since it contains a static constant value (<<<QUERY>>>)
+  which is used to configure the query for the writer.
 
-+---
-<bean id="taskletJob" parent="simpleJob">
-	<property name="steps">
-		<list>
-			<bean id="deleteFilesInDir" parent="taskletStep">
-				<property name="tasklet">
-					<bean
-			class="org.springframework.batch.sample.tasklet.FileDeletingTasklet">
-						<property name="directoryResource"
-							ref="directory" />
-					</bean>
-				</property>
-			</bean>
-			<bean id="executeSystemCommand" parent="taskletStep">
-				<property name="tasklet">
-					<bean
-			class="org.springframework.batch.sample.common.SystemCommandTasklet">
-						<property name="command" value="echo hello" />
-						<!-- 5 second timeout for the command to complete -->
-						<property name="timeout" value="5000" />
-					</bean>
-				</property>
-			</bean>
-		</list>
-	</property>
+* BeanWrapperMapper Sample ({beanWrapperMapperSample})
 
-</bean>
+  This sample shows the use of automatic mapping from fields in a file
+  to a domain object.  The <<<Trade>>> and <<<Person>>> objects needed
+  by the job are created from the Spring configuration using prototype
+  beans, and then their properties are set using the
+  <<<BeanWrapperFieldSetMapper>>>, which sets properties of the
+  prototype according to the field names in the file.
 
-<bean id="directory"
-	class="org.springframework.core.io.FileSystemResource">
-	<constructor-arg value="target/test-outputs/test-dir" />
-</bean>
-+---
+  Nested property paths are resolved in the same way as normal Spring
+  binding occurs, but with a little extra leeway in terms of spelling
+  and capitalization.  Thus for instance, the <<<Trade>>> object has a
+  property called <<<customer>>> (lower case), but the file has been
+  configured to have a column name <<<CUSTOMER>>> (upper case), and
+  the mapper will accept the values happily.  Underscores instead of
+  camel-casing (e.g. <<<CREDIT_CARD>>> instead of <<<creditCard>>>)
+  also work.
 
-  For simplicity we are only displaying the job configuration itself
-  and leaving out the details of the supporting batch execution
-  environment configuration. 
+* Composite ItemWriter Sample ({compositeItemWriterSample})
 
-** Fixed Length Import Job
+  This shows a common use case using a composite pattern, composing
+  instances of other framework readers or writers.  It is also quite
+  common for business-specific readers or writers to wrap
+  off-the-shelf components in a similar way.
+
+  In this job the composite pattern is used just to make duplicate
+  copies of the output data.  The delegates for the
+  <<<CompositeItemWriter>>> have to be separately registered as
+  streams in the <<<Step>>> where they are used, in order for the step
+  to be restartable.  This is a common feature of all delegate
+  patterns.
+
+* Delegating Sample ({delegating})
+
+  This sample shows the delegate pattern again, and also the
+  <<<ItemReaderAdapter>>> which is used to adapt a POJO to the
+  <<<ItemReader>>> interface.
+
+* Fixed Length Import Job ({fixedLengthImport})
 
   The goal is to demonstrate a typical scenario of importing data
   from a fixed-length file to database
 
-  <Description:> This job shows a more typical scenario, when reading
-  input data and processing the data is cleanly separated. The data
-  provider is responsible for reading input and mapping each record to
-  a domain object, which is then passed to the module processor. The
-  module processor handles the processing of the domain objects, in
-  this case it only writes them to database.
-
-  <XML definition:> fixedLengthImportJob.xml
-
-  <Input source:> file with fixed row structure
+  This job shows a typical scenario, when reading input data and
+  processing the data is cleanly separated. The data provider is
+  responsible for reading input and mapping each record to a domain
+  object, which is then passed to the module processor. The module
+  processor handles the processing of the domain objects, in this case
+  it only writes them to database.
 
   In this example we are using a simple fixed length record structure
   that can be found in the project at
@@ -214,109 +229,7 @@ xmlStaxJob               |  |  | x |  |  |  |  |  | x |  |  |  |  |  |  |  |
   object
 
 
-* Multiline Order Job
-
-  The goal is to demostrate how to handle a more complex file input
-  format, where a record meant for processing inludes nested records
-  and spans multiple lines 
-
-  <XML definition:> multilineOrderJob.xml
-
-  <Input source:> file with multiline records.  OrderDataProvider is
-  an example of a non-default programmatic data provider. It reads
-  input until it detects that the multiline record has finished and
-  encapsulates the record in a single domain object.
-
-  <Output target:> file with multiline records.  The concrete
-  <<<ItemWriter>>> passes the object to a an injected 'delegate
-  writer' which in this case writes the output to a file.  The writer
-  in this case demonstrates how to write multiline output using a
-  custom aggregator transformer.
-
-* Quartz Sample
-
-  The goal is to demonstrate how to schedule job execution using
-  Quartz scheduler.  In this case there is no unit test to launch the
-  sample because it just re-uses the football job.  There is a main
-  method in <<<QuartzBatchLauncher>>> and an Eclipse launch
-  configuration which runs it with empty arguments.  The main method
-  is very basic - it is intended only as a guide to how Quartz might
-  be used in principle.
-
-  <XML definition:> <<<quartz-job-launcher.xml>>>, also re-uses
-  <<<footballJob.xml>>>
-
-  The configuration declares a <<<JobLauncher>>> bean. The launcher
-  bean is different from the other samples only in that it uses an
-  asynchronous task executor, so that the jobs are launched in a
-  separate thread to the main method:
-
-+---
-<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-  <property name="jobRepository" ref="jobRepository" />
-  <property name="taskExecutor">
-    <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-  </property>
-</bean>
-+---
-
-  Also, a Quartz <<<JobDetail>>> is defined using a Spring
-  <<<JobDetailBean>>> as a convenience.
-
-+--
-<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-  <property name="triggers">
-    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-      <property name="jobDetail" ref="jobDetail" />
-      <property name="cronExpression" value="0/10 * * * * ?" />
-    </bean>
-  </property>
-</bean>
-+--
-
-  Finally, a trigger with a scheduler is defined that will launch the
-  job detail every 10 seconds:
-
-+---
-<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
-  <property name="triggers">
-    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
-      <property name="jobDetail" ref="jobDetail" />
-      <property name="cronExpression" value="0/10 * * * * ?" />
-    </bean>
-  </property>
-</bean>
-+---
-
-  The job is thus scheduled to run every 10 seconds.  In fact it
-  should be successful on the first attempt, so the second and
-  subsequent attempts should through a
-  <<<JobInstanceAlreadyCompleteException>>>.  In a production system,
-  the job detail would probably be modified to account for this
-  exception (e.g. catch it and re-submit with a new set of job
-  parameters).  The point here is that Spring Batch guarantees that
-  the job execution is idempotent - you can never inadvertently
-  process the same data twice.
-
-* Trade Job
-
-  The goal is to show a reasonably complex scenario, that would
-  resemble the real-life usage of the framework.
-
-  <Description:> This job has 3 steps.  First, data about trades are
-  imported from a file to database. Second, the trades are read from
-  the database and credit on customer accounts is decreased
-  appropriately. Last, a report about customers is exported to a file.
-
-  <XML definition:> <<<tradeJob.xml>>> - the job definition,
-  <<<tradeJobIo.xml>>> - input and output configuration
-
-  <Description:> This job has 3 steps.  First, data about trades is
-  imported from a file to database. Second, the data about trades is
-  read from the database and credit on customer accounts is decreased
-  appropriately. Last, a report about customers is exported to a file.
-
-* Football Job
+* Football Job ({football})
 
   This is a (American) Football statistics loading job. We gave it the
   id of <<<footballJob>>> in our configuration file. Before diving
@@ -448,7 +361,7 @@ AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
   the developer can remain solely concerned with their business
   logic.
 
-    * <ItemReaderr> – the item reader is the source of the information
+    * <ItemReader> – the item reader is the source of the information
     pipe. At the most basic level input is read in from an input
     source, parsed into a domain object and returned. In this way, the
     good batch architecture practice of ensuring all data has been
@@ -615,3 +528,200 @@ games.player_id group by games.player_id, games.year_no
   each of the records as they are processed. Please keep in mind that
   AoP is used to wrap the <<<ItemWriter>>> and output each record as it
   is processed to the logger, which may impact performance.
+
+* Hibernate {hibernate}
+
+  The purpose of this sample is to show a typical usage of Hibernate
+  as an ORM tool in the input and output of a job.
+
+  The job uses a <<<HibernateCursorItemReader>>> for the input, where
+  a simple HQL query is used to supply items.  It also uses a
+  non-framework <<<ItemWriter>>> wrapping a DAO, which perhaps was
+  written as part of an online system.  
+
+
+  The output reliability and robustness are improved by the use of the
+  <<<HibernateAwareItemWriter>>> from the framework.  One of its roles
+  is to buffer items and flush them explicitly, rather than implicitly
+  on a transaction boundary (which would be the default).  This
+  "write-behind" behaviour is provided by Hibernate implicitly, but we
+  need to take control of it so that the skip and retry features
+  fprovided by Spring Batch can work effectively.  Thus the other role
+  of the <<<HibernateAwareItemWriter>>> is to watch out for failures
+  and flush aggressively when an item is seen from a previously failed
+  chunk.  In this way there will always be a failure at some point
+  immediately after the bad item was written, and the item is then
+  easily identifiable.
+
+* Ibatis ({ibatis})
+
+  The goal of this sample is to show the use of Ibatis as a query
+  mapping tool.  Its features are similar to the Hibernate sample, but
+  it uses Ibatis to drive its input and output.
+
+* Multiline ({multiline})
+
+* Multiline Order Job ({multilineOrder})
+
+  The goal is to demostrate how to handle a more complex file input
+  format, where a record meant for processing inludes nested records
+  and spans multiple lines 
+
+  The input source is file with multiline records.
+  <<<OrderItemReader>>> is an example of a non-default programmatic
+  item reader. It reads input until it detects that the multiline
+  record has finished and encapsulates the record in a single domain
+  object.
+
+  The output target is a file with multiline records.  The concrete
+  <<<ItemWriter>>> passes the object to a an injected 'delegate
+  writer' which in this case writes the output to a file.  The writer
+  in this case demonstrates how to write multiline output using a
+  custom aggregator transformer.
+
+* Quartz Sample ({quartz})
+
+  The goal is to demonstrate how to schedule job execution using
+  Quartz scheduler.  In this case there is no unit test to launch the
+  sample because it just re-uses the football job.  There is a main
+  method in <<<JobRegistryBackgroundJobRunner>>> and an Eclipse launch
+  configuration which runs it with arguments to pick up the football
+  job.
+
+  The additional XML configuration for this job is in
+  <<<quartz-job-launcher.xml>>>, and it also re-uses
+  <<<footballJob.xml>>>
+
+  The configuration declares a <<<JobLauncher>>> bean. The launcher
+  bean is different from the other samples only in that it uses an
+  asynchronous task executor, so that the jobs are launched in a
+  separate thread to the main method:
+
++---
+<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+  <property name="jobRepository" ref="jobRepository" />
+  <property name="taskExecutor">
+    <bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+  </property>
+</bean>
++---
+
+  Also, a Quartz <<<JobDetail>>> is defined using a Spring
+  <<<JobDetailBean>>> as a convenience.
+
++--
+<bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <property name="jobClass" value="org.springframework.batch.sample.quartz.JobLauncherDetails" />
+    <property name="group" value="quartz-batch" />
+    <property name="jobDataAsMap">
+        <map>
+            <entry key="jobName" value="footballJob"/>
+            <entry key="jobLocator" value-ref="jobRegistry"/>
+            <entry key="jobLauncher" value-ref="jobLauncher"/>
+        </map>
+    </property>
+</bean>
++--
+
+  Finally, a trigger with a scheduler is defined that will launch the
+  job detail every 10 seconds:
+
++---
+<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+  <property name="triggers">
+    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+      <property name="jobDetail" ref="jobDetail" />
+      <property name="cronExpression" value="0/10 * * * * ?" />
+    </bean>
+  </property>
+</bean>
++---
+
+  The job is thus scheduled to run every 10 seconds.  In fact it
+  should be successful on the first attempt, so the second and
+  subsequent attempts should through a
+  <<<JobInstanceAlreadyCompleteException>>>.  In a production system,
+  the job detail would probably be modified to account for this
+  exception (e.g. catch it and re-submit with a new set of job
+  parameters).  The point here is that Spring Batch guarantees that
+  the job execution is idempotent - you can never inadvertently
+  process the same data twice.
+
+* Restart Sample ({restartSample})
+
+* Retry Sample ({retrySample})
+
+* Skip Sample ({skipSample})
+
+* Tasklet Job ({tasklet})
+
+  The goal is to show the simplest use of the batch framework with a
+  single job with a single step, which cleans up a directory and runs
+  a system command.
+
+  <Description:> The
+  <<<Job>>> itself is defined by the bean definition with
+  <<<id="taskletJob">>>. In this example we have two steps. 
+
+    * The first step defines a tasklet that is responsible for
+    clearing out a directory though a custom <<<Tasklet>>>.  Each
+    tasklet has an <<<execute()>>> method which is called by the
+    step. All processing of business data should be handled by this
+    method.
+
+    * The second step uses another tasklet to execute a system (OS)
+      command line.
+
+  You can visualize the Spring configuration of a job through
+  Spring-IDE.  See {{{http://springide.org/blog/}Spring IDE}}.  The
+  source view of the configuration is as follows:
+
++---
+<bean id="taskletJob" parent="simpleJob">
+    <property name="steps">
+        <list>
+            <bean id="deleteFilesInDir" parent="taskletStep">
+                <property name="tasklet">
+                    <bean
+            class="org.springframework.batch.sample.tasklet.FileDeletingTasklet">
+                        <property name="directoryResource"
+                            ref="directory" />
+                    </bean>
+                </property>
+            </bean>
+            <bean id="executeSystemCommand" parent="taskletStep">
+                <property name="tasklet">
+                    <bean
+            class="org.springframework.batch.sample.common.SystemCommandTasklet">
+                        <property name="command" value="echo hello" />
+                        <!-- 5 second timeout for the command to complete -->
+                        <property name="timeout" value="5000" />
+                    </bean>
+                </property>
+            </bean>
+        </list>
+    </property>
+
+</bean>
+
+<bean id="directory"
+    class="org.springframework.core.io.FileSystemResource">
+    <constructor-arg value="target/test-outputs/test-dir" />
+</bean>
++---
+
+  For simplicity we are only displaying the job configuration itself
+  and leaving out the details of the supporting batch execution
+  environment configuration. 
+
+* Trade Job ({trade})
+
+  The goal is to show a reasonably complex scenario, that would
+  resemble the real-life usage of the framework.
+
+  <Description:> This job has 3 steps.  First, data about trades are
+  imported from a file to database. Second, the trades are read from
+  the database and credit on customer accounts is decreased
+  appropriately. Last, a report about customers is exported to a file.
+
+* XML Input Output ({xmlStax})

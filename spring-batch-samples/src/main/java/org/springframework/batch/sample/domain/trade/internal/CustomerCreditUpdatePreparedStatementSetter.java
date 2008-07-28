@@ -29,6 +29,8 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 public class CustomerCreditUpdatePreparedStatementSetter implements ItemPreparedStatementSetter<CustomerCredit> {
 
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal(1000);
+	
+	public static final String QUERY = "UPDATE CUSTOMER SET CREDIT=? WHERE ID=?";
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.support.ItemPreparedStatementSetter#setValues(java.lang.Object, java.sql.PreparedStatement)
