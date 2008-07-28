@@ -1,8 +1,10 @@
 package org.springframework.batch.item.transform;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
 
-import org.easymock.MockControl;
+import org.easymock.EasyMock;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -10,20 +12,17 @@ import org.springframework.batch.item.ItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class ItemTransformerItemWriterTests extends TestCase {
+public class ItemTransformerItemWriterTests {
 
 	private ItemTransformerItemWriter<Object, Object> processor = new ItemTransformerItemWriter<Object, Object>();
 
-	private ItemTransformer<Object, Object> transformer;
-	private ItemWriter<Object> itemWriter;
+	@SuppressWarnings("unchecked")
+	private ItemTransformer<Object, Object> transformer = EasyMock.createMock(ItemTransformer.class);
+	@SuppressWarnings("unchecked")
+	private ItemWriter<Object> itemWriter = EasyMock.createMock(ItemWriter.class);
 
-	private MockControl<ItemTransformer> tControl = MockControl.createControl(ItemTransformer.class);
-	private MockControl<ItemWriter> outControl = MockControl.createControl(ItemWriter.class);
-
-	protected void setUp() throws Exception {
-		transformer = tControl.getMock();
-		itemWriter = outControl.getMock();
-		
+	@Before
+	public void setUp() throws Exception {		
 		processor.setItemTransformer(transformer);
 		processor.setDelegate(itemWriter);
 		processor.afterPropertiesSet();
@@ -33,28 +32,27 @@ public class ItemTransformerItemWriterTests extends TestCase {
 	 * Regular usage scenario - item is passed to transformer
 	 * and the result of transformation is passed to output source.
 	 */
+	@Test
 	public void testProcess() throws Exception {
 		Object item = new Object();
 		Object itemAfterTransformation = new Object();
 
-		transformer.transform(item);
-		tControl.setReturnValue(itemAfterTransformation);
+		EasyMock.expect(transformer.transform(item)).andReturn(itemAfterTransformation);
 		
 		itemWriter.write(itemAfterTransformation);
-		outControl.setVoidCallable();
+		EasyMock.expectLastCall();
 		
-		tControl.replay();
-		outControl.replay();
+		EasyMock.replay(itemWriter, transformer);
 
 		processor.write(item);
 
-		tControl.verify();
-		outControl.verify();
+		EasyMock.verify(itemWriter, transformer);
 	}
 	
 	/**
 	 * Item transformer must be set.
 	 */
+	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		
 		// value not set
