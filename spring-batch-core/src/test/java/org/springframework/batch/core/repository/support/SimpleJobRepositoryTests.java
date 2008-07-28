@@ -116,7 +116,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		// failure scenario - must have job ID
 		JobExecution jobExecution = new JobExecution(null);
 		try {
-			jobRepository.updateJobExecution(jobExecution);
+			jobRepository.update(jobExecution);
 			fail();
 		}
 		catch (Exception ex) {
@@ -131,7 +131,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		// new execution - call update on job dao
 		jobExecutionDao.updateJobExecution(jobExecution);
 		jobExecutionDaoControl.replay();
-		jobRepository.updateJobExecution(jobExecution);
+		jobRepository.update(jobExecution);
 		jobExecutionDaoControl.verify();
 		
 	}

@@ -70,7 +70,7 @@ public interface JobRepository {
 	 * 
 	 * @param jobExecution
 	 */
-	void updateJobExecution(JobExecution jobExecution);
+	void update(JobExecution jobExecution);
 
 	/**
 	 * Save the {@link StepExecution}. ID will be assigned - it is not advisable

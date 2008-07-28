@@ -203,7 +203,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * @param jobExecution to be stored.
 	 * @throws IllegalArgumentException if jobExecution is null.
 	 */
-	public void updateJobExecution(JobExecution jobExecution) {
+	public void update(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution, "JobExecution cannot be null.");
 		Assert.notNull(jobExecution.getJobId(), "JobExecution must have a Job ID set.");
