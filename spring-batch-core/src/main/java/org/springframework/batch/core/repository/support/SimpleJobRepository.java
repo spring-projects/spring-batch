@@ -186,7 +186,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
-		saveOrUpdate(jobExecution);
+		jobExecutionDao.saveJobExecution(jobExecution);
 
 		return jobExecution;
 
@@ -203,19 +203,13 @@ public class SimpleJobRepository implements JobRepository {
 	 * @param jobExecution to be stored.
 	 * @throws IllegalArgumentException if jobExecution is null.
 	 */
-	public void saveOrUpdate(JobExecution jobExecution) {
+	public void updateJobExecution(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution, "JobExecution cannot be null.");
 		Assert.notNull(jobExecution.getJobId(), "JobExecution must have a Job ID set.");
+		Assert.notNull(jobExecution.getId(), "JobExecution must be already saved (have an id assigned).");
 
-		if (jobExecution.getId() == null) {
-			// existing instance
-			jobExecutionDao.saveJobExecution(jobExecution);
-		}
-		else {
-			// new execution
-			jobExecutionDao.updateJobExecution(jobExecution);
-		}
+		jobExecutionDao.updateJobExecution(jobExecution);
 	}
 
 	/**

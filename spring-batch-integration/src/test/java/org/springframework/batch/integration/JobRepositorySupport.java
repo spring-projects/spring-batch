@@ -57,7 +57,7 @@ public class JobRepositorySupport implements JobRepository {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdate(org.springframework.batch.core.JobExecution)
 	 */
-	public void saveOrUpdate(JobExecution jobExecution) {
+	public void updateJobExecution(JobExecution jobExecution) {
 	}
 
 	/* (non-Javadoc)

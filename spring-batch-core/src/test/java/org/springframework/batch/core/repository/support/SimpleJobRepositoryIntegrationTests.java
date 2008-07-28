@@ -55,9 +55,9 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 		assertEquals(job.getName(), firstExecution.getJobInstance().getJobName());
 
-		jobRepository.saveOrUpdate(firstExecution);
+		jobRepository.updateJobExecution(firstExecution);
 		firstExecution.setEndTime(new Date());
-		jobRepository.saveOrUpdate(firstExecution);
+		jobRepository.updateJobExecution(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParams);
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
@@ -74,7 +74,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
 		firstExecution.setStartTime(new Date(0));
 		firstExecution.setEndTime(new Date(1));
-		jobRepository.saveOrUpdate(firstExecution);
+		jobRepository.updateJobExecution(firstExecution);
 		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParameters);
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
@@ -89,7 +89,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		job.setRestartable(false);
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
-		jobRepository.saveOrUpdate(firstExecution);
+		jobRepository.updateJobExecution(firstExecution);
 
 		try {
 			jobRepository.createJobExecution(job, jobParameters);
@@ -111,7 +111,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		// first execution
 		JobExecution firstJobExec = jobRepository.createJobExecution(job, jobParameters);
 		StepExecution firstStepExec = new StepExecution(step.getName(), firstJobExec);
-		jobRepository.saveOrUpdate(firstJobExec);
+		jobRepository.updateJobExecution(firstJobExec);
 		jobRepository.saveOrUpdate(firstStepExec);
 
 		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step));
@@ -125,12 +125,12 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		jobRepository.saveOrUpdate(firstStepExec);
 		firstJobExec.setStatus(BatchStatus.FAILED);
 		firstJobExec.setEndTime(new Date(7));
-		jobRepository.saveOrUpdate(firstJobExec);
+		jobRepository.updateJobExecution(firstJobExec);
 
 		// second execution
 		JobExecution secondJobExec = jobRepository.createJobExecution(job, jobParameters);
 		StepExecution secondStepExec = new StepExecution(step.getName(), secondJobExec);
-		jobRepository.saveOrUpdate(secondJobExec);
+		jobRepository.updateJobExecution(secondJobExec);
 		jobRepository.saveOrUpdate(secondStepExec);
 
 		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step));

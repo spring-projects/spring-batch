@@ -63,18 +63,14 @@ public interface JobRepository {
 			JobRestartException, JobInstanceAlreadyCompleteException;
 
 	/**
-	 * Save or Update a {@link JobExecution}. If no ID is found a new instance
-	 * will be saved. If an ID does exist it will be updated. The ID should only
-	 * be assigned to a {@link JobExecution} by calling this method - it should
-	 * be left blank on the first call, and assigned by the
-	 * {@link JobRepository}.
+	 * Update the {@link JobExecution}. 
 	 * 
 	 * Preconditions: {@link JobExecution} must contain a valid
-	 * {@link JobInstance}.
+	 * {@link JobInstance} and be saved (have an id assigned).
 	 * 
 	 * @param jobExecution
 	 */
-	void saveOrUpdate(JobExecution jobExecution);
+	void updateJobExecution(JobExecution jobExecution);
 
 	/**
 	 * Save or update a {@link StepExecution}. If no ID is found a new instance

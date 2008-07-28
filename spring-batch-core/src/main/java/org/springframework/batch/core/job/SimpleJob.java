@@ -136,14 +136,14 @@ public class SimpleJob extends AbstractJob {
 
 			execution.setEndTime(new Date());
 			execution.setExitStatus(status);
-			getJobRepository().saveOrUpdate(execution);
+			getJobRepository().updateJobExecution(execution);
 		}
 
 	}
 
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
 		jobExecution.setStatus(status);
-		getJobRepository().saveOrUpdate(jobExecution);
+		getJobRepository().updateJobExecution(jobExecution);
 	}
 
 	/*

@@ -165,7 +165,7 @@ public class JdbcJobRepositoryTests {
 		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobParameters());
 		cacheJobIds(execution);
 		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
-		repository.saveOrUpdate(execution);
+		repository.updateJobExecution(execution);
 		execution.setStatus(BatchStatus.FAILED);
 
 		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
