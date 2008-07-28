@@ -7,20 +7,7 @@
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 	<import resource="simple-job-launcher-context.xml" />
 	
-	<!--  For Java 1.4 we need to ceate the mbean server explicitly -->
-	<bean id="mbeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean">
-		<property name="locateExistingServerIfPossible" value="true" />
-	</bean>
-	<bean id="registry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
-		<property name="port" value="1099" />
-	</bean>
-	<bean id="serverConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean">
-		<property name="objectName" value="connector:name=rmi" />
-		<property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples" />
-		<property name="server" ref="mbeanServer" />
-	</bean>
 	<bean class="org.springframework.jmx.export.MBeanExporter">
-		<property name="server" ref="mbeanServer" />
 		<property name="beans">
 			<map>
 				<entry key="spring:service=batch,bean=jobLauncher">

@@ -1,17 +1,22 @@
 package org.springframework.batch.item.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
 
-public class AggregateItemReaderTests extends TestCase {
+public class AggregateItemReaderTests {
 
 	private ItemReader<Object> input;
 
 	private AggregateItemReader provider;
 
+	@Before
 	public void setUp() {
 		// create mock for input
 		input = new AbstractItemReader<Object>() {
@@ -39,6 +44,7 @@ public class AggregateItemReaderTests extends TestCase {
 		provider.setItemReader(input);
 	}
 
+	@Test
 	public void testNext() throws Exception {
 		// read object
 		Object result = provider.read();
