@@ -94,7 +94,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		return (StepExecution) executions.get(step.getName());
 	}
 
-	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+	public void persistExecutionContext(StepExecution stepExecution) {
 		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
 	}
 

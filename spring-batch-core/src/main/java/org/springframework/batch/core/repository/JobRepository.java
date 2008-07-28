@@ -77,7 +77,7 @@ public interface JobRepository {
 	 * that an ID be assigned before calling this method. Instead, it should be
 	 * left blank, to be assigned by a {@link JobRepository}. The
 	 * {@link ExecutionContext} of the {@link StepExecution} is <em>not</em>
-	 * saved: see {@link #saveOrUpdateExecutionContext(StepExecution)}.
+	 * saved: see {@link #persistExecutionContext(StepExecution)}.
 	 * 
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * 
@@ -95,12 +95,13 @@ public interface JobRepository {
 	void update(StepExecution stepExecution);
 
 	/**
-	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
+	 * Persist the {@link ExecutionContext} of the given {@link StepExecution}
+	 * and enclosing {@link JobExecution}.
 	 * 
 	 * @param stepExecution the {@link StepExecution} containing the
 	 * {@link ExecutionContext} to be saved.
 	 */
-	void saveOrUpdateExecutionContext(StepExecution stepExecution);
+	void persistExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * @return the last execution of step for the given job instance.

@@ -265,7 +265,7 @@ public class ItemOrientedStepTests extends TestCase {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecution);
 		itemOrientedStep.setJobRepository(new JobRepositorySupport() {
-			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+			public void persistExecutionContext(StepExecution stepExecution) {
 				list.add(stepExecution);
 			}
 		});
@@ -284,7 +284,7 @@ public class ItemOrientedStepTests extends TestCase {
 			private int counter = 0;
 
 			// initial save before item processing succeeds, later calls fail
-			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+			public void persistExecutionContext(StepExecution stepExecution) {
 				if (counter > 0)
 					throw new RuntimeException("foo");
 				counter++;

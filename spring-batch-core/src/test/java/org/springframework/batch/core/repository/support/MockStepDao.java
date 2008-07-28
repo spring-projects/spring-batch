@@ -47,7 +47,7 @@ public class MockStepDao implements StepExecutionDao {
 		return null;
 	}
 
-	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+	public void persistExecutionContext(StepExecution stepExecution) {
 	}
 
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {

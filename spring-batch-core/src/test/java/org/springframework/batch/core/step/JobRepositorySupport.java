@@ -76,7 +76,7 @@ public class JobRepositorySupport implements JobRepository {
 	public void update(StepExecution stepExecution) {
 	}
 
-	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+	public void persistExecutionContext(StepExecution stepExecution) {
 	}
 
 }

@@ -67,6 +67,6 @@ public interface JobExecutionDao {
 	 * {@link ExecutionContext} to be saved.
 	 * @throws IllegalArgumentException if the attributes are null.
 	 */
-	void saveOrUpdateExecutionContext(JobExecution jobExecution);
+	void persistExecutionContext(JobExecution jobExecution);
 
 }

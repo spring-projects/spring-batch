@@ -137,7 +137,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * 
 	 * @see LobCreator
 	 */
-	public void saveOrUpdateExecutionContext(final StepExecution stepExecution) {
+	public void persistExecutionContext(final StepExecution stepExecution) {
 
 		ecDao.saveOrUpdateExecutionContext(stepExecution);
 	}

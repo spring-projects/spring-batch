@@ -154,7 +154,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		stepExec.setExecutionContext(ctx);
 
 		jobRepository.save(stepExec);
-		jobRepository.saveOrUpdateExecutionContext(stepExec);
+		jobRepository.persistExecutionContext(stepExec);
 
 		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step);
 		assertEquals(stepExec, retrievedStepExec);

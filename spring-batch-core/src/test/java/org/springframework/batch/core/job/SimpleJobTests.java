@@ -500,7 +500,7 @@ public class SimpleJobTests extends TestCase {
 			stepExecution.getExecutionContext().putString("stepKey", "stepValue");
 			stepExecution.getJobExecution().getExecutionContext().putString("jobKey", "jobValue");
 			jobRepository.save(stepExecution);
-			jobRepository.saveOrUpdateExecutionContext(stepExecution);
+			jobRepository.persistExecutionContext(stepExecution);
 
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);

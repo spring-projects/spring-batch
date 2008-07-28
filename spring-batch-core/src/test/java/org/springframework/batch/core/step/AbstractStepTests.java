@@ -104,7 +104,7 @@ public class AbstractStepTests extends TestCase {
 
 		ExecutionContext saved = new ExecutionContext();
 
-		public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+		public void persistExecutionContext(StepExecution stepExecution) {
 			saved = stepExecution.getExecutionContext();
 		}
 
@@ -224,7 +224,7 @@ public class AbstractStepTests extends TestCase {
 			}
 		};
 		repository = new JobRepositoryStub() {
-			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+			public void persistExecutionContext(StepExecution stepExecution) {
 				throw new RuntimeException("Bad context!");
 			}
 		};

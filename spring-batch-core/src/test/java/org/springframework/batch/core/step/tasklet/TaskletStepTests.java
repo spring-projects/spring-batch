@@ -72,7 +72,7 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithExecutionContext() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false), new JobRepositorySupport() {
-			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+			public void persistExecutionContext(StepExecution stepExecution) {
 				list.add(stepExecution);
 			}
 		});
@@ -82,7 +82,7 @@ public class TaskletStepTests extends TestCase {
 
 	public void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
 		TaskletStep step = new TaskletStep(new StubTasklet(false, false, true), new JobRepositorySupport() {
-			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+			public void persistExecutionContext(StepExecution stepExecution) {
 				throw new RuntimeException("foo");
 			}
 		});

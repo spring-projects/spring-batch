@@ -85,7 +85,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		return (ExecutionContext) contextsByJobExecutionId.get(jobExecution.getId());
 	}
 
-	public void saveOrUpdateExecutionContext(JobExecution jobExecution) {
+	public void persistExecutionContext(JobExecution jobExecution) {
 		contextsByJobExecutionId.put(jobExecution.getId(), jobExecution.getExecutionContext());
 
 	}

@@ -222,7 +222,7 @@ public class ItemOrientedStep extends AbstractStep {
 	 */
 	protected ExitStatus doExecute(final StepExecution stepExecution) throws Exception {
 		stream.update(stepExecution.getExecutionContext());
-		getJobRepository().saveOrUpdateExecutionContext(stepExecution);
+		getJobRepository().persistExecutionContext(stepExecution);
 		itemHandler.mark();
 
 		final ExceptionHolder fatalException = new ExceptionHolder();
@@ -286,7 +286,7 @@ public class ItemOrientedStep extends AbstractStep {
 					}
 
 					try {
-						getJobRepository().saveOrUpdateExecutionContext(stepExecution);
+						getJobRepository().persistExecutionContext(stepExecution);
 					}
 					catch (Exception e) {
 						fatalException.setException(e);

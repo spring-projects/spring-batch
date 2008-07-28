@@ -252,7 +252,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		return ecDao.getExecutionContext(jobExecution);
 	}
 
-	public void saveOrUpdateExecutionContext(JobExecution jobExecution) {
+	public void persistExecutionContext(JobExecution jobExecution) {
 		ecDao.saveOrUpdateExecutionContext(jobExecution);
 	}
 

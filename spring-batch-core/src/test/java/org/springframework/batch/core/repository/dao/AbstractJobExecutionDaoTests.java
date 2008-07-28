@@ -102,7 +102,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 		dao.saveJobExecution(exec1);
 		dao.saveJobExecution(exec2);
-		dao.saveOrUpdateExecutionContext(exec2);
+		dao.persistExecutionContext(exec2);
 
 		JobExecution last = dao.getLastJobExecution(jobInstance);
 		assertEquals(exec2, last);
@@ -117,7 +117,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 			}
 		});
 		execution.setExecutionContext(ctx);
-		dao.saveOrUpdateExecutionContext(execution);
+		dao.persistExecutionContext(execution);
 
 		ExecutionContext retrieved = dao.findExecutionContext(execution);
 		assertEquals(ctx, retrieved);
@@ -127,7 +127,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		dao.saveJobExecution(execution);
 		ExecutionContext ctx = new ExecutionContext();
 		execution.setExecutionContext(ctx);
-		dao.saveOrUpdateExecutionContext(execution);
+		dao.persistExecutionContext(execution);
 
 		ExecutionContext retrieved = dao.findExecutionContext(execution);
 		assertEquals(ctx, retrieved);
@@ -141,10 +141,10 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 			}
 		});
 		execution.setExecutionContext(ctx);
-		dao.saveOrUpdateExecutionContext(execution);
+		dao.persistExecutionContext(execution);
 
 		ctx.putLong("longKey", 7);
-		dao.saveOrUpdateExecutionContext(execution);
+		dao.persistExecutionContext(execution);
 
 		ExecutionContext retrieved = dao.findExecutionContext(execution);
 		assertEquals(ctx, retrieved);

@@ -156,7 +156,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 			}
 		});
 		stepExecution.setExecutionContext(ctx);
-		dao.saveOrUpdateExecutionContext(stepExecution);
+		dao.persistExecutionContext(stepExecution);
 
 		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
@@ -166,7 +166,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		dao.saveStepExecution(stepExecution);
 		ExecutionContext ctx = new ExecutionContext();
 		stepExecution.setExecutionContext(ctx);
-		dao.saveOrUpdateExecutionContext(stepExecution);
+		dao.persistExecutionContext(stepExecution);
 
 		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
@@ -180,10 +180,10 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 			}
 		});
 		stepExecution.setExecutionContext(ctx);
-		dao.saveOrUpdateExecutionContext(stepExecution);
+		dao.persistExecutionContext(stepExecution);
 
 		ctx.putLong("longKey", 7);
-		dao.saveOrUpdateExecutionContext(stepExecution);
+		dao.persistExecutionContext(stepExecution);
 
 		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
@@ -225,7 +225,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		ExecutionContext ec = new ExecutionContext();
 		ec.put("intValue", new Integer(343232));
 		stepExecution.setExecutionContext(ec);
-		dao.saveOrUpdateExecutionContext(stepExecution);
+		dao.persistExecutionContext(stepExecution);
 		ExecutionContext restoredEc = dao.findExecutionContext(stepExecution);
 		assertEquals(ec, restoredEc);
 	}

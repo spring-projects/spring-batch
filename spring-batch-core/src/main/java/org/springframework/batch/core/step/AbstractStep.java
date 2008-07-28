@@ -207,7 +207,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			try {
 				getJobRepository().update(stepExecution);
-				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
+				getJobRepository().persistExecutionContext(stepExecution);
 			}
 			catch (Exception e) {
 				commitException = e;
@@ -223,7 +223,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			try {
 				exitStatus = exitStatus.and(getCompositeListener().onErrorInStep(stepExecution, e));
-				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
+				getJobRepository().persistExecutionContext(stepExecution);
 			}
 			catch (Exception ex) {
 				logger.error("Encountered an error on listener error callback.", ex);

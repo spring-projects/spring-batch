@@ -41,7 +41,7 @@ public interface StepExecutionDao {
 	 * {@link ExecutionContext} to be saved.
 	 * @throws IllegalArgumentException if the attributes are null.
 	 */
-	void saveOrUpdateExecutionContext(StepExecution stepExecution);
+	void persistExecutionContext(StepExecution stepExecution);
 
 	StepExecution getStepExecution(JobExecution jobExecution, Step step);
 
