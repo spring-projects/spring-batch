@@ -20,8 +20,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
-import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+
+import javax.sql.DataSource;
 
 
 /**
@@ -39,7 +41,7 @@ public class JdbcTradeDao implements TradeDao {
     /**
      * handles the processing of sql query
      */
-    private JdbcOperations jdbcTemplate;
+    private SimpleJdbcTemplate simpleJdbcTemplate;
 
     /**
      * database is not expected to be setup for autoincrementation
@@ -50,17 +52,15 @@ public class JdbcTradeDao implements TradeDao {
      * @see TradeDao
      */
     public void writeTrade(Trade trade) {
-        Long id = new Long(incrementer.nextLongValue());
+        Long id = incrementer.nextLongValue();
         log.debug("Processing: " + trade);
-        jdbcTemplate.update(INSERT_TRADE_RECORD,
-            new Object[] {
-                id, trade.getIsin(), new Long(trade.getQuantity()), trade.getPrice(),
-                trade.getCustomer()
-            });
+        simpleJdbcTemplate.update(INSERT_TRADE_RECORD,
+				id, trade.getIsin(), trade.getQuantity(), trade.getPrice(),
+				trade.getCustomer());
     }
 
-    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public void setDataSource(DataSource dataSource) {
+        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
     }
 
     public void setIncrementer(DataFieldMaxValueIncrementer incrementer) {

@@ -78,7 +78,7 @@
 	</bean>
 
 	<bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
+		<property name="dataSource" ref="dataSource" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
 				<property name="incrementerName" value="TRADE_SEQ" />

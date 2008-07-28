@@ -10,7 +10,7 @@
 
 
 	<bean class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao"
-		id="tradeDao" p:jdbcTemplate-ref="jdbcTemplate">
+		id="tradeDao" p:dataSource-ref="dataSource">
 		<property name="incrementer">
 			<bean parent="incrementerParent">
 				<property name="incrementerName" value="TRADE_SEQ" />
