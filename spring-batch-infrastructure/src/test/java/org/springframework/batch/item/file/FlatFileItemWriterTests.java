@@ -32,6 +32,7 @@ import org.springframework.batch.item.file.mapping.FieldSetCreator;
 import org.springframework.batch.item.file.mapping.PassThroughFieldSetCreator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -103,9 +104,9 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		return reader.readLine();
 	}
-	
-	public void testWriteWithMultipleOpen() throws Exception{
-		
+
+	public void testWriteWithMultipleOpen() throws Exception {
+
 		writer.open(executionContext);
 		writer.write("test1");
 		writer.flush();
@@ -115,9 +116,9 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals("test1", readLine());
 		assertEquals("test2", readLine());
 	}
-	
-	public void testOpenTwice(){
-		//opening the writer twice should cause no issues
+
+	public void testOpenTwice() {
+		// opening the writer twice should cause no issues
 		writer.open(executionContext);
 		writer.open(executionContext);
 	}
@@ -221,7 +222,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testRestart() throws Exception {
-		
+
 		writer.open(executionContext);
 
 		// write some lines
@@ -252,7 +253,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		// init with correct data
 		writer.open(executionContext);
-		
+
 		// write more lines
 		writer.write("testLine6");
 		writer.write("testLine7");
@@ -274,7 +275,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
 	}
-	
+
 	public void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<String>();
 		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
@@ -282,14 +283,16 @@ public class FlatFileItemWriterTests extends TestCase {
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
-		file.getFile().setReadOnly();
+		Assert.state(file.exists(), "Test file must exist");
+		Assert.state(file.getFile().setReadOnly(), "Test file set to read-only");
 		writer.afterPropertiesSet();
 		try {
 			writer.open(executionContext);
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'writable': "+message, message.indexOf("writable")>=0);
+			assertTrue("Message does not contain 'writable': " + message, message.indexOf("writable") >= 0);
 		}
 	}
 
@@ -351,7 +354,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testWriteHeader() throws Exception {
-		writer.setHeaderLines(new String[] {"a", "b"});
+		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
 		writer.write(TEST_STRING);
 		writer.flush();
@@ -365,7 +368,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
-		writer.setHeaderLines(new String[] {"a", "b"});
+		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
 		writer.write(TEST_STRING);
 		writer.clear();
@@ -385,7 +388,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	}
 
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
-		writer.setHeaderLines(new String[] {"a", "b"});
+		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
 		writer.write(TEST_STRING);
 		writer.flush();
