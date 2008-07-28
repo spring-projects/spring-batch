@@ -39,8 +39,8 @@ public interface JobRepository {
 
 	/**
 	 * Find or create a {@link JobExecution} for a given {@link Job} and
-	 * {@link JobParameters}. If the {@link Job} was already executed with
-	 * these {@link JobParameters}, its persisted values (including ID) will be
+	 * {@link JobParameters}. If the {@link Job} was already executed with these
+	 * {@link JobParameters}, its persisted values (including ID) will be
 	 * returned in a new {@link JobInstance}, associated with the
 	 * {@link JobExecution}. If no previous instance is found, the execution
 	 * will be associated with a new {@link JobInstance}
@@ -63,7 +63,7 @@ public interface JobRepository {
 			JobRestartException, JobInstanceAlreadyCompleteException;
 
 	/**
-	 * Update the {@link JobExecution}. 
+	 * Update the {@link JobExecution}.
 	 * 
 	 * Preconditions: {@link JobExecution} must contain a valid
 	 * {@link JobInstance} and be saved (have an id assigned).
@@ -73,25 +73,29 @@ public interface JobRepository {
 	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Save or update a {@link StepExecution}. If no ID is found a new instance
-	 * will be created (and saved). If an ID does exist it will be updated. It
-	 * is not advisable that an ID be assigned before calling this method.
-	 * Instead, it should be left blank, to be assigned by a
-	 * {@link JobRepository}. The {@link ExecutionContext} of the
-	 * {@link StepExecution} is <em>not</em> saved: see
-	 * {@link #saveOrUpdateExecutionContext(StepExecution)}.
+	 * Save the {@link StepExecution}. ID will be assigned - it is not advisable
+	 * that an ID be assigned before calling this method. Instead, it should be
+	 * left blank, to be assigned by a {@link JobRepository}. The
+	 * {@link ExecutionContext} of the {@link StepExecution} is <em>not</em>
+	 * saved: see {@link #saveOrUpdateExecutionContext(StepExecution)}.
 	 * 
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * 
 	 * @param stepExecution
 	 */
-	void saveOrUpdate(StepExecution stepExecution);
+	void save(StepExecution stepExecution);
+
+	/**
+	 * Update the {@link StepExecution}.
+	 * 
+	 * Preconditions: {@link StepExecution} must be saved (have an id assigned).
+	 * 
+	 * @param stepExecution
+	 */
+	void update(StepExecution stepExecution);
 
 	/**
 	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
-	 * Implementations are allowed to ensure that the {@link StepExecution} is
-	 * already saved by calling {@link #saveOrUpdate(StepExecution)} before
-	 * saving the {@link ExecutionContext}.
 	 * 
 	 * @param stepExecution the {@link StepExecution} containing the
 	 * {@link ExecutionContext} to be saved.

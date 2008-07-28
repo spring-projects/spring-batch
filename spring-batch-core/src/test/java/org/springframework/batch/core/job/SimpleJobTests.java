@@ -499,7 +499,7 @@ public class SimpleJobTests extends TestCase {
 			passedInStepContext = new ExecutionContext(stepExecution.getExecutionContext());
 			stepExecution.getExecutionContext().putString("stepKey", "stepValue");
 			stepExecution.getJobExecution().getExecutionContext().putString("jobKey", "jobValue");
-			jobRepository.saveOrUpdate(stepExecution);
+			jobRepository.save(stepExecution);
 			jobRepository.saveOrUpdateExecutionContext(stepExecution);
 
 			if (exception instanceof RuntimeException) {

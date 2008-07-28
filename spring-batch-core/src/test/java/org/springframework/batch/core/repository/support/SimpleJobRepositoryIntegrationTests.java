@@ -112,7 +112,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		JobExecution firstJobExec = jobRepository.createJobExecution(job, jobParameters);
 		StepExecution firstStepExec = new StepExecution(step.getName(), firstJobExec);
 		jobRepository.updateJobExecution(firstJobExec);
-		jobRepository.saveOrUpdate(firstStepExec);
+		jobRepository.save(firstStepExec);
 
 		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step));
 		assertEquals(firstStepExec, jobRepository.getLastStepExecution(firstJobExec.getJobInstance(), step));
@@ -122,7 +122,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		firstStepExec.setStartTime(new Date(5));
 		firstStepExec.setStatus(BatchStatus.FAILED);
 		firstStepExec.setEndTime(new Date(6));
-		jobRepository.saveOrUpdate(firstStepExec);
+		jobRepository.update(firstStepExec);
 		firstJobExec.setStatus(BatchStatus.FAILED);
 		firstJobExec.setEndTime(new Date(7));
 		jobRepository.updateJobExecution(firstJobExec);
@@ -131,7 +131,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		JobExecution secondJobExec = jobRepository.createJobExecution(job, jobParameters);
 		StepExecution secondStepExec = new StepExecution(step.getName(), secondJobExec);
 		jobRepository.updateJobExecution(secondJobExec);
-		jobRepository.saveOrUpdate(secondStepExec);
+		jobRepository.save(secondStepExec);
 
 		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step));
 		assertEquals(secondStepExec, jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step));
@@ -153,7 +153,7 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		StepExecution stepExec = new StepExecution(step.getName(), jobExec);
 		stepExec.setExecutionContext(ctx);
 
-		jobRepository.saveOrUpdate(stepExec);
+		jobRepository.save(stepExec);
 		jobRepository.saveOrUpdateExecutionContext(stepExec);
 
 		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step);

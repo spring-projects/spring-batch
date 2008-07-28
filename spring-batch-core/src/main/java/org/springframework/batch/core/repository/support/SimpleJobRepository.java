@@ -213,27 +213,34 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	/**
-	 * Save or Update the given StepExecution. If it's id is null, it will be
-	 * saved and an id will be set, otherwise it will be updated. It should be
-	 * noted that assigning an ID randomly will likely cause an exception
-	 * depending on the StepDao implementation.
+	 * Save the {@link StepExecution}.
 	 * 
-	 * @param stepExecution to be saved.
-	 * @throws IllegalArgumentException if stepExecution is null.
+	 * Preconditions: step name must be given and associated
+	 * {@link JobExecution} must already be saved (have an id assigned).
 	 */
-	public void saveOrUpdate(StepExecution stepExecution) {
+	public void save(StepExecution stepExecution) {
+		validateStepExecution(stepExecution);
 
+		stepExecutionDao.saveStepExecution(stepExecution);
+	}
+
+	/**
+	 * Update the {@link StepExecution}.
+	 * 
+	 * Preconditions: step name must be given and associated
+	 * {@link JobExecution} must already be saved (have an id assigned).
+	 */
+	public void update(StepExecution stepExecution) {
+		validateStepExecution(stepExecution);
+		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
+
+		stepExecutionDao.updateStepExecution(stepExecution);
+	}
+	
+	private void validateStepExecution(StepExecution stepExecution) {
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
 		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
 		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
-
-		if (stepExecution.getId() == null) {
-			stepExecutionDao.saveStepExecution(stepExecution);
-		}
-		else {
-			// existing execution, update
-			stepExecutionDao.updateStepExecution(stepExecution);
-		}
 	}
 
 	/*

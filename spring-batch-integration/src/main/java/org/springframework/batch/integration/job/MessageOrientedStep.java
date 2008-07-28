@@ -111,7 +111,7 @@ public class MessageOrientedStep extends AbstractStep {
 		else {
 			executionContext.putString(WAITING, "true");
 			// TODO: need these two lines to be atomic
-			getJobRepository().saveOrUpdate(stepExecution);
+			getJobRepository().update(stepExecution);
 			requestChannel.send(new GenericMessage<JobExecutionRequest>(request));
 			waitForReply(request.getJobId());
 		}

@@ -47,12 +47,6 @@ public class JobRepositorySupport implements JobRepository {
 	 */
 	public void saveOrUpdate(StepExecution stepExecution) {
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.domain.StepExecution)
-	 */
-	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
-	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.container.common.repository.JobRepository#update(org.springframework.batch.container.common.domain.Job)
@@ -74,6 +68,15 @@ public class JobRepositorySupport implements JobRepository {
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 		return null;
+	}
+
+	public void save(StepExecution stepExecution) {
+	}
+
+	public void update(StepExecution stepExecution) {
+	}
+
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 	}
 
 }

@@ -181,6 +181,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			UnexpectedJobExecutionException {
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
+		getJobRepository().save(stepExecution);
 
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		Exception commitException = null;
@@ -205,7 +206,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 
 			try {
-				getJobRepository().saveOrUpdate(stepExecution);
+				getJobRepository().update(stepExecution);
 				getJobRepository().saveOrUpdateExecutionContext(stepExecution);
 			}
 			catch (Exception e) {
@@ -235,7 +236,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			stepExecution.setEndTime(new Date());
 
 			try {
-				getJobRepository().saveOrUpdate(stepExecution);
+				getJobRepository().update(stepExecution);
 			}
 			catch (Exception e) {
 				if (commitException == null) {
