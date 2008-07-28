@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.support.ItemTrackingItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -24,24 +24,24 @@ public class SkipSampleFunctionalTests extends AbstractValidatingBatchLauncherTe
 
 	int before = -1;
 
-	JdbcTemplate jdbcTemplate;
+	SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Autowired
 	ItemTrackingItemWriter<?> writer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	@Before
 	public void onSetUp() throws Exception {
-		before = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 	}
 
 	protected void validatePostConditions() throws Exception {
 
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 		// 5 input records, 1 skipped => 4 written to output
 		assertEquals(before + 4, after);
 		

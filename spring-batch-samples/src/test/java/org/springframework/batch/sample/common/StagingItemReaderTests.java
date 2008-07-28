@@ -13,11 +13,8 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.sample.common.StagingItemReader;
-import org.springframework.batch.sample.common.StagingItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -31,7 +28,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @ContextConfiguration()
 public class StagingItemReaderTests {
 
-	private JdbcOperations jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -45,13 +42,9 @@ public class StagingItemReaderTests {
 	private Long jobId = 11L;
 
 
-	public JdbcOperations getJdbcTemplate() {
-		return jdbcTemplate;
-	}
-
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	@Before
@@ -70,23 +63,23 @@ public class StagingItemReaderTests {
 	@After
 	public void onTearDownAfterTransaction() throws Exception {
 		reader.close(null);
-		getJdbcTemplate().update("DELETE FROM BATCH_STAGING");
+		simpleJdbcTemplate.update("DELETE FROM BATCH_STAGING");
 	}
 
 	@Transactional @Test
 	public void testReaderUpdatesProcessIndicator() throws Exception {
 
-		long id = getJdbcTemplate().queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
-				new Object[] { jobId });
-		String before = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-				new Object[] { id }, String.class);
+		long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
+				jobId);
+		String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+				String.class, id);
 		assertEquals(StagingItemWriter.NEW, before);
 
 		String item = reader.read();
 		assertEquals("FOO", item);
 
-		String after = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-				new Object[] { id }, String.class);
+		String after = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+				String.class, id);
 		assertEquals(StagingItemWriter.DONE, after);
 
 	}
@@ -98,11 +91,11 @@ public class StagingItemReaderTests {
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		txTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus transactionStatus) {
-						long id = getJdbcTemplate().queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
-								new Object[] { jobId });
+						long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
+								jobId);
 						String before =
-								(String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-								new Object[] { id }, String.class);
+								simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+								String.class, id);
 						assertEquals(StagingItemWriter.DONE, before);
 						return null;
 					}
@@ -119,8 +112,8 @@ public class StagingItemReaderTests {
 
 		txTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus transactionStatus) {
-						int count = getJdbcTemplate().queryForInt("SELECT COUNT(*) from BATCH_STAGING where JOB_ID=? AND PROCESSED=?",
-								new Object[] { jobId, StagingItemWriter.NEW });
+						int count = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING where JOB_ID=? AND PROCESSED=?",
+								jobId, StagingItemWriter.NEW);
 						assertEquals(4, count);
 
 						Object item = reader.read();
@@ -178,10 +171,10 @@ public class StagingItemReaderTests {
 		final Long idToUse = (Long)txTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus transactionStatus) {
 
-						long id = getJdbcTemplate().queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
-								new Object[] { jobId });
-						String before = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-								new Object[] { id }, String.class);
+						long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
+								jobId);
+						String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+								String.class, id);
 						assertEquals(StagingItemWriter.NEW, before);
 
 						Object item = reader.read();
@@ -200,8 +193,8 @@ public class StagingItemReaderTests {
 		txTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus transactionStatus) {
 
-						String after = (String) getJdbcTemplate().queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-								new Object[] { idToUse }, String.class);
+						String after = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+								String.class, idToUse);
 						assertEquals(StagingItemWriter.NEW, after);
 
 						Object item = reader.read();

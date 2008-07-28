@@ -23,10 +23,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
-import org.springframework.batch.sample.domain.football.internal.JdbcPlayerSummaryDao;
-import org.springframework.batch.sample.domain.football.internal.PlayerSummaryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,14 +42,14 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 
 	private PlayerSummary summary;
 
-	private JdbcTemplate jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Autowired
 	public void init(DataSource dataSource) {
 
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 		playerSummaryDao = new JdbcPlayerSummaryDao();
-		playerSummaryDao.setJdbcTemplate(this.jdbcTemplate);
+		playerSummaryDao.setDataSource(dataSource);
 
 		summary = new PlayerSummary();
 		summary.setId("AikmTr00");
@@ -72,7 +70,7 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 
-		jdbcTemplate.execute("delete from PLAYER_SUMMARY");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from PLAYER_SUMMARY");
 
 	}
 	
@@ -81,10 +79,11 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 
 		playerSummaryDao.write(summary);
 
-		PlayerSummary testSummary = (PlayerSummary) jdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
+		PlayerSummary testSummary = simpleJdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
 						new PlayerSummaryMapper());
 
-		assertEquals(testSummary, summary);
+		assertEquals(summary, testSummary);
+		
 	}
 
 }

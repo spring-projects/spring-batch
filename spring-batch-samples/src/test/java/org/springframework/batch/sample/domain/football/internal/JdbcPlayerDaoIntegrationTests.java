@@ -26,10 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.football.Player;
-import org.springframework.batch.sample.domain.football.internal.JdbcPlayerDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,14 +47,14 @@ public class JdbcPlayerDaoIntegrationTests {
 
 	private static final String GET_PLAYER = "SELECT * from PLAYERS";
 	
-	private JdbcTemplate jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Autowired
 	public void init(DataSource dataSource) {
 
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 		playerDao = new JdbcPlayerDao();
-		playerDao.setJdbcTemplate(this.jdbcTemplate);		
+		playerDao.setDataSource(dataSource);		
 
 		player = new Player();
 		player.setID("AKFJDL00");
@@ -71,7 +70,7 @@ public class JdbcPlayerDaoIntegrationTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 
-		jdbcTemplate.execute("delete from PLAYERS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from PLAYERS");
 
 	}
 
@@ -80,7 +79,7 @@ public class JdbcPlayerDaoIntegrationTests {
 		
 		playerDao.savePlayer(player);
 		
-		jdbcTemplate.query(GET_PLAYER, new RowCallbackHandler(){
+		simpleJdbcTemplate.getJdbcOperations().query(GET_PLAYER, new RowCallbackHandler(){
 
 			public void processRow(ResultSet rs) throws SQLException {
 				assertEquals(rs.getString("PLAYER_ID"), "AKFJDL00");

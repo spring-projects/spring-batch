@@ -100,7 +100,9 @@ public class PlayerSummary {
 	
 	
 	public String toString() {
-		return "Player Summary: ID=" + id + " Year=" + year;
+		return "Player Summary: ID=" + id + " Year=" + year + "[" + completes + ";" + attempts + ";" + passingYards +
+				";" + passingTd + ";" + interceptions + ";" + rushes + ";" + rushYards + ";" + receptions +
+				";" + receptionYards + ";" + totalTd;
 	}
 	
 	public boolean equals(Object obj) {
