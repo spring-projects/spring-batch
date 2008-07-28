@@ -70,6 +70,8 @@ Spring Batch Samples
 *----
 {{multilineOrder}}           |x |  |  |x |  |  |  |x |  |x |  |  |  |  |  |  |  |  |
 *----
+{{parallel}}                 |  |x |  |  |  |  |  |  |  |  |x |  |  |  |  |x |  |  |
+*----
 {{quartzSample}}             |x |  |  |  |  |x |  |  |  |  |x |  |  |  |x |  |  |  |
 *----
 {{restartSample}}            |  |x |  |  |  |  |  |  |  |  |x |  |x |  |  |x |  |  |
@@ -117,7 +119,7 @@ Spring Batch Samples
 
   The JMX launcher uses an additional XML configuration file
   (adhoc-job-launcher-context.xml) to set up a <<<JobLauncher>>> for
-  running jobs asynchronously (i.e. in a backgound thread).  This
+  running jobs asynchronously (i.e. in a background thread).  This
   follows the same pattern as the {{{quartzSample}Quartz sample}}, so
   see that section for more details of the <<<JobLauncher>>>
   configuration.
@@ -128,7 +130,7 @@ Spring Batch Samples
   <<<ExportedJobLauncher>>>, so that it can be controlled from a
   remote client (such as JConsole from the JDK) which does not have
   Spring Batch on the classpath.  See the Spring Core Reference Guide
-  for more details on how to customize the JMX configuration.
+  for more details on how to customise the JMX configuration.
 
 * Batch Update ({batchUpdate})
 
@@ -157,7 +159,7 @@ Spring Batch Samples
 
   Nested property paths are resolved in the same way as normal Spring
   binding occurs, but with a little extra leeway in terms of spelling
-  and capitalization.  Thus for instance, the <<<Trade>>> object has a
+  and capitalisation.  Thus for instance, the <<<Trade>>> object has a
   property called <<<customer>>> (lower case), but the file has been
   configured to have a column name <<<CUSTOMER>>> (upper case), and
   the mapper will accept the values happily.  Underscores instead of
@@ -276,10 +278,10 @@ AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
   receptions, rushes, and total touchdowns.
 
   Our example batch job is going to load both files into a database,
-  and then combine each to summarize how each player performed for a
+  and then combine each to summarise how each player performed for a
   particular year. Although this example is fairly trivial, it shows
   multiple types of input, and the general style is a common batch
-  scenario.  That is, summarizing a very large dataset so that it can
+  scenario.  That is, summarising a very large dataset so that it can
   be more easily manipulated or viewed by an online web-based
   application. In an enterprise solution the third step, the reporting
   step, could be implemented through the use of Eclipse BIRT or one of
@@ -399,7 +401,7 @@ AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
   Following the general flow of the batch job, the next step is to
   describe how each line of the file will be parsed from its string
   representation into a domain object. The first thing the provider
-  will need is an InputSource, which is provided as part of the Spring
+  will need is an <<<ItemReader>>>, which is provided as part of the Spring
   Batch infrastructure. Because the input is flat-file based, a
   <<<FlatFileItemReader>>> is used:
 
@@ -438,7 +440,7 @@ AbduKa00,1996,mia,15,nyg,0,0,0,0,0,17,96,,14,0
   <<<FieldSetMapper>>> interface. There is a single method,
   <<<mapLine()>>>, which maps <<<FieldSet>>>s the same way that
   developers are comfortable mapping <<<ResultSet>>>s into Java
-  <<<Object>>>s, either by index or fieldname. This behavior is by
+  <<<Object>>>s, either by index or field name. This behaviour is by
   intention and design similar to the <<<RowMapper>>> passed into a
   <<<JdbcTemplate>>>.  You can see this below:
 
@@ -509,7 +511,7 @@ games.player_id group by games.player_id, games.year_no
 </bean>
 +----
 
-  The SqlCursorInputSource has three dependences:
+  The <<<JdbcCursorItemReader>>> has three dependences:
 
     * A <<<DataSource>>>
 
@@ -546,7 +548,7 @@ games.player_id group by games.player_id, games.year_no
   on a transaction boundary (which would be the default).  This
   "write-behind" behaviour is provided by Hibernate implicitly, but we
   need to take control of it so that the skip and retry features
-  fprovided by Spring Batch can work effectively.  Thus the other role
+  provided by Spring Batch can work effectively.  Thus the other role
   of the <<<HibernateAwareItemWriter>>> is to watch out for failures
   and flush aggressively when an item is seen from a previously failed
   chunk.  In this way there will always be a failure at some point
@@ -561,10 +563,44 @@ games.player_id group by games.player_id, games.year_no
 
 * Multiline ({multiline})
 
+  The goal of this sample is to show some common tricks with multiline
+  records in file input jobs.
+
+  The input file in this case consists of two groups of trades
+  delimited by special lines in a file (BEGIN and END):
+
++---
+BEGIN
+UK21341EAH4597898.34customer1
+UK21341EAH4611218.12customer2
+END
+BEGIN
+UK21341EAH4724512.78customer2
+UK21341EAH4810809.25customer3
+UK21341EAH4985423.39customer4
+END
++---
+
+  The goal of the job is to operate on the two groups, so the item
+  type is naturally <<<List<Trade>>>>.  To get these items delivered
+  from an item reader we employ two components from Spring Batch: the
+  <<<AggregateItemReader>>> and the
+  <<<PrefixMatchingCompositeLineTokenizer>>>.  The latter is
+  responsible for recognising the difference between the trade data
+  and the delimiter records.  The former is responsible for
+  aggregating the trades from each group into a <<<List>>> and handing
+  out the list from its <<<read()>>> method.  To help these components
+  perform their responsibilities we also provide some business
+  knowledge about the data in the form of a <<<FieldSetMapper>>>
+  (<<<TradeFieldSetMapper>>>).  The <<<TradeFieldSetMapper>>> checks
+  its input for the delimiter fields (BEGIN, END) and if it detects
+  them, returns the special tokens that <<<AggregateItemReader>>>
+  needs.  Otherwise it maps the input into a <<<Trade>>> object.
+
 * Multiline Order Job ({multilineOrder})
 
-  The goal is to demostrate how to handle a more complex file input
-  format, where a record meant for processing inludes nested records
+  The goal is to demonstrate how to handle a more complex file input
+  format, where a record meant for processing includes nested records
   and spans multiple lines 
 
   The input source is file with multiline records.
@@ -578,6 +614,60 @@ games.player_id group by games.player_id, games.year_no
   writer' which in this case writes the output to a file.  The writer
   in this case demonstrates how to write multiline output using a
   custom aggregator transformer.
+
+* Parallel Sample ({parallel})
+
+  The purpose of this sample is to show multi-threaded step execution
+  using the Process Indicator pattern.
+
+  The job reads data from the same file as the
+  {{{fixedLengthImport}Fixed Length Import}} sample, but instead of
+  writing it out directly it goes through a staging table, and the
+  staging table is read in a multi-threaded step.  Note that for such
+  a simple example where the item processing was not expensive, there
+  is unlikely to be much if any benefit in using a multi-threaded
+  step.
+
+  Multi-threaded step execution is easy to configure using Spring
+  Batch, but there are some limitations.  Most of the out-of-the-box
+  <<<ItemReader>>> and <<<ItemWriter>>> implementations are not
+  designed to work in this scenario because they need to be
+  restartable and they are also stateful.  There should be no surprise
+  about this, and reading a file (for instance) is usually fast enough
+  that multi-threading that part of the process is not likely to
+  provide much benefit, compared to the cost of managing the state.
+
+  The best strategy to cope with restart state from multiple
+  concurrent threads depends on the kind of input source involved:
+
+    * For file-based input (and output) restart sate is practically
+    impossible to manage.  Spring Batch does not provide any features
+    or samples to help with this use case.
+
+    * With message middleware input it is trivial to manage restarts,
+    since there is no state to store (if a transaction rolls back the
+    messages are returned to the destination they came from).  
+
+    * With database input state management is still necessary, but it
+    isn't particularly difficult.  The easiest thing to do is rely on
+    a Process Indicator in the input data, which is a column in the
+    data indicating for each row if it has been processed or not.  The
+    flag is updated inside the batch transaction, and then in the case
+    of a failure the updates are lost, and the records will show as
+    un-processed on a restart.
+
+  This last strategy is implemented in the <<<StagingItemReader>>>.
+  Its companion, the <<<StagingItemWriter>>> is responsible for
+  setting up the data in a staging table which contains the process
+  indicator.  The reader is then driven by a simple SQL query that
+  includes a where clause for the processed flag, i.e.
+
++---
+SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
++---
+
+  It is then responsible for updating the processed flag (which
+  happens inside the main step transaction).
 
 * Quartz Sample ({quartz})
 
@@ -649,9 +739,84 @@ games.player_id group by games.player_id, games.year_no
 
 * Restart Sample ({restartSample})
 
+  The goal of this sample is to show how a job can be restarted after
+  a failure and continue processing where it left off.
+
+  To simulate a failure we "fake" a failure on the fourth record
+  though the use of a sample component
+  <<<ExceptionThrowingItemReaderProxy>>>.  This is a stateful reader
+  that counts how many records it has processed and throws a planned
+  exception in a specified place.  Since we re-use the same instance
+  when we restart the job it will not fail the second time.
+
 * Retry Sample ({retrySample})
 
+  The purpose of this sample is to show how to use the automatic retry
+  capabilities of Spring Batch.
+
+  The retry is configured in the step through the
+  <<<SkipLimitStepFactoryBean>>>:
+
++---
+<bean id="step1" parent="simpleStep"
+    class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean">
+    ...
+    <property name="retryLimit" value="3" />
+    <property name="retryableExceptionClasses" value="java.lang.Exception" />
+</bean>
++---
+
+  Failed items will cause a rollback for all <<<Exception>>> types, up
+  to a limit of 3 attempts.  On the 4th attempt, the failed item would
+  be skipped, and there would be a callback to a
+  <<<ItemSkipListener>>> if one was provided (via the "listeners"
+  property of the step factory bean).
+
+  An <<<ItemReader>>> is provided that will generate unique
+  <<<Trade>>> data by just incrementing a counter.  Note that it uses
+  the counter in its <<<mark()>>> and <<<reset()>>> methods so that
+  the same content is returned after a rollback.  The same content is
+  returned, but the instance of <<<Trade>>> is different, which means
+  that the implementation of <<<equals()>>> in the <<<Trade>>> object
+  is important.  This is because to identify a failed item on retry
+  (so that the number of attempts can be counted) the framework by
+  default uses <<<Object.equals()>>> to compare the recently failed
+  item with a cache of previously failed items.  Without implementing
+  a field-based <<<equals()>>> method for the domain object, our job
+  will spin round the retry for potentially quite a long time before
+  failing because the default implementation of <<<equals()>>> is
+  based on object reference, not on field content.
+
 * Skip Sample ({skipSample})
+
+  The purpose of this sample is to show how to use the skip features
+  of Spring Batch.  Since skip is really just a special case of retry
+  (with limit 0), the details are quite similar to the {{{retrySample}Retry
+  Sample}}, but the use case is less artificial, since it
+  is based on the {{{trade}Trade Sample}}.
+
+  The failure condition is still artificial, since it is triggered by
+  a special <<<ItemWriter>>> wrapper (<<<ItemTrackingItemWriter>>>).
+  The plan is that a certain item (the third) will fail business
+  validation in the writer, and the system can then respond by
+  skipping it.  We also configure the step so that it will not roll
+  back on the validation exception, since we know that it didn't
+  invalidate the transaction, only the item.  This is done through the
+  transaction attribute:
+
++---
+<bean id="step2" parent="skipLimitStep">
+    <property name="skipLimit" value="1" />
+    <!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
+    <property name="transactionAttribute"
+        value="+org.springframework.batch.item.validator.ValidationException" />
+    ....
+</bean>
++---
+
+  The format for the transaction attribute specification is given in
+  the Spring Core documentation (e.g. see the Javadocs for
+  {{{http://static.springframework.org/spring/docs/2.5.x/api/org/springframework/transaction/interceptor/TransactionAttributeEditor.html}TransactionAttributeEditor}}).
 
 * Tasklet Job ({tasklet})
 
@@ -672,7 +837,7 @@ games.player_id group by games.player_id, games.year_no
     * The second step uses another tasklet to execute a system (OS)
       command line.
 
-  You can visualize the Spring configuration of a job through
+  You can visualise the Spring configuration of a job through
   Spring-IDE.  See {{{http://springide.org/blog/}Spring IDE}}.  The
   source view of the configuration is as follows:
 
@@ -719,9 +884,19 @@ games.player_id group by games.player_id, games.year_no
   The goal is to show a reasonably complex scenario, that would
   resemble the real-life usage of the framework.
 
-  <Description:> This job has 3 steps.  First, data about trades are
-  imported from a file to database. Second, the trades are read from
-  the database and credit on customer accounts is decreased
-  appropriately. Last, a report about customers is exported to a file.
+  This job has 3 steps.  First, data about trades are imported from a
+  file to database. Second, the trades are read from the database and
+  credit on customer accounts is decreased appropriately. Last, a
+  report about customers is exported to a file.
 
 * XML Input Output ({xmlStax})
+
+  The goal here is to show the use of XML input and output through
+  streaming and Spring OXM marshallers and unmarshallers. 
+
+  The job has a single step that copies <<<Trade>>> data from one XML
+  file to another.  It uses XStream for the object XML conversion,
+  because this is simple to configure for basic use cases like this
+  one.  See
+  {{{http://static.springframework.org/spring-ws/sites/1.5/reference/html/oxm.html}Spring
+  OXM documentation}} for details of other options.
