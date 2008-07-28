@@ -38,7 +38,6 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	}
 
 	protected FieldSetMapper<Trade> fieldSetMapper() {
-		@SuppressWarnings("unchecked")
 		FieldSetMapper<Trade> mapper = new TradeFieldSetMapper();
 		return mapper;
 	}

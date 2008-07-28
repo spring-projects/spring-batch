@@ -32,10 +32,10 @@ public class TradeFieldSetMapper implements FieldSetMapper<Trade> {
     public Trade mapLine(FieldSet fieldSet, int lineNum) {
     	
     	Trade trade = new Trade();
-    	trade.setIsin(fieldSet.readString(0));
-        trade.setQuantity(fieldSet.readLong(1));
-        trade.setPrice(fieldSet.readBigDecimal(2));
-        trade.setCustomer(fieldSet.readString(3));
+    	trade.setIsin(fieldSet.readString(ISIN_COLUMN));
+        trade.setQuantity(fieldSet.readLong(QUANTITY_COLUMN));
+        trade.setPrice(fieldSet.readBigDecimal(PRICE_COLUMN));
+        trade.setCustomer(fieldSet.readString(CUSTOMER_COLUMN));
         
         return trade;
     }
