@@ -237,7 +237,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	public void persistExecutionContext(JobExecution jobExecution) {
-		ecDao.saveOrUpdateExecutionContext(jobExecution);
+		ecDao.persistExecutionContext(jobExecution);
 	}
 
 	public void setLobHandler(LobHandler lobHandler) {

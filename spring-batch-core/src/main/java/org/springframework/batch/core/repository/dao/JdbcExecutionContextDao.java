@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * @author Robert Kasanicky
  */
-class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
+public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
 	private static final String STEP_DISCRIMINATOR = "S";
 
@@ -83,7 +83,7 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 	 * jobExecution
 	 * @param jobExecution
 	 */
-	public void saveOrUpdateExecutionContext(final JobExecution jobExecution) {
+	public void persistExecutionContext(final JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -97,7 +97,7 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 	 * stepExecution
 	 * @param stepExecution
 	 */
-	public void saveOrUpdateExecutionContext(final StepExecution stepExecution) {
+	public void persistExecutionContext(final StepExecution stepExecution) {
 
 		Long executionId = stepExecution.getId();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();

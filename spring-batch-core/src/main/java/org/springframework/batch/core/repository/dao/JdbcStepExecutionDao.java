@@ -139,7 +139,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	public void persistExecutionContext(final StepExecution stepExecution) {
 
-		ecDao.saveOrUpdateExecutionContext(stepExecution);
+		ecDao.persistExecutionContext(stepExecution);
 	}
 
 	/*
