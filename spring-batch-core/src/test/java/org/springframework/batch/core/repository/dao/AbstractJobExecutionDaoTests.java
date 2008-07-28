@@ -53,22 +53,6 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	}
 
 	/**
-	 * Execution count increases by one with every save for the same job
-	 * instance.
-	 */
-	public void testGetExecutionCount() {
-
-		JobExecution exec1 = new JobExecution(jobInstance);
-		JobExecution exec2 = new JobExecution(jobInstance);
-
-		dao.saveJobExecution(exec1);
-		assertEquals(1, dao.getJobExecutionCount(jobInstance));
-
-		dao.saveJobExecution(exec2);
-		assertEquals(2, dao.getJobExecutionCount(jobInstance));
-	}
-
-	/**
 	 * Update and retrieve job execution - check attributes have changed as
 	 * expected.
 	 */

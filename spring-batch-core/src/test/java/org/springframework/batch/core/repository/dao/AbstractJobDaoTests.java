@@ -189,24 +189,6 @@ public abstract class AbstractJobDaoTests extends AbstractTransactionalDataSourc
 		}
 	}
 
-	public void testIncrementExecutionCount() {
-
-		// 1 JobExection already added in setup
-		assertEquals(jobExecutionDao.getJobExecutionCount(jobInstance), 1);
-
-		// Save new JobExecution for same job
-		JobExecution testJobExecution = new JobExecution(jobInstance);
-		jobExecutionDao.saveJobExecution(testJobExecution);
-		// JobExecutionCount should be incremented by 1
-		assertEquals(jobExecutionDao.getJobExecutionCount(jobInstance), 2);
-	}
-
-	public void testZeroExecutionCount() {
-
-		JobInstance testJob = jobInstanceDao.createJobInstance(new JobSupport("test"), new JobParameters());
-		// no jobExecutions saved for new job, count should be 0
-		assertEquals(jobExecutionDao.getJobExecutionCount(testJob), 0);
-	}
 
 	@SuppressWarnings("unchecked")
 	public void testJobWithSimpleJobIdentifier() throws Exception {

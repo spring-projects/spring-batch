@@ -12,9 +12,7 @@ import org.springframework.util.Assert;
 
 /**
  * In-memory implementation of {@link JobExecutionDao}.
- * 
  */
-
 public class MapJobExecutionDao implements JobExecutionDao {
 
 	private static Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
@@ -27,16 +25,6 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	public static void clear() {
 		executionsById.clear();
 		contextsByJobExecutionId.clear();
-	}
-
-	public int getJobExecutionCount(JobInstance jobInstance) {
-		int count = 0;
-		for (JobExecution execution : executionsById.values()) {
-			if (execution.getJobInstance().equals(jobInstance)) {
-				count++;
-			}
-		}
-		return count;
 	}
 
 	public void saveJobExecution(JobExecution jobExecution) {

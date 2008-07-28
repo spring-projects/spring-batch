@@ -38,9 +38,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 
-	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION "
-			+ "where JOB_INSTANCE_ID = ?";
-
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -80,19 +77,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS), new Object[] { job.getId() },
 				new JobExecutionRowMapper(job));
-	}
-
-	/**
-	 * @see JobExecutionDao#getJobExecutionCount(JobInstance)
-	 * @throws IllegalArgumentException if jobId is null.
-	 */
-	public int getJobExecutionCount(JobInstance jobInstance) {
-		Long jobId = jobInstance.getId();
-		Assert.notNull(jobId, "JobId cannot be null");
-
-		Object[] parameters = new Object[] { jobId };
-
-		return getJdbcTemplate().queryForInt(getQuery(GET_JOB_EXECUTION_COUNT), parameters);
 	}
 
 	/**
