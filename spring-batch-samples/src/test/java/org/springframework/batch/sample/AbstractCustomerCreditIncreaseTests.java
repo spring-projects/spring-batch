@@ -12,9 +12,9 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -29,7 +29,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValidatingBatchLauncherTests {
 
-	protected JdbcOperations jdbcTemplate;
+	protected SimpleJdbcTemplate simpleJdbcTemplate;
 
 	protected PlatformTransactionManager transactionManager;
 
@@ -52,7 +52,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	@Autowired
@@ -68,10 +68,9 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 		super.validatePreConditions();
 		ensureState();
 		creditsBeforeUpdate = (List<BigDecimal>) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus status) {
-				
-				return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
-					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+			public Object doInTransaction(TransactionStatus status) {				
+				return simpleJdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
+					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
 						return rs.getBigDecimal(CREDIT_COLUMN);
 					}
 				});
@@ -87,9 +86,9 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback(){
 
 			public Object doInTransaction(TransactionStatus status) {
-				jdbcTemplate.update(DELETE_CUSTOMERS);
+				simpleJdbcTemplate.update(DELETE_CUSTOMERS);
 				for (String customer : customers) {
-					jdbcTemplate.update(customer);
+					simpleJdbcTemplate.update(customer);
 				}
 				return null;
 			}
@@ -106,20 +105,18 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
+				simpleJdbcTemplate.getJdbcOperations().query(ALL_CUSTOMERS, new RowCallbackHandler() {
 
-					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-						final BigDecimal creditBeforeUpdate = creditsBeforeUpdate.get(rowNum);
-						System.out.print("BEFORE:" + creditBeforeUpdate);
+					private int i = 0;
+
+					public void processRow(ResultSet rs) throws SQLException {
+						final BigDecimal creditBeforeUpdate = creditsBeforeUpdate.get(i++);
 						final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
-						System.out.print(" EXPECTED:" + expectedCredit);
 						if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
 							matches.add(rs.getBigDecimal(ID_COLUMN));
 						}
-						System.out.println(" ACTUAL: " + rs.getBigDecimal(CREDIT_COLUMN));
-						return null;
 					}
-
+					
 				});
 				return null;
 			}

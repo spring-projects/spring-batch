@@ -48,7 +48,7 @@ public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIn
 		setJobParameters(params);
 		writer.setFailOnFlush(2);
 
-		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
+		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertTrue(before > 0);
 		try {
 			super.testLaunchJob();
@@ -62,7 +62,7 @@ public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIn
 			// assertEquals(1, writer.getErrors().size());
 			throw e;
 		}
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
+		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertEquals(before, after);
 	}
 
