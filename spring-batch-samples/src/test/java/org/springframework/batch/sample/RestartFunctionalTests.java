@@ -28,8 +28,7 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
@@ -45,11 +44,11 @@ import org.springframework.test.context.transaction.BeforeTransaction;
 public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// auto-injected attributes
-	private JdbcOperations jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	/*
@@ -58,7 +57,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	 */
 	@BeforeTransaction
 	public void onTearDown() throws Exception {
-		jdbcTemplate.update("DELETE FROM TRADE");
+		simpleJdbcTemplate.update("DELETE FROM TRADE");
 	}
 
 	/**
@@ -72,7 +71,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	@Test
 	public void testRestart() throws Exception {
 
-		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		try {
 			runJobForRestartTest();
@@ -84,13 +83,13 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 					"planned") >= 0);
 		}
 
-		int medium = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int medium = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
 		runJobForRestartTest();
 
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		assertEquals(before + 5, after);
 	}

@@ -37,9 +37,8 @@ import org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMappe
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -51,14 +50,14 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	private static final int LINE_LENGTH = 29;
 
 	//auto-injected attributes
-	private JdbcOperations jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 	private Resource fileLocator;
 	private FlatFileItemReader<Trade> inputSource;
 	private LineTokenizer lineTokenizer;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	@Autowired
@@ -69,7 +68,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 
 	@Before
 	public void onSetUp() throws Exception {
-		jdbcTemplate.update("delete from TRADE");
+		simpleJdbcTemplate.update("delete from TRADE");
 		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
 		inputSource = new FlatFileItemReader<Trade>();
 		
@@ -89,23 +88,24 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 		
 		inputSource.open(new ExecutionContext());
 
-		jdbcTemplate.query("SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", new RowCallbackHandler() {
+		simpleJdbcTemplate.getJdbcOperations().query(
+				"SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", 
+				new RowCallbackHandler() {
+					public void processRow(ResultSet rs) throws SQLException {
+						Trade trade;
+						try {
+							trade = inputSource.read();
+						}
+						catch (Exception e) {
+							throw new IllegalStateException(e.getMessage());
+						}
+						assertEquals(trade.getIsin(), rs.getString(2));
+						assertEquals(trade.getQuantity(),rs.getLong(3));
+						assertEquals(trade.getPrice(), rs.getBigDecimal(4));
+						assertEquals(trade.getCustomer(), rs.getString(5));
+					}
 
-			public void processRow(ResultSet rs) throws SQLException {
-				Trade trade;
-				try {
-					trade = (Trade)inputSource.read();
-				}
-				catch (Exception e) {
-					throw new IllegalStateException(e.getMessage());
-				}
-				assertEquals(trade.getIsin(), rs.getString(2));
-				assertEquals(trade.getQuantity(),rs.getLong(3));
-				assertEquals(trade.getPrice(), rs.getBigDecimal(4));
-				assertEquals(trade.getCustomer(), rs.getString(5));
-			}
-
-		});
+				});
 
 		assertNull(inputSource.read());
 	}
@@ -114,7 +114,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	 * fixed-length file is expected on input
 	 */
 	protected void validatePreConditions() throws Exception{
-		BufferedReader reader = null;
+		BufferedReader reader;
 
 		reader = new BufferedReader(new FileReader(fileLocator.getFile()));
 		String line;

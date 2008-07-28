@@ -7,8 +7,7 @@ import javax.sql.DataSource;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.common.StagingItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -16,24 +15,24 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration()
 public class ParallelJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
-	private JdbcOperations jdbcTemplate;
+	private SimpleJdbcTemplate jdbcTemplate;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	protected void validatePostConditions() throws Exception {
 		int count;
 		count = jdbcTemplate.queryForInt(
 				"SELECT COUNT(*) from BATCH_STAGING where PROCESSED=?",
-				new Object[] {StagingItemWriter.NEW});
+				StagingItemWriter.NEW);
 		assertEquals(0, count);
 		int total = jdbcTemplate.queryForInt(
 				"SELECT COUNT(*) from BATCH_STAGING");
 		count = jdbcTemplate.queryForInt(
 				"SELECT COUNT(*) from BATCH_STAGING where PROCESSED=?",
-				new Object[] {StagingItemWriter.DONE});
+				StagingItemWriter.DONE);
 		assertEquals(total, count);
 	}
 

@@ -16,9 +16,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -36,7 +35,7 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 		"Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]" +
 		"Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]";
 	
-	private JdbcOperations jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 	
 	private int activeRow = 0;
 	
@@ -44,15 +43,15 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 	
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.sample.AbstractLifecycleSpringContextTests#validatePreConditions()
 	 */
 	protected void validatePreConditions() throws Exception {
-		jdbcTemplate.update("DELETE from TRADE");
-		before = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		simpleJdbcTemplate.update("DELETE from TRADE");
+		before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 	}
 	
 	protected void validatePostConditions() throws Exception {	
@@ -69,11 +68,11 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 				add(new Trade("UK21341EAH45", 215, new BigDecimal("35.11"), "customer5"));
 		}};
 
-		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 		
 		assertEquals(before+5, after);
 		
-		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
+		simpleJdbcTemplate.getJdbcOperations().query(GET_TRADES, new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
 				Trade trade = trades.get(activeRow++);
 				
@@ -99,7 +98,4 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 		assertEquals(EXPECTED_OUTPUT_FILE, output);
 	}
 	
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
 }
