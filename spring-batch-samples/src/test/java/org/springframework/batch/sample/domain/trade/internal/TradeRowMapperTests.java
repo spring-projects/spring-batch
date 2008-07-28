@@ -1,12 +1,12 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
+import static org.easymock.EasyMock.*;
+
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.easymock.MockControl;
 import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.batch.sample.domain.trade.internal.TradeRowMapper;
 import org.springframework.batch.sample.support.AbstractRowMapperTests;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -30,18 +30,11 @@ public class TradeRowMapperTests extends AbstractRowMapperTests {
 		return new TradeRowMapper();
 	}
 
-	protected void setUpResultSetMock(ResultSet rs, MockControl rsControl) throws SQLException {
-		rs.getString(TradeRowMapper.ISIN_COLUMN);
-		rsControl.setReturnValue(ISIN);
-		
-		rs.getLong(TradeRowMapper.QUANTITY_COLUMN);
-		rsControl.setReturnValue(QUANTITY);
-		
-		rs.getBigDecimal(TradeRowMapper.PRICE_COLUMN);
-		rsControl.setReturnValue(PRICE);
-		
-		rs.getString(TradeRowMapper.CUSTOMER_COLUMN);
-		rsControl.setReturnValue(CUSTOMER);
+	protected void setUpResultSetMock(ResultSet rs) throws SQLException {
+		expect(rs.getString(TradeRowMapper.ISIN_COLUMN)).andReturn(ISIN);
+		expect(rs.getLong(TradeRowMapper.QUANTITY_COLUMN)).andReturn(QUANTITY);
+		expect(rs.getBigDecimal(TradeRowMapper.PRICE_COLUMN)).andReturn(PRICE);
+		expect(rs.getString(TradeRowMapper.CUSTOMER_COLUMN)).andReturn(CUSTOMER);
 	}
 
 }

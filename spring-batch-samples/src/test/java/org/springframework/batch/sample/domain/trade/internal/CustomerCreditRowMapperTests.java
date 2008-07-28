@@ -1,12 +1,12 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
+import static org.easymock.EasyMock.*;
+
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.easymock.MockControl;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper;
 import org.springframework.batch.sample.support.AbstractRowMapperTests;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -31,13 +31,10 @@ public class CustomerCreditRowMapperTests extends AbstractRowMapperTests {
 		return new CustomerCreditRowMapper();
 	}
 
-	protected void setUpResultSetMock(ResultSet rs, MockControl rsControl) throws SQLException {
-		rs.getInt(CustomerCreditRowMapper.ID_COLUMN);
-		rsControl.setReturnValue(ID);
-		rs.getString(CustomerCreditRowMapper.NAME_COLUMN);
-		rsControl.setReturnValue(CUSTOMER);
-		rs.getBigDecimal(CustomerCreditRowMapper.CREDIT_COLUMN);
-		rsControl.setReturnValue(CREDIT);
+	protected void setUpResultSetMock(ResultSet rs) throws SQLException {
+		expect(rs.getInt(CustomerCreditRowMapper.ID_COLUMN)).andReturn(ID);
+		expect(rs.getString(CustomerCreditRowMapper.NAME_COLUMN)).andReturn(CUSTOMER);
+		expect(rs.getBigDecimal(CustomerCreditRowMapper.CREDIT_COLUMN)).andReturn(CREDIT);
 	}
 
 }

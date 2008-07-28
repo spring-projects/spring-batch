@@ -27,11 +27,9 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.batch.sample.domain.trade.internal.FlatFileCustomerCreditDao;
 
 public class FlatFileCustomerCreditDaoTests {
 
-	//private MockControl outputControl;
 	private ResourceLifecycleItemWriter output;
 	private FlatFileCustomerCreditDao writer;
 	
