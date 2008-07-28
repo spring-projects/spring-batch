@@ -382,7 +382,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 								.getStepSkipCount())) {
 							// increment skip count and try again
 							contribution.incrementTemporaryReadSkipCount();
-							listener.onSkipInRead(e);
+							onSkipInRead(e);
 							logger.debug("Skipping failed input", e);
 						} else {
 							// re-throw only when the skip policy runs out of
@@ -434,6 +434,16 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 				}
 			});
 			retryOperations.execute(retryCallback);
+		}
+		
+		private void onSkipInRead(Exception e){
+			
+			try{
+				listener.onSkipInRead(e);
+			}
+			catch(Exception ex){
+				logger.debug("Error in SkipListener onSkipInReader encountered and ignored.", ex);
+			}
 		}
 
 	}
