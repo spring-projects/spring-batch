@@ -3,7 +3,6 @@ package org.springframework.batch.core.repository.dao;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
 
 public interface StepExecutionDao {
 
@@ -26,22 +25,6 @@ public interface StepExecutionDao {
 	 * @param stepExecution
 	 */
 	void updateStepExecution(StepExecution stepExecution);
-
-	/**
-	 * Find all {@link ExecutionContext} for the given {@link StepExecution}.
-	 * 
-	 * @throws IllegalArgumentException if the id is null.
-	 */
-	ExecutionContext findExecutionContext(StepExecution stepExecution);
-
-	/**
-	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
-	 * 
-	 * @param stepExecution the {@link StepExecution} containing the
-	 * {@link ExecutionContext} to be saved.
-	 * @throws IllegalArgumentException if the attributes are null.
-	 */
-	void persistExecutionContext(StepExecution stepExecution);
 
 	StepExecution getStepExecution(JobExecution jobExecution, Step step);
 

@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.util.HashMap;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -27,7 +25,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
@@ -148,48 +145,6 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		assertEquals(BatchStatus.STOPPED, retrieved.getStatus());
 	}
 
-	public void testSaveAndFindContext() {
-		dao.saveStepExecution(stepExecution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
-			{
-				put("key", "value");
-			}
-		});
-		stepExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(stepExecution);
-
-		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
-		assertEquals(ctx, retrieved);
-	}
-	
-	public void testSaveAndFindEmptyContext() {
-		dao.saveStepExecution(stepExecution);
-		ExecutionContext ctx = new ExecutionContext();
-		stepExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(stepExecution);
-
-		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
-		assertEquals(ctx, retrieved);
-	}
-
-	public void testUpdateContext() {
-		dao.saveStepExecution(stepExecution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
-			{
-				put("key", "value");
-			}
-		});
-		stepExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(stepExecution);
-
-		ctx.putLong("longKey", 7);
-		dao.persistExecutionContext(stepExecution);
-
-		ExecutionContext retrieved = dao.findExecutionContext(stepExecution);
-		assertEquals(ctx, retrieved);
-		assertEquals(7, retrieved.getLong("longKey"));
-	}
-
 	/**
 	 * Exception should be raised when the version of update argument doesn't
 	 * match the version of persisted entity.
@@ -218,16 +173,6 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 			// expected
 		}
 
-	}
-	
-	public void testStoreInteger(){	
-		dao.saveStepExecution(stepExecution);
-		ExecutionContext ec = new ExecutionContext();
-		ec.put("intValue", new Integer(343232));
-		stepExecution.setExecutionContext(ec);
-		dao.persistExecutionContext(stepExecution);
-		ExecutionContext restoredEc = dao.findExecutionContext(stepExecution);
-		assertEquals(ec, restoredEc);
 	}
 
 }

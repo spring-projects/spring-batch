@@ -48,6 +48,8 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	protected StepExecutionDao stepExecutionDao;
 	
 	protected JobExecutionDao jobExecutionDao;
+	
+	protected ExecutionContextDao ecDao;
 
 	protected JobInstance jobInstance;
 
@@ -73,6 +75,10 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	public void setJobExecutionDao(JobExecutionDao jobExecutionDao) {
 		this.jobExecutionDao = jobExecutionDao;
+	}
+	
+	public void setExecutionContextDao(ExecutionContextDao ecDao) {
+		this.ecDao = ecDao;
 	}
 
 	/*
@@ -117,8 +123,8 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 
 	public void testUpdateStepWithExecutionContext() {
 		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.persistExecutionContext(stepExecution);
-		ExecutionContext tempAttributes = stepExecutionDao.findExecutionContext(stepExecution);
+		ecDao.persistExecutionContext(stepExecution);
+		ExecutionContext tempAttributes = ecDao.getExecutionContext(stepExecution);
 		assertEquals(executionContext, tempAttributes);
 	}
 	
@@ -141,7 +147,7 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 		execution.setExecutionContext(executionContext);
 		execution.setExitStatus(ExitStatus.FAILED.addExitDescription("java.lang.Exception"));
 		stepExecutionDao.saveStepExecution(execution);
-		stepExecutionDao.persistExecutionContext(execution);
+		ecDao.persistExecutionContext(execution);
 		StepExecution retrievedExecution = stepExecutionDao.getStepExecution(jobExecution, step2);
 		assertNotNull(retrievedExecution);
 		assertEquals(execution, retrievedExecution);
@@ -202,15 +208,15 @@ public abstract class AbstractStepDaoTests extends AbstractTransactionalDataSour
 	public void testSaveExecutionContext(){
 		
 		stepExecution.setExecutionContext(executionContext);
-		stepExecutionDao.persistExecutionContext(stepExecution);
-		ExecutionContext attributes = stepExecutionDao.findExecutionContext(stepExecution);
+		ecDao.persistExecutionContext(stepExecution);
+		ExecutionContext attributes = ecDao.getExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
 		executionContext.putString("newString", "newString");
 		executionContext.putLong("newLong", 1);
 		executionContext.putDouble("newDouble", 2.5);
 		executionContext.put("newSerializable", "serializableValue");
-		stepExecutionDao.persistExecutionContext(stepExecution);
-		attributes = stepExecutionDao.findExecutionContext(stepExecution);
+		ecDao.persistExecutionContext(stepExecution);
+		attributes = ecDao.getExecutionContext(stepExecution);
 		assertEquals(executionContext, attributes);
 	}
 	
