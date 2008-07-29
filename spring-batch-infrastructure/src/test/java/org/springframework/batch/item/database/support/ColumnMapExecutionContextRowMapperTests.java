@@ -3,14 +3,14 @@
  */
 package org.springframework.batch.item.database.support;
 
+import static org.easymock.EasyMock.*;
+
 import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import junit.framework.TestCase;
-
-import org.easymock.MockControl;
 
 /**
  * @author Lucas Ward
@@ -21,14 +21,12 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	
 	private Map<String, Object> key;
 	
-	private MockControl psControl = MockControl.createControl(PreparedStatement.class);
 	private PreparedStatement ps;
 		
-	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
 		super.setUp();
 	
-		ps = (PreparedStatement)psControl.getMock();
+		ps = createMock(PreparedStatement.class);
 		mapper = new ColumnMapItemPreparedStatementSetter();
 		
 		key = new LinkedHashMap<String, Object>(2);
@@ -38,18 +36,18 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
 		
-		psControl.replay();
+		replay(ps);
 		mapper.setValues(new HashMap<String, Object>(), ps);
-		psControl.verify();
+		verify(ps);
 	}
 	
 	public void testCreateSetter() throws Exception {
 		
 		ps.setObject(1, new Integer(1));
 		ps.setObject(2, new Integer(2));
-		psControl.replay();
+		replay(ps);
 		mapper.setValues(key, ps);	
-		psControl.verify();
+		verify(ps);
 	}
 	
 }

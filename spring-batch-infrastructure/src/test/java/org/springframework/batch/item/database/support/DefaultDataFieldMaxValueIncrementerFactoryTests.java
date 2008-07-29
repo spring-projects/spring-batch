@@ -19,7 +19,7 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
@@ -43,7 +43,7 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		DataSource dataSource = (DataSource)MockControl.createControl(DataSource.class).getMock();
+		DataSource dataSource = createMock(DataSource.class);
 		factory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 	}
 	

@@ -24,7 +24,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -51,14 +51,12 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 
 	private PreparedStatement ps;
 
-	private MockControl control = MockControl.createControl(PreparedStatement.class);
-
 	/*
 	 * (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
-		ps = (PreparedStatement) control.getMock();
+		ps = createMock(PreparedStatement.class);
 		jdbcTemplate = new JdbcTemplate() {
 			public Object execute(String sql, PreparedStatementCallback action) throws DataAccessException {
 				list.add(sql);
@@ -139,9 +137,9 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	public void testFlush() throws SQLException {
 		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		ps.addBatch(); // there is one item in the buffer to start
-		control.setVoidCallable();
-		control.expectAndReturn(ps.executeBatch(), new int[0]);
-		control.replay();
+		expectLastCall().times(1);
+		expect(ps.executeBatch()).andReturn(new int[0]);
+		replay(ps);
 		writer.flush();
 		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(2, list.size());
@@ -156,9 +154,9 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	public void testWriteAndFlush() throws Exception {
 		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		ps.addBatch();
-		control.setVoidCallable(2);
-		control.expectAndReturn(ps.executeBatch(), new int[] { 123 });
-		control.replay();
+		expectLastCall().times(2);
+		expect(ps.executeBatch()).andReturn(new int[] { 123 });
+		replay(ps);
 		writer.write("bar");
 		writer.flush();
 		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
@@ -174,9 +172,9 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
 		assertTrue(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		ps.addBatch();
-		control.setVoidCallable(2);
-		control.expectAndReturn(ps.executeBatch(), new int[] { 0 });
-		control.replay();
+		expectLastCall().times(2);
+		expect(ps.executeBatch()).andReturn(new int[] {0});
+		replay(ps);
 		writer.write("bar");
 		try {
 			writer.flush();
@@ -200,9 +198,9 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 			}
 		});
 		ps.addBatch();
-		control.setVoidCallable();
-		control.expectAndReturn(ps.executeBatch(), new int[] { 123 });
-		control.replay();
+		expectLastCall().times(1);
+		expect(ps.executeBatch()).andReturn(new int[] {123});
+		replay(ps);
 		writer.write("foo");
 		try {
 			writer.flush();
@@ -220,7 +218,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		});
 		writer.write("foo");
 		writer.flush();
-		control.verify();
+		verify(ps);
 		assertEquals(4, list.size());
 		assertTrue(list.contains("SQL"));
 		assertTrue(list.contains("foo"));
