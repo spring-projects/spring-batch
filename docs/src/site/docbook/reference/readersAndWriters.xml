@@ -2514,7 +2514,7 @@
   }</programlisting>
 
       <section>
-        <title>Making the <classname>ItemReader</classname>
+        <title>Making the <classname>ItemWriter</classname>
         transactional</title>
 
         <para>The example is extremely simple, but it's worth showing to
