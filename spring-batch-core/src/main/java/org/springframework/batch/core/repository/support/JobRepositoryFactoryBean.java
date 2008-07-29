@@ -19,6 +19,8 @@ package org.springframework.batch.core.repository.support;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
 import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
@@ -122,6 +124,15 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "STEP_EXECUTION_SEQ"));
+		dao.setTablePrefix(tablePrefix);
+		dao.afterPropertiesSet();
+		return dao;
+	}
+
+	@Override
+	protected ExecutionContextDao createExecutionContextDao() throws Exception {
+		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
+		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;

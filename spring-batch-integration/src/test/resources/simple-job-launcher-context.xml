@@ -23,7 +23,10 @@
 		<constructor-arg ref="mapJobInstanceDao" />
 		<constructor-arg ref="mapJobExecutionDao" />
 		<constructor-arg ref="mapStepExecutionDao" />
+		<constructor-arg ref="mapExecutionContextDao" />
 	</bean>
+	<bean id="mapExecutionContextDao" lazy-init="true"
+		class="org.springframework.batch.core.repository.dao.MapExecutionContextDao" />
 	<bean id="mapJobInstanceDao" lazy-init="true"
 		class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" />
 	<bean id="mapJobExecutionDao" lazy-init="true"

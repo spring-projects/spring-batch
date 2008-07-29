@@ -38,8 +38,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -64,6 +66,8 @@ public class SimpleJobTests extends TestCase {
 	private JobExecutionDao jobExecutionDao;
 
 	private StepExecutionDao stepExecutionDao;
+	
+	private ExecutionContextDao ecDao;
 
 	private List<Serializable> list = new ArrayList<Serializable>();
 
@@ -89,10 +93,12 @@ public class SimpleJobTests extends TestCase {
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
+		MapExecutionContextDao.clear();
 		jobInstanceDao = new MapJobInstanceDao();
 		jobExecutionDao = new MapJobExecutionDao();
 		stepExecutionDao = new MapStepExecutionDao();
-		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
+		ecDao = new MapExecutionContextDao();
+		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 

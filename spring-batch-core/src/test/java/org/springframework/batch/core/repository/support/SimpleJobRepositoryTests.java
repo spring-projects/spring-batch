@@ -30,6 +30,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
@@ -60,6 +61,8 @@ public class SimpleJobRepositoryTests extends TestCase {
 	JobInstanceDao jobInstanceDao;
 
 	StepExecutionDao stepExecutionDao;
+	
+	ExecutionContextDao ecDao;
 
 	JobInstance databaseJob;
 
@@ -75,8 +78,9 @@ public class SimpleJobRepositoryTests extends TestCase {
 		jobExecutionDao = createMock(JobExecutionDao.class);
 		jobInstanceDao = createMock(JobInstanceDao.class);
 		stepExecutionDao = createMock(StepExecutionDao.class);
+		ecDao = createMock(ExecutionContextDao.class);
 
-		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
+		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
 
 		jobParameters = new JobParametersBuilder().toJobParameters();
 

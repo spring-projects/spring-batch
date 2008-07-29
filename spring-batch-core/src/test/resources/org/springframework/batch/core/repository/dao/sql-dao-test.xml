@@ -9,6 +9,11 @@
 		<constructor-arg ref="jobInstanceDao" />
 		<constructor-arg ref="jobExecutionDao" />
 		<constructor-arg ref="stepExecutionDao" />
+		<constructor-arg ref="executionContextDao" />
+	</bean>
+	
+	<bean id="executionContextDao" class="org.springframework.batch.core.repository.dao.JdbcExecutionContextDao" >
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
 	</bean>
 
 	<bean id="jobInstanceDao" class="org.springframework.batch.core.repository.dao.JdbcJobInstanceDao" >

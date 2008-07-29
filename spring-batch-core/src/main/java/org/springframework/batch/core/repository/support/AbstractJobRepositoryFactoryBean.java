@@ -4,6 +4,7 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
@@ -53,6 +54,11 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	 * @return fully configured {@link StepExecutionDao} implementation.
 	 */
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
+	
+	/**
+	 * @return fully configured {@link ExecutionContextDao} implementation.
+	 */
+	protected abstract ExecutionContextDao createExecutionContextDao() throws Exception;
 
 	public Object getObject() throws Exception {
 		return proxyFactory.getProxy();
@@ -95,7 +101,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	}
 
 	private Object getTarget() throws Exception {
-		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao());
+		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(), createExecutionContextDao());
 	}
 
 	/**

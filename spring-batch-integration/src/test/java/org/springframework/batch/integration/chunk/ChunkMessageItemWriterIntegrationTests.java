@@ -20,6 +20,7 @@ import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -63,7 +64,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 		factory = new SimpleStepFactoryBean<Object>();
 		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(),
-				new MapJobExecutionDao(), new MapStepExecutionDao());
+				new MapJobExecutionDao(), new MapStepExecutionDao(), new MapExecutionContextDao());
 		factory.setJobRepository(jobRepository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setBeanName("step");

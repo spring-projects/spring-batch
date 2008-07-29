@@ -35,6 +35,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -156,7 +157,7 @@ public class ItemOrientedStepTests extends TestCase {
 	public void testRepository() throws Exception {
 
 		SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
-				new MapStepExecutionDao());
+				new MapStepExecutionDao(), new MapExecutionContextDao());
 		itemOrientedStep.setJobRepository(repository);
 
 		JobExecution jobExecution = repository.createJobExecution(job, jobInstance.getJobParameters());

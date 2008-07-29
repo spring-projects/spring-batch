@@ -30,6 +30,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
@@ -62,6 +63,8 @@ public class SimpleJobRepository implements JobRepository {
 
 	private StepExecutionDao stepExecutionDao;
 
+	private ExecutionContextDao ecDao;
+
 	/**
 	 * Provide default constructor with low visibility in case user wants to use
 	 * use aop:proxy-target-class="true" for AOP interceptor.
@@ -70,11 +73,12 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
-			StepExecutionDao stepExecutionDao) {
+			StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
 		super();
 		this.jobInstanceDao = jobInstanceDao;
 		this.jobExecutionDao = jobExecutionDao;
 		this.stepExecutionDao = stepExecutionDao;
+		this.ecDao = ecDao;
 	}
 
 	/**
@@ -236,7 +240,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		stepExecutionDao.updateStepExecution(stepExecution);
 	}
-	
+
 	private void validateStepExecution(StepExecution stepExecution) {
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
 		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
@@ -246,14 +250,14 @@ public class SimpleJobRepository implements JobRepository {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @seeorg.springframework.batch.core.repository.JobRepository#
-	 * saveOrUpdateExecutionContext
+	 * @see org.springframework.batch.core.repository.JobRepository#
+	 * persistExecutionContext
 	 * (org.springframework.batch.core.domain.StepExecution)
 	 */
 	public void persistExecutionContext(StepExecution stepExecution) {
 		// Until there is an interface change (
-		stepExecutionDao.persistExecutionContext(stepExecution);
-		jobExecutionDao.persistExecutionContext(stepExecution.getJobExecution());
+		ecDao.persistExecutionContext(stepExecution.getJobExecution());
+		ecDao.persistExecutionContext(stepExecution);
 	}
 
 	/**

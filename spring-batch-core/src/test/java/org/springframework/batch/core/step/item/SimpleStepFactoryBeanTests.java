@@ -32,6 +32,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
+import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -58,7 +59,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	private List<Exception> recovered = new ArrayList<Exception>();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
-			new MapStepExecutionDao());
+			new MapStepExecutionDao(), new MapExecutionContextDao());
 
 	private List<String> written = new ArrayList<String>();
 

@@ -32,6 +32,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.SkipListenerSupport;
+import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -67,7 +68,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 	int count = 0;
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
-			new MapStepExecutionDao());
+			new MapStepExecutionDao(), new MapExecutionContextDao());
 
 	JobExecution jobExecution;
 
