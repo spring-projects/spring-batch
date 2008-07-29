@@ -10,13 +10,10 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
 /**
@@ -55,10 +52,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
-
-	private LobHandler lobHandler = new DefaultLobHandler();
-
-	private JdbcExecutionContextDao ecDao = new JdbcExecutionContextDao();
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if
@@ -179,10 +172,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobExecutionIncrementer);
-		ecDao.setJdbcTemplate(getJdbcTemplate());
-		ecDao.setLobHandler(lobHandler);
-		ecDao.setTablePrefix(getTablePrefix());
-		ecDao.afterPropertiesSet();
 	}
 
 	/**
@@ -208,7 +197,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(4)));
 			jobExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(5)), rs.getString(6), rs.getString(7)));
 			jobExecution.setCreateTime(rs.getDate(8));
-			jobExecution.setExecutionContext(findExecutionContext(jobExecution));
 			return jobExecution;
 		}
 
@@ -230,18 +218,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		else {
 			return (JobExecution) executions.get(0);
 		}
-	}
-
-	public ExecutionContext findExecutionContext(JobExecution jobExecution) {
-		return ecDao.getExecutionContext(jobExecution);
-	}
-
-	public void persistExecutionContext(JobExecution jobExecution) {
-		ecDao.persistExecutionContext(jobExecution);
-	}
-
-	public void setLobHandler(LobHandler lobHandler) {
-		this.lobHandler = lobHandler;
 	}
 
 }

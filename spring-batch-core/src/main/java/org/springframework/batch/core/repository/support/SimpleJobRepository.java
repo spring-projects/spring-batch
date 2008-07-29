@@ -177,7 +177,7 @@ public class SimpleJobRepository implements JobRepository {
 									+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
-			executionContext = jobExecutionDao.getLastJobExecution(jobInstance).getExecutionContext();
+			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
 		}
 		else {
 			// no job found, create one

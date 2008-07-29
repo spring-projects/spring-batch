@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 
@@ -18,8 +17,6 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	private static Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
 
 	private static long currentId = 0;
-	
-	private MapExecutionContextDao ecDao = new MapExecutionContextDao();
 
 	public static void clear() {
 		executionsById.clear();
@@ -67,12 +64,4 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		return lastExec;
 	}
 
-	public ExecutionContext findExecutionContext(JobExecution jobExecution) {
-		return ecDao.getExecutionContext(jobExecution);
-	}
-
-	public void persistExecutionContext(JobExecution jobExecution) {
-		ecDao.persistExecutionContext(jobExecution);
-
-	}
 }
