@@ -21,7 +21,6 @@ import java.util.Map;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
@@ -35,15 +34,9 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			.createTransactionalMap();
 
 	private static long currentId = 0;
-	
-	private MapExecutionContextDao ecDao = new MapExecutionContextDao();
 
 	public static void clear() {
 		executionsByJobExecutionId.clear();
-	}
-
-	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
-		return ecDao.getExecutionContext(stepExecution);
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
@@ -90,10 +83,6 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		}
 
 		return (StepExecution) executions.get(step.getName());
-	}
-
-	public void persistExecutionContext(StepExecution stepExecution) {
-		ecDao.persistExecutionContext(stepExecution);
 	}
 
 }

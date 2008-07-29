@@ -281,6 +281,10 @@ public class SimpleJobRepository implements JobRepository {
 				latest = stepExecution;
 			}
 		}
+		if (latest != null) {
+			ExecutionContext executionContext = ecDao.getExecutionContext(latest);
+			latest.setExecutionContext(executionContext);
+		}
 		return latest;
 	}
 

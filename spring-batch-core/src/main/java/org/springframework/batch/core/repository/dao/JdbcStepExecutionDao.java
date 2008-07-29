@@ -11,15 +11,11 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobCreator;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
 /**
@@ -62,11 +58,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
-	private LobHandler lobHandler = new DefaultLobHandler();
-
 	private DataFieldMaxValueIncrementer stepExecutionIncrementer;
-
-	private JdbcExecutionContextDao ecDao = new JdbcExecutionContextDao();
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if
@@ -75,11 +67,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	public void setExitMessageLength(int exitMessageLength) {
 		this.exitMessageLength = exitMessageLength;
-	}
-
-	public ExecutionContext findExecutionContext(final StepExecution stepExecution) {
-
-		return ecDao.getExecutionContext(stepExecution);
 	}
 
 	/**
@@ -128,18 +115,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		Assert.notNull(stepExecution.getStepName(), "StepExecution step name cannot be null.");
 		Assert.notNull(stepExecution.getStartTime(), "StepExecution start time cannot be null.");
 		Assert.notNull(stepExecution.getStatus(), "StepExecution status cannot be null.");
-	}
-
-	/**
-	 * Save or update execution attributes. A lob creator must be used, since
-	 * any attributes that don't match a provided type must be serialized into a
-	 * blob.
-	 * 
-	 * @see LobCreator
-	 */
-	public void persistExecutionContext(final StepExecution stepExecution) {
-
-		ecDao.persistExecutionContext(stepExecution);
 	}
 
 	/*
@@ -225,17 +200,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setCommitCount(rs.getInt(6));
 			stepExecution.setItemCount(rs.getInt(7));
 			stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(8)), rs.getString(9), rs.getString(10)));
-			stepExecution.setExecutionContext(findExecutionContext(stepExecution));
 			stepExecution.setReadSkipCount(rs.getInt(11));
 			stepExecution.setWriteSkipCount(rs.getInt(12));
 			stepExecution.setRollbackCount(rs.getInt(13));
 			return stepExecution;
 		}
 
-	}
-
-	public void setLobHandler(LobHandler lobHandler) {
-		this.lobHandler = lobHandler;
 	}
 
 	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
@@ -245,10 +215,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
-		ecDao.setJdbcTemplate(getJdbcTemplate());
-		ecDao.setLobHandler(lobHandler);
-		ecDao.setTablePrefix(getTablePrefix());
-		ecDao.afterPropertiesSet();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -16,38 +16,18 @@
 
 package org.springframework.batch.core.repository.support;
 
-import java.util.List;
-
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.item.ExecutionContext;
 
 public class MockStepDao implements StepExecutionDao {
 
-	private List<Step> newSteps;
-
-	public List<Step> findStepInstances(JobInstance job) {
-		return newSteps;
-	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
 	}
 
 	public void updateStepExecution(StepExecution stepExecution) {
-	}
-
-	public void setStepsToReturnOnCreate(List<Step> steps) {
-		this.newSteps = steps;
-	}
-
-	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
-		return null;
-	}
-
-	public void persistExecutionContext(StepExecution stepExecution) {
 	}
 
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
