@@ -17,14 +17,12 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	private static Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
 
-	private static Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
-
 	private static long currentId = 0;
+	
+	private MapExecutionContextDao ecDao = new MapExecutionContextDao();
 
 	public static void clear() {
 		executionsById.clear();
-		contextsByJobExecutionId.clear();
 	}
 
 	public void saveJobExecution(JobExecution jobExecution) {
@@ -70,11 +68,11 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	}
 
 	public ExecutionContext findExecutionContext(JobExecution jobExecution) {
-		return (ExecutionContext) contextsByJobExecutionId.get(jobExecution.getId());
+		return ecDao.getExecutionContext(jobExecution);
 	}
 
 	public void persistExecutionContext(JobExecution jobExecution) {
-		contextsByJobExecutionId.put(jobExecution.getId(), jobExecution.getExecutionContext());
+		ecDao.persistExecutionContext(jobExecution);
 
 	}
 }

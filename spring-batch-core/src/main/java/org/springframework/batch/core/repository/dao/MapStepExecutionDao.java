@@ -34,18 +34,16 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
 			.createTransactionalMap();
 
-	private static Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
-
 	private static long currentId = 0;
+	
+	private MapExecutionContextDao ecDao = new MapExecutionContextDao();
 
 	public static void clear() {
 		executionsByJobExecutionId.clear();
-		contextsByStepExecutionId.clear();
 	}
 
 	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
-		return (ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId());
+		return ecDao.getExecutionContext(stepExecution);
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
@@ -95,7 +93,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	}
 
 	public void persistExecutionContext(StepExecution stepExecution) {
-		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
+		ecDao.persistExecutionContext(stepExecution);
 	}
 
 }
