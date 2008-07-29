@@ -17,77 +17,83 @@ package org.springframework.batch.item.support;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.DelegatingItemWriter;
 
 /**
  * @author Lucas Ward
- *
+ * 
  */
 public class DelegatingItemWriterTests extends TestCase {
 
-	MockControl<ItemWriter> writerControl = MockControl.createControl(ItemWriter.class);
-	ItemWriter<Object> itemWriter;
+	@SuppressWarnings("unchecked")
+	ItemWriter<Object> itemWriter = createMock(ItemWriter.class);
+
 	DelegatingItemWriter<Object, Object> delegatingWriter;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
+
 	protected void setUp() throws Exception {
 		super.setUp();
-		
-		itemWriter = writerControl.getMock();
+
 		delegatingWriter = new DelegatingItemWriter<Object, Object>();
 		delegatingWriter.setDelegate(itemWriter);
 	}
 
-	public void testFlush() throws Exception{
+	public void testFlush() throws Exception {
 		itemWriter.flush();
-		writerControl.replay();
+		expectLastCall().once();
+		replay(itemWriter);
 		delegatingWriter.flush();
-		writerControl.verify();
+		verify(itemWriter);
 	}
-	
-	public void testClear() throws Exception{
+
+	public void testClear() throws Exception {
 		itemWriter.clear();
-		writerControl.replay();
+		expectLastCall().once();
+		replay(itemWriter);
 		delegatingWriter.clear();
-		writerControl.verify();
+		verify(itemWriter);
 	}
-	
-	public void testCreation() throws Exception{
-		try{
+
+	public void testCreation() throws Exception {
+		try {
 			delegatingWriter.setDelegate(null);
 			delegatingWriter.afterPropertiesSet();
 			fail();
 		}
-		catch(IllegalArgumentException ex){
-			//expected
+		catch (IllegalArgumentException ex) {
+			// expected
 		}
 	}
-	
-	public void testWrite() throws Exception{
-		
+
+	public void testWrite() throws Exception {
+
 		ProcessingWriter<Object, Object> writer = new ProcessingWriter<Object, Object>();
 		writer.setDelegate(itemWriter);
 		Object item = new Object();
 		itemWriter.write(item);
-		writerControl.replay();
+		expectLastCall().once();
+		replay(itemWriter);
 		writer.write(item);
-		writerControl.verify();
+		verify(itemWriter);
 		assertTrue(writer.isDoProcessCalled());
 	}
-	
-	private class ProcessingWriter<I,O> extends DelegatingItemWriter<I,O>{
-		
+
+	private class ProcessingWriter<I, O> extends DelegatingItemWriter<I, O> {
+
 		boolean doProcessCalled = false;
-		
+
 		protected O doProcess(I item) throws Exception {
 			doProcessCalled = true;
 			return super.doProcess(item);
 		}
-		
+
 		public boolean isDoProcessCalled() {
 			return doProcessCalled;
 		}

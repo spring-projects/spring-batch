@@ -9,6 +9,7 @@ import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
+@SuppressWarnings("unchecked")
 public class IbatisItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {

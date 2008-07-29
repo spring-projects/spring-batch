@@ -13,6 +13,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  *
  * @author Robert Kasanicky
  */
+@SuppressWarnings("unchecked")
 public class IbatisItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {

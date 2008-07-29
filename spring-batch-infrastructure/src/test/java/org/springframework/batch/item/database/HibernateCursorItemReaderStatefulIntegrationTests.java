@@ -1,6 +1,6 @@
 package org.springframework.batch.item.database;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
@@ -21,32 +21,28 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends Hibernate
 	//Ensure close is called on the stateful session correctly.
 	public void testStatfulClose(){
 		
-		MockControl<SessionFactory> sessionFactoryControl = MockControl.createControl(SessionFactory.class);
-		SessionFactory sessionFactory = sessionFactoryControl.getMock();
-		MockControl<Session> sessionControl = MockControl.createControl(Session.class);
-		Session session = sessionControl.getMock();
-		MockControl<Query> resultsControl = MockControl.createNiceControl(Query.class);
-		Query scrollableResults = resultsControl.getMock();
+		SessionFactory sessionFactory = createMock(SessionFactory.class);
+		Session session = createMock(Session.class);
+		Query scrollableResults = createNiceMock(Query.class);
 		HibernateCursorItemReader<Foo> itemReader = new HibernateCursorItemReader<Foo>();
 		itemReader.setSessionFactory(sessionFactory);
 		itemReader.setQueryString("testQuery");
 		itemReader.setUseStatelessSession(false);
 		
-		sessionFactory.openSession();
-		sessionFactoryControl.setReturnValue(session);
-		session.createQuery("testQuery");
-		sessionControl.setReturnValue(scrollableResults);
-		scrollableResults.setFetchSize(0);
-		resultsControl.setReturnValue(scrollableResults);
-		session.close();
-		sessionControl.setReturnValue(null);
-		sessionFactoryControl.replay();
-		sessionControl.replay();
-		resultsControl.replay();
+		expect(sessionFactory.openSession()).andReturn(session);
+		expect(session.createQuery("testQuery")).andReturn(scrollableResults);
+		expect(scrollableResults.setFetchSize(0)).andReturn(scrollableResults);
+		expect(session.close()).andReturn(null);
+		
+		replay(sessionFactory);
+		replay(session);
+		replay(scrollableResults);
+		
 		itemReader.open(new ExecutionContext());
 		itemReader.close(new ExecutionContext());
-		sessionFactoryControl.verify();
-		sessionControl.verify();
+		
+		verify(sessionFactory);
+		verify(session);
 	}
 	
 }

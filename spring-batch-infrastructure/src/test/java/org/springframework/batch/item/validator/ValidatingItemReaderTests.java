@@ -17,7 +17,7 @@ package org.springframework.batch.item.validator;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.AbstractItemReader;
 
@@ -30,7 +30,6 @@ public class ValidatingItemReaderTests extends TestCase {
 	ItemReader<Object> inputSource;
 	ValidatingItemReader<Object> itemProvider;
 	Validator validator;
-	MockControl validatorControl = MockControl.createControl(Validator.class);
 
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
@@ -39,7 +38,7 @@ public class ValidatingItemReaderTests extends TestCase {
 		super.setUp();
 
 		inputSource = new MockItemReader(this);
-		validator = (Validator)validatorControl.getMock();
+		validator = createMock(Validator.class);
 		itemProvider = new ValidatingItemReader<Object>();
 		itemProvider.setItemReader(inputSource);
 		itemProvider.setValidator(validator);
@@ -72,16 +71,17 @@ public class ValidatingItemReaderTests extends TestCase {
 	public void testValidation() throws Exception{
 
 		validator.validate(this);
-		validatorControl.replay();
+		expectLastCall().once();
+		replay(validator);
 		assertEquals(itemProvider.read(), this);
-		validatorControl.verify();
+		verify(validator);
 	}
 
 	public void testValidationException() throws Exception{
 
 		validator.validate(this);
-		validatorControl.setThrowable(new ValidationException(""));
-		validatorControl.replay();
+		expectLastCall().andThrow(new ValidationException(""));
+		replay(validator);
 		try{
 			itemProvider.read();
 			fail();
@@ -91,11 +91,11 @@ public class ValidatingItemReaderTests extends TestCase {
 	}
 
 	public void testNullInput() throws Exception{
-		validatorControl.replay();
+		replay(validator);
 		itemProvider.setItemReader(new MockItemReader(null));
 		assertNull(itemProvider.read());
 		//assert validator wasn't called.
-		validatorControl.verify();
+		verify(validator);
 	}
 
 	private static class MockItemReader extends AbstractItemReader<Object> {
