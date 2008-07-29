@@ -21,7 +21,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 
 import com.bea.xml.stream.events.StartDocumentEvent;
 
@@ -32,98 +32,92 @@ import com.bea.xml.stream.events.StartDocumentEvent;
 public class AbstractEventReaderWrapperTests extends TestCase {
 
 	AbstractEventReaderWrapper eventReaderWrapper;
-	MockControl mockEventReaderControl = MockControl.createControl(XMLEventReader.class);
 	XMLEventReader xmlEventReader;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		xmlEventReader = (XMLEventReader)mockEventReaderControl.getMock();
+		xmlEventReader = createMock(XMLEventReader.class);
 		eventReaderWrapper = new StubEventReader(xmlEventReader);
 	}
 
 	public void testClose() throws XMLStreamException {
 		xmlEventReader.close();
-		mockEventReaderControl.replay();
+		expectLastCall().once();
+		replay(xmlEventReader);
 		eventReaderWrapper.close();
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testGetElementText() throws XMLStreamException {
 
 		String text = "text";
-		xmlEventReader.getElementText();
-		mockEventReaderControl.setReturnValue(text);
-		mockEventReaderControl.replay();
+		expect(xmlEventReader.getElementText()).andReturn(text);
+		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.getElementText(), text);
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testGetProperty() throws IllegalArgumentException {
 
 		String text = "text";
-		xmlEventReader.getProperty("name");
-		mockEventReaderControl.setReturnValue(text);
-		mockEventReaderControl.replay();
+		expect(xmlEventReader.getProperty("name")).andReturn(text);
+		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.getProperty("name"), text);
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testHasNext() {
 
-		xmlEventReader.hasNext();
-		mockEventReaderControl.setReturnValue(true);
-		mockEventReaderControl.replay();
+		expect(xmlEventReader.hasNext()).andReturn(true);
+		replay(xmlEventReader);
 		assertTrue(eventReaderWrapper.hasNext());
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testNext() {
 
 		String text = "text";
-		xmlEventReader.next();
-		mockEventReaderControl.setReturnValue(text);
-		mockEventReaderControl.replay();
+		expect(xmlEventReader.next()).andReturn(text);
+		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.next(), text);
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testNextEvent() throws XMLStreamException {
 
 		XMLEvent event = new StartDocumentEvent();
-		xmlEventReader.nextEvent();
-		mockEventReaderControl.setReturnValue(event);
-		mockEventReaderControl.replay();
+		expect(xmlEventReader.nextEvent()).andReturn(event);
+		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.nextEvent(), event);
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testNextTag() throws XMLStreamException {
 
 		XMLEvent event = new StartDocumentEvent();
-		xmlEventReader.nextTag();
-		mockEventReaderControl.setReturnValue(event);
-		mockEventReaderControl.replay();
+		expect(xmlEventReader.nextTag()).andReturn(event);
+		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.nextTag(), event);
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testPeek() throws XMLStreamException {
 
 		XMLEvent event = new StartDocumentEvent();
-		xmlEventReader.peek();
-		mockEventReaderControl.setReturnValue(event);
-		mockEventReaderControl.replay();
+		expect(xmlEventReader.peek()).andReturn(event);
+		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.peek(), event);
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	public void testRemove() {
 
 		xmlEventReader.remove();
-		mockEventReaderControl.replay();
+		expectLastCall().once();
+		replay(xmlEventReader);
 		eventReaderWrapper.remove();
-		mockEventReaderControl.verify();
+		verify(xmlEventReader);
 	}
 
 	private static class StubEventReader extends AbstractEventReaderWrapper{

@@ -6,7 +6,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 
 /**
  * Tests for {@link NoStartEndDocumentStreamWriter}
@@ -17,34 +17,32 @@ public class NoStartEndDocumentWriterTests extends TestCase {
 
 	// object under test
 	private NoStartEndDocumentStreamWriter writer;
-	
+
 	private XMLEventWriter wrappedWriter;
-	private MockControl wrappedWriterControl = MockControl.createStrictControl(XMLEventWriter.class);
-	
+
 	private XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-	
-	
+
 	protected void setUp() throws Exception {
-		wrappedWriter = (XMLEventWriter) wrappedWriterControl.getMock();
+		wrappedWriter = createStrictMock(XMLEventWriter.class);
 		writer = new NoStartEndDocumentStreamWriter(wrappedWriter);
 	}
 
-
 	/**
-	 * StartDocument and EndDocument events are not passed to the wrapped writer.
+	 * StartDocument and EndDocument events are not passed to the wrapped
+	 * writer.
 	 */
 	public void testNoStartEnd() throws Exception {
 		XMLEvent event = eventFactory.createComment("testEvent");
-		
-		//mock expects only a single event
+
+		// mock expects only a single event
 		wrappedWriter.add(event);
-		wrappedWriterControl.setVoidCallable();
-		wrappedWriterControl.replay();
-		
+		expectLastCall().once();
+		replay(wrappedWriter);
+
 		writer.add(eventFactory.createStartDocument());
 		writer.add(event);
 		writer.add(eventFactory.createEndDocument());
-		
-		wrappedWriterControl.verify();
+
+		verify(wrappedWriter);
 	}
 }

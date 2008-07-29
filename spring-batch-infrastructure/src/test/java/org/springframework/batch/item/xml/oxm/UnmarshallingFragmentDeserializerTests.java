@@ -4,10 +4,11 @@ import java.io.IOException;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.transform.Source;
 
 import junit.framework.TestCase;
 
-import org.easymock.MockControl;
+import static org.easymock.EasyMock.*;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
@@ -27,15 +28,14 @@ public class UnmarshallingFragmentDeserializerTests extends TestCase {
 	private String xml = "<root> </root>";
 	
 	private Unmarshaller unmarshaller;
-	private MockControl unmarshallerControl = MockControl.createStrictControl(Unmarshaller.class);
 	
 	
 
 	protected void setUp() throws Exception {
 		Resource input = new ByteArrayResource(xml.getBytes());
 		eventReader = XMLInputFactory.newInstance().createXMLEventReader(input.getInputStream());
-		unmarshaller = (Unmarshaller) unmarshallerControl.getMock();
-		unmarshallerControl.setDefaultMatcher(MockControl.ALWAYS_MATCHER);
+		unmarshaller = createMock(Unmarshaller.class);
+		//unmarshallerControl.setDefaultMatcher(MockControl.ALWAYS_MATCHER);
 		deserializer = new UnmarshallingEventReaderDeserializer<Object>(unmarshaller);
 	}
 
@@ -44,24 +44,22 @@ public class UnmarshallingFragmentDeserializerTests extends TestCase {
 	 */
 	public void testSuccessfulDeserialization() throws Exception {
 		Object expectedResult = new Object();
-		unmarshaller.unmarshal(null);
-		unmarshallerControl.setReturnValue(expectedResult);
-		unmarshallerControl.replay();
+		expect(unmarshaller.unmarshal(isA(Source.class))).andReturn(expectedResult);
+		replay(unmarshaller);
 		
 		Object result = deserializer.deserializeFragment(eventReader);
 		
 		assertEquals(expectedResult, result);
 		
-		unmarshallerControl.verify();
+		verify(unmarshaller);
 	}
 	
 	/**
 	 * Appropriate exception rethrown in case of failure.
 	 */
 	public void testFailedDeserialization() throws Exception {
-		unmarshaller.unmarshal(null);
-		unmarshallerControl.setThrowable(new IOException());
-		unmarshallerControl.replay();
+		expect(unmarshaller.unmarshal(isA(Source.class))).andThrow(new IOException());
+		replay(unmarshaller);
 		
 		try {
 			deserializer.deserializeFragment(eventReader);
@@ -71,7 +69,7 @@ public class UnmarshallingFragmentDeserializerTests extends TestCase {
 			// expected
 		}
 		
-		unmarshallerControl.verify();
+		verify(unmarshaller);
 	}
 	
 	/**
