@@ -71,7 +71,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		}
 		TransactionSynchronizationManager.initSynchronization();
 
-		outputFile = File.createTempFile("flatfile-output-", ".tmp");
+		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
 
 		writer.setResource(new FileSystemResource(outputFile));
 		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
@@ -288,8 +288,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		writer.afterPropertiesSet();
 		try {
 			writer.open(executionContext);
-			// TODO: put this back in when Bamboo is fixed (2008/07/27)
-			// fail("Expected IllegalStateException");
+			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
 			String message = e.getMessage();
