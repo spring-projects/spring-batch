@@ -16,6 +16,11 @@
 
 package org.springframework.batch.container.jms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -26,78 +31,66 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 
-import junit.framework.TestCase;
-
 import org.aopalliance.aop.Advice;
-import org.easymock.MockControl;
+import org.easymock.EasyMock;
+import org.junit.Test;
 import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.util.ReflectionUtils;
 
-public class BatchMessageListenerContainerTests extends TestCase {
+public class BatchMessageListenerContainerTests {
 
 	BatchMessageListenerContainer container;
 
 	int count = 0;
 
+	@Test
 	public void testReceiveAndExecuteWithCallback() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		MockControl<Session> sessionControl = MockControl.createNiceControl(Session.class);
-		MockControl<MessageConsumer> consumerControl = MockControl.createControl(MessageConsumer.class);
-		MockControl<Message> messageControl = MockControl.createControl(Message.class);
-
-		Session session = sessionControl.getMock();
-		MessageConsumer consumer = consumerControl.getMock();
-		Message message = messageControl.getMock();
+		Session session = EasyMock.createMock(Session.class);
+		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
+		Message message = EasyMock.createMock(Message.class);
 
 		// Expect two calls to consumer (chunk size)...
-		consumerControl.expectAndReturn(consumer.receive(1000), message);
-		consumerControl.expectAndReturn(consumer.receive(1000), message);
+		EasyMock.expect(consumer.receive(1000)).andReturn(message).times(2);
 
-		sessionControl.replay();
-		consumerControl.replay();
-		messageControl.replay();
+		EasyMock.replay(consumer);
 
 		boolean received = doExecute(session, consumer);
 		assertTrue("Message not received", received);
 
-		sessionControl.verify();
-		consumerControl.verify();
-		messageControl.verify();
+		EasyMock.verify(consumer);
 
 	}
 
+	@Test
 	public void testReceiveAndExecuteWithCallbackReturningNull() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		container = getContainer(template);
 
-		MockControl<Session> sessionControl = MockControl.createNiceControl(Session.class);
-		MockControl<MessageConsumer> consumerControl = MockControl.createControl(MessageConsumer.class);
-
-		Session session = sessionControl.getMock();
-		MessageConsumer consumer = consumerControl.getMock();
+		Session session = EasyMock.createMock(Session.class);
+		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
 		Message message = null;
 
 		// Expect one call to consumer (chunk size is 2 but terminates on
 		// first)...
-		consumerControl.expectAndReturn(consumer.receive(1000), message);
+		EasyMock.expect(consumer.receive(1000)).andReturn(message);
 
-		sessionControl.replay();
-		consumerControl.replay();
+		EasyMock.replay(consumer, session);
 
 		boolean received = doExecute(session, consumer);
 		assertFalse("Message not received", received);
 
-		sessionControl.verify();
-		consumerControl.verify();
+		EasyMock.verify(consumer, session);
 
 	}
 
+	@Test
 	public void testTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
@@ -112,6 +105,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingException() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
@@ -121,6 +115,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 		assertTrue("Message not received but listener not transactional so this should be true", received);
 	}
 
+	@Test
 	public void testNonTransactionalReceiveAndExecuteWithCallbackThrowingError() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
@@ -137,8 +132,7 @@ public class BatchMessageListenerContainerTests extends TestCase {
 	}
 
 	private BatchMessageListenerContainer getContainer(RepeatTemplate template) {
-		MockControl<ConnectionFactory> connectionFactoryControl = MockControl.createControl(ConnectionFactory.class);
-		ConnectionFactory connectionFactory = connectionFactoryControl.getMock();
+		ConnectionFactory connectionFactory = EasyMock.createMock(ConnectionFactory.class);
 		// Yuck: we need to turn these method in base class to no-ops because the invoker is a private class
 		// we can't create for test purposes...
 		BatchMessageListenerContainer container = new BatchMessageListenerContainer() {
@@ -168,33 +162,25 @@ public class BatchMessageListenerContainerTests extends TestCase {
 			}
 		});
 
-		MockControl<Session> sessionControl = MockControl.createNiceControl(Session.class);
-		MockControl<MessageConsumer> consumerControl = MockControl.createNiceControl(MessageConsumer.class);
-		MockControl<Message> messageControl = MockControl.createNiceControl(Message.class);
+		Session session = EasyMock.createMock(Session.class);
+		MessageConsumer consumer = EasyMock.createMock(MessageConsumer.class);
+		Message message = EasyMock.createMock(Message.class);
 
-		Session session = sessionControl.getMock();
-		MessageConsumer consumer = consumerControl.getMock();
-		Message message = messageControl.getMock();
-
-		sessionControl.expectAndReturn(session.getTransacted(), true, expectGetTransactionCount);
+		EasyMock.expect(session.getTransacted()).andReturn(true).times(expectGetTransactionCount);
 
 		// Expect only one call to consumer (chunk size is 2, but first one
 		// rolls back terminating batch)...
-		consumerControl.expectAndReturn(consumer.receive(1000), message);
+		EasyMock.expect(consumer.receive(1000)).andReturn(message).anyTimes();
 		if (expectRollback) {
 			session.rollback();
-			sessionControl.setVoidCallable();
+			EasyMock.expectLastCall();
 		}
 
-		sessionControl.replay();
-		consumerControl.replay();
-		messageControl.replay();
+		EasyMock.replay(session, consumer, message);
 
 		boolean received = doExecute(session, consumer);
 
-		sessionControl.verify();
-		consumerControl.verify();
-		messageControl.verify();
+		EasyMock.verify(session, consumer, message);
 		return received;
 	}
 
