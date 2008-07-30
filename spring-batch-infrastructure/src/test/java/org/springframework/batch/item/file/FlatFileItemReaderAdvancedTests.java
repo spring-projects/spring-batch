@@ -25,6 +25,7 @@ import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
+import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -165,6 +166,41 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.update(executionContext);
 		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
 		        + ".read.count"));
+	}
+	
+	public void testRestartWithCustomRecordSeparatorPolicy() throws Exception {
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			public boolean isEndOfRecord(String line) {
+				pair = !pair;
+				return pair;
+			}
+
+			public String postProcess(String record) {
+				return record;
+			}
+
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.open(executionContext);
+
+		assertEquals("[testLine1testLine2]", reader.read().toString());
+		assertEquals("[testLine3testLine4]", reader.read().toString());
+		
+		reader.mark();
+		reader.update(executionContext);
+		
+		reader.close(executionContext);
+	
+		reader.open(executionContext);
+		
+		assertEquals("[testLine5testLine6]", reader.read().toString());
 	}
 
 	public void testRestartWithHeader() throws Exception {
