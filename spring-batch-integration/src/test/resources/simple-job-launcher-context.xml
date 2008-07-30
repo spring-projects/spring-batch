@@ -1,44 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-	<bean id="jobRegistryBeanPostProcessor"
-		class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
-		<property name="jobRegistry" ref="jobRegistry" />
-	</bean>
+
 	<bean id="jobLauncher"
 		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
-	<bean id="jobRegistry"
-		class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+
 	<bean id="transactionManager"
 		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
 	<bean id="jobRepository"
-		class="org.springframework.batch.core.repository.support.SimpleJobRepository">
-		<constructor-arg ref="mapJobInstanceDao" />
-		<constructor-arg ref="mapJobExecutionDao" />
-		<constructor-arg ref="mapStepExecutionDao" />
-		<constructor-arg ref="mapExecutionContextDao" />
+		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager" />
 	</bean>
-	<bean id="mapExecutionContextDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.dao.MapExecutionContextDao" />
-	<bean id="mapJobInstanceDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" />
-	<bean id="mapJobExecutionDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.dao.MapJobExecutionDao" />
-	<bean id="mapStepExecutionDao" lazy-init="true"
-		class="org.springframework.batch.core.repository.dao.MapStepExecutionDao" />
-	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob"
+
+	<bean id="simpleJob"
+		class="org.springframework.batch.core.job.SimpleJob"
 		abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
 	</bean>
-	<bean id="taskletStep" class="org.springframework.batch.core.step.tasklet.TaskletStep"
+	<bean id="taskletStep"
+		class="org.springframework.batch.core.step.tasklet.TaskletStep"
 		abstract="true">
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
@@ -61,14 +52,17 @@
 		<property name="customEditors">
 			<map>
 				<entry key="int[]">
-					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
+					<bean
+						class="org.springframework.batch.support.IntArrayPropertyEditor" />
 				</entry>
-				<entry key="org.springframework.batch.item.file.transform.Range[]">
+				<entry
+					key="org.springframework.batch.item.file.transform.Range[]">
 					<bean
 						class="org.springframework.batch.item.file.transform.RangeArrayPropertyEditor" />
 				</entry>
 				<entry key="java.util.Date">
-					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
+					<bean
+						class="org.springframework.beans.propertyeditors.CustomDateEditor">
 						<constructor-arg>
 							<bean class="java.text.SimpleDateFormat">
 								<constructor-arg value="yyyyMMdd" />
