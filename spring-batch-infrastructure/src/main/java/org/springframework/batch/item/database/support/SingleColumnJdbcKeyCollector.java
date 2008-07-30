@@ -20,9 +20,9 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -56,7 +56,7 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 
 	private static final String RESTART_KEY = "key";
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private String sql;
 
@@ -77,7 +77,7 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	 * @throws IllegalArgumentException if jdbcTemplate is null.
 	 * @throws IllegalArgumentException if sql string is empty or null.
 	 */
-	public SingleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
+	public SingleColumnJdbcKeyCollector(JdbcOperations jdbcTemplate, String sql) {
 		this();
 		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null.");
 		Assert.hasText(sql, "The sql statement must not be null or empty.");
@@ -158,11 +158,11 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	}
 
 	/**
-	 * Set the {@link JdbcTemplate} to be used.
+	 * Set the {@link JdbcOperations} to be used.
 	 * 
 	 * @param jdbcTemplate
 	 */
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 }

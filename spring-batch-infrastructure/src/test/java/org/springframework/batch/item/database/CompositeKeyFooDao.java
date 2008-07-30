@@ -20,9 +20,10 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+
+import javax.sql.DataSource;
 
 /**
  * @author Lucas Ward
@@ -30,9 +31,10 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
  */
 public class CompositeKeyFooDao extends JdbcDaoSupport implements FooDao {
 
-	public CompositeKeyFooDao(JdbcTemplate jdbcTemplate) {
-		this.setJdbcTemplate(jdbcTemplate);
+	public CompositeKeyFooDao(DataSource dataSource) {
+		this.setDataSource(dataSource);
 	}
+	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.sql.scratch.FooDao#getFoo(java.lang.Object)
 	 */

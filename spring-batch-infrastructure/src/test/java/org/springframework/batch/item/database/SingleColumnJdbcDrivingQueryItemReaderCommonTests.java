@@ -16,7 +16,7 @@ public class SingleColumnJdbcDrivingQueryItemReaderCommonTests extends CommonDat
 		DrivingQueryItemReader<Long> reader = new DrivingQueryItemReader<Long>();
 		reader.setKeyCollector(keyCollector);
 		reader.setSaveState(true);
-		return new FooItemReader(reader, jdbcTemplate);
+		return new FooItemReader(reader, getDataSource());
 	}
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {

@@ -25,9 +25,9 @@ import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -57,7 +57,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 
 	private static final String CURRENT_KEY = "current.key";
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private RowMapper keyMapper = new ColumnMapRowMapper();
 
@@ -78,7 +78,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 	 * @param jdbcTemplate
 	 * @param sql - SQL statement that returns all keys to process. object.
 	 */
-	public MultipleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
+	public MultipleColumnJdbcKeyCollector(JdbcOperations jdbcTemplate, String sql) {
 		this();
 		Assert.notNull(jdbcTemplate, "The JdbcTemplate must not be null.");
 		Assert.hasText(sql, "The sql statement must not be null or empty.");
@@ -163,7 +163,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 		this.sql = sql;
 	}
 
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 

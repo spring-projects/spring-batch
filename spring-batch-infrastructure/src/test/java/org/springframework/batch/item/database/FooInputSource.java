@@ -6,7 +6,8 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
 
 class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, InitializingBean {
 
@@ -18,9 +19,9 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 
 	FooDao fooDao = new SingleKeyFooDao();
 
-	public FooItemReader(DrivingQueryItemReader<?> inputSource, JdbcTemplate jdbcTemplate) {
+	public FooItemReader(DrivingQueryItemReader<?> inputSource, DataSource dataSource) {
 		this.itemReader = inputSource;
-		fooDao.setJdbcTemplate(jdbcTemplate);
+		fooDao.setDataSource(dataSource);
 	}
 
 	public Foo read() {
@@ -50,7 +51,7 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 
 	public void open(ExecutionContext executionContext) {
 		itemReader.open(executionContext);
-	};
+	}
 
 	public void close(ExecutionContext executionContext) {
 		itemReader.close(executionContext);
@@ -70,5 +71,5 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 	 */
 	public void reset() {
 		itemReader.reset();
-	};
+	}
 }
