@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.util.ArrayList;
+import static org.junit.Assert.*;
+
 import java.util.Arrays;
-import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -28,7 +28,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.AbstractJobDaoTests;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -39,51 +38,42 @@ import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Dave Syer
  * 
  */
-public class ItemOrientedStepIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
-
-	private List<String> processed = new ArrayList<String>();
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+public class ItemOrientedStepIntegrationTests {
 
 	private ItemOrientedStep step;
 
 	private Job job;
 
+	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	@Autowired
 	private DataSource dataSource;
 
 	private JobRepository jobRepository;
-
-	/**
-	 * Public setter for the PlatformTransactionManager.
-	 * @param transactionManager the transactionManager to set
-	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-
-	/**
-	 * Public setter for the DataSource.
-	 * @param dataSource the dataSource to set
-	 */
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
 
 	private ItemReader<String> getReader(String[] args) {
 		return new ListItemReader<String>(Arrays.asList(args));
 	}
 
-	protected void onSetUp() throws Exception {
+	@Before
+	public void onSetUp() throws Exception {
 		MapJobInstanceDao.clear();
 		MapStepExecutionDao.clear();
 		MapJobExecutionDao.clear();
@@ -114,19 +104,11 @@ public class ItemOrientedStepIntegrationTests extends AbstractDependencyInjectio
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
-	 */
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(AbstractJobDaoTests.class, "sql-dao-test.xml") };
-	}
-
+	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
 		step.setItemHandler(new SimpleItemHandler<String>(getReader(new String[] { "a", "b", "c" }), new AbstractItemWriter<String>() {
 			public void write(String data) throws Exception {
-				processed.add((String) data);
 				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 					public void beforeCommit(boolean readOnly) {
 						throw new RuntimeException("Simulate commit failure");

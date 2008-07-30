@@ -1,5 +1,7 @@
 package org.springframework.batch.core.repository.support;
 
+import static org.junit.Assert.*;
+
 import java.util.Date;
 
 import org.springframework.batch.core.BatchStatus;
@@ -11,22 +13,23 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.dao.AbstractJobDaoTests;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
-import org.springframework.util.ClassUtils;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.junit.runner.RunWith;
+import org.junit.Test;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
  * 
  * @author Robert Kasanicky
  */
-public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
-
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(AbstractJobDaoTests.class, "sql-dao-test.xml") };
-	}
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
+public class SimpleJobRepositoryIntegrationTests {
 
 	private SimpleJobRepository jobRepository;
 
@@ -34,14 +37,16 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 
 	private JobParameters jobParameters = new JobParameters();
 
+	@Autowired
 	public void setJobRepository(SimpleJobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
 
-	/**
+	/*
 	 * Create two job executions for same job+parameters tuple. Check both
 	 * executions belong to the same job instance and job.
 	 */
+	@Transactional @Test
 	public void testCreateAndFind() throws Exception {
 
 		job.setRestartable(true);
@@ -64,10 +69,11 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
 	}
 
-	/**
+	/*
 	 * Create two job executions for same job+parameters tuple. Check both
 	 * executions belong to the same job instance and job.
 	 */
+	@Transactional @Test
 	public void testCreateAndFindWithNoStartDate() throws Exception {
 		job.setRestartable(true);
 
@@ -81,10 +87,11 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
 	}
 
-	/**
+	/*
 	 * Non-restartable JobInstance can be run only once - attempt to run
 	 * existing non-restartable JobInstance causes error.
 	 */
+	@Transactional @Test
 	public void testRunNonRestartableJobInstanceTwice() throws Exception {
 		job.setRestartable(false);
 
@@ -100,10 +107,11 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		}
 	}
 
-	/**
+	/*
 	 * Save multiple StepExecutions for the same step and check the returned
 	 * count and last execution are correct.
 	 */
+	@Transactional @Test
 	public void testGetStepExecutionCountAndLastStepExecution() throws Exception {
 		job.setRestartable(true);
 		StepSupport step = new StepSupport("restartedStep");
@@ -137,9 +145,10 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 		assertEquals(secondStepExec, jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step));
 	}
 
-	/**
+	/*
 	 * Save execution context and retrieve it.
 	 */
+	@Transactional @Test
 	public void testSaveExecutionContext() throws Exception {
 		ExecutionContext ctx = new ExecutionContext() {
 			{
@@ -165,10 +174,11 @@ public class SimpleJobRepositoryIntegrationTests extends AbstractTransactionalDa
 //		assertEquals(ctx, retrievedJobExec.getExecutionContext());
 	}
 
-	/**
+	/*
 	 * If JobExecution is already running, exception will be thrown in attempt
 	 * to create new execution.
 	 */
+	@Transactional @Test
 	public void testOnlyOneJobExecutionAllowedRunning() throws Exception {
 		job.setRestartable(true);
 		jobRepository.createJobExecution(job, jobParameters);

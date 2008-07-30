@@ -16,6 +16,10 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -26,14 +30,15 @@ import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Tests for {@link StepExecutionDao} implementations.
  * 
  * @see #getStepExecutionDao()
  */
-public abstract class AbstractStepExecutionDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
+public abstract class AbstractStepExecutionDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
 
 	protected StepExecutionDao dao;
 
@@ -57,7 +62,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 */
 	protected abstract JobRepository getJobRepository();
 
-	protected void onSetUp() throws Exception {
+	@Before
+	public void onSetUp() throws Exception {
 		repository = getJobRepository();
 		
 		
@@ -68,6 +74,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		dao = getStepExecutionDao();
 	}
 
+	@Transactional @Test
 	public void testSaveExecutionAssignsIdAndVersion() throws Exception {
 		
 		assertNull(stepExecution.getId());
@@ -77,6 +84,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		assertNotNull(stepExecution.getVersion());
 	}
 
+	@Transactional @Test
 	public void testSaveAndFindExecution() {
 		
 		stepExecution.setStatus(BatchStatus.STARTED);
@@ -95,15 +103,17 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		assertNull(dao.getStepExecution(jobExecution, new StepSupport("not-existing step")));
 	}
 
+	@Transactional @Test
 	public void testGetForNotExistingJobExecution() {
-		assertNull(dao.getStepExecution(new JobExecution(jobInstance, new Long(777)), step));
+		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777), step));
 	}
 
 	/**
 	 * To-be-saved execution must not already have an id.
 	 */
+	@Transactional @Test
 	public void testSaveExecutionWithIdAlreadySet() {
-		stepExecution.setId(new Long(7));
+		stepExecution.setId((long) 7);
 		try {
 			dao.saveStepExecution(stepExecution);
 			fail();
@@ -116,6 +126,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	/**
 	 * To-be-saved execution must not already have a version.
 	 */
+	@Transactional @Test
 	public void testSaveExecutionWithVersionAlreadySet() {
 		stepExecution.incrementVersion();
 		try {
@@ -131,6 +142,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 * Update and retrieve updated StepExecution - make sure the update is
 	 * reflected as expected and version number has been incremented
 	 */
+	@Transactional @Test
 	public void testUpdateExecution() {
 		stepExecution.setStatus(BatchStatus.STARTED);
 		dao.saveStepExecution(stepExecution);
@@ -138,7 +150,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 		stepExecution.setStatus(BatchStatus.STOPPED);
 		dao.updateStepExecution(stepExecution);
-		assertEquals(versionAfterSave.intValue() + 1, stepExecution.getVersion().intValue());
+		assertEquals(versionAfterSave + 1, stepExecution.getVersion().intValue());
 
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
 		assertEquals(stepExecution, retrieved);
@@ -149,6 +161,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	 * Exception should be raised when the version of update argument doesn't
 	 * match the version of persisted entity.
 	 */
+	@Transactional @Test
 	public void testConcurrentModificationException() {
 		step = new StepSupport("foo");
 

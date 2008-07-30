@@ -1,29 +1,34 @@
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.junit.Test;
+
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.util.ClassUtils;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "sql-dao-test.xml")
 public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 
 	protected StepExecutionDao getStepExecutionDao() {
-		return (StepExecutionDao) getApplicationContext().getBean("stepExecutionDao");
+		return (StepExecutionDao) applicationContext.getBean("stepExecutionDao");
 	}
 
 	protected JobRepository getJobRepository() {
-		deleteFromTables(new String[] { "BATCH_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
-				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE" });
-		return (JobRepository) getApplicationContext().getBean("jobRepository");
-	}
-
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
+		deleteFromTables("BATCH_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
+				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
+		return (JobRepository) applicationContext.getBean("jobRepository");
 	}
 
 	/**
 	 * Long exit descriptions are truncated on both save and update.
 	 */
+	@Transactional @Test
 	public void testTruncateExitDescription() {
 		
 		StringBuffer sb = new StringBuffer();

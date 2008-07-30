@@ -1,5 +1,9 @@
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Date;
 
 import org.springframework.batch.core.Job;
@@ -7,9 +11,10 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
+public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
 
 	private static final long DATE = 777;
 
@@ -18,18 +23,20 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 	private Job fooJob = new JobSupport("foo");
 
 	private JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue").addLong(
-			"longKey", new Long(Long.MAX_VALUE)).addDouble("doubleKey", new Double(Double.MAX_VALUE)).addDate(
+			"longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE).addDate(
 			"dateKey", new Date(DATE)).toJobParameters();
 
 	protected abstract JobInstanceDao getJobInstanceDao();
 
-	protected void onSetUp() throws Exception {
+	@Before
+	public void onSetUp() throws Exception {
 		dao = getJobInstanceDao();
 	}
 
-	/**
+	/*
 	 * Create and retrieve a job instance.
 	 */
+	@Transactional @Test
 	public void testCreateAndRetrieve() throws Exception {
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
@@ -52,6 +59,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 	/**
 	 * Trying to create instance twice for the same job+parameters causes error
 	 */
+	@Transactional @Test
 	public void testCreateDuplicateInstance() {
 
 		dao.createJobInstance(fooJob, fooParams);
@@ -65,9 +73,10 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalD
 		}
 	}
 
+	@Transactional @Test
 	public void testCreationAddsVersion() {
 
-		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "testVersionAndId");
+		JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "testVersionAndId");
 
 		assertNull(jobInstance.getVersion());
 
