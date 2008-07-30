@@ -3,32 +3,48 @@
  */
 package org.springframework.batch.item.database.support;
 
+import static org.junit.Assert.*;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+
+import javax.sql.DataSource;
 
 /**
  * @author Lucas Ward
  *
  */
-public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/item/database/data-source-context.xml")
+public class MultipleColumnJdbcKeyGeneratorIntegrationTests {
 	
 	MultipleColumnJdbcKeyCollector<Map<?,?>> keyStrategy;
 	
 	ExecutionContext executionContext;
-	
-	protected String[] getConfigLocations(){
-		return new String[] { "org/springframework/batch/item/database/data-source-context.xml"};
+
+	private SimpleJdbcTemplate simpleJdbcTemplate;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	protected void onSetUpBeforeTransaction() throws Exception {
-		super.onSetUpBeforeTransaction();
-		
-		keyStrategy = new MultipleColumnJdbcKeyCollector<Map<?,?>>(getJdbcTemplate(),
+	@Before
+	public void onSetUpBeforeTransaction() throws Exception {
+
+		keyStrategy = new MultipleColumnJdbcKeyCollector<Map<?,?>>(simpleJdbcTemplate.getJdbcOperations(),
 		"SELECT ID, VALUE from T_FOOS order by ID");
 		
 		keyStrategy.setRestartSql("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
@@ -36,17 +52,19 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		executionContext = new ExecutionContext();
 	}
 	
+	@Transactional @Test
 	public void testRetrieveKeys(){
 		
 		List<Map<?,?>> keys = keyStrategy.retrieveKeys(executionContext);
 		
 		for (int i = 0; i < keys.size(); i++) {
 			Map<?,?> id = keys.get(i);
-			assertEquals(id.get("ID"), new Long(i + 1));
-			assertEquals(id.get("VALUE"), new Integer(i + 1));
+			assertEquals(i + 1L, id.get("ID"));
+			assertEquals(i + 1, id.get("VALUE"));
 		}
 	}
 	
+	@Transactional @Test
 	public void testRestoreKeys(){
 		
 		Map<String, String> keyMap = new LinkedHashMap<String, String>();
@@ -54,17 +72,18 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 		keyMap.put("VALUE", "3");
 		executionContext.put(ClassUtils.getShortName(MultipleColumnJdbcKeyCollector.class)+ ".current.key", keyMap);
 		
-		List<Map<?,?>> keys = keyStrategy.retrieveKeys(executionContext);
+		List<Map<?, ?>> keys = keyStrategy.retrieveKeys(executionContext);
 		
 		assertEquals(2, keys.size());
 		Map<?,?> key = keys.get(0);
-		assertEquals(new Long(4), key.get("ID"));
-		assertEquals(new Integer(4), key.get("VALUE"));
+		assertEquals(4L, key.get("ID"));
+		assertEquals(4, key.get("VALUE"));
 		key = keys.get(1);
-		assertEquals(new Long(5), key.get("ID"));
-		assertEquals(new Integer(5), key.get("VALUE"));
+		assertEquals(5L, key.get("ID"));
+		assertEquals(5, key.get("VALUE"));
 	}
 	
+	@Transactional @Test
 	public void testGetNullKeyAsStreamContext(){
 		
 		try{
@@ -74,4 +93,5 @@ public class MultipleColumnJdbcKeyGeneratorIntegrationTests extends AbstractTran
 			//expected
 		}
 	}
+
 }
