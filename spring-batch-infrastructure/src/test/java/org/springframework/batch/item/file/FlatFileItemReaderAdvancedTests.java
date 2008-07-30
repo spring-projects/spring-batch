@@ -24,6 +24,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -58,7 +59,8 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 	};
 
 	/**
-	 * Create inputFile, inject mock/stub dependencies for tested object, initialize the tested object
+	 * Create inputFile, inject mock/stub dependencies for tested object,
+	 * initialize the tested object
 	 */
 	protected void setUp() throws Exception {
 
@@ -151,8 +153,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 		// get restart data
 		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".read.count"));
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 		// close input
 		reader.close(executionContext);
 
@@ -166,14 +167,49 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine6]", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".read.count"));
+		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+	}
+
+	public void testRestartWithCustomRecordSeparatorPolicy() throws Exception {
+		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader.setRecordSeparatorPolicy(new RecordSeparatorPolicy() {
+			// 1 record = 2 lines
+			boolean pair = true;
+
+			public boolean isEndOfRecord(String line) {
+				pair = !pair;
+				return pair;
+			}
+
+			public String postProcess(String record) {
+				return record;
+			}
+
+			public String preProcess(String record) {
+				return record;
+			}
+		});
+
+		reader.open(executionContext);
+
+		assertEquals("[testLine1testLine2]", reader.read().toString());
+		assertEquals("[testLine3testLine4]", reader.read().toString());
+		
+		reader.mark();
+		reader.update(executionContext);
+		
+		reader.close(executionContext);
+	
+		reader.open(executionContext);
+		
+		assertEquals("[testLine5testLine6]", reader.read().toString());
 	}
 
 	public void testRestartWithHeader() throws Exception {
 
 		reader.close(null);
-		reader.setResource(getInputResource("header\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader
+				.setResource(getInputResource("header\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 		reader.setFirstLineIsHeader(true);
 		reader.open(executionContext);
 
@@ -188,12 +224,12 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 		// get restart data
 		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".read.count"));
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 		// close input
 		reader.close(executionContext);
 
-		reader.setResource(getInputResource("header\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader
+				.setResource(getInputResource("header\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
 		reader.open(executionContext);
@@ -203,14 +239,14 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine6]", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".read.count"));
+		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 	}
 
 	public void testRestartWithSkippedLines() throws Exception {
 
 		reader.close(null);
-		reader.setResource(getInputResource("header\nignoreme\n\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader
+				.setResource(getInputResource("header\nignoreme\n\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 		reader.setLinesToSkip(2);
 		reader.open(executionContext);
 
@@ -225,12 +261,12 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 		// get restart data
 		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".read.count"));
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 		// close input
 		reader.close(executionContext);
 
-		reader.setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
+		reader
+				.setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
 
 		// init for restart
 		reader.open(executionContext);
@@ -240,7 +276,6 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine6]", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
-		        + ".read.count"));
+		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 	}
 }

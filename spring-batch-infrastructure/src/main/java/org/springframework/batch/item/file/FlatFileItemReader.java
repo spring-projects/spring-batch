@@ -95,14 +95,6 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
 
-	protected void jumpToItem(int itemIndex) throws Exception {
-		Object record = "";
-		int index = itemIndex + (firstLineIsHeader?1:0) + linesToSkip;
-		while (reader.getPosition() < index && record != null) {
-			readLine();
-		}
-	}
-
 	/**
 	 * @return next line to be tokenized and mapped.
 	 */
