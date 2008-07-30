@@ -13,6 +13,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.util.Assert;
 
 /**
  * Tests for {@link AbstractStep}.
@@ -103,10 +104,22 @@ public class AbstractStepTests extends TestCase {
 	private static class JobRepositoryStub extends JobRepositorySupport {
 
 		ExecutionContext saved = new ExecutionContext();
+		
+		static long counter = 0;
 
 		public void persistExecutionContext(StepExecution stepExecution) {
+			Assert.state(stepExecution.getId() != null, "StepExecution must already be saved");
 			saved = stepExecution.getExecutionContext();
 		}
+
+		@Override
+		public void save(StepExecution stepExecution) {
+			if (stepExecution.getId() == null) {
+				stepExecution.setId(counter);
+				counter++;
+			}
+		}
+		
 
 	}
 
