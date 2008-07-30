@@ -1,5 +1,9 @@
 package org.springframework.batch.core.repository.dao;
 
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Date;
 import java.util.List;
 
@@ -7,13 +11,14 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
+public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
 
 	JobExecutionDao dao;
 
-	JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "execTestJob");
+	JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "execTestJob");
 
 	JobExecution execution = new JobExecution(jobInstance);
 
@@ -22,13 +27,15 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 */
 	protected abstract JobExecutionDao getJobExecutionDao();
 
-	protected void onSetUp() throws Exception {
+	@Before
+	public void onSetUp() throws Exception {
 		dao = getJobExecutionDao();
 	}
 
 	/**
 	 * Save and find a job execution.
 	 */
+	@Transactional @Test
 	public void testSaveAndFind() {
 
 		dao.saveJobExecution(execution);
@@ -41,6 +48,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	/**
 	 * Saving sets id to the entity.
 	 */
+	@Transactional @Test
 	public void testSaveAddsIdAndVersion() {
 
 		assertNull(execution.getId());
@@ -54,6 +62,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 * Update and retrieve job execution - check attributes have changed as
 	 * expected.
 	 */
+	@Transactional @Test
 	public void testUpdateExecution() {
 		execution.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(execution);
@@ -61,7 +70,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		execution.setStatus(BatchStatus.COMPLETED);
 		dao.updateJobExecution(execution);
 
-		JobExecution updated = (JobExecution) dao.findJobExecutions(jobInstance).get(0);
+		JobExecution updated = dao.findJobExecutions(jobInstance).get(0);
 		assertEquals(execution, updated);
 		assertEquals(BatchStatus.COMPLETED, updated.getStatus());
 	}
@@ -69,6 +78,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	/**
 	 * Check the execution with most recent start time is returned
 	 */
+	@Transactional @Test
 	public void testGetLastExecution() {
 		JobExecution exec1 = new JobExecution(jobInstance);
 		exec1.setCreateTime(new Date(0));
