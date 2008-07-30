@@ -25,7 +25,6 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 		((JdbcJobExecutionDao) jobExecutionDao).setTablePrefix(AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Transactional @Test
 	public void testUpdateJobExecutionWithLongExitCode() {
 
