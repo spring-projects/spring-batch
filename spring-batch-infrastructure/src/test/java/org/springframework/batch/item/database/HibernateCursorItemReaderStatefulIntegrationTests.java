@@ -6,12 +6,17 @@ import org.hibernate.SessionFactory;
 import org.hibernate.classic.Session;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.junit.runner.RunWith;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using standard hibernate {@link Session}.
  * 
  * @author Robert Kasanicky
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "data-source-context.xml")
 public class HibernateCursorItemReaderStatefulIntegrationTests extends HibernateCursorItemReaderIntegrationTests {
 
 	protected boolean isUseStatelessSession() {

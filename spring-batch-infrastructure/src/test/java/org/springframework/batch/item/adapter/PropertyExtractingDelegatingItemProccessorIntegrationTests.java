@@ -1,30 +1,37 @@
 package org.springframework.batch.item.adapter;
 
+import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.junit.Test;
+
 import java.util.List;
 
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
 import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Tests for {@link PropertyExtractingDelegatingItemWriter}
  * 
  * @author Robert Kasanicky
  */
-public class PropertyExtractingDelegatingItemProccessorIntegrationTests extends
-        AbstractDependencyInjectionSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "pe-delegating-item-writer.xml")
+public class PropertyExtractingDelegatingItemProccessorIntegrationTests {
 
+	@Autowired
 	private PropertyExtractingDelegatingItemWriter<Foo> processor;
 
+	@Autowired
 	private FooService fooService;
 
-	protected String getConfigPath() {
-		return "pe-delegating-item-writer.xml";
-	}
-
-	/**
+	/*
 	 * Regular usage scenario - input object should be passed to the service the injected invoker points to.
 	 */
+	@Test
 	public void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
@@ -44,14 +51,6 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests extends
 			assertEquals(0, outputFoo.getId());
 		}
 
-	}
-
-	public void setProcessor(PropertyExtractingDelegatingItemWriter<Foo> processor) {
-		this.processor = processor;
-	}
-
-	public void setFooService(FooService fooService) {
-		this.fooService = fooService;
 	}
 
 }

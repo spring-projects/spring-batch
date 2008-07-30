@@ -1,30 +1,37 @@
 package org.springframework.batch.item.adapter;
 
+import static org.junit.Assert.*;
+
 import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.runner.RunWith;
+import org.junit.Test;
 
 /**
  * Tests for {@link ItemWriterAdapter}.
  * 
  * @author Robert Kasanicky
  */
-public class ItemWriterAdapterTests extends AbstractDependencyInjectionSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "delegating-item-writer.xml")
+public class ItemWriterAdapterTests {
 
+	@Autowired
 	private ItemWriter<Foo> processor;
 
+	@Autowired
 	private FooService fooService;
 
-	protected String getConfigPath() {
-		return "delegating-item-writer.xml";
-	}
-
-	/**
+	/*
 	 * Regular usage scenario - input object should be passed to the service the injected invoker points to.
 	 */
+	@Test
 	public void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
@@ -42,13 +49,4 @@ public class ItemWriterAdapterTests extends AbstractDependencyInjectionSpringCon
 
 	}
 
-	// setter for auto-injection
-	public void setProcessor(ItemWriter<Foo> processor) {
-		this.processor = processor;
-	}
-
-	// setter for auto-injection
-	public void setFooService(FooService fooService) {
-		this.fooService = fooService;
-	}
 }

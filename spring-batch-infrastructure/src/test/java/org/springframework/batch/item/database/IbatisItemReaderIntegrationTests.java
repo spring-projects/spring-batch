@@ -5,6 +5,9 @@ import org.springframework.batch.item.database.support.IbatisKeyCollector;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.junit.runner.RunWith;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -14,13 +17,15 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * @author Robert Kasanicky
  */
 @SuppressWarnings("unchecked")
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "data-source-context.xml")
 public class IbatisItemReaderIntegrationTests extends AbstractDataSourceItemReaderIntegrationTests {
 
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
 		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
 		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));
-		factory.setDataSource(super.getJdbcTemplate().getDataSource());
+		factory.setDataSource(dataSource);
 		factory.afterPropertiesSet();
 		SqlMapClient sqlMapClient = (SqlMapClient) factory.getObject();
 
