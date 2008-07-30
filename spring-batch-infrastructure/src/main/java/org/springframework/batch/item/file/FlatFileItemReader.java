@@ -16,15 +16,19 @@
 
 package org.springframework.batch.item.file;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemReaderException;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.separator.LineReader;
+import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.ResourceLineReader;
 import org.springframework.batch.item.file.transform.AbstractLineTokenizer;
@@ -73,9 +77,9 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 
 	private Resource resource;
 
-	private RecordSeparatorPolicy recordSeparatorPolicy;
+	private RecordSeparatorPolicy recordSeparatorPolicy = new DefaultRecordSeparatorPolicy();
 
-	private String[] comments;
+	private String[] comments = new String[] { "#" };
 
 	private int linesToSkip = 0;
 
@@ -85,43 +89,12 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 
 	private FieldSetMapper<? extends T> fieldSetMapper;
 
-	/**
-	 * Encapsulates the state of the input source. If it is null then we are
-	 * uninitialized.
-	 */
-	private LineReader reader;
+	private int lineCount = 0;
+
+	private BufferedReader reader;
 
 	public FlatFileItemReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
-	}
-
-	/**
-	 * @return next line to be tokenized and mapped.
-	 */
-	private String readLine() {
-		try {
-			return (String) getReader().read();
-		}
-		catch (ItemStreamException e) {
-			throw e;
-		}
-		catch (ItemReaderException e) {
-			throw e;
-		}
-		catch (Exception e) {
-			throw new IllegalStateException();
-		}
-	}
-
-	/**
-	 * @return line reader used to read input file
-	 */
-	protected LineReader getReader() {
-		if (reader == null) {
-			throw new ReaderNotOpenException("Reader must be open before it can be read.");
-			// reader is now not null, or else an exception is thrown
-		}
-		return reader;
 	}
 
 	/**
@@ -210,14 +183,17 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 	}
 
 	protected void doClose() throws Exception {
+		if (reader == null) {
+			return;
+		}
 		try {
-			if (reader != null) {
-				log.debug("Closing flat file for reading: " + resource);
-				reader.close();
-			}
+			reader.close();
+		}
+		catch (IOException e) {
+			throw new ItemStreamException("Could not close reader", e);
 		}
 		finally {
-			reader = null;
+			lineCount = 0;
 		}
 	}
 
@@ -225,27 +201,23 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 		Assert.notNull(resource, "Input resource must not be null");
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
 
-		log.debug("Opening flat file for reading: " + resource);
-
-		if (this.reader == null) {
-			ResourceLineReader reader = new ResourceLineReader(resource, encoding);
-			if (recordSeparatorPolicy != null) {
-				reader.setRecordSeparatorPolicy(recordSeparatorPolicy);
-			}
-			if (comments != null) {
-				reader.setComments(comments);
-			}
-			reader.open();
-			this.reader = reader;
+		try {
+			reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
+			mark();
+		}
+		catch (IOException e) {
+			throw new ItemStreamException("Could not open resource", e);
 		}
 
+		log.debug("Opening flat file for reading: " + resource);
+
 		for (int i = 0; i < linesToSkip; i++) {
-			readLine();
+			readRecordLine();
 		}
 
 		if (firstLineIsHeader) {
 			// skip the header
-			String firstLine = readLine();
+			String firstLine = readRecordLine();
 			// set names in tokenizer if they haven't been set already
 			if (tokenizer instanceof AbstractLineTokenizer && !((AbstractLineTokenizer) tokenizer).hasNames()) {
 				String[] names = tokenizer.tokenize(firstLine).getValues();
@@ -263,10 +235,9 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	protected T doRead() throws Exception {
-		String line = readLine();
+		String line = readRecordLine();
 
 		if (line != null) {
-			int lineCount = getReader().getPosition();
 			try {
 				FieldSet tokenizedLine = tokenizer.tokenize(line);
 				return fieldSetMapper.mapLine(tokenizedLine, lineCount);
@@ -278,6 +249,63 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return next line that shouldn't be skipped.
+	 */
+	private String readLineFromFile() {
+
+		if (reader == null) {
+			throw new ReaderNotOpenException("Reader must be open before it can be read.");
+		}
+
+		String line = null;
+
+		try {
+			line = this.reader.readLine();
+			if (line == null) {
+				return null;
+			}
+			lineCount++;
+			while (isComment(line)) {
+				line = reader.readLine();
+				if (line == null) {
+					return null;
+				}
+				lineCount++;
+			}
+		}
+		catch (IOException e) {
+			throw new UnexpectedInputException("Unable to read from resource '" + resource + "' at line " + lineCount,
+					e);
+		}
+		return line;
+	}
+
+	/**
+	 * @return string corresponding to logical record according to
+	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span
+	 * multiple lines in file).
+	 */
+	private String readRecordLine() {
+		String line = readLineFromFile();
+		String record = line;
+		if (line != null) {
+			while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
+				record = recordSeparatorPolicy.preProcess(record) + (line = readLineFromFile());
+			}
+		}
+		return recordSeparatorPolicy.postProcess(record);
+	}
+
+	private boolean isComment(String line) {
+		for (String prefix : comments) {
+			if (line.startsWith(prefix)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
