@@ -4,66 +4,85 @@ import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.transaction.annotation.Transactional;
 
-public abstract class AbstractExecutionContextDaoTests {
+/**
+ * Tests for {@link ExecutionContextDao} implementations.
+ */
+public abstract class AbstractExecutionContextDaoTests extends AbstractTransactionalJUnit4SpringContextTests{
 	
 	private ExecutionContextDao dao;
 	
-	private JobExecutionDao jobDao;
+	private JobExecution jobExecution = new JobExecution(new JobInstance(1L, new JobParameters(), "jobName"), 1L);
 	
-	private StepExecutionDao stepDao;
+	private StepExecution stepExecution = new StepExecution("stepName", jobExecution, 1L);
 	
-	private JobExecution execution;
+	@Before
+	public void setUp() {
+		dao = getExecutionContextDao();
+	}
 	
-	private StepExecution stepExecution;
-
+	/**
+	 * @return Configured {@link ExecutionContextDao} implementation ready for use.
+	 */
+	protected abstract ExecutionContextDao getExecutionContextDao();
+	
+	@Transactional @Test
 	public void testSaveAndFindContext() {
-		jobDao.saveJobExecution(execution);
+		
 		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
 			}
 		});
-		execution.setExecutionContext(ctx);
-		dao.persistExecutionContext(execution);
+		jobExecution.setExecutionContext(ctx);
+		dao.persistExecutionContext(jobExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(execution);
+		ExecutionContext retrieved = dao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
 	}
 
+	@Transactional @Test
 	public void testSaveAndFindEmptyContext() {
-		jobDao.saveJobExecution(execution);
+		
 		ExecutionContext ctx = new ExecutionContext();
-		execution.setExecutionContext(ctx);
-		dao.persistExecutionContext(execution);
+		jobExecution.setExecutionContext(ctx);
+		dao.persistExecutionContext(jobExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(execution);
+		ExecutionContext retrieved = dao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
 	}
 
+	@Transactional @Test
 	public void testUpdateContext() {
-		jobDao.saveJobExecution(execution);
+		
 		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
 			}
 		});
-		execution.setExecutionContext(ctx);
-		dao.persistExecutionContext(execution);
+		jobExecution.setExecutionContext(ctx);
+		dao.persistExecutionContext(jobExecution);
 
 		ctx.putLong("longKey", 7);
-		dao.persistExecutionContext(execution);
+		dao.persistExecutionContext(jobExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(execution);
+		ExecutionContext retrieved = dao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
 		assertEquals(7, retrieved.getLong("longKey"));
 	}
 	
+	@Transactional @Test
 	public void testSaveAndFindStepContext() {
-		stepDao.saveStepExecution(stepExecution);
+		
 		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
@@ -76,8 +95,9 @@ public abstract class AbstractExecutionContextDaoTests {
 		assertEquals(ctx, retrieved);
 	}
 	
+	@Transactional @Test
 	public void testSaveAndFindEmptyStepContext() {
-		stepDao.saveStepExecution(stepExecution);
+		
 		ExecutionContext ctx = new ExecutionContext();
 		stepExecution.setExecutionContext(ctx);
 		dao.persistExecutionContext(stepExecution);
@@ -86,8 +106,9 @@ public abstract class AbstractExecutionContextDaoTests {
 		assertEquals(ctx, retrieved);
 	}
 
+	@Transactional @Test
 	public void testUpdateStepContext() {
-		stepDao.saveStepExecution(stepExecution);
+		
 		ExecutionContext ctx = new ExecutionContext(new HashMap<String, Object>() {
 			{
 				put("key", "value");
@@ -104,8 +125,9 @@ public abstract class AbstractExecutionContextDaoTests {
 		assertEquals(7, retrieved.getLong("longKey"));
 	}
 	
+	@Transactional @Test
 	public void testStoreInteger(){	
-		stepDao.saveStepExecution(stepExecution);
+		
 		ExecutionContext ec = new ExecutionContext();
 		ec.put("intValue", new Integer(343232));
 		stepExecution.setExecutionContext(ec);
