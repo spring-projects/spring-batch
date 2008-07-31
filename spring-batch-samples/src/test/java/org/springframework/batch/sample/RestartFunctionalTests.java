@@ -51,10 +51,6 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
-	 */
 	@BeforeTransaction
 	public void onTearDown() throws Exception {
 		simpleJdbcTemplate.update("DELETE FROM TRADE");
