@@ -3,55 +3,19 @@
 	<part id="General">
 		<faq id="release">
 			<question>
-				When will Batch 1.0 be out? My understanding is that the
-				current product can be used on projects, is that
+				When will Batch 2.0 be out? My understanding is that the
+				current 1.0 and 1.1 releases can be used on projects, is that
 				correct?
 			</question>
 			<answer>
-				We expect rc1 before 1.0 final, so realistically
-				not soon. You can track the progress and planning in
-				JIRA
+				We expect Batch 2.0 to be released in the Fall of 2008.
+				You can track the progress and planning in JIRA
 				(http://opensource.atlassian.com/projects/spring/browse/BATCH).
-				But it is already usable at m3 as long as there is an
-				understanding that upgrading might take a small amount
-				of effort - there are 5 or 6 projects using it, with at
-				least one in production. That project upgraded from m1
-				to m2 in less than a day. We intend to keep changes from
-				here to 1.0 as close to internal as possible, so the
-				client touch points are pretty stable.
-			</answer>
-		</faq>
-		<faq id="stable">
-			<question>
-				How stable are the interfaces in Spring Batch?
-			</question>
-			<answer>
-				<p>
-					We are still in the milestone release phase (1.0-m5
-					is just out). This means that we are still
-					adding functionality that we want to be part of a
-					1.0 release. We do not rule out changes to package
-					and interface names in this phase, but that said we
-					think the basic domain concepts in Spring Batch are
-					sound enough to survive significant re-factoring.
-					The bulk of the application developer "touch points"
-					have been stable for quite some time now, and we
-					have several early adopter projects already using
-					snapshot releases.
-				</p>
-				<p>
-					The process from here is to collect feedback from
-					the community and use that to decide on what extra
-					features need to be added to get us to 1.0. When we
-					are feature complete we will move to the "release
-					candidate" phase, and the first release in that
-					phase will be 1.0-rc1. We only expect one release
-					candidate, but if there is enough demand for new
-					features, or significant problems occur in rc1, then
-					we might need an rc2. We aim for 2 weeks elapsed
-					time between release candidates (and between the
-					last milestone and rc1).
-				</p>
+				Batch 1.0 and 1.1 are stable and very much usable. There will be 
+				some migration work if you decide to upgrade to 2.0 at a later point.  
+				It's perfectly reasonable to not upgrade an existing project and
+				continue to use the Batch 1.1.x releases.  This is especially true
+				if you use Java 1.4 since Spring 2.0 is Java 5 or later only.
 			</answer>
 		</faq>
 		<faq id="threading">
