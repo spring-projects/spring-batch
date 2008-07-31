@@ -1,0 +1,27 @@
+Spring Batch 1.1.1 Release Notes
+
+* Bugfixes:
+
+  * FlatFileItemReader restart broken for non-default RecordSeparatorPolicy (record > 1 line)  
+  
+  * JdbcCursorItemReader fails to restart after rollback on first chunk
+  
+  * Throwing an Exception from a SkipListener caused unpredictable behavior 
+  
+  * StepExecution is saved before trying to save ExecutionContext  
+  
+  * DefaultFieldSet should clone the tokens before exposing them in getValues()
+  
+  
+* Improvements
+
+  * Configurable RetryPolicy in SkipLimitStepFactoryBean  
+
+  
+* Documentation updates
+
+  * Updated 'Getting Started' page
+  
+  * Fixed missing images from the html reference documentation
+  
+  * Added description how to access JobExecution and StepExecution from Tasklets
