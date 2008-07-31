@@ -72,7 +72,6 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
 		inputSource = new FlatFileItemReader<Trade>();
 		
-		@SuppressWarnings("unchecked")
 		FieldSetMapper<Trade> mapper = new TradeFieldSetMapper();
 		inputSource.setFieldSetMapper(mapper);
 		

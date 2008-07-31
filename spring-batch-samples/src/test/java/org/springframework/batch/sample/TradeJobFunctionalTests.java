@@ -62,7 +62,6 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Before
 	public void onSetUp() throws Exception {
 		simpleJdbcTemplate.update("delete from TRADE");
