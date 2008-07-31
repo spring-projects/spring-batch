@@ -7,7 +7,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>spring-batch-integration</artifactId>
-  <version>1.1.0.RELEASE</version>
+  <version>1.1.1.RELEASE</version>
   <name>Enterprise Integration</name>
   <build>
     <plugins>
