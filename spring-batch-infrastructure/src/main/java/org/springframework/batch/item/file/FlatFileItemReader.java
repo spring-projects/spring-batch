@@ -182,6 +182,9 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
 	}
 
+	/**
+	 * Close the {@link BufferedReader} and reset internal state.
+	 */
 	protected void doClose() throws Exception {
 		if (reader == null) {
 			return;
@@ -197,13 +200,17 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 		}
 	}
 
+	/**
+	 * Initialize the {@link BufferedReader} and skip
+	 * {@link #setLinesToSkip(int)} number of lines. Setup column names if
+	 * {@link #setFirstLineIsHeader(boolean)} is <code>true</code>.
+	 */
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "Input resource must not be null");
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
 
 		try {
 			reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
-			mark();
 		}
 		catch (IOException e) {
 			throw new ItemStreamException("Could not open resource", e);
@@ -212,12 +219,12 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 		log.debug("Opening flat file for reading: " + resource);
 
 		for (int i = 0; i < linesToSkip; i++) {
-			readRecordLine();
+			readRecord();
 		}
 
 		if (firstLineIsHeader) {
 			// skip the header
-			String firstLine = readRecordLine();
+			String firstLine = readRecord();
 			// set names in tokenizer if they haven't been set already
 			if (tokenizer instanceof AbstractLineTokenizer && !((AbstractLineTokenizer) tokenizer).hasNames()) {
 				String[] names = tokenizer.tokenize(firstLine).getValues();
@@ -231,30 +238,28 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 	 * Reads a line from input, tokenizes is it using the
 	 * {@link #setLineTokenizer(LineTokenizer)} and maps to domain object using
 	 * {@link #setFieldSetMapper(FieldSetMapper)}.
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	protected T doRead() throws Exception {
-		String line = readRecordLine();
+		String record = readRecord();
 
-		if (line != null) {
+		if (record != null) {
 			try {
-				FieldSet tokenizedLine = tokenizer.tokenize(line);
+				FieldSet tokenizedLine = tokenizer.tokenize(record);
 				return fieldSetMapper.mapLine(tokenizedLine, lineCount);
 			}
 			catch (RuntimeException ex) {
 				// add current line count to message and re-throw
 				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource="
-						+ resource.getDescription() + ", input=[" + line + "]", ex, line, lineCount);
+						+ resource.getDescription() + ", input=[" + record + "]", ex, record, lineCount);
 			}
 		}
 		return null;
 	}
 
 	/**
-	 * @return next line that shouldn't be skipped.
+	 * @return next line (skip comments).
 	 */
-	private String readLineFromFile() {
+	private String readLine() {
 
 		if (reader == null) {
 			throw new ReaderNotOpenException("Reader must be open before it can be read.");
@@ -288,12 +293,12 @@ public class FlatFileItemReader<T> extends AbstractBufferedItemReaderItemStream<
 	 * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} (might span
 	 * multiple lines in file).
 	 */
-	private String readRecordLine() {
-		String line = readLineFromFile();
+	private String readRecord() {
+		String line = readLine();
 		String record = line;
 		if (line != null) {
 			while (line != null && !recordSeparatorPolicy.isEndOfRecord(record)) {
-				record = recordSeparatorPolicy.preProcess(record) + (line = readLineFromFile());
+				record = recordSeparatorPolicy.preProcess(record) + (line = readLine());
 			}
 		}
 		return recordSeparatorPolicy.postProcess(record);
