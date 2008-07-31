@@ -16,6 +16,8 @@
 
 package org.springframework.batch.retry.jms;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,55 +26,50 @@ import javax.sql.DataSource;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.item.support.AbstractItemWriter;
-import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.junit.runner.RunWith;
+import org.junit.Before;
+import org.junit.Test;
 
-public class ExternalRetryTests extends AbstractDependencyInjectionSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+public class ExternalRetryTests {
 
+	@Autowired
 	private JmsTemplate jmsTemplate;
 
 	private RetryTemplate retryTemplate;
 
 	private ItemReaderRecoverer<String> provider;
 
-	private JdbcTemplate jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 
+	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-
-	public void setJmsTemplate(JmsTemplate jmsTemplate) {
-		this.jmsTemplate = jmsTemplate;
-	}
-
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
-				"jms-context.xml") };
-	}
-
-	protected void onSetUp() throws Exception {
-		super.onSetUp();
+	@Before
+	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.execute("delete from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		provider = new ItemReaderRecoverer<String>() {
 			public String read() {
@@ -90,7 +87,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 	}
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 	}
 
@@ -98,12 +95,11 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 	private List<Object> recovered = new ArrayList<Object>();
 
-	/**
+	/*
 	 * Message processing is successful on the second attempt but must receive
 	 * the message again.
-	 * 
-	 * @throws Exception
 	 */
+	@Test
 	public void testExternalRetrySuccessOnSecondAttempt() throws Exception {
 
 		assertInitialState();
@@ -112,8 +108,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 
 		final AbstractItemWriter<Object> writer = new AbstractItemWriter<Object>() {
 			public void write(final Object text) {
-				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						new Integer(list.size()), text });
+				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
 				if (list.size() == 1) {
 					throw new RuntimeException("Rollback!");
 				}
@@ -171,18 +166,17 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
 		assertEquals("[]", msgs.toString());
 	}
 
-	/**
+	/*
 	 * Message processing fails on both attempts.
-	 * 
-	 * @throws Exception
 	 */
+	@Test
 	public void testExternalRetryWithRecovery() throws Exception {
 
 		assertInitialState();
@@ -192,8 +186,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		final Object item = provider.read();
 		final RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
 			public Object doWithRetry(RetryContext context) throws Throwable {
-				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						new Integer(list.size()), item });
+				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
 				throw new RuntimeException("Rollback!");
 			}
 		});
@@ -239,7 +232,7 @@ public class ExternalRetryTests extends AbstractDependencyInjectionSpringContext
 		assertEquals(1, recovered.size());
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.

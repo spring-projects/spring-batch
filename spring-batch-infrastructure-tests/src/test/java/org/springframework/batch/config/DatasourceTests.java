@@ -16,23 +16,36 @@
 
 package org.springframework.batch.config;
 
-import org.springframework.batch.jms.ExternalRetryInBatchTests;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
-import org.springframework.util.ClassUtils;
+import static org.junit.Assert.*;
 
-public class DatasourceTests extends AbstractTransactionalDataSourceSpringContextTests {
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
+import org.junit.runner.RunWith;
+import org.junit.Test;
 
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class, "jms-context.xml") };
+import javax.sql.DataSource;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+public class DatasourceTests {
+
+	private SimpleJdbcTemplate simpleJdbcTemplate;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
+	@Transactional @Test
 	public void testTemplate() throws Exception {
 		System.err.println(System.getProperty("java.class.path"));
-		jdbcTemplate.execute("delete from T_FOOS");
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
-		jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] { new Integer(0),
-		        "foo" });
+		simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", 0, "foo");
 	}
 }

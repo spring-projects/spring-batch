@@ -16,6 +16,8 @@
 
 package org.springframework.batch.retry.jms;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,20 +28,41 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.junit.runner.RunWith;
+import org.junit.Before;
+import org.junit.Test;
 
-public class SynchronousTests extends AbstractTransactionalDataSourceSpringContextTests {
+import javax.sql.DataSource;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+public class SynchronousTests {
+
+	@Autowired
 	private JmsTemplate jmsTemplate;
+
+	@Autowired
+	private PlatformTransactionManager transactionManager;
 
 	private RetryTemplate retryTemplate;
 
-	public void setJmsTemplate(JmsTemplate jmsTemplate) {
-		this.jmsTemplate = jmsTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	protected String[] getConfigLocations() {
@@ -47,39 +70,43 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 				"jms-context.xml") };
 	}
 
-	protected void onSetUpBeforeTransaction() throws Exception {
-		super.onSetUpBeforeTransaction();
+	@BeforeTransaction
+	public void onSetUpBeforeTransaction() throws Exception {
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		jmsTemplate.convertAndSend("queue", "foo");
+		jmsTemplate.convertAndSend("queue", "foo");
+		final String text = (String) jmsTemplate.receiveAndConvert("queue");
+		assertNotNull(text);
+	}
+
+	@Before
+	public void onSetUpInTransaction() throws Exception {
+		retryTemplate = new RetryTemplate();
+	}
+
+	@AfterTransaction
+	public void afterTransaction() {
 		String foo = "";
 		int count = 0;
 		while (foo != null && count < 100) {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		jdbcTemplate.execute("delete from T_FOOS");
-		jmsTemplate.convertAndSend("queue", "foo");
-		jmsTemplate.convertAndSend("queue", "foo");
-		final String text = (String) jmsTemplate.receiveAndConvert("queue");
-		assertNotNull(text);
-		retryTemplate = new RetryTemplate();
-	}
-
-	protected void onSetUpInTransaction() throws Exception {
-		super.onSetUpInTransaction();
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
 	}
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 	}
 
 	List<Object> list = new ArrayList<Object>();
 
-	/**
+	/*
 	 * Message processing is successful on the second attempt without having to
 	 * receive the message again.
-	 * 
-	 * @throws Exception
 	 */
+	@Transactional @Test
 	public void testInternalRetrySuccessOnSecondAttempt() throws Exception {
 
 		assertInitialState();
@@ -105,8 +132,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 						list.add(text);
 						System.err.println("Inserting: [" + list.size() + "," + text + "]");
-						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								new Integer(list.size()), text });
+						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -118,28 +144,23 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 			}
 		});
 
-		// force commit...
-		setComplete();
-		endTransaction();
-
-		startNewTransaction();
+		// Verify the state after stransactional processing is complete
 
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
 		assertEquals("[]", msgs.toString());
 	}
 
-	/**
+	/*
 	 * Message processing is successful on the second attempt without having to
 	 * receive the message again - uses JmsItemProvider internally.
-	 * 
-	 * @throws Exception
 	 */
+	@Transactional @Test
 	public void testInternalRetrySuccessOnSecondAttemptWithItemProvider() throws Exception {
 
 		assertInitialState();
@@ -150,6 +171,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		jmsTemplate.setDefaultDestinationName("queue");
 
 		final Object item = provider.read();
+
 		retryTemplate.execute(new RecoveryRetryCallback(item, new RetryCallback() {
 			public Object doWithRetry(RetryContext context) throws Throwable {
 
@@ -160,8 +182,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 
 						list.add(item);
 						System.err.println("Inserting: [" + list.size() + "," + item + "]");
-						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								new Integer(list.size()), item });
+						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -174,28 +195,23 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 			}
 		}));
 
-		// force commit...
-		setComplete();
-		endTransaction();
-
-		startNewTransaction();
+		// Verify the state after stransactional processing is complete
 
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
 		assertEquals("[]", msgs.toString());
 	}
 
-	/**
+	/*
 	 * Message processing is successful on the second attempt without having to
 	 * receive the message again.
-	 * 
-	 * @throws Exception
 	 */
+	@Transactional @Test
 	public void testInternalRetrySuccessOnFirstAttemptRollbackOuter() throws Exception {
 
 		assertInitialState();
@@ -208,66 +224,76 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		 * PROPAGATION_REQUIRES_NEW is wrong because it doesn't allow the outer
 		 * transaction to fail and rollback the inner one.
 		 */
-		final String text = (String) jmsTemplate.receiveAndConvert("queue");
 
-		retryTemplate.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext status) throws Throwable {
+		TransactionTemplate outerTxTemplate = new TransactionTemplate(transactionManager);
+		outerTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
+		outerTxTemplate.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus outerStatus) {
 
-				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				return transactionTemplate.execute(new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus status) {
+				final String text = (String) jmsTemplate.receiveAndConvert("queue");
 
-						list.add(text);
-						System.err.println("Inserting: [" + list.size() + "," + text + "]");
-						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								new Integer(list.size()), text });
-						return text;
+				try {
+					retryTemplate.execute(new RetryCallback() {
+						public Object doWithRetry(RetryContext status) throws Throwable {
 
-					}
-				});
+							TransactionTemplate nestedTxTemplate = new TransactionTemplate(transactionManager);
+							nestedTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
+							return nestedTxTemplate.execute(new TransactionCallback() {
+								public Object doInTransaction(TransactionStatus nestedStatus) {
 
+									list.add(text);
+									System.err.println("Inserting: [" + list.size() + "," + text + "]");
+									simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+									return text;
+
+								}
+							});
+
+						}
+					});
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+
+				// The nested database transaction has committed...
+				int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+				assertEquals(1, count);
+
+				// force rollback...
+				outerStatus.setRollbackOnly();
+
+				return null;
 			}
 		});
 
-		// The database transaction has committed...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
-		assertEquals(1, count);
-
-		// force rollback...
-		endTransaction();
-
-		startNewTransaction();
+		// Verify the state after stransactional processing is complete
 
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.
 		assertEquals("[foo]", msgs.toString());
+
 	}
 
-	/**
+	/*
 	 * Message processing is successful on the second attempt but must receive
 	 * the message again.
-	 * 
-	 * @throws Exception
 	 */
+	@Test
 	public void testExternalRetrySuccessOnSecondAttempt() throws Exception {
 
 		assertInitialState();
 
-		// force commit so that the retry executes in its own transaction (not
-		// nested)...
-		setComplete();
-		endTransaction();
-
 		retryTemplate.execute(new RetryCallback() {
 			public Object doWithRetry(RetryContext status) throws Throwable {
 
+				// use REQUIRES_NEW  so that the retry executes in its own transaction
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
 				return transactionTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 
@@ -275,8 +301,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 						// transaction...
 						final String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
-						jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-								new Integer(list.size()), text });
+						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
 						if (list.size() == 1) {
 							throw new RuntimeException("Rollback!");
 						}
@@ -288,38 +313,35 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 			}
 		});
 
-		startNewTransaction();
+		// Verify the state after stransactional processing is complete
 
 		List<String> msgs = getMessages();
 
 		// The database portion committed once...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
 		assertEquals("[]", msgs.toString());
+
 	}
 
-	/**
+	/*
 	 * Message processing fails.
-	 * 
-	 * @throws Exception
 	 */
+	@Transactional @Test
 	public void testExternalRetryFailOnSecondAttempt() throws Exception {
 
 		assertInitialState();
-
-		// force commit so that the retry executes in its own transaction (not
-		// nested)...
-		setComplete();
-		endTransaction();
 
 		try {
 
 			retryTemplate.execute(new RetryCallback() {
 				public Object doWithRetry(RetryContext status) throws Throwable {
 
+					// use REQUIRES_NEW  so that the retry executes in its own transaction
 					TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+					transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
 					return transactionTemplate.execute(new TransactionCallback() {
 						public Object doInTransaction(TransactionStatus status) {
 
@@ -327,8 +349,7 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 							// transaction...
 							final String text = (String) jmsTemplate.receiveAndConvert("queue");
 							list.add(text);
-							jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)",
-									new Object[] { new Integer(list.size()), text });
+							simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
 							throw new RuntimeException("Rollback!");
 
 						}
@@ -349,12 +370,12 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 			// expected
 		}
 
-		startNewTransaction();
+		// Verify the state after stransactional processing is complete
 
 		List<String> msgs = getMessages();
 
 		// The database portion rolled back...
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.
@@ -371,4 +392,5 @@ public class SynchronousTests extends AbstractTransactionalDataSourceSpringConte
 		}
 		return msgs;
 	}
+
 }

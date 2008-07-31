@@ -16,6 +16,12 @@
 
 package org.springframework.batch.jms;
 
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,52 +41,44 @@ import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+public class ExternalRetryInBatchTests {
+
+	@Autowired
 	private JmsTemplate jmsTemplate;
 
 	private RetryTemplate retryTemplate;
 
+	@Autowired
 	private RepeatTemplate repeatTemplate;
 
 	private ItemReaderRecoverer provider;
 
-	private JdbcTemplate jdbcTemplate;
+	private SimpleJdbcTemplate jdbcTemplate;
 
+	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
-		this.transactionManager = transactionManager;
-	}
-
-	public void setRepeatTemplate(RepeatTemplate repeatTemplate) {
-		this.repeatTemplate = repeatTemplate;
-	}
-
-	public void setJmsTemplate(JmsTemplate jmsTemplate) {
-		this.jmsTemplate = jmsTemplate;
-	}
-
-	protected String[] getConfigLocations() {
-		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "jms-context.xml" )};
-	}
-
-	protected void onSetUp() throws Exception {
-		super.onSetUp();
+	@Before
+	public void onSetUp() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.execute("delete from T_FOOS");
+		jdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = new ItemReaderRecoverer() {
@@ -98,9 +96,10 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 		retryTemplate = new RetryTemplate();
 	}
 
-	protected void onTearDown() throws Exception {
+	@After
+	public void onTearDown() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.execute("delete from T_FOOS");
+		jdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
 	}
 
 	private void assertInitialState() {
@@ -112,6 +111,7 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 
 	private List<Object> recovered = new ArrayList<Object>();
 
+	@Test
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
@@ -142,8 +142,9 @@ public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpring
 											// No need for transaction here: the whole batch will roll
 											// back. When it comes back for recovery this code is not
 											// executed...
-											jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-											        new Integer(list.size()), item });
+											jdbcTemplate.update(
+													"INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", 
+													list.size(), item);
 											throw new RuntimeException("Rollback!");
 										}
 									});

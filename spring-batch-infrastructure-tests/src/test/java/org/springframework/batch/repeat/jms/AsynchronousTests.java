@@ -16,6 +16,8 @@
 
 package org.springframework.batch.repeat.jms;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,49 +25,53 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+import javax.sql.DataSource;
 
 import org.springframework.batch.container.jms.BatchMessageListenerContainer;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.SessionAwareMessageListener;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.util.ClassUtils;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.runner.RunWith;
+import org.junit.Before;
+import org.junit.After;
+import org.junit.Test;
 
-public class AsynchronousTests extends AbstractDependencyInjectionSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+public class AsynchronousTests {
 
 	protected String[] getConfigLocations() {
 		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
 				"jms-context.xml") };
 	}
 
+	@Autowired
 	private BatchMessageListenerContainer container;
 
+	@Autowired
 	private JmsTemplate jmsTemplate;
 
-	private JdbcTemplate jdbcTemplate;
+	private SimpleJdbcTemplate simpleJdbcTemplate;
 
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	public void setJmsTemplate(JmsTemplate jmsTemplate) {
-		this.jmsTemplate = jmsTemplate;
-	}
-
-	public void setContainer(BatchMessageListenerContainer container) {
-		this.container = container;
-	}
-
-	protected void onSetUp() throws Exception {
-		super.onSetUp();
+	@Before
+	public void onSetUp() throws Exception {
 		String foo = "";
 		int count = 0;
 		while (foo != null && count < 100) {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		jdbcTemplate.execute("delete from T_FOOS");
+		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
 
 		// Queue is now drained...
 		assertNull(foo);
@@ -76,8 +82,8 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		
 	}
 
-	protected void onTearDown() throws Exception {
-		super.onTearDown();
+	@After
+	public void onTearDown() throws Exception {
 		container.stop();
 		// Need to give the container time to shutdown
 		Thread.sleep(1000L);
@@ -92,10 +98,11 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 	List<String> list = new ArrayList<String>();
 
 	private void assertInitialState() {
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 	}
 
+	@Test
 	public void testSunnyDay() throws Exception {
 
 		assertInitialState();
@@ -104,8 +111,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
 				String text = ((TextMessage) message).getText();
-				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						new Integer(list.size()), text });
+				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
 			}
 		});
 
@@ -116,18 +122,19 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		// Need to sleep for at least a second here...
 		Thread.sleep(1000L);
 
-		System.err.println(jdbcTemplate.queryForList("select * from T_FOOS"));
+		System.err.println(simpleJdbcTemplate.queryForList("select * from T_FOOS"));
 
 		assertEquals(2, list.size());
 
 		String foo = (String) jmsTemplate.receiveAndConvert("queue");
 		assertEquals(null, foo);
 
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(2, count);
 
 	}
 
+	@Test
 	public void testRollback() throws Exception {
 
 		assertInitialState();
@@ -139,9 +146,7 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 			public void onMessage(Message message, Session session) throws JMSException {
 				list.add(message.toString());
 				final String text = ((TextMessage) message).getText();
-				logger.debug("Processing message: " + message);
-				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
-						new Integer(list.size()), text });
+				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
 				// This causes the DB to rollback but not the message
 				if (text.equals("bar")) {
 					throw new RuntimeException("Rollback!");
@@ -161,20 +166,18 @@ public class AsynchronousTests extends AbstractDependencyInjectionSpringContextT
 		// We rolled back so the messages might come in many times...
 		assertTrue(list.size() >= 1);
 
-		logger.debug("T_FOOS: "+jdbcTemplate.queryForList("select * from T_FOOS"));
-
 		String text = "";
 		List<String> msgs = new ArrayList<String>();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
 		}
-		logger.debug("Messages: "+msgs);
 
-		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
 		assertTrue("Foo not on queue", msgs.contains("foo"));
 
 	}
+
 }

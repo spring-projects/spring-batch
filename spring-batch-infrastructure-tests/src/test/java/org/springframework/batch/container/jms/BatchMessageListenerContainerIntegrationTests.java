@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.container.jms;
 
+import static org.junit.Assert.*;
+
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
-import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -27,72 +28,53 @@ import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
-import org.springframework.util.ClassUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.ContextConfiguration;
+import org.junit.Before;
+import org.junit.After;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @author Dave Syer
  * 
  */
-public class BatchMessageListenerContainerIntegrationTests extends AbstractDependencyInjectionSpringContextTests {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
+public class BatchMessageListenerContainerIntegrationTests {
 	
+	@Autowired
 	private JmsTemplate jmsTemplate;
 
+	@Autowired
 	private BatchMessageListenerContainer container;
 
 	private int recovered;
 
 	private volatile int count;
 
-	/**
-	 * Public setter for the {@link BatchMessageListenerContainer}.
-	 * @param container the container to set
-	 */
-	public void setContainer(BatchMessageListenerContainer container) {
-		this.container = container;
-	}
-
-	/**
-	 * Public setter for the JmsTemplate.
-	 * @param jmsTemplate the jmsTemplate to set
-	 */
-	public void setJmsTemplate(JmsTemplate jmsTemplate) {
-		this.jmsTemplate = jmsTemplate;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
-	 */
-	protected String[] getConfigLocations() {
-		// Share config with other test so that ActiveMQ only starts up once.
-		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class, "jms-context.xml") };
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#onSetUp()
-	 */
-	protected void onSetUp() throws Exception {
+	@Before
+	public void onSetUp() throws Exception {
 		while(jmsTemplate.receiveAndConvert("queue")!=null) {
 			// do nothing
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
-	 */
-	protected void onTearDown() throws Exception {
+	@After
+	public void onTearDown() throws Exception {
 		container.stop();
 		while(jmsTemplate.receiveAndConvert("queue")!=null) {
 			// do nothing
 		}
 	}
 
+	@Test
 	public void testConfiguration() throws Exception {
 		assertNotNull(container);
 	}
 
+	@Test
 	public void testSendAndReceive() throws Exception {
 		container.setMessageListener(new MessageListener() {
 			public void onMessage(Message msg) {
@@ -112,10 +94,10 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 		}
 	}
 
+	@Test
 	public void testFailureAndRepresent() throws Exception {
 		container.setMessageListener(new MessageListener() {
 			public void onMessage(Message msg) {
-				logger.debug("Message: "+msg);
 				count++;
 				throw new RuntimeException("planned failure for represent: " + msg);
 			}
@@ -128,11 +110,11 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 			Thread.sleep(100L);
 		}
 		if (count < 2) {
-			logger.debug("Count: "+count);
 			fail("Expected message to be processed twice.");
 		}
 	}
 
+	@Test
 	public void testFailureAndRecovery() throws Exception {
 		final RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(new NeverRetryPolicy()));
@@ -141,7 +123,6 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 				try {
 					RecoveryRetryCallback callback = new RecoveryRetryCallback(msg, new RetryCallback() {
 						public Object doWithRetry(RetryContext context) throws Throwable {
-							logger.debug("Message: "+msg);
 							count++;
 							throw new RuntimeException("planned failure: " + msg);
 						}
@@ -149,7 +130,6 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 					callback.setRecoveryCallback(new RecoveryCallback() {
 						public Object recover(RetryContext context) {
 							recovered++;
-							logger.debug("Recovered: " + msg);
 							return msg;
 						}
 					});
@@ -170,4 +150,5 @@ public class BatchMessageListenerContainerIntegrationTests extends AbstractDepen
 		assertEquals(1, count);
 		assertEquals(1, recovered);
 	}
+
 }
