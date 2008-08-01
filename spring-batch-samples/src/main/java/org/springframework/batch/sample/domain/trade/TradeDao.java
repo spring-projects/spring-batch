@@ -23,7 +23,7 @@ package org.springframework.batch.sample.domain.trade;
  * @author Robert Kasanicky
  */
 public interface TradeDao {
-	/**
+	/*
 	 * Write a trade object to some kind of output, different implementations
 	 * can write to file, database etc.
 	 */

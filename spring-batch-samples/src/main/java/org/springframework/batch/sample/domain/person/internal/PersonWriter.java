@@ -27,13 +27,9 @@ public class PersonWriter extends AbstractItemWriter<Person> {
     private static Log log = LogFactory.getLog(PersonWriter.class);
  
     public void write(Person data) {
-        if (!(data instanceof Person)) {
-            log.warn("PersonProcessor can process only Person objects, skipping record");
-
-            return;
-        }
 
         log.debug("Processing: " + data);
+
     }
 
 }

@@ -76,7 +76,7 @@ public class JobLauncherDetails extends QuartzJobBean {
 		}
 	}
 
-	/**
+	/*
 	 * Copy parameters that are of the correct type over to
 	 * {@link JobParameters}, ignoring jobName.
 	 * 
@@ -93,10 +93,10 @@ public class JobLauncherDetails extends QuartzJobBean {
 				builder.addString(key, (String) value);
 			}
 			else if (value instanceof Float || value instanceof Double) {
-				builder.addDouble(key, (Double) value);
+				builder.addDouble(key, ((Number) value).doubleValue());
 			}
 			else if (value instanceof Integer || value instanceof Long) {
-				builder.addLong(key, (Long) value);
+				builder.addLong(key, ((Number)value).longValue());
 			}
 			else if (value instanceof Date) {
 				builder.addDate(key, (Date) value);

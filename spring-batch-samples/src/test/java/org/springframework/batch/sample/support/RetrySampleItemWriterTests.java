@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.springframework.batch.sample.support.RetrySampleItemWriter;
 
 /**
  * Tests for {@link RetrySampleItemWriter}.
@@ -15,7 +14,7 @@ public class RetrySampleItemWriterTests {
 
 	private RetrySampleItemWriter<Object> processor = new RetrySampleItemWriter<Object>();
 
-	/**
+	/*
 	 * Processing throws exception on 2nd and 3rd call.
 	 */
 	@Test

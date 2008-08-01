@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.sample.common.ConfigurableSystemProcessExitCodeMapper;
 
 /**
  * Tests for {@link ConfigurableSystemProcessExitCodeMapper}

@@ -3,7 +3,6 @@ package org.springframework.batch.sample.domain.trade.internal;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader;
 
 /**
  * Tests for {@link GeneratingTradeItemReader}.
@@ -14,7 +13,7 @@ public class GeneratingItemReaderTests {
 
 	private GeneratingTradeItemReader reader = new GeneratingTradeItemReader();
 	
-	/**
+	/*
 	 * Generates a given number of not-null records,
 	 * consecutive calls return null.
 	 */

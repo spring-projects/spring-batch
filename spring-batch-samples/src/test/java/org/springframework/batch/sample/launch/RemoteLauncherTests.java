@@ -46,8 +46,6 @@ public class RemoteLauncherTests {
 
 	private static List<Exception> errors = new ArrayList<Exception>();
 
-	private static Thread thread;
-
 	private static ExportedJobLauncher launcher;
 
 	private static JobLoader loader;
@@ -89,7 +87,7 @@ public class RemoteLauncherTests {
 			return;
 		}
 		System.setProperty("com.sun.management.jmxremote", "");
-		thread = new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 			public void run() {
 				try {
 					JobRegistryBackgroundJobRunner.main("adhoc-job-launcher-context.xml", "jobs/adhocLoopJob.xml");
@@ -106,14 +104,10 @@ public class RemoteLauncherTests {
 		}
 	}
 
-	/**
-	 * @throws Exception 
-	 * 
-	 */
 	private static boolean isConnected() throws Exception {
 		boolean connected = false;
 		if (!JobRegistryBackgroundJobRunner.getErrors().isEmpty()) {
-			throw (RuntimeException) JobRegistryBackgroundJobRunner.getErrors().get(0);
+			throw JobRegistryBackgroundJobRunner.getErrors().get(0);
 		}
 		if (launcher == null) {
 			MBeanServerConnectionFactoryBean connectionFactory = new MBeanServerConnectionFactoryBean();
@@ -138,12 +132,6 @@ public class RemoteLauncherTests {
 		return connected;
 	}
 
-	/**
-	 * @param connectionFactory
-	 * @param objectName 
-	 * @param interfaceType 
-	 * @throws MalformedObjectNameException
-	 */
 	private static Object getMBean(MBeanServerConnectionFactoryBean connectionFactory, String objectName, Class<?> interfaceType)
 			throws MalformedObjectNameException {
 		MBeanProxyFactoryBean factory = new MBeanProxyFactoryBean();

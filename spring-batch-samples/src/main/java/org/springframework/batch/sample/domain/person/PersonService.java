@@ -62,7 +62,7 @@ public class PersonService {
 		return person;
 	}
 
-	/**
+	/*
 	 * Badly designed method signature which accepts multiple implicitly related
 	 * arguments instead of a single Person argument.
 	 */

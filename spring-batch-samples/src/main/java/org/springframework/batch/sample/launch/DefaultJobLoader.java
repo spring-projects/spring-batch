@@ -37,7 +37,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		Map<String, String> result = new HashMap<String, String>(configurations);
 		for (String jobName : registry.getJobNames()) {
 			try {
-				Job configuration = (Job) registry.getJob(jobName);
+				Job configuration = registry.getJob(jobName);
 				String name = configuration.getName();
 				if (!configurations.containsKey(name)) {
 					result.put(name, "<unknown path>: " + configuration);
@@ -54,8 +54,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(new String[] { path },
 				applicationContext);
 		String[] names = context.getBeanNamesForType(Job.class);
-		for (int i = 0; i < names.length; i++) {
-			String name = names[i];
+		for (String name : names) {
 			configurations.put(name, path);
 		}
 	}
@@ -88,8 +87,7 @@ public class DefaultJobLoader implements JobLoader, ApplicationContextAware {
 		String name = path.substring(0, index);
 		Object bean = getJobConfiguration(name);
 		Assert.notNull(bean, "No JobConfiguration exists with name=" + name);
-		BeanWrapperImpl wrapper = new BeanWrapperImpl(bean);
-		return wrapper;
+		return new BeanWrapperImpl(bean);
 	}
 
 }

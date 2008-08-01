@@ -56,7 +56,7 @@ public class JobSupport implements BeanNameAware, Job {
 	 * Convenience constructor to immediately add name (which is mandatory but
 	 * not final).
 	 * 
-	 * @param name
+	 * @param name the name
 	 */
 	public JobSupport(String name) {
 		super();
@@ -83,6 +83,7 @@ public class JobSupport implements BeanNameAware, Job {
 	 * is a Spring bean.
 	 * 
 	 * @see #setBeanName(java.lang.String)
+	 * @param name the name
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -102,6 +103,10 @@ public class JobSupport implements BeanNameAware, Job {
 
 	public void addStep(Step step) {
 		this.steps.add(step);
+	}
+
+	public List<Step> getSteps() {
+		return steps;
 	}
 
 	/* (non-Javadoc)

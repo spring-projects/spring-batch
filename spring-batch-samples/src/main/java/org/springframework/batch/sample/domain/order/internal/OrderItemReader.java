@@ -64,7 +64,7 @@ public class OrderItemReader extends AbstractItemReader<Order> {
 		recordFinished = false;
 
 		while (!recordFinished) {
-			process((FieldSet) fieldSetReader.read());
+			process(fieldSetReader.read());
 		}
 
 		log.info("Mapped: " + order);

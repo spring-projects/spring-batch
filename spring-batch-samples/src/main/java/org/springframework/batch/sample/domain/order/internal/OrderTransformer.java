@@ -71,7 +71,7 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 	}
 
 	private LineAggregator getAggregator(String name) {
-		return (LineAggregator) aggregators.get(name);
+		return aggregators.get(name);
 	}
 
 	/**

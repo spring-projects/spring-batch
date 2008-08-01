@@ -43,9 +43,6 @@ public class StepSupport implements Step, BeanNameAware {
 		super();
 	}
 
-	/**
-	 * @param string
-	 */
 	public StepSupport(String string) {
 		super();
 		this.name = string;
@@ -68,11 +65,6 @@ public class StepSupport implements Step, BeanNameAware {
 		}
 	}
 
-	/**
-	 * Set the name property. Always overrides the default value if this object is a Spring bean.
-	 * 
-	 * @see #setBeanName(java.lang.String)
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}

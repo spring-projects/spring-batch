@@ -38,8 +38,7 @@ public class TradeFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	}
 
 	protected FieldSetMapper<Trade> fieldSetMapper() {
-		FieldSetMapper<Trade> mapper = new TradeFieldSetMapper();
-		return mapper;
+		return new TradeFieldSetMapper();
 	}
 
 }

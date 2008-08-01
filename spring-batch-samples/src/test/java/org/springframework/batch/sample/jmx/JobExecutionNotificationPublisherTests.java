@@ -24,8 +24,6 @@ import java.util.List;
 import javax.management.Notification;
 
 import org.junit.Test;
-import org.springframework.batch.sample.jmx.JobExecutionNotificationPublisher;
-import org.springframework.batch.sample.jmx.SimpleMessageApplicationEvent;
 import org.springframework.jmx.export.notification.NotificationPublisher;
 import org.springframework.jmx.export.notification.UnableToSendNotificationException;
 

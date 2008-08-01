@@ -27,11 +27,7 @@ import org.springmodules.validation.valang.functions.Function;
  * @author peter.zozom
  */
 public class FutureDateFunction extends AbstractFunction {
-    /**
-     * @param arguments
-     * @param line
-     * @param column
-     */
+
     public FutureDateFunction(Function[] arguments, int line, int column) {
         super(arguments, line, column);
         definedExactNumberOfArguments(1);
@@ -44,7 +40,7 @@ public class FutureDateFunction extends AbstractFunction {
         //get argument
         final Object value = getArguments()[0].getResult(target);
 
-        Boolean result = Boolean.FALSE;
+        Boolean result;
 
         if (value instanceof Date) {
             final Date now = new Date(System.currentTimeMillis());

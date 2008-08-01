@@ -41,13 +41,13 @@ public final class FieldSetResultSetExtractor {
 	 * Processes single row in ResultSet and returns its FieldSet representation.
 	 * @param rs ResultSet ResultSet to extract data from.
 	 * @return FieldSet representation of current row in ResultSet
-	 * @throws SQLException
+	 * @throws SQLException thrown during processing
 	 */
 	public static FieldSet getFieldSet(ResultSet rs) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
 
-        FieldSet fs = null;
+        FieldSet fs;
         
         List<String> tokens = new ArrayList<String>();
         List<String> names = new ArrayList<String>();
@@ -57,7 +57,7 @@ public final class FieldSetResultSetExtractor {
             names.add(metaData.getColumnName(i));
         }
 
-        fs = new DefaultFieldSet((String[])tokens.toArray(new String[0]), (String[])names.toArray(new String[0]));
+        fs = new DefaultFieldSet(tokens.toArray(new String[0]), names.toArray(new String[0]));
 
         return fs;	
 	}

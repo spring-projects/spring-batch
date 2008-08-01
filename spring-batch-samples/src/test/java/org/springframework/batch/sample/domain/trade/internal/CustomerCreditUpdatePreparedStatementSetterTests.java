@@ -23,7 +23,6 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
-import org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdatePreparedStatementSetter;
 
 /**
  * @author Dave Syer
@@ -46,9 +45,8 @@ public class CustomerCreditUpdatePreparedStatementSetterTests {
 		credit.setName("foo");
 	}
 	
-	/**
+	/*
 	 * Test method for {@link org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdatePreparedStatementSetter#setValues(CustomerCredit, PreparedStatement) }
-	 * @throws SQLException 
 	 */
 	@Test
 	public void testSetValues() throws SQLException {

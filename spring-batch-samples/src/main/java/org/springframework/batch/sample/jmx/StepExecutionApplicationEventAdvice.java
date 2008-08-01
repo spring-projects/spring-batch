@@ -55,13 +55,9 @@ public class StepExecutionApplicationEventAdvice implements ApplicationEventPubl
 		publish(jp.getTarget(), msg);
 	}
 
-	/**
-	 * Publish a {@link RepeatOperationsApplicationEvent} with the given
+	/*
+	 * Publish a {@link SimpleMessageApplicationEvent} with the given
 	 * parameters.
-	 * 
-	 * @param context the current batch context
-	 * @param message the message to publish
-	 * @param type the type of event to publish
 	 */
 	private void publish(Object source, String message) {
 		applicationEventPublisher.publishEvent(new SimpleMessageApplicationEvent(source, message));

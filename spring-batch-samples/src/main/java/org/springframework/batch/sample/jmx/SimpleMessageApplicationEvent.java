@@ -10,10 +10,6 @@ public class SimpleMessageApplicationEvent extends ApplicationEvent {
 
 	private String message;
 
-	/**
-	 * @param source
-	 * @param message
-	 */
 	public SimpleMessageApplicationEvent(Object source, String message) {
 		super(source);
 		this.message = message;

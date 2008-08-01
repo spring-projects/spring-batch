@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.sample.common.SimpleSystemProcessExitCodeMapper;
 
 /**
  * Tests for {@link SimpleSystemProcessExitCodeMapper}.

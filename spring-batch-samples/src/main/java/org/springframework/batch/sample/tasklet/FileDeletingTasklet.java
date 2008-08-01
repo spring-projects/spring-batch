@@ -24,10 +24,10 @@ public class FileDeletingTasklet implements Tasklet, InitializingBean {
 		Assert.state(dir.isDirectory());
 
 		File[] files = dir.listFiles();
-		for (int i = 0; i < files.length; i++) {
-			boolean deleted = files[i].delete();
+		for (File file : files) {
+			boolean deleted = file.delete();
 			if (!deleted) {
-				throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());
+				throw new UnexpectedJobExecutionException("Could not delete file " + file.getPath());
 			}
 		}
 		return ExitStatus.FINISHED;

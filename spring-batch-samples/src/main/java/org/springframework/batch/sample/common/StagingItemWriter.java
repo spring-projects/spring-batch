@@ -72,7 +72,7 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	 */
 	public void write(T data) {
 		final long id = incrementer.nextLongValue();
-		final long jobId = stepExecution.getJobExecution().getJobId().longValue();
+		final long jobId = stepExecution.getJobExecution().getJobId();
 		final byte[] blob = SerializationUtils.serialize((Serializable) data);
 		getJdbcTemplate().update("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
 				new PreparedStatementSetter() {

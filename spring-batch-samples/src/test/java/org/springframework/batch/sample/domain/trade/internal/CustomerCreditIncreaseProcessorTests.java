@@ -7,7 +7,6 @@ import java.math.BigDecimal;
 import org.junit.Test;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
-import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseWriter;
 
 /**
  * Tests for {@link CustomerCreditIncreaseWriter}.
@@ -18,7 +17,7 @@ public class CustomerCreditIncreaseProcessorTests {
 
 	private CustomerCreditIncreaseWriter writer = new CustomerCreditIncreaseWriter();
 
-	/**
+	/*
 	 * Increases customer's credit by fixed value
 	 */
 	@Test

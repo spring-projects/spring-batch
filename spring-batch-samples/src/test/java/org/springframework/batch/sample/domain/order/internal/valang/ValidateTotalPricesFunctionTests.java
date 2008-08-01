@@ -14,7 +14,6 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.sample.domain.order.LineItem;
-import org.springframework.batch.sample.domain.order.internal.valang.ValidateTotalPricesFunction;
 import org.springmodules.validation.valang.functions.Function;
 
 public class ValidateTotalPricesFunctionTests {

@@ -22,7 +22,7 @@ public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTe
 	@Autowired
 	private Resource directory;
 	
-	/**
+	/*
 	 * Create the directory and some files in it.
 	 */
 	@Before

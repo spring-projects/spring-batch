@@ -20,11 +20,11 @@ public class ConfigurableSystemProcessExitCodeMapper implements SystemProcessExi
 	private Map<Object, ExitStatus> mappings;
 
 	public ExitStatus getExitStatus(int exitCode) {
-		ExitStatus exitStatus = (ExitStatus) mappings.get(new Integer(exitCode));
+		ExitStatus exitStatus = mappings.get(exitCode);
 		if (exitStatus != null) {
 			return exitStatus;
 		} else {
-			return (ExitStatus) mappings.get(ELSE_KEY);
+			return mappings.get(ELSE_KEY);
 		}
 	}
 

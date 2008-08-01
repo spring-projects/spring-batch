@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.batch.sample.domain.trade.internal.CustomerUpdateWriter;
 
 public class CustomerUpdateProcessorTests {
 

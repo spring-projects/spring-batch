@@ -32,11 +32,6 @@ import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.transform.ItemTransformerItemWriter;
 import org.springframework.batch.sample.StubLineAggregator;
-import org.springframework.batch.sample.domain.order.Address;
-import org.springframework.batch.sample.domain.order.BillingInfo;
-import org.springframework.batch.sample.domain.order.Customer;
-import org.springframework.batch.sample.domain.order.LineItem;
-import org.springframework.batch.sample.domain.order.Order;
 import org.springframework.batch.sample.domain.order.internal.OrderTransformer;
 
 public class FlatFileOrderWriterTests {

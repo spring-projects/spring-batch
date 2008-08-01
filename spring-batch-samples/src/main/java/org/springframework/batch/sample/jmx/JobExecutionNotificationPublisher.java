@@ -61,7 +61,6 @@ public class JobExecutionNotificationPublisher implements ApplicationListener, N
 			logger.info(message);
 			publish(message);
 		}
-		return;
 	}
 
 	/**

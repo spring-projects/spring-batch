@@ -11,7 +11,6 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.sample.domain.order.internal.valang.FutureDateFunction;
 import org.springmodules.validation.valang.functions.Function;
 
 public class FutureDateFunctionTests {

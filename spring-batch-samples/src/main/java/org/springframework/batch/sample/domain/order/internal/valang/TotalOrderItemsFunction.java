@@ -16,7 +16,6 @@
 
 package org.springframework.batch.sample.domain.order.internal.valang;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.sample.domain.order.LineItem;
@@ -41,7 +40,7 @@ public class TotalOrderItemsFunction extends AbstractFunction {
     @SuppressWarnings("unchecked")
 	protected Object doGetResult(Object target) throws Exception {
         //get arguments
-        int count = ((Integer) getArguments()[0].getResult(target)).intValue();
+        int count = (Integer) getArguments()[0].getResult(target);
         Object value = getArguments()[1].getResult(target);
 
         Boolean result;
@@ -50,11 +49,11 @@ public class TotalOrderItemsFunction extends AbstractFunction {
         if (value instanceof List) {
             int totalItems = 0;
 
-            for (Iterator<LineItem> i = ((List<LineItem>) value).iterator(); i.hasNext();) {
-                totalItems += i.next().getQuantity();
-            }
+			for (LineItem lineItem : ((List<LineItem>) value)) {
+				totalItems += lineItem.getQuantity();
+			}
 
-            result = (totalItems == count) ? Boolean.TRUE : Boolean.FALSE;
+			result = (totalItems == count) ? Boolean.TRUE : Boolean.FALSE;
         } else {
             throw new Exception("No list for validation");
         }
