@@ -37,6 +37,7 @@ import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageSource;
 import org.springframework.integration.message.MessageTarget;
+import org.springframework.integration.message.PollableSource;
 import org.springframework.integration.scheduling.PollingSchedule;
 import org.springframework.integration.scheduling.SimpleTaskScheduler;
 import org.springframework.integration.scheduling.TaskScheduler;
@@ -385,7 +386,7 @@ public class PollableSourceRetryTests {
 	 * @return
 	 */
 	private DirectChannel getChannel(MessageTarget handler, MessageSource<Object> source) {
-		DirectChannel channel = new DirectChannel(source);
+		DirectChannel channel = new DirectChannel();
 		channel.setName("input");
 		channel.subscribe(handler);
 		return channel;
@@ -400,7 +401,7 @@ public class PollableSourceRetryTests {
 		lifecycle.stop();
 	}
 
-	private MessageSource<Object> getPollableSource(List<String> list) {
+	private PollableSource<Object> getPollableSource(List<String> list) {
 		final ItemReader<String> reader = new ListItemReader<String>(list) {
 			public String read() {
 				String item = super.read();
@@ -408,10 +409,12 @@ public class PollableSourceRetryTests {
 				return item;
 			}
 		};
-		MessageSource<Object> source = new MessageSource<Object>() {
+		PollableSource<Object> source = new PollableSource<Object>() {
 			public Message<Object> receive() {
 				try {
-					return new GenericMessage<Object>(reader.read());
+					String payload = reader.read();
+					if (payload==null) return null;
+					return new GenericMessage<Object>(payload);
 				}
 				catch (RuntimeException e) {
 					throw e;

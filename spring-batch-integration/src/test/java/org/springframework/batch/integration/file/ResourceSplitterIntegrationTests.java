@@ -28,6 +28,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Splitter;
 import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.test.context.ContextConfiguration;
@@ -48,7 +49,7 @@ public class ResourceSplitterIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
-	private MessageChannel requests;
+	private PollableChannel requests;
 
 	/*
 	 * This is so cool (but see INT-190)...<br/>

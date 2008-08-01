@@ -15,7 +15,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageHandlingException;
@@ -30,11 +30,11 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
-	private MessageChannel requestChannel;
+	private PollableChannel requestChannel;
 
 	@Autowired
 	@Qualifier("response")
-	private MessageChannel responseChannel;
+	private PollableChannel responseChannel;
 
 	private JobSupport job = new JobSupport("testJob");
 

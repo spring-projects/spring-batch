@@ -16,9 +16,10 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.message.BlockingSource;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
+import org.springframework.integration.message.MessageTarget;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
@@ -37,9 +38,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
 
-	private MessageChannel requestChannel;
+	private MessageTarget target;
 
-	private MessageChannel replyChannel;
+	private BlockingSource<ChunkResponse> source;
 
 	// TODO: abstract the state or make a factory for this writer?
 	private LocalState localState = new LocalState();
@@ -55,12 +56,12 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		this.throttleLimit = throttleLimit;
 	}
 
-	public void setReplyChannel(MessageChannel replyChannel) {
-		this.replyChannel = replyChannel;
+	public void setSource(BlockingSource<ChunkResponse> source) {
+		this.source = source;
 	}
 
-	public void setRequestChannel(MessageChannel requestChannel) {
-		this.requestChannel = requestChannel;
+	public void setTarget(MessageTarget target) {
+		this.target = target;
 	}
 
 	public void write(T item) throws Exception {
@@ -95,7 +96,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			logger.debug("Dispatching chunk: " + processed);
 			ChunkRequest<T> request = new ChunkRequest<T>(processed, localState.getJobId(), localState.getSkipCount());
 			GenericMessage<ChunkRequest<T>> message = new GenericMessage<ChunkRequest<T>>(request);
-			requestChannel.send(message);
+			target.send(message);
 			localState.expected++;
 
 		}
@@ -176,9 +177,10 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * otherwise return null.
 	 */
 	private void getNextResult(long timeout) {
-		Message<?> message = replyChannel.receive(timeout);
+		// TODO: use the timeout
+		Message<ChunkResponse> message = source.receive(timeout);
 		if (message != null) {
-			ChunkResponse payload = (ChunkResponse) message.getPayload();
+			ChunkResponse payload = message.getPayload();
 			Long jobInstanceId = payload.getJobId();
 			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["

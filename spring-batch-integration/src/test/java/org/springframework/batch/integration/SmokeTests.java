@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.annotation.Handler;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.message.BlockingSource;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.test.context.ContextConfiguration;
@@ -26,7 +27,7 @@ public class SmokeTests {
 
 	@Autowired
 	@Qualifier("smokeout")
-	private MessageChannel smokeout;
+	private BlockingSource<String> smokeout;
 
 	// This has to be static because the MessageBus registers the handler
 	// more than once (every time a test instance is created), but only one of
@@ -48,7 +49,7 @@ public class SmokeTests {
 	@Test
 	public void testVanillaSendAndReceive() throws Exception {
 		smokein.send(new GenericMessage<String>("foo"));
-		Message<?> message = smokeout.receive(100);
+		Message<String> message = smokeout.receive(100);
 		String result = (String) (message == null ? null : message.getPayload());
 		assertEquals("foo: 1", result);
 		assertEquals(1, count);

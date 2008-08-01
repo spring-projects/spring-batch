@@ -33,11 +33,13 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.integration.JobRepositorySupport;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.channel.ThreadLocalChannel;
 import org.springframework.integration.dispatcher.DirectChannel;
+import org.springframework.integration.message.BlockingSource;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
+import org.springframework.integration.message.MessageSource;
 import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.ReflectionUtils;
 
@@ -53,15 +55,16 @@ public class MessageOrientedStepTests {
 
 	private DirectChannel requestChannel;
 
-	private MessageChannel replyChannel;
+	private PollableChannel replyChannel;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void createStep() {
 		replyChannel = new ThreadLocalChannel();
 		requestChannel = new DirectChannel();
 		step.setName("step");
-		step.setRequestChannel(requestChannel);
-		step.setReplyChannel(replyChannel);
+		step.setTarget(requestChannel);
+		step.setSource(replyChannel);
 		step.setStartLimit(10);
 		step.setJobRepository(new JobRepositorySupport());
 		JobInstance jobInstance = new JobInstance(0L, new JobParameters(), "job");
@@ -70,12 +73,12 @@ public class MessageOrientedStepTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.job.MessageOrientedStep#setRequestChannel(org.springframework.integration.channel.MessageChannel)}.
+	 * {@link org.springframework.batch.integration.job.MessageOrientedStep#setTarget(MessageTarget)}.
 	 */
 	@Test
 	public void testSetRequestChannel() {
-		Method method = ReflectionUtils.findMethod(MessageOrientedStep.class, "setRequestChannel",
-				new Class<?>[] { MessageChannel.class });
+		Method method = ReflectionUtils.findMethod(MessageOrientedStep.class, "setTarget",
+				new Class<?>[] { MessageTarget.class });
 		assertNotNull(method);
 		Annotation[] annotations = AnnotationUtils.getAnnotations(method);
 		assertEquals(1, annotations.length);
@@ -84,12 +87,12 @@ public class MessageOrientedStepTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.job.MessageOrientedStep#setReplyChannel(org.springframework.integration.channel.MessageChannel)}.
+	 * {@link org.springframework.batch.integration.job.MessageOrientedStep#setSource(MessageSource)}.
 	 */
 	@Test
 	public void testSetReplyChannel() {
-		Method method = ReflectionUtils.findMethod(MessageOrientedStep.class, "setReplyChannel",
-				new Class<?>[] { MessageChannel.class });
+		Method method = ReflectionUtils.findMethod(MessageOrientedStep.class, "setSource",
+				new Class<?>[] { BlockingSource.class });
 		assertNotNull(method);
 		Annotation[] annotations = AnnotationUtils.getAnnotations(method);
 		assertEquals(1, annotations.length);

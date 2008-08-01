@@ -32,7 +32,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.test.context.ContextConfiguration;
@@ -47,11 +47,11 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
-	private MessageChannel requests;
+	private PollableChannel requests;
 
 	@Autowired
 	@Qualifier("replies")
-	private MessageChannel replies;
+	private PollableChannel replies;
 
 	private SimpleStepFactoryBean<Object> factory;
 
@@ -59,6 +59,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	private static long jobCounter;
 
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() {
 
@@ -71,8 +72,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemWriter(writer);
 		factory.setCommitInterval(4);
 
-		writer.setReplyChannel(replies);
-		writer.setRequestChannel(requests);
+		writer.setSource(replies);
+		writer.setTarget(requests);
 
 		TestItemWriter.count = 0;
 		

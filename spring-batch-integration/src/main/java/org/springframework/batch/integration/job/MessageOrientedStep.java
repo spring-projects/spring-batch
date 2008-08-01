@@ -23,9 +23,10 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.message.BlockingSource;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
+import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.Assert;
 
 /**
@@ -39,9 +40,9 @@ public class MessageOrientedStep extends AbstractStep {
 	 */
 	public static final String WAITING = MessageOrientedStep.class.getName() + ".WAITING";
 
-	private MessageChannel requestChannel;
+	private MessageTarget target;
 
-	private MessageChannel replyChannel;
+	private BlockingSource<JobExecutionRequest> source;
 
 	private static int MINUTE = 1000 * 60;
 
@@ -75,21 +76,21 @@ public class MessageOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Public setter for the requestChannel.
-	 * @param requestChannel the requestChannel to set
+	 * Public setter for the target.
+	 * @param target the target to set
 	 */
 	@Required
-	public void setRequestChannel(MessageChannel requestChannel) {
-		this.requestChannel = requestChannel;
+	public void setTarget(MessageTarget target) {
+		this.target = target;
 	}
 
 	/**
-	 * Public setter for the replyChannel.
-	 * @param replyChannel the replyChannel to set
+	 * Public setter for the source.
+	 * @param source the source to set
 	 */
 	@Required
-	public void setReplyChannel(MessageChannel replyChannel) {
-		this.replyChannel = replyChannel;
+	public void setSource(BlockingSource<JobExecutionRequest> source) {
+		this.source = source;
 	}
 
 	/*
@@ -112,7 +113,7 @@ public class MessageOrientedStep extends AbstractStep {
 			executionContext.putString(WAITING, "true");
 			// TODO: need these two lines to be atomic
 			getJobRepository().update(stepExecution);
-			requestChannel.send(new GenericMessage<JobExecutionRequest>(request));
+			target.send(new GenericMessage<JobExecutionRequest>(request));
 			waitForReply(request.getJobId());
 		}
 
@@ -128,14 +129,14 @@ public class MessageOrientedStep extends AbstractStep {
 		long maxCount = executionTimeout / timeout;
 		long count = 0;
 
-		// TODO: use a ReponseCorrelator?, or just a SynchronousChannel
 		while (count++ < maxCount) {
 
-			Message<?> message = replyChannel.receive(timeout);
+			// TODO: timeout?
+			Message<JobExecutionRequest> message = source.receive(timeout);
 
 			if (message != null) {
 
-				JobExecutionRequest payload = (JobExecutionRequest) message.getPayload();
+				JobExecutionRequest payload = message.getPayload();
 				Long jobInstanceId = payload.getJobId();
 				Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
 				Assert.state(jobInstanceId.equals(expectedJobId), "Message contained wrong job instance id ["
