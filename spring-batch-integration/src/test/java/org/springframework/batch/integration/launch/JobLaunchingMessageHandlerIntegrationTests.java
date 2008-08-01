@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +19,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.MessageHandlingException;
+import org.springframework.integration.message.MessageDeliveryException;
 import org.springframework.integration.message.MessageHeaders;
+import org.springframework.integration.message.MessageTarget;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,7 +32,7 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
-	private PollableChannel requestChannel;
+	private MessageTarget requestChannel;
 
 	@Autowired
 	@Qualifier("response")
@@ -40,7 +42,6 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 
 	@Before
 	public void setUp() {
-		requestChannel.purge(null);
 		responseChannel.purge(null);
 	}
 
@@ -53,9 +54,9 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 		try {
 			requestChannel.send(trigger);
 		}
-		catch (MessageHandlingException e) {
-			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("reply channel"));
+		catch (MessageDeliveryException e) {
+			String message = e.getCause().getMessage();
+			assertTrue("Wrong message: " + message, message.contains("return address"));
 		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
@@ -68,8 +69,9 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	public void testReply() {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("dontclash", "12");
-		MessageHeaders headers = new MessageHeaders(new HashMap<String, Object>());
-		headers.put(MessageHeaders.RETURN_ADDRESS, "response");
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put(MessageHeaders.RETURN_ADDRESS, "response");
+		MessageHeaders headers = new MessageHeaders(map);
 		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job,
 				builder.toJobParameters()), headers);
 		requestChannel.send(trigger);

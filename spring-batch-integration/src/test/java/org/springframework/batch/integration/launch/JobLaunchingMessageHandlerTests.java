@@ -16,7 +16,6 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.bus.MessageBus;
-import org.springframework.integration.channel.AbstractMessageChannel;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -27,10 +26,6 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 
 	StubJobLauncher jobLauncher;
 
-	//	@Autowired
-	//	@Qualifier("jobs") TODO: Qualifier seems to be broken here why ?????
-	public AbstractMessageChannel jobsChannel;
-	
 	@Autowired
 	public MessageBus messageBus;
 
@@ -38,7 +33,6 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 	public void setUp() {
 		jobLauncher = new StubJobLauncher();
 		messageHandler = new JobLaunchingMessageHandler(jobLauncher);
-		jobsChannel = (AbstractMessageChannel) applicationContext.getBean("jobs");
 	}
 	
 	@Test

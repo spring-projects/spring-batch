@@ -23,8 +23,8 @@
 			<bean
 				class="org.springframework.batch.integration.job.MessageOrientedStep">
 				<property name="name" value="TODO: I shouldn't have to set this"/>
-				<property name="requestChannel" ref="requests" />
-				<property name="replyChannel" ref="replies" />
+				<property name="target" ref="requests" />
+				<property name="source" ref="replies" />
 				<property name="jobRepository" ref="jobRepository" />
 			</bean>
 		</property>

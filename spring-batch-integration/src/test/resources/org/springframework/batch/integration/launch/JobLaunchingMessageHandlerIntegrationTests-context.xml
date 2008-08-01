@@ -14,13 +14,11 @@
 
 	<import resource="classpath:simple-job-launcher-context.xml" />
 
-	<integration:message-bus auto-create-channels="true" channel-factory="channelFactory" />
+	<integration:message-bus auto-create-channels="true" />
 	<integration:annotation-driven />
-	<integration:channel id="requests" />
-	<integration:channel id="jobs" />
+	<integration:direct-channel id="requests" />
+	<integration:direct-channel id="jobs" />
 	<integration:thread-local-channel id="response" />
-
-	<bean id="channelFactory" class="org.springframework.integration.dispatcher.DirectChannelFactory" />
 
 	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" return-address-overrides="true" />
 	<integration:service-activator input-channel="none" output-channel="jobs" ref="jobRequestConverter" />
