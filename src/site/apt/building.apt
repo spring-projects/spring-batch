@@ -153,14 +153,22 @@ $ mvn -P snapshots dependency:tree
   the docbook format.  Also look at existing examples in Spring Batch
   and in the Core Spring Framework source code.
 
-  N.B. there is no need to explicitly create section numbers in the
+  [N.B.] there is no need to explicitly create section numbers in the
   XML - this is done for you by the build when everything is stitched
   together into a book.
 
-  N.B. you put docbook .xml source files in a subdirectory called
+  [N.B.] you put docbook .xml source files in a subdirectory called
   <<<docbook>>>, but they are moved to the top level when the site is
   built.  Thus <<<docbook/reference/index.xml>>> becomes
   <<<reference/index.html>>>.
+
+  [N.B.] If you use {{{http://www.xmlmind.com}XmlMind}} to edit the
+  reference guide add the following line to
+  <<<<XMLMind>/addon/config/docbook/common.incl>>>:
+
++---
+  <cfg:saveOptions xmlns="" cdataSectionElements="screen programlisting" />
++---
 
 ** Adding a new chapter to the Reference Guide
 
