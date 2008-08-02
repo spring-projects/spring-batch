@@ -1,6 +1,11 @@
 package org.springframework.batch.item;
 
+import static org.junit.Assert.*;
+
 import org.springframework.batch.item.sample.Foo;
+import org.junit.Before;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * Common tests for readers implementing both {@link ItemReader} and
@@ -18,13 +23,14 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		return (ItemStream) tested;
 	}
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		super.setUp();
 		testedAsStream().open(executionContext);
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
+	@After
+	public void tearDown() throws Exception {
 		testedAsStream().close(executionContext);
 	}
 
@@ -33,6 +39,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 	 * reader and restore from restart data - the new input source should
 	 * continue where the old one finished.
 	 */
+	@Test
 	public void testRestart() throws Exception {
 
 		testedAsStream().update(executionContext);
@@ -59,6 +66,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 	 * execution context, create new reader and restore from restart data - the
 	 * new input source should continue where the old one finished.
 	 */
+	@Test
 	public void testResetAndRestart() throws Exception {
 
 		testedAsStream().update(executionContext);
@@ -87,6 +95,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 
+	@Test
 	public void testReopen() throws Exception {
 		testedAsStream().update(executionContext);
 

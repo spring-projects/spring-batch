@@ -1,5 +1,9 @@
 package org.springframework.batch.item;
 
+import static org.junit.Assert.*;
+import org.junit.Test;
+import org.junit.Before;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.sample.Foo;
@@ -8,7 +12,7 @@ import org.springframework.batch.item.sample.Foo;
  * Common tests for {@link ItemReader} implementations. Expected input is five
  * {@link Foo} objects with values 1 to 5.
  */
-public abstract class CommonItemReaderTests extends TestCase {
+public abstract class CommonItemReaderTests {
 
 	protected ItemReader<Foo> tested;
 
@@ -17,13 +21,15 @@ public abstract class CommonItemReaderTests extends TestCase {
 	 */
 	protected abstract ItemReader<Foo> getItemReader() throws Exception;
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		tested = getItemReader();
 	}
 
 	/**
 	 * Regular scenario - read the input and eventually return null.
 	 */
+	@Test
 	public void testRead() throws Exception {
 
 		Foo foo1 = tested.read();
@@ -48,6 +54,7 @@ public abstract class CommonItemReaderTests extends TestCase {
 	 * Rollback scenario - reader resets to last marked point. Note the commit
 	 * interval can change dynamically.
 	 */
+	@Test
 	public void testReset() throws Exception {
 		Foo foo1 = tested.read();
 		assertEquals(1, foo1.getValue());
@@ -92,6 +99,7 @@ public abstract class CommonItemReaderTests extends TestCase {
 	 * Empty input should be handled gracefully - null is returned on first
 	 * read.
 	 */
+	@Test
 	public void testEmptyInput() throws Exception {
 		pointToEmptyInput(tested);
 		assertNull(tested.read());

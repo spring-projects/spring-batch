@@ -5,7 +5,10 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.SingleColumnJdbcKeyCollector;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.junit.runner.RunWith;
+import org.junit.internal.runners.JUnit4ClassRunner;
 
+@RunWith(JUnit4ClassRunner.class)
 public class SingleColumnJdbcDrivingQueryItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {

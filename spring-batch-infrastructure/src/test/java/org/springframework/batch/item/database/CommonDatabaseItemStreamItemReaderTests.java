@@ -4,17 +4,21 @@ import javax.sql.DataSource;
 
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.junit.Before;
+import org.junit.After;
 
 public abstract class CommonDatabaseItemStreamItemReaderTests extends CommonItemStreamItemReaderTests {
 
 	private ClassPathXmlApplicationContext ctx;
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		ctx = new ClassPathXmlApplicationContext("org/springframework/batch/item/database/data-source-context.xml");
 		super.setUp();
 	}
 
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		super.tearDown();
 		ctx.close();
 	}

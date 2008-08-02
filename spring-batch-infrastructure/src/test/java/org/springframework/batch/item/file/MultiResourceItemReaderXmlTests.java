@@ -1,5 +1,9 @@
 package org.springframework.batch.item.file;
 
+import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.junit.internal.runners.JUnit4ClassRunner;
+
 import java.util.Comparator;
 
 import javax.xml.stream.XMLEventReader;
@@ -16,6 +20,7 @@ import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
+@RunWith(JUnit4ClassRunner.class)
 public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {

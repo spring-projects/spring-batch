@@ -3,7 +3,11 @@ package org.springframework.batch.item.database;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
+import org.junit.runner.RunWith;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.Test;
 
+@RunWith(JUnit4ClassRunner.class)
 public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
@@ -24,6 +28,7 @@ public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamIte
 		return result;
 	}
 
+	@Test
 	public void testRestartWithDriverSupportsAbsolute() throws Exception {
 		tested = getItemReader();
 		((JdbcCursorItemReader<Foo>) tested).setDriverSupportsAbsolute(true);

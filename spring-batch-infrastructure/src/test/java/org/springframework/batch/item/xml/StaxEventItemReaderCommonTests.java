@@ -1,5 +1,9 @@
 package org.springframework.batch.item.xml;
 
+import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.junit.internal.runners.JUnit4ClassRunner;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
@@ -11,6 +15,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 
+@RunWith(JUnit4ClassRunner.class)
 public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTests {
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";

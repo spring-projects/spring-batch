@@ -7,7 +7,10 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
+import org.junit.runner.RunWith;
+import org.junit.internal.runners.JUnit4ClassRunner;
 
+@RunWith(JUnit4ClassRunner.class)
 public class HibernateCursorItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
