@@ -80,6 +80,7 @@
  org.springframework.xml.*;version="[1.0.0, 2.0.0)";resolution:=optional,
  org.springframework.batch.*,
  org.springframework.*;version="[2.0.0, 3.0.0)",
+ javax.persistence.*,
  javax.sql.*,
  javax.xml.namespace.*,
  javax.xml.transform.*

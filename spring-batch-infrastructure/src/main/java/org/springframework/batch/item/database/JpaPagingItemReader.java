@@ -1,3 +1,19 @@
+/*
+ * Copyright 2006-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
@@ -24,8 +40,14 @@ import java.util.List;
  * are requested when needed as {@link #read()} method is called, returning
  * an object corresponding to current position.
  *
+ * The performance of the paging depends on the JPA implementation and its use of database specific
+ * features to limit the number of returned rows.
+ *
+ * Setting a fairly large page size and using a commit interval that matches the page size should provide
+ * better performance.
+ *
  * The reader must be configured with an {@link javax.persistence.EntityManagerFactory} that is capable
- * of participating in SPring managed transactions.
+ * of participating in Spring managed transactions.
  *
  * The implementation is *not* thread-safe.
  *
