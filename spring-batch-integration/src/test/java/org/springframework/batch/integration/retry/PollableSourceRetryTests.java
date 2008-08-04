@@ -39,8 +39,10 @@ import org.springframework.integration.message.MessageSource;
 import org.springframework.integration.message.MessageTarget;
 import org.springframework.integration.message.PollableSource;
 import org.springframework.integration.scheduling.PollingSchedule;
-import org.springframework.integration.scheduling.SimpleTaskScheduler;
+import org.springframework.integration.scheduling.SchedulableTask;
 import org.springframework.integration.scheduling.TaskScheduler;
+import org.springframework.integration.scheduling.spi.ProviderTaskScheduler;
+import org.springframework.integration.scheduling.spi.SimpleScheduleServiceProvider;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.StringUtils;
 
@@ -427,8 +429,9 @@ public class PollableSourceRetryTests {
 		return source;
 	}
 
-	private TaskScheduler getSchedulerWithErrorHandler(Runnable task) {
-		SimpleTaskScheduler scheduler = new SimpleTaskScheduler(Executors.newSingleThreadScheduledExecutor());
+	private TaskScheduler getSchedulerWithErrorHandler(SchedulableTask task) {
+		SimpleScheduleServiceProvider provider = new SimpleScheduleServiceProvider(Executors.newSingleThreadScheduledExecutor());
+		TaskScheduler scheduler = new ProviderTaskScheduler(provider);
 		// Workaround for INT-182
 //		scheduler.setErrorHandler(new ErrorHandler() {
 //			public void handle(Throwable t) {
