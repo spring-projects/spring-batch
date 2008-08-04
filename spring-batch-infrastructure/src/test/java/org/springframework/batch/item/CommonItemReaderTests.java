@@ -1,11 +1,10 @@
 package org.springframework.batch.item;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import org.junit.Before;
-
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.batch.item.sample.Foo;
 
 /**

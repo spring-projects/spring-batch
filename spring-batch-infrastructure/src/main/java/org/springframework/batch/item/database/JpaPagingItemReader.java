@@ -16,21 +16,22 @@
 
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.Assert;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.springframework.dao.DataAccessResourceFailureException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
-import javax.persistence.EntityManager;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.orm.jpa.EntityManagerFactoryUtils;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * {@link org.springframework.batch.item.ItemReader} for reading database records built on top of JPA.
@@ -59,7 +60,7 @@ public class JpaPagingItemReader<T> extends AbstractBufferedItemReaderItemStream
 
 	private EntityManagerFactory entityManagerFactory;
 
-	private final Map jpaPropertyMap = new HashMap();
+	private final Map<String,Object> jpaPropertyMap = new HashMap<String,Object>();
 
 	private String queryString;
 
