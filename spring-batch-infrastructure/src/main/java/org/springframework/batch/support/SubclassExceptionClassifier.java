@@ -17,7 +17,6 @@ package org.springframework.batch.support;
 
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,10 +28,9 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-@SuppressWarnings("unchecked")
 public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	
-	private Map classified = new HashMap();
+	private Map<Class<?>, String> classified = new HashMap<Class<?>, String>();
 
 	/**
 	 * Map of Throwable class types to keys for the classifier. Any subclass of
@@ -41,10 +39,9 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	 * 
 	 * @param typeMap the typeMap to set
 	 */
-	public final void setTypeMap(Map typeMap) {
-		Map map = new HashMap();
-		for (Iterator iter = typeMap.entrySet().iterator(); iter.hasNext();) {
-			Map.Entry entry = (Map.Entry) iter.next();
+	public final void setTypeMap(Map<Class<?>, String> typeMap) {
+		Map<Class<?>, String> map = new HashMap<Class<?>, String>();
+		for (Map.Entry<Class<?>, String> entry : typeMap.entrySet()) {
 			addRetryableExceptionClass(entry.getKey(), entry.getValue(), map);
 		}
 		this.classified = map;
@@ -56,24 +53,23 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	 * 
 	 * @see org.springframework.batch.support.ExceptionClassifierSupport#classify(java.lang.Throwable)
 	 */
-	public Object classify(Throwable throwable) {
+	public String classify(Throwable throwable) {
 
 		if (throwable == null) {
 			return super.classify(throwable);
 		}
 
-		Class exceptionClass = throwable.getClass();
+		Class<?> exceptionClass = throwable.getClass();
 		if (classified.containsKey(exceptionClass)) {
 			return classified.get(exceptionClass);
 		}
 
 		// check for subclasses
-		Set classes = new TreeSet(new ClassComparator());
+		Set<Class<?>> classes = new TreeSet<Class<?>>(new ClassComparator());
 		classes.addAll(classified.keySet());
-		for (Iterator iterator = classes.iterator(); iterator.hasNext();) {
-			Class cls = (Class) iterator.next();
+		for (Class<?> cls : classes) {
 			if (cls.isAssignableFrom(exceptionClass)) {
-				Object value = classified.get(cls);
+				String value = classified.get(cls);
 				addRetryableExceptionClass(exceptionClass, value, this.classified);
 				return value;
 			}
@@ -82,9 +78,7 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 		return super.classify(throwable);
 	}
 
-	private void addRetryableExceptionClass(Object candidateClass, Object classifiedAs, Map map) {
-		Assert.isAssignable(Class.class, candidateClass.getClass());
-		Class exceptionClass = (Class) candidateClass;
+	private void addRetryableExceptionClass(Class<?> exceptionClass, String classifiedAs, Map<Class<?>, String> map) {
 		Assert.isAssignable(Throwable.class, exceptionClass);
 		map.put(exceptionClass, classifiedAs);
 	}
@@ -95,15 +89,13 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	 * @author Dave Syer
 	 * 
 	 */
-	private class ClassComparator implements Comparator {
+	private class ClassComparator implements Comparator<Class<?>> {
 		/**
 		 * @return 1 if arg0 is assignable from arg1, -1 otherwise
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
-		public int compare(Object arg0, Object arg1) {
-			Class cls0 = (Class) arg0;
-			Class cls1 = (Class) arg1;
-			if (cls0.isAssignableFrom(cls1)) {
+		public int compare(Class<?> arg0, Class<?> arg1) {
+			if (arg0.isAssignableFrom(arg1)) {
 				return 1;
 			}
 			return -1;

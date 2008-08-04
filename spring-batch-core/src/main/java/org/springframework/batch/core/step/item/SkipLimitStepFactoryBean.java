@@ -54,9 +54,9 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 
 	private int skipLimit = 0;
 
-	private Class<?>[] skippableExceptionClasses = new Class[] { Exception.class };
+	private Class<?>[] skippableExceptionClasses = new Class<?>[] { Exception.class };
 
-	private Class<?>[] fatalExceptionClasses = new Class[] { Error.class };
+	private Class<?>[] fatalExceptionClasses = new Class<?>[] { Error.class };
 
 	private ItemKeyGenerator itemKeyGenerator;
 
@@ -64,7 +64,7 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 
 	private int retryLimit = 0;
 
-	private Class<?>[] retryableExceptionClasses = new Class[] {};
+	private Class<?>[] retryableExceptionClasses = new Class<?>[] {};
 
 	private BackOffPolicy backOffPolicy;
 
@@ -206,8 +206,7 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 				ExceptionClassifierRetryPolicy classifierRetryPolicy = new ExceptionClassifierRetryPolicy();
 				SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
 				HashMap<Class<?>, String> exceptionTypeMap = new HashMap<Class<?>, String>();
-				for (int i = 0; i < retryableExceptionClasses.length; i++) {
-					Class<?> cls = retryableExceptionClasses[i];
+				for (Class<?> cls : retryableExceptionClasses) {
 					exceptionTypeMap.put(cls, "retry");
 				}
 				exceptionClassifier.setTypeMap(exceptionTypeMap);
@@ -243,11 +242,24 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 			}
 
 			List<Class<?>> exceptions = new ArrayList<Class<?>>(Arrays.asList(skippableExceptionClasses));
-			ItemSkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions, Arrays
-					.asList(fatalExceptionClasses));
-			exceptions.addAll(Arrays.asList(retryableExceptionClasses));
-			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions, Arrays
-					.asList(fatalExceptionClasses));
+			ItemSkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
+					new ArrayList<Class<?>>(){{
+						for (Class<?> exceptionClass : fatalExceptionClasses) {
+							add(exceptionClass);
+						}
+					}});
+			exceptions.addAll(
+					new ArrayList<Class<?>>(){{
+						for (Class<?> exceptionClass : retryableExceptionClasses) {
+							add(exceptionClass);
+						}
+					}});
+			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
+					new ArrayList<Class<?>>(){{
+						for (Class<?> exceptionClass : fatalExceptionClasses) {
+							add(exceptionClass);
+						}
+					}});
 			StatefulRetryItemHandler<T> itemHandler = new StatefulRetryItemHandler<T>(getItemReader(), getItemWriter(),
 					retryTemplate, itemKeyGenerator, readSkipPolicy, writeSkipPolicy);
 			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
@@ -263,11 +275,14 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 	}
 
 	public void addFatalExceptionIfMissing(Class<?> cls) {
-		List<Class<?>> fatalExceptionList = new ArrayList<Class<?>>(Arrays.asList(fatalExceptionClasses));
+		List<Class<?>> fatalExceptionList = new ArrayList<Class<?>>();
+		for (Class<?> exceptionClass : fatalExceptionClasses) {
+			fatalExceptionList.add(exceptionClass);
+		}
 		if (!fatalExceptionList.contains(cls)) {
 			fatalExceptionList.add(cls);
 		}
-		fatalExceptionClasses = (Class[]) fatalExceptionList.toArray(new Class[0]);
+		fatalExceptionClasses = fatalExceptionList.toArray(new Class[0]);
 	}
 
 	/**
@@ -318,8 +333,8 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 		 * @param listeners
 		 */
 		public void setSkipListeners(SkipListener[] listeners) {
-			for (int i = 0; i < listeners.length; i++) {
-				registerSkipListener(listeners[i]);
+			for (SkipListener listener1 : listeners) {
+				registerSkipListener(listener1);
 			}
 		}
 

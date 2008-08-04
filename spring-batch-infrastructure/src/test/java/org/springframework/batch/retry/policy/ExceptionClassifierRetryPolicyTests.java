@@ -80,7 +80,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 		assertTrue(policy.canRetry(context));
 
 		policy.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				if (throwable != null) {
 					return "foo";
 				}

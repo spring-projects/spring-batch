@@ -42,9 +42,9 @@ public class BinaryExceptionClassifier extends ExceptionClassifierSupport {
 	 * @param exceptionClasses defaults to {@link Exception}.
 	 */
 	public final void setExceptionClasses(Class<?>[] exceptionClasses) {
-		Map<Class<?>, Object> temp = new HashMap<Class<?>, Object>();
-		for (int i = 0; i < exceptionClasses.length; i++) {
-			temp.put(exceptionClasses[i], NON_DEFAULT);
+		Map<Class<?>, String> temp = new HashMap<Class<?>, String>();
+		for (Class<?> exceptionClass : exceptionClasses) {
+			temp.put(exceptionClass, NON_DEFAULT);
 		}
 		this.delegate.setTypeMap(temp);
 	}
@@ -70,7 +70,7 @@ public class BinaryExceptionClassifier extends ExceptionClassifierSupport {
 	 * @see #setExceptionClasses(Class[])
 	 * @see ExceptionClassifierSupport#classify(Throwable)
 	 */
-	public Object classify(Throwable throwable) {
+	public String classify(Throwable throwable) {
 		return delegate.classify(throwable);
 	}
 

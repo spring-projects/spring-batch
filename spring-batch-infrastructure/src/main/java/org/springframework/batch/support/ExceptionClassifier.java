@@ -22,7 +22,7 @@ package org.springframework.batch.support;
  * @author Dave Syer
  * 
  */
-public interface ExceptionClassifier {
+public interface ExceptionClassifier<T> {
 
 	/**
 	 * Get a default value, normally the same as would be returned by
@@ -30,7 +30,7 @@ public interface ExceptionClassifier {
 	 * 
 	 * @return the default value.
 	 */
-	Object getDefault();
+	T getDefault();
 
 	/**
 	 * Classify the given exception and return a non-null object. The return
@@ -40,6 +40,6 @@ public interface ExceptionClassifier {
 	 * @param throwable the input exception. Can be null.
 	 * @return an object.
 	 */
-	Object classify(Throwable throwable);
+	T classify(Throwable throwable);
 
 }

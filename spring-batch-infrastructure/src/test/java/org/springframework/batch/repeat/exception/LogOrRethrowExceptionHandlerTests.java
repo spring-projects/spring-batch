@@ -63,7 +63,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 	
 	public void testNotRethrownErrorLevel() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return LogOrRethrowExceptionHandler.ERROR;
 			}
 		});
@@ -74,7 +74,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	public void testNotRethrownWarnLevel() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return LogOrRethrowExceptionHandler.WARN;
 			}
 		});
@@ -85,7 +85,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 	
 	public void testNotRethrownDebugLevel() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return LogOrRethrowExceptionHandler.DEBUG;
 			}
 		});
@@ -96,7 +96,7 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	public void testUnclassifiedException() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return "DEFAULT";
 			}
 		});

@@ -56,8 +56,8 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(LogOrRethrowExceptionHandler.class);
 
-	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport() {
-		public Object classify(Throwable throwable) {
+	private ExceptionClassifier<String> exceptionClassifier = new ExceptionClassifierSupport() {
+		public String classify(Throwable throwable) {
 			return RETHROW;
 		}
 	};
@@ -66,9 +66,9 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * Setter for the {@link ExceptionClassifier} used by this handler. The default is to map all throwable instances to
 	 * {@link #RETHROW}.
 	 * 
-	 * @param exceptionClassifier
+	 * @param exceptionClassifier the ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExceptionClassifier<String> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 

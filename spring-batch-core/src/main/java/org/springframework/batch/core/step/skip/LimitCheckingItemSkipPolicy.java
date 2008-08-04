@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -69,7 +70,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
 	private final int skipLimit;
 
-	private ExceptionClassifier exceptionClassifier;
+	private ExceptionClassifier<String> exceptionClassifier;
 
 	/**
 	 * Convenience constructor that assumes all exception types are skippable
@@ -78,7 +79,9 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 */
 	@SuppressWarnings("unchecked")
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
-		this(skipLimit, (List) Collections.singletonList(Exception.class), Collections.EMPTY_LIST);
+		this(skipLimit,
+				new ArrayList<Class<?>>(){{add(Exception.class);}},
+				Collections.EMPTY_LIST);
 	}
 
 	/**

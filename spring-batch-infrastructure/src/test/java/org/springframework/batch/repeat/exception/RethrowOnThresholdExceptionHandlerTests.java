@@ -51,7 +51,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 	
 	public void testNotRethrownWithThreshold() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return "RuntimeException";
 			}
 		});
@@ -65,7 +65,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 	
 	public void testRethrowOnThreshold() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return "RuntimeException";
 			}
 		});
@@ -84,7 +84,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 	
 	public void testNotUseParent() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return "RuntimeException";
 			}
 		});
@@ -103,7 +103,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 
 	public void testUseParent() throws Throwable {
 		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
+			public String classify(Throwable throwable) {
 				return "RuntimeException";
 			}
 		});

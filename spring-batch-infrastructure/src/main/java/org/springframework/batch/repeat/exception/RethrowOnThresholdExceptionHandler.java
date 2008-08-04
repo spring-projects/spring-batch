@@ -41,7 +41,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
-	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport();
+	private ExceptionClassifier<String> exceptionClassifier = new ExceptionClassifierSupport();
 
 	private Map<Object, Integer> thresholds = new HashMap<Object, Integer>();
 
@@ -65,7 +65,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 */
 	public RethrowOnThresholdExceptionHandler() {
 		super();
-		thresholds.put(ExceptionClassifierSupport.DEFAULT, new Integer(0));
+		thresholds.put(ExceptionClassifierSupport.DEFAULT, 0);
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 			if (!(entry.getKey() instanceof String)) {
 				logger.warn("Key in thresholds map is not of type String: " + entry.getKey());
 			}
-			Assert.state(entry.getValue() instanceof Integer, "Threshold value must be of type Integer.  "
+			Assert.state(entry.getValue() != null, "Threshold value must be of type Integer.  "
 					+ "Try using the value-type attribute if you care configuring this map via xml.");
 		}
 		this.thresholds = thresholds;
@@ -93,9 +93,9 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * {@link ExceptionClassifierSupport#DEFAULT}, which are then mapped to a
 	 * threshold of 0 by the {@link #setThresholds(Map)} map.
 	 * 
-	 * @param exceptionClassifier
+	 * @param exceptionClassifier ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExceptionClassifier<String> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -114,7 +114,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 		counter.increment();
 		int count = counter.getCount();
 		Integer threshold = thresholds.get(key);
-		if (threshold == null || count > threshold.intValue()) {
+		if (threshold == null || count > threshold) {
 			throw throwable;
 		}
 

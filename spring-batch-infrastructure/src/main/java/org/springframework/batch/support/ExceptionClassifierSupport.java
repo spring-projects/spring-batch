@@ -23,7 +23,7 @@ package org.springframework.batch.support;
  * @author Dave Syer
  * 
  */
-public class ExceptionClassifierSupport implements ExceptionClassifier {
+public class ExceptionClassifierSupport implements ExceptionClassifier<String> {
 
 	/**
 	 * Default classification key.
@@ -35,7 +35,7 @@ public class ExceptionClassifierSupport implements ExceptionClassifier {
 	 * 
 	 * @see org.springframework.batch.support.ExceptionClassifier#classify(java.lang.Throwable)
 	 */
-	public Object classify(Throwable throwable) {
+	public String classify(Throwable throwable) {
 		return DEFAULT;
 	}
 
@@ -44,7 +44,7 @@ public class ExceptionClassifierSupport implements ExceptionClassifier {
 	 * 
 	 * @see org.springframework.batch.support.ExceptionClassifier#getDefault()
 	 */
-	public Object getDefault() {
+	public String getDefault() {
 		return classify(null);
 	}
 

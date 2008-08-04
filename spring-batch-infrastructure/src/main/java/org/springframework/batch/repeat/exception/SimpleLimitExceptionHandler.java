@@ -67,6 +67,8 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	/**
 	 * Convenience constructor for the {@link SimpleLimitExceptionHandler} to
 	 * set the limit.
+	 *
+	 * @param limit the limit
 	 */
 	public SimpleLimitExceptionHandler(int limit) {
 		this();
@@ -79,14 +81,14 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	public SimpleLimitExceptionHandler() {
 		super();
 		delegate.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public Object classify(Throwable throwable) {
-				for (int i = 0; i < fatalExceptionClasses.length; i++) {
-					if (fatalExceptionClasses[i].isAssignableFrom(throwable.getClass())) {
+			public String classify(Throwable throwable) {
+				for (Class<?> fatalExceptionClass : fatalExceptionClasses) {
+					if (fatalExceptionClass.isAssignableFrom(throwable.getClass())) {
 						return FATAL;
 					}
 				}
-				for (int i = 0; i < exceptionClasses.length; i++) {
-					if (exceptionClasses[i].isAssignableFrom(throwable.getClass())) {
+				for (Class<?> exceptionClass : exceptionClasses) {
+					if (exceptionClass.isAssignableFrom(throwable.getClass())) {
 						return TX_INVALID;
 					}
 				}
@@ -113,14 +115,14 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * The limit on the given exception type within a single context before it
 	 * is rethrown.
 	 * 
-	 * @param limit
+	 * @param limit the limit
 	 */
 	public void setLimit(final int limit) {
 		delegate.setThresholds(new HashMap<Object, Integer>() {
 			{
-				put(ExceptionClassifierSupport.DEFAULT, new Integer(0));
-				put(TX_INVALID, new Integer(limit));
-				put(FATAL, new Integer(0));
+				put(ExceptionClassifierSupport.DEFAULT, 0);
+				put(TX_INVALID, limit);
+				put(FATAL, 0);
 			}
 		});
 	}
@@ -130,6 +132,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * Defaults to {@link Exception}. If more exceptionClasses are specified
 	 * handler uses single counter that is incremented when one of the
 	 * recognized exception exceptionClasses is handled.
+	 * @param classes exceptionClasses
 	 */
 	public void setExceptionClasses(Class<?>[] classes) {
 		this.exceptionClasses = classes;
