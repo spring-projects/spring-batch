@@ -47,6 +47,10 @@ import org.springframework.util.ClassUtils;
  * Setting a fairly large page size and using a commit interval that matches the page size should provide
  * better performance.
  *
+ * In order to reduce the memory usage for large results the persistence context is flushed and cleared
+ * after each page is read.  This cuases any entities read to be detached. If you make changes to the
+ * entities and want the changes persisted then you must explicitly merge the entities.
+ *
  * The reader must be configured with an {@link javax.persistence.EntityManagerFactory} that is capable
  * of participating in Spring managed transactions.
  *
