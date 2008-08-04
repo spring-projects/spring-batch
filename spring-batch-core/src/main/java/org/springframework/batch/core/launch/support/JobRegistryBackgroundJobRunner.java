@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,9 +34,8 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
 /**
@@ -60,7 +60,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class JobRegistryBackgroundJobRunner implements ResourceLoaderAware {
+public class JobRegistryBackgroundJobRunner {
 
 	/**
 	 * System property key that switches the runner to "embedded" mode
@@ -72,8 +72,6 @@ public class JobRegistryBackgroundJobRunner implements ResourceLoaderAware {
 	private static Log logger = LogFactory.getLog(JobRegistryBackgroundJobRunner.class);
 
 	private JobRegistry registry;
-
-	private ResourceLoader resourceLoader;
 
 	private ApplicationContext parentContext = null;
 
@@ -97,14 +95,6 @@ public class JobRegistryBackgroundJobRunner implements ResourceLoaderAware {
 		this.registry = registry;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.context.ResourceLoaderAware#setResourceLoader(org.springframework.core.io.ResourceLoader)
-	 */
-	public void setResourceLoader(ResourceLoader resourceLoader) {
-		this.resourceLoader = resourceLoader;
-	}
-
 	/**
 	 * Public getter for the startup errors encountered during parent context
 	 * creation.
@@ -114,21 +104,33 @@ public class JobRegistryBackgroundJobRunner implements ResourceLoaderAware {
 		return errors;
 	}
 
-	private void register(String[] paths) throws DuplicateJobException {
+	private void register(String[] paths) throws DuplicateJobException, IOException {
+
 		for (int i = 0; i < paths.length; i++) {
-			String path = paths[i];
-			logger.info("Registering Job definitions from " + path);
-			ConfigurableListableBeanFactory beanFactory = new XmlBeanFactory(resourceLoader.getResource(path),
-					parentContext.getAutowireCapableBeanFactory());
-			String[] names = beanFactory.getBeanNamesForType(Job.class);
-			for (int j = 0; j < names.length; j++) {
-				ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
-				factory.setApplicationContext(parentContext);
-				factory.setPath(path);
-				logger.info("Registering Job definition: " + names[j]);
-				registry.register(new ApplicationContextJobFactory(factory, names[j]));
+
+			Resource[] resources = parentContext.getResources(paths[i]);
+
+			for (int j = 0; j < resources.length; j++) {
+
+				Resource path = resources[j];
+				logger.info("Registering Job definitions from " + resources);
+
+				ConfigurableListableBeanFactory beanFactory = new XmlBeanFactory(path, parentContext
+						.getAutowireCapableBeanFactory());
+				String[] names = beanFactory.getBeanNamesForType(Job.class);
+
+				for (int k = 0; k < names.length; k++) {
+					ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
+					factory.setApplicationContext(parentContext);
+					factory.setPath(new Resource[] { path });
+					logger.info("Registering Job definition: " + names[k]);
+					registry.register(new ApplicationContextJobFactory(factory, names[k]));
+				}
+
 			}
+
 		}
+
 	}
 
 	/**

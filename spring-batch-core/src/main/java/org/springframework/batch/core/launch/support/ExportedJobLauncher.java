@@ -58,6 +58,17 @@ public interface ExportedJobLauncher {
 	void stop();
 
 	/**
+	 * Stop running jobs with the supplied name.
+	 */
+	void stop(String name);
+
+	/**
+	 * Clear volatile memory of any jobs that are not running (and are therefore
+	 * completed or failed).
+	 */
+	void clear();
+
+	/**
 	 * Enquire if any jobs launched here are still running.
 	 * 
 	 * @return true if any jobs are running.
@@ -65,11 +76,10 @@ public interface ExportedJobLauncher {
 	boolean isRunning();
 
 	/**
-	 * Query statistics of currently executing jobs.
+	 * Query statistics of jobs.
 	 * 
-	 * @return properties representing last known state of currently executing
-	 * jobs
+	 * @return properties representing last known state of jobs with this name
+	 * (including those that may have finished)
 	 */
-	public Properties getStatistics();
-
+	public Properties getStatistics(String name);
 }

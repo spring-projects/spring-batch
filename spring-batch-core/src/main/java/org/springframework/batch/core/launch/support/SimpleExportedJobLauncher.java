@@ -16,8 +16,10 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.batch.core.Job;
@@ -41,6 +43,8 @@ import org.springframework.util.Assert;
  */
 public class SimpleExportedJobLauncher implements ExportedJobLauncher, InitializingBean {
 
+	private static final String SEPARATOR = "|";
+
 	private JobLauncher launcher;
 
 	private JobLocator jobLocator;
@@ -52,8 +56,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(launcher, "JobLauncher must be provided.");
@@ -87,16 +90,16 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
 	 * #getStatistics()
 	 */
-	public Properties getStatistics() {
+	public Properties getStatistics(String name) {
 		Properties result = new Properties();
 		int i = 0;
-		for (String key : registry.keySet()) {
+		Set<String> keys = getKeyForName(name);
+		for (String key : keys) {
 			JobExecution execution = (JobExecution) registry.get(key);
-			addStatistics(result, execution, "job" + i + ".");
+			addStatistics(result, execution, name + "." + i + ".");
 			i++;
 		}
 		return result;
@@ -119,8 +122,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
 	 * #isRunning()
 	 */
 	public boolean isRunning() {
@@ -136,8 +138,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
 	 * #run(java.lang.String)
 	 */
 	public String run(String name) {
@@ -147,8 +148,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
 	 * #run(java.lang.String, java.lang.String)
 	 */
 	public String run(String name, String params) {
@@ -173,7 +173,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 		catch (JobExecutionException e) {
 			return e.getClass().getName() + ": " + e.getMessage();
 		}
-		registry.put(name + params, execution);
+		registry.put(name + SEPARATOR + params, execution);
 
 		return execution.toString();
 
@@ -182,8 +182,7 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
+	 * @see org.springframework.batch.execution.bootstrap.support.ExportedJobLauncher
 	 * #stop()
 	 */
 	public void stop() {
@@ -191,7 +190,45 @@ public class SimpleExportedJobLauncher implements ExportedJobLauncher, Initializ
 			JobExecution execution = (JobExecution) registry.get(key);
 			execution.stop();
 		}
-		registry.clear();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.launch.support.ExportedJobLauncher#stop(java.lang.String)
+	 */
+	public void stop(String name) {
+		Set<String> keys = getKeyForName(name);
+		for (String key : keys) {
+			JobExecution execution = (JobExecution) registry.get(key);
+			execution.stop();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.launch.support.ExportedJobLauncher#clear()
+	 */
+	public void clear() {
+		for (String key : registry.keySet()) {
+			JobExecution execution = (JobExecution) registry.get(key);
+			if (!execution.isRunning()) {
+				registry.remove(key);
+			}
+		}
+	}
+
+	/**
+	 * @param key
+	 * @return
+	 */
+	private Set<String> getKeyForName(String name) {
+		Set<String> result = new HashSet<String>();
+		for (String key : registry.keySet()) {
+			if (key.startsWith(name + SEPARATOR)) {
+				result.add(key);
+			}
+		}
+		return result;
 	}
 
 }

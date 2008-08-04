@@ -4,21 +4,24 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.AbstractXmlApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
-public class ClassPathXmlApplicationContextFactory implements
-		ApplicationContextFactory, ApplicationContextAware {
+public class ClassPathXmlApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
 
-	private ApplicationContext parent;
+	private ConfigurableApplicationContext parent;
 
-	private String path;
+	private Resource[] path;
 
 	/**
-	 * @param path
-	 *            the resource path to the xml to load for the child context.
+	 * Setter for the path to the xml to load to create an
+	 * {@link ApplicationContext}. Can include wild cards as per the usual
+	 * Spring resource resolution.
+	 * 
+	 * @param path the resource path to the xml to load for the child context.
 	 */
-	public void setPath(String path) {
+	public void setPath(Resource[] path) {
 		this.path = path;
 	}
 
@@ -27,11 +30,9 @@ public class ClassPathXmlApplicationContextFactory implements
 	 * 
 	 * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
 	 */
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
-		Assert.isInstanceOf(ConfigurableApplicationContext.class,
-				applicationContext);
-		parent = applicationContext;
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		Assert.isInstanceOf(ConfigurableApplicationContext.class, applicationContext);
+		parent = (ConfigurableApplicationContext) applicationContext;
 	}
 
 	/**
@@ -40,7 +41,29 @@ public class ClassPathXmlApplicationContextFactory implements
 	 * @see ApplicationContextFactory#createApplicationContext()
 	 */
 	public ConfigurableApplicationContext createApplicationContext() {
-		return new ClassPathXmlApplicationContext(new String[] { path }, parent);
+		if (path==null) {
+			return parent;
+		}
+		return new ResourceXmlApplicationContext(parent);
 	}
+
+	/**
+	 * @author Dave Syer
+	 *
+	 */
+	private final class ResourceXmlApplicationContext extends AbstractXmlApplicationContext {
+		/**
+		 * @param parent
+		 */
+		private ResourceXmlApplicationContext(ApplicationContext parent) {
+			super(parent);
+			refresh();
+		}
+
+		protected Resource[] getConfigResources() {
+			return path;
+		}
+	}
+
 
 }

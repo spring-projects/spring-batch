@@ -74,6 +74,7 @@ public class RemoteLauncherTests {
 		Thread.sleep(500);
 		assertTrue(launcher.isRunning());
 		launcher.stop();
+		Thread.sleep(500);
 		assertFalse(launcher.isRunning());
 	}
 

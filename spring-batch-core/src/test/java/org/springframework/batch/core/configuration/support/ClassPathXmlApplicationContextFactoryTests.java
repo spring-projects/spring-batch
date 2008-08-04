@@ -18,6 +18,8 @@ package org.springframework.batch.core.configuration.support;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.Job;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -29,12 +31,12 @@ public class ClassPathXmlApplicationContextFactoryTests extends TestCase {
 	private ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
 
 	public void testCreateJob() {
-		factory.setPath(ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"));
+		factory.setPath(new Resource[] {new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"))});
 		assertNotNull(factory.createApplicationContext());
 	}
 
 	public void testGetJobName() {
-		factory.setPath(ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"));
+		factory.setPath(new Resource[] {new ClassPathResource(ClassUtils.addResourcePathToPackagePath(getClass(), "trivial-context.xml"))});
 		assertEquals("test-job", factory.createApplicationContext().getBeanNamesForType(Job.class)[0]);
 	}
 
