@@ -42,10 +42,9 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	List<Object> list;
 
-	@SuppressWarnings("unchecked")
 	public void afterPropertiesSet() throws Exception {
-		TransactionAwareProxyFactory factory = new TransactionAwareProxyFactory(new ArrayList());
-		list = (List<Object>) factory.createInstance();
+		TransactionAwareProxyFactory<List<Object>> factory = new TransactionAwareProxyFactory<List<Object>>(new ArrayList<Object>());
+		list = factory.createInstance();
 	}
 
 	public void setFailurePoint(int failurePoint) {

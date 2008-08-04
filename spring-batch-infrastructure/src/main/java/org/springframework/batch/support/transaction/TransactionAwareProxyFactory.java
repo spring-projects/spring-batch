@@ -46,12 +46,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Dave Syer
  * 
  */
-@SuppressWarnings("unchecked")
-public class TransactionAwareProxyFactory {
+public class TransactionAwareProxyFactory<T> {
 
-	private Object target;
+	private T target;
 
-	public TransactionAwareProxyFactory(Object target) {
+	public TransactionAwareProxyFactory(T target) {
 		super();
 		this.target = begin(target);
 	}
@@ -64,15 +63,16 @@ public class TransactionAwareProxyFactory {
 	 * @param target the target object (List, Set or Map)
 	 * @return an independent copy
 	 */
-	protected final Object begin(Object target) {
+	@SuppressWarnings("unchecked")
+	protected final T begin(T target) {
 		if (target instanceof List) {
-			return new ArrayList((List) target);
+			return (T) new ArrayList((List) target);
 		}
 		else if (target instanceof Set) {
-			return new HashSet((Set) target);
+			return (T) new HashSet((Set) target);
 		}
 		else if (target instanceof Map) {
-			return new HashMap((Map) target);
+			return (T) new HashMap((Map) target);
 		}
 		else {
 			throw new UnsupportedOperationException("Cannot copy target for this type: " + target.getClass());
@@ -87,7 +87,8 @@ public class TransactionAwareProxyFactory {
 	 * @param copy the working copy.
 	 * @param target the original target of the factory.
 	 */
-	protected void commit(Object copy, Object target) {
+	@SuppressWarnings("unchecked")
+	protected void commit(T copy, T target) {
 		if (target instanceof Collection) {
 			((Collection) target).clear();
 			((Collection) target).addAll((Collection) copy);
@@ -98,16 +99,17 @@ public class TransactionAwareProxyFactory {
 		}
 	}
 
-	public Object createInstance() {
+	public T createInstance() {
 		ProxyFactory factory = new ProxyFactory(target);
 		factory.addAdvice(new MethodInterceptor() {
+			
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 
 				if (!TransactionSynchronizationManager.isActualTransactionActive()) {
 					return invocation.proceed();
 				}
 
-				Object cache;
+				T cache;
 
 				if (!TransactionSynchronizationManager.hasResource(this)) {
 					cache = begin(target);
@@ -115,35 +117,42 @@ public class TransactionAwareProxyFactory {
 					TransactionSynchronizationManager.registerSynchronization(new TargetSynchronization(this, cache));
 				}
 				else {
-					cache = TransactionSynchronizationManager.getResource(this);
+					@SuppressWarnings("unchecked")
+					T retrievedCache = (T) TransactionSynchronizationManager.getResource(this);
+					cache = retrievedCache;
 				}
 
 				return invocation.getMethod().invoke(cache, invocation.getArguments());
 
 			}
 		});
-		return factory.getProxy();
+		@SuppressWarnings("unchecked")
+		T instance = (T) factory.getProxy();
+		return instance;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static <K,V> Map<K,V> createTransactionalMap() {
 		return (Map<K,V>) new TransactionAwareProxyFactory(new HashMap<K,V>()).createInstance();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> Set<T> createTransactionalSet() {
 		return (Set<T>) new TransactionAwareProxyFactory(new HashSet<T>()).createInstance();
 	}
 
+	@SuppressWarnings("unchecked")
 	public static <T> List<T> createTransactionalList() {
 		return (List<T>) new TransactionAwareProxyFactory(new ArrayList<T>()).createInstance();
 	}
 
 	private class TargetSynchronization extends TransactionSynchronizationAdapter {
 
-		Object cache;
+		T cache;
 
 		Object key;
 
-		public TargetSynchronization(Object key, Object cache) {
+		public TargetSynchronization(Object key, T cache) {
 			super();
 			this.cache = cache;
 			this.key = key;

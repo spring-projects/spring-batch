@@ -44,7 +44,7 @@ public class TransactionAwareProxyFactoryTests extends TestCase {
 
 	public void testCreateUnsupported() throws Exception {
 		try {
-			new TransactionAwareProxyFactory(new Object()).createInstance();
+			new TransactionAwareProxyFactory<Object>(new Object()).createInstance();
 			fail("Expected UnsupportedOperationException");
 		} catch (UnsupportedOperationException e) {
 			// expected

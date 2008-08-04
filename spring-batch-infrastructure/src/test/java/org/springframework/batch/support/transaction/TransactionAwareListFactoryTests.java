@@ -27,14 +27,13 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class TransactionAwareListFactoryTests extends TestCase {
 
-	TransactionAwareProxyFactory factory = new TransactionAwareProxyFactory(Arrays.asList(new String[] { "foo",
+	TransactionAwareProxyFactory<List<String>> factory = new TransactionAwareProxyFactory<List<String>>(Arrays.asList(new String[] { "foo",
 			"bar", "spam" }));
 
 	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
 	List<String> list;
 
-	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
 		list = (List<String>) factory.createInstance();
 	}
