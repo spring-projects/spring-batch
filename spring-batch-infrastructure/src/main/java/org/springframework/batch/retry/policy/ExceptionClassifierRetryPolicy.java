@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  */
 public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy {
 
-	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport();
+	private ExceptionClassifier<String> exceptionClassifier = new ExceptionClassifierSupport();
 
 	private Map<String, RetryPolicy> policyMap = new HashMap<String, RetryPolicy>();
 
@@ -62,9 +62,9 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * Setter for an exception classifier. The classifier is responsible for
 	 * translating exceptions to keys in the policy map.
 	 * 
-	 * @param exceptionClassifier
+	 * @param exceptionClassifier ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier exceptionClassifier) {
+	public void setExceptionClassifier(ExceptionClassifier<String> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -113,7 +113,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 	private class ExceptionClassifierRetryContext extends RetryContextSupport implements RetryPolicy {
 
-		private ExceptionClassifier exceptionClassifier;
+		private ExceptionClassifier<String> exceptionClassifier;
 
 		// Dynamic: depends on the latest exception:
 		RetryPolicy policy;
@@ -126,7 +126,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 		Map<RetryPolicy, RetryContext> contexts = new HashMap<RetryPolicy, RetryContext>();
 
-		public ExceptionClassifierRetryContext(RetryContext parent, ExceptionClassifier exceptionClassifier) {
+		public ExceptionClassifierRetryContext(RetryContext parent, ExceptionClassifier<String> exceptionClassifier) {
 			super(parent);
 			this.exceptionClassifier = exceptionClassifier;
 			Object key = exceptionClassifier.getDefault();
@@ -165,7 +165,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		}
 
 		private RetryContext getContext(RetryPolicy policy) {
-			RetryContext context = (RetryContext) contexts.get(policy);
+			RetryContext context = contexts.get(policy);
 			if (context == null) {
 				context = policy.open(callback, null);
 				contexts.put(policy, context);
@@ -174,7 +174,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		}
 
 		private RetryPolicy getPolicy(Object key) {
-			RetryPolicy result = (RetryPolicy) policyMap.get(key);
+			RetryPolicy result = policyMap.get(key);
 			Assert.notNull(result, "Could not locate policy for key=[" + key + "].");
 			return result;
 		}
