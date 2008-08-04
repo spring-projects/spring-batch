@@ -29,8 +29,11 @@ import org.springframework.batch.core.listener.CompositeItemReadListener;
 import org.springframework.batch.core.listener.CompositeItemWriteListener;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.FlushFailedException;
+import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.support.DelegatingItemReader;
 import org.springframework.batch.item.support.DelegatingItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.listener.RepeatListenerSupport;
@@ -82,7 +85,7 @@ abstract class BatchListenerFactoryHelper {
 	 * @param itemWriter
 	 * @param listeners
 	 */
-	public static <T> ItemWriter<T> getItemWriter(ItemWriter<T> itemWriter, StepListener[] listeners) {
+	public static <T> ItemWriter<T> getItemWriter(final ItemWriter<T> itemWriter, StepListener[] listeners) {
 		final CompositeItemWriteListener multicaster = new CompositeItemWriteListener();
 
 		for (int i = 0; i < listeners.length; i++) {
@@ -92,11 +95,11 @@ abstract class BatchListenerFactoryHelper {
 			}
 		}
 
-		itemWriter = new DelegatingItemWriter<T,T>(itemWriter) {
+		return new ItemWriter<T>() {
 			public void write(T item) throws Exception {
 				try {
 					multicaster.beforeWrite(item);
-					super.write(item);
+					itemWriter.write(item);
 					multicaster.afterWrite(item);
 				}
 				catch (Exception e) {
@@ -104,9 +107,15 @@ abstract class BatchListenerFactoryHelper {
 					throw e;
 				}
 			}
-		};
 
-		return itemWriter;
+			public void flush() throws FlushFailedException {
+				itemWriter.flush();
+			}
+
+			public void clear() throws ClearFailedException {
+				itemWriter.clear();
+			}
+		};
 
 	}
 
