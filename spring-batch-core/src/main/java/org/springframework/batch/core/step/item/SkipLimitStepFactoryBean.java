@@ -244,23 +244,28 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 
 			List<Class<?>> exceptions = new ArrayList<Class<?>>(Arrays.asList(skippableExceptionClasses));
 			ItemSkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
-					new ArrayList<Class<?>>(){{
-						for (Class<?> exceptionClass : fatalExceptionClasses) {
-							add(exceptionClass);
+					new ArrayList<Class<?>>() {
+						{
+							for (Class<?> exceptionClass : fatalExceptionClasses) {
+								add(exceptionClass);
+							}
 						}
-					}});
-			exceptions.addAll(
-					new ArrayList<Class<?>>(){{
-						for (Class<?> exceptionClass : retryableExceptionClasses) {
-							add(exceptionClass);
-						}
-					}});
+					});
+			exceptions.addAll(new ArrayList<Class<?>>() {
+				{
+					for (Class<?> exceptionClass : retryableExceptionClasses) {
+						add(exceptionClass);
+					}
+				}
+			});
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
-					new ArrayList<Class<?>>(){{
-						for (Class<?> exceptionClass : fatalExceptionClasses) {
-							add(exceptionClass);
+					new ArrayList<Class<?>>() {
+						{
+							for (Class<?> exceptionClass : fatalExceptionClasses) {
+								add(exceptionClass);
+							}
 						}
-					}});
+					});
 			StatefulRetryItemHandler<T> itemHandler = new StatefulRetryItemHandler<T>(getItemReader(), getItemWriter(),
 					retryTemplate, itemKeyGenerator, readSkipPolicy, writeSkipPolicy);
 			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
@@ -335,8 +340,8 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 		 * @param listeners
 		 */
 		public void setSkipListeners(SkipListener[] listeners) {
-			for (SkipListener listener1 : listeners) {
-				registerSkipListener(listener1);
+			for (SkipListener listener : listeners) {
+				registerSkipListener(listener);
 			}
 		}
 
@@ -416,7 +421,12 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 				public Object recover(RetryContext context) {
 					Throwable t = context.getLastThrowable();
 					if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
-						listener.onSkipInWrite(item, t);
+						try {
+							listener.onSkipInWrite(item, t);
+						}
+						catch (RuntimeException ex) {
+							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
+						}
 					}
 					contribution.incrementWriteSkipCount();
 					return null;

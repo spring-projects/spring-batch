@@ -31,10 +31,10 @@ public class SkipListenerFailedException extends UnexpectedJobExecutionException
 	/**
 	 * @param message describes the error to the user
 	 * @param ex the exception that was thrown by a {@link SkipListener}
-	 * @param e the exception that caused the skip
+	 * @param t the exception that caused the skip
 	 */
-	public SkipListenerFailedException(String message, RuntimeException ex, Exception e) {
-		super(message + "\n" + e.getClass().getName() + ": " + e.getMessage(), ex);
+	public SkipListenerFailedException(String message, RuntimeException ex, Throwable t) {
+		super(message + "\n" + t.getClass().getName() + ": " + t.getMessage(), ex);
 	}
 
 }
