@@ -191,13 +191,14 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
 
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
+			addFatalExceptionIfMissing(SkipListenerFailedException.class);
 			addFatalExceptionIfMissing(RetryException.class);
 
 			if (retryPolicy == null) {
 
 				SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
 				if (retryableExceptionClasses.length > 0) { // otherwise we
-															// retry
+					// retry
 					// all exceptions
 					simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 				}
@@ -316,8 +317,9 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 		 * @param retryTemplate
 		 * @param itemKeyGenerator
 		 */
-		public StatefulRetryItemHandler(ItemReader<? extends T> itemReader, ItemWriter<? super T> itemWriter, RetryOperations retryTemplate,
-				ItemKeyGenerator itemKeyGenerator, ItemSkipPolicy readSkipPolicy, ItemSkipPolicy writeSkipPolicy) {
+		public StatefulRetryItemHandler(ItemReader<? extends T> itemReader, ItemWriter<? super T> itemWriter,
+				RetryOperations retryTemplate, ItemKeyGenerator itemKeyGenerator, ItemSkipPolicy readSkipPolicy,
+				ItemSkipPolicy writeSkipPolicy) {
 			super(itemReader, itemWriter);
 			this.retryOperations = retryTemplate;
 			this.itemKeyGenerator = itemKeyGenerator;
@@ -367,7 +369,12 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 						if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 							// increment skip count and try again
 							contribution.incrementTemporaryReadSkipCount();
-							listener.onSkipInRead(e);
+							try {
+								listener.onSkipInRead(e);
+							}
+							catch (RuntimeException ex) {
+								throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+							}
 							logger.debug("Skipping failed input", e);
 						}
 						else {

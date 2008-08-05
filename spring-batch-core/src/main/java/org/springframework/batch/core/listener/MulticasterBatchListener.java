@@ -89,7 +89,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep(StepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		return stepListener.afterStep(stepExecution);
+		try {
+			return stepListener.afterStep(stepExecution);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in afterStep.", e);
+		}
 	}
 
 	/**
@@ -97,15 +102,26 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
-		stepListener.beforeStep(stepExecution);
+		try {
+			stepListener.beforeStep(stepExecution);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in beforeStep.", e);
+		}
 	}
 
 	/**
-	 * @param e
-	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#onErrorInStep(StepExecution, Throwable)
+	 * @param t
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#onErrorInStep(StepExecution,
+	 * Throwable)
 	 */
-	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-		return stepListener.onErrorInStep(stepExecution, e);
+	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable t) {
+		try {
+			return stepListener.onErrorInStep(stepExecution, t);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in onErrorInStep.", t, e);
+		}
 	}
 
 	/**
@@ -113,7 +129,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk()
 	 */
 	public void afterChunk() {
-		chunkListener.afterChunk();
+		try {
+			chunkListener.afterChunk();
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in afterChunk.", e);
+		}
 	}
 
 	/**
@@ -121,7 +142,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk()
 	 */
 	public void beforeChunk() {
-		chunkListener.beforeChunk();
+		try {
+			chunkListener.beforeChunk();
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in beforeChunk.", e);
+		}
 	}
 
 	/**
@@ -129,7 +155,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#afterRead(java.lang.Object)
 	 */
 	public void afterRead(Object item) {
-		itemReadListener.afterRead(item);
+		try {
+			itemReadListener.afterRead(item);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in afterRead.", e);
+		}
 	}
 
 	/**
@@ -137,7 +168,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#beforeRead()
 	 */
 	public void beforeRead() {
-		itemReadListener.beforeRead();
+		try {
+			itemReadListener.beforeRead();
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in beforeRead.", e);
+		}
 	}
 
 	/**
@@ -145,7 +181,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#onReadError(java.lang.Exception)
 	 */
 	public void onReadError(Exception ex) {
-		itemReadListener.onReadError(ex);
+		try {
+			itemReadListener.onReadError(ex);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in onReadError.", ex, e);
+		}
 	}
 
 	/**
@@ -153,7 +194,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#afterWrite(Object)
 	 */
 	public void afterWrite(Object item) {
-		itemWriteListener.afterWrite(item);
+		try {
+			itemWriteListener.afterWrite(item);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in afterWrite.", e);
+		}
 	}
 
 	/**
@@ -161,7 +207,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#beforeWrite(java.lang.Object)
 	 */
 	public void beforeWrite(Object item) {
-		itemWriteListener.beforeWrite(item);
+		try {
+			itemWriteListener.beforeWrite(item);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in beforeWrite.", e);
+		}
 	}
 
 	/**
@@ -171,7 +222,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * java.lang.Object)
 	 */
 	public void onWriteError(Exception ex, Object item) {
-		itemWriteListener.onWriteError(ex, item);
+		try {
+			itemWriteListener.onWriteError(ex, item);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in onWriteError.", ex, e);
+		}
 	}
 
 	/**
@@ -179,16 +235,27 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	public void onSkipInRead(Throwable t) {
-		skipListener.onSkipInRead(t);
+		try {
+			skipListener.onSkipInRead(t);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in onSkipInRead.", t, e);
+		}
 	}
 
 	/**
 	 * @param item
 	 * @param t
-	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
+	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object,
+	 * java.lang.Throwable)
 	 */
 	public void onSkipInWrite(Object item, Throwable t) {
-		skipListener.onSkipInWrite(item, t);
+		try {
+			skipListener.onSkipInWrite(item, t);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in onSkipInWrite.", t, e);
+		}
 	}
 
 }
