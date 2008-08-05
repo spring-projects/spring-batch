@@ -30,7 +30,7 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 import org.springframework.context.Lifecycle;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.dispatcher.DirectChannel;
-import org.springframework.integration.endpoint.EndpointTrigger;
+import org.springframework.integration.dispatcher.PollingDispatcher;
 import org.springframework.integration.endpoint.SourceEndpoint;
 import org.springframework.integration.endpoint.interceptor.EndpointInterceptorAdapter;
 import org.springframework.integration.message.GenericMessage;
@@ -88,13 +88,14 @@ public class PollableSourceRetryTests {
 				return processed.add((String) payload);
 			}
 		};
-		MessageSource<Object> source = getPollableSource(list);
+		PollableSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
 		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
-		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(endpoint);
+		PollingDispatcher trigger = new PollingDispatcher(source, endpoint.getSchedule());
+		trigger.setMaxMessagesPerPoll(1);
+		trigger.subscribe(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 40);
@@ -121,12 +122,13 @@ public class PollableSourceRetryTests {
 				throw new RuntimeException("Planned failure: " + payload);
 			}
 		};
-		MessageSource<Object> source = getPollableSource(list);
+		PollableSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
 		endpoint.afterPropertiesSet();
-		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(endpoint);
+		PollingDispatcher trigger = new PollingDispatcher(source, endpoint.getSchedule());
+		trigger.setMaxMessagesPerPoll(1);
+		trigger.subscribe(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 20);
@@ -155,13 +157,14 @@ public class PollableSourceRetryTests {
 				throw new RuntimeException("Planned failure: " + payload);
 			}
 		};
-		MessageSource<Object> source = getPollableSource(list);
+		PollableSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
 		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
-		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(endpoint);
+		PollingDispatcher trigger = new PollingDispatcher(source, endpoint.getSchedule());
+		trigger.setMaxMessagesPerPoll(1);
+		trigger.subscribe(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 20);
@@ -196,13 +199,14 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		MessageSource<Object> source = getPollableSource(list);
+		PollableSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
 		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
-		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(endpoint);
+		PollingDispatcher trigger = new PollingDispatcher(source, endpoint.getSchedule());
+		trigger.setMaxMessagesPerPoll(1);
+		trigger.subscribe(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 5, 30);
@@ -240,15 +244,16 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		MessageSource<Object> source = getPollableSource(list);
+		PollableSource<Object> source = getPollableSource(list);
 		DirectChannel channel = getChannel(handler, source);
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
 		// endpoint.addInterceptor(getTransactionInterceptor());
 		addTransactionInterceptor(endpoint);
 		addRepeatInterceptor(endpoint, 3);
 		endpoint.afterPropertiesSet();
-		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(endpoint);
+		PollingDispatcher trigger = new PollingDispatcher(source, endpoint.getSchedule());
+		trigger.setMaxMessagesPerPoll(1);
+		trigger.subscribe(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 6, 100);
@@ -291,7 +296,7 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		MessageSource<Object> source = getPollableSource(list);
+		PollableSource<Object> source = getPollableSource(list);
 		MessageChannel channel = getChannel(handler, source);
 		// this was the old dispatch advice chain
 		channel = (MessageChannel) getProxy(channel, MessageChannel.class,
@@ -299,8 +304,9 @@ public class PollableSourceRetryTests {
 		SourceEndpoint endpoint = getSourceEndpoint(source, channel);
 		addTransactionInterceptor(endpoint);
 		endpoint.afterPropertiesSet();
-		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(endpoint);
+		PollingDispatcher trigger = new PollingDispatcher(source, endpoint.getSchedule());
+		trigger.setMaxMessagesPerPoll(1);
+		trigger.subscribe(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 4, 40);
@@ -338,7 +344,7 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		MessageSource<Object> source = getPollableSource(list);
+		PollableSource<Object> source = getPollableSource(list);
 		MessageChannel channel = getChannel(handler, source);
 		// this was the old dispatch advice chain
 		channel = (MessageChannel) getProxy(channel, MessageChannel.class,
@@ -347,8 +353,9 @@ public class PollableSourceRetryTests {
 		addTransactionInterceptor(endpoint);
 		addRepeatInterceptor(endpoint, 3);
 		endpoint.afterPropertiesSet();
-		EndpointTrigger trigger = new EndpointTrigger(endpoint.getSchedule());
-		trigger.addTarget(endpoint);
+		PollingDispatcher trigger = new PollingDispatcher(source, endpoint.getSchedule());
+		trigger.setMaxMessagesPerPoll(1);
+		trigger.subscribe(endpoint);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 6, 100);
