@@ -38,7 +38,7 @@
 			</includes>
 			<sources>
 				<outputDirectoryMapping>
-					samples/${artifactId}
+					samples/${module.artifactId}
 				</outputDirectoryMapping>
 				<fileSets>
 					<fileSet>

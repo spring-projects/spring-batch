@@ -38,7 +38,7 @@
 			</includes>
 			<sources>
 				<outputDirectoryMapping>
-					samples/${artifactId}
+					samples/${module.artifactId}
 				</outputDirectoryMapping>
 				<fileSets>
 					<fileSet>
@@ -89,7 +89,7 @@
 				<dependencySets>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
+							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
@@ -106,7 +106,7 @@
 					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
+							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>provided</scope>
 					</dependencySet>
@@ -126,7 +126,7 @@
 				<dependencySets>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
+							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
@@ -143,7 +143,7 @@
 					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
+							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>provided</scope>
 						<excludes>
@@ -160,7 +160,7 @@
 					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${groupId}/${version}/${artifactId}-${version}.${extension}
+							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>test</scope>
 						<excludes>
