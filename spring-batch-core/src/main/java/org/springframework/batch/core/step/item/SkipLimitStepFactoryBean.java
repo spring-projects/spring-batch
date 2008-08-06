@@ -11,6 +11,7 @@ import org.springframework.batch.core.listener.CompositeSkipListener;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
+import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -378,6 +379,7 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 								listener.onSkipInRead(e);
 							}
 							catch (RuntimeException ex) {
+								contribution.combineSkipCounts();
 								throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 							}
 							logger.debug("Skipping failed input", e);
@@ -421,6 +423,7 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 				public Object recover(RetryContext context) {
 					Throwable t = context.getLastThrowable();
 					if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
+						contribution.incrementWriteSkipCount();
 						try {
 							listener.onSkipInWrite(item, t);
 						}
@@ -428,13 +431,11 @@ public class SkipLimitStepFactoryBean<T> extends SimpleStepFactoryBean<T> {
 							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
 						}
 					}
-					contribution.incrementWriteSkipCount();
 					return null;
 				}
 			});
 			retryOperations.execute(retryCallback);
 		}
-
 	}
 
 }

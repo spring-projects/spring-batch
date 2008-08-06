@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.springframework.batch.core;
+package org.springframework.batch.core.listener;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-public abstract class AbstractExceptionTests {
-
-	@Test
-	public void testExceptionString() throws Exception {
-		Exception exception = getException("foo");
-		assertEquals("foo", exception.getMessage());
-	}
+/**
+ * @author Dave Syer
+ *
+ */
+public abstract class AbstractDoubleExceptionTests {
 
 	@Test
 	public void testExceptionStringThrowable() throws Exception {
-		Exception exception = getException("foo", new IllegalStateException());
+		Exception exception = getException("foo", new IllegalStateException(), new RuntimeException("bar"));
 		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}
 
-	public abstract Exception getException(String msg) throws Exception;
-
-	public abstract Exception getException(String msg, Throwable t) throws Exception;
+	public abstract Exception getException(String msg, RuntimeException cause, Throwable e) throws Exception;
 
 }

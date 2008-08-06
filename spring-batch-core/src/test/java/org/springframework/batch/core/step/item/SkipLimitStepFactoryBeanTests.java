@@ -14,9 +14,12 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
+import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
@@ -91,7 +94,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
 		assertEquals(expectedOutput, writer.written);
-		
+
 		assertEquals(4, stepExecution.getItemCount().intValue());
 
 	}
@@ -117,7 +120,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		// no rollbacks
 		assertEquals(0, stepExecution.getRollbackCount().intValue());
-		
+
 		assertEquals(4, stepExecution.getItemCount().intValue());
 
 	}
@@ -208,12 +211,88 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertFalse(reader.processed.contains("2"));
 		assertTrue(reader.processed.contains("4"));
 
-		// failure on "5" tripped the skip limit but "4" failed on write and was skipped and 
-		// RepeatSynchronizationManager.setCompleteOnly() was called in the retry policy to
+		// failure on "5" tripped the skip limit but "4" failed on write and was
+		// skipped and
+		// RepeatSynchronizationManager.setCompleteOnly() was called in the
+		// retry policy to
 		// aggressively commit after a recovery ("1" was written at that point)
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
 		assertEquals(expectedOutput, writer.written);
 
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@SuppressWarnings("unchecked")
+	public void testSkipListenerFailsOnRead() throws Exception {
+
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
+				.commaDelimitedListToSet("2,3,5"));
+
+		factory.setSkipLimit(3);
+		factory.setItemReader(reader);
+		factory.setListeners(new StepListener[] { new SkipListenerSupport() {
+			@Override
+			public void onSkipInRead(Throwable t) {
+				throw new RuntimeException("oops");
+			}
+		} });
+		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
+
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipListenerFailedException.");
+		}
+		catch (SkipListenerFailedException e) {
+			assertEquals("oops", e.getCause().getMessage());
+		}
+
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(1, stepExecution.getReadSkipCount().intValue());
+		assertEquals(0, stepExecution.getWriteSkipCount().intValue());
+		
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@SuppressWarnings("unchecked")
+	public void testSkipListenerFailsOnWrite() throws Exception {
+
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
+				.commaDelimitedListToSet("2,3,5"));
+
+		factory.setSkipLimit(3);
+		factory.setItemReader(reader);
+		factory.setListeners(new StepListener[] { new SkipListenerSupport() {
+			@Override
+			public void onSkipInWrite(Object item, Throwable t) {
+				throw new RuntimeException("oops");
+			}
+		} });
+		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
+
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipListenerFailedException.");
+		}
+		catch (SkipListenerFailedException e) {
+			assertEquals("oops", e.getCause().getMessage());
+		}
+
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(0, stepExecution.getReadSkipCount().intValue());
+		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
+		
 	}
 
 	/**
@@ -383,7 +462,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		public void clear() throws ClearFailedException {
 			for (int i = flushIndex + 1; i < written.size(); i++) {
-				written.remove(written.size()-1);
+				written.remove(written.size() - 1);
 			}
 		}
 

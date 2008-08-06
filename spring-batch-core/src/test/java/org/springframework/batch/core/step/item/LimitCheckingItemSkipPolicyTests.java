@@ -15,27 +15,31 @@
  */
 package org.springframework.batch.core.step.item;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.file.FlatFileParseException;
 
 /**
  * @author Lucas Ward
+ * @author Dave Syer
  *
  */
-public class SkipLimitReadFailurePolicyTests extends TestCase {
+public class LimitCheckingItemSkipPolicyTests {
 
 	private LimitCheckingItemSkipPolicy failurePolicy;
 	
-	protected void setUp() throws Exception {
-		super.setUp();
-		
+	@Before
+	public void setUp() throws Exception {
 		List<Class<?>> skippableExceptions = new ArrayList<Class<?>>();
 		skippableExceptions.add(FlatFileParseException.class);
 		List<Class<?>> fatalExceptions = new ArrayList<Class<?>>();
@@ -43,6 +47,7 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
 	}
 	
+	@Test
 	public void testLimitExceed(){		
 		try{
 			failurePolicy.shouldSkip(new FlatFileParseException("", ""), 2);
@@ -53,10 +58,12 @@ public class SkipLimitReadFailurePolicyTests extends TestCase {
 		}
 	}
 	
+	@Test
 	public void testNonSkippableException(){
 		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), 2));
 	}
 	
+	@Test
 	public void testSkip(){
 		assertTrue(failurePolicy.shouldSkip(new FlatFileParseException("",""), 0));
 	}
