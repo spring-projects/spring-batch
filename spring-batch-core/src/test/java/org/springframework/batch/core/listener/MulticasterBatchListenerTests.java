@@ -1,0 +1,569 @@
+/*
+ * Copyright 2006-2007 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.batch.core.listener;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepListener;
+import org.springframework.batch.repeat.ExitStatus;
+
+/**
+ * @author Dave Syer
+ *
+ */
+public class MulticasterBatchListenerTests {
+	
+	private MulticasterBatchListener multicast = new MulticasterBatchListener();
+	
+	private int count = 0;
+	
+	private boolean error = false;
+	
+	@Before
+	public void setUp() {
+		multicast.register(new CountingStepListenerSupport());
+	}
+	
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#setListeners(org.springframework.batch.core.StepListener[])}.
+	 */
+	@Test
+	public void testSetListeners() {
+		multicast.setListeners(new StepListener[] { new StepListenerSupport() {
+			@Override
+			public ExitStatus afterStep(StepExecution stepExecution) {
+				count++;
+				return super.afterStep(stepExecution);
+			}
+		}});
+		multicast.afterStep(null);
+		// setListeners is cumulative (should be OK if used for DI)
+		assertEquals(2, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#register(org.springframework.batch.core.StepListener)}.
+	 */
+	@Test
+	public void testRegister() {
+		multicast.register(new StepListenerSupport() {
+			@Override
+			public ExitStatus afterStep(StepExecution stepExecution) {
+				count++;
+				return super.afterStep(stepExecution);
+			}
+		});
+		multicast.afterStep(null);
+		assertEquals(2, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterStep(org.springframework.batch.core.StepExecution)}.
+	 */
+	@Test
+	public void testAfterStepFails() {
+		error = true;
+		try {
+			multicast.afterStep(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeStep(org.springframework.batch.core.StepExecution)}.
+	 */
+	@Test
+	public void testBeforeStep() {
+		multicast.beforeStep(null);
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeStep(org.springframework.batch.core.StepExecution)}.
+	 */
+	@Test
+	public void testBeforeStepFails() {
+		error = true;
+		try {
+			multicast.beforeStep(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onErrorInStep(org.springframework.batch.core.StepExecution, java.lang.Throwable)}.
+	 */
+	@Test
+	public void testOnErrorInStep() {
+		multicast.onErrorInStep(null, new RuntimeException("foo"));
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onErrorInStep(org.springframework.batch.core.StepExecution, java.lang.Throwable)}.
+	 */
+	@Test
+	public void testOnErrorInStepFails() {
+		error = true;
+		try {
+			multicast.onErrorInStep(null, new RuntimeException("foo"));
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "foo", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterChunk()}.
+	 */
+	@Test
+	public void testAfterChunk() {
+		multicast.afterChunk();
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterChunk()}.
+	 */
+	@Test
+	public void testAfterChunkFails() {
+		error = true;
+		try {
+			multicast.afterChunk();
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeChunk()}.
+	 */
+	@Test
+	public void testBeforeChunk() {
+		multicast.beforeChunk();
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeChunk()}.
+	 */
+	@Test
+	public void testBeforeChunkFails() {
+		error = true;
+		try {
+			multicast.beforeChunk();
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterRead(java.lang.Object)}.
+	 */
+	@Test
+	public void testAfterRead() {
+		multicast.afterRead(null);
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterRead(java.lang.Object)}.
+	 */
+	@Test
+	public void testAfterReadFails() {
+		error = true;
+		try {
+			multicast.afterRead(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeRead()}.
+	 */
+	@Test
+	public void testBeforeRead() {
+		multicast.beforeRead();
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeRead()}.
+	 */
+	@Test
+	public void testBeforeReadFails() {
+		error = true;
+		try {
+			multicast.beforeRead();
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onReadError(java.lang.Exception)}.
+	 */
+	@Test
+	public void testOnReadError() {
+		multicast.onReadError(new RuntimeException("foo"));
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onReadError(java.lang.Exception)}.
+	 */
+	@Test
+	public void testOnReadErrorFails() {
+		error = true;
+		try {
+			multicast.onReadError(new RuntimeException("foo"));
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "foo", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterWrite(java.lang.Object)}.
+	 */
+	@Test
+	public void testAfterWrite() {
+		multicast.afterWrite(null);
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterWrite(java.lang.Object)}.
+	 */
+	@Test
+	public void testAfterWriteFails() {
+		error = true;
+		try {
+			multicast.afterWrite(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeWrite(java.lang.Object)}.
+	 */
+	@Test
+	public void testBeforeWrite() {
+		multicast.beforeWrite(null);
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#beforeWrite(java.lang.Object)}.
+	 */
+	@Test
+	public void testBeforeWriteFails() {
+		error = true;
+		try {
+			multicast.beforeWrite(null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "listener error", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onWriteError(java.lang.Exception, java.lang.Object)}.
+	 */
+	@Test
+	public void testOnWriteError() {
+		multicast.onWriteError(new RuntimeException("foo"), null);
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onWriteError(java.lang.Exception, java.lang.Object)}.
+	 */
+	@Test
+	public void testOnWriteErrorFails() {
+		error = true;
+		try {
+			multicast.onWriteError(new RuntimeException("foo"), null);
+			fail("Expected StepListenerFailedException");
+		} catch (StepListenerFailedException e) {
+			// expected
+			String message = e.getCause().getMessage();
+			assertEquals("Wrong message: "+message, "foo", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onSkipInRead(java.lang.Throwable)}.
+	 */
+	@Test
+	public void testOnSkipInRead() {
+		multicast.register(new SkipListenerSupport() {
+			@Override
+			public void onSkipInRead(Throwable t) {
+				count++;
+				super.onSkipInRead(t);
+			}
+		});
+		multicast.onSkipInRead(new RuntimeException("foo"));
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onSkipInRead(java.lang.Throwable)}.
+	 */
+	@Test
+	public void testOnSkipInReadFails() {
+		multicast.register(new SkipListenerSupport() {
+			@Override
+			public void onSkipInRead(Throwable t) {
+				count++;
+				throw new RuntimeException("foo");
+			}
+		});
+		try {
+			multicast.onSkipInRead(new RuntimeException("bar"));
+			fail("Expected RuntimeException");
+		} catch (RuntimeException e) {
+			// expected
+			String message = e.getMessage();
+			assertEquals("Wrong message: "+message, "foo", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)}.
+	 */
+	@Test
+	public void testOnSkipInWrite() {
+		multicast.register(new SkipListenerSupport() {
+			@Override
+			public void onSkipInWrite(Object item, Throwable t) {
+				count++;
+				super.onSkipInWrite(item, t);
+			}
+		});
+		multicast.onSkipInWrite(null, new RuntimeException("foo"));
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for {@link org.springframework.batch.core.listener.MulticasterBatchListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)}.
+	 */
+	@Test
+	public void testOnSkipInWriteFails() {
+		multicast.register(new SkipListenerSupport() {
+			@Override
+			public void onSkipInWrite(Object item, Throwable t) {
+				count++;
+				throw new RuntimeException("foo");
+			}
+		});
+		try {
+			multicast.onSkipInWrite(null, new RuntimeException("bar"));
+			fail("Expected RuntimeException");
+		} catch (RuntimeException e) {
+			// expected
+			String message = e.getMessage();
+			assertEquals("Wrong message: "+message, "foo", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * @author Dave Syer
+	 *
+	 */
+	private final class CountingStepListenerSupport extends StepListenerSupport {
+		@Override
+		public void onReadError(Exception ex) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.onReadError(ex);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterChunk()
+		 */
+		@Override
+		public void afterChunk() {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.afterChunk();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterRead(java.lang.Object)
+		 */
+		@Override
+		public void afterRead(Object item) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.afterRead(item);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterStep(org.springframework.batch.core.StepExecution)
+		 */
+		@Override
+		public ExitStatus afterStep(StepExecution stepExecution) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			return super.afterStep(stepExecution);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#afterWrite(java.lang.Object)
+		 */
+		@Override
+		public void afterWrite(Object item) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.afterWrite(item);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeChunk()
+		 */
+		@Override
+		public void beforeChunk() {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.beforeChunk();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeRead()
+		 */
+		@Override
+		public void beforeRead() {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.beforeRead();
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeStep(org.springframework.batch.core.StepExecution)
+		 */
+		@Override
+		public void beforeStep(StepExecution stepExecution) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.beforeStep(stepExecution);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeWrite(java.lang.Object)
+		 */
+		@Override
+		public void beforeWrite(Object item) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.beforeWrite(item);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#onErrorInStep(org.springframework.batch.core.StepExecution, java.lang.Throwable)
+		 */
+		@Override
+		public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			return super.onErrorInStep(stepExecution, e);
+		}
+
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.core.listener.StepListenerSupport#onWriteError(java.lang.Exception, java.lang.Object)
+		 */
+		@Override
+		public void onWriteError(Exception ex, Object item) {
+			count++;
+			if (error) {
+				throw new RuntimeException("listener error");
+			}
+			super.onWriteError(ex, item);
+		}
+	}
+
+
+}

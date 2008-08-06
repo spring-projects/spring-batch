@@ -235,12 +235,7 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	public void onSkipInRead(Throwable t) {
-		try {
-			skipListener.onSkipInRead(t);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onSkipInRead.", t, e);
-		}
+		skipListener.onSkipInRead(t);
 	}
 
 	/**
@@ -250,12 +245,7 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	 * java.lang.Throwable)
 	 */
 	public void onSkipInWrite(Object item, Throwable t) {
-		try {
-			skipListener.onSkipInWrite(item, t);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onSkipInWrite.", t, e);
-		}
+		skipListener.onSkipInWrite(item, t);
 	}
 
 }
