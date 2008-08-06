@@ -140,7 +140,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 
 		// failure scenario -- no step id set.
 		try {
-			jobRepository.save(stepExecution);
+			jobRepository.add(stepExecution);
 			fail();
 		}
 		catch (Exception ex) {

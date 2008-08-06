@@ -73,17 +73,17 @@ public interface JobRepository {
 	void update(JobExecution jobExecution);
 
 	/**
-	 * Save the {@link StepExecution}. ID will be assigned - it is not advisable
+	 * Save the {@link StepExecution}. ID will be assigned - it is not permitted
 	 * that an ID be assigned before calling this method. Instead, it should be
 	 * left blank, to be assigned by a {@link JobRepository}. The
 	 * {@link ExecutionContext} of the {@link StepExecution} is <em>not</em>
-	 * saved: see {@link #persistExecutionContext(StepExecution)}.
+	 * saved: see {@link #updateExecutionContext(StepExecution)}.
 	 * 
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * 
 	 * @param stepExecution
 	 */
-	void save(StepExecution stepExecution);
+	void add(StepExecution stepExecution);
 
 	/**
 	 * Update the {@link StepExecution}.
@@ -101,7 +101,7 @@ public interface JobRepository {
 	 * @param stepExecution the {@link StepExecution} containing the
 	 * {@link ExecutionContext} to be saved.
 	 */
-	void persistExecutionContext(StepExecution stepExecution);
+	void updateExecutionContext(StepExecution stepExecution);
 
 	/**
 	 * @return the last execution of step for the given job instance.

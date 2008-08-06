@@ -107,13 +107,13 @@ public class AbstractStepTests extends TestCase {
 		
 		static long counter = 0;
 
-		public void persistExecutionContext(StepExecution stepExecution) {
+		public void updateExecutionContext(StepExecution stepExecution) {
 			Assert.state(stepExecution.getId() != null, "StepExecution must already be saved");
 			saved = stepExecution.getExecutionContext();
 		}
 
 		@Override
-		public void save(StepExecution stepExecution) {
+		public void add(StepExecution stepExecution) {
 			if (stepExecution.getId() == null) {
 				stepExecution.setId(counter);
 				counter++;
@@ -237,7 +237,7 @@ public class AbstractStepTests extends TestCase {
 			}
 		};
 		repository = new JobRepositoryStub() {
-			public void persistExecutionContext(StepExecution stepExecution) {
+			public void updateExecutionContext(StepExecution stepExecution) {
 				throw new RuntimeException("Bad context!");
 			}
 		};

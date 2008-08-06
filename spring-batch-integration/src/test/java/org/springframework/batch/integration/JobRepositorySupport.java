@@ -69,10 +69,10 @@ public class JobRepositorySupport implements JobRepository {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.StepExecution)
 	 */
-	public void persistExecutionContext(StepExecution stepExecution) {
+	public void updateExecutionContext(StepExecution stepExecution) {
 	}
 
-	public void save(StepExecution stepExecution) {
+	public void add(StepExecution stepExecution) {
 	}
 
 	public void update(StepExecution stepExecution) {

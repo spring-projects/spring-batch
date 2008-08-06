@@ -222,7 +222,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * Preconditions: step name must be given and associated
 	 * {@link JobExecution} must already be saved (have an id assigned).
 	 */
-	public void save(StepExecution stepExecution) {
+	public void add(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 
 		stepExecutionDao.saveStepExecution(stepExecution);
@@ -254,7 +254,7 @@ public class SimpleJobRepository implements JobRepository {
 	 * persistExecutionContext
 	 * (org.springframework.batch.core.domain.StepExecution)
 	 */
-	public void persistExecutionContext(StepExecution stepExecution) {
+	public void updateExecutionContext(StepExecution stepExecution) {
 		// Until there is an interface change (
 		ecDao.persistExecutionContext(stepExecution.getJobExecution());
 		ecDao.persistExecutionContext(stepExecution);

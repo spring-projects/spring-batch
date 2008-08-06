@@ -503,8 +503,8 @@ public class SimpleJobTests extends TestCase {
 			passedInStepContext = new ExecutionContext(stepExecution.getExecutionContext());
 			stepExecution.getExecutionContext().putString("stepKey", "stepValue");
 			stepExecution.getJobExecution().getExecutionContext().putString("jobKey", "jobValue");
-			jobRepository.save(stepExecution);
-			jobRepository.persistExecutionContext(stepExecution);
+			jobRepository.add(stepExecution);
+			jobRepository.updateExecutionContext(stepExecution);
 
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
