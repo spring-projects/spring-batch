@@ -15,22 +15,28 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.step.skip.SkipListenerFailedException;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 
 
 /**
  * @author Dave Syer
  *
  */
-public class StepListenerFailedExceptionTests extends AbstractDoubleExceptionTests {
+public class StepListenerFailedExceptionTests {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.listener.AbstractDoubleExceptionTests#getException(java.lang.String, java.lang.Throwable, java.lang.Throwable)
-	 */
-	@Override
-	public Exception getException(String msg, RuntimeException cause, Throwable e) throws Exception {
-		return new SkipListenerFailedException(msg, cause, e);
+	@Test
+	public void testExceptionStringThrowable() throws Exception {
+		Exception exception = new StepListenerFailedException("foo", new IllegalStateException("bar"));
+		assertEquals("foo", exception.getMessage().substring(0, 3));
 	}
 
+	@Test
+	public void testExceptionStringThrowableThrowable() throws Exception {
+		Exception exception = new StepListenerFailedException("foo", new IllegalStateException(), new RuntimeException("bar"));
+		assertEquals("foo", exception.getMessage().substring(0, 3));
+	}
 
 }
