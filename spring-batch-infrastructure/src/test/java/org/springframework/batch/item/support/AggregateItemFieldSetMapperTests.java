@@ -16,26 +16,26 @@ public class AggregateItemFieldSetMapperTests {
 
 	@Test
 	public void testDefaultBeginRecord() throws Exception {
-		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "BEGIN" }), -1).isHeader());
-		assertFalse(mapper.mapLine(new DefaultFieldSet(new String[] { "BEGIN" }), -1).isFooter());
+		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "BEGIN" })).isHeader());
+		assertFalse(mapper.mapLine(new DefaultFieldSet(new String[] { "BEGIN" })).isFooter());
 	}
 
 	@Test
 	public void testSetBeginRecord() throws Exception {
 		mapper.setBegin("FOO");
-		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "FOO" }), -1).isHeader());
+		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "FOO" })).isHeader());
 	}
 
 	@Test
 	public void testDefaultEndRecord() throws Exception {
-		assertFalse(mapper.mapLine(new DefaultFieldSet(new String[] { "END" }), -1).isHeader());
-		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "END" }), -1).isFooter());
+		assertFalse(mapper.mapLine(new DefaultFieldSet(new String[] { "END" })).isHeader());
+		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "END" })).isFooter());
 	}
 
 	@Test
 	public void testSetEndRecord() throws Exception {
 		mapper.setEnd("FOO");
-		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "FOO" }), -1).isFooter());
+		assertTrue(mapper.mapLine(new DefaultFieldSet(new String[] { "FOO" })).isFooter());
 	}
 
 	@Test
@@ -52,11 +52,11 @@ public class AggregateItemFieldSetMapperTests {
 	@Test
 	public void testDelegate() throws Exception {
 		mapper.setDelegate(new FieldSetMapper<String>() {
-			public String mapLine(FieldSet fs, int lineNum) {
+			public String mapLine(FieldSet fs) {
 				return "foo";
 			}
 		});
-		assertEquals("foo", mapper.mapLine(new DefaultFieldSet(new String[] { "FOO" }), -1).getItem());
+		assertEquals("foo", mapper.mapLine(new DefaultFieldSet(new String[] { "FOO" })).getItem());
 	}
 
 

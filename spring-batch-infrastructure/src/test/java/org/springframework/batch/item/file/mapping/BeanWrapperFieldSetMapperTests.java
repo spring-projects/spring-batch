@@ -63,7 +63,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });
-		TestObject result = mapper.mapLine(fieldSet, -1);
+		TestObject result = mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
@@ -78,7 +78,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });
-		TestObject result = mapper.mapLine(fieldSet, -1);
+		TestObject result = mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
@@ -93,7 +93,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "VarString", "VAR_BOOLEAN", "VAR_CHAR" });
-		TestObject result = mapper.mapLine(fieldSet, -1);
+		TestObject result = mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
@@ -107,7 +107,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });
-		TestObject result = mapper.mapLine(fieldSet, -1);
+		TestObject result = mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
@@ -130,7 +130,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 				new String[] { "This is some dummy string", "1", "Another dummy", "2" }, new String[] { "valueA",
 						"valueB", "testObjectB.valueA", "testObjectB.testObjectC.value" });
 
-		TestNestedA result = mapper.mapLine(fieldSet, -1);
+		TestNestedA result = mapper.mapLine(fieldSet);
 
 		assertEquals("This is some dummy string", result.getValueA());
 		assertEquals(1, result.getValueB());
@@ -150,7 +150,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "1" }, new String[] {
 				"VALUE_A", "VALUE_B" });
 
-		TestNestedA result = (TestNestedA) mapper.mapLine(fieldSet, -1);
+		TestNestedA result = (TestNestedA) mapper.mapLine(fieldSet);
 
 		assertEquals("This is some dummy string", result.getValueA());
 		assertEquals(1, result.getValueB());
@@ -167,7 +167,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1" }, new String[] { "foo" });
 
-		TestNestedC result = mapper.mapLine(fieldSet, -1);
+		TestNestedC result = mapper.mapLine(fieldSet);
 
 		// "foo" is similar enough to "value" that it matches - but only because
 		// nothing else does...
@@ -189,7 +189,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy", "2" }, new String[] {
 				"TestObjectB.ValueA", "TestObjectB.TestObjectC.Value" });
 
-		TestNestedA result = mapper.mapLine(fieldSet, -1);
+		TestNestedA result = mapper.mapLine(fieldSet);
 
 		assertEquals("Another dummy", result.getTestObjectB().getValueA());
 		assertEquals(2, result.getTestObjectB().getTestObjectC().getValue());
@@ -209,7 +209,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy" }, new String[] { "TestObjectB.foo" });
 
 		try {
-			mapper.mapLine(fieldSet, -1);
+			mapper.mapLine(fieldSet);
 			fail("Expected NotWritablePropertyException");
 		}
 		catch (NotWritablePropertyException e) {
@@ -231,7 +231,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "2" }, new String[] { "TestObjectA.garbage" });
 
 		try {
-			mapper.mapLine(fieldSet, -1);
+			mapper.mapLine(fieldSet);
 			fail("Expected NotWritablePropertyException");
 		}
 		catch (NotWritablePropertyException e) {
@@ -271,7 +271,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "2", "3" }, new String[] { "NestedC[0].Value",
 				"NestedC[1].Value", "NestedC[2].Value" });
 
-		mapper.mapLine(fieldSet, -1);
+		mapper.mapLine(fieldSet);
 
 		assertEquals(1, ((TestNestedC) nestedList.getNestedC().get(0)).getValue());
 		assertEquals(2, ((TestNestedC) nestedList.getNestedC().get(1)).getValue());
@@ -285,7 +285,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		mapper.setTargetType(TestObject.class);
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "00009" }, new String[] { "varLong" });
-		TestObject bean = (TestObject) mapper.mapLine(fieldSet, -1);
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
 		// since Spring 2.5.5 this is OK (before that BATCH-261)
 		assertEquals(9, bean.getVarLong());
 	}
@@ -299,7 +299,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
 				.getNumberInstance(), true)));
-		TestObject bean = (TestObject) mapper.mapLine(fieldSet, -1);
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
 	}
@@ -313,7 +313,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
 				.getNumberInstance(), true)));
-		TestObject bean = (TestObject) mapper.mapLine(fieldSet, -1);
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
 		assertEquals(78, bean.getVarInt());

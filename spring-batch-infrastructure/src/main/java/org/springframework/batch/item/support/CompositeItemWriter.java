@@ -1,7 +1,5 @@
 package org.springframework.batch.item.support;
 
-import java.util.List;
-
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
@@ -15,9 +13,9 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class CompositeItemWriter<T> implements ItemWriter<T> {
 
-	private List<ItemWriter<T>> delegates;
+	private ItemWriter<? super T>[] delegates;
 
-	public void setDelegates(List<ItemWriter<T>> delegates) {
+	public void setDelegates(ItemWriter<? super T>[] delegates) {
 		this.delegates = delegates;
 	}
 
@@ -25,19 +23,19 @@ public class CompositeItemWriter<T> implements ItemWriter<T> {
 	 * Calls injected ItemProcessors in order.
 	 */
 	public void write(T item) throws Exception {
-		for (ItemWriter<T> writer : delegates) {
+		for (ItemWriter<? super T> writer : delegates) {
 			writer.write(item);
 		}
 	}
 
 	public void clear() throws ClearFailedException {
-		for (ItemWriter<T> writer : delegates) {
+		for (ItemWriter<? super T> writer : delegates) {
 			writer.clear();
 		}
 	}
 
 	public void flush() throws FlushFailedException {
-		for (ItemWriter<T> writer : delegates) {
+		for (ItemWriter<? super T> writer : delegates) {
 			writer.flush();
 		}
 	}

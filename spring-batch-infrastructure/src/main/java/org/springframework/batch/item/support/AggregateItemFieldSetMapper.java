@@ -78,14 +78,12 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 	 * input {@link FieldSet} to check for begin and end delimiters. If the
 	 * current record is neither a begin nor an end marker then it is mapped
 	 * using the delegate.
-	 * 
 	 * @param fieldSet a {@link FieldSet} to map
-	 * @param lineNum the current line number if known
 	 * 
 	 * @return an {@link AggregateItem} that wraps the return value from the
 	 * delegate
 	 */
-	public AggregateItem<T> mapLine(FieldSet fieldSet, int lineNum) {
+	public AggregateItem<T> mapLine(FieldSet fieldSet) {
 
 		if (fieldSet.readString(0).equals(begin)) {
 			return AggregateItem.getHeader();
@@ -94,7 +92,7 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 			return AggregateItem.getFooter();
 		}
 
-		return new AggregateItem<T>(delegate.mapLine(fieldSet, lineNum));
+		return new AggregateItem<T>(delegate.mapLine(fieldSet));
 
 	}
 

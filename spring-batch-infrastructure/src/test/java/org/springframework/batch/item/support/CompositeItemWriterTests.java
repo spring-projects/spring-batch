@@ -1,11 +1,11 @@
 package org.springframework.batch.item.support;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import junit.framework.TestCase;
 
-import static org.easymock.EasyMock.*;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -28,7 +28,8 @@ public class CompositeItemWriterTests extends TestCase {
 		final int NUMBER_OF_WRITERS = 10;
 		Object data = new Object();
 		
-		List<ItemWriter<Object>> writers = new ArrayList<ItemWriter<Object>>(NUMBER_OF_WRITERS);
+		@SuppressWarnings("unchecked")
+		ItemWriter<Object>[] writers = new ItemWriter[NUMBER_OF_WRITERS];
 		
 		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
 			@SuppressWarnings("unchecked")
@@ -38,7 +39,7 @@ public class CompositeItemWriterTests extends TestCase {
 			expectLastCall().once();
 			replay(writer);
 			
-			writers.add(writer);
+			writers[i] = writer;
 		}
 		
 		itemProcessor.setDelegates(writers);

@@ -27,11 +27,11 @@ public class PassThroughFieldSetMapperTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet, int)}.
+	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet)}.
 	 */
 	public void testMapLine() {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
-		assertEquals(fieldSet, mapper.mapLine(fieldSet, -1));
+		assertEquals(fieldSet, mapper.mapLine(fieldSet));
 	}
 
 	

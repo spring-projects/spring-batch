@@ -18,8 +18,6 @@ package org.springframework.batch.item.file;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -107,23 +105,6 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
-	public void testReadWithLineNumber() throws Exception {
-		final List<Integer> list = new ArrayList<Integer>();
-		itemReader.setFieldSetMapper(new FieldSetMapper<FieldSet>() {
-			public FieldSet mapLine(FieldSet fs, int lineNum) {
-				list.add(lineNum);
-				return fs;
-			}
-		});
-		itemReader.open(executionContext);
-		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
-		assertEquals(new Integer(1), list.get(0));
-		assertEquals(null, itemReader.read());
-	}
-
-	/**
-	 * Regular usage of <code>read</code> method
-	 */
 	public void testReadWithTokenizerError() throws Exception {
 		itemReader.setLineTokenizer(new LineTokenizer() {
 			public FieldSet tokenize(String line) {
@@ -142,7 +123,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 
 	public void testReadWithMapperError() throws Exception {
 		itemReader.setFieldSetMapper(new FieldSetMapper<FieldSet>() {
-			public FieldSet mapLine(FieldSet fs, int lineNum) {
+			public FieldSet mapLine(FieldSet fs) {
 				throw new RuntimeException("foo");
 			}
 		});
