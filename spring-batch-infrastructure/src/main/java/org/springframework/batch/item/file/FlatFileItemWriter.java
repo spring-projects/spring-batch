@@ -37,8 +37,6 @@ import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.mapping.FieldSet;
-import org.springframework.batch.item.file.mapping.FieldSetCreator;
-import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
@@ -78,9 +76,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private OutputState state = null;
 
-	private LineAggregator lineAggregator = new DelimitedLineAggregator();
-
-	private FieldSetCreator<? super T> fieldSetCreator;
+	private LineAggregator<T> lineAggregator;
 
 	private boolean saveState = true;
 
@@ -101,12 +97,12 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	/**
-	 * Assert that mandatory properties (resource) are set.
+	 * Assert that mandatory properties (lineAggregator) are set.
 	 * 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(fieldSetCreator, "A FieldSetCreator must be provided.");
+		Assert.notNull(lineAggregator, "A LineAggregator must be provided.");
 	}
 
 	/**
@@ -124,19 +120,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @param lineAggregator the {@link LineAggregator} to set
 	 */
-	public void setLineAggregator(LineAggregator lineAggregator) {
+	public void setLineAggregator(LineAggregator<T> lineAggregator) {
 		this.lineAggregator = lineAggregator;
-	}
-
-	/**
-	 * Public setter for the {@link FieldSetCreator}. This will be used to
-	 * transform the item into a {@link FieldSet} before it is aggregated by the
-	 * {@link LineAggregator}.
-	 * 
-	 * @param fieldSetCreator the {@link FieldSetCreator} to set
-	 */
-	public void setFieldSetCreator(FieldSetCreator<? super T> fieldSetCreator) {
-		this.fieldSetCreator = fieldSetCreator;
 	}
 
 	/**
@@ -208,8 +193,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 */
 	public void write(T item) throws Exception {
 		if (getOutputState().isInitialized()) {
-			FieldSet fieldSet = fieldSetCreator.mapItem(item);
-			lineBuffer.add(lineAggregator.aggregate(fieldSet) + lineSeparator);
+			lineBuffer.add(lineAggregator.aggregate(item) + lineSeparator);
 		}
 		else {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");

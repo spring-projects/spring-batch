@@ -91,9 +91,9 @@
 		id="fileItemWriter">
 		<property name="resource"
 			value="file:target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
-		<property name="fieldSetCreator">
+		<property name="lineAggregator">
 			<bean
-				class="org.springframework.batch.item.file.mapping.PassThroughFieldSetCreator" />
+				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 		</property>
 	</bean>
 

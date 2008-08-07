@@ -24,8 +24,8 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.junit.Test;
-import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.batch.sample.domain.order.internal.OrderTransformer;
 
 /**
@@ -38,14 +38,14 @@ public class OrderTransformerTests {
 
 	@Test
 	public void testConvert() throws Exception {
-		converter.setAggregators(new HashMap<String, LineAggregator>() {
+		converter.setAggregators(new HashMap<String, LineAggregator<String[]>>() {
 			{
-				put("header", new DelimitedLineAggregator());
-				put("customer", new DelimitedLineAggregator());
-				put("address", new DelimitedLineAggregator());
-				put("billing", new DelimitedLineAggregator());
-				put("item", new DelimitedLineAggregator());
-				put("footer", new DelimitedLineAggregator());
+				put("header", new PassThroughLineAggregator<String[]>());
+				put("customer", new PassThroughLineAggregator<String[]>());
+				put("address", new PassThroughLineAggregator<String[]>());
+				put("billing", new PassThroughLineAggregator<String[]>());
+				put("item", new PassThroughLineAggregator<String[]>());
+				put("footer", new PassThroughLineAggregator<String[]>());
 			}
 		});
 		Order order = new Order();

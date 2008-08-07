@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.transform.ItemTransformer;
 import org.springframework.batch.sample.domain.order.Address;
@@ -40,7 +38,7 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 	/**
 	 * Aggregators for all types of lines in the output file
 	 */
-	private Map<String, LineAggregator> aggregators;
+	private Map<String, LineAggregator<String[]>> aggregators;
 
 	/**
 	 * Converts information from an Order object to a collection of Strings for
@@ -66,11 +64,11 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 		return result;
 	}
 
-	public void setAggregators(Map<String, LineAggregator> aggregators) {
+	public void setAggregators(Map<String, LineAggregator<String[]>> aggregators) {
 		this.aggregators = aggregators;
 	}
 
-	private LineAggregator getAggregator(String name) {
+	private LineAggregator<String[]> getAggregator(String name) {
 		return aggregators.get(name);
 	}
 
@@ -82,39 +80,36 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 
 		private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-		static FieldSet headerArgs(Order order) {
-			return new DefaultFieldSet(new String[] { "BEGIN_ORDER:", String.valueOf(order.getOrderId()),
-					dateFormat.format(order.getOrderDate()) });
+		static String[] headerArgs(Order order) {
+			return new String[] { "BEGIN_ORDER:", String.valueOf(order.getOrderId()),
+					dateFormat.format(order.getOrderDate()) };
 		}
 
-		static FieldSet footerArgs(Order order) {
-			return new DefaultFieldSet(new String[] { "END_ORDER:", order.getTotalPrice().toString() });
+		static String[] footerArgs(Order order) {
+			return new String[] { "END_ORDER:", order.getTotalPrice().toString() };
 		}
 
-		static FieldSet customerArgs(Order order) {
+		static String[] customerArgs(Order order) {
 			Customer customer = order.getCustomer();
 
-			return new DefaultFieldSet(new String[] { "CUSTOMER:", String.valueOf(customer.getRegistrationId()),
-					customer.getFirstName(), customer.getMiddleName(), customer.getLastName() });
+			return new String[] { "CUSTOMER:", String.valueOf(customer.getRegistrationId()), customer.getFirstName(),
+					customer.getMiddleName(), customer.getLastName() };
 		}
 
-		static FieldSet lineItemArgs(LineItem item) {
-			return new DefaultFieldSet(new String[] { "ITEM:", String.valueOf(item.getItemId()),
-					item.getPrice().toString() });
+		static String[] lineItemArgs(LineItem item) {
+			return new String[] { "ITEM:", String.valueOf(item.getItemId()), item.getPrice().toString() };
 		}
 
-		static FieldSet billingAddressArgs(Order order) {
+		static String[] billingAddressArgs(Order order) {
 			Address address = order.getBillingAddress();
 
-			return new DefaultFieldSet(new String[] { "ADDRESS:", address.getAddrLine1(), address.getCity(),
-					address.getZipCode() });
+			return new String[] { "ADDRESS:", address.getAddrLine1(), address.getCity(), address.getZipCode() };
 		}
 
-		static FieldSet billingInfoArgs(Order order) {
+		static String[] billingInfoArgs(Order order) {
 			BillingInfo billingInfo = order.getBilling();
 
-			return new DefaultFieldSet(new String[] { "BILLING:", billingInfo.getPaymentId(),
-					billingInfo.getPaymentDesc() });
+			return new String[] { "BILLING:", billingInfo.getPaymentId(), billingInfo.getPaymentDesc() };
 		}
 	}
 

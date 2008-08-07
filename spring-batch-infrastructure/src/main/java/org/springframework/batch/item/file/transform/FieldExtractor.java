@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.file.mapping;
-
-import org.springframework.batch.item.file.transform.LineTokenizer;
+package org.springframework.batch.item.file.transform;
 
 /**
- * Strategy interface for mapping between arbitrary objects and {@link FieldSet}.
- * Similar to a {@link LineTokenizer}, but the input is generally a domain
- * object, not a String.
- * 
  * @author Dave Syer
- * 
+ *
  */
-public interface FieldSetCreator<T> {
-
-	/**
-	 * @param data an Object to convert.
-	 * @return a {@link FieldSet} created from the input.
-	 */
-	FieldSet mapItem(T data);
+public interface FieldExtractor<T> {
+	
+	Object[] extract(T item);
 
 }

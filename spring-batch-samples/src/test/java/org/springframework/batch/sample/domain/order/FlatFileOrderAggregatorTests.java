@@ -16,7 +16,6 @@
 package org.springframework.batch.sample.domain.order;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,40 +24,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.support.AbstractItemWriter;
-import org.springframework.batch.item.transform.ItemTransformerItemWriter;
-import org.springframework.batch.sample.StubLineAggregator;
 import org.springframework.batch.sample.domain.order.internal.OrderTransformer;
 
-public class FlatFileOrderWriterTests {
-
-	List<Object> list = new ArrayList<Object>();
-	
-	private ItemWriter<Object> output = new AbstractItemWriter<Object>() {
-		public void write(Object output) {
-			list.add(output);
-		}
-	};
-
-	private ItemTransformerItemWriter<Order, Object> writer;
-	
-	@Before
-	public void setUp() throws Exception {
-		//create new writer
-		writer = new ItemTransformerItemWriter<Order, Object>();
-		writer.setDelegate(output);
-	}
+public class FlatFileOrderAggregatorTests {
 
 	@Test
 	public void testWrite() throws Exception {
-		
-		//Create and set-up Order
+
+		// Create and set-up Order
 		Order order = new Order();
-		
+
 		order.setOrderDate(new GregorianCalendar(2007, GregorianCalendar.JUNE, 1).getTime());
 		order.setCustomer(new Customer());
 		order.setBilling(new BillingInfo());
@@ -70,13 +48,13 @@ public class FlatFileOrderWriterTests {
 		lineItems.add(item);
 		order.setLineItems(lineItems);
 		order.setTotalPrice(BigDecimal.valueOf(0));
-		
-		//create aggregator stub
-		LineAggregator aggregator = new StubLineAggregator();
-		
-		//create map of aggregators and set it to writer
-		Map<String, LineAggregator> aggregators = new HashMap<String, LineAggregator>();
-		
+
+		// create aggregator stub
+		LineAggregator<String[]> aggregator = new DelimitedLineAggregator<String>();
+
+		// create map of aggregators and set it to writer
+		Map<String, LineAggregator<String[]>> aggregators = new HashMap<String, LineAggregator<String[]>>();
+
 		OrderTransformer converter = new OrderTransformer();
 		aggregators.put("header", aggregator);
 		aggregators.put("customer", aggregator);
@@ -85,16 +63,14 @@ public class FlatFileOrderWriterTests {
 		aggregators.put("item", aggregator);
 		aggregators.put("footer", aggregator);
 		converter.setAggregators(aggregators);
-		writer.setItemTransformer(converter);
-				
-		//call tested method
-		writer.write(order);
-		
-		//verify method calls
-		assertEquals(1, list.size());
-		assertTrue(list.get(0) instanceof List);
-		assertEquals("02007/06/01", ((List<?>) list.get(0)).get(0));
-		
+
+		// call tested method
+		List<String> list = converter.transform(order);
+
+		// verify method calls
+		assertEquals(7, list.size());
+		assertEquals("BEGIN_ORDER:,0,2007/06/01", list.get(0));
+
 	}
 
 }

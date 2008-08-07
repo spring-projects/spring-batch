@@ -30,9 +30,9 @@
 				class="org.springframework.batch.item.file.FlatFileItemWriter"
 				id="customerFlatFileOutputSource">
 				<property name="resource" ref="customerFileLocator" />
-				<property name="fieldSetCreator">
+				<property name="lineAggregator">
 					<bean
-						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetCreator" />
+						class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 				</property>
 			</bean>
 		</property>

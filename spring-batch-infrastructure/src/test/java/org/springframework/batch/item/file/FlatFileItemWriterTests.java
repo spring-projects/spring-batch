@@ -26,10 +26,8 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
-import org.springframework.batch.item.file.mapping.FieldSetCreator;
-import org.springframework.batch.item.file.mapping.PassThroughFieldSetCreator;
+import org.springframework.batch.item.file.transform.LineAggregator;
+import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
@@ -74,7 +72,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
 
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
+		writer.setLineAggregator(new PassThroughLineAggregator<String>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		executionContext = new ExecutionContext();
@@ -144,9 +142,9 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverter() throws Exception {
-		writer.setFieldSetCreator(new FieldSetCreator<String>() {
-			public FieldSet mapItem(String data) {
-				return new DefaultFieldSet(new String[] { "FOO:" + data });
+		writer.setLineAggregator(new LineAggregator<String>() {
+			public String aggregate(String item) {
+				return "FOO:" + item;
 			}
 		});
 		String data = "string";
@@ -164,9 +162,9 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		writer.setFieldSetCreator(new FieldSetCreator<String>() {
-			public FieldSet mapItem(String data) {
-				return new DefaultFieldSet(new String[] { "FOO:" + data });
+		writer.setLineAggregator(new LineAggregator<String>() {
+			public String aggregate(String item) {
+				return "FOO:" + item;
 			}
 		});
 		writer.open(executionContext);
@@ -278,7 +276,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	public void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<String>();
-		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
+		writer.setLineAggregator(new PassThroughLineAggregator<String>());
 		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
@@ -310,7 +308,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testDefaultStreamContext() throws Exception {
 		writer = new FlatFileItemWriter<String>();
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setFieldSetCreator(new PassThroughFieldSetCreator<String>());
+		writer.setLineAggregator(new PassThroughLineAggregator<String>());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.open(executionContext);

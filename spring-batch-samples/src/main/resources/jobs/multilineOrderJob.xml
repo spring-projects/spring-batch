@@ -16,7 +16,7 @@
 			<bean id="step1" parent="simpleStep">
 				<property name="streams">
 					<list>
-						<ref bean="flatFileWriter" />
+						<ref bean="fileItemWriter" />
 						<ref bean="fileItemReader" />
 					</list>
 				</property>
@@ -52,7 +52,7 @@
 
 	<bean id="orderWriter" 
 		class="org.springframework.batch.item.transform.ItemTransformerItemWriter">
-		<property name="delegate" ref="flatFileTransformerWriter" />
+		<property name="delegate" ref="fileItemWriter" />
 		<property name="itemTransformer">
 			<bean
 				class="org.springframework.batch.sample.domain.order.internal.OrderTransformer">
