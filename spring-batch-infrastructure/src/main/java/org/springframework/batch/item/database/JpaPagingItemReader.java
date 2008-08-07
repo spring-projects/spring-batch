@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.EntityTransaction;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,8 +52,8 @@ import org.springframework.util.ClassUtils;
  * after each page is read.  This cuases any entities read to be detached. If you make changes to the
  * entities and want the changes persisted then you must explicitly merge the entities.
  *
- * The reader must be configured with an {@link javax.persistence.EntityManagerFactory} that is capable
- * of participating in Spring managed transactions.
+ * The reader must be configured with an {@link javax.persistence.EntityManagerFactory}.  All entity access
+ * is performed within a new transaction, independent of any existing Spring managed transactions.
  *
  * The implementation is *not* thread-safe.
  *
@@ -122,11 +123,14 @@ public class JpaPagingItemReader<T> extends AbstractBufferedItemReaderItemStream
 
 		if (entities == null || current >= pageSize) {
 			EntityManager entityManager =
-					EntityManagerFactoryUtils.getTransactionalEntityManager(entityManagerFactory, jpaPropertyMap);
+					entityManagerFactory.createEntityManager(jpaPropertyMap);
 			if (entityManager == null) {
-				throw new DataAccessResourceFailureException("Unable to obtain a transactional EntityManager");
+				throw new DataAccessResourceFailureException("Unable to obtain an EntityManager");
 			}
 
+			EntityTransaction tx = entityManager.getTransaction();
+			tx.begin();
+			
 			Query query = entityManager.createQuery(queryString)
 					.setFirstResult(page * pageSize)
 					.setMaxResults(pageSize);
@@ -136,6 +140,8 @@ public class JpaPagingItemReader<T> extends AbstractBufferedItemReaderItemStream
 			entityManager.flush();
 			entityManager.clear();
 
+			tx.commit();
+			
 			if (current >= pageSize) {
 				current = 0;
 			}

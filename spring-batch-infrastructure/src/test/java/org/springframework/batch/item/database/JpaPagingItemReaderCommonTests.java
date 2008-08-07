@@ -7,7 +7,6 @@ import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Transactional;
 import org.junit.runner.RunWith;
 import org.junit.Test;
 
@@ -43,32 +42,32 @@ public class JpaPagingItemReaderCommonTests extends CommonItemStreamItemReaderTe
 	}
 
 
-	@Transactional @Test
+	@Test
 	public void testRestart() throws Exception {
 		super.testRestart();
 	}
 
-	@Transactional @Test
+	@Test
 	public void testResetAndRestart() throws Exception {
 		super.testResetAndRestart();
 	}
 
-	@Transactional @Test
+	@Test
 	public void testReopen() throws Exception {
 		super.testReopen();
 	}
 
-	@Transactional @Test
+	@Test
 	public void testRead() throws Exception {
 		super.testRead();
 	}
 
-	@Transactional @Test
+	@Test
 	public void testReset() throws Exception {
 		super.testReset();
 	}
 
-	@Transactional @Test
+	@Test
 	public void testEmptyInput() throws Exception {
 		super.testEmptyInput();
 	}
