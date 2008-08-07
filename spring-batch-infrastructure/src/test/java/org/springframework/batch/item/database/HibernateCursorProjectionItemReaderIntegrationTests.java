@@ -32,15 +32,12 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 
 	protected ItemReader<?> reader;
 
-	protected ExecutionContext executionContext;
-
 	@Autowired
 	protected DataSource dataSource;
 
 	@Before
-	public void onSetUpInTransaction() throws Exception {
+	public void onSetUp() throws Exception {
 		reader = createItemReader();
-		executionContext = new ExecutionContext();
 	}
 
 	
@@ -63,7 +60,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 		return inputSource;
 	}
 
-	@Transactional @Test
+	@Test
 	public void testNormalProcessing() throws Exception {
 		((InitializingBean) reader).afterPropertiesSet();
 		((ItemStream) reader).open(new ExecutionContext());

@@ -9,6 +9,7 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.junit.runner.RunWith;
+import org.junit.Test;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using standard hibernate {@link Session}.
@@ -24,6 +25,7 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends Hibernate
 	}
 	
 	//Ensure close is called on the stateful session correctly.
+	@Test
 	public void testStatfulClose(){
 		
 		SessionFactory sessionFactory = createMock(SessionFactory.class);

@@ -2,6 +2,7 @@ package org.springframework.batch.item.database;
 
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
+import org.junit.Test;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
@@ -53,6 +54,7 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourc
 	 * {@link HibernateCursorItemReader#setUseStatelessSession(boolean)} can be
 	 * called only in uninitialized state.
 	 */
+	@Test
 	public void testSetUseStatelessSession() {
 		HibernateCursorItemReader<Foo> inputSource = (HibernateCursorItemReader<Foo>)reader;
 
