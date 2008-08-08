@@ -1,16 +1,17 @@
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 
-import org.springframework.batch.core.Job;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 
 	private JobInstanceDao dao = new MapJobInstanceDao();
 
-	private Job fooJob = new JobSupport("foo");
+	private String fooJob = "foo";
 
 	private JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue").addLong(
 			"longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE).addDate(
@@ -41,13 +42,13 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
 		assertNotNull(fooInstance.getId());
-		assertEquals(fooJob.getName(), fooInstance.getJobName());
+		assertEquals(fooJob, fooInstance.getJobName());
 		assertEquals(fooParams, fooInstance.getJobParameters());
 
 		JobInstance retrievedInstance = dao.getJobInstance(fooJob, fooParams);
 		JobParameters retrievedParams = retrievedInstance.getJobParameters();
 		assertEquals(fooInstance, retrievedInstance);
-		assertEquals(fooJob.getName(), retrievedInstance.getJobName());
+		assertEquals(fooJob, retrievedInstance.getJobName());
 		assertEquals(fooParams, retrievedParams);
 		
 		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey"));
@@ -80,7 +81,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 
 		assertNull(jobInstance.getVersion());
 
-		jobInstance = dao.createJobInstance(new JobSupport("testVersion"), new JobParameters());
+		jobInstance = dao.createJobInstance("testVersion", new JobParameters());
 
 		assertNotNull(jobInstance.getVersion());
 	}

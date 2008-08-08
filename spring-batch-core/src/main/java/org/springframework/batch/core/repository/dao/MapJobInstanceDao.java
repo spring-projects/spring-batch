@@ -2,7 +2,6 @@ package org.springframework.batch.core.repository.dao;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -21,21 +20,21 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		jobInstances.clear();
 	}
 
-	public JobInstance createJobInstance(Job job, JobParameters jobParameters) {
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 
-		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
+		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
-		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, job.getName());
+		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, jobName);
 		jobInstance.incrementVersion();
 		jobInstances.add(jobInstance);
 
 		return jobInstance;
 	}
 
-	public JobInstance getJobInstance(Job job, JobParameters jobParameters) {
+	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
 
 		for (JobInstance instance : jobInstances) {
-			if (instance.getJobName().equals(job.getName()) && instance.getJobParameters().equals(jobParameters)) {
+			if (instance.getJobName().equals(jobName) && instance.getJobParameters().equals(jobParameters)) {
 				return instance;
 			}
 		}

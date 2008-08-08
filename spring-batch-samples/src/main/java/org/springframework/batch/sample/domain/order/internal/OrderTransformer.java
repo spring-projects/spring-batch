@@ -38,7 +38,7 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 	/**
 	 * Aggregators for all types of lines in the output file
 	 */
-	private Map<String, LineAggregator<String[]>> aggregators;
+	private Map<String, LineAggregator<Object[]>> aggregators;
 
 	/**
 	 * Converts information from an Order object to a collection of Strings for
@@ -64,11 +64,11 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 		return result;
 	}
 
-	public void setAggregators(Map<String, LineAggregator<String[]>> aggregators) {
+	public void setAggregators(Map<String, LineAggregator<Object[]>> aggregators) {
 		this.aggregators = aggregators;
 	}
 
-	private LineAggregator<String[]> getAggregator(String name) {
+	private LineAggregator<Object[]> getAggregator(String name) {
 		return aggregators.get(name);
 	}
 
@@ -80,36 +80,36 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 
 		private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-		static String[] headerArgs(Order order) {
-			return new String[] { "BEGIN_ORDER:", String.valueOf(order.getOrderId()),
+		static Object[] headerArgs(Order order) {
+			return new Object[] { "BEGIN_ORDER:", String.valueOf(order.getOrderId()),
 					dateFormat.format(order.getOrderDate()) };
 		}
 
-		static String[] footerArgs(Order order) {
-			return new String[] { "END_ORDER:", order.getTotalPrice().toString() };
+		static Object[] footerArgs(Order order) {
+			return new Object[] { "END_ORDER:", order.getTotalPrice().toString() };
 		}
 
-		static String[] customerArgs(Order order) {
+		static Object[] customerArgs(Order order) {
 			Customer customer = order.getCustomer();
 
-			return new String[] { "CUSTOMER:", String.valueOf(customer.getRegistrationId()), customer.getFirstName(),
+			return new Object[] { "CUSTOMER:", String.valueOf(customer.getRegistrationId()), customer.getFirstName(),
 					customer.getMiddleName(), customer.getLastName() };
 		}
 
-		static String[] lineItemArgs(LineItem item) {
-			return new String[] { "ITEM:", String.valueOf(item.getItemId()), item.getPrice().toString() };
+		static Object[] lineItemArgs(LineItem item) {
+			return new Object[] { "ITEM:", String.valueOf(item.getItemId()), item.getPrice().toString() };
 		}
 
-		static String[] billingAddressArgs(Order order) {
+		static Object[] billingAddressArgs(Order order) {
 			Address address = order.getBillingAddress();
 
-			return new String[] { "ADDRESS:", address.getAddrLine1(), address.getCity(), address.getZipCode() };
+			return new Object[] { "ADDRESS:", address.getAddrLine1(), address.getCity(), address.getZipCode() };
 		}
 
-		static String[] billingInfoArgs(Order order) {
+		static Object[] billingInfoArgs(Order order) {
 			BillingInfo billingInfo = order.getBilling();
 
-			return new String[] { "BILLING:", billingInfo.getPaymentId(), billingInfo.getPaymentDesc() };
+			return new Object[] { "BILLING:", billingInfo.getPaymentId(), billingInfo.getPaymentDesc() };
 		}
 	}
 

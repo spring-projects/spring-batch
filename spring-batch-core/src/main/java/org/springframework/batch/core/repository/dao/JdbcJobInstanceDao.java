@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
@@ -51,24 +50,23 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * jobIncrementer (which is likely a sequence) for the nextLong, and then
 	 * passing the Id and parameter values into an INSERT statement.
 	 * 
-	 * @see JobInstanceDao#createJobInstance(Job, JobParameters)
+	 * @see JobInstanceDao#createJobInstance(String, JobParameters)
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are
 	 * null.
 	 */
-	public JobInstance createJobInstance(Job job, JobParameters jobParameters) {
+	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
 
-		Assert.notNull(job, "Job must not be null.");
-		Assert.hasLength(job.getName(), "Job must have a name");
+		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
-		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
+		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
 		Long jobId = new Long(jobIncrementer.nextLongValue());
 
-		JobInstance jobInstance = new JobInstance(jobId, jobParameters, job.getName());
+		JobInstance jobInstance = new JobInstance(jobId, jobParameters, jobName);
 		jobInstance.incrementVersion();
 
-		Object[] parameters = new Object[] { jobId, job.getName(), createJobKey(jobParameters),
+		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters),
 				jobInstance.getVersion() };
 		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,
 				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
@@ -132,24 +130,23 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * The job table is queried for <strong>any</strong> jobs that match the
 	 * given identifier, adding them to a list via the RowMapper callback.
 	 * 
-	 * @see JobInstanceDao#getJobInstance(Job, JobParameters)
+	 * @see JobInstanceDao#getJobInstance(String, JobParameters)
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are
 	 * null.
 	 */
 	@SuppressWarnings("unchecked")
-	public JobInstance getJobInstance(final Job job, final JobParameters jobParameters) {
+	public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
 
-		Assert.notNull(job, "Job must not be null.");
-		Assert.hasLength(job.getName(), "Job must have a name");
+		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		String jobKey = createJobKey(jobParameters);
 
-		Object[] parameters = new Object[] { job.getName(), jobKey };
+		Object[] parameters = new Object[] { jobName, jobKey };
 
 		RowMapper rowMapper = new RowMapper() {
 			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, job.getName());
+				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, jobName);
 				return jobInstance;
 			}
 		};

@@ -154,7 +154,7 @@ public class SimpleJobRepository implements JobRepository {
 		 * has finished.
 		 */
 
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(job, jobParameters);
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(job.getName(), jobParameters);
 		ExecutionContext executionContext;
 
 		// existing job instance found
@@ -181,7 +181,7 @@ public class SimpleJobRepository implements JobRepository {
 		}
 		else {
 			// no job found, create one
-			jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
+			jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
 			executionContext = new ExecutionContext();
 		}
 
