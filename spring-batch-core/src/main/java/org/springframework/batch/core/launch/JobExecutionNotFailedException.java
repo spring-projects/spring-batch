@@ -24,12 +24,12 @@ import org.springframework.batch.core.JobExecutionException;
  * @author Dave Syer
  * 
  */
-public class LastExecutionNotFailedException extends JobExecutionException {
+public class JobExecutionNotFailedException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public LastExecutionNotFailedException(String msg) {
+	public JobExecutionNotFailedException(String msg) {
 		super(msg);
 	}
 
@@ -37,7 +37,7 @@ public class LastExecutionNotFailedException extends JobExecutionException {
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public LastExecutionNotFailedException(String msg, Throwable e) {
+	public JobExecutionNotFailedException(String msg, Throwable e) {
 		super(msg, e);
 	}
 }

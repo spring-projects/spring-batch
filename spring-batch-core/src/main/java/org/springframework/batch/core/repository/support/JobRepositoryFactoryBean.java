@@ -30,8 +30,8 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.jdbc.core.JdbcOperations;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -48,7 +48,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 
 	private DataSource dataSource;
 
-	private JdbcOperations jdbcTemplate;
+	private SimpleJdbcOperations jdbcTemplate;
 
 	private String databaseType;
 
@@ -87,7 +87,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);

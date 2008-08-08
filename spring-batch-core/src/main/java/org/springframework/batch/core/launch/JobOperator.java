@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.core.repository.JobInstanceAlreadyExistsException;
@@ -35,23 +36,27 @@ import org.springframework.batch.core.repository.NoSuchJobInstanceException;
  */
 public interface JobOperator {
 
-	String getParameters(Long instanceId) throws NoSuchJobInstanceException;
-
-	Long getLastInstance(String jobName) throws NoSuchJobException;
+	Long getLastExecution(String jobName) throws NoSuchJobException;
+	
+	List<Long> getLastExecutions(String jobName, int count) throws NoSuchJobException;
+	
+	String getParameters(Long executionId) throws NoSuchJobInstanceException;
 
 	Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException,
 			JobRestartException;
 
-	Long resume(Long instanceId) throws LastExecutionNotFailedException, NoSuchJobInstanceException;
+	Long resume(Long executionId) throws JobExecutionNotFailedException, NoSuchJobExecutionException;
 
 	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersIncrementerNotFoundException;
 
 	boolean stop(Long executionId) throws NoSuchJobExecutionException;
+	
+	String getSummary(Long executionId) throws NoSuchJobExecutionException;
 
-	Map<Long, String> status(Long executionId) throws NoSuchJobExecutionException;
+	Map<Long, String> getStepExecutionSummaries(Long executionId) throws NoSuchJobExecutionException;
 
 	Collection<Long> getRunningExecutions(String jobName) throws NoSuchJobException;
 
-	Collection<String> getJobNames();
+	Map<String, String> getJobNamesAndRegistryStatuses();
 
 }

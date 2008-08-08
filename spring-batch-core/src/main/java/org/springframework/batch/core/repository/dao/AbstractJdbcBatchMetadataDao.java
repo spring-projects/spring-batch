@@ -1,7 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -20,7 +20,7 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
 
-	private JdbcOperations jdbcTemplate;
+	private SimpleJdbcOperations jdbcTemplate;
 
 	protected String getQuery(String base) {
 		return StringUtils.replace(base, "%PREFIX%", tablePrefix);
@@ -41,11 +41,11 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 		this.tablePrefix = tablePrefix;
 	}
 
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
+	public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	protected JdbcOperations getJdbcTemplate() {
+	protected SimpleJdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
 	}
 

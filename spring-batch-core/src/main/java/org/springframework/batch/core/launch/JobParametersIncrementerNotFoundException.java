@@ -16,6 +16,7 @@
 package org.springframework.batch.core.launch;
 
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobParametersIncrementer;
 
 
 /**

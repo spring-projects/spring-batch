@@ -13,7 +13,7 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -68,7 +68,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters),
 				jobInstance.getVersion() };
-		getJdbcTemplate().update(getQuery(CREATE_JOB_INSTANCE), parameters,
+		getJdbcTemplate().getJdbcOperations().update(getQuery(CREATE_JOB_INSTANCE), parameters,
 				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
 
 		insertJobParameters(jobId, jobParameters);
@@ -123,7 +123,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			args = new Object[] { jobId, key, type, "", value, new Long(0), new Double(0) };
 		}
 
-		getJdbcTemplate().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
+		getJdbcTemplate().getJdbcOperations().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
 	}
 
 	/**
@@ -134,7 +134,6 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are
 	 * null.
 	 */
-	@SuppressWarnings("unchecked")
 	public JobInstance getJobInstance(final String jobName, final JobParameters jobParameters) {
 
 		Assert.notNull(jobName, "Job name must not be null.");
@@ -142,10 +141,8 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		String jobKey = createJobKey(jobParameters);
 
-		Object[] parameters = new Object[] { jobName, jobKey };
-
-		RowMapper rowMapper = new RowMapper() {
-			public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+		ParameterizedRowMapper<JobInstance> rowMapper = new ParameterizedRowMapper<JobInstance>() {
+			public JobInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
 				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, jobName);
 				return jobInstance;
 			}
@@ -153,10 +150,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		List<JobInstance> instances;
 		if (StringUtils.hasLength(jobKey)) {
-			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY), parameters, rowMapper);
+			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_KEY), rowMapper, jobName, jobKey);
 		}
 		else {
-			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_EMPTY_KEY), parameters, rowMapper);
+			instances = getJdbcTemplate().query(getQuery(FIND_JOBS_WITH_EMPTY_KEY), rowMapper, jobName, jobKey);
 		}
 
 		if (instances.isEmpty()) {

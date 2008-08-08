@@ -12,7 +12,9 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 
@@ -49,6 +51,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME from %PREFIX%JOB_EXECUTION"
 			+ " where JOB_INSTANCE_ID = ? and CREATE_TIME = (SELECT max(CREATE_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
 
+	private static final String FIND_EXECUTIONS_BY_NAME = "SELECT E.JOB_EXECUTION_ID, E.START_TIME, E.END_TIME, E.STATUS, E.CONTINUABLE, E.EXIT_CODE, E.EXIT_MESSAGE, E.CREATE_TIME, E.JOB_INSTANCE_ID "
+			+ "from BATCH_JOB_EXECUTION E, BATCH_JOB_INSTANCE I "
+			+ "where E.JOB_INSTANCE_ID = I.JOB_INSTANCE_ID and I.JOB_NAME=? ORDER by JOB_EXECUTION_ID desc";
+
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
@@ -62,14 +68,13 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		this.exitMessageLength = exitMessageLength;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<JobExecution> findJobExecutions(final JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
 
-		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS), new Object[] { job.getId() },
-				new JobExecutionRowMapper(job));
+		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS),
+				new JobExecutionRowMapper(job), job.getId());
 	}
 
 	/**
@@ -94,7 +99,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution.getExitStatus().isContinuable() ? "Y" : "N", jobExecution.getExitStatus().getExitCode(),
 				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(),
 				jobExecution.getCreateTime() };
-		getJdbcTemplate().update(
+		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR,
@@ -152,7 +157,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			throw new NoSuchObjectException("Invalid JobExecution, ID " + jobExecution.getId() + " not found.");
 		}
 
-		getJdbcTemplate().update(
+		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(UPDATE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR,
@@ -174,13 +179,47 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobExecutionIncrementer);
 	}
 
+	public JobExecution getLastJobExecution(JobInstance jobInstance) {
+
+		Long id = jobInstance.getId();
+
+		List<JobExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_EXECUTION),
+				new JobExecutionRowMapper(jobInstance), id, id);
+
+		Assert.state(executions.size() <= 1, "There must be at most one latest job execution");
+
+		if (executions.isEmpty()) {
+			return null;
+		}
+		else {
+			return (JobExecution) executions.get(0);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#getLastJobExecution(java.lang.String)
+	 */
+	public JobExecution getLastJobExecution(String jobName) {
+		ResultSetExtractor extractor = new ResultSetExtractor() {
+			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+				if (!rs.next()) {					
+					return null;
+				}
+				// TODO use a real job instance (this will barf)
+				return new JobExecutionRowMapper(null).mapRow(rs, 1);
+			}
+		};
+		return (JobExecution) getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTIONS_BY_NAME), extractor);
+	}
+
 	/**
 	 * Re-usable mapper for {@link JobExecution} instances.
 	 * 
 	 * @author Dave Syer
 	 * 
 	 */
-	private class JobExecutionRowMapper implements RowMapper {
+	private class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
 
 		private JobInstance job;
 
@@ -189,7 +228,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			this.job = job;
 		}
 
-		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 			JobExecution jobExecution = new JobExecution(job);
 			jobExecution.setId(new Long(rs.getLong(1)));
 			jobExecution.setStartTime(rs.getTimestamp(2));
@@ -200,24 +239,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			return jobExecution;
 		}
 
-	}
-
-	@SuppressWarnings("unchecked")
-	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-
-		Long id = jobInstance.getId();
-
-		List<JobExecution> executions = getJdbcTemplate().query(getQuery(GET_LAST_EXECUTION), new Object[] { id, id },
-				new JobExecutionRowMapper(jobInstance));
-
-		Assert.state(executions.size() <= 1, "There must be at most one latest job execution");
-
-		if (executions.isEmpty()) {
-			return null;
-		}
-		else {
-			return (JobExecution) executions.get(0);
-		}
 	}
 
 }

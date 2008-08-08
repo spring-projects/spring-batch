@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.launch;
+package org.springframework.batch.core;
 
-import org.springframework.batch.core.JobParameters;
 
 /**
  * Interface for obtaining the next {@link JobParameters} in a sequence.

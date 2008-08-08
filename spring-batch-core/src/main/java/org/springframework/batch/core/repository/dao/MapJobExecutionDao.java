@@ -64,4 +64,23 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		return lastExec;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#getLastJobExecution(java.lang.String)
+	 */
+	public JobExecution getLastJobExecution(String jobName) {
+		JobExecution lastExec = null;
+		for (JobExecution exec : executionsById.values()) {
+			if (!exec.getJobInstance().getJobName().equals(jobName)) {
+				continue;
+			}
+			if (lastExec == null) {
+				lastExec = exec;
+			}
+			if (lastExec.getCreateTime().before(exec.getCreateTime())) {
+				lastExec = exec;
+			}
+		}
+		return lastExec;
+	}
+
 }

@@ -45,4 +45,9 @@ public interface JobExecutionDao {
 	 */
 	JobExecution getLastJobExecution(JobInstance jobInstance);
 
+	/**
+	 * @return last JobExecution for given job name.
+	 */
+	JobExecution getLastJobExecution(String jobName);
+
 }

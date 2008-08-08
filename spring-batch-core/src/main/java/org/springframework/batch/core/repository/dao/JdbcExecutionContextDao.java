@@ -56,7 +56,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		final ExecutionContext executionContext = new ExecutionContext();
 
-		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, JOB_DISCRIMINATOR },
+		getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTION_CONTEXT),
+				new Object[] { executionId, JOB_DISCRIMINATOR },
 				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
@@ -72,7 +73,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		final ExecutionContext executionContext = new ExecutionContext();
 
-		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, STEP_DISCRIMINATOR },
+		getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTION_CONTEXT),
+				new Object[] { executionId, STEP_DISCRIMINATOR },
 				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
@@ -114,7 +116,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private void saveOrUpdateExecutionContext(ExecutionContext ctx, Long executionId, String discriminator) {
 
 		for (Entry<String, Object> entry : ctx.entrySet()) {
-			
+
 			final String key = entry.getKey().toString();
 			final Object value = entry.getValue();
 
@@ -182,7 +184,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		// LobCreating callbacks always return the affect row count for SQL DML
 		// statements, if less than 1 row
 		// is affected, then this row is new and should be inserted.
-		Integer affectedRows = (Integer) getJdbcTemplate().execute(getQuery(UPDATE_STEP_EXECUTION_CONTEXT), callback);
+		Integer affectedRows = (Integer) getJdbcTemplate().getJdbcOperations().execute(
+				getQuery(UPDATE_STEP_EXECUTION_CONTEXT), callback);
 		if (affectedRows.intValue() < 1) {
 			insertExecutionAttribute(executionId, discriminator, key, value, type);
 		}
@@ -232,7 +235,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 				}
 			}
 		};
-		getJdbcTemplate().execute(getQuery(INSERT_STEP_EXECUTION_CONTEXT), callback);
+		getJdbcTemplate().getJdbcOperations().execute(getQuery(INSERT_STEP_EXECUTION_CONTEXT), callback);
 	}
 
 	public void setLobHandler(LobHandler lobHandler) {

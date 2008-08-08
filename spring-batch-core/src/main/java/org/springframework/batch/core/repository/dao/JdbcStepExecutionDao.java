@@ -14,7 +14,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
 
@@ -95,7 +95,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getItemCount(), stepExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				stepExecution.getExitStatus().getExitCode(), exitDescription, stepExecution.getReadSkipCount(),
 				stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount() };
-		getJdbcTemplate().update(
+		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
 				new int[] { Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP,
@@ -143,7 +143,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getExitStatus().getExitCode(), exitDescription, version,
 					stepExecution.getReadSkipCount(), stepExecution.getWriteSkipCount(),
 					stepExecution.getRollbackCount(), stepExecution.getId(), stepExecution.getVersion() };
-			int count = getJdbcTemplate().update(
+			int count = getJdbcTemplate().getJdbcOperations().update(
 					getQuery(UPDATE_STEP_EXECUTION),
 					parameters,
 					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
@@ -180,7 +180,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 	}
 
-	private class StepExecutionRowMapper implements RowMapper {
+	private class StepExecutionRowMapper implements ParameterizedRowMapper<StepExecution> {
 
 		private final JobExecution jobExecution;
 
@@ -191,7 +191,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			this.step = step;
 		}
 
-		public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+		public StepExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
 
 			StepExecution stepExecution = new StepExecution(step.getName(), jobExecution, new Long(rs.getLong(1)));
 			stepExecution.setStartTime(rs.getTimestamp(3));
@@ -217,10 +217,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
 	}
 
-	@SuppressWarnings("unchecked")
 	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
-				new Object[] { step.getName(), jobExecution.getId() }, new StepExecutionRowMapper(jobExecution, step));
+				new StepExecutionRowMapper(jobExecution, step), step.getName(), jobExecution.getId());
 
 		Assert.state(executions.size() <= 1,
 				"There can be at most one step execution with given name for single job execution");
@@ -231,5 +230,4 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			return (StepExecution) executions.get(0);
 		}
 	}
-
 }
