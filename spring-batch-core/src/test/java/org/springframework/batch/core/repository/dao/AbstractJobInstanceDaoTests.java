@@ -1,11 +1,14 @@
 package org.springframework.batch.core.repository.dao;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Date;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -55,6 +58,56 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
 		assertEquals("stringValue", retrievedParams.getString("stringKey"));
 		assertEquals(new Date(DATE), retrievedParams.getDate("dateKey"));
+	}
+
+	/*
+	 * Create and retrieve a job instance.
+	 */
+	@Transactional @Test
+	public void testCreateAndGetById() throws Exception {
+
+		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
+		assertNotNull(fooInstance.getId());
+		assertEquals(fooJob, fooInstance.getJobName());
+		assertEquals(fooParams, fooInstance.getJobParameters());
+
+		JobInstance retrievedInstance = dao.getJobInstance(fooInstance.getId());
+		JobParameters retrievedParams = retrievedInstance.getJobParameters();
+		assertEquals(fooInstance, retrievedInstance);
+		assertEquals(fooJob, retrievedInstance.getJobName());
+		assertEquals(fooParams, retrievedParams);
+		
+		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey"));
+		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
+		assertEquals("stringValue", retrievedParams.getString("stringKey"));
+		assertEquals(new Date(DATE), retrievedParams.getDate("dateKey"));
+	}
+
+	/*
+	 * Create and retrieve a job instance.
+	 */
+	@Transactional @Test
+	public void testGetJobNames() throws Exception {
+		
+		testCreateAndRetrieve();
+		List<String> jobNames = dao.getJobNames();
+		assertFalse(jobNames.isEmpty());
+		assertTrue(jobNames.contains(fooJob));
+		
+	}
+
+	/*
+	 * Create and retrieve a job instance.
+	 */
+	@Transactional @Test
+	public void testGetLastInstances() throws Exception {
+		
+		testCreateAndRetrieve();
+		List<JobInstance> jobInstances = dao.getLastJobInstances(fooJob, 1);
+		assertEquals(1, jobInstances.size());
+		assertEquals(fooJob, jobInstances.get(0).getJobName());
+		assertEquals(Integer.valueOf(0), jobInstances.get(0).getVersion());
+		
 	}
 
 	/**

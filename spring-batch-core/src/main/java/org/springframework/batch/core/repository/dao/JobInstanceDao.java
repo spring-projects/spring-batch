@@ -1,7 +1,6 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -45,8 +44,7 @@ public interface JobInstanceDao {
 	 * Fetch the job instance with the provided identifier.
 	 * 
 	 * @param instanceId the job identifier
-	 * @return the job instance with this identifier or null if it doesn't
-	 * exist
+	 * @return the job instance with this identifier or null if it doesn't exist
 	 */
 	JobInstance getJobInstance(Long instanceId);
 
@@ -62,10 +60,10 @@ public interface JobInstanceDao {
 	List<JobInstance> getLastJobInstances(String jobName, int count);
 
 	/**
-	 * Retrieve the names of all job instances - i.e. jobs that have ever been
-	 * executed.
+	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs
+	 * that have ever been executed.
 	 * @return the names of all job instances
 	 */
-	Set<String> getJobNames();
+	List<String> getJobNames();
 
 }

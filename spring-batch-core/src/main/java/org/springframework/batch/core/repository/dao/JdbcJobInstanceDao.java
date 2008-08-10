@@ -4,9 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.batch.core.JobInstance;
@@ -14,6 +15,9 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -40,16 +44,27 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String CREATE_JOB_PARAMETERS = "INSERT into %PREFIX%JOB_PARAMS(JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, "
 			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL) values (?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String FIND_JOBS_WITH_KEY = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and JOB_KEY = ?";
+	private static final String FIND_JOBS_WITH_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ?";
 
-	private static final String FIND_JOBS_WITH_EMPTY_KEY = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
+	private static final String FIND_JOBS_WITH_KEY = FIND_JOBS_WITH_NAME + " and JOB_KEY = ?";
+
+	private static final String FIND_JOBS_WITH_EMPTY_KEY = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
+
+	private static final String GET_JOB_FROM_ID = "SELECT JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID = ?";
+
+	private static final String FIND_PARAMS_FROM_ID = "SELECT JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, "
+			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL from %PREFIX%JOB_PARAMS where JOB_INSTANCE_ID = ?";
+
+	private static final String FIND_JOB_NAMES = "SELECT distinct JOB_NAME from %PREFIX%JOB_INSTANCE order by JOB_NAME";
+
+	private static final String FIND_LAST_JOBS_BY_NAME = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? order by JOB_INSTANCE_ID desc";
 
 	private DataFieldMaxValueIncrementer jobIncrementer;
 
 	/**
 	 * In this jdbc implementation a job id is obtained by asking the
-	 * jobIncrementer (which is likely a sequence) for the nextLong, and then
-	 * passing the Id and parameter values into an INSERT statement.
+	 * jobIncrementer (which is likely a sequence) for the next long value, and
+	 * then passing the Id and parameter values into an INSERT statement.
 	 * 
 	 * @see JobInstanceDao#createJobInstance(String, JobParameters)
 	 * @throws IllegalArgumentException if any {@link JobParameters} fields are
@@ -67,8 +82,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		JobInstance jobInstance = new JobInstance(jobId, jobParameters, jobName);
 		jobInstance.incrementVersion();
 
-		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters),
-				jobInstance.getVersion() };
+		Object[] parameters = new Object[] { jobId, jobName, createJobKey(jobParameters), jobInstance.getVersion() };
 		getJdbcTemplate().getJdbcOperations().update(getQuery(CREATE_JOB_INSTANCE), parameters,
 				new int[] { Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER });
 
@@ -95,7 +109,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 */
 	private void insertJobParameters(Long jobId, JobParameters jobParameters) {
 
-		for(Entry<String,JobParameter> entry : jobParameters.getParameters().entrySet()){
+		for (Entry<String, JobParameter> entry : jobParameters.getParameters().entrySet()) {
 			JobParameter jobParameter = entry.getValue();
 			insertParameter(jobId, jobParameter.getType(), entry.getKey(), jobParameter.getValue());
 		}
@@ -142,12 +156,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		String jobKey = createJobKey(jobParameters);
 
-		ParameterizedRowMapper<JobInstance> rowMapper = new ParameterizedRowMapper<JobInstance>() {
-			public JobInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
-				JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, jobName);
-				return jobInstance;
-			}
-		};
+		ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper(jobParameters);
 
 		List<JobInstance> instances;
 		if (StringUtils.hasLength(jobKey)) {
@@ -166,28 +175,90 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance(java.lang.Long)
 	 */
 	public JobInstance getJobInstance(Long instanceId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		final JobParameters jobParameters = getJobParameters(instanceId);
+		ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper(jobParameters);
+		return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), rowMapper, instanceId);
+
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * @param instanceId
+	 * @return
+	 */
+	private JobParameters getJobParameters(Long instanceId) {
+		final Map<String, JobParameter> map = new HashMap<String, JobParameter>();
+		RowCallbackHandler handler = new RowCallbackHandler() {
+			public void processRow(ResultSet rs) throws SQLException {
+				ParameterType type = ParameterType.valueOf(rs.getString(3));
+				JobParameter value = null;
+				if (type == ParameterType.STRING) {
+					value = new JobParameter(rs.getString(4));
+				}
+				else if (type == ParameterType.LONG) {
+					value = new JobParameter(rs.getLong(6));
+				}
+				else if (type == ParameterType.DOUBLE) {
+					value = new JobParameter(rs.getDouble(7));
+				}
+				else if (type == ParameterType.DATE) {
+					value = new JobParameter(rs.getTimestamp(5));
+				}
+				// TODO: assert that value is not null?
+				map.put(rs.getString(2), value);
+			}
+		};
+		getJdbcTemplate().getJdbcOperations()
+				.query(getQuery(FIND_PARAMS_FROM_ID), new Object[] { instanceId }, handler);
+		return new JobParameters(map);
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames()
 	 */
-	public Set<String> getJobNames() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<String> getJobNames() {
+		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES), new ParameterizedRowMapper<String>() {
+			public String mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return rs.getString(1);
+			}
+		});
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getLastJobInstances(java.lang.String, int)
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getLastJobInstances(java.lang.String,
+	 * int)
 	 */
-	public List<JobInstance> getLastJobInstances(String jobName, int count) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<JobInstance> getLastJobInstances(String jobName, final int count) {
+
+		ResultSetExtractor extractor = new ResultSetExtractor() {
+
+			private List<JobInstance> list = new ArrayList<JobInstance>();
+
+			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
+				int rowNum = 0;
+				while (rowNum < count && rs.next()) {
+					final JobParameters jobParameters = getJobParameters(rs.getLong(1));
+					ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper(jobParameters);
+					list.add(rowMapper.mapRow(rs, rowNum));
+					rowNum++;
+				}
+				return list;
+			}
+
+		};
+
+		@SuppressWarnings("unchecked")
+		List<JobInstance> result = (List<JobInstance>) getJdbcTemplate().getJdbcOperations().query(
+				getQuery(FIND_LAST_JOBS_BY_NAME), new Object[] { jobName }, extractor);
+
+		return result;
 	}
 
 	/**
@@ -203,6 +274,26 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobIncrementer);
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	private final class JobInstanceRowMapper implements ParameterizedRowMapper<JobInstance> {
+
+		private final JobParameters jobParameters;
+
+		private JobInstanceRowMapper(JobParameters jobParameters) {
+			this.jobParameters = jobParameters;
+		}
+
+		public JobInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
+			JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, rs.getString(2));
+			// should always be at version=0 because they never get updated
+			jobInstance.incrementVersion();
+			return jobInstance;
+		}
 	}
 
 }

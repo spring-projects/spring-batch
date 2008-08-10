@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -63,11 +61,12 @@ public class MapJobInstanceDao implements JobInstanceDao {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames()
 	 */
-	public Set<String> getJobNames() {
-		Set<String> result = new HashSet<String>();
+	public List<String> getJobNames() {
+		List<String> result = new ArrayList<String>();
 		for (JobInstance instance : jobInstances) {
 			result.add(instance.getJobName());
 		}
+		Collections.sort(result);
 		return result;
 	}
 
@@ -83,7 +82,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 			}
 		});
 		int length = count>list.size() ? list.size() : count;
-		return list.subList(0, length-1);
+		return list.subList(0, length);
 	}
 
 }
