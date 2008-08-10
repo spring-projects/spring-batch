@@ -51,7 +51,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final String GET_RAW_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
 		+ " ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID = ?";
 
-	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " oreder by STEP_EXECUTION_ID";
+	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " order by STEP_EXECUTION_ID";
 	
 	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " and STEP_NAME = ?";
 
