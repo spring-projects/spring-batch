@@ -8,4 +8,11 @@
 	</buildSpec>
 	<natures>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>archetypes-pom.xml</name>
+			<type>1</type>
+			<location>SPRING_BATCH/archetypes/pom.xml</location>
+		</link>
+	</linkedResources>
 </projectDescription>
