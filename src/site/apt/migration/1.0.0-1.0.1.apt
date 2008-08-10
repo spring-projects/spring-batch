@@ -1,0 +1,49 @@
+Changes in version 1.0.1 (2008-04-25)
+
+* Bug fixes (changes made, loosely ordered by importance)
+  
+	* StepExecutionListener#afterStep(..) is called only after successful processing, onErrorInStep(..) handles failures
+	
+	* Throwing exception in StepExecutionListener#afterStep(..) causes step to fail
+	
+	* StatefulRetryStepFactoryBean honors skip configuration (ignored it before)
+	
+	* More robust skip and retry logic with informative failures
+	
+	* JdbcCursorItemReader handles resets (rollbacks) correctly
+	
+	* JdbcCursorItemReader handles multiple restarts correctly
+	
+	* Long values mapped to JDBC Types.BIGINT instead of Types.INTEGER to avoid value truncating 
+	
+	* StepExecutionResourceProxy now works correctly with FlatFileItemWriter
+	
+	* JobRepositoryBean applies table prefix consistently (including sequences)
+	
+	* HibernateCursorItemReader closes stateful session correctly
+	
+	* RetryTemplate rethrows Throwables that are neither Exception nor Error instead of ignoring
+	
+	* StepExecution#itemCount value was off by one
+	
+	* TaskletAdapter returns ExitStatus.FINISHED by default instead of ExitStatus.CONTINUABLE
+	
+	* JdbcCursorItemReader works with Derby under condition verifyCurorPosition=false
+	
+	* MySQL schema uses DATETIME instead of problematic TIMESTAMP
+
+* Improvements
+	
+	* Cleaned up javadocs and documentation
+	
+	* StepExecutionResourceProxy#toString delegates to the proxied Resource (once it is set)
+	
+	* More informative exception messages in SpringValidator (the invalid item is included)
+	
+	* ExecutionContext and JobParameters support default values
+	
+	* Oracle schema uses more appropriate datatypes
+	
+	* Subclasses of SimpleStepFactoryBean have access to ItemOrientedStep#chunkOperations property
+	
+	* Reusable tests for item readers, repository daos and step implementations (if you need to implement any of these)
