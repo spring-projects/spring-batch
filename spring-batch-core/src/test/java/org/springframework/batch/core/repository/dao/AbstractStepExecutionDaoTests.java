@@ -16,10 +16,15 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -93,19 +98,32 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		stepExecution.setRollbackCount(3);
 		dao.saveStepExecution(stepExecution);
 
-		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
+		StepExecution retrieved = dao.getStepExecution(jobExecution, step.getName());
 		assertEquals(stepExecution, retrieved);
 		assertEquals(BatchStatus.STARTED, retrieved.getStatus());
 		assertEquals(stepExecution.getReadSkipCount(), retrieved.getReadSkipCount());
 		assertEquals(stepExecution.getWriteSkipCount(), retrieved.getWriteSkipCount());
 		assertEquals(stepExecution.getRollbackCount(), retrieved.getRollbackCount());
 		
-		assertNull(dao.getStepExecution(jobExecution, new StepSupport("not-existing step")));
+		assertNull(dao.getStepExecution(jobExecution, "not-existing step"));
+	}
+
+	@Transactional @Test
+	public void testSaveAndGetExecution() {
+		
+		stepExecution.setStatus(BatchStatus.STARTED);
+		stepExecution.setReadSkipCount(7);
+		stepExecution.setWriteSkipCount(5);
+		stepExecution.setRollbackCount(3);
+		dao.saveStepExecution(stepExecution);
+
+		List<StepExecution> retrieved = dao.getStepExecutions(jobExecution);
+		assertEquals(stepExecution, retrieved.get(0));
 	}
 
 	@Transactional @Test
 	public void testGetForNotExistingJobExecution() {
-		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777), step));
+		assertNull(dao.getStepExecution(new JobExecution(jobInstance, (long) 777), step.getName()));
 	}
 
 	/**
@@ -152,7 +170,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		dao.updateStepExecution(stepExecution);
 		assertEquals(versionAfterSave + 1, stepExecution.getVersion().intValue());
 
-		StepExecution retrieved = dao.getStepExecution(jobExecution, step);
+		StepExecution retrieved = dao.getStepExecution(jobExecution, step.getName());
 		assertEquals(stepExecution, retrieved);
 		assertEquals(BatchStatus.STOPPED, retrieved.getStatus());
 	}

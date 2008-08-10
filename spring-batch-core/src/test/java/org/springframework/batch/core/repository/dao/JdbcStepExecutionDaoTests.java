@@ -1,14 +1,14 @@
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -44,14 +44,14 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		((JdbcStepExecutionDao) dao).setExitMessageLength(250);
 		dao.saveStepExecution(stepExecution);
 
-		StepExecution retrievedAfterSave = dao.getStepExecution(jobExecution, step);
+		StepExecution retrievedAfterSave = dao.getStepExecution(jobExecution, step.getName());
 
 		assertTrue("Exit description should be truncated", retrievedAfterSave.getExitStatus().getExitDescription()
 				.length() < stepExecution.getExitStatus().getExitDescription().length());
 
 		dao.updateStepExecution(stepExecution);
 
-		StepExecution retrievedAfterUpdate = dao.getStepExecution(jobExecution, step);
+		StepExecution retrievedAfterUpdate = dao.getStepExecution(jobExecution, step.getName());
 
 		assertTrue("Exit description should be truncated", retrievedAfterUpdate.getExitStatus().getExitDescription()
 				.length() < stepExecution.getExitStatus().getExitDescription().length());

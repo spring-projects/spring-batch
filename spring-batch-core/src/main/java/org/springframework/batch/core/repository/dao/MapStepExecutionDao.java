@@ -16,10 +16,14 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -76,13 +80,24 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		}
 	}
 
-	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
+	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
 		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
 		if (executions == null) {
 			return null;
 		}
 
-		return (StepExecution) executions.get(step.getName());
+		return (StepExecution) executions.get(stepName);
+	}
+
+	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
+		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
+		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
+		Collections.sort(result, new Comparator<Entity>() {
+			public int compare(Entity o1, Entity o2) {
+				return Long.signum(o2.getId()-o1.getId());
+			}
+		});
+		return result;
 	}
 
 }

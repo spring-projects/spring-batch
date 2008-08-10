@@ -138,7 +138,7 @@ public class JobExecution extends Entity {
 	 * Register a step execution with the current job execution.
 	 */
 	public StepExecution createStepExecution(Step step) {
-		StepExecution stepExecution = new StepExecution(step.getName(), this, null);
+		StepExecution stepExecution = new StepExecution(step.getName(), this);
 		this.stepExecutions.add(stepExecution);
 		return stepExecution;
 	}
@@ -212,5 +212,14 @@ public class JobExecution extends Entity {
 	 */
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	/**
+	 * Package private method for re-constituting the step executions from
+	 * existing instances.
+	 * @param stepExecution
+	 */
+	void addStepExecution(StepExecution stepExecution) {
+		stepExecutions.add(stepExecution);
 	}
 }

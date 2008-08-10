@@ -15,15 +15,14 @@
  */
 package org.springframework.batch.core.launch;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.repository.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.batch.core.repository.NoSuchJobExecutionException;
-import org.springframework.batch.core.repository.NoSuchJobInstanceException;
 
 /**
  * A really low level interface for inspecting and controlling jobs with access
@@ -36,27 +35,28 @@ import org.springframework.batch.core.repository.NoSuchJobInstanceException;
  */
 public interface JobOperator {
 
-	Long getLastExecution(String jobName) throws NoSuchJobException;
-	
-	List<Long> getLastExecutions(String jobName, int count) throws NoSuchJobException;
-	
-	String getParameters(Long executionId) throws NoSuchJobInstanceException;
+	List<Long> getExecutions(Long instanceId) throws NoSuchJobException;
+
+	List<Long> getLastInstances(String jobName, int count) throws NoSuchJobException;
+
+	Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException;
+
+	String getParameters(Long executionId) throws NoSuchJobExecutionException;
 
 	Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException,
 			JobRestartException;
 
-	Long resume(Long executionId) throws JobExecutionNotFailedException, NoSuchJobExecutionException;
+	Long resume(Long executionId) throws JobExecutionNotFailedException, NoSuchJobExecutionException,
+			NoSuchJobException;
 
 	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersIncrementerNotFoundException;
 
 	boolean stop(Long executionId) throws NoSuchJobExecutionException;
-	
+
 	String getSummary(Long executionId) throws NoSuchJobExecutionException;
 
 	Map<Long, String> getStepExecutionSummaries(Long executionId) throws NoSuchJobExecutionException;
 
-	Collection<Long> getRunningExecutions(String jobName) throws NoSuchJobException;
-
-	Map<String, String> getJobNamesAndRegistryStatuses();
+	Set<String> getJobNames();
 
 }

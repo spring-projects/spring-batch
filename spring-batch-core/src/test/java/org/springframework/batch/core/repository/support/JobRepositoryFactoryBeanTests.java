@@ -140,9 +140,9 @@ public class JobRepositoryFactoryBeanTests {
 
 		expect(incrementerFactory.isSupportedIncrementerType("foo")).andReturn(true);
 		expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
-		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer()).times(2);
 		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
-		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer()).times(2);
 		replay(incrementerFactory);
 
 		factory.afterPropertiesSet();

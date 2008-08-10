@@ -1,6 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -16,7 +17,8 @@ public interface JobExecutionDao {
 	/**
 	 * Save a new JobExecution.
 	 * 
-	 * Preconditions: jobInstance the jobExecution belongs to must have a jobInstanceId.
+	 * Preconditions: jobInstance the jobExecution belongs to must have a
+	 * jobInstanceId.
 	 * 
 	 * @param jobExecution
 	 */
@@ -33,7 +35,8 @@ public interface JobExecutionDao {
 	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Return list of JobExecutions for given JobInstance.
+	 * Return all {@link JobExecution} for given {@link JobInstance}, sorted
+	 * backwards by creation order (so the first element is the most recent).
 	 * 
 	 * @param jobInstance
 	 * @return list of jobExecutions.
@@ -41,13 +44,21 @@ public interface JobExecutionDao {
 	List<JobExecution> findJobExecutions(JobInstance jobInstance);
 
 	/**
-	 * @return last JobExecution for given JobInstance.
+	 * Find the last {@link JobExecution} to have been created for a given {@link JobInstance}.
+	 * @param jobInstance the {@link JobInstance}
+	 * @return the last {@link JobExecution} to execute for this instance
 	 */
 	JobExecution getLastJobExecution(JobInstance jobInstance);
 
 	/**
-	 * @return last JobExecution for given job name.
+	 * @return all {@link JobExecution} that are still running (or indeterminate
+	 * state), i.e. having null end date, for the specified job name.
 	 */
-	JobExecution getLastJobExecution(String jobName);
+	Set<JobExecution> findRunningJobExecutions(String jobName);
+
+	/**
+	 * @return the {@link JobExecution} for given identifier.
+	 */
+	JobExecution getJobExecution(Long executionId);
 
 }

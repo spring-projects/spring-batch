@@ -114,6 +114,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "JOB_EXECUTION_SEQ"));
+		dao.setJobInstanceDao(createJobInstanceDao());
+		dao.setStepExecutionDao(createStepExecutionDao());
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;

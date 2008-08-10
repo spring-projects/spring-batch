@@ -3,7 +3,9 @@ package org.springframework.batch.core.repository.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,8 +14,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
@@ -51,13 +52,21 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME from %PREFIX%JOB_EXECUTION"
 			+ " where JOB_INSTANCE_ID = ? and CREATE_TIME = (SELECT max(CREATE_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
 
-	private static final String FIND_EXECUTIONS_BY_NAME = "SELECT E.JOB_EXECUTION_ID, E.START_TIME, E.END_TIME, E.STATUS, E.CONTINUABLE, E.EXIT_CODE, E.EXIT_MESSAGE, E.CREATE_TIME, E.JOB_INSTANCE_ID "
-			+ "from BATCH_JOB_EXECUTION E, BATCH_JOB_INSTANCE I "
-			+ "where E.JOB_INSTANCE_ID = I.JOB_INSTANCE_ID and I.JOB_NAME=? ORDER by JOB_EXECUTION_ID desc";
+	private static final String GET_INSTANCE_BY_EXECUTION_ID = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
+
+	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME from %PREFIX%JOB_EXECUTION"
+			+ " where JOB_EXECUTION_ID = ?";
+
+	private static final String GET_RUNNING_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION"
+			+ " where END_TIME is NULL";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
+
+	private JobInstanceDao jobInstanceDao;
+
+	private StepExecutionDao stepExecutionDao;
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if
@@ -68,13 +77,45 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		this.exitMessageLength = exitMessageLength;
 	}
 
+	/**
+	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
+	 * generating primary keys for {@link JobExecution} instances.
+	 * 
+	 * @param jobExecutionIncrementer the {@link DataFieldMaxValueIncrementer}
+	 */
+	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
+		this.jobExecutionIncrementer = jobExecutionIncrementer;
+	}
+
+	/**
+	 * Public setter for the {@link JobInstanceDao}.
+	 * @param jobInstanceDao the {@link JobInstanceDao} to set
+	 */
+	public void setJobInstanceDao(JobInstanceDao jobInstanceDao) {
+		this.jobInstanceDao = jobInstanceDao;
+	}
+
+	/**
+	 * Public setter for the {@link StepExecutionDao}.
+	 * @param stepExecutionDao the {@link StepExecutionDao} to set
+	 */
+	public void setStepExecutionDao(StepExecutionDao stepExecutionDao) {
+		this.stepExecutionDao = stepExecutionDao;
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		Assert.notNull(jobExecutionIncrementer);
+		Assert.notNull(jobInstanceDao);
+		Assert.notNull(stepExecutionDao);
+	}
+
 	public List<JobExecution> findJobExecutions(final JobInstance job) {
 
 		Assert.notNull(job, "Job cannot be null.");
 		Assert.notNull(job.getId(), "Job Id cannot be null.");
 
-		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS),
-				new JobExecutionRowMapper(job), job.getId());
+		return getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTIONS), new JobExecutionRowMapper(job), job.getId());
 	}
 
 	/**
@@ -164,21 +205,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 						Types.INTEGER, Types.TIMESTAMP, Types.INTEGER });
 	}
 
-	/**
-	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
-	 * generating primary keys for {@link JobExecution} instances.
-	 * 
-	 * @param jobExecutionIncrementer the {@link DataFieldMaxValueIncrementer}
-	 */
-	public void setJobExecutionIncrementer(DataFieldMaxValueIncrementer jobExecutionIncrementer) {
-		this.jobExecutionIncrementer = jobExecutionIncrementer;
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		Assert.notNull(jobExecutionIncrementer);
-	}
-
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 
 		Long id = jobInstance.getId();
@@ -200,17 +226,35 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#getLastJobExecution(java.lang.String)
 	 */
-	public JobExecution getLastJobExecution(String jobName) {
-		ResultSetExtractor extractor = new ResultSetExtractor() {
-			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
-				if (!rs.next()) {					
-					return null;
-				}
-				// TODO use a real job instance (this will barf)
-				return new JobExecutionRowMapper(null).mapRow(rs, 1);
+	public JobExecution getJobExecution(Long executionId) {
+		Long instanceId = getJdbcTemplate().queryForLong(getQuery(GET_INSTANCE_BY_EXECUTION_ID), executionId);
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(instanceId);
+		return getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID), new JobExecutionRowMapper(jobInstance),
+				executionId);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#findRunningJobExecutions(java.lang.String)
+	 */
+	public Set<JobExecution> findRunningJobExecutions(String jobName) {
+
+		final Set<JobExecution> result = new HashSet<JobExecution>();
+		RowCallbackHandler handler = new RowCallbackHandler() {
+			public void processRow(ResultSet rs) throws SQLException {
+				Long instanceId = rs.getLong("JOB_INSTANCE_ID");
+				JobInstance jobInstance = jobInstanceDao.getJobInstance(instanceId);
+				JobExecutionRowMapper mapper = new JobExecutionRowMapper(jobInstance);
+				result.add(mapper.mapRow(rs, 0));
 			}
 		};
-		return (JobExecution) getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTIONS_BY_NAME), extractor);
+		getJdbcTemplate().getJdbcOperations().query(getQuery(GET_RUNNING_EXECUTIONS), handler);
+		
+		for (JobExecution jobExecution : result) {
+			stepExecutionDao.getStepExecutions(jobExecution);
+		}
+
+		return result;
 	}
 
 	/**

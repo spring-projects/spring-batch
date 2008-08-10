@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.springframework.batch.core.JobInstance;
@@ -165,6 +166,30 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance(java.lang.Long)
+	 */
+	public JobInstance getJobInstance(Long instanceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames()
+	 */
+	public Set<String> getJobNames() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getLastJobInstances(java.lang.String, int)
+	 */
+	public List<JobInstance> getLastJobInstances(String jobName, int count) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/**
 	 * Setter for {@link DataFieldMaxValueIncrementer} to be used when
 	 * generating primary keys for {@link JobInstance} instances.
@@ -179,4 +204,5 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		super.afterPropertiesSet();
 		Assert.notNull(jobIncrementer);
 	}
+
 }

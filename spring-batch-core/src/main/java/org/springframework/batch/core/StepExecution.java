@@ -69,10 +69,11 @@ public class StepExecution extends Entity {
 	 * @param id the id of this execution
 	 */
 	public StepExecution(String stepName, JobExecution jobExecution, Long id) {
-		super(id);
-		Assert.hasLength(stepName);
-		this.stepName = stepName;
-		this.jobExecution = jobExecution;
+		this(stepName, jobExecution);
+		Assert.notNull(jobExecution, "JobExecution must be provided to re-hydrate an existing StepExecution");
+		Assert.notNull(id, "The entity Id must be provided to re-hydrate an existing StepExecution");
+		setId(id);
+		jobExecution.addStepExecution(this);
 	}
 
 	/**
@@ -82,7 +83,10 @@ public class StepExecution extends Entity {
 	 * @param jobExecution the current job execution
 	 */
 	public StepExecution(String stepName, JobExecution jobExecution) {
-		this(stepName, jobExecution, null);
+		super();
+		Assert.hasLength(stepName);
+		this.stepName = stepName;
+		this.jobExecution = jobExecution;
 	}
 
 	/**

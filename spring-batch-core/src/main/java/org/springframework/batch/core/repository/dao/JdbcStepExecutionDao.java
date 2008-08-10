@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
@@ -49,8 +48,12 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			+ "STATUS = ?, COMMIT_COUNT = ?, ITEM_COUNT = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
 			+ "EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ? where STEP_EXECUTION_ID = ? and VERSION = ?";
 
-	private static final String GET_STEP_EXECUTION = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT from %PREFIX%STEP_EXECUTION where STEP_NAME = ? and JOB_EXECUTION_ID = ?";
+	private static final String GET_RAW_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
+		+ " ITEM_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID = ?";
+
+	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " oreder by STEP_EXECUTION_ID";
+	
+	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " and STEP_NAME = ?";
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
 
@@ -67,6 +70,15 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 */
 	public void setExitMessageLength(int exitMessageLength) {
 		this.exitMessageLength = exitMessageLength;
+	}
+
+	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
+		this.stepExecutionIncrementer = stepExecutionIncrementer;
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
 	}
 
 	/**
@@ -180,20 +192,36 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 	}
 
+	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
+		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
+				new StepExecutionRowMapper(jobExecution), jobExecution.getId(), stepName);
+
+		Assert.state(executions.size() <= 1,
+				"There can be at most one step execution with given name for single job execution");
+		if (executions.isEmpty()) {
+			return null;
+		}
+		else {
+			return (StepExecution) executions.get(0);
+		}
+	}
+	
+	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
+		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTIONS),
+				new StepExecutionRowMapper(jobExecution), jobExecution.getId());
+		return executions;
+	}
+	
 	private class StepExecutionRowMapper implements ParameterizedRowMapper<StepExecution> {
 
 		private final JobExecution jobExecution;
 
-		private final Step step;
-
-		public StepExecutionRowMapper(JobExecution jobExecution, Step step) {
+		public StepExecutionRowMapper(JobExecution jobExecution) {
 			this.jobExecution = jobExecution;
-			this.step = step;
 		}
 
 		public StepExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-			StepExecution stepExecution = new StepExecution(step.getName(), jobExecution, new Long(rs.getLong(1)));
+			StepExecution stepExecution = new StepExecution(rs.getString(2), jobExecution, rs.getLong(1));
 			stepExecution.setStartTime(rs.getTimestamp(3));
 			stepExecution.setEndTime(rs.getTimestamp(4));
 			stepExecution.setStatus(BatchStatus.valueOf(rs.getString(5)));
@@ -207,27 +235,5 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 
 	}
-
-	public void setStepExecutionIncrementer(DataFieldMaxValueIncrementer stepExecutionIncrementer) {
-		this.stepExecutionIncrementer = stepExecutionIncrementer;
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		Assert.notNull(stepExecutionIncrementer, "StepExecutionIncrementer cannot be null.");
-	}
-
-	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
-		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
-				new StepExecutionRowMapper(jobExecution, step), step.getName(), jobExecution.getId());
-
-		Assert.state(executions.size() <= 1,
-				"There can be at most one step execution with given name for single job execution");
-		if (executions.isEmpty()) {
-			return null;
-		}
-		else {
-			return (StepExecution) executions.get(0);
-		}
-	}
+	
 }

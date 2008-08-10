@@ -1,8 +1,10 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -81,6 +83,27 @@ public class MapJobExecutionDao implements JobExecutionDao {
 			}
 		}
 		return lastExec;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#findRunningJobExecutions(java.lang.String)
+	 */
+	public Set<JobExecution> findRunningJobExecutions(String jobName) {
+		Set<JobExecution> result = new HashSet<JobExecution>();
+		for (JobExecution exec : executionsById.values()) {
+			if (!exec.getJobInstance().getJobName().equals(jobName) || !exec.isRunning()) {
+				continue;
+			}
+			result.add(exec);
+		}
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#getJobExecution(java.lang.Long)
+	 */
+	public JobExecution getJobExecution(Long executionId) {
+		return executionsById.get(executionId);
 	}
 
 }
