@@ -13,32 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.repository;
+package org.springframework.batch.core.launch;
 
 import org.springframework.batch.core.AbstractExceptionTests;
-import org.springframework.batch.core.repository.DuplicateJobException;
+import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public class DuplicateJobExceptionTests extends AbstractExceptionTests {
+public class NoSuchJobExecutionExceptionTests extends AbstractExceptionTests {
 
-	/*
-	 * (non-Javadoc)
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new DuplicateJobException(msg);
+		return new NoSuchJobExecutionException(msg);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
-	 * java.lang.Throwable)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
 	 */
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new DuplicateJobException(msg, t);
+		return new NoSuchJobExecutionException(msg, t);
 	}
 
 }

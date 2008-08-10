@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.repository;
+package org.springframework.batch.core.launch;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionException;
@@ -26,12 +26,12 @@ import org.springframework.batch.core.JobExecutionException;
  * @author Dave Syer
  * 
  */
-public class NoSuchJobException extends JobExecutionException {
+public class JobInstanceAlreadyExistsException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public NoSuchJobException(String msg) {
+	public JobInstanceAlreadyExistsException(String msg) {
 		super(msg);
 	}
 
@@ -39,7 +39,7 @@ public class NoSuchJobException extends JobExecutionException {
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public NoSuchJobException(String msg, Throwable e) {
+	public JobInstanceAlreadyExistsException(String msg, Throwable e) {
 		super(msg, e);
 	}
 }

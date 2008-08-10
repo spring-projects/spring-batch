@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration;
+package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.AbstractExceptionTests;
 import org.springframework.batch.core.launch.NoSuchJobException;
 
 /**
- * A runtime service locator interface for retrieving job configurations by
- * <code>name</code>.
- * 
  * @author Dave Syer
  * 
  */
-public interface JobLocator {
+public class NoSuchJobExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * Locates a {@link Job} at runtime.
-	 * 
-	 * @param name the name of the {@link Job} which should be
-	 * unique
-	 * @return a {@link Job} identified by the given name
-	 * 
-	 * @throws NoSuchJobException if the required configuration can
-	 * not be found.
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
-	Job getJob(String name) throws NoSuchJobException;
+	public Exception getException(String msg) throws Exception {
+		return new NoSuchJobException(msg);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
+	 * java.lang.Throwable)
+	 */
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new NoSuchJobException(msg, t);
+	}
+
 }

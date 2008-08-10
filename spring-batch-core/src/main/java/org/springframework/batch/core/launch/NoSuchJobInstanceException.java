@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.repository;
+package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobInstance;
 
 /**
- * Checked exception that indicates a name clash when registering
- * {@link Job} instances.
+ * Exception that signals that the user requested an operation on a non-existent
+ * {@link JobInstance}.
  * 
  * @author Dave Syer
  * 
  */
-public class DuplicateJobException extends JobExecutionException {
+public class NoSuchJobInstanceException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public DuplicateJobException(String msg) {
+	public NoSuchJobInstanceException(String msg) {
 		super(msg);
 	}
 
@@ -38,7 +38,7 @@ public class DuplicateJobException extends JobExecutionException {
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public DuplicateJobException(String msg, Throwable e) {
+	public NoSuchJobInstanceException(String msg, Throwable e) {
 		super(msg, e);
 	}
 

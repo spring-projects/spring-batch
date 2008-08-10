@@ -22,11 +22,11 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.ListableJobRegistry;
-import org.springframework.batch.core.repository.DuplicateJobException;
-import org.springframework.batch.core.repository.NoSuchJobException;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.util.Assert;
 
 /**

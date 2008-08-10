@@ -15,32 +15,30 @@
  */
 package org.springframework.batch.core.configuration;
 
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.AbstractExceptionTests;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 
 /**
- * A runtime service registry interface for registering job configurations by
- * <code>name</code>.
- * 
  * @author Dave Syer
  * 
  */
-public interface JobRegistry extends JobLocator {
+public class DuplicateJobExceptionTests extends AbstractExceptionTests {
 
-	/**
-	 * Registers a {@link Job} at runtime.
-	 * 
-	 * @param jobFactory the {@link Job} to be registered
-	 * 
-	 * @throws DuplicateJobException if a factory with the same job name has
-	 * already been registered.
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
-	void register(JobFactory jobFactory) throws DuplicateJobException;
+	public Exception getException(String msg) throws Exception {
+		return new DuplicateJobException(msg);
+	}
 
-	/**
-	 * Unregisters a previously registered {@link Job}. If it was not
-	 * previously registered there is no error.
-	 * 
-	 * @param jobName the {@link Job} to unregister.
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String,
+	 * java.lang.Throwable)
 	 */
-	void unregister(String jobName);
+	public Exception getException(String msg, Throwable t) throws Exception {
+		return new DuplicateJobException(msg, t);
+	}
+
 }

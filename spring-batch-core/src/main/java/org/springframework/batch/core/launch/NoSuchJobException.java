@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.repository;
+package org.springframework.batch.core.launch;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionException;
 
+
 /**
- * Checked exception to indicate that a required {@link JobExecution} is not
+ * Checked exception to indicate that a required {@link Job} is not
  * available.
  * 
  * @author Dave Syer
  * 
  */
-public class NoSuchJobExecutionException extends JobExecutionException {
+public class NoSuchJobException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public NoSuchJobExecutionException(String msg) {
+	public NoSuchJobException(String msg) {
 		super(msg);
 	}
 
@@ -38,7 +39,7 @@ public class NoSuchJobExecutionException extends JobExecutionException {
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public NoSuchJobExecutionException(String msg, Throwable e) {
+	public NoSuchJobException(String msg, Throwable e) {
 		super(msg, e);
 	}
 }

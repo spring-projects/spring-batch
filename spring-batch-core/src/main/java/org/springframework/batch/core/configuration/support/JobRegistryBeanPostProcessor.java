@@ -19,9 +19,9 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.DisposableBean;

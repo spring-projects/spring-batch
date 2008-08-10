@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.configuration.ListableJobRegistry;
-import org.springframework.batch.core.repository.NoSuchJobException;
+import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyAccessorUtils;
