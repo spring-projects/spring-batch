@@ -30,7 +30,6 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.separator.DefaultRecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
-import org.springframework.batch.item.file.separator.ResourceLineReader;
 import org.springframework.batch.item.file.transform.AbstractLineTokenizer;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.LineTokenizer;
@@ -48,9 +47,7 @@ import org.springframework.util.ClassUtils;
  * {@link LineTokenizer} is used to parse data obtained from the file. <br/>
  * 
  * A {@link FlatFileItemReader} is not thread safe because it maintains state in
- * the form of a {@link ResourceLineReader}. Be careful to configure a
- * {@link FlatFileItemReader} using an appropriate factory or scope so that it
- * is not shared between threads.<br/>
+ * instance variables. <br/>
  * 
  * <p>
  * This class supports restart, skipping invalid lines and storing statistics.
