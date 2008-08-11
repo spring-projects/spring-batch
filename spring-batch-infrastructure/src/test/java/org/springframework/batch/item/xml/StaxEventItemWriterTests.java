@@ -8,11 +8,14 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer;
+import org.springframework.core.io.DescriptiveResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
@@ -24,7 +27,7 @@ import org.springframework.xml.transform.StaxResult;
 /**
  * Tests for {@link StaxEventItemWriter}.
  */
-public class StaxEventItemWriterTests extends TestCase {
+public class StaxEventItemWriterTests {
 
 	// object under test
 	private StaxEventItemWriter<Object> writer;
@@ -46,7 +49,8 @@ public class StaxEventItemWriterTests extends TestCase {
 
 	private static final int NOT_FOUND = -1;
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"));
 		writer = createItemWriter();
 		executionContext = new ExecutionContext();
@@ -55,6 +59,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Flush should pass buffered items to Serializer.
 	 */
+	@Test
 	public void testFlush() throws Exception {
 		writer.open(executionContext);
 		InputCheckMarshaller marshaller = new InputCheckMarshaller();
@@ -70,6 +75,7 @@ public class StaxEventItemWriterTests extends TestCase {
 
 	}
 
+	@Test
 	public void testClear() throws Exception {
 		writer.open(executionContext);
 		writer.write(item);
@@ -83,6 +89,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Rolled back records should not be written to output file.
 	 */
+	@Test
 	public void testRollback() throws Exception {
 		writer.open(executionContext);
 		writer.write(item);
@@ -94,6 +101,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Item is written to the output file only after flush.
 	 */
+	@Test
 	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
 		writer.write(item);
@@ -107,6 +115,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Restart scenario - content is appended to the output file after restart.
 	 */
+	@Test
 	public void testRestart() throws Exception {
 		writer.open(executionContext);
 		// write item
@@ -137,6 +146,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Item is written to the output file only after flush.
 	 */
+	@Test
 	public void testWriteWithHeader() throws Exception {
 		Object header1 = new Object();
 		Object header2 = new Object();
@@ -153,6 +163,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Item is written to the output file only after flush.
 	 */
+	@Test
 	public void testWriteWithHeaderAfterRollback() throws Exception {
 		Object header = new Object();
 		writer.setHeaderItems(new Object[] {header});
@@ -170,6 +181,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Item is written to the output file only after flush.
 	 */
+	@Test
 	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
 		Object header = new Object();
 		writer.setHeaderItems(new Object[] {header});
@@ -190,6 +202,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Count of 'records written so far' is returned as statistics.
 	 */
+	@Test
 	public void testStreamContext() throws Exception {
 		writer.open(executionContext);
 		final int NUMBER_OF_RECORDS = 10;
@@ -206,6 +219,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	/**
 	 * Open method writes the root tag, close method adds corresponding end tag.
 	 */
+	@Test
 	public void testOpenAndClose() throws Exception {
 		writer.setRootTagName("testroot");
 		writer.setRootElementAttributes(new HashMap<String, String>() {
@@ -221,6 +235,26 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.close(null);
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\">") != NOT_FOUND);
 		assertTrue(outputFileContent().endsWith("</testroot>"));
+	}
+	
+	@Test
+	public void testNonExistantResource() throws Exception {
+		Resource doesntExist = new DescriptiveResource("") {
+
+			public boolean exists() {
+				return false;
+			}
+
+		};
+		writer.setResource(doesntExist);
+
+		try {
+			writer.open(executionContext);
+			fail();
+		}
+		catch (IllegalStateException e) {
+			assertEquals("Output resource must exist", e.getMessage());
+		}
 	}
 
 	/**

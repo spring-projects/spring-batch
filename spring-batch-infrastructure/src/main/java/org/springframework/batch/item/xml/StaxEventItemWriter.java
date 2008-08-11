@@ -256,6 +256,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		
 		Assert.notNull(resource, "The resource must be set");
 		
+		Assert.state(resource.exists(), "Output resource must exist");
+		
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset
