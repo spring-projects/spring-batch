@@ -54,8 +54,8 @@ public class ItemOrientedStepHandler<T, S> implements ItemHandler {
 	 * @param itemProcessor
 	 * @param itemWriter
 	 */
-	public ItemOrientedStepHandler(ItemReader<? extends T> itemReader, ItemProcessor<? super T, ? extends S> itemProcessor,
-			ItemWriter<? super S> itemWriter) {
+	public ItemOrientedStepHandler(ItemReader<? extends T> itemReader,
+			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter) {
 		super();
 		this.itemReader = itemReader;
 		this.itemProcessor = itemProcessor;
@@ -64,17 +64,23 @@ public class ItemOrientedStepHandler<T, S> implements ItemHandler {
 
 	/**
 	 * Get the next item from {@link #read(StepContribution)} and if not null
-	 * pass the item to {@link #write(Object, StepContribution)}.
+	 * pass the item to {@link #write(Object, StepContribution)}. If the
+	 * {@link ItemProcessor} returns null, the write is omitted and another
+	 * item taken from the reader.
 	 * 
 	 * @see org.springframework.batch.core.step.item.ItemHandler#handle(org.springframework.batch.core.StepContribution)
 	 */
 	public ExitStatus handle(StepContribution contribution) throws Exception {
-		T item = read(contribution);
-		if (item == null) {
-			return ExitStatus.FINISHED;
+		boolean processed = false;
+		while (!processed) {
+			T item = read(contribution);
+			if (item == null) {
+				return ExitStatus.FINISHED;
+			}
+			// TODO: segregate read / write / filter count
+			contribution.incrementItemCount();
+			processed = write(item, contribution);
 		}
-		contribution.incrementItemCount();
-		write(item, contribution);
 		return ExitStatus.CONTINUABLE;
 	}
 
@@ -98,21 +104,24 @@ public class ItemOrientedStepHandler<T, S> implements ItemHandler {
 	 * 
 	 * @param item the item to write
 	 * @param contribution current context
+	 * @return true if the item was written (as opposed to filtered)
 	 */
-	protected void write(T item, StepContribution contribution) throws Exception {
-		doWrite(item);
+	protected boolean write(T item, StepContribution contribution) throws Exception {
+		return doWrite(item);
 	}
 
 	/**
 	 * @param item
 	 * @throws Exception
 	 */
-	protected final void doWrite(T item) throws Exception {
+	protected final boolean doWrite(T item) throws Exception {
 		S processed = itemProcessor.process(item);
 		if (processed != null) {
 			// TODO: increment filtered item count
 			itemWriter.write(processed);
+			return true;
 		}
+		return false;
 	}
 
 	/**

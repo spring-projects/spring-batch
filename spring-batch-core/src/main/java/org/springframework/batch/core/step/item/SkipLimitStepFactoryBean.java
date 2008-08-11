@@ -413,11 +413,10 @@ public class SkipLimitStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object,
 		 * org.springframework.batch.core.StepContribution)
 		 */
-		protected void write(final T item, final StepContribution contribution) throws Exception {
+		protected boolean write(final T item, final StepContribution contribution) throws Exception {
 			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
 				public Object doWithRetry(RetryContext context) throws Throwable {
-					doWrite(item);
-					return null;
+					return doWrite(item);
 				}
 			}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item) : item);
 			retryCallback.setRecoveryCallback(new RecoveryCallback() {
@@ -432,10 +431,10 @@ public class SkipLimitStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
 						}
 					}
-					return null;
+					return true;
 				}
 			});
-			retryOperations.execute(retryCallback);
+			return (Boolean) retryOperations.execute(retryCallback);
 		}
 	}
 
