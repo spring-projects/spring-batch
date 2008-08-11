@@ -227,6 +227,10 @@ public class StaxEventItemWriterTests extends TestCase {
 	public void testNonExistantResource() throws Exception {
 		Resource doesntExist = new DescriptiveResource("") {
 
+			public File getFile() throws IOException {
+				return new File("does not exist");
+			}
+
 			public boolean exists() {
 				return false;
 			}

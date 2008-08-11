@@ -255,8 +255,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 */
 	public void open(ExecutionContext executionContext) {
 		
-		Assert.state(resource.exists(), "Output resource must exist");
-		
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset
@@ -287,6 +285,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		try {
 			file = resource.getFile();
 			FileUtils.setUpOutputFile(file, restarted, overwriteOutput);
+			Assert.state(resource.exists(), "Output resource must exist");
 			os = new FileOutputStream(file, true);
 			channel = os.getChannel();
 			setPosition(position);

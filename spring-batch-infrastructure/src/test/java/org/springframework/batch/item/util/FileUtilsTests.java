@@ -120,6 +120,23 @@ public class FileUtilsTests extends TestCase {
 			file.delete();
 		}
 	}
+	
+	public void testCouldntCreateFile(){
+
+		File file = new File("new file"){
+			public boolean exists() {
+				return false;
+			}
+		};
+		try{
+			FileUtils.setUpOutputFile(file, false, false);
+			fail();
+		}catch(IllegalStateException ex){
+			assertEquals("Output file must exist", ex.getMessage());
+		}finally{
+			file.delete();
+		}
+	}
 
 	protected void setUp() throws Exception {
 		Assert.state(!file.exists());
