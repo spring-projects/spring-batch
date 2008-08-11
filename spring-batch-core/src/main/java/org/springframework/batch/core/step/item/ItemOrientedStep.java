@@ -318,6 +318,8 @@ public class ItemOrientedStep extends AbstractStep {
 						logger.error("Fatal error detected during commit.");
 						throw new FatalException("Fatal error detected during commit", e);
 					}
+					
+					getJobRepository().saveOrUpdate(stepExecution);
 
 				}
 				catch (Error e) {

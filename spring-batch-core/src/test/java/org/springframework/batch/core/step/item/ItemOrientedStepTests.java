@@ -684,8 +684,7 @@ public class ItemOrientedStepTests extends TestCase {
 			String msg = stepExecution.getExitStatus().getExitDescription();
 			assertEquals("", msg);
 			msg = ex.getMessage();
-			assertTrue("Message does not contain 'closing step': " + msg, contains(msg,
-					"closing step"));
+			assertTrue("Message does not contain 'closing step': " + msg, contains(msg, "closing step"));
 			// The original rollback was caused by this one:
 			assertEquals("Bar", ex.getCause().getMessage());
 		}
@@ -792,6 +791,36 @@ public class ItemOrientedStepTests extends TestCase {
 		}
 
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+
+	}
+
+	public void testStepExecutionUpdates() throws Exception {
+
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecution);
+
+		itemOrientedStep.setStepOperations(new RepeatTemplate());
+
+		JobRepositoryStub jobRepository = new JobRepositoryStub();
+		itemOrientedStep.setJobRepository(jobRepository);
+
+		itemOrientedStep.execute(stepExecution);
+
+		assertEquals(3, processed.size());
+		assertEquals(3, stepExecution.getItemCount().intValue());
+		assertTrue(3 <= jobRepository.updateCount);
+	}
+
+	private static class JobRepositoryStub extends JobRepositorySupport {
+
+		private int updateCount = -1;
+
+		public void saveOrUpdate(StepExecution stepExecution) {
+			updateCount++;
+			if (updateCount <= 3) {
+				assertEquals(Integer.valueOf(updateCount), stepExecution.getItemCount());
+			}
+		}
 
 	}
 
