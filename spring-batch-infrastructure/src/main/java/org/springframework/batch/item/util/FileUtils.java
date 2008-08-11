@@ -52,6 +52,7 @@ public class FileUtils {
 					new File(file.getParent()).mkdirs();
 				}
 				file.createNewFile();
+				Assert.state(file.exists(), "Output file must exist");
 			}
 		} catch (IOException ioe) {
 			throw new ItemStreamException(

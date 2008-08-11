@@ -1,5 +1,14 @@
 package org.springframework.batch.item.xml;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,14 +17,11 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
-import static org.junit.Assert.*;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer;
-import org.springframework.core.io.DescriptiveResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
@@ -239,13 +245,11 @@ public class StaxEventItemWriterTests {
 	
 	@Test
 	public void testNonExistantResource() throws Exception {
-		Resource doesntExist = new DescriptiveResource("") {
-
-			public boolean exists() {
-				return false;
-			}
-
-		};
+		Resource doesntExist = createMock(Resource.class);
+		expect(doesntExist.getFile()).andReturn(new File("does not exist"));
+		expect(doesntExist.exists()).andReturn(false);
+		replay(doesntExist);
+		
 		writer.setResource(doesntExist);
 
 		try {
