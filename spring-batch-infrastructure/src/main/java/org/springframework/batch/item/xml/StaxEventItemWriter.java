@@ -16,6 +16,8 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.FlushFailedException;
@@ -49,6 +51,8 @@ import org.springframework.util.CollectionUtils;
  */
 public class StaxEventItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream,
 		InitializingBean {
+
+	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
 
 	// default encoding
 	private static final String DEFAULT_ENCODING = "UTF-8";
@@ -260,11 +264,11 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		}
 
 		open(startAtPosition);
-		
-		if (startAtPosition==0) {
+
+		if (startAtPosition == 0) {
 			for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
 				Object header = (Object) iterator.next();
-				write(header);				
+				write(header);
 			}
 		}
 	}
@@ -338,22 +342,15 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	}
 
 	/**
-	 * Finishes the XML document. It closes any start tag and writes
-	 * corresponding end tags.
+	 * Writes the EndDocument tag manually.
 	 * 
 	 * @param writer XML event writer
 	 * @throws XMLStreamException
 	 */
-	private void endDocument(XMLEventWriter writer) throws XMLStreamException {
+	protected void endDocument(XMLEventWriter writer) throws XMLStreamException {
 
 		// writer.writeEndDocument(); <- this doesn't work after restart
 		// we need to write end tag of the root element manually
-
-		// harmless event to close the root tag if there were no items
-		XMLEventFactory factory = XMLEventFactory.newInstance();
-		writer.add(factory.createCharacters(""));
-
-		writer.flush();
 
 		ByteBuffer bbuf = ByteBuffer.wrap(("</" + getRootTagName() + ">").getBytes());
 		try {
@@ -370,6 +367,16 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
+		
+		// harmless event to close the root tag if there were no items
+		XMLEventFactory factory = XMLEventFactory.newInstance();
+		try {
+			delegateEventWriter.add(factory.createCharacters(""));
+		}
+		catch (XMLStreamException e) {
+			log.error(e);
+		}
+
 		flush();
 		try {
 			endDocument(delegateEventWriter);
