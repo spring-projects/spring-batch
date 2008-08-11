@@ -254,6 +254,9 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
+		
+		Assert.state(resource.exists(), "Output resource must exist");
+		
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset

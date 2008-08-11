@@ -13,6 +13,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer;
+import org.springframework.core.io.DescriptiveResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
@@ -37,7 +38,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	// test item for writing to output
 	private Object item = new Object() {
 		public String toString() {
-			return ClassUtils.getShortName(StaxEventItemWriter.class)+"-testString";
+			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
 	};
 
@@ -101,7 +102,7 @@ public class StaxEventItemWriterTests extends TestCase {
 		assertFalse(content.contains(TEST_STRING));
 		writer.flush();
 		content = outputFileContent();
-		assertTrue("Wrong content: "+content, contains(content, TEST_STRING));
+		assertTrue("Wrong content: " + content, contains(content, TEST_STRING));
 	}
 
 	/**
@@ -140,14 +141,14 @@ public class StaxEventItemWriterTests extends TestCase {
 	public void testWriteWithHeader() throws Exception {
 		Object header1 = new Object();
 		Object header2 = new Object();
-		writer.setHeaderItems(new Object[] {header1, header2});
+		writer.setHeaderItems(new Object[] { header1, header2 });
 		writer.open(executionContext);
 		writer.write(item);
 		writer.flush();
 		String content = outputFileContent();
-		assertTrue("Wrong content: "+content, contains(content, "<!--" + header1 + "-->"));
-		assertTrue("Wrong content: "+content, contains(content, "<!--" + header2 + "-->"));
-		assertTrue("Wrong content: "+content, contains(content, TEST_STRING));
+		assertTrue("Wrong content: " + content, contains(content, "<!--" + header1 + "-->"));
+		assertTrue("Wrong content: " + content, contains(content, "<!--" + header2 + "-->"));
+		assertTrue("Wrong content: " + content, contains(content, TEST_STRING));
 	}
 
 	/**
@@ -155,7 +156,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	 */
 	public void testWriteWithHeaderAfterRollback() throws Exception {
 		Object header = new Object();
-		writer.setHeaderItems(new Object[] {header});
+		writer.setHeaderItems(new Object[] { header });
 		writer.open(executionContext);
 		writer.write(item);
 		writer.clear();
@@ -163,8 +164,8 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.write(item);
 		writer.flush();
 		String content = outputFileContent();
-		assertEquals("Wrong content: "+content, 1, countContains(content, "<!--" + header + "-->"));
-		assertEquals("Wrong content: "+content, 1, countContains(content, TEST_STRING));
+		assertEquals("Wrong content: " + content, 1, countContains(content, "<!--" + header + "-->"));
+		assertEquals("Wrong content: " + content, 1, countContains(content, TEST_STRING));
 	}
 
 	/**
@@ -172,7 +173,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	 */
 	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
 		Object header = new Object();
-		writer.setHeaderItems(new Object[] {header});
+		writer.setHeaderItems(new Object[] { header });
 		writer.open(executionContext);
 		writer.write(item);
 		writer.flush();
@@ -183,8 +184,8 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.clear();
 		writer.flush();
 		String content = outputFileContent();
-		assertEquals("Wrong content: "+content, 1, countContains(content, "<!--" + header + "-->"));
-		assertEquals("Wrong content: "+content, 1, countContains(content, TEST_STRING));
+		assertEquals("Wrong content: " + content, 1, countContains(content, "<!--" + header + "-->"));
+		assertEquals("Wrong content: " + content, 1, countContains(content, TEST_STRING));
 	}
 
 	/**
@@ -221,6 +222,25 @@ public class StaxEventItemWriterTests extends TestCase {
 		writer.close(null);
 		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\">") != NOT_FOUND);
 		assertTrue(outputFileContent().endsWith("</testroot>"));
+	}
+
+	public void testNonExistantResource() throws Exception {
+		Resource doesntExist = new DescriptiveResource("") {
+
+			public boolean exists() {
+				return false;
+			}
+
+		};
+		writer.setResource(doesntExist);
+
+		try {
+			writer.open(executionContext);
+			fail();
+		}
+		catch (IllegalStateException e) {
+			assertEquals("Output resource must exist", e.getMessage());
+		}
 	}
 
 	/**
@@ -298,7 +318,7 @@ public class StaxEventItemWriterTests extends TestCase {
 	private int countContains(String str, String searchStr) {
 		int begin = -1;
 		int count = 0;
-		while (str.indexOf(searchStr, begin+1) > begin) {
+		while (str.indexOf(searchStr, begin + 1) > begin) {
 			count++;
 			begin = str.indexOf(searchStr, begin);
 		}
