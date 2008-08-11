@@ -135,6 +135,23 @@ public class ItemOrientedStepTests extends TestCase {
 		assertEquals(1, stepExecution.getItemCount().intValue());
 	}
 
+	public void testStepExecutionUpdates() throws Exception {
+
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecution);
+
+		itemOrientedStep.setStepOperations(new RepeatTemplate());
+
+		JobRepositoryStub jobRepository = new JobRepositoryStub();
+		itemOrientedStep.setJobRepository(jobRepository);
+
+		itemOrientedStep.execute(stepExecution);
+
+		assertEquals(3, processed.size());
+		assertEquals(3, stepExecution.getItemCount().intValue());
+		assertTrue(3 <= jobRepository.updateCount);
+	}
+
 	public void testChunkExecutor() throws Exception {
 
 		RepeatTemplate template = new RepeatTemplate();
@@ -780,7 +797,22 @@ public class ItemOrientedStepTests extends TestCase {
 		return str.indexOf(searchStr) != -1;
 	}
 
-	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader<String>, StepExecutionListener {
+	private static class JobRepositoryStub extends JobRepositorySupport {
+
+		private int updateCount = 0;
+
+		@Override
+		public void update(StepExecution stepExecution) {
+			updateCount++;
+			if (updateCount <= 3) {
+				assertEquals(Integer.valueOf(updateCount), stepExecution.getItemCount());
+			}
+		}
+
+	}
+
+	private class MockRestartableItemReader extends ItemStreamSupport implements ItemReader<String>,
+			StepExecutionListener {
 
 		private boolean getExecutionAttributesCalled = false;
 
