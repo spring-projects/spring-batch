@@ -23,12 +23,12 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
@@ -85,16 +85,16 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		MapStepExecutionDao.clear();
 	}
 
-	private SimpleStepFactoryBean<String> getStepFactory(String arg) throws Exception {
+	private SimpleStepFactoryBean<String,String> getStepFactory(String arg) throws Exception {
 		return getStepFactory(new String[] { arg });
 	}
 
-	private SimpleStepFactoryBean<String> getStepFactory(String arg0, String arg1) throws Exception {
+	private SimpleStepFactoryBean<String,String> getStepFactory(String arg0, String arg1) throws Exception {
 		return getStepFactory(new String[] { arg0, arg1 });
 	}
 
-	private SimpleStepFactoryBean<String> getStepFactory(String[] args) throws Exception {
-		SimpleStepFactoryBean<String> factory = new SimpleStepFactoryBean<String>();
+	private SimpleStepFactoryBean<String,String> getStepFactory(String[] args) throws Exception {
+		SimpleStepFactoryBean<String,String> factory = new SimpleStepFactoryBean<String,String>();
 
 		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
 		items.addAll(Arrays.asList(args));
@@ -129,7 +129,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	public void testSimpleConcurrentJob() throws Exception {
 
 		job.setSteps(new ArrayList<Step>());
-		SimpleStepFactoryBean<String> factory = getStepFactory("foo", "bar");
+		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo", "bar");
 		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		factory.setThrottleLimit(1);
 
@@ -163,7 +163,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		 * is recovered ("skipped") on the second attempt (see retry policy
 		 * definition above)...
 		 */
-		SimpleStepFactoryBean<String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
 		factory.setItemWriter(new AbstractItemWriter<String>() {
 			public void write(String data) throws Exception {
@@ -196,7 +196,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	}
 
 	public void testExceptionTerminates() throws Exception {
-		SimpleStepFactoryBean<String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setItemWriter(new AbstractItemWriter<String>() {
 			public void write(String data) throws Exception {
@@ -219,7 +219,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	}
 
 	public void testExceptionHandler() throws Exception {
-		SimpleStepFactoryBean<String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setExceptionHandler(new SimpleLimitExceptionHandler(1));
 		factory.setItemWriter(new AbstractItemWriter<String>() {
@@ -245,7 +245,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
 		int commitInterval = 3;
 
-		SimpleStepFactoryBean<String> factory = getStepFactory(items);
+		SimpleStepFactoryBean<String,String> factory = getStepFactory(items);
 		class CountingChunkListener implements ChunkListener {
 			int beforeCount = 0;
 
@@ -284,7 +284,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testCommitIntervalMustBeGreaterThanZero() throws Exception {
-		SimpleStepFactoryBean<String> factory = getStepFactory("foo");
+		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo");
 		// nothing wrong here
 		factory.getObject();
 
@@ -304,7 +304,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testCommitIntervalAndCompletionPolicyBothSet() throws Exception {
-		SimpleStepFactoryBean<String> factory = getStepFactory("foo");
+		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo");
 
 		// but exception expected after setting commit interval and completion
 		// policy

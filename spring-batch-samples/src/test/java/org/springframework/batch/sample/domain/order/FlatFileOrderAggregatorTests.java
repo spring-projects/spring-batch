@@ -27,7 +27,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.sample.domain.order.internal.OrderTransformer;
+import org.springframework.batch.sample.domain.order.internal.OrderProcessor;
 
 public class FlatFileOrderAggregatorTests {
 
@@ -55,7 +55,7 @@ public class FlatFileOrderAggregatorTests {
 		// create map of aggregators and set it to writer
 		Map<String, LineAggregator<Object[]>> aggregators = new HashMap<String, LineAggregator<Object[]>>();
 
-		OrderTransformer converter = new OrderTransformer();
+		OrderProcessor converter = new OrderProcessor();
 		aggregators.put("header", aggregator);
 		aggregators.put("customer", aggregator);
 		aggregators.put("address", aggregator);
@@ -65,7 +65,7 @@ public class FlatFileOrderAggregatorTests {
 		converter.setAggregators(aggregators);
 
 		// call tested method
-		List<String> list = converter.transform(order);
+		List<String> list = converter.process(order);
 
 		// verify method calls
 		assertEquals(7, list.size());

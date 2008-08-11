@@ -15,126 +15,25 @@
  */
 package org.springframework.batch.core.step.item;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.item.support.PassthroughItemProcessor;
 
 /**
  * Simplest possible implementation of {@link ItemHandler} with no skipping or
- * recovering. Just delegates all calls to the provided {@link ItemReader} and
- * {@link ItemWriter}.
- * 
- * Provides extension points by protected {@link #read(StepContribution)} and
- * {@link #write(Object, StepContribution)} methods that can be overriden to
- * provide more sophisticated behavior (e.g. skipping).
+ * recovering or processing. Just delegates all calls to the provided
+ * {@link ItemReader} and {@link ItemWriter}.
  * 
  * @author Dave Syer
- * @author Robert Kasanicky
  */
-public class SimpleItemHandler<T> implements ItemHandler {
-
-	protected final Log logger = LogFactory.getLog(getClass());
-
-	private ItemReader<? extends T> itemReader;
-
-	private ItemWriter<? super T> itemWriter;
+public class SimpleItemHandler<T> extends ItemOrientedStepHandler<T, T> {
 
 	/**
-	 * @param itemReader
-	 * @param itemWriter
+	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
+	 * instance of {@link ItemOrientedStepHandler}.
 	 */
-	public SimpleItemHandler(ItemReader<? extends T> itemReader, ItemWriter<? super T> itemWriter) {
-		super();
-		this.itemReader = itemReader;
-		this.itemWriter = itemWriter;
-	}
-
-	/**
-	 * Get the next item from {@link #read(StepContribution)} and if not null
-	 * pass the item to {@link #write(Object, StepContribution)}.
-	 * 
-	 * @see org.springframework.batch.core.step.item.ItemHandler#handle(org.springframework.batch.core.StepContribution)
-	 */
-	public ExitStatus handle(StepContribution contribution) throws Exception {
-		T item = read(contribution);
-		if (item == null) {
-			return ExitStatus.FINISHED;
-		}
-		contribution.incrementItemCount();
-		write(item, contribution);
-		return ExitStatus.CONTINUABLE;
-	}
-
-	/**
-	 * @param contribution current context
-	 * @return next item for writing
-	 */
-	protected T read(StepContribution contribution) throws Exception {
-		return doRead();
-	}
-
-	/**
-	 * @return item
-	 * @throws Exception
-	 */
-	protected final T doRead() throws Exception {
-		return itemReader.read();
-	}
-
-	/**
-	 * 
-	 * @param item the item to write
-	 * @param contribution current context
-	 */
-	protected void write(T item, StepContribution contribution) throws Exception {
-		doWrite(item);
-	}
-
-	/**
-	 * @param item
-	 * @throws Exception
-	 */
-	protected final void doWrite(T item) throws Exception {
-		itemWriter.write(item);
-	}
-
-	/**
-	 * @throws MarkFailedException
-	 * @see org.springframework.batch.item.ItemReader#mark()
-	 */
-	public void mark() throws MarkFailedException {
-		itemReader.mark();
-	}
-
-	/**
-	 * @throws ResetFailedException
-	 * @see org.springframework.batch.item.ItemReader#reset()
-	 */
-	public void reset() throws ResetFailedException {
-		itemReader.reset();
-	}
-
-	/**
-	 * @throws ClearFailedException
-	 * @see org.springframework.batch.item.ItemWriter#clear()
-	 */
-	public void clear() throws ClearFailedException {
-		itemWriter.clear();
-	}
-
-	/**
-	 * @throws FlushFailedException
-	 * @see org.springframework.batch.item.ItemWriter#flush()
-	 */
-	public void flush() throws FlushFailedException {
-		itemWriter.flush();
+	public SimpleItemHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
+		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter);
 	}
 
 }

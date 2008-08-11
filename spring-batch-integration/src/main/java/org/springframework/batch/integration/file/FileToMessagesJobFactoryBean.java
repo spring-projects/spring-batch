@@ -39,10 +39,10 @@ import org.springframework.util.Assert;
 
 /**
  * A FactoryBean for a {@link Job} with a single step which just pumps messages
- * from a file into a channel. The channel has to be a
- * {@link DirectChannel} to ensure that failures propagate up to the step
- * and fail the job execution. Normally this job will be used in conjunction
- * with a {@link JobLaunchingMessageHandler} and a
+ * from a file into a channel. The channel has to be a {@link DirectChannel} to
+ * ensure that failures propagate up to the step and fail the job execution.
+ * Normally this job will be used in conjunction with a
+ * {@link JobLaunchingMessageHandler} and a
  * {@link ResourcePayloadAsJobParameterStrategy}, so that the user can just
  * send a message to a request channel listing the files to be processed, and
  * everything else just happens by magic. After a failure the job will be
@@ -125,7 +125,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 		job.setName(name);
 		job.setJobRepository(jobRepository);
 
-		SimpleStepFactoryBean<T> stepFactory = new SimpleStepFactoryBean<T>();
+		SimpleStepFactoryBean<T, T> stepFactory = new SimpleStepFactoryBean<T, T>();
 		stepFactory.setBeanName("step");
 
 		Assert.state((itemReader instanceof FlatFileItemReader) || (itemReader instanceof StaxEventItemReader),

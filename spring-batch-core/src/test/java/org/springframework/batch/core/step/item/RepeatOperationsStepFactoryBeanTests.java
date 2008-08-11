@@ -39,7 +39,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
  */
 public class RepeatOperationsStepFactoryBeanTests extends TestCase {
 
-	private RepeatOperationsStepFactoryBean<String> factory = new RepeatOperationsStepFactoryBean<String>();
+	private RepeatOperationsStepFactoryBean<String,String> factory = new RepeatOperationsStepFactoryBean<String,String>();
 
 	private List<String> list;
 

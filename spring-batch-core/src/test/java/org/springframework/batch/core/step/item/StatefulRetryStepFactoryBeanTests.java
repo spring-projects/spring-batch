@@ -59,7 +59,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SkipLimitStepFactoryBean<Object> factory = new SkipLimitStepFactoryBean<Object>();
+	private SkipLimitStepFactoryBean<Object,Object> factory = new SkipLimitStepFactoryBean<Object,Object>();
 
 	private List<Object> recovered = new ArrayList<Object>();
 

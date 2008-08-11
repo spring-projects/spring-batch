@@ -42,7 +42,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SkipLimitStepFactoryBean<String> factory = new SkipLimitStepFactoryBean<String>();
+	private SkipLimitStepFactoryBean<String,String> factory = new SkipLimitStepFactoryBean<String,String>();
 
 	private Class<?>[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
 

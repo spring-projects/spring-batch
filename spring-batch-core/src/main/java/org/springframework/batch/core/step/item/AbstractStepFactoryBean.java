@@ -19,6 +19,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -42,7 +43,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNameAware {
+public abstract class AbstractStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 
 	private String name;
 
@@ -52,7 +53,7 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 
 	private ItemReader<? extends T> itemReader;
 
-	private ItemWriter<? super T> itemWriter;
+	private ItemWriter<? super S> itemWriter;
 
 	private PlatformTransactionManager transactionManager;
 	
@@ -67,6 +68,11 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 	private ItemStream[] streams = new ItemStream[0];
 
 	private StepListener[] listeners = new StepListener[0];
+
+	private ItemProcessor<? super T, ? extends S> itemProcessor = new ItemProcessor<T, S>() {
+		@SuppressWarnings("unchecked")
+		public S process(T item) throws Exception {return (S)item;}
+	};
 
 	/**
 	 * 
@@ -121,8 +127,15 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 	/**
 	 * @param itemWriter the itemWriter to set
 	 */
-	public void setItemWriter(ItemWriter<? super T> itemWriter) {
+	public void setItemWriter(ItemWriter<? super S> itemWriter) {
 		this.itemWriter = itemWriter;
+	}
+
+	/**
+	 * @param itemProcessor the itemProcessor to set
+	 */
+	public void setItemProcessor(ItemProcessor<? super T, ? extends S> itemProcessor) {
+		this.itemProcessor = itemProcessor;
 	}
 
 	/**
@@ -167,8 +180,16 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 	 * Protected getter for the {@link ItemWriter} for subclasses to use
 	 * @return the itemWriter
 	 */
-	protected ItemWriter<? super T> getItemWriter() {
+	protected ItemWriter<? super S> getItemWriter() {
 		return itemWriter;
+	}
+
+	/**
+	 * Protected getter for the {@link ItemProcessor} for subclasses to use
+	 * @return the itemProcessor
+	 */
+	protected ItemProcessor<? super T, ? extends S> getItemProcessor() {
+		return itemProcessor;
 	}
 
 	/**
@@ -198,7 +219,8 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 	}
 
 	/**
-	 * Protected getter for the {@link TransactionAttribute} for subclasses only.
+	 * Protected getter for the {@link TransactionAttribute} for subclasses
+	 * only.
 	 * @return the transactionAttribute
 	 */
 	protected TransactionAttribute getTransactionAttribute() {
@@ -227,7 +249,6 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 		Assert.notNull(transactionManager, "TransactionManager must be provided");
 		jobRepositoryValidator.validate(jobRepository);
 
-		step.setItemHandler(new SimpleItemHandler<T>(itemReader, itemWriter));
 		step.setTransactionManager(transactionManager);
 		if (transactionAttribute!=null) {
 			step.setTransactionAttribute(transactionAttribute);
@@ -239,7 +260,8 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 		step.setStreams(streams);
 
 		ItemReader<? extends T> itemReader = getItemReader();
-		ItemWriter<? super T> itemWriter = getItemWriter();
+		ItemWriter<? super S> itemWriter = getItemWriter();
+		ItemProcessor<? super T, ? extends S> itemProcessor = getItemProcessor();
 
 		// Since we are going to wrap these things with listener callbacks we
 		// need to register them here because the step will not know we did
@@ -249,6 +271,12 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 		}
 		if (itemReader instanceof StepExecutionListener) {
 			step.registerStepExecutionListener((StepExecutionListener) itemReader);
+		}
+		if (itemProcessor instanceof ItemStream) {
+			step.registerStream((ItemStream) itemProcessor);
+		}
+		if (itemProcessor instanceof StepExecutionListener) {
+			step.registerStepExecutionListener((StepExecutionListener) itemProcessor);
 		}
 		if (itemWriter instanceof ItemStream) {
 			step.registerStream((ItemStream) itemWriter);
@@ -266,8 +294,7 @@ public abstract class AbstractStepFactoryBean<T> implements FactoryBean, BeanNam
 		setItemWriter(itemWriter);
 
 		step.setStepExecutionListeners(stepListeners);
-		//TODO: Why is setItemHandler called twice?
-		step.setItemHandler(new SimpleItemHandler<T>(itemReader, itemWriter));
+		step.setItemHandler(new ItemOrientedStepHandler<T,S>(itemReader, itemProcessor, itemWriter));
 
 	}
 

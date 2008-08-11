@@ -1,4 +1,4 @@
-package org.springframework.batch.item.transform;
+package org.springframework.batch.item.support;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
@@ -11,26 +11,28 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.support.CompositeItemProcessor;
 
 /**
- * Tests for {@link CompositeItemTransformer}.
+ * Tests for {@link CompositeItemProcessor}.
  * 
  * @author Robert Kasanicky
  */
-public class CompositeItemTransformerTests {
+public class CompositeItemProcessorTests {
 
-	private CompositeItemTransformer<Object, Object> composite = new CompositeItemTransformer<Object, Object>();
+	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<Object, Object>();
 	
-	private ItemTransformer<Object, Object> transformer1;
-	private ItemTransformer<Object, Object> transformer2;
+	private ItemProcessor<Object, Object> transformer1;
+	private ItemProcessor<Object, Object> transformer2;
 	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		transformer1 = createMock(ItemTransformer.class);
-		transformer2 = createMock(ItemTransformer.class);
+		transformer1 = createMock(ItemProcessor.class);
+		transformer2 = createMock(ItemProcessor.class);
 		
-		composite.setItemTransformers(new ArrayList<ItemTransformer>() {{ 
+		composite.setItemTransformers(new ArrayList<ItemProcessor>() {{ 
 			add(transformer1); add(transformer2); 
 		}});
 		
@@ -47,14 +49,14 @@ public class CompositeItemTransformerTests {
 		Object itemAfterFirstTransfromation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 
-		expect(transformer1.transform(item)).andReturn(itemAfterFirstTransfromation);
+		expect(transformer1.process(item)).andReturn(itemAfterFirstTransfromation);
 		
-		expect(transformer2.transform(itemAfterFirstTransfromation)).andReturn(itemAfterSecondTransformation);
+		expect(transformer2.process(itemAfterFirstTransfromation)).andReturn(itemAfterSecondTransformation);
 		
 		replay(transformer1);
 		replay(transformer2);
 		
-		assertSame(itemAfterSecondTransformation, composite.transform(item));
+		assertSame(itemAfterSecondTransformation, composite.process(item));
 
 		verify(transformer1);
 		verify(transformer2);
@@ -62,7 +64,7 @@ public class CompositeItemTransformerTests {
 	
 	/**
 	 * The list of transformers must not be null or empty and 
-	 * can contain only instances of {@link ItemTransformer}.
+	 * can contain only instances of {@link ItemProcessor}.
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
@@ -79,7 +81,7 @@ public class CompositeItemTransformerTests {
 		}
 		
 		// empty list
-		composite.setItemTransformers(new ArrayList<ItemTransformer>());
+		composite.setItemTransformers(new ArrayList<ItemProcessor>());
 		try {
 			composite.afterPropertiesSet();
 			fail();

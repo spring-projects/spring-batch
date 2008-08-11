@@ -31,8 +31,6 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
-import org.springframework.batch.core.step.item.ItemOrientedStep;
-import org.springframework.batch.core.step.item.SimpleItemHandler;
 import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -46,7 +44,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private JobExecution jobExecution;
 
 	private AbstractItemWriter<Object> itemWriter;
-
+	
 	private StepExecution stepExecution;
 
 	public void setUp() throws Exception {

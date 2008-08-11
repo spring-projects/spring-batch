@@ -15,12 +15,18 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
 import javax.sql.DataSource;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -38,15 +44,12 @@ import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  * @author Dave Syer
@@ -107,15 +110,17 @@ public class ItemOrientedStepIntegrationTests {
 	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setItemHandler(new SimpleItemHandler<String>(getReader(new String[] { "a", "b", "c" }), new AbstractItemWriter<String>() {
-			public void write(String data) throws Exception {
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-					public void beforeCommit(boolean readOnly) {
-						throw new RuntimeException("Simulate commit failure");
+		step.setItemHandler(new SimpleItemHandler<String>(getReader(new String[] { "a", "b", "c" }),
+				new AbstractItemWriter<String>() {
+					public void write(String data) throws Exception {
+						TransactionSynchronizationManager
+								.registerSynchronization(new TransactionSynchronizationAdapter() {
+									public void beforeCommit(boolean readOnly) {
+										throw new RuntimeException("Simulate commit failure");
+									}
+								});
 					}
-				});
-			}
-		}));
+				}));
 
 		JobExecution jobExecution = jobRepository.createJobExecution(job, new JobParameters());
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);

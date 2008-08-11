@@ -27,7 +27,7 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  * @author Dave Syer
  * 
  */
-public class RepeatOperationsStepFactoryBean<T> extends AbstractStepFactoryBean<T> {
+public class RepeatOperationsStepFactoryBean<T,S> extends AbstractStepFactoryBean<T,S> {
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 

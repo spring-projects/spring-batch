@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.transform.ItemTransformer;
 import org.springframework.batch.sample.domain.order.Address;
 import org.springframework.batch.sample.domain.order.BillingInfo;
 import org.springframework.batch.sample.domain.order.Customer;
@@ -30,10 +30,11 @@ import org.springframework.batch.sample.domain.order.LineItem;
 import org.springframework.batch.sample.domain.order.Order;
 
 /**
- * Converts <code>Order</code> object to a String.
+ * Converts <code>Order</code> object to a list of strings.
+ * 
  * @author Dave Syer
  */
-public class OrderTransformer implements ItemTransformer<Order, List<String>> {
+public class OrderProcessor implements ItemProcessor<Order, List<String>> {
 
 	/**
 	 * Aggregators for all types of lines in the output file
@@ -44,7 +45,7 @@ public class OrderTransformer implements ItemTransformer<Order, List<String>> {
 	 * Converts information from an Order object to a collection of Strings for
 	 * output.
 	 */
-	public List<String> transform(Order order) {
+	public List<String> process(Order order) {
 
 		List<String> result = new ArrayList<String>();
 

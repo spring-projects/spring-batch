@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class SimpleStepFactoryBean<T> extends AbstractStepFactoryBean<T> {
+public class SimpleStepFactoryBean<T,S> extends AbstractStepFactoryBean<T,S> {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
