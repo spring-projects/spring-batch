@@ -246,7 +246,7 @@ public class StaxEventItemWriterTests {
 	@Test
 	public void testNonExistantResource() throws Exception {
 		Resource doesntExist = createMock(Resource.class);
-		expect(doesntExist.getFile()).andReturn(new File("does not exist"));
+		expect(doesntExist.getFile()).andReturn(File.createTempFile("arbitrary", null));
 		expect(doesntExist.exists()).andReturn(false);
 		replay(doesntExist);
 		
