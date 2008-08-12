@@ -112,8 +112,8 @@ public class StepExecution extends Entity {
 	 * 
 	 * @return the current number of commits
 	 */
-	public Integer getCommitCount() {
-		return new Integer(commitCount);
+	public int getCommitCount() {
+		return commitCount;
 	}
 
 	/**
@@ -148,8 +148,8 @@ public class StepExecution extends Entity {
 	 * 
 	 * @return the current number of items processed for this execution
 	 */
-	public Integer getItemCount() {
-		return new Integer(itemCount);
+	public int getItemCount() {
+		return itemCount;
 	}
 
 	/**
@@ -166,8 +166,8 @@ public class StepExecution extends Entity {
 	 * 
 	 * @return the current number of rollbacks for this execution
 	 */
-	public Integer getRollbackCount() {
-		return new Integer(rollbackCount);
+	public int getRollbackCount() {
+		return rollbackCount;
 	}
 
 	/**
@@ -360,12 +360,12 @@ public class StepExecution extends Entity {
 		return jobExecution.getJobInstance().getJobParameters();
 	}
 
-	public Integer getReadSkipCount() {
-		return new Integer(readSkipCount);
+	public int getReadSkipCount() {
+		return readSkipCount;
 	}
 
-	public Integer getWriteSkipCount() {
-		return new Integer(writeSkipCount);
+	public int getWriteSkipCount() {
+		return writeSkipCount;
 	}
 
 	public void setReadSkipCount(int readSkipCount) {

@@ -82,11 +82,11 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		step.execute(stepExecution);
 
 		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(1, stepExecution.getReadSkipCount().intValue());
-		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(1, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
 
 		// only write exception caused rollback
-		assertEquals(1, stepExecution.getRollbackCount().intValue());
+		assertEquals(1, stepExecution.getRollbackCount());
 
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertTrue(reader.processed.contains("4"));
@@ -95,7 +95,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
 		assertEquals(expectedOutput, writer.written);
 
-		assertEquals(4, stepExecution.getItemCount().intValue());
+		assertEquals(4, stepExecution.getItemCount());
 
 	}
 
@@ -115,13 +115,13 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		step.execute(stepExecution);
 
 		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(1, stepExecution.getReadSkipCount().intValue());
-		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(1, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
 
 		// no rollbacks
-		assertEquals(0, stepExecution.getRollbackCount().intValue());
+		assertEquals(0, stepExecution.getRollbackCount());
 
-		assertEquals(4, stepExecution.getItemCount().intValue());
+		assertEquals(4, stepExecution.getItemCount());
 
 	}
 
@@ -204,8 +204,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		assertEquals(3, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getReadSkipCount().intValue());
-		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(2, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
 
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertFalse(reader.processed.contains("2"));
@@ -253,8 +253,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		assertEquals(1, stepExecution.getSkipCount());
-		assertEquals(1, stepExecution.getReadSkipCount().intValue());
-		assertEquals(0, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(1, stepExecution.getReadSkipCount());
+		assertEquals(0, stepExecution.getWriteSkipCount());
 		
 	}
 
@@ -290,8 +290,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		assertEquals(1, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getReadSkipCount().intValue());
-		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
 		
 	}
 
@@ -313,8 +313,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());
-		assertEquals(3, stepExecution.getReadSkipCount().intValue());
-		assertEquals(1, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(3, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
 
 		// skipped 2,3,4,5
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
@@ -345,8 +345,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		System.err.println(writer.written);
 		System.err.println(reader.processed);
 		assertEquals(4, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getReadSkipCount().intValue());
-		assertEquals(2, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(2, stepExecution.getReadSkipCount());
+		assertEquals(2, stepExecution.getWriteSkipCount());
 
 		// skipped 2,3,4,5
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));

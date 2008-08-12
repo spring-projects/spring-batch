@@ -132,7 +132,7 @@ public class StepHandlerStepTests extends TestCase {
 
 		step.execute(stepExecution);
 		assertEquals(1, processed.size());
-		assertEquals(1, stepExecution.getItemCount().intValue());
+		assertEquals(1, stepExecution.getItemCount());
 	}
 
 	public void testStepExecutionUpdates() throws Exception {
@@ -148,7 +148,7 @@ public class StepHandlerStepTests extends TestCase {
 		step.execute(stepExecution);
 
 		assertEquals(3, processed.size());
-		assertEquals(3, stepExecution.getItemCount().intValue());
+		assertEquals(3, stepExecution.getItemCount());
 		assertTrue(3 <= jobRepository.updateCount);
 	}
 
@@ -166,7 +166,7 @@ public class StepHandlerStepTests extends TestCase {
 		StepContribution contribution = stepExecution.createStepContribution();
 		step.processChunk(stepExecution, contribution);
 		assertEquals(1, processed.size());
-		assertEquals(0, stepExecution.getItemCount().intValue());
+		assertEquals(0, stepExecution.getItemCount());
 		assertEquals(1, contribution.getItemCount());
 
 	}
@@ -202,7 +202,7 @@ public class StepHandlerStepTests extends TestCase {
 			step.execute(stepExecution);
 		}
 		catch (Exception ex) {
-			assertEquals(stepExecution.getRollbackCount(), new Integer(1));
+			assertEquals(1, stepExecution.getRollbackCount());
 		}
 
 	}
@@ -765,7 +765,7 @@ public class StepHandlerStepTests extends TestCase {
 
 		step.execute(stepExecution);
 		assertEquals(3, processed.size());
-		assertEquals(3, stepExecution.getItemCount().intValue());
+		assertEquals(3, stepExecution.getItemCount());
 	}
 
 	/**
@@ -805,7 +805,7 @@ public class StepHandlerStepTests extends TestCase {
 		public void update(StepExecution stepExecution) {
 			updateCount++;
 			if (updateCount <= 3) {
-				assertEquals(Integer.valueOf(updateCount), stepExecution.getItemCount());
+				assertEquals(updateCount, stepExecution.getItemCount());
 			}
 		}
 

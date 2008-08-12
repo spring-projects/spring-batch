@@ -107,7 +107,7 @@ public class StepExecutionTests extends TestCase {
 	 */
 	public void testGetCommitCount() {
 		execution.setCommitCount(123);
-		assertEquals(123, execution.getCommitCount().intValue());
+		assertEquals(123, execution.getCommitCount());
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class StepExecutionTests extends TestCase {
 	 */
 	public void testGetTaskCount() {
 		execution.setItemCount(123);
-		assertEquals(123, execution.getItemCount().intValue());
+		assertEquals(123, execution.getItemCount());
 	}
 
 	public void testGetJobExecution() throws Exception {
@@ -127,7 +127,7 @@ public class StepExecutionTests extends TestCase {
 		StepContribution contribution = execution.createStepContribution();
 		contribution.incrementCommitCount();
 		execution.apply(contribution);
-		assertEquals(new Integer(1), execution.getCommitCount());
+		assertEquals(1, execution.getCommitCount());
 	}
 
 	public void testTerminateOnly() throws Exception {

@@ -127,7 +127,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		waitForResults(6, 10);
 
 		assertEquals(6, TestItemWriter.count);
-		assertEquals(6, stepExecution.getItemCount().intValue());
+		assertEquals(6, stepExecution.getItemCount());
 
 	}
 
@@ -154,7 +154,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		waitForResults(8, 10);
 
 		assertEquals(8, TestItemWriter.count);
-		assertEquals(6, stepExecution.getItemCount().intValue());
+		assertEquals(6, stepExecution.getItemCount());
 
 	}
 
@@ -186,7 +186,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		waitForResults(1, 10);
 
 		assertEquals(1, TestItemWriter.count);
-		assertEquals(0, stepExecution.getItemCount().intValue());
+		assertEquals(0, stepExecution.getItemCount());
 
 	}
 
@@ -261,7 +261,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		}
 
 		assertEquals(0, TestItemWriter.count);
-		assertEquals(0, stepExecution.getItemCount().intValue());
+		assertEquals(0, stepExecution.getItemCount());
 
 	}
 

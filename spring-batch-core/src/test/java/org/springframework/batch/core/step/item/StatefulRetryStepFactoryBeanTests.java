@@ -146,7 +146,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 		// b is processed twice, plus a, plus c, plus the null at end
 		assertEquals(5, count);
-		assertEquals(3, stepExecution.getItemCount().intValue());
+		assertEquals(3, stepExecution.getItemCount());
 	}
 
 	public void testSkipAndRetry() throws Exception {
@@ -174,7 +174,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(2, stepExecution.getSkipCount());
 		// b is processed once and skipped, plus 1, plus c, plus the null at end
 		assertEquals(7, count);
-		assertEquals(4, stepExecution.getItemCount().intValue());
+		assertEquals(4, stepExecution.getItemCount());
 	}
 
 	public void testSkipAndRetryWithWriteFailure() throws Exception {
@@ -217,7 +217,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 		assertEquals(2, recovered.size());
 		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getWriteSkipCount().intValue());
+		assertEquals(2, stepExecution.getWriteSkipCount());
 		// each item once, plus 5 failed retries each for b and d, plus the null
 		// terminator
 		assertEquals(17, count);
@@ -258,7 +258,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(0, stepExecution.getSkipCount());
 		// b is processed 4 times plus the null at end
 		assertEquals(5, count);
-		assertEquals(0, stepExecution.getItemCount().intValue());
+		assertEquals(0, stepExecution.getItemCount());
 	}
 
 	public void testRetryPolicy() throws Exception {
@@ -295,7 +295,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(0, stepExecution.getSkipCount());
 		// b is processed 4 times plus the null at end
 		assertEquals(5, count);
-		assertEquals(0, stepExecution.getItemCount().intValue());
+		assertEquals(0, stepExecution.getItemCount());
 	}
 
 	public void testCacheLimitWithRetry() throws Exception {
