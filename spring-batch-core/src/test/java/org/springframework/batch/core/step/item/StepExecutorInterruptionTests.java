@@ -39,7 +39,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 
 public class StepExecutorInterruptionTests extends TestCase {
 
-	private ItemOrientedStep step;
+	private StepHandlerStep step;
 
 	private JobExecution jobExecution;
 
@@ -56,7 +56,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 				new MapStepExecutionDao(), new MapExecutionContextDao());
 
 		JobSupport jobConfiguration = new JobSupport();
-		step = new ItemOrientedStep("interruptedStep");
+		step = new StepHandlerStep("interruptedStep");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
 		jobExecution = jobRepository.createJobExecution(jobConfiguration, new JobParameters());
@@ -66,7 +66,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 			public void write(Object item) throws Exception {
 			}
 		};
-		step.setItemHandler(new SimpleItemHandler<Object>(new AbstractItemReader<Object>() {
+		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {
 			public Object read() throws Exception {
 				return null;
 			}
@@ -106,7 +106,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		Thread processingThread = createThread(stepExecution);
 
-		step.setItemHandler(new SimpleItemHandler<Object>(new AbstractItemReader<Object>() {
+		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {
 			public Object read() throws Exception {
 				return null;
 			}
@@ -144,7 +144,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 	 * @return
 	 */
 	private Thread createThread(final StepExecution stepExecution) {
-		step.setItemHandler(new SimpleItemHandler<Object>(new AbstractItemReader<Object>() {
+		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;

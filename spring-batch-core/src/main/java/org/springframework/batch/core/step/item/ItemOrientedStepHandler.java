@@ -28,7 +28,7 @@ import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simplest possible implementation of {@link ItemHandler} with no skipping or
+ * Simplest possible implementation of {@link StepHandler} with no skipping or
  * recovering. Just delegates all calls to the provided {@link ItemReader} and
  * {@link ItemWriter}.
  * 
@@ -39,7 +39,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class ItemOrientedStepHandler<T, S> implements ItemHandler {
+public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -68,7 +68,7 @@ public class ItemOrientedStepHandler<T, S> implements ItemHandler {
 	 * {@link ItemProcessor} returns null, the write is omitted and another
 	 * item taken from the reader.
 	 * 
-	 * @see org.springframework.batch.core.step.item.ItemHandler#handle(org.springframework.batch.core.StepContribution)
+	 * @see org.springframework.batch.core.step.item.StepHandler#handle(org.springframework.batch.core.StepContribution)
 	 */
 	public ExitStatus handle(StepContribution contribution) throws Exception {
 		boolean processed = false;

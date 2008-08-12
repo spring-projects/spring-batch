@@ -59,7 +59,7 @@ public class RepeatOperationsStepFactoryBean<T,S> extends AbstractStepFactoryBea
 	 * @param step
 	 * 
 	 */
-	protected void applyConfiguration(ItemOrientedStep step) {
+	protected void applyConfiguration(StepHandlerStep step) {
 
 		super.applyConfiguration(step);
 

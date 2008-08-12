@@ -32,7 +32,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
- * Base class for factory beans for {@link ItemOrientedStep}. Ensures that all
+ * Base class for factory beans for {@link StepHandlerStep}. Ensures that all
  * the mandatory properties are set, and provides basic support for the
  * {@link Step} interface responsibilities like start limit. Supports
  * registration of {@link ItemStream}s and {@link StepListener}s.
@@ -233,7 +233,7 @@ public abstract class AbstractStepFactoryBean<T,S> implements FactoryBean, BeanN
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
-		ItemOrientedStep step = new ItemOrientedStep(getName());
+		StepHandlerStep step = new StepHandlerStep(getName());
 		applyConfiguration(step);
 		return step;
 	}
@@ -242,7 +242,7 @@ public abstract class AbstractStepFactoryBean<T,S> implements FactoryBean, BeanN
 	 * @param step
 	 * 
 	 */
-	protected void applyConfiguration(ItemOrientedStep step) {
+	protected void applyConfiguration(StepHandlerStep step) {
 
 		Assert.notNull(getItemReader(), "ItemReader must be provided");
 		Assert.notNull(getItemWriter(), "ItemWriter must be provided");

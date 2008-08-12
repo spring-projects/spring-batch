@@ -25,14 +25,14 @@ import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Strategy for processing a single item in an item-oriented step. Extends
- * {@link ItemReader} and {@link ItemWriter} because part of the contract of the
- * processor is that it should delegate calls to those interfaces.
+ * Strategy for processing in a step. Bears a resemblance to {@link ItemReader}
+ * and {@link ItemWriter} because part of the contract of the processor is that
+ * it should delegate calls to those interfaces.
  * 
  * @author Dave Syer
  * 
  */
-public interface ItemHandler {
+public interface StepHandler {
 
 	/**
 	 * Given the current context in the form of a step contribution, do whatever

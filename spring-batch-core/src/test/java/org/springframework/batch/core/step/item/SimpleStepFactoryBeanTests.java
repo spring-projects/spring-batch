@@ -180,7 +180,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 			}
 		} });
 
-		ItemOrientedStep step = (ItemOrientedStep) factory.getObject();
+		StepHandlerStep step = (StepHandlerStep) factory.getObject();
 		step.setChunkOperations(chunkOperations);
 
 		job.setSteps(Collections.singletonList((Step) step));

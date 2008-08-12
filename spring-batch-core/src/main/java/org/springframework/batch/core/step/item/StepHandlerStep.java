@@ -64,9 +64,9 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @author Ben Hale
  * @author Robert Kasanicky
  */
-public class ItemOrientedStep extends AbstractStep {
+public class StepHandlerStep extends AbstractStep {
 
-	private static final Log logger = LogFactory.getLog(ItemOrientedStep.class);
+	private static final Log logger = LogFactory.getLog(StepHandlerStep.class);
 
 	private RepeatOperations chunkOperations = new RepeatTemplate();
 
@@ -81,14 +81,14 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
-	private ItemHandler itemHandler;
+	private StepHandler itemHandler;
 
 	private StepExecutionSynchronizer synchronizer;
 
 	/**
 	 * @param name
 	 */
-	public ItemOrientedStep(String name) {
+	public StepHandlerStep(String name) {
 		super(name);
 		synchronizer = new StepExecutionSynchronizerFactory().getStepExecutionSynchronizer();
 	}
@@ -111,11 +111,11 @@ public class ItemOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Public setter for the {@link ItemHandler}.
+	 * Public setter for the {@link StepHandler}.
 	 * 
-	 * @param itemHandler the {@link ItemHandler} to set
+	 * @param itemHandler the {@link StepHandler} to set
 	 */
-	public void setItemHandler(ItemHandler itemHandler) {
+	public void setItemHandler(StepHandler itemHandler) {
 		this.itemHandler = itemHandler;
 	}
 
@@ -304,7 +304,7 @@ public class ItemOrientedStep extends AbstractStep {
 						logger.error("Fatal error detected during commit.");
 						throw new FatalException("Fatal error detected during commit", e);
 					}
-					
+
 					getJobRepository().update(stepExecution);
 
 				}

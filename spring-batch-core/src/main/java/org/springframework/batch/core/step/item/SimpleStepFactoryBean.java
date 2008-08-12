@@ -49,7 +49,7 @@ public class SimpleStepFactoryBean<T,S> extends AbstractStepFactoryBean<T,S> {
 
 	private TaskExecutor taskExecutor;
 
-	private ItemHandler itemHandler;
+	private StepHandler itemHandler;
 
 	private RepeatTemplate stepOperations;
 
@@ -142,7 +142,7 @@ public class SimpleStepFactoryBean<T,S> extends AbstractStepFactoryBean<T,S> {
 	 * Public getter for the ItemHandler.
 	 * @return the ItemHandler
 	 */
-	protected ItemHandler getItemHandler() {
+	protected StepHandler getItemHandler() {
 		return itemHandler;
 	}
 
@@ -150,7 +150,7 @@ public class SimpleStepFactoryBean<T,S> extends AbstractStepFactoryBean<T,S> {
 	 * Public setter for the ItemHandler.
 	 * @param itemHandler the ItemHandler to set
 	 */
-	protected void setItemHandler(ItemHandler itemHandler) {
+	protected void setItemHandler(StepHandler itemHandler) {
 		this.itemHandler = itemHandler;
 	}
 
@@ -158,7 +158,7 @@ public class SimpleStepFactoryBean<T,S> extends AbstractStepFactoryBean<T,S> {
 	 * @param step
 	 * 
 	 */
-	protected void applyConfiguration(ItemOrientedStep step) {
+	protected void applyConfiguration(StepHandlerStep step) {
 
 		super.applyConfiguration(step);
 

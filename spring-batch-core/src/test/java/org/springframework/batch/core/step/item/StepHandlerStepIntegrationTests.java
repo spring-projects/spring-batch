@@ -57,9 +57,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
-public class ItemOrientedStepIntegrationTests {
+public class StepHandlerStepIntegrationTests {
 
-	private ItemOrientedStep step;
+	private StepHandlerStep step;
 
 	private Job job;
 
@@ -89,7 +89,7 @@ public class ItemOrientedStepIntegrationTests {
 		jobRepository = (JobRepository) jobRepositoryFactoryBean.getObject();
 		RepeatTemplate template;
 
-		step = new ItemOrientedStep("stepName");
+		step = new StepHandlerStep("stepName");
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(transactionManager);
 		template = new RepeatTemplate();
@@ -110,7 +110,7 @@ public class ItemOrientedStepIntegrationTests {
 	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setItemHandler(new SimpleItemHandler<String>(getReader(new String[] { "a", "b", "c" }),
+		step.setItemHandler(new SimpleStepHandler<String>(getReader(new String[] { "a", "b", "c" }),
 				new AbstractItemWriter<String>() {
 					public void write(String data) throws Exception {
 						TransactionSynchronizationManager

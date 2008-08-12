@@ -187,7 +187,7 @@ public class SkipLimitStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and
 	 * and exception handler.
 	 */
-	protected void applyConfiguration(ItemOrientedStep step) {
+	protected void applyConfiguration(StepHandlerStep step) {
 		super.applyConfiguration(step);
 
 		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
@@ -268,7 +268,7 @@ public class SkipLimitStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 							}
 						}
 					});
-			StatefulRetryItemHandler<T,S> itemHandler = new StatefulRetryItemHandler<T,S>(getItemReader(), getItemProcessor(), getItemWriter(),
+			StatefulRetryStepHandler<T,S> itemHandler = new StatefulRetryStepHandler<T,S>(getItemReader(), getItemProcessor(), getItemWriter(),
 					retryTemplate, itemKeyGenerator, readSkipPolicy, writeSkipPolicy);
 			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
 
@@ -306,7 +306,7 @@ public class SkipLimitStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class StatefulRetryItemHandler<T,S> extends ItemOrientedStepHandler<T,S> {
+	private static class StatefulRetryStepHandler<T,S> extends ItemOrientedStepHandler<T,S> {
 
 		final private RetryOperations retryOperations;
 
@@ -324,7 +324,7 @@ public class SkipLimitStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 		 * @param retryTemplate
 		 * @param itemKeyGenerator
 		 */
-		public StatefulRetryItemHandler(ItemReader<? extends T> itemReader, ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
+		public StatefulRetryStepHandler(ItemReader<? extends T> itemReader, ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 				RetryOperations retryTemplate, ItemKeyGenerator itemKeyGenerator, ItemSkipPolicy readSkipPolicy,
 				ItemSkipPolicy writeSkipPolicy) {
 			super(itemReader, itemProcessor, itemWriter);
@@ -410,7 +410,7 @@ public class SkipLimitStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 		 * exhausted. The listener callback (on write failure) will happen in
 		 * the next transaction automatically.<br/>
 		 * 
-		 * @see org.springframework.batch.core.step.item.SimpleItemHandler#write(java.lang.Object,
+		 * @see org.springframework.batch.core.step.item.SimpleStepHandler#write(java.lang.Object,
 		 * org.springframework.batch.core.StepContribution)
 		 */
 		protected boolean write(final T item, final StepContribution contribution) throws Exception {

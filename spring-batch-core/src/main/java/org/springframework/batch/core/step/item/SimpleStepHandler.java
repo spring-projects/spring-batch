@@ -20,19 +20,19 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
 
 /**
- * Simplest possible implementation of {@link ItemHandler} with no skipping or
+ * Simplest possible implementation of {@link StepHandler} with no skipping or
  * recovering or processing. Just delegates all calls to the provided
  * {@link ItemReader} and {@link ItemWriter}.
  * 
  * @author Dave Syer
  */
-public class SimpleItemHandler<T> extends ItemOrientedStepHandler<T, T> {
+public class SimpleStepHandler<T> extends ItemOrientedStepHandler<T, T> {
 
 	/**
 	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
 	 * instance of {@link ItemOrientedStepHandler}.
 	 */
-	public SimpleItemHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
+	public SimpleStepHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
 		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter);
 	}
 
