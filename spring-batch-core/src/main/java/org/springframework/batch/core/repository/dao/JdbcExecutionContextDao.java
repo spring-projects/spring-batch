@@ -31,10 +31,6 @@ import org.springframework.util.Assert;
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
-	private static final String STEP_DISCRIMINATOR = "S";
-
-	private static final String JOB_DISCRIMINATOR = "J";
-
 	private static final String FIND_EXECUTION_CONTEXT = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
 			+ "from %PREFIX%EXECUTION_CONTEXT where EXECUTION_ID = ? and DISCRIMINATOR = ?";
 
@@ -57,7 +53,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		final ExecutionContext executionContext = new ExecutionContext();
 
 		getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTION_CONTEXT),
-				new Object[] { executionId, JOB_DISCRIMINATOR },
+				new Object[] { executionId, Discriminator.JOB },
 				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
@@ -74,7 +70,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		final ExecutionContext executionContext = new ExecutionContext();
 
 		getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTION_CONTEXT),
-				new Object[] { executionId, STEP_DISCRIMINATOR },
+				new Object[] { executionId, Discriminator.STEP },
 				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
@@ -91,7 +87,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		saveOrUpdateExecutionContext(executionContext, executionId, JOB_DISCRIMINATOR);
+		saveOrUpdateExecutionContext(executionContext, executionId, Discriminator.JOB);
 	}
 
 	/**
@@ -106,14 +102,14 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		saveOrUpdateExecutionContext(executionContext, executionId, STEP_DISCRIMINATOR);
+		saveOrUpdateExecutionContext(executionContext, executionId, Discriminator.STEP);
 	}
 
 	/**
 	 * Resolves attribute's class to corresponding {@link AttributeType} and
 	 * persists or updates the attribute.
 	 */
-	private void saveOrUpdateExecutionContext(ExecutionContext ctx, Long executionId, String discriminator) {
+	private void saveOrUpdateExecutionContext(ExecutionContext ctx, Long executionId, Discriminator discriminator) {
 
 		for (Entry<String, Object> entry : ctx.entrySet()) {
 
@@ -140,7 +136,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * to update the attribute - if the attribute does not exist in the database
 	 * yet it is inserted.
 	 */
-	private void updateExecutionAttribute(final Long executionId, final String discriminator, final String key,
+	private void updateExecutionAttribute(final Long executionId, final Discriminator discriminator, final String key,
 			final Object value, final AttributeType type) {
 
 		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
@@ -195,7 +191,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * Creates {@link PreparedStatement} from provided arguments and inserts new
 	 * row for the attribute.
 	 */
-	private void insertExecutionAttribute(final Long executionId, final String discriminator, final String key,
+	private void insertExecutionAttribute(final Long executionId, final Discriminator discriminator, final String key,
 			final Object value, final AttributeType type) {
 		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
 
@@ -203,7 +199,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 					DataAccessException {
 
 				ps.setLong(1, executionId.longValue());
-				ps.setString(2, discriminator);
+				ps.setString(2, discriminator.toString());
 				ps.setString(4, key);
 				if (type == AttributeType.STRING) {
 					ps.setString(3, AttributeType.STRING.toString());
@@ -245,8 +241,28 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	/**
 	 * Attribute types supported by the {@link ExecutionContext}.
 	 */
-	private enum AttributeType {
+	private static enum AttributeType {
 		STRING, OBJECT, LONG, DOUBLE
+	}
+
+	/**
+	 * Discriminates whether the execution context belongs to job or step.
+	 */
+	private static enum Discriminator {
+
+		STEP {
+			@Override
+			public String toString() {
+				return "S";
+			}
+		},
+
+		JOB {
+			@Override
+			public String toString() {
+				return "J";
+			}
+		}
 	}
 
 	/**
