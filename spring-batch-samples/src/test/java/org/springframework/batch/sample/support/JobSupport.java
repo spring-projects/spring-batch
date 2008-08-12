@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.beans.factory.BeanNameAware;
@@ -129,6 +130,13 @@ public class JobSupport implements BeanNameAware, Job {
 	 */
 	public boolean isRestartable() {
 		return restartable;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
+	 */
+	public JobParametersIncrementer getJobParametersIncrementer() {
+		return null;
 	}
 	
 	/* (non-Javadoc)

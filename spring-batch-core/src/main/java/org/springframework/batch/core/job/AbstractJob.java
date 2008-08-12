@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.listener.CompositeExecutionJobListener;
 import org.springframework.batch.core.repository.JobRepository;
@@ -49,6 +50,8 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	private JobRepository jobRepository;
 
 	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
+
+	private JobParametersIncrementer jobParametersIncrementer;
 
 	/**
 	 * Default constructor.
@@ -125,6 +128,21 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	 */
 	public boolean isRestartable() {
 		return restartable;
+	}
+	
+	/**
+	 * Public setter for the {@link JobParametersIncrementer}.
+	 * @param jobParametersIncrementer the {@link JobParametersIncrementer} to set
+	 */
+	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
+		this.jobParametersIncrementer = jobParametersIncrementer;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
+	 */
+	public JobParametersIncrementer getJobParametersIncrementer() {
+		return this.jobParametersIncrementer;
 	}
 
 	public String toString() {

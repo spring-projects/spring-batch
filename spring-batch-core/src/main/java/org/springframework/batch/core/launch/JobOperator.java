@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 
@@ -45,9 +50,28 @@ public interface JobOperator {
 			JobRestartException;
 
 	Long resume(Long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
-			NoSuchJobException;
+			NoSuchJobException, JobRestartException;
 
-	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersIncrementerNotFoundException;
+	/**
+	 * Launch the next in a sequence of {@link JobInstance} determined by the
+	 * {@link JobParametersIncrementer} attached to the specified job. If the
+	 * previous instance is still in a failed state, this method should still
+	 * create a new instance and run it with different parameters (as long as
+	 * the {@link JobParametersIncrementer} is working).<br/><br/>
+	 * 
+	 * The last three exception described below should be extremely unlikely,
+	 * but cannot be ruled out entirely. It points to some other thread or
+	 * process trying to use this method (or a similar one) at the same time.
+	 * 
+	 * @param jobName the name of the job to launch
+	 * @return the {@link JobExecution} id of the execution created when the job
+	 * is launched
+	 * @throws NoSuchJobException if there is no such job definition available
+	 * @throws JobParametersNotFoundException if the parameters cannot be found
+	 * @throws UnexpectedJobExecutionException if an unexpected condition arises
+	 */
+	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
+			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
 
 	boolean stop(Long executionId) throws NoSuchJobExecutionException;
 

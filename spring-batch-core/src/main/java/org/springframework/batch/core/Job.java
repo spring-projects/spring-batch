@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core;
 
-
 /**
  * Batch domain object representing a job. Job is an explicit abstraction
  * representing the configuration of a job specified by a developer. It should
@@ -39,5 +38,10 @@ public interface Job {
 	 * @throws JobExecutionException
 	 */
 	void execute(JobExecution execution) throws JobExecutionException;
+
+	/**
+	 * @return in incrementer to be used for creating new parameters
+	 */
+	JobParametersIncrementer getJobParametersIncrementer();
 
 }

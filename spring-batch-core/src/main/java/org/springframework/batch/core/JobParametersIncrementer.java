@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core;
 
-
 /**
  * Interface for obtaining the next {@link JobParameters} in a sequence.
  * 
@@ -23,7 +22,15 @@ package org.springframework.batch.core;
  * 
  */
 public interface JobParametersIncrementer {
-	
+
+	/**
+	 * Increment the provided parameters. If the input is empty, then this
+	 * should return a bootstrap or initial value to be used on the first
+	 * instance of a job.
+	 * 
+	 * @param parameters the last value used
+	 * @return the next value to use
+	 */
 	JobParameters getNext(JobParameters parameters);
 
 }

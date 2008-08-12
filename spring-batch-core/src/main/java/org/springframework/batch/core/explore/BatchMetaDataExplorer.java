@@ -15,13 +15,11 @@
  */
 package org.springframework.batch.core.explore;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumSet;
+import java.util.List;
 
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 
 /**
  * @author Dave Syer
@@ -29,23 +27,24 @@ import org.springframework.batch.core.JobInstance;
  */
 public interface BatchMetaDataExplorer {
 
-	int countJobExecutionsByStatus(EnumSet<BatchStatus> statuses);
+	/**
+	 * @param jobName the name of the job to query
+	 * @param count the maximum number of instances to return
+	 * @return the latest {@link JobInstance} values up to a maximum of count values
+	 */
+	List<JobInstance> getLastJobInstances(String jobName, int count);
 
 	/**
-	 * @param statuses the status values to search
-	 * @param start the start record (defaults to 0)
-	 * @param count the maximum number of objects to return 
-	 * @return the {@link JobExecution} objects that have the provided status,
-	 * sorted in reverse order by start time.
+	 * @param jobName the name of the job
+	 * @param jobParameters the parameters to match
+	 * @return true if a {@link JobInstance} already exists for this job name and job parameters
 	 */
-	Collection<JobExecution> findJobExecutionsByStatus(EnumSet<BatchStatus> statuses, int start, int count);
-	
-	int countJobExecutionsByDate(Date from, Date to);
+	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
 
-	Collection<JobExecution> findJobExecutionsByDate(Date from, Date to, int start, int count);
-
-	Collection<JobInstance> findJobInstancesByJobName(String jobName);
-
-	Collection<JobExecution> getJobExecutionsForJobInstance(JobInstance jobInstance);
+	/**
+	 * @param executionId
+	 * @return the {@link JobExecution} with this id, or null
+	 */
+	JobExecution getJobExecution(Long executionId);
 
 }

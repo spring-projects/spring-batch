@@ -26,12 +26,12 @@ import org.springframework.batch.core.JobParametersIncrementer;
  * @author Dave Syer
  * 
  */
-public class JobParametersIncrementerNotFoundException extends JobExecutionException {
+public class JobParametersNotFoundException extends JobExecutionException {
 
 	/**
 	 * Create an exception with the given message.
 	 */
-	public JobParametersIncrementerNotFoundException(String msg) {
+	public JobParametersNotFoundException(String msg) {
 		super(msg);
 	}
 
@@ -39,7 +39,7 @@ public class JobParametersIncrementerNotFoundException extends JobExecutionExcep
 	 * @param msg The message to send to caller
 	 * @param e the cause of the exception
 	 */
-	public JobParametersIncrementerNotFoundException(String msg, Throwable e) {
+	public JobParametersNotFoundException(String msg, Throwable e) {
 		super(msg, e);
 	}
 }

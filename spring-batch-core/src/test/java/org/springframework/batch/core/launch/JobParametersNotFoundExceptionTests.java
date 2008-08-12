@@ -21,20 +21,20 @@ import org.springframework.batch.core.AbstractExceptionTests;
  * @author Dave Syer
  *
  */
-public class JobParametersIncrementerNotFoundExceptionTests extends AbstractExceptionTests {
+public class JobParametersNotFoundExceptionTests extends AbstractExceptionTests {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String)
 	 */
 	public Exception getException(String msg) throws Exception {
-		return new JobParametersIncrementerNotFoundException(msg);
+		return new JobParametersNotFoundException(msg);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.io.exception.AbstractExceptionTests#getException(java.lang.String, java.lang.Throwable)
 	 */
 	public Exception getException(String msg, Throwable t) throws Exception {
-		return new JobParametersIncrementerNotFoundException(msg, t);
+		return new JobParametersNotFoundException(msg, t);
 	}
 
 }
