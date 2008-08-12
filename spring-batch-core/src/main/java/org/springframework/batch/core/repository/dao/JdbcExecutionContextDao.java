@@ -245,38 +245,8 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	/**
 	 * Attribute types supported by the {@link ExecutionContext}.
 	 */
-	private static class AttributeType {
-
-		private final String type;
-
-		private AttributeType(String type) {
-			this.type = type;
-		}
-
-		public String toString() {
-			return type;
-		}
-
-		public static final AttributeType STRING = new AttributeType("STRING");
-
-		public static final AttributeType LONG = new AttributeType("LONG");
-
-		public static final AttributeType OBJECT = new AttributeType("OBJECT");
-
-		public static final AttributeType DOUBLE = new AttributeType("DOUBLE");
-
-		private static final AttributeType[] VALUES = { STRING, OBJECT, LONG, DOUBLE };
-
-		public static AttributeType getType(String typeAsString) {
-
-			for (int i = 0; i < VALUES.length; i++) {
-				if (VALUES[i].toString().equals(typeAsString)) {
-					return (AttributeType) VALUES[i];
-				}
-			}
-
-			return null;
-		}
+	private enum AttributeType {
+		STRING, OBJECT, LONG, DOUBLE
 	}
 
 	/**
@@ -295,7 +265,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		public void processRow(ResultSet rs) throws SQLException {
 
 			String typeCd = rs.getString("TYPE_CD");
-			AttributeType type = AttributeType.getType(typeCd);
+			AttributeType type = AttributeType.valueOf(typeCd);
 			String key = rs.getString("KEY_NAME");
 			if (type == AttributeType.STRING) {
 				executionContext.putString(key, rs.getString("STRING_VAL"));
