@@ -1,0 +1,14 @@
+Spring Batch 1.1.1 Release Notes
+
+* Bugfixes:
+
+  * STEP_EXECUTION table is now updated after every chunk
+  
+  * StaxEventItemWriter throws informative error for non-existing Resource
+  
+  
+* Improvements
+
+  * StaxEventItemWriter#endDocument(..) can be overriden (allows users to fix problems with Woodstox end tag auto-insertions)
+
+  * Javadoc included in the distribution

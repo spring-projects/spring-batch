@@ -12,6 +12,10 @@
   You can also browse the upcoming releases and look at the {{{http://opensource.atlassian.com/projects/spring/browse/BATCH?report=com.atlassian.jira.plugin.system.project:roadmap-panel}Road Map}} query.
 
   Links:
+  
+    * {{{1.1.1-1.1.2.html}1.1.1 to 1.1.2}}
+  
+    * {{{1.1-1.1.1.html}1.1 to 1.1.1}}
 
     * {{{1.0.1-1.1.html}1.0.1 to 1.1}}
 
@@ -27,5 +31,3 @@
 
     * {{{1.0-m2-m3.html}1.0 m2 to m3}}
     
-    * {{{1.1-1.1.1.html}1.1 to 1.1.1}}
-
