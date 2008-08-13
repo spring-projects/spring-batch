@@ -145,8 +145,11 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		exec.createStepExecution(new StepSupport("foo"));
 
 		dao.saveJobExecution(exec);
-		for (StepExecution stepExecution : exec.getStepExecutions()) {
-			getStepExecutionDao().saveStepExecution(stepExecution);
+		StepExecutionDao stepExecutionDao = getStepExecutionDao();
+		if (stepExecutionDao != null) {
+			for (StepExecution stepExecution : exec.getStepExecutions()) {
+				stepExecutionDao.saveStepExecution(stepExecution);
+			}
 		}
 		JobExecution value = dao.getJobExecution(exec.getId());
 
