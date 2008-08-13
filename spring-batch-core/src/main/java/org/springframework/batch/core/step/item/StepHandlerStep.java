@@ -304,8 +304,15 @@ public class StepHandlerStep extends AbstractStep {
 						logger.error("Fatal error detected during commit.");
 						throw new FatalException("Fatal error detected during commit", e);
 					}
-
-					getJobRepository().update(stepExecution);
+					
+					try {
+						getJobRepository().update(stepExecution);
+					}
+					catch (Exception e) {
+						fatalException.setException(e);
+						stepExecution.setStatus(BatchStatus.UNKNOWN);
+						throw new FatalException("Fatal error detected during update of step execution", e);
+					}
 
 				}
 				catch (Error e) {
