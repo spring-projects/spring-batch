@@ -18,6 +18,10 @@ package org.springframework.batch.core.repository.support;
 
 import javax.sql.DataSource;
 
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
@@ -29,9 +33,13 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -44,7 +52,16 @@ import org.springframework.util.StringUtils;
  * @author Ben Hale
  * @author Lucas Ward
  */
-public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
+public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
+	
+	/**
+	 * Default value for isolation level in create* method.
+	 */
+	private static final String DEFAULT_ISOLATION_LEVEL = "ISOLATION_SERIALIZABLE";
+
+	private ProxyFactory proxyFactory;
+
+	private String isolationLevelForCreate = DEFAULT_ISOLATION_LEVEL;
 
 	private DataSource dataSource;
 
@@ -55,7 +72,32 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
+	
+	private PlatformTransactionManager transactionManager;
 
+	/**
+	 * Public setter for the isolation level to be used for the transaction when
+	 * job execution entities are initially created. The default is
+	 * ISOLATION_SERIALIZABLE, which prevents accidental concurrent execution of
+	 * the same job (ISOLATION_REPEATABLE_READ would work as well).
+	 * 
+	 * @param isolationLevelForCreate the isolation level name to set
+	 * 
+	 * @see SimpleJobRepository#createJobExecution(org.springframework.batch.core.Job,
+	 * org.springframework.batch.core.JobParameters)
+	 */
+	public void setIsolationLevelForCreate(String isolationLevelForCreate) {
+		this.isolationLevelForCreate = isolationLevelForCreate;
+	}
+	
+	/**
+	 * Public setter for the {@link PlatformTransactionManager}.
+	 * @param transactionManager the transactionManager to set
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+	
 	/**
 	 * Public setter for the {@link DataSource}.
 	 * @param dataSource a {@link DataSource}
@@ -86,7 +128,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 
 	public void afterPropertiesSet() throws Exception {
 
+		Assert.notNull(transactionManager, "TransactionManager must not be null.");
 		Assert.notNull(dataSource, "DataSource must not be null.");
+		
 		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 
 		if (incrementerFactory == null) {
@@ -96,10 +140,31 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
 				+ "' is an unsupported database type.  The supported database types are "
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
+		
+		initializeProxy();
 
-		super.afterPropertiesSet();
+	}
+	
+	protected void initializeProxy() throws Exception {
+		proxyFactory = new ProxyFactory();
+		TransactionInterceptor advice = new TransactionInterceptor(transactionManager, PropertiesConverter
+				.stringToProperties("create*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
+						+ "\n*=PROPAGATION_REQUIRED"));
+		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advice);
+		NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+		pointcut.addMethodName("*");
+		advisor.setPointcut(pointcut);
+		proxyFactory.addAdvisor(advisor);
+		proxyFactory.setProxyTargetClass(false);
+		proxyFactory.addInterface(JobRepository.class);
+		proxyFactory.setTarget(getTarget());
+	}
+	
+	private Object getTarget() throws Exception {
+		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(), createExecutionContextDao());
 	}
 
+	@Override
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcTemplate);
@@ -109,6 +174,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 		return dao;
 	}
 
+	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
@@ -121,6 +187,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 		return dao;
 	}
 
+	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
@@ -138,5 +205,9 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
+	}
+
+	public Object getObject() throws Exception {
+		return proxyFactory.getProxy();
 	}
 }
