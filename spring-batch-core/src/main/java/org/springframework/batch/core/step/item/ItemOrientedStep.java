@@ -47,11 +47,12 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * Simple implementation of executing the step as a set of chunks, each chunk
  * surrounded by a transaction. The structure is therefore that of two nested
  * loops, with transaction boundary around the whole inner loop. The outer loop
- * is controlled by the step operations ({@link #setStepOperations(RepeatOperations)}),
- * and the inner loop by the chunk operations ({@link #setChunkOperations(RepeatOperations)}).
- * The inner loop should always be executed in a single thread, so the chunk
- * operations should not do any concurrent execution. N.B. usually that means
- * that the chunk operations should be a {@link RepeatTemplate} (which is the
+ * is controlled by the step operations (
+ * {@link #setStepOperations(RepeatOperations)}), and the inner loop by the
+ * chunk operations ({@link #setChunkOperations(RepeatOperations)}). The inner
+ * loop should always be executed in a single thread, so the chunk operations
+ * should not do any concurrent execution. N.B. usually that means that the
+ * chunk operations should be a {@link RepeatTemplate} (which is the
  * default).<br/>
  * 
  * Clients can use interceptors in the step operations to intercept or listen to
@@ -209,9 +210,9 @@ public class ItemOrientedStep extends AbstractStep {
 	 * Process the step and update its context so that progress can be monitored
 	 * by the caller. The step is broken down into chunks, each one executing in
 	 * a transaction. The step and its execution and execution context are all
-	 * given an up to date {@link BatchStatus}, and the {@link JobRepository}
-	 * is used to store the result. Various reporting information are also added
-	 * to the current context (the {@link RepeatContext} governing the step
+	 * given an up to date {@link BatchStatus}, and the {@link JobRepository} is
+	 * used to store the result. Various reporting information are also added to
+	 * the current context (the {@link RepeatContext} governing the step
 	 * execution, which would normally be available to the caller somehow
 	 * through the step's {@link ExecutionContext}.<br/>
 	 * 
@@ -246,14 +247,16 @@ public class ItemOrientedStep extends AbstractStep {
 
 					try {
 						exitStatus = processChunk(stepExecution, contribution);
-					} catch (Error e) {
+					}
+					catch (Error e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
-						}						
+						}
 					}
 
 					contribution.incrementCommitCount();
@@ -277,26 +280,30 @@ public class ItemOrientedStep extends AbstractStep {
 					// state are updated
 					try {
 						itemHandler.flush();
-					} catch (Error e) {
+					}
+					catch (Error e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
-						}						
+						}
 					}
 
 					try {
 						stream.update(stepExecution.getExecutionContext());
-					} catch (Error e) {
+					}
+					catch (Error e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
-						}						
+						}
 					}
 
 					try {
@@ -318,8 +325,15 @@ public class ItemOrientedStep extends AbstractStep {
 						logger.error("Fatal error detected during commit.");
 						throw new FatalException("Fatal error detected during commit", e);
 					}
-					
-					getJobRepository().saveOrUpdate(stepExecution);
+
+					try {
+						getJobRepository().saveOrUpdate(stepExecution);
+					}
+					catch (Exception e) {
+						fatalException.setException(e);
+						stepExecution.setStatus(BatchStatus.UNKNOWN);
+						throw new FatalException("Fatal error detected during update of step execution", e);
+					}
 
 				}
 				catch (Error e) {
@@ -399,8 +413,8 @@ public class ItemOrientedStep extends AbstractStep {
 		}
 		catch (Exception e) {
 			/*
-			 * If we already failed to commit, it doesn't help to do this again -
-			 * it's better to allow the CommitFailedException to propagate
+			 * If we already failed to commit, it doesn't help to do this again
+			 * - it's better to allow the CommitFailedException to propagate
 			 */
 			if (!fatalException.hasException()) {
 				fatalException.setException(e);

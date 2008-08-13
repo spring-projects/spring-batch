@@ -34,6 +34,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -58,6 +59,7 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
@@ -809,6 +811,43 @@ public class ItemOrientedStepTests extends TestCase {
 		assertEquals(3, processed.size());
 		assertEquals(3, stepExecution.getItemCount().intValue());
 		assertTrue(3 <= jobRepository.updateCount);
+	}
+	
+	/**
+	 * Failure to update StepExecution after chunk commit is fatal.
+	 */
+	public void testStepExecutionUpdateFailure() throws Exception {
+
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecution);
+
+		JobRepository repository = new JobRepositoryFailedUpdateStub();
+
+		itemOrientedStep.setJobRepository(repository);
+		itemOrientedStep.afterPropertiesSet();
+
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail();
+		}
+		catch (Exception e) {
+			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+			assertEquals("Fatal error detected during update of step execution", e.getMessage());
+			assertEquals("stub exception", e.getCause().getMessage());
+		}
+		
+	}
+	
+	private static class JobRepositoryFailedUpdateStub extends JobRepositorySupport {
+		
+		private int timesCalled = 0;
+		
+		public void saveOrUpdate(StepExecution stepExecution) {
+			timesCalled++;
+			if (timesCalled == 2) {
+				throw new DataAccessResourceFailureException("stub exception");
+			}
+		}
 	}
 
 	private static class JobRepositoryStub extends JobRepositorySupport {
