@@ -19,8 +19,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -30,7 +35,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
-import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.explore.BatchMetaDataExplorer;
 import org.springframework.batch.core.job.JobSupport;
@@ -40,6 +45,8 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
@@ -72,34 +79,43 @@ public class SimpleJobOperatorTests {
 				};
 			}
 		};
-		
+
 		jobOperator = new SimpleJobOperator();
-		
-		jobOperator.setJobLocator(new JobLocator() {
+
+		jobOperator.setJobRegistry(new MapJobRegistry() {
 			public Job getJob(String name) throws NoSuchJobException {
 				if (name.equals("foo")) {
 					return job;
 				}
 				throw new NoSuchJobException("foo");
 			}
+			@Override
+			public Collection<String> getJobNames() {
+				return Arrays.asList(new String[] {"foo", "bar"});
+			}
 		});
-		
+
 		jobOperator.setJobLauncher(new JobLauncher() {
 			public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 					JobRestartException, JobInstanceAlreadyCompleteException {
 				return new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 999L);
 			}
 		});
-		
+
 		batchMetaDataExplorer = EasyMock.createNiceMock(BatchMetaDataExplorer.class);
-		
+
 		jobOperator.setBatchMetaDataExplorer(batchMetaDataExplorer);
 
 		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
 			@Override
 			public JobParameters getJobParameters(Properties props) {
-				assertTrue("Wrong properties",props.containsKey("a"));
+				assertTrue("Wrong properties", props.containsKey("a"));
 				return jobParameters;
+			}
+
+			@Override
+			public Properties getProperties(JobParameters params) {
+				return PropertiesConverter.stringToProperties("a=b");
 			}
 		});
 
@@ -115,6 +131,17 @@ public class SimpleJobOperatorTests {
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
+	@Test
+	public void testStop() throws Exception {
+		try {
+			jobOperator.stop(123L);
+			fail("Expected UnsupportedOperationException");
+		}
+		catch (UnsupportedOperationException e) {
 			// expected
 		}
 	}
@@ -167,7 +194,8 @@ public class SimpleJobOperatorTests {
 	public void testResumeSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
 		batchMetaDataExplorer.getJobExecution(111L);
-		EasyMock.expectLastCall().andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
+		EasyMock.expectLastCall()
+				.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
 		EasyMock.replay(batchMetaDataExplorer);
 		Long value = jobOperator.resume(111L);
 		assertEquals(999, value.longValue());
@@ -186,5 +214,76 @@ public class SimpleJobOperatorTests {
 		EasyMock.verify(batchMetaDataExplorer);
 	}
 
+	@Test
+	public void testGetStepExecutionSummariesSunnyDay() throws Exception {
+		jobParameters = new JobParameters();
+		batchMetaDataExplorer.getJobExecution(111L);
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L);
+		jobExecution.createStepExecution(new StepSupport("step1"));
+		jobExecution.createStepExecution(new StepSupport("step2"));
+		jobExecution.getStepExecutions().iterator().next().setId(21L);
+		EasyMock.expectLastCall().andReturn(jobExecution);
+		EasyMock.replay(batchMetaDataExplorer);
+		Map<Long, String> value = jobOperator.getStepExecutionSummaries(111L);
+		assertEquals(2, value.size());
+		EasyMock.verify(batchMetaDataExplorer);
+	}
+
+	@Test
+	public void testFindRunningExecutionsSunnyDay() throws Exception {
+		jobParameters = new JobParameters();
+		batchMetaDataExplorer.findRunningJobExecutions("foo");
+		JobExecution jobExecution = new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L);
+		EasyMock.expectLastCall().andReturn(Collections.singleton(jobExecution));
+		EasyMock.replay(batchMetaDataExplorer);
+		Set<Long> value = jobOperator.getRunningExecutions("foo");
+		assertEquals(111L, value.iterator().next().longValue());
+		EasyMock.verify(batchMetaDataExplorer);
+	}
+
+	@Test
+	public void testGetJobParametersSunnyDay() throws Exception {
+		final JobParameters jobParameters = new JobParameters();
+		batchMetaDataExplorer.getJobExecution(111L);
+		EasyMock.expectLastCall()
+				.andReturn(new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L));
+		EasyMock.replay(batchMetaDataExplorer);
+		String value = jobOperator.getParameters(111L);
+		assertEquals("a=b", value);
+		EasyMock.verify(batchMetaDataExplorer);
+	}
+
+	@Test
+	public void testGetLastInstancesSunnyDay() throws Exception {
+		jobParameters = new JobParameters();
+		batchMetaDataExplorer.getLastJobInstances("foo",2);
+		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobInstance));
+		EasyMock.replay(batchMetaDataExplorer);
+		List<Long> value = jobOperator.getLastInstances("foo",2);
+		assertEquals(123L, value.get(0).longValue());
+		EasyMock.verify(batchMetaDataExplorer);
+	}
+	
+	@Test
+	public void testGetJobNames() throws Exception {
+		Set<String> names = jobOperator.getJobNames();
+		assertEquals(2, names.size());
+		assertTrue("Wrong names: "+names, names.contains("foo"));
+	}
+
+	@Test
+	public void testGetExecutionsSunnyDay() throws Exception {
+		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		batchMetaDataExplorer.getJobInstance(123L);
+		EasyMock.expectLastCall().andReturn(jobInstance);
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		batchMetaDataExplorer.findJobExecutions(jobInstance);
+		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobExecution));
+		EasyMock.replay(batchMetaDataExplorer);
+		List<Long> value = jobOperator.getExecutions(123L);
+		assertEquals(111L, value.iterator().next().longValue());
+		EasyMock.verify(batchMetaDataExplorer);
+	}
 
 }

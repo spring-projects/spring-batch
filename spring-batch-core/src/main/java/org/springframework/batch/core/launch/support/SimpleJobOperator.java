@@ -15,6 +15,10 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,8 +30,9 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.configuration.JobLocator;
+import org.springframework.batch.core.configuration.ListableJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.BatchMetaDataExplorer;
@@ -56,7 +61,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	private static final String ILLEGAL_STATE_MSG = "Illegal state (only happens on a race condition): "
 			+ "%s with name=%s and parameters=%s";
 
-	private JobLocator jobRegistry;
+	private ListableJobRegistry jobRegistry;
 
 	private BatchMetaDataExplorer batchMetaDataExplorer;
 
@@ -86,10 +91,10 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	}
 
 	/**
-	 * Public setter for the {@link JobLocator}.
-	 * @param jobRegistry the {@link JobLocator} to set
+	 * Public setter for the {@link ListableJobRegistry}.
+	 * @param jobRegistry the {@link ListableJobRegistry} to set
 	 */
-	public void setJobLocator(JobLocator jobRegistry) {
+	public void setJobRegistry(ListableJobRegistry jobRegistry) {
 		this.jobRegistry = jobRegistry;
 	}
 
@@ -117,8 +122,15 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * lang.Long)
 	 */
 	public List<Long> getExecutions(Long instanceId) throws NoSuchJobException {
-		// TODO Auto-generated method stub
-		return null;
+		JobInstance jobInstance = batchMetaDataExplorer.getJobInstance(instanceId);
+		if (jobInstance == null) {
+			throw new NoSuchJobException(String.format("No job instance with id=%d", instanceId));
+		}
+		List<Long> list = new ArrayList<Long>();
+		for (JobExecution jobExecution : batchMetaDataExplorer.findJobExecutions(jobInstance)) {
+			list.add(jobExecution.getId());
+		}
+		return list;
 	}
 
 	/*
@@ -127,8 +139,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see org.springframework.batch.core.launch.JobOperator#getJobNames()
 	 */
 	public Set<String> getJobNames() {
-		// TODO Auto-generated method stub
-		return null;
+		return new HashSet<String>(jobRegistry.getJobNames());
 	}
 
 	/*
@@ -139,8 +150,11 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * .lang.String, int)
 	 */
 	public List<Long> getLastInstances(String jobName, int count) throws NoSuchJobException {
-		// TODO Auto-generated method stub
-		return null;
+		List<Long> list = new ArrayList<Long>();
+		for (JobInstance jobInstance : batchMetaDataExplorer.getLastJobInstances(jobName, count)) {
+			list.add(jobInstance.getId());
+		}
+		return list;
 	}
 
 	/*
@@ -151,8 +165,12 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * lang.Long)
 	 */
 	public String getParameters(Long executionId) throws NoSuchJobExecutionException {
-		// TODO Auto-generated method stub
-		return null;
+		JobExecution jobExecution = batchMetaDataExplorer.getJobExecution(executionId);
+		if (jobExecution == null) {
+			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
+		}
+		return PropertiesConverter.propertiesToString(jobParametersConverter.getProperties(jobExecution
+				.getJobInstance().getJobParameters()));
 	}
 
 	/*
@@ -163,8 +181,11 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * (java.lang.String)
 	 */
 	public Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Long> set = new LinkedHashSet<Long>();
+		for (JobExecution jobExecution : batchMetaDataExplorer.findRunningJobExecutions(jobName)) {
+			set.add(jobExecution.getId());
+		}
+		return set;
 	}
 
 	/*
@@ -175,8 +196,15 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * (java.lang.Long)
 	 */
 	public Map<Long, String> getStepExecutionSummaries(Long executionId) throws NoSuchJobExecutionException {
-		// TODO Auto-generated method stub
-		return null;
+		JobExecution jobExecution = batchMetaDataExplorer.getJobExecution(executionId);
+		if (jobExecution == null) {
+			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
+		}
+		Map<Long, String> map = new LinkedHashMap<Long, String>();
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			map.put(stepExecution.getId(), stepExecution.toString());
+		}
+		return map;
 	}
 
 	/*
@@ -188,7 +216,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	public String getSummary(Long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = batchMetaDataExplorer.getJobExecution(executionId);
-		if (jobExecution==null) {
+		if (jobExecution == null) {
 			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
 		}
 		return jobExecution.toString();
@@ -211,7 +239,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		}
 
 		String jobName = jobExecution.getJobInstance().getJobName();
-		Job job = jobRegistry.getJob(jobName );
+		Job job = jobRegistry.getJob(jobName);
 		JobParameters parameters = jobExecution.getJobInstance().getJobParameters();
 
 		logger.info(String.format("Attempting to resume job with name=%s and parameters=%s", jobName, parameters));
@@ -219,8 +247,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			return jobLauncher.run(job, parameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG,
-					"job execution already running", jobName, parameters), e);
+			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job execution already running",
+					jobName, parameters), e);
 		}
 
 	}
@@ -252,16 +280,16 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			return jobLauncher.run(job, jobParameters).getId();
 		}
 		catch (JobExecutionAlreadyRunningException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG,
-					"job execution already running", jobName, parameters), e);
+			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job execution already running",
+					jobName, parameters), e);
 		}
 		catch (JobRestartException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job not restartable",
-					jobName, parameters), e);
+			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job not restartable", jobName,
+					parameters), e);
 		}
 		catch (JobInstanceAlreadyCompleteException e) {
-			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job already complete",
-					jobName, parameters), e);
+			throw new UnexpectedJobExecutionException(String.format(ILLEGAL_STATE_MSG, "job already complete", jobName,
+					parameters), e);
 		}
 
 	}

@@ -16,6 +16,7 @@
 package org.springframework.batch.core.explore;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -46,5 +47,23 @@ public interface BatchMetaDataExplorer {
 	 * @return the {@link JobExecution} with this id, or null
 	 */
 	JobExecution getJobExecution(Long executionId);
+
+	/**
+	 * @param instanceId
+	 * @return the {@link JobInstance} with this id, or null
+	 */
+	JobInstance getJobInstance(Long instanceId);
+
+	/**
+	 * @param jobInstance the {@link JobInstance} to query
+	 * @return the set of all executions for the specified {@link JobInstance}
+	 */
+	List<JobExecution> findJobExecutions(JobInstance jobInstance);
+
+	/**
+	 * @param jobName the name of the job
+	 * @return the set of running executions for jobs with the specified name
+	 */
+	Set<JobExecution> findRunningJobExecutions(String jobName);
 
 }
