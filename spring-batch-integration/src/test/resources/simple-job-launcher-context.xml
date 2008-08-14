@@ -18,9 +18,7 @@
 		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 
 	<bean id="jobRepository"
-		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-		<property name="transactionManager" ref="transactionManager" />
-	</bean>
+		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"/>
 
 	<bean id="simpleJob"
 		class="org.springframework.batch.core.job.SimpleJob"
