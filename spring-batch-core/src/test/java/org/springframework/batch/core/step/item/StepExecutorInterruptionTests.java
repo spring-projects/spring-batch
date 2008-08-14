@@ -140,6 +140,36 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	}
 
+
+	public void testLockNotReleasedIfChunkFails() throws Exception {
+
+		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {
+			public Object read() throws Exception {
+				throw new RuntimeException("Planned!");
+			}
+		}, itemWriter));
+
+		step.setSynchronizer(new StepExecutionSynchronizer() {
+			private boolean locked = false;
+			public void lock(StepExecution stepExecution) throws InterruptedException {
+				locked = true;
+			}
+			public void release(StepExecution stepExecution) {
+				assertTrue("Lock released before it is acquired", locked);
+			}
+		});
+		
+		try {
+			step.execute(stepExecution);
+			fail("Expected planned RuntimeException");
+		} catch (RuntimeException e) {
+			assertEquals("Planned!", e.getMessage());
+		}
+
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+
+	}
+
 	/**
 	 * @return
 	 */
