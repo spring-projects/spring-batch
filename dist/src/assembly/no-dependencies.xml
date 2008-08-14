@@ -38,7 +38,7 @@
 			</includes>
 			<sources>
 				<outputDirectoryMapping>
-					samples/${module.artifactId}
+					samples/spring-batch-samples
 				</outputDirectoryMapping>
 				<fileSets>
 					<fileSet>
