@@ -605,7 +605,7 @@
       <classname>Step</classname> interface. Two step implementation classes
       are available in the Spring Batch framework, and they are each discussed
       in detail in Chatper 4 of this guide. For most situations, the
-      <classname>ItemOrientedStep</classname> implementation is sufficient,
+      <classname>StepHandlerStep</classname> implementation is sufficient,
       but for situations where only one call is needed, such as a stored
       procedure call or a wrapper around existing script, a
       <classname>TaskletStep</classname> may be a better option.</para>

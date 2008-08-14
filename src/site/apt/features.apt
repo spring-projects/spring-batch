@@ -80,7 +80,7 @@ Spring Batch Features and Roadmap
   represenation of the state of the job - can be augmented by
   developers).
 
-  * ItemOrientedStep - uses an ItemReader to obtain the next record to
+  * StepHandlerStep - uses an ItemReader to obtain the next record to
   process, and hands it to an ItemWriter if it is not null.  It can
   run a StepExecution in the same process (VM).
 

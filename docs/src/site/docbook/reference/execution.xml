@@ -796,7 +796,7 @@
     </mediaobject>
 
     <section>
-      <title>ItemOrientedStep</title>
+      <title>StepHandlerStep</title>
 
       <para>The figure above shows a simple 'item-oriented' execution flow.
       One item is read in from an <classname>ItemReader</classname>, and then
@@ -804,7 +804,7 @@
       items left. When processing first begins, a transaction is started and
       periodically committed until the <classname>Step</classname> is
       complete. Given these basic requirements, the
-      <classname>ItemOrientedStep</classname> requires the following
+      <classname>StepHandlerStep</classname> requires the following
       dependencies, at a minimum:</para>
 
       <itemizedlist>
@@ -839,7 +839,7 @@
         <title>SimpleStepFactoryBean</title>
 
         <para>Despite the relatively short list of required dependencies for
-        an <classname>ItemOrientedStep</classname>, it is an extremely complex
+        an <classname>StepHandlerStep</classname>, it is an extremely complex
         class that can potentially contain many collaborators. In order to
         ease configuration, a <classname>SimpleStepFactoryBean</classname> can
         be used:</para>
@@ -862,7 +862,7 @@
       <section>
         <title>Configuring a CommitInterval</title>
 
-        <para>As mentioned above, the <classname>ItemOrientedStep</classname>
+        <para>As mentioned above, the <classname>StepHandlerStep</classname>
         reads in and writes out items, periodically commiting using the
         supplied <classname>PlatformTransactionManager</classname>. By
         default, it will commit after each item has been written. This is less
@@ -1397,7 +1397,7 @@
     <section>
       <title>TaskletStep</title>
 
-      <para>ItemOriented processing is not the only way to process in a
+      <para>Item oriented processing is not the only way to process in a
       <classname>Step</classname>. What if a <classname>Step</classname> must
       consist as a simple storec procedure call? You could implement the call
       as an <classname>ItemReader</classname> and return null after the
@@ -1565,10 +1565,12 @@
     <section>
       <title>Logging Item Processing and Failures</title>
 
-      <para>A common use case is the need for special handling of errors in a
-      step, item by item, perhaps logging to a special channel, or inserting a
-      record into a database. The ItemOrientedStep (created from the step
-      factory beans) allows users to implement this use case with a simple
+      <para>A common use case is the need for special handling of
+      errors in a step, item by item, perhaps logging to a special
+      channel, or inserting a record into a
+      database. The <classname>StepHandlerStep</classname> (created
+      from the step factory beans) allows users to implement this use
+      case with a simple
       <classname>ItemReadListener</classname>, for errors on read, and an
       <classname>ItemWriteListener</classname>, for errors on write. The below
       code snippets illustrate a listener that logs both read and write
