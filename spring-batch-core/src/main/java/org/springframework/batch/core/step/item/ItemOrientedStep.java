@@ -243,6 +243,8 @@ public class ItemOrientedStep extends AbstractStep {
 
 				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
 
+				boolean locked = false;
+
 				try {
 
 					try {
@@ -265,7 +267,8 @@ public class ItemOrientedStep extends AbstractStep {
 					// to synchronize changes to the step execution (at a
 					// minimum).
 					try {
-						synchronizer.lock(stepExecution);
+							synchronizer.lock(stepExecution);
+							locked = true;
 					}
 					catch (InterruptedException e) {
 						stepExecution.setStatus(BatchStatus.STOPPED);
@@ -345,7 +348,11 @@ public class ItemOrientedStep extends AbstractStep {
 					throw e;
 				}
 				finally {
-					synchronizer.release(stepExecution);
+						// only release the lock if we acquired it
+						if (locked) {
+							synchronizer.release(stepExecution);
+						}
+						locked = false;
 				}
 
 				// Check for interruption after transaction as well, so that

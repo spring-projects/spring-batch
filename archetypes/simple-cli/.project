@@ -39,7 +39,7 @@ $ mvn archetype:create -DgroupId=com.mycompany -DartifactId=batch \
 		<link>
 			<name>archetypes-pom.xml</name>
 			<type>1</type>
-			<location>SPRING_BATCH/archetypes/pom.xml</location>
+			<locationURI>SPRING_BATCH/archetypes/pom.xml</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
