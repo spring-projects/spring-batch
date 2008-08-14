@@ -4,7 +4,9 @@ Spring Batch 1.1.1 Release Notes
 
   * STEP_EXECUTION table is now updated after every chunk
   
-  * StaxEventItemWriter throws informative error for non-existing Resource
+  * StaxEventItemWriter throws informative error for non-existing Resource, and only does it on open (so it will work with MultResourceItemReader)
+
+  * In a multi-threaded step, the lock that is taken while the step executio nis being updated cannot be inadvertently released by another thread if it fails
   
   
 * Improvements
