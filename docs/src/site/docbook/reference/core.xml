@@ -963,11 +963,13 @@
     public JobExecution createJobExecution(Job job, JobParameters jobParameters)
          throws JobExecutionAlreadyRunningException, JobRestartException;
 
-    void saveOrUpdate(JobExecution jobExecution);
+    void add(StepExecution stepExecution);
 
-    void saveOrUpdate(StepExecution stepExecution);
+    void update(JobExecution jobExecution);
 
-    void saveOrUpdateExecutionContext(StepExecution stepExecution);
+    void update(StepExecution stepExecution);
+
+    void updateExecutionContext(StepExecution stepExecution);
 
     StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
 
