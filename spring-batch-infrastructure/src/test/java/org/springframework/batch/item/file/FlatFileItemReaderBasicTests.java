@@ -152,6 +152,26 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 			assertTrue(contains(e.getMessage(), "open"));
 		}
 	}
+	
+	public void testResourceUnavailableAfterPropertiesSet() throws Exception{
+		
+		itemReader.setResource(null);
+		itemReader.afterPropertiesSet();
+		//no exception should be thrown
+	}
+	
+	public void testNullResourceInOpen() throws Exception{
+		
+		itemReader.setResource(null);
+		try{
+			itemReader.open(new ExecutionContext());
+			fail();
+		}
+		catch(Exception ex){
+			//expected
+		}
+	}
+	
 
 	public void testCloseBeforeOpen() throws Exception {
 		itemReader = new FlatFileItemReader();

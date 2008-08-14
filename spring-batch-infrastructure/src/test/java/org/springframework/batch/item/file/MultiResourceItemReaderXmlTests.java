@@ -56,7 +56,6 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 				return 0; // preserve original ordering
 			}
 		});
-		multiReader.afterPropertiesSet();
 
 		return multiReader;
 	}
@@ -66,7 +65,6 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 		multiReader.close(new ExecutionContext());
 		multiReader.setResources(new Resource[] { new ByteArrayResource("<foos />"
 				.getBytes()) });
-		multiReader.afterPropertiesSet();
 		multiReader.open(new ExecutionContext());
 		
 	}

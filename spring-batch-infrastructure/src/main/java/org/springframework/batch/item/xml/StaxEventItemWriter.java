@@ -244,7 +244,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(resource);
 		Assert.notNull(serializer);
 	}
 
@@ -254,6 +253,8 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
+		
+		Assert.notNull(resource);
 		
 		long startAtPosition = 0;
 

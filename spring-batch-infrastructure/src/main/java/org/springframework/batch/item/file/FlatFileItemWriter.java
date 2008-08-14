@@ -109,7 +109,6 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(resource, "The resource must be set");
 		Assert.notNull(fieldSetCreator, "A FieldSetCreator must be provided.");
 	}
 
@@ -238,6 +237,8 @@ public class FlatFileItemWriter extends ExecutionContextUserSupport implements I
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
+		Assert.notNull(resource, "The resource must be set");
+		
 		if(!getOutputState().isInitialized()){
 			doOpen(executionContext);
 		}

@@ -16,7 +16,6 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -34,8 +33,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream,
-		InitializingBean {
+public class MultiResourceItemReader extends ExecutionContextUserSupport implements ItemReader, ItemStream {
 
 	/**
 	 * Unique object instance that marks resource boundaries in the item buffer
@@ -199,6 +197,9 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
+		Assert.notEmpty(resources, "There must be at least one input resource");
+		Assert.notNull(delegate, "Delegate must not be null");
+		
 		Arrays.sort(resources, comparator);
 
 		index.open(executionContext);
@@ -232,10 +233,6 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public void setDelegate(ResourceAwareItemReaderItemStream delegate) {
 		this.delegate = delegate;
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		Assert.notEmpty(resources, "There must be at least one input resource");
 	}
 
 	/**

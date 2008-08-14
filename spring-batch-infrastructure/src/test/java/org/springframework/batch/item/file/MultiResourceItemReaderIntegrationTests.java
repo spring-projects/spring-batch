@@ -45,7 +45,6 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 				return 0; // do not change ordering
 			}});
 		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
-		tested.afterPropertiesSet();
 	}
 
 	/**
@@ -181,6 +180,30 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		Object result = tested.read();
 		return result == null ? null : ((FieldSet) result).readString(0);
 
+	}
+	
+	public void testNullResourceInOpen() throws Exception{
+		
+		tested.setResources(null);
+		try{
+			tested.open(new ExecutionContext());
+			fail();
+		}
+		catch(Exception ex){
+			//expected
+		}
+	}
+	
+	public void testNullDelegateInOpen() throws Exception{
+		
+		tested.setDelegate(null);
+		try{
+			tested.open(new ExecutionContext());
+			fail();
+		}
+		catch(Exception ex){
+			//expected
+		}
 	}
 
 }

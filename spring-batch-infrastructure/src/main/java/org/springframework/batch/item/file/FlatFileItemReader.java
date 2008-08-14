@@ -206,7 +206,6 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(resource, "Input resource must not be null");
 		Assert.notNull(fieldSetMapper, "FieldSetMapper must not be null.");
 	}
 
@@ -223,6 +222,7 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 	}
 
 	protected void doOpen() throws Exception {
+		Assert.notNull(resource, "Input Resource must not be null");
 		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
 
 		log.debug("Opening flat file for reading: " + resource);

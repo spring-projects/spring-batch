@@ -51,12 +51,7 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	public void testAfterPropertesSetException() throws Exception {
 		source.setResource(null);
-		try {
-			source.afterPropertiesSet();
-			fail();
-		} catch (IllegalArgumentException e) {
-			// expected;
-		}
+		source.afterPropertiesSet();
 
 		source = createNewInputSouce();
 		source.setFragmentRootElementName("");
