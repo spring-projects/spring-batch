@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch</artifactId>
@@ -9,7 +8,7 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-	<version>2.0.0.CI-SNAPSHOT</version>
+	<version>2.0.0.M1</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-infrastructure</module>
@@ -26,13 +25,9 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/trunk</url>
-		<connection>
-			scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
-		</connection>
-		<developerConnection>
-			scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/trunk
-		</developerConnection>
+		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/tags/spring-batch-2.0.0.M1</url>
+		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-2.0.0.M1</connection>
+		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-2.0.0.M1</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
@@ -184,8 +179,7 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml"
-											out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
+										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
 											<param name="project" expression="${project.name}" />
 											<param name="version" expression="${project.version}" />
 										</xslt>
@@ -268,8 +262,7 @@
 									</junitreport>
 									<echo>Creating Emma reports</echo>
 									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
-										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
 										<mapper type="glob" from="*.xml" to="*.fragment" />
 										<param name="project" expression="${project.name}" />
 									</xslt>
