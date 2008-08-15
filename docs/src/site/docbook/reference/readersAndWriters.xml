@@ -1951,15 +1951,15 @@
     that contains another <classname>ItemReader</classname>. For
     example:</para>
 
-    <programlisting>  public class CompositeItemWriter implements ItemWriter {
+    <programlisting>  public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
 
-    ItemWriter itemWriter;
+    ItemWriter&lt;T&gt; itemWriter;
 
-    public CompositeItemWriter(ItemWriter itemWriter) {
+    public CompositeItemWriter(ItemWriter&lt;T&gt; itemWriter) {
       this.itemWriter = itemWriter;
     }
 
-    public void write(Object item) throws Exception {
+    public void write(T item) throws Exception {
 
       //Add business logic here
 
@@ -1990,10 +1990,10 @@
     just want to modify the item. For this scenario, Spring Batch provides the
     <classname>ItemTransformer</classname> interface:</para>
 
-    <programlisting>  public interface ItemTransformer {
+    <programlisting>  public interface ItemProcessor&lt;I, O&gt; {
 
-    Object transform(Object item) throws Exception;
-  }</programlisting>
+  O process(I item) throws Exception;
+}</programlisting>
 
     <para>An <classname>ItemTransformer</classname> is very simple, given one
     object, transorm it and return another. The object provided may or may not
@@ -2015,7 +2015,7 @@
     public Bar(Foo foo) {}
   }
 
-  public class FooTransformer implements ItemTransformer{
+  public class FooTransformer implements ItemProcessor{
 
     //Preform simple transformation, convert a Foo to a Barr
     public Object transform(Object item) throws Exception {
@@ -2126,7 +2126,7 @@
       <classname>BarTransformer</classname> can be 'chained' together to give
       the resultant <classname>Foobar</classname>:</para>
 
-      <programlisting>  CompositeItemTransformer compositeTransformer = new CompositeItemTransformer();
+      <programlisting>  CompositeItemProcessor compositeTransformer = new CompositeItemProcessor();
   List itemTransformers = new ArrayList();
   itemTransformers.add(new FooTransformer());
   itemTransformers.add(new BarTransformer());
@@ -2299,15 +2299,15 @@
       basic contract of <classname>ItemReader</classname>,
       <methodname>read</methodname>:</para>
 
-      <programlisting>  public class CustomItemReader implements ItemReader{
+      <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
 
-    List items;
+    List&lt;T&gt; items;
 
-    public CustomItemReader(List items) {
+    public CustomItemReader(List&lt;T&gt; items) {
       this.items = items;
     }
 
-    public Object read() throws Exception, UnexpectedInputException,
+    public T read() throws Exception, UnexpectedInputException,
        NoWorkFoundException, ParseException {
 
       if (!items.isEmpty()) {
@@ -2326,12 +2326,12 @@
       thus satisfying the most basic requirements of an
       <classname>ItemReader</classname>, as illustrated below:</para>
 
-      <programlisting>  List items = new ArrayList();
+      <programlisting>  List&lt;String&gt; items = new ArrayList&lt;String&gt;();
   items.add("1");
   items.add("2");
   items.add("3");
 
-  ItemReader itemReader = new CustomItemReader(items);
+  ItemReader itemReader = new CustomItemReader&lt;String&gt;(items);
   assertEquals("1", itemReader.read());
   assertEquals("2", itemReader.read());
   assertEquals("3", itemReader.read());
@@ -2351,17 +2351,17 @@
         empty, but we'll need to add code to them in order to support the
         rollback scenario:</para>
 
-        <programlisting>  public class CustomItemReader implements ItemReader{
+        <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
 
-    List items;
+    List&lt;T&gt; items;
     int currentIndex = 0;
     int lastMarkedIndex = 0;
 
-    public CustomItemReader(List items) {
+    public CustomItemReader(List&lt;T&gt; items) {
       this.items = items;
     }
 
-    public Object read() throws Exception, UnexpectedInputException,
+    public T read() throws Exception, UnexpectedInputException,
        NoWorkFoundException, ParseException {
 
       if (currentIndex &lt; items.size()) {
@@ -2434,49 +2434,51 @@
         implemented with the <classname>ItemStream</classname>
         interface:</para>
 
-        <programlisting>  public class CustomItemReader implements ItemReader, ItemStream{
+        <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream{
 
-    List items;
+    List&lt;T&gt; items;
     int currentIndex = 0;
     int lastMarkedIndex = 0;
-    private static String CURRENT_INDEX = "current.index";
+    private static final String CURRENT_INDEX = "current.index";
 
-    public CustomItemReader(List items) {
+    public CustomItemReader(List&lt;T&gt; items) {
       this.items = items;
     }
 
-    public Object read() throws Exception, UnexpectedInputException,
+    public T read() throws Exception, UnexpectedInputException,
         NoWorkFoundException, ParseException {
 
       if (currentIndex &lt; items.size()) {
         return items.get(currentIndex++);
       }
-      return null; 
+     
+      return null;
     }
 
     public void mark() throws MarkFailedException {
       lastMarkedIndex = currentIndex;
-    };
+    }
 
     public void reset() throws ResetFailedException {
       currentIndex = lastMarkedIndex;
     }
 
-    public void open(ExecutionContext executionContext) throws ItemStreamTException {
+    public void open(ExecutionContext executionContext) throws ItemStreamException {
+
       if(executionContext.containsKey(CURRENT_INDEX)){
         currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
       }
       else{
         currentIndex = 0;
         lastMarkedIndex = 0;
-      }
+      } 
     }
+
+    public void close(ExecutionContext executionContext) throws ItemStreamException {}
 
     public void update(ExecutionContext executionContext) throws ItemStreamException {
       executionContext.putLong(CURRENT_INDEX, new Long(currentIndex).longValue());
     };
-
-    public void close(ExecutionContext executionContext) throws ItemStreamException {}
   }</programlisting>
 
         <para>On each call to <classname>ItemStream</classname>
@@ -2494,11 +2496,11 @@
   assertEquals("1", itemReader.read());
   ((ItemStream)itemReader).update(executionContext);
 
-  List items = new ArrayList();
+  List&lt;String&gt; items = new ArrayList&lt;String&gt;();
   items.add("1");
   items.add("2");
   items.add("3");
-  itemReader = new CustomItemReader(items);
+  itemReader = new CustomItemReader&lt;String&gt;(items);
 
   ((ItemStream)itemReader).open(executionContext);
   assertEquals("2", itemReader.read());</programlisting>
@@ -2532,11 +2534,11 @@
       example. As with the <classname>ItemReader</classname> example, a List
       will be used in order to keep the example as simple as possible:</para>
 
-      <programlisting>  public class CustomItemWriter implements ItemWriter{
+      <programlisting>  public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt;{
 
-    List output = new ArrayList();
+    List&lt;T&gt; output = new ArrayList&lt;T&gt;();
 
-    public void write(Object item) throws Exception {
+    public void write(T item) throws Exception {
       output.add(item);
     }
 
@@ -2563,12 +2565,12 @@
         <methodname>flush</methodname> and <methodname>clear</methodname>
         should be implemented to allow for a buffering solution:</para>
 
-        <programlisting>  public class CustomItemWriter implements ItemWriter{
+        <programlisting>  public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt;{
 
-    List output = new ArrayList();
-    List buffer = new ArrayList();
+    List&lt;T&gt; output = new ArrayList&lt;T&gt;();
+    List&lt;T&gt; buffer = new ArrayList&lt;T&gt;();
 
-    public void write(Object item) throws Exception {
+    public void write(T item) throws Exception {
       buffer.add(item);
     }
   
@@ -2577,9 +2579,8 @@
     }
 
     public void flush() throws FlushFailedException {
-      for(Iterator it = buffer.iterator(); it.hasNext();){
-        output.add(it.next());
-        it.remove();
+      for(T t:buffer){
+        output.add(t); 
       }
     }
   }</programlisting>
