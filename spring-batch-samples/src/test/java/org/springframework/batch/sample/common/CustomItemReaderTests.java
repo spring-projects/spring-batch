@@ -37,7 +37,7 @@ import junit.framework.TestCase;
  * @author Lucas Ward
  *
  */
-public class CustomItemReaderTest extends TestCase {
+public class CustomItemReaderTests extends TestCase {
 
 	ItemReader<String> itemReader;
 	
