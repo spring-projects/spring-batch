@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.management.MBeanServerConnection;
@@ -63,7 +64,7 @@ public class RemoteLauncherTests {
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 		try {
-			launcher.start("foo", "");
+			launcher.start("foo", "time="+(new Date().getTime()));
 			fail("Expected NoSuchJobException");
 		} catch (NoSuchJobException e) {
 			//expected;
