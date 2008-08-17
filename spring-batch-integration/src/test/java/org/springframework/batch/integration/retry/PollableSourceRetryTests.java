@@ -23,7 +23,7 @@ import org.springframework.batch.retry.interceptor.StatefulRetryOperationsInterc
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.context.Lifecycle;
-import org.springframework.integration.dispatcher.DirectChannel;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.dispatcher.PollingDispatcher;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
@@ -348,7 +348,7 @@ public class PollableSourceRetryTests {
 
 	private DirectChannel getChannel(MessageTarget target) {
 		DirectChannel channel = new DirectChannel();
-		channel.setName("input");
+		channel.setBeanName("input");
 		channel.subscribe(target);
 		return channel;
 	}

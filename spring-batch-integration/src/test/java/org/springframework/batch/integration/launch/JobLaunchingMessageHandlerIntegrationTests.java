@@ -55,8 +55,8 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 			requestChannel.send(trigger);
 		}
 		catch (MessageDeliveryException e) {
-			String message = e.getCause().getMessage();
-			assertTrue("Wrong message: " + message, message.contains("return address"));
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.contains("reply target"));
 		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 

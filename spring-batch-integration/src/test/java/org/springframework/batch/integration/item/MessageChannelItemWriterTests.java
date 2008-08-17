@@ -25,10 +25,10 @@ import java.lang.reflect.Method;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.ThreadLocalChannel;
-import org.springframework.integration.dispatcher.DirectChannel;
-import org.springframework.integration.endpoint.HandlerEndpoint;
+import org.springframework.integration.endpoint.DefaultEndpoint;
 import org.springframework.integration.handler.MessageHandler;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageTarget;
@@ -99,7 +99,7 @@ public class MessageChannelItemWriterTests {
 	@Test
 	public void testWriteWithRollbackOnEndpoint() throws Exception {
 		DirectChannel channel = new DirectChannel();
-		HandlerEndpoint endpoint = new HandlerEndpoint(new MessageHandler() {
+		DefaultEndpoint<MessageHandler> endpoint = new DefaultEndpoint<MessageHandler>(new MessageHandler() {
 			public Message<?> handle(Message<?> message) {
 				throw new RuntimeException("Planned failure");
 			}
@@ -112,7 +112,8 @@ public class MessageChannelItemWriterTests {
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
-			assertEquals("Planned failure", e.getMessage());
+			// INT-377: this assertion fails because the exception is wrapped too tightly
+			assertEquals("Planned failure", e.getCause().getMessage());
 		}
 	}
 }
