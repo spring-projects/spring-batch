@@ -26,7 +26,7 @@ import org.springframework.batch.core.JobParameters;
  * @author Dave Syer
  * 
  */
-public interface BatchMetaDataExplorer {
+public interface JobExplorer {
 
 	/**
 	 * @param jobName the name of the job to query
