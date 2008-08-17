@@ -22,29 +22,59 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.config.AbstractFactoryBean;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
+/**
+ * Wrapper for a {@link DataSource} that can run scripts on start up and shut
+ * down.  Us as a bean definition <br/><br/>
+ * 
+ * Run this class to initialize a database in a running server process.
+ * Make sure the server is running first by launching the "hsql-server" from the
+ * <code>hsql.server</code> project. Then you can right click in Eclipse and
+ * Run As -&gt; Java Application. Do the same any time you want to wipe the
+ * database and start again.
+ * 
+ * @author Dave Syer
+ * 
+ */
+public class DataSourceInitializer implements InitializingBean, DisposableBean {
+
+	private static final Log logger = LogFactory.getLog(DataSourceInitializer.class);
 
 	private Resource[] initScripts;
 
-	private Resource destroyScript;
+	private Resource[] destroyScripts;
 
 	private DataSource dataSource;
-	
+
 	private boolean ignoreFailedDrop = true;
 
 	private static boolean initialized = false;
+
+	/**
+	 * Main method as convenient entry point.
+	 * 
+	 * @param args
+	 */
+	public static void main(String... args) {
+		new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(DataSourceInitializer.class,
+				DataSourceInitializer.class.getSimpleName() + "-context.xml"));
+	}
 
 	/**
 	 * @throws Throwable
@@ -56,42 +86,40 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 		logger.debug("finalize called");
 	}
 
-	protected void destroyInstance(Object instance) throws Exception {
-		try {
-			doExecuteScript(destroyScript);
-		}
-		catch (Exception e) {
-			if (logger.isDebugEnabled()) {
-				logger.warn("Could not execute destroy script [" + destroyScript + "]", e);
+	public void destroy() {
+		if (destroyScripts==null) return;
+		for (int i = 0; i < destroyScripts.length; i++) {
+			Resource destroyScript = initScripts[i];
+			try {
+				doExecuteScript(destroyScript);
 			}
-			else {
-				logger.warn("Could not execute destroy script [" + destroyScript + "]");
+			catch (Exception e) {
+				if (logger.isDebugEnabled()) {
+					logger.warn("Could not execute destroy script [" + destroyScript + "]", e);
+				}
+				else {
+					logger.warn("Could not execute destroy script [" + destroyScript + "]");
+				}
 			}
 		}
 	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
-		super.afterPropertiesSet();
+		initialize();
 	}
 
-	protected Object createInstance() throws Exception {
-		Assert.notNull(dataSource);
+	private void initialize() {
 		if (!initialized) {
-			try {
-				doExecuteScript(destroyScript);
-			}
-			catch (Exception e) {
-				logger.debug("Could not execute destroy script [" + destroyScript + "]", e);
-			}
+			destroy();
 			if (initScripts != null) {
-				for (Resource initScript : initScripts) {
+				for (int i = 0; i < initScripts.length; i++) {
+					Resource initScript = initScripts[i];
 					doExecuteScript(initScript);
 				}
 			}
 			initialized = true;
 		}
-		return dataSource;
 	}
 
 	private void doExecuteScript(final Resource scriptResource) {
@@ -102,7 +130,7 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 
 			@SuppressWarnings("unchecked")
 			public Object doInTransaction(TransactionStatus status) {
-				SimpleJdbcTemplate jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+				JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 				String[] scripts;
 				try {
 					scripts = StringUtils.delimitedListToStringArray(stripComments(IOUtils.readLines(scriptResource
@@ -111,15 +139,17 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 				catch (IOException e) {
 					throw new BeanInitializationException("Cannot load script from [" + scriptResource + "]", e);
 				}
-				for (String script1 : scripts) {
-					String script = script1.trim();
+				for (int i = 0; i < scripts.length; i++) {
+					String script = scripts[i].trim();
 					if (StringUtils.hasText(script)) {
 						try {
-							jdbcTemplate.getJdbcOperations().execute(script);
-						} catch (DataAccessException e) {
+							jdbcTemplate.execute(script);
+						}
+						catch (DataAccessException e) {
 							if (ignoreFailedDrop && script.toLowerCase().startsWith("drop")) {
 								logger.debug("DROP script failed (ignoring): " + script);
-							} else {
+							}
+							else {
 								throw e;
 							}
 						}
@@ -136,32 +166,24 @@ public class InitializingDataSourceFactoryBean extends AbstractFactoryBean {
 		StringBuffer buffer = new StringBuffer();
 		for (String line : list) {
 			if (!line.startsWith("//") && !line.startsWith("--")) {
-				buffer.append(line).append("\n");
+				buffer.append(line + "\n");
 			}
 		}
 		return buffer.toString();
-	}
-
-	public Class<DataSource> getObjectType() {
-		return DataSource.class;
-	}
-
-	public void setInitScript(Resource initScript) {
-		this.initScripts = new Resource[] { initScript };
 	}
 
 	public void setInitScripts(Resource[] initScripts) {
 		this.initScripts = initScripts;
 	}
 
-	public void setDestroyScript(Resource destroyScript) {
-		this.destroyScript = destroyScript;
+	public void setDestroyScripts(Resource[] destroyScripts) {
+		this.destroyScripts = destroyScripts;
 	}
 
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	public void setIgnoreFailedDrop(boolean ignoreFailedDrop) {
 		this.ignoreFailedDrop = ignoreFailedDrop;
 	}
