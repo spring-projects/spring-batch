@@ -31,7 +31,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.JobRegistryBackgroundJobRunner;
 import org.springframework.jmx.MBeanServerNotFoundException;
 import org.springframework.jmx.access.InvalidInvocationException;
@@ -65,9 +64,11 @@ public class RemoteLauncherTests {
 		assertTrue(isConnected());
 		try {
 			launcher.start("foo", "time="+(new Date().getTime()));
-			fail("Expected NoSuchJobException");
-		} catch (NoSuchJobException e) {
+			fail("Expected RuntimeException");
+		} catch (RuntimeException e) {
 			//expected;
+			String message = e.getMessage();
+			assertTrue("Wrong message: "+message, message.contains("NoSuchJobException"));
 		}
 	}
 
