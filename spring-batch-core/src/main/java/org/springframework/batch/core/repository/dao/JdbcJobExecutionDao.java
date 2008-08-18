@@ -14,6 +14,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
@@ -224,20 +225,29 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#getLastJobExecution(java.lang.String)
+	 * 
+	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
+	 * getLastJobExecution(java.lang.String)
 	 */
 	public JobExecution getJobExecution(Long executionId) {
-		Long instanceId = getJdbcTemplate().queryForLong(getQuery(GET_INSTANCE_BY_EXECUTION_ID), executionId);
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(instanceId);
-		JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID), new JobExecutionRowMapper(jobInstance),
-				executionId);
-		stepExecutionDao.getStepExecutions(jobExecution);
-		return jobExecution;
+		try {
+			Long instanceId = getJdbcTemplate().queryForLong(getQuery(GET_INSTANCE_BY_EXECUTION_ID), executionId);
+			JobInstance jobInstance = jobInstanceDao.getJobInstance(instanceId);
+			JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
+					new JobExecutionRowMapper(jobInstance), executionId);
+			stepExecutionDao.getStepExecutions(jobExecution);
+			return jobExecution;
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#findRunningJobExecutions(java.lang.String)
+	 * 
+	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
+	 * findRunningJobExecutions(java.lang.String)
 	 */
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 
@@ -251,7 +261,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			}
 		};
 		getJdbcTemplate().getJdbcOperations().query(getQuery(GET_RUNNING_EXECUTIONS), handler);
-		
+
 		for (JobExecution jobExecution : result) {
 			stepExecutionDao.getStepExecutions(jobExecution);
 		}

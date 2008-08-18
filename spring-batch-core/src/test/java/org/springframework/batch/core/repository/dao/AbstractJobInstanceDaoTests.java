@@ -87,6 +87,17 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 	 * Create and retrieve a job instance.
 	 */
 	@Transactional @Test
+	public void testGetMissingById() throws Exception {
+
+		JobInstance retrievedInstance = dao.getJobInstance(1111111L);
+		assertNull(retrievedInstance);
+
+	}
+
+	/*
+	 * Create and retrieve a job instance.
+	 */
+	@Transactional @Test
 	public void testGetJobNames() throws Exception {
 		
 		testCreateAndRetrieve();

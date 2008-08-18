@@ -16,6 +16,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -183,7 +184,12 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		final JobParameters jobParameters = getJobParameters(instanceId);
 		ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper(jobParameters);
-		return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), rowMapper, instanceId);
+		try {
+			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_ID), rowMapper, instanceId);
+		}
+		catch (EmptyResultDataAccessException e) {
+			return null;
+		}
 
 	}
 

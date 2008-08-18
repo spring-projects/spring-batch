@@ -38,18 +38,18 @@ import org.springframework.batch.core.repository.JobRestartException;
  */
 public interface JobOperator {
 
-	List<Long> getExecutions(Long instanceId) throws NoSuchJobException;
+	List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException;
 
 	List<Long> getLastInstances(String jobName, int count) throws NoSuchJobException;
 
 	Set<Long> getRunningExecutions(String jobName) throws NoSuchJobException;
 
-	String getParameters(Long executionId) throws NoSuchJobExecutionException;
+	String getParameters(long executionId) throws NoSuchJobExecutionException;
 
 	Long start(String jobName, String parameters) throws NoSuchJobException, JobInstanceAlreadyExistsException,
 			JobRestartException;
 
-	Long resume(Long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+	Long resume(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
 			NoSuchJobException, JobRestartException;
 
 	/**
@@ -73,11 +73,11 @@ public interface JobOperator {
 	Long startNextInstance(String jobName) throws NoSuchJobException, JobParametersNotFoundException,
 			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
 
-	boolean stop(Long executionId) throws NoSuchJobExecutionException;
+	boolean stop(long executionId) throws NoSuchJobExecutionException;
 
-	String getSummary(Long executionId) throws NoSuchJobExecutionException;
+	String getSummary(long executionId) throws NoSuchJobExecutionException;
 
-	Map<Long, String> getStepExecutionSummaries(Long executionId) throws NoSuchJobExecutionException;
+	Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException;
 
 	Set<String> getJobNames();
 

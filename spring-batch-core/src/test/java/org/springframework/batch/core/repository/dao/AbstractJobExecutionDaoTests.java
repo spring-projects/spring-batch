@@ -52,8 +52,18 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		dao.saveJobExecution(execution);
 
 		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
-		assertTrue(executions.size() == 1);
+		assertEquals(1, executions.size());
 		assertEquals(execution, executions.get(0));
+	}
+
+	/**
+	 * Save and find a job execution.
+	 */
+	@Transactional
+	@Test
+	public void testFindNonExistentExecutions() {
+		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
+		assertEquals(0, executions.size());
 	}
 
 	/**
@@ -112,6 +122,16 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 */
 	@Transactional
 	@Test
+	public void testGetMissingLastExecution() {
+		JobExecution value = dao.getLastJobExecution(jobInstance);
+		assertNull(value);
+	}
+	
+	/**
+	 * Check the execution is returned
+	 */
+	@Transactional
+	@Test
 	public void testFindRunningExecutions() {
 		JobExecution exec = new JobExecution(jobInstance);
 		exec.setCreateTime(new Date(0));
@@ -139,6 +159,16 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 */
 	@Transactional
 	@Test
+	public void testNoRunningExecutions() {
+		Set<JobExecution> values = dao.findRunningJobExecutions("no-such-job");
+		assertEquals(0, values.size());
+	}
+	
+	/**
+	 * Check the execution is returned
+	 */
+	@Transactional
+	@Test
 	public void testGetExecution() {
 		JobExecution exec = new JobExecution(jobInstance);
 		exec.setCreateTime(new Date(0));
@@ -157,4 +187,13 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		assertEquals(1, value.getStepExecutions().size());
 	}
 
+	/**
+	 * Check the execution is returned
+	 */
+	@Transactional
+	@Test
+	public void testGetMissingExecution() {
+		JobExecution value = dao.getJobExecution(54321L);
+		assertNull(value);
+	}
 }

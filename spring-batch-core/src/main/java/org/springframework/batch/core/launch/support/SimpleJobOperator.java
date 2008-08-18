@@ -42,6 +42,7 @@ import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.JobParametersNotFoundException;
 import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.NoSuchJobExecutionException;
+import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
@@ -121,10 +122,10 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getExecutions(java.
 	 * lang.Long)
 	 */
-	public List<Long> getExecutions(Long instanceId) throws NoSuchJobException {
+	public List<Long> getExecutions(long instanceId) throws NoSuchJobInstanceException {
 		JobInstance jobInstance = jobExplorer.getJobInstance(instanceId);
 		if (jobInstance == null) {
-			throw new NoSuchJobException(String.format("No job instance with id=%d", instanceId));
+			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
 		}
 		List<Long> list = new ArrayList<Long>();
 		for (JobExecution jobExecution : jobExplorer.findJobExecutions(jobInstance)) {
@@ -154,6 +155,9 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		for (JobInstance jobInstance : jobExplorer.getLastJobInstances(jobName, count)) {
 			list.add(jobInstance.getId());
 		}
+		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
+			throw new NoSuchJobException("No such job (either in registry or in historical data): "+jobName);
+		}
 		return list;
 	}
 
@@ -164,7 +168,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getParameters(java.
 	 * lang.Long)
 	 */
-	public String getParameters(Long executionId) throws NoSuchJobExecutionException {
+	public String getParameters(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
 		if (jobExecution == null) {
 			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
@@ -185,6 +189,9 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		for (JobExecution jobExecution : jobExplorer.findRunningJobExecutions(jobName)) {
 			set.add(jobExecution.getId());
 		}
+		if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
+			throw new NoSuchJobException("No such job (either in registry or in historical data): "+jobName);
+		}
 		return set;
 	}
 
@@ -195,7 +202,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getStepExecutionSummaries
 	 * (java.lang.Long)
 	 */
-	public Map<Long, String> getStepExecutionSummaries(Long executionId) throws NoSuchJobExecutionException {
+	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
 		if (jobExecution == null) {
 			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
@@ -214,7 +221,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#getSummary(java.lang
 	 * .Long)
 	 */
-	public String getSummary(Long executionId) throws NoSuchJobExecutionException {
+	public String getSummary(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
 		if (jobExecution == null) {
 			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
@@ -228,7 +235,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see
 	 * org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
 	 */
-	public Long resume(Long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+	public Long resume(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
 			NoSuchJobException, JobRestartException {
 
 		logger.info("Checking status of job execution with id=" + executionId);
@@ -348,7 +355,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see
 	 * org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
-	public boolean stop(Long executionId) throws NoSuchJobExecutionException {
+	public boolean stop(long executionId) throws NoSuchJobExecutionException {
 		throw new UnsupportedOperationException("See BATCH-453 for implementation.");
 	}
 
