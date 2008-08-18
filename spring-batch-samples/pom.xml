@@ -104,12 +104,10 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
@@ -159,11 +157,6 @@
 			<!-- Force Hibernate to use a particular nodep version of cglib in case of clash with Spring AOP -->
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>backport-util-concurrent</groupId>
-			<artifactId>backport-util-concurrent</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
