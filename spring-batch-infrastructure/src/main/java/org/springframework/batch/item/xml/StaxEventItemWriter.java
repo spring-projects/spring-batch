@@ -3,6 +3,8 @@ package org.springframework.batch.item.xml;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.item.xml.stax.NoStartEndDocumentStreamWriter;
+import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -53,7 +56,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
-	
+
 	// default encoding
 	private static final String DEFAULT_ENCODING = "UTF-8";
 
@@ -253,9 +256,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
-		
+
 		Assert.notNull(resource, "The resource must be set");
-		
+
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset
@@ -272,7 +275,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 				write(iterator.next());
 			}
 		}
-		
+
 	}
 
 	/**
@@ -298,7 +301,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
 		try {
-			delegateEventWriter = outputFactory.createXMLEventWriter(os, encoding);
+			delegateEventWriter = outputFactory.createXMLEventWriter(new TransactionAwareBufferedWriter(
+					new OutputStreamWriter(os, encoding)));
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
@@ -306,6 +310,10 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		}
 		catch (XMLStreamException xse) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", xse);
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource
+					+ "] with encoding=[" + encoding + "]", e);
 		}
 
 	}
@@ -369,7 +377,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
-		
+
 		// harmless event to close the root tag if there were no items
 		XMLEventFactory factory = XMLEventFactory.newInstance();
 		try {
@@ -378,7 +386,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		catch (XMLStreamException e) {
 			log.error(e);
 		}
-		
+
 		flush();
 		try {
 			endDocument(delegateEventWriter);

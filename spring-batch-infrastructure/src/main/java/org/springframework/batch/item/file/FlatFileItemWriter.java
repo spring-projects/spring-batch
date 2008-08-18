@@ -16,10 +16,10 @@
 
 package org.springframework.batch.item.file;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
@@ -40,6 +40,7 @@ import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
+import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -64,7 +65,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream, InitializingBean {
+public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream,
+		InitializingBean {
 
 	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -83,8 +85,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	private boolean shouldDeleteIfExists = true;
 
 	private String encoding = OutputState.DEFAULT_CHARSET;
-
-	private int bufferSize = OutputState.DEFAULT_BUFFER_SIZE;
 
 	private List<String> lineBuffer = new ArrayList<String>();
 
@@ -138,13 +138,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 */
 	public void setEncoding(String newEncoding) {
 		this.encoding = newEncoding;
-	}
-
-	/**
-	 * Sets buffer size for output template
-	 */
-	public void setBufferSize(int newSize) {
-		this.bufferSize = newSize;
 	}
 
 	/**
@@ -219,7 +212,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
 		Assert.notNull(resource, "The resource must be set");
-		
+
 		if (!getOutputState().isInitialized()) {
 			doOpen(executionContext);
 		}
@@ -292,7 +285,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			}
 			state = new OutputState();
 			state.setDeleteIfExists(shouldDeleteIfExists);
-			state.setBufferSize(bufferSize);
 			state.setEncoding(encoding);
 		}
 		return (OutputState) state;
@@ -306,19 +298,14 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		// default encoding for writing to output files - set to UTF-8.
 		private static final String DEFAULT_CHARSET = "UTF-8";
 
-		private static final int DEFAULT_BUFFER_SIZE = 2048;
-
 		// The bufferedWriter over the file channel that is actually written
-		BufferedWriter outputBufferedWriter;
+		Writer outputBufferedWriter;
 
 		FileChannel fileChannel;
 
 		// this represents the charset encoding (if any is needed) for the
 		// output file
 		String encoding = DEFAULT_CHARSET;
-
-		// Optional write buffer size
-		int bufferSize = DEFAULT_BUFFER_SIZE;
 
 		boolean restarted = false;
 
@@ -361,13 +348,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		 */
 		public void setDeleteIfExists(boolean shouldDeleteIfExists) {
 			this.shouldDeleteIfExists = shouldDeleteIfExists;
-		}
-
-		/**
-		 * @param bufferSize
-		 */
-		public void setBufferSize(int bufferSize) {
-			this.bufferSize = bufferSize;
 		}
 
 		/**
@@ -444,7 +424,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 			fileChannel = (new FileOutputStream(file.getAbsolutePath(), true)).getChannel();
 
-			outputBufferedWriter = getBufferedWriter(fileChannel, encoding, bufferSize);
+			outputBufferedWriter = getBufferedWriter(fileChannel, encoding);
 
 			// in case of restarting reset position to last committed point
 			if (restarted) {
@@ -463,19 +443,10 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		 * Returns the buffered writer opened to the beginning of the file
 		 * specified by the absolute path name contained in absoluteFileName.
 		 */
-		private BufferedWriter getBufferedWriter(FileChannel fileChannel, String encoding, int bufferSize) {
+		private Writer getBufferedWriter(FileChannel fileChannel, String encoding) {
 			try {
-
-				BufferedWriter outputBufferedWriter = null;
-
-				// If a buffer was requested, allocate.
-				if (bufferSize > 0) {
-					outputBufferedWriter = new BufferedWriter(Channels.newWriter(fileChannel, encoding), bufferSize);
-				}
-				else {
-					outputBufferedWriter = new BufferedWriter(Channels.newWriter(fileChannel, encoding));
-				}
-
+				TransactionAwareBufferedWriter outputBufferedWriter = new TransactionAwareBufferedWriter(Channels
+						.newWriter(fileChannel, encoding));
 				return outputBufferedWriter;
 			}
 			catch (UnsupportedCharsetException ucse) {
