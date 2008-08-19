@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.item.sample.Foo;
@@ -34,7 +35,7 @@ public class PropertyExtractingDelegatingItemProccessorIntegrationTests {
 	public void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
-			processor.write(foo);
+			processor.write(Collections.singletonList(foo));
 		}
 
 		List<Foo> input = fooService.getGeneratedFoos();

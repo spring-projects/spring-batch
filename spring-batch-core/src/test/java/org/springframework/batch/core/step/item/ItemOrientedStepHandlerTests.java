@@ -17,6 +17,8 @@ package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -91,8 +93,10 @@ public class ItemOrientedStepHandlerTests {
 	private final class StubItemWriter extends AbstractItemWriter<String> {
 		private String values = "";
 
-		public void write(String item) throws Exception {
-			values += item;
+		public void write(List<? extends String> items) throws Exception {
+			for (String item : items) {
+				values += item;				
+			}
 		}
 	}
 

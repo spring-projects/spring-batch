@@ -109,12 +109,12 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#write(java.lang.Object)}.
+	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#write(List)}.
 	 * @throws Exception
 	 */
 	public void testWrite() throws Exception {
 		writer.setSql("foo");
-		writer.write("bar");
+		writer.write(Collections.singletonList("bar"));
 		// Nothing happens till we flush
 		assertEquals(0, list.size());
 	}
@@ -157,7 +157,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		expectLastCall().times(2);
 		expect(ps.executeBatch()).andReturn(new int[] { 123 });
 		replay(ps);
-		writer.write("bar");
+		writer.write(Collections.singletonList("bar"));
 		writer.flush();
 		assertFalse(TransactionSynchronizationManager.hasResource(writer.getResourceKey()));
 		assertEquals(3, list.size());
@@ -175,7 +175,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		expectLastCall().times(2);
 		expect(ps.executeBatch()).andReturn(new int[] {0});
 		replay(ps);
-		writer.write("bar");
+		writer.write(Collections.singletonList("bar"));
 		try {
 			writer.flush();
 			fail("Expected EmptyResultDataAccessException");
@@ -201,7 +201,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		expectLastCall().times(1);
 		expect(ps.executeBatch()).andReturn(new int[] {123});
 		replay(ps);
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		try {
 			writer.flush();
 			fail("Expected RuntimeException");
@@ -216,7 +216,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 				list.add(item);
 			}
 		});
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		writer.flush();
 		verify(ps);
 		assertEquals(4, list.size());

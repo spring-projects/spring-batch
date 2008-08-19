@@ -16,13 +16,18 @@
 
 package org.springframework.batch.retry.jms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.item.support.AbstractItemWriter;
@@ -32,18 +37,15 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.junit.runner.RunWith;
-import org.junit.Before;
-import org.junit.Test;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -107,10 +109,16 @@ public class ExternalRetryTests {
 		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
 
 		final AbstractItemWriter<Object> writer = new AbstractItemWriter<Object>() {
-			public void write(final Object text) {
-				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
-				if (list.size() == 1) {
-					throw new RuntimeException("Rollback!");
+			public void write(final List<? extends Object> texts) {
+
+				for (Object text : texts) {
+
+					simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(),
+							text);
+					if (list.size() == 1) {
+						throw new RuntimeException("Rollback!");
+					}
+
 				}
 
 			}
@@ -123,7 +131,7 @@ public class ExternalRetryTests {
 						final Object item = provider.read();
 						RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
 							public Object doWithRetry(RetryContext context) throws Throwable {
-								writer.write(item);
+								writer.write(Collections.singletonList(item));
 								return null;
 							}
 						});
@@ -151,7 +159,7 @@ public class ExternalRetryTests {
 					final Object item = provider.read();
 					RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
 						public Object doWithRetry(RetryContext context) throws Throwable {
-							writer.write(item);
+							writer.write(Collections.singletonList(item));
 							return null;
 						}
 					});
@@ -190,7 +198,7 @@ public class ExternalRetryTests {
 				throw new RuntimeException("Rollback!");
 			}
 		});
-		
+
 		callback.setRecoveryCallback(new RecoveryCallback() {
 			public Object recover(RetryContext context) {
 				return provider.recover(item, context.getLastThrowable());

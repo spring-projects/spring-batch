@@ -64,8 +64,8 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	private List<String> written = new ArrayList<String>();
 
 	private ItemWriter<String> writer = new AbstractItemWriter<String>() {
-		public void write(String data) throws Exception {
-			written.add(data);
+		public void write(List<? extends String> data) throws Exception {
+			written.addAll(data);
 		}
 	};
 
@@ -166,7 +166,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
 		factory.setItemWriter(new AbstractItemWriter<String>() {
-			public void write(String data) throws Exception {
+			public void write(List<? extends String> data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
 		});
@@ -199,7 +199,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setItemWriter(new AbstractItemWriter<String>() {
-			public void write(String data) throws Exception {
+			public void write(List<? extends String> data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
 		});
@@ -225,7 +225,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		factory.setItemWriter(new AbstractItemWriter<String>() {
 			int count = 0;
 
-			public void write(String data) throws Exception {
+			public void write(List<? extends String> data) throws Exception {
 				if (count++ == 0) {
 					throw new RuntimeException("Foo");
 				}

@@ -1,5 +1,7 @@
 package example;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemWriter;
@@ -16,7 +18,7 @@ public class ExampleItemWriter extends AbstractItemWriter<Object> {
 	/**
 	 * @see ItemWriter#write(Object)
 	 */
-	public void write(Object data) throws Exception {
+	public void write(List<? extends Object> data) throws Exception {
 		log.info(data);
 	}
 

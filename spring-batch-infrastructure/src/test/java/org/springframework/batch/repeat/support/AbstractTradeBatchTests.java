@@ -16,6 +16,8 @@
 
 package org.springframework.batch.repeat.support;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -70,7 +72,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 
 		// This has to be synchronized because we are going to test the state
 		// (count) at the end of a concurrent batch run.
-		public synchronized void write(Trade data) {
+		public synchronized void write(List<? extends Trade> data) {
 			count++;
 			System.out.println("Executing trade '" + data + "'");
 		}

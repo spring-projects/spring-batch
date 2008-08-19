@@ -27,6 +27,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityManager;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -80,9 +82,9 @@ public class JpaAwareItemWriterTests {
 
 	@Test
 	public void testWrite() throws Exception {
-		delegate.write("foo");
+		delegate.write(Collections.singletonList("foo"));
 		replay(delegate);
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		verify(delegate);
 	}
 
@@ -119,13 +121,13 @@ public class JpaAwareItemWriterTests {
 		replay(em);
 		replay(emf);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
-		delegate.write("foo");
+		delegate.write(Collections.singletonList("foo"));
 		delegate.flush();
-		delegate.write("spam");
+		delegate.write(Collections.singletonList("spam"));
 		delegate.flush();
 		replay(delegate);
 
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		try {
 			writer.flush();
 			fail("Expected RuntimeException");
@@ -133,7 +135,7 @@ public class JpaAwareItemWriterTests {
 			assertEquals("bar", e.getMessage());
 		}
 
-		writer.write("spam");
+		writer.write(Collections.singletonList("spam"));
 		writer.flush();
 
 		verify(delegate);

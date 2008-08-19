@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
@@ -118,7 +120,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 		S processed = itemProcessor.process(item);
 		if (processed != null) {
 			// TODO: increment filtered item count
-			itemWriter.write(processed);
+			itemWriter.write(Collections.singletonList(processed));
 			return true;
 		}
 		return false;

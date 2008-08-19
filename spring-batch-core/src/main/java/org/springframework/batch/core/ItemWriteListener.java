@@ -26,14 +26,14 @@ import org.springframework.batch.item.ItemWriter;
 public interface ItemWriteListener extends StepListener {
 
 	/**
-	 * Called before {@link ItemWriter#write(Object)}
+	 * Called before {@link ItemWriter#write(java.util.List)}
 	 * 
 	 * @param item to be written
 	 */
 	void beforeWrite(Object item);
 
 	/**
-	 * Called after {@link ItemWriter#write(Object)}  If  the item is last in a
+	 * Called after {@link ItemWriter#write(java.util.List)}  If  the item is last in a
 	 * chunk, this will be called before any transaction is committed, and
 	 * before {@link ChunkListener#afterChunk()}
 	 * @param item written item

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -112,7 +113,7 @@ public class StepHandlerStepIntegrationTests {
 
 		step.setItemHandler(new SimpleStepHandler<String>(getReader(new String[] { "a", "b", "c" }),
 				new AbstractItemWriter<String>() {
-					public void write(String data) throws Exception {
+					public void write(List<? extends String> data) throws Exception {
 						TransactionSynchronizationManager
 								.registerSynchronization(new TransactionSynchronizationAdapter() {
 									public void beforeCommit(boolean readOnly) {

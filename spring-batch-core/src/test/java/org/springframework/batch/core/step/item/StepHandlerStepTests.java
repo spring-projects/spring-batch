@@ -71,8 +71,8 @@ public class StepHandlerStepTests extends TestCase {
 	private List<Serializable> list = new ArrayList<Serializable>();
 
 	ItemWriter<String> itemWriter = new AbstractItemWriter<String>() {
-		public void write(String data) throws Exception {
-			processed.add(data);
+		public void write(List<? extends String> data) throws Exception {
+			processed.addAll(data);
 		}
 	};
 

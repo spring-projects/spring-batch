@@ -16,13 +16,13 @@
 
 package org.springframework.batch.repeat.support;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
@@ -48,7 +48,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 				Thread.sleep(100);
 				Trade item = provider.read();
 				if (item!=null) {
-					processor.write(item);
+					processor.write(Collections.singletonList(item));
 				}
 				return new ExitStatus(item!=null);
 			}

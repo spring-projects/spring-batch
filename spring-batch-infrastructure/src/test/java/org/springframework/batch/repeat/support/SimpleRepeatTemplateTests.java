@@ -24,7 +24,6 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatListener;
-import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.ExceptionHandler;

@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.adapter;
 
+import java.util.List;
+
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
@@ -31,8 +33,10 @@ import org.springframework.batch.item.ItemWriter;
  */
 public class ItemWriterAdapter<T> extends AbstractMethodInvokingDelegator<T> implements ItemWriter<T> {
 	
-    public void write(T item) throws Exception {
-    	invokeDelegateMethodWithArgument(item);
+    public void write(List<? extends T> items) throws Exception {
+    	for (T item : items) {
+    		invokeDelegateMethodWithArgument(item);			
+		}
     }
 
     /*

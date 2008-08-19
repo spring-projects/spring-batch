@@ -1,5 +1,8 @@
 package org.springframework.batch.item.support;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
@@ -10,19 +13,20 @@ import org.springframework.batch.item.ItemWriter;
  * The implementation is thread-safe if all delegates are thread-safe.
  * 
  * @author Robert Kasanicky
+ * @author Dave Syer
  */
 public class CompositeItemWriter<T> implements ItemWriter<T> {
 
-	private ItemWriter<? super T>[] delegates;
+	private List<ItemWriter<? super T>> delegates;
 
 	public void setDelegates(ItemWriter<? super T>[] delegates) {
-		this.delegates = delegates;
+		this.delegates = Arrays.asList(delegates);
 	}
 
 	/**
 	 * Calls injected ItemProcessors in order.
 	 */
-	public void write(T item) throws Exception {
+	public void write(List<? extends  T> item) throws Exception {
 		for (ItemWriter<? super T> writer : delegates) {
 			writer.write(item);
 		}
@@ -35,7 +39,7 @@ public class CompositeItemWriter<T> implements ItemWriter<T> {
 	}
 
 	public void flush() throws FlushFailedException {
-		for (ItemWriter<? super T> writer : delegates) {
+		for (ItemWriter<? super  T> writer : delegates) {
 			writer.flush();
 		}
 	}

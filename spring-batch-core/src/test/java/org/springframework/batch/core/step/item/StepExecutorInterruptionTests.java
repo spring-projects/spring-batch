@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.step.item;
 
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.BatchStatus;
@@ -63,7 +65,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		itemWriter = new AbstractItemWriter<Object>() {
-			public void write(Object item) throws Exception {
+			public void write(List<? extends Object> item) throws Exception {
 			}
 		};
 		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {

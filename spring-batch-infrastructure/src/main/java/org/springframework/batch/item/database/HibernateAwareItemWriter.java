@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.database;
 
+import java.util.List;
+
 import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ItemWriter;
@@ -30,7 +32,7 @@ import org.springframework.util.Assert;
  * {@link ItemWriter} (the delegate). A delegate is required, and will be used
  * to do the actual writing of the item.<br/>
  * 
- * It is expected that {@link #write(Object)} is called inside a transaction,
+ * It is expected that {@link #write(List)} is called inside a transaction,
  * and that {@link #flush()} is then subsequently called before the transaction
  * commits, or {@link #clear()} before it rolls back.<br/>
  * 
@@ -114,7 +116,7 @@ public class HibernateAwareItemWriter<T> extends AbstractTransactionalResourceIt
 		return ITEMS_PROCESSED;
 	}
 
-	protected void doWrite(T item) throws Exception {
+	protected void doWrite(List<? extends T> item) throws Exception {
 		delegate.write(item);
 	}
 

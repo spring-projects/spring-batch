@@ -42,7 +42,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SkipLimitStepFactoryBean<String,String> factory = new SkipLimitStepFactoryBean<String,String>();
+	private SkipLimitStepFactoryBean<String, String> factory = new SkipLimitStepFactoryBean<String, String>();
 
 	private Class<?>[] skippableExceptions = new Class[] { SkippableException.class, SkippableRuntimeException.class };
 
@@ -132,7 +132,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	public void testFatalException() throws Exception {
 		factory.setFatalExceptionClasses(new Class[] { FatalRuntimeException.class });
 		factory.setItemWriter(new SkipWriterStub() {
-			public void write(String item) {
+			public void write(List<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
 			}
 		});
@@ -255,7 +255,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(1, stepExecution.getReadSkipCount());
 		assertEquals(0, stepExecution.getWriteSkipCount());
-		
+
 	}
 
 	/**
@@ -292,7 +292,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
-		
+
 	}
 
 	/**
@@ -470,12 +470,14 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			flushIndex = written.size() - 1;
 		}
 
-		public void write(String item) throws Exception {
-			if (failures.contains(item)) {
-				logger.debug("Throwing write exception on [" + item + "]");
-				throw new SkippableRuntimeException("exception in writer");
+		public void write(List<? extends String> items) throws Exception {
+			for (String item : items) {
+				if (failures.contains(item)) {
+					logger.debug("Throwing write exception on [" + item + "]");
+					throw new SkippableRuntimeException("exception in writer");
+				}
+				written.add(item);
 			}
-			written.add(item);
 		}
 
 	}

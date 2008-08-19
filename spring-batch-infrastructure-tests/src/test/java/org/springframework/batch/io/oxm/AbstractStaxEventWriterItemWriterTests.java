@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -43,9 +42,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 	 * Write list of domain objects and check the output file.
 	 */
 	public void testWrite() throws Exception {
-		for (Iterator<Trade> iterator = objects.listIterator(); iterator.hasNext();) {
-			writer.write(iterator.next());
-		}
+		writer.write(objects);
 		writer.close(null);
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()), new FileReader(resource.getFile()));
@@ -53,7 +50,9 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 	}
 
 	protected void setUp() throws Exception {
-		// File outputFile = File.createTempFile("AbstractStaxStreamWriterOutputSourceTests", "xml");
+		// File outputFile =
+		// File.createTempFile("AbstractStaxStreamWriterOutputSourceTests",
+		// "xml");
 		outputFile = File.createTempFile(ClassUtils.getShortName(this.getClass()), ".xml");
 		resource = new FileSystemResource(outputFile);
 		writer.setResource(resource);

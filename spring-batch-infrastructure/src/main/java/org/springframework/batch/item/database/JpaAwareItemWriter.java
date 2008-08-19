@@ -1,14 +1,16 @@
 package org.springframework.batch.item.database;
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.util.Assert;
-import org.springframework.orm.jpa.EntityManagerFactoryUtils;
-import org.springframework.dao.DataAccessResourceFailureException;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+
+import org.springframework.batch.item.ClearFailedException;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.orm.jpa.EntityManagerFactoryUtils;
+import org.springframework.util.Assert;
 
 /**
  * {@link org.springframework.batch.item.ItemWriter} that is aware of the JPA EntityManagerFactory and can
@@ -16,7 +18,7 @@ import javax.persistence.EntityManagerFactory;
  * {@link org.springframework.batch.item.ItemWriter} (the delegate). A delegate is required, and will be used
  * to do the actual writing of the item.<br/>
  *
- * It is required that {@link #write(Object)} is called inside a transaction,
+ * It is required that {@link #write(List)} is called inside a transaction,
  * and that {@link #flush()} is then subsequently called before the transaction
  * commits, or {@link #clear()} before it rolls back.<br/>
  *
@@ -102,7 +104,7 @@ public class JpaAwareItemWriter<T> extends AbstractTransactionalResourceItemWrit
 		return ITEMS_PROCESSED;
 	}
 
-	protected void doWrite(T item) throws Exception {
+	protected void doWrite(List<? extends T> item) throws Exception {
 		delegate.write(item);
 	}
 

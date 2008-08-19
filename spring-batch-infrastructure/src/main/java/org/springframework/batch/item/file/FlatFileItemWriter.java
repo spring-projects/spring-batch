@@ -161,7 +161,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	/**
 	 * Public setter for the header lines. These will be output at the head of
-	 * the file before any calls to {@link #write(Object)} (and not on restart
+	 * the file before any calls to {@link #write(List)} (and not on restart
 	 * unless the restart is after a failure before the first flush).
 	 * 
 	 * @param headerLines the header lines to set
@@ -179,17 +179,21 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * line (recursively calling this method for each value). If no converter is
 	 * supplied the input object's toString method will be used.<br/>
 	 * 
-	 * @param item Object (a String or Object that can be converted) to be
-	 * written to output stream
+	 * @param items list of items to be written to output stream
 	 * @throws Exception if the transformer or file output fail,
 	 * WriterNotOpenException if the writer has not been initialized.
 	 */
-	public void write(T item) throws Exception {
-		if (getOutputState().isInitialized()) {
-			lineBuffer.add(lineAggregator.aggregate(item) + lineSeparator);
-		}
-		else {
-			throw new WriterNotOpenException("Writer must be open before it can be written to");
+	public void write(List<? extends T> items) throws Exception {
+
+		for (T item : items) {
+
+			if (getOutputState().isInitialized()) {
+				lineBuffer.add(lineAggregator.aggregate(item) + lineSeparator);
+			}
+			else {
+				throw new WriterNotOpenException("Writer must be open before it can be written to");
+			}
+
 		}
 	}
 

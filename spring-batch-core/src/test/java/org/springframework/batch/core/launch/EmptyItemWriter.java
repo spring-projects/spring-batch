@@ -28,8 +28,8 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * Mock {@link ItemWriter} that will throw an exception when a certain
- * number of items have been written. 
+ * Mock {@link ItemWriter} that will throw an exception when a certain number of
+ * items have been written.
  */
 public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
@@ -43,7 +43,8 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	List<Object> list;
 
 	public void afterPropertiesSet() throws Exception {
-		TransactionAwareProxyFactory<List<Object>> factory = new TransactionAwareProxyFactory<List<Object>>(new ArrayList<Object>());
+		TransactionAwareProxyFactory<List<Object>> factory = new TransactionAwareProxyFactory<List<Object>>(
+				new ArrayList<Object>());
 		list = factory.createInstance();
 	}
 
@@ -51,13 +52,15 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 		this.failurePoint = failurePoint;
 	}
 
-	public void write(T data) {
-		if (!failed && list.size() == failurePoint) {
-			failed = true;
-			throw new RuntimeException("Failed processing: [" + data + "]");
+	public void write(List<? extends T> items) {
+		for (T data : items) {
+			if (!failed && list.size() == failurePoint) {
+				failed = true;
+				throw new RuntimeException("Failed processing: [" + data + "]");
+			}
+			logger.info("Processing: [" + data + "]");
+			list.add(data);
 		}
-		logger.info("Processing: [" + data + "]");
-		list.add(data);
 	}
 
 	public List<Object> getList() {
@@ -65,11 +68,11 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	public void clear() throws ClearFailedException {
-		//no-op
+		// no-op
 	}
 
 	public void flush() throws FlushFailedException {
-		//no-op
+		// no-op
 	}
 
 }

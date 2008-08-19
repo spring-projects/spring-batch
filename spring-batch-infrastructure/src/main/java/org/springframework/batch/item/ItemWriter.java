@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item;
 
+import java.util.List;
+
 /**
  * <p>
  * Basic interface for generic output operations. Class implementing this
@@ -46,7 +48,7 @@ public interface ItemWriter<T> {
 	 * retry or a batch the framework will catch the exception and convert or
 	 * rethrow it as appropriate.
 	 */
-	void write(T item) throws Exception;
+	void write(List<? extends T> items) throws Exception;
 
 	/**
 	 * Flush any buffers that are being held. This will usually be performed

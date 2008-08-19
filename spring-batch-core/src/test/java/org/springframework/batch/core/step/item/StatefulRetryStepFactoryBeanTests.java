@@ -73,8 +73,8 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 	JobExecution jobExecution;
 
 	private ItemWriter<Object> processor = new AbstractItemWriter<Object>() {
-		public void write(Object data) throws Exception {
-			processed.add(data);
+		public void write(List<? extends Object> data) throws Exception {
+			processed.addAll(data);
 		}
 	};
 
@@ -199,9 +199,9 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		};
 
 		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
-			public void write(Object item) throws Exception {
+			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
-				if ("b".equals(item) || "d".equals(item)) {
+				if (item.contains("b") || item.contains("d")) {
 					throw new RuntimeException("Read error - planned but skippable.");
 				}
 			}
@@ -237,7 +237,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 			}
 		};
 		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
-			public void write(Object item) throws Exception {
+			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}
@@ -274,7 +274,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 			}
 		};
 		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
-			public void write(Object item) throws Exception {
+			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}
@@ -312,7 +312,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 			}
 		};
 		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
-			public void write(Object item) throws Exception {
+			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}

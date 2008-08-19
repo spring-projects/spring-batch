@@ -16,6 +16,7 @@
 package org.springframework.batch.item.database;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -45,8 +46,8 @@ public class HibernateAwareItemWriterTests extends TestCase {
 	}
 
 	private class StubItemWriter implements ItemWriter<Object> {
-		public void write(Object item) {
-			list.add(item);
+		public void write(List<? extends Object> items) {
+			list.addAll(items);
 		}
 
 		public void clear() throws ClearFailedException {
@@ -116,21 +117,12 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		writer.afterPropertiesSet();
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#write(java.lang.Object)}.
-	 * @throws Exception 
-	 */
 	public void testWrite() throws Exception {
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		assertEquals(1, list.size());
 		assertTrue(list.contains("foo"));
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#write(java.lang.Object)}.
-	 */
 	public void testFlushWithFailure() throws Exception{
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setHibernateTemplate(new HibernateTemplate() {
@@ -146,11 +138,6 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		}
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.database.HibernateAwareItemWriter#write(java.lang.Object)}.
-	 * @throws Exception 
-	 */
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setHibernateTemplate(new HibernateTemplateWrapper() {
@@ -158,7 +145,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 				throw ex;
 			}
 		});
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		try {
 			writer.flush();
 			fail("Expected RuntimeException");
@@ -173,11 +160,10 @@ public class HibernateAwareItemWriterTests extends TestCase {
 				list.add("flush");
 			}
 		});
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		assertEquals(6, list.size());
 		assertTrue(list.contains("flush"));
 		assertTrue(list.contains("clear"));
-		assertTrue(list.contains("delegateFlush"));
 		assertTrue(context.isCompleteOnly());
 	}
 

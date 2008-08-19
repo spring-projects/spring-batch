@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
  * {@link ItemPreparedStatementSetter}, which is responsible for mapping the
  * item to a PreparedStatement.<br/>
  * 
- * It is expected that {@link #write(Object)} is called inside a transaction,
+ * It is expected that {@link #write(List)} is called inside a transaction,
  * and that {@link #flush()} is then subsequently called before the transaction
  * commits, or {@link #clear()} before it rolls back.<br/>
  * 
@@ -158,7 +158,7 @@ public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceIt
 	/**
 	 * No-op.
 	 */
-	protected void doWrite(T item) {
+	protected void doWrite(List<? extends T> item) {
 	}
 
 	/**

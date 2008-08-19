@@ -21,6 +21,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.Arrays;
+import java.util.Collections;
 
 import junit.framework.TestCase;
 
@@ -106,10 +108,10 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testWriteWithMultipleOpen() throws Exception {
 
 		writer.open(executionContext);
-		writer.write("test1");
+		writer.write(Collections.singletonList("test1"));
 		writer.flush();
 		writer.open(executionContext);
-		writer.write("test2");
+		writer.write(Collections.singletonList("test2"));
 		writer.flush();
 		assertEquals("test1", readLine());
 		assertEquals("test2", readLine());
@@ -128,7 +130,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 */
 	public void testWriteString() throws Exception {
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.flush();
 		writer.close(null);
 		String lineFromFile = readLine();
@@ -149,7 +151,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		});
 		String data = "string";
 		writer.open(executionContext);
-		writer.write(data);
+		writer.write(Collections.singletonList(data));
 		writer.flush();
 		String lineFromFile = readLine();
 		// converter not used if input is String
@@ -168,7 +170,7 @@ public class FlatFileItemWriterTests extends TestCase {
 			}
 		});
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.flush();
 		String lineFromFile = readLine();
 		assertEquals("FOO:" + TEST_STRING, lineFromFile);
@@ -180,19 +182,17 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * @throws Exception
 	 */
 	public void testWriteRecord() throws Exception {
-		String args = "1";
 		writer.open(executionContext);
-		writer.write(args);
+		writer.write(Collections.singletonList("1"));
 		writer.flush();
 		String lineFromFile = readLine();
-		assertEquals(args, lineFromFile);
+		assertEquals("1", lineFromFile);
 	}
 
 	public void testWriteRecordWithrecordSeparator() throws Exception {
 		writer.setLineSeparator("|");
 		writer.open(executionContext);
-		writer.write("1");
-		writer.write("2");
+		writer.write(Arrays.asList(new String[] { "1", "2" }));
 		writer.flush();
 		String lineFromFile = readLine();
 		assertEquals("1|2|", lineFromFile);
@@ -200,7 +200,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	public void testRollback() throws Exception {
 		writer.open(executionContext);
-		writer.write("testLine1");
+		writer.write(Collections.singletonList("testLine1"));
 		// rollback
 		rollback();
 		writer.flush();
@@ -211,7 +211,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	public void testCommit() throws Exception {
 		writer.open(executionContext);
-		writer.write("testLine1");
+		writer.write(Collections.singletonList("testLine1"));
 		// rollback
 		commit();
 		writer.close(null);
@@ -224,22 +224,19 @@ public class FlatFileItemWriterTests extends TestCase {
 		writer.open(executionContext);
 
 		// write some lines
-		writer.write("testLine1");
-		writer.write("testLine2");
-		writer.write("testLine3");
+		writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
 
 		// commit
 		commit();
 
 		// this will be rolled back...
-		writer.write("this will be rolled back");
+		writer.write(Collections.singletonList("this will be rolled back"));
 
 		// rollback
 		rollback();
 
 		// write more lines
-		writer.write("testLine4");
-		writer.write("testLine5");
+		writer.write(Arrays.asList(new String[] {"testLine4", "testLine5"}));
 
 		// commit
 		commit();
@@ -253,9 +250,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		writer.open(executionContext);
 
 		// write more lines
-		writer.write("testLine6");
-		writer.write("testLine7");
-		writer.write("testLine8");
+		writer.write(Arrays.asList(new String[] {"testLine6","testLine7","testLine8"}));
 
 		commit();
 
@@ -344,7 +339,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		testWriteStringWithBogusEncoding();
 		writer.setEncoding("UTF-8");
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.flush();
 		String lineFromFile = readLine();
 
@@ -354,7 +349,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testWriteHeader() throws Exception {
 		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.flush();
 		writer.close(null);
 		String lineFromFile = readLine();
@@ -368,11 +363,11 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
 		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.clear();
 		writer.close(executionContext);
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.flush();
 		writer.close(executionContext);
 		String lineFromFile = readLine();
@@ -388,10 +383,10 @@ public class FlatFileItemWriterTests extends TestCase {
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
 		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.flush();
 		writer.update(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.clear();
 		writer.close(executionContext);
 		String lineFromFile = readLine();
@@ -401,7 +396,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 		writer.open(executionContext);
-		writer.write(TEST_STRING);
+		writer.write(Collections.singletonList(TEST_STRING));
 		writer.flush();
 		writer.close(executionContext);
 		reader = null;

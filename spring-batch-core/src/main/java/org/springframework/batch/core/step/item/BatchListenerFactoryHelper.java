@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
@@ -94,15 +95,18 @@ abstract class BatchListenerFactoryHelper {
 		}
 
 		return new ItemWriter<T>() {
-			public void write(T item) throws Exception {
-				try {
-					multicaster.beforeWrite(item);
-					itemWriter.write(item);
-					multicaster.afterWrite(item);
-				}
-				catch (Exception e) {
-					multicaster.onWriteError(e, item);
-					throw e;
+			public void write(List<? extends T> items) throws Exception {
+
+				for (T item : items) {
+					try {
+						multicaster.beforeWrite(item);
+						itemWriter.write(Collections.singletonList(item));
+						multicaster.afterWrite(item);
+					}
+					catch (Exception e) {
+						multicaster.onWriteError(e, item);
+						throw e;
+					}
 				}
 			}
 

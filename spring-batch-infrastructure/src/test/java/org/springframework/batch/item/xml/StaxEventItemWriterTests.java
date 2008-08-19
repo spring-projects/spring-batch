@@ -11,7 +11,10 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
@@ -50,6 +53,8 @@ public class StaxEventItemWriterTests {
 		}
 	};
 
+	private List<? extends Object> items = Collections.singletonList(item);
+
 	private static final String TEST_STRING = "<!--" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString-->";
 
@@ -73,7 +78,7 @@ public class StaxEventItemWriterTests {
 		writer.setSerializer(serializer);
 
 		// see asserts in the marshaller
-		writer.write(item);
+		writer.write(items);
 		assertFalse(marshaller.wasCalled);
 
 		writer.flush();
@@ -84,8 +89,7 @@ public class StaxEventItemWriterTests {
 	@Test
 	public void testClear() throws Exception {
 		writer.open(executionContext);
-		writer.write(item);
-		writer.write(item);
+		writer.write(Arrays.asList(new Object[] {item, item}));
 		writer.clear();
 		// writer.write(item);
 		writer.flush();
@@ -98,7 +102,7 @@ public class StaxEventItemWriterTests {
 	@Test
 	public void testRollback() throws Exception {
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		// rollback
 		writer.clear();
 		assertFalse(outputFileContent().contains(TEST_STRING));
@@ -110,7 +114,7 @@ public class StaxEventItemWriterTests {
 	@Test
 	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		String content = outputFileContent();
 		assertFalse(content.contains(TEST_STRING));
 		writer.flush();
@@ -125,7 +129,7 @@ public class StaxEventItemWriterTests {
 	public void testRestart() throws Exception {
 		writer.open(executionContext);
 		// write item
-		writer.write(item);
+		writer.write(items);
 		writer.flush();
 		writer.update(executionContext);
 		writer.close(executionContext);
@@ -133,7 +137,7 @@ public class StaxEventItemWriterTests {
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		writer.close(executionContext);
 
 		// check the output is concatenation of 'before restart' and 'after
@@ -158,7 +162,7 @@ public class StaxEventItemWriterTests {
 		Object header2 = new Object();
 		writer.setHeaderItems(new Object[] {header1, header2});
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		writer.flush();
 		String content = outputFileContent();
 		assertTrue("Wrong content: "+content, contains(content, "<!--" + header1 + "-->"));
@@ -174,10 +178,10 @@ public class StaxEventItemWriterTests {
 		Object header = new Object();
 		writer.setHeaderItems(new Object[] {header});
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		writer.clear();
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		writer.flush();
 		String content = outputFileContent();
 		assertEquals("Wrong content: "+content, 1, countContains(content, "<!--" + header + "-->"));
@@ -192,12 +196,12 @@ public class StaxEventItemWriterTests {
 		Object header = new Object();
 		writer.setHeaderItems(new Object[] {header});
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		writer.flush();
 		writer.update(executionContext);
 		writer.close(executionContext);
 		writer.open(executionContext);
-		writer.write(item);
+		writer.write(items);
 		writer.clear();
 		writer.flush();
 		String content = outputFileContent();
@@ -212,8 +216,10 @@ public class StaxEventItemWriterTests {
 	public void testStreamContext() throws Exception {
 		writer.open(executionContext);
 		final int NUMBER_OF_RECORDS = 10;
+		assertFalse(executionContext.containsKey(ClassUtils.getShortName(StaxEventItemWriter.class)
+				+ ".record.count"));
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
-			writer.write(item);
+			writer.write(items);
 			writer.update(executionContext);
 			long writeStatistics = executionContext.getLong(ClassUtils.getShortName(StaxEventItemWriter.class)
 					+ ".record.count");

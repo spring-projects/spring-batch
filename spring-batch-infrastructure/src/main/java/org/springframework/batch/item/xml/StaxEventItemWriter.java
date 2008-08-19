@@ -9,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -231,7 +230,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	/**
 	 * Setter for the headers. This list will be marshalled and output before
-	 * any calls to {@link #write(Object)}.
+	 * any calls to {@link #write(List)}.
 	 * @param headers
 	 */
 	public void setHeaderItems(T[] headers) {
@@ -271,9 +270,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		open(startAtPosition);
 
 		if (startAtPosition == 0) {
-			for (Iterator<? extends T> iterator = headers.listIterator(); iterator.hasNext();) {
-				write(iterator.next());
-			}
+			write(headers);
 		}
 
 	}
@@ -407,10 +404,10 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @param item the value object
 	 * @see #flush()
 	 */
-	public void write(T item) {
+	public void write(List<? extends T> item) {
 
-		currentRecordCount++;
-		buffer.add(item);
+		currentRecordCount+=item.size();
+		buffer.addAll(item);
 	}
 
 	/**

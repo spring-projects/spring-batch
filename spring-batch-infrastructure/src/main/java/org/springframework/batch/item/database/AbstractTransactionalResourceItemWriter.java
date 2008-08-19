@@ -16,6 +16,7 @@
 package org.springframework.batch.item.database;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.batch.item.ClearFailedException;
@@ -71,11 +72,11 @@ public abstract class AbstractTransactionalResourceItemWriter<T> implements Item
 	 * 
 	 * @throws Exception
 	 * 
-	 * @see org.springframework.batch.item.ItemWriter#write(Object)
+	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-	public final void write(T output) throws Exception {
+	public final void write(List<? extends T> output) throws Exception {
 		bindTransactionResources();
-		getProcessed().add(output);
+		getProcessed().addAll(output);
 		doWrite(output);
 		flushIfNecessary(output);
 	}
@@ -104,9 +105,9 @@ public abstract class AbstractTransactionalResourceItemWriter<T> implements Item
 	protected abstract void doClear() throws ClearFailedException;
 
 	/**
-	 * Callback method of {@link #write(Object)}.
+	 * Callback method of {@link #write(List)}.
 	 */
-	protected abstract void doWrite(T item) throws Exception;
+	protected abstract void doWrite(List<? extends T> output) throws Exception;
 
 	/**
 	 * @return Key for items processed in the current transaction
@@ -114,19 +115,23 @@ public abstract class AbstractTransactionalResourceItemWriter<T> implements Item
 	 */
 	protected abstract String getResourceKey();
 
-	private void flushIfNecessary(Object output) {
-		boolean flush;
+	private void flushIfNecessary(List<? extends T> outputs) {
+		Set<T> flush = new HashSet<T>();
 		synchronized (failed) {
-			flush = failed.contains(output);
+			for (T output : outputs) {
+				if (failed.contains(output)) {
+					flush.add(output);				
+				}
+			}
 		}
-		if (flush) {
+		if (!flush.isEmpty()) {
 			// Force early completion to commit aggressively if we encounter a
 			// failed item (from a failed chunk but we don't know which one was
 			// the problem).
 			RepeatSynchronizationManager.setCompleteOnly();
 			// Remove the failed item from the cache, otherwise it could grow
 			// unnecessarily large.
-			failed.remove(output);
+			failed.removeAll(flush);
 			// Flush now, so that if there is a failure this record can be
 			// skipped.
 			flush();

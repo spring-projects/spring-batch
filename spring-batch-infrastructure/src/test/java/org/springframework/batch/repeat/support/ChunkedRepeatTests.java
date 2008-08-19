@@ -21,7 +21,6 @@ import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;

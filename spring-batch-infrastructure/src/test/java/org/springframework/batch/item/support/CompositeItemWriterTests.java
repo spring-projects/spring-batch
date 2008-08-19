@@ -4,6 +4,10 @@ import static org.easymock.EasyMock.createStrictMock;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ItemWriter;
@@ -26,7 +30,7 @@ public class CompositeItemWriterTests extends TestCase {
 	public void testProcess() throws Exception {
 		
 		final int NUMBER_OF_WRITERS = 10;
-		Object data = new Object();
+		List<Object> data = Collections.singletonList(new Object());
 		
 		@SuppressWarnings("unchecked")
 		ItemWriter<Object>[] writers = new ItemWriter[NUMBER_OF_WRITERS];
