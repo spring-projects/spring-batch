@@ -16,30 +16,35 @@
 
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 import org.junit.Before;
 import org.junit.Test;
-
-import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.orm.jpa.EntityManagerHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityManager;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * @author Thomas Risberg
- *
+ * 
  */
 public class JpaAwareItemWriterTests {
 
 	JpaAwareItemWriter<Object> writer = new JpaAwareItemWriter<Object>();
-	
+
 	ItemWriter<Object> delegate;
 
 	EntityManagerFactory emf;
@@ -47,10 +52,10 @@ public class JpaAwareItemWriterTests {
 	final List<Object> list = new ArrayList<Object>();
 
 	@Before
-	@SuppressWarnings({"unchecked"})
+	@SuppressWarnings( { "unchecked" })
 	public void setUp() throws Exception {
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
-			TransactionSynchronizationManager.clearSynchronization();					
+			TransactionSynchronizationManager.clearSynchronization();
 		}
 		delegate = createMock("delegate", ItemWriter.class);
 		writer.setDelegate(delegate);
@@ -64,49 +69,39 @@ public class JpaAwareItemWriterTests {
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
-			assertTrue("Wrong message for exception: " + e.getMessage(), e
-					.getMessage().indexOf("delegate") >= 0);
+			assertTrue("Wrong message for exception: " + e.getMessage(), e.getMessage().indexOf("delegate") >= 0);
 		}
 		writer.setDelegate(delegate);
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
+		}
+		catch (IllegalArgumentException e) {
 			// expected
-			assertTrue("Wrong message for exception: " + e.getMessage(), e
-					.getMessage().indexOf("EntityManagerFactory") >= 0);
+			assertTrue("Wrong message for exception: " + e.getMessage(),
+					e.getMessage().indexOf("EntityManagerFactory") >= 0);
 		}
 	}
 
 	@Test
-	public void testWrite() throws Exception {
-		delegate.write(Collections.singletonList("foo"));
-		replay(delegate);
-		writer.write(Collections.singletonList("foo"));
-		verify(delegate);
-	}
-
-	@Test
-	public void testFlushWithFailure() throws Exception{
-		final RuntimeException ex = new RuntimeException("bar");
+	public void testWriteAndFlushSunnyDay() throws Exception {
 		EntityManager em = createMock("em", EntityManager.class);
-		em.joinTransaction();
 		em.flush();
-		expectLastCall().andThrow(ex);
+		em.clear();
 		replay(em);
-		expect(emf.createEntityManager()).andReturn(em);
 		replay(emf);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
-		delegate.flush();
+		List<String> items = Arrays.asList(new String[] { "foo", "spam" });
+		delegate.write(items);
 		replay(delegate);
-		try {
-			writer.flush();
-			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
-			assertEquals("bar", e.getMessage());
-		}
+
+		writer.write(items);
+
+		verify(delegate);
+		verify(em);
 		TransactionSynchronizationManager.unbindResource(emf);
 	}
 
@@ -116,65 +111,25 @@ public class JpaAwareItemWriterTests {
 		EntityManager em = createMock("em", EntityManager.class);
 		em.flush();
 		expectLastCall().andThrow(ex);
-		em.flush();
 		em.clear();
 		replay(em);
 		replay(emf);
 		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
-		delegate.write(Collections.singletonList("foo"));
-		delegate.flush();
-		delegate.write(Collections.singletonList("spam"));
-		delegate.flush();
+		List<String> items = Arrays.asList(new String[] { "foo", "spam" });
+		delegate.write(items);
 		replay(delegate);
 
-		writer.write(Collections.singletonList("foo"));
 		try {
-			writer.flush();
+			writer.write(items);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("bar", e.getMessage());
 		}
 
-		writer.write(Collections.singletonList("spam"));
-		writer.flush();
-
 		verify(delegate);
 		verify(em);
 		TransactionSynchronizationManager.unbindResource(emf);
 	}
 
-	@Test
-	public void testFlush() throws Exception{
-		EntityManager em = createMock("em", EntityManager.class);
-		em.flush();
-		em.clear();
-		replay(em);
-		replay(emf);
-		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
-		delegate.flush();
-		replay(delegate);
-
-		writer.flush();
-
-		verify(delegate);
-		verify(em);
-		TransactionSynchronizationManager.unbindResource(emf);
-	}
-
-	@Test
-	public void testClear() throws Exception{
-		EntityManager em = createMock("em", EntityManager.class);
-		em.clear();
-		replay(em);
-		replay(emf);
-		TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em));
-		delegate.clear();
-		replay(delegate);
-
-		writer.clear();
-
-		verify(delegate);
-		verify(em);
-		TransactionSynchronizationManager.unbindResource(emf);
-	}
 }

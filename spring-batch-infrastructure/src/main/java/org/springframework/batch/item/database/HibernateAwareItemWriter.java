@@ -18,9 +18,8 @@ package org.springframework.batch.item.database;
 import java.util.List;
 
 import org.hibernate.SessionFactory;
-import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.orm.hibernate3.HibernateOperations;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -32,8 +31,8 @@ import org.springframework.util.Assert;
  * {@link ItemWriter} (the delegate). A delegate is required, and will be used
  * to do the actual writing of the item.<br/>
  * 
- * It is expected that {@link #write(List)} is called inside a transaction,
- * and that {@link #flush()} is then subsequently called before the transaction
+ * It is expected that {@link #write(List)} is called inside a transaction, and
+ * that {@link #flush()} is then subsequently called before the transaction
  * commits, or {@link #clear()} before it rolls back.<br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
@@ -46,12 +45,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter<T> extends AbstractTransactionalResourceItemWriter<T> implements InitializingBean {
-
-	/**
-	 * Key for items processed in the current transaction {@link RepeatContext}.
-	 */
-	private static final String ITEMS_PROCESSED = HibernateAwareItemWriter.class.getName() + ".ITEMS_PROCESSED";
+public class HibernateAwareItemWriter<T> extends AbstractItemWriter<T> implements InitializingBean {
 
 	private ItemWriter<? super T> delegate;
 
@@ -86,7 +80,8 @@ public class HibernateAwareItemWriter<T> extends AbstractTransactionalResourceIt
 	}
 
 	/**
-	 * Check mandatory properties - there must be a delegate and hibernateTemplate.
+	 * Check mandatory properties - there must be a delegate and
+	 * hibernateTemplate.
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(delegate, "HibernateAwareItemWriter requires an ItemWriter as a delegate.");
@@ -94,30 +89,20 @@ public class HibernateAwareItemWriter<T> extends AbstractTransactionalResourceIt
 	}
 
 	/**
-	 * Delegate to subclass and flush the hibernate session.
+	 * Delegate the writing and then flush and clear te hibernate session.
+	 * 
+	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-	protected void doFlush() {
-		delegate.flush();
-		hibernateTemplate.flush();
-		// This should happen when the transaction commits anyway, but to be
-		// sure...
-		hibernateTemplate.clear();
-	}
-
-	/**
-	 * Call the delegate clear() method, and then clear the hibernate session.
-	 */
-	protected void doClear() throws ClearFailedException {
-		delegate.clear();
-		hibernateTemplate.clear();
-	}
-
-	protected String getResourceKey() {
-		return ITEMS_PROCESSED;
-	}
-
-	protected void doWrite(List<? extends T> item) throws Exception {
-		delegate.write(item);
+	public void write(List<? extends T> items) throws Exception {
+		delegate.write(items);
+		try {
+			hibernateTemplate.flush();
+		}
+		finally {
+			// This should happen when the transaction commits anyway, but to be
+			// sure...
+			hibernateTemplate.clear();
+		}
 	}
 
 }

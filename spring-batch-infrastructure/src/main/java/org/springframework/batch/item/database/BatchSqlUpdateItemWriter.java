@@ -17,12 +17,10 @@ package org.springframework.batch.item.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -42,9 +40,7 @@ import org.springframework.util.Assert;
  * {@link ItemPreparedStatementSetter}, which is responsible for mapping the
  * item to a PreparedStatement.<br/>
  * 
- * It is expected that {@link #write(List)} is called inside a transaction,
- * and that {@link #flush()} is then subsequently called before the transaction
- * commits, or {@link #clear()} before it rolls back.<br/>
+ * It is expected that {@link #write(List)} is called inside a transaction.<br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
  * behaviour), so it can be used to write in multiple concurrent transactions.
@@ -56,12 +52,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceItemWriter<T> implements InitializingBean {
-
-	/**
-	 * Key for items processed in the current transaction {@link RepeatContext}.
-	 */
-	private static final String ITEMS_PROCESSED = BatchSqlUpdateItemWriter.class.getName() + ".ITEMS_PROCESSED";
+public class BatchSqlUpdateItemWriter<T> extends AbstractItemWriter<T> implements InitializingBean {
 
 	private JdbcOperations jdbcTemplate;
 
@@ -114,22 +105,18 @@ public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceIt
 		Assert.notNull(jdbcTemplate, "BatchSqlUpdateItemWriter requires an data source.");
 		Assert.notNull(preparedStatementSetter, "BatchSqlUpdateItemWriter requires a ItemPreparedStatementSetter");
 	}
-
-	/**
-	 * Create and execute batch prepared statement.
-	 * @throws EmptyResultDataAccessException if any of the items does not cause
-	 * an update
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
 	 */
-	protected void doFlush() throws EmptyResultDataAccessException {
+	public void write(final List<? extends T> items) throws Exception {
 
-		final List<T> processed = new ArrayList<T>(getProcessed());
-
-		if (!processed.isEmpty()) {
+		if (!items.isEmpty()) {
 
 			int[] values = (int[]) jdbcTemplate.execute(sql, new PreparedStatementCallback() {
 				public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 
-					for (T item : processed) {
+					for (T item : items) {
 						preparedStatementSetter.setValues(item, ps);
 						ps.addBatch();
 					}
@@ -142,29 +129,13 @@ public class BatchSqlUpdateItemWriter<T> extends AbstractTransactionalResourceIt
 					int value = values[i];
 					if (value == 0) {
 						throw new EmptyResultDataAccessException("Item " + i + " of " + values.length
-								+ " did not update any rows: [" + processed.get(i) + "]", 1);
+								+ " did not update any rows: [" + items.get(i) + "]", 1);
 					}
 				}
 			}
 
 		}
 
-	}
-
-	protected String getResourceKey() {
-		return ITEMS_PROCESSED;
-	}
-
-	/**
-	 * No-op.
-	 */
-	protected void doWrite(List<? extends T> item) {
-	}
-
-	/**
-	 * No-op.
-	 */
-	protected void doClear() throws ClearFailedException {
 	}
 
 }
