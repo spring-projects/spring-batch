@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Required;
@@ -63,7 +64,7 @@ public class MessageChannelItemWriterTests {
 		channel.subscribe(receiver);
 		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
 		writer.setChannel(channel);
-		writer.write("foo");
+		writer.write(Collections.singletonList("foo"));
 		Message<?> message = receiver.receive(10);
 		assertNotNull(message);
 		assertEquals("foo", message.getPayload());
@@ -84,7 +85,7 @@ public class MessageChannelItemWriterTests {
 		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
 		writer.setChannel(channel);
 		try {
-			writer.write("foo");
+			writer.write(Collections.singletonList("foo"));
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
@@ -108,7 +109,7 @@ public class MessageChannelItemWriterTests {
 		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
 		writer.setChannel(channel);
 		try {
-			writer.write("foo");
+			writer.write(Collections.singletonList("foo"));
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {

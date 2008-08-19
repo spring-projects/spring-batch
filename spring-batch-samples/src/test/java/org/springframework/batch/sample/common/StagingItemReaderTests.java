@@ -2,6 +2,8 @@ package org.springframework.batch.sample.common;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+
 import javax.sql.DataSource;
 
 import org.junit.After;
@@ -53,10 +55,7 @@ public class StagingItemReaderTests {
 				new JobParameters(), "testJob")));
 		reader.beforeStep(stepExecution);
 		writer.beforeStep(stepExecution);
-		writer.write("FOO");
-		writer.write("BAR");
-		writer.write("SPAM");
-		writer.write("BUCKET");
+		writer.write(Arrays.asList(new String[] {"FOO","BAR","SPAM","BUCKET"}));
 		reader.open(new ExecutionContext());
 	}
 

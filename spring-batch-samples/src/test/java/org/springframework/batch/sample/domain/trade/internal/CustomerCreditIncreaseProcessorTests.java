@@ -3,6 +3,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
@@ -40,7 +41,7 @@ public class CustomerCreditIncreaseProcessorTests {
 
 		customerCredit.setCredit(oldCredit);
 
-		writer.write(customerCredit);
+		writer.write(Collections.singletonList(customerCredit));
 
 	}
 }

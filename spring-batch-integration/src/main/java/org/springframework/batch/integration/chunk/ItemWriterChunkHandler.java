@@ -1,5 +1,7 @@
 package org.springframework.batch.integration.chunk;
 
+import java.util.Collections;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.SkipListener;
@@ -55,7 +57,7 @@ public class ItemWriterChunkHandler<T> implements ChunkHandler<T> {
 		try {
 			for (T item : chunk.getItems()) {
 				try {
-					itemWriter.write(item);
+					itemWriter.write(Collections.singletonList(item));
 				}
 				catch (Exception e) {
 					if (itemSkipPolicy.shouldSkip(e, parentSkipCount + skipCount)) {

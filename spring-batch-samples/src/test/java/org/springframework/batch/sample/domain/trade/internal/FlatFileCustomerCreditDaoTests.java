@@ -20,6 +20,7 @@ import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -84,7 +85,7 @@ public class FlatFileCustomerCreditDaoTests {
 		writer.setSeparator(";");
 		
 		//set-up OutputSource mock
-		output.write("testName;1");
+		output.write(Collections.singletonList("testName;1"));
 		output.open(new ExecutionContext());
 		replay(output);
 

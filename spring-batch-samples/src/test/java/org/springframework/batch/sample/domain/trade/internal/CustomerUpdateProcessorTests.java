@@ -3,6 +3,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 import static org.junit.Assert.assertEquals;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
@@ -32,6 +33,6 @@ public class CustomerUpdateProcessorTests {
 		processor.setDao(dao);
 		
 		//call tested method - see asserts in dao.write() method
-		processor.write(trade);
+		processor.write(Collections.singletonList(trade));
 	}
 }

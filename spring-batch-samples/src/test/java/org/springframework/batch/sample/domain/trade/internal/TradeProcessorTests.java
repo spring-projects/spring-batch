@@ -1,6 +1,10 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +36,7 @@ public class TradeProcessorTests {
 		replay(writer);
 		
 		//call tested method
-		processor.write(trade);
+		processor.write(Collections.singletonList(trade));
 		
 		//verify method calls
 		verify(writer);

@@ -16,29 +16,31 @@
 
 package org.springframework.batch.sample.domain.trade.internal;
 
+import java.util.List;
+
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 
-
-
 public class CustomerCreditUpdateWriter extends AbstractItemWriter<CustomerCredit> {
-    private double creditFilter = 800;
-    private CustomerCreditDao dao;
+	private double creditFilter = 800;
 
-    public void write(CustomerCredit customerCredit) throws Exception {
+	private CustomerCreditDao dao;
 
-        if (customerCredit.getCredit().doubleValue() > creditFilter) {
-            dao.writeCredit(customerCredit);
-        }
-    }
+	public void write(List<? extends CustomerCredit> customerCredits) throws Exception {
+		for (CustomerCredit customerCredit : customerCredits) {
+			if (customerCredit.getCredit().doubleValue() > creditFilter) {
+				dao.writeCredit(customerCredit);
+			}
+		}
+	}
 
-    public void setCreditFilter(double creditFilter) {
-        this.creditFilter = creditFilter;
-    }
+	public void setCreditFilter(double creditFilter) {
+		this.creditFilter = creditFilter;
+	}
 
-    public void setDao(CustomerCreditDao dao) {
-        this.dao = dao;
-    }
+	public void setDao(CustomerCreditDao dao) {
+		this.dao = dao;
+	}
 
 }

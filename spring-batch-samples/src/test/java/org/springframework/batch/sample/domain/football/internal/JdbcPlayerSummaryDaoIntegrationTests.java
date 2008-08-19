@@ -17,6 +17,8 @@ package org.springframework.batch.sample.domain.football.internal;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
+
 import javax.sql.DataSource;
 
 import org.junit.Before;
@@ -29,13 +31,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-
 /**
  * @author Lucas Ward
  * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/data-source-context.xml"})
+@ContextConfiguration(locations = { "/data-source-context.xml" })
 public class JdbcPlayerSummaryDaoIntegrationTests {
 
 	private JdbcPlayerSummaryDao playerSummaryDao;
@@ -73,17 +74,18 @@ public class JdbcPlayerSummaryDaoIntegrationTests {
 		simpleJdbcTemplate.getJdbcOperations().execute("delete from PLAYER_SUMMARY");
 
 	}
-	
-	@Transactional @Test
+
+	@Transactional
+	@Test
 	public void testWrite() {
 
-		playerSummaryDao.write(summary);
+		playerSummaryDao.write(Collections.singletonList(summary));
 
 		PlayerSummary testSummary = simpleJdbcTemplate.queryForObject("SELECT * FROM PLAYER_SUMMARY",
-						new PlayerSummaryMapper());
+				new PlayerSummaryMapper());
 
 		assertEquals(summary, testSummary);
-		
+
 	}
 
 }

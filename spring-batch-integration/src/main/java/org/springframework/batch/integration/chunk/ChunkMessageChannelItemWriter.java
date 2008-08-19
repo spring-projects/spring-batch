@@ -64,10 +64,12 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		this.target = target;
 	}
 
-	public void write(T item) throws Exception {
+	public void write(List<? extends T> items) throws Exception {
 		bindTransactionResources();
-		getProcessed().add(item);
-		logger.debug("Added item to chunk: " + item);
+		for (T item : items) {
+			getProcessed().add(item);
+			logger.debug("Added item to chunk: " + item);
+		}
 	}
 
 	/**

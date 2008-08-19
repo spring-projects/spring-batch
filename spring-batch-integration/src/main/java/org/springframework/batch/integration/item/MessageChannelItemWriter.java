@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.integration.item;
 
+import java.util.List;
+
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.integration.channel.MessageChannel;
@@ -39,10 +41,13 @@ public class MessageChannelItemWriter<T> extends AbstractItemWriter<T> {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(java.lang.Object)
 	 */
-	public void write(T item) throws Exception {
-		channel.send(new GenericMessage<T>(item));
+	public void write(List<? extends T> items) throws Exception {
+		for (T item : items) {
+			channel.send(new GenericMessage<T>(item));
+		}
 	}
 
 }

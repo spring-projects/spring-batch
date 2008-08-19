@@ -16,6 +16,8 @@
 
 package org.springframework.batch.sample.domain.trade.internal;
 
+import java.util.Collections;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
@@ -47,7 +49,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 		String line = "" + customerCredit.getName() + separator
 				+ customerCredit.getCredit();
 
-		itemWriter.write(line);
+		itemWriter.write(Collections.singletonList(line));
 	}
 
 	public void setSeparator(String separator) {

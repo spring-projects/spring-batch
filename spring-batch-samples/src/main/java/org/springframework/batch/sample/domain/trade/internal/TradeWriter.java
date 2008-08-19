@@ -16,6 +16,8 @@
 
 package org.springframework.batch.sample.domain.trade.internal;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.support.AbstractItemWriter;
@@ -44,14 +46,18 @@ public class TradeWriter extends AbstractItemWriter<Trade> {
 		this.failure = failure;
 	}
 
-	public void write(Trade trade) {
+	public void write(List<? extends Trade> trades) {
 
-		log.debug(trade);
+		for (Trade trade : trades) {
 
-		dao.writeTrade(trade);
+			log.debug(trade);
 
-		if (index++ == failure) {
-			throw new RuntimeException("Something unexpected happened!");
+			dao.writeTrade(trade);
+
+			if (index++ == failure) {
+				throw new RuntimeException("Something unexpected happened!");
+			}
+
 		}
 
 	}

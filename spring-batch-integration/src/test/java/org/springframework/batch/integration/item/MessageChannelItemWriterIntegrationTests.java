@@ -18,6 +18,8 @@ package org.springframework.batch.integration.item;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Collections;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemWriter;
@@ -43,7 +45,7 @@ public class MessageChannelItemWriterIntegrationTests {
 	
 	@Test
 	public void testSend() throws Exception {
-		itemWriter.write("foo");
+		itemWriter.write(Collections.singletonList("foo"));
 		Message<?> message = channel.receive(10);
 		assertNotNull(message);
 		assertEquals("foo", message.getPayload());

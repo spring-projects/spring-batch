@@ -3,6 +3,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 import static org.easymock.EasyMock.*;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class CustomerCreditUpdateProcessorTests {
 		CustomerCredit credit = new CustomerCredit();
 		credit.setCredit(new BigDecimal(CREDIT_FILTER));
 		//call tested method
-		writer.write(credit);
+		writer.write(Collections.singletonList(credit));
 		//verify method calls - no method should be called 
 		//because credit is not greater then credit filter
 		verify(dao);
@@ -48,7 +49,7 @@ public class CustomerCreditUpdateProcessorTests {
 		replay(dao);
 		
 		//call tested method
-		writer.write(credit);
+		writer.write(Collections.singletonList(credit));
 		
 		//verify method calls
 		verify(dao);

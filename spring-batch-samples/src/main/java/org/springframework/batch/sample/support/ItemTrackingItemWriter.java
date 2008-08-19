@@ -12,15 +12,16 @@ import org.springframework.batch.item.validator.ValidationException;
 public class ItemTrackingItemWriter<T> extends AbstractItemWriter<T> {
 
 	private List<T> items = new ArrayList<T>();
-	
+
 	private int failure = -1;
-	
+
 	private int counter = 0;
-	
-	public void write(T item) throws Exception {
-		
-		items.add(item);
-		if (++counter == failure) {
+
+	public void write(List<? extends T> item) throws Exception {
+		items.addAll(item);
+		int current = counter;
+		counter += item.size();
+		if (current < failure && counter >= failure) {
 			throw new ValidationException("validation failed");
 		}
 	}

@@ -3,6 +3,9 @@ package org.springframework.batch.sample.support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.Test;
 
 /**
@@ -20,20 +23,18 @@ public class RetrySampleItemWriterTests {
 	@Test
 	public void testProcess() throws Exception {
 		Object item = null;
-		processor.write(item);
+		processor.write(Collections.singletonList(item));
 
-		for (int i = 0; i < 2; i++) {
-			try {
-				processor.write(item);
-				fail();
-			}
-			catch (RuntimeException e) {
-				// expected
-			}
+		try {
+			processor.write(Arrays.asList(new Object[] { item, item, item }));
+			fail();
 		}
-		
-		processor.write(item);
-		
+		catch (RuntimeException e) {
+			// expected
+		}
+
+		processor.write(Collections.singletonList(item));
+
 		assertEquals(4, processor.getCounter());
 	}
 }

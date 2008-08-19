@@ -3,6 +3,7 @@ package org.springframework.batch.sample.common;
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.StepExecution;
@@ -68,22 +69,28 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	/**
 	 * Serialize the item to the staging table, and add a NEW processed flag.
 	 * 
-	 * @see ItemWriter#write(java.lang.Object)
+	 * @see ItemWriter#write(java.util.List)
 	 */
-	public void write(T data) {
-		final long id = incrementer.nextLongValue();
-		final long jobId = stepExecution.getJobExecution().getJobId();
-		final byte[] blob = SerializationUtils.serialize((Serializable) data);
-		getJdbcTemplate().update("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
-				new PreparedStatementSetter() {
-					public void setValues(PreparedStatement ps) throws SQLException {
-						ps.setLong(1, id);
-						ps.setLong(2, jobId);
-						lobHandler.getLobCreator().setBlobAsBytes(ps, 3, blob);
-						ps.setString(4, NEW);
-					}
+	public void write(List<? extends T> items) {
 
-				});
+		for (T data : items) {
+
+			final long id = incrementer.nextLongValue();
+			final long jobId = stepExecution.getJobExecution().getJobId();
+			final byte[] blob = SerializationUtils.serialize((Serializable) data);
+			getJdbcTemplate().update("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
+					new PreparedStatementSetter() {
+						public void setValues(PreparedStatement ps) throws SQLException {
+							ps.setLong(1, id);
+							ps.setLong(2, jobId);
+							lobHandler.getLobCreator().setBlobAsBytes(ps, 3, blob);
+							ps.setString(4, NEW);
+						}
+
+					});
+
+		}
+
 	}
 
 	public void clear() throws ClearFailedException {

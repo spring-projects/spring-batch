@@ -17,6 +17,8 @@ package org.springframework.batch.sample.common;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
+
 import javax.sql.DataSource;
 
 import org.junit.Before;
@@ -57,7 +59,7 @@ public class StagingItemWriterTests {
 	@Test
 	public void testProcessInsertsNewItem() throws Exception {
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
-		writer.write("FOO");
+		writer.write(Collections.singletonList("FOO"));
 		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING");
 		assertEquals(before + 1, after);
 	}

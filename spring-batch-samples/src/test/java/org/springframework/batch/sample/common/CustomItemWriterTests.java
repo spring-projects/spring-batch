@@ -16,6 +16,8 @@
 package org.springframework.batch.sample.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -42,39 +44,37 @@ public class CustomItemWriterTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
-	
-	public void testFlush() throws Exception{
-		
+
+	public void testFlush() throws Exception {
+
 		CustomItemWriter<String> itemWriter = new CustomItemWriter<String>();
-		itemWriter.write("1");
+		itemWriter.write(Collections.singletonList("1"));
 		assertEquals(0, itemWriter.getOutput().size());
 		itemWriter.flush();
 		assertEquals(1, itemWriter.getOutput().size());
-		itemWriter.write("2");
-		itemWriter.write("3");
+		itemWriter.write(Arrays.asList(new String[] {"2","3"}));
 		itemWriter.clear();
 		assertEquals(1, itemWriter.getOutput().size());
 	}
 
-	public class CustomItemWriter<T> implements ItemWriter<T>{
-		
+	public class CustomItemWriter<T> implements ItemWriter<T> {
+
 		List<T> output = new ArrayList<T>();
+
 		List<T> buffer = new ArrayList<T>();
 
-		public void write(T item) throws Exception {
-			buffer.add(item);
+		public void write(List<? extends T> items) throws Exception {
+			buffer.addAll(items);
 		}
-		
+
 		public void clear() throws ClearFailedException {
 			buffer.clear();
 		}
 
 		public void flush() throws FlushFailedException {
-			for(T t:buffer){
-				output.add(t);
-			}
+			output.addAll(buffer);
 		}
-		
+
 		public List<T> getOutput() {
 			return output;
 		}

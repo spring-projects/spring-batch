@@ -16,14 +16,16 @@
 
 package org.springframework.batch.sample.domain.trade.internal;
 
+import java.util.List;
+
 import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.batch.sample.domain.trade.Trade;
 
-
 /**
- * Transforms Trade to a CustomerDebit and asks DAO delegate to write the result.
+ * Transforms Trade to a CustomerDebit and asks DAO delegate to write the
+ * result.
  * 
  * @author Robert Kasanicky
  */
@@ -31,14 +33,16 @@ public class CustomerUpdateWriter extends AbstractItemWriter<Trade> {
 
 	private CustomerDebitDao dao;
 
-    public void write(Trade trade) {
-        CustomerDebit customerDebit = new CustomerDebit();
-        customerDebit.setName(trade.getCustomer());
-        customerDebit.setDebit(trade.getPrice());
-        dao.write(customerDebit);
-    }
+	public void write(List<? extends Trade> trades) {
+		for (Trade trade : trades) {
+			CustomerDebit customerDebit = new CustomerDebit();
+			customerDebit.setName(trade.getCustomer());
+			customerDebit.setDebit(trade.getPrice());
+			dao.write(customerDebit);
+		}
+	}
 
-    public void setDao(CustomerDebitDao outputSource) {
-        this.dao = outputSource;
-    }
+	public void setDao(CustomerDebitDao outputSource) {
+		this.dao = outputSource;
+	}
 }

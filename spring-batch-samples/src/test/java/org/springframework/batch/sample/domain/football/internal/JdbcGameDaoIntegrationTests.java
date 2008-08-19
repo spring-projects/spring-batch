@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 
 import javax.sql.DataSource;
 
@@ -79,7 +80,7 @@ public class JdbcGameDaoIntegrationTests {
 	@Transactional @Test
 	public void testWrite() {
 
-		gameDao.write(game);
+		gameDao.write(Collections.singletonList(game));
 
 		Game tempGame = simpleJdbcTemplate.queryForObject("SELECT * FROM GAMES where PLAYER_ID=? AND YEAR_NO=?",
 				new GameRowMapper(), "XXXXX00 ", game.getYear());
