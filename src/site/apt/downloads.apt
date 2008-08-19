@@ -15,7 +15,7 @@ Spring Batch Downloads
 
   * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  
 
-  * Milestones: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.
+  * Milestones: {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
 
 * Maven Artifacts
 
@@ -47,7 +47,7 @@ Spring Batch Downloads
 
   These builds are provided for evaluation and community feedback.  Spring Batch builds have a release identifier ending in "mX" where X is the milestone number, or "rcX" for a release candidate.  
 
-  You can find the .ZIP downloads of the milestones {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.
+  You can find the .ZIP downloads of the milestones {{{http://static.springframework.org/downloads/nightly/milestone-download.php?project=BATCH}here}}.
 
   Milestones and snapshots Maven artifacts are also published in s3, but not in Maven central repo.  You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}repository}} with a web browser.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
