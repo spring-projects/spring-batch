@@ -15,16 +15,15 @@
  */
 package org.springframework.batch.sample.common;
 
-import java.util.ArrayList;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
-import org.springframework.batch.item.ItemWriter;
+import org.junit.Test;
+import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 /**
  * Unit test class that was used as part of the Reference Documentation. I'm
@@ -34,45 +33,24 @@ import org.springframework.batch.item.ItemWriter;
  * @author Lucas Ward
  * 
  */
-public class CustomItemWriterTests extends TestCase {
+public class CustomItemWriterTests {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
-
+	@Test
 	public void testFlush() throws Exception {
 
 		CustomItemWriter<String> itemWriter = new CustomItemWriter<String>();
 		itemWriter.write(Collections.singletonList("1"));
-		assertEquals(0, itemWriter.getOutput().size());
-		itemWriter.flush();
 		assertEquals(1, itemWriter.getOutput().size());
 		itemWriter.write(Arrays.asList(new String[] {"2","3"}));
-		itemWriter.clear();
-		assertEquals(1, itemWriter.getOutput().size());
+		assertEquals(3, itemWriter.getOutput().size());
 	}
 
-	public class CustomItemWriter<T> implements ItemWriter<T> {
+	public class CustomItemWriter<T> extends AbstractItemWriter<T> {
 
-		List<T> output = new ArrayList<T>();
-
-		List<T> buffer = new ArrayList<T>();
+		List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 
 		public void write(List<? extends T> items) throws Exception {
-			buffer.addAll(items);
-		}
-
-		public void clear() throws ClearFailedException {
-			buffer.clear();
-		}
-
-		public void flush() throws FlushFailedException {
-			output.addAll(buffer);
+			output.addAll(items);
 		}
 
 		public List<T> getOutput() {

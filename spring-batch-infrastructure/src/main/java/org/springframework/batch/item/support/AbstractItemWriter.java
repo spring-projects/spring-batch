@@ -20,8 +20,7 @@ import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Abstract {@link ItemWriter} that allows for base classes to only implement
- * the {@link #flush()} and {@link #clear()} methods if they need it.
+ * Abstract {@link ItemWriter}.
  * 
  * @author Lucas Ward
  */

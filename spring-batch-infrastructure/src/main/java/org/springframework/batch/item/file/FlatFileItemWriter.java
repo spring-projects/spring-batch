@@ -86,8 +86,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private String encoding = OutputState.DEFAULT_CHARSET;
 
-	private List<String> lineBuffer = new ArrayList<String>();
-
 	private List<String> headerLines = new ArrayList<String>();
 
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
@@ -185,16 +183,24 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 */
 	public void write(List<? extends T> items) throws Exception {
 
-		for (T item : items) {
-
-			if (getOutputState().isInitialized()) {
-				lineBuffer.add(lineAggregator.aggregate(item) + lineSeparator);
-			}
-			else {
-				throw new WriterNotOpenException("Writer must be open before it can be written to");
-			}
-
+		if (!getOutputState().isInitialized()) {
+			throw new WriterNotOpenException("Writer must be open before it can be written to");
 		}
+
+		OutputState state = getOutputState();
+
+		for (T item : items) {
+			String line = lineAggregator.aggregate(item) + lineSeparator;
+			try {
+				state.write(line);
+			} catch (IOException e) {
+				throw new FlushFailedException(
+						"Could not write data.  The file may be corrupt.", e);
+			}
+		}
+
+		state.mark();
+
 	}
 
 	/**
@@ -222,7 +228,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		}
 	}
 
-	private void doOpen(ExecutionContext executionContext) {
+	private void doOpen(ExecutionContext executionContext) throws ItemStreamException {
 		OutputState outputState = getOutputState();
 		if (executionContext.containsKey(getKey(RESTART_DATA_NAME))) {
 			outputState.restoreFrom(executionContext);
@@ -234,8 +240,14 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			throw new ItemStreamException("Failed to initialize writer", ioe);
 		}
 		if (outputState.lastMarkedByteOffsetPosition == 0) {
-			for (String line : headerLines) {
-				lineBuffer.add(line + lineSeparator);
+			try {
+				for (String line : headerLines) {
+					outputState.write(line + lineSeparator);
+				}
+			}
+			catch (IOException e) {
+				throw new FlushFailedException(
+						"Could not write headers.  The file may be corrupt.", e);
 			}
 		}
 	}
@@ -264,17 +276,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	public void flush() throws FlushFailedException {
-		OutputState state = getOutputState();
-		for (String line : lineBuffer) {
-			try {
-				state.write(line);
-			}
-			catch (IOException e) {
-				throw new FlushFailedException("Failed to write line to output file: " + line, e);
-			}
-		}
-		lineBuffer.clear();
-		state.mark();
 	}
 
 	// Returns object representing state.
@@ -501,7 +502,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	public void clear() throws ClearFailedException {
-		lineBuffer.clear();
 	}
 
 }

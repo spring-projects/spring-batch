@@ -442,9 +442,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		protected final Log logger = LogFactory.getLog(getClass());
 
-		private List<Object> written = new ArrayList<Object>();
-
-		private int flushIndex = -1;
+		private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
 
 		private final Collection<String> failures;
 
@@ -461,13 +459,9 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		public void clear() throws ClearFailedException {
-			for (int i = flushIndex + 1; i < written.size(); i++) {
-				written.remove(written.size() - 1);
-			}
 		}
 
 		public void flush() throws FlushFailedException {
-			flushIndex = written.size() - 1;
 		}
 
 		public void write(List<? extends String> items) throws Exception {

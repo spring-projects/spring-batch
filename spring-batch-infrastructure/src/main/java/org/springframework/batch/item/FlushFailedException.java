@@ -16,7 +16,7 @@
 package org.springframework.batch.item;
 
 /**
- * Unchecked exception indicating that an error has occurred while trying to call {@link ItemWriter#flush()}
+ * Unchecked exception indicating that an error has occurred while trying to flush a buffer.
  * 
  * @author Lucas Ward
  * @author Ben Hale

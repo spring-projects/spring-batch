@@ -144,18 +144,14 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	/**
 	 * @throws ClearFailedException
-	 * @see org.springframework.batch.item.ItemWriter#clear()
 	 */
 	public void clear() throws ClearFailedException {
-		itemWriter.clear();
 	}
 
 	/**
 	 * @throws FlushFailedException
-	 * @see org.springframework.batch.item.ItemWriter#flush()
 	 */
 	public void flush() throws FlushFailedException {
-		itemWriter.flush();
 	}
 
 }

@@ -1,6 +1,5 @@
 package org.springframework.batch.integration.chunk;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -15,22 +14,15 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.integration.message.BlockingSource;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageTarget;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 
 public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>, ItemStream {
 
 	private static final Log logger = LogFactory.getLog(ChunkMessageChannelItemWriter.class);
-
-	/**
-	 * Key for items processed in the current transaction {@link RepeatContext}.
-	 */
-	private static final String ITEMS_PROCESSED = ChunkMessageChannelItemWriter.class.getName() + ".ITEMS_PROCESSED";
 
 	static final String ACTUAL = "ACTUAL";
 
@@ -65,38 +57,16 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	public void write(List<? extends T> items) throws Exception {
-		bindTransactionResources();
-		for (T item : items) {
-			getProcessed().add(item);
-			logger.debug("Added item to chunk: " + item);
-		}
-	}
-
-	/**
-	 * Flush the buffer, sending the items as a chunk message to be processed by
-	 * a {@link ChunkHandler}. To avoid overwhelming the receivers, this method
-	 * will block until the number of chunks pending is less than the throttle
-	 * limit.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#flush()
-	 */
-	public void flush() throws FlushFailedException {
-
-		bindTransactionResources(); // in case we are called outside a
-		// transaction
-
 		// Block until expecting <= throttle limit - can Spring
 		// Integration do that for me?
 		while (localState.getExpecting() > throttleLimit) {
 			getNextResult(100);
 		}
 
-		List<T> processed = getProcessed();
+		if (!items.isEmpty()) {
 
-		if (!processed.isEmpty()) {
-
-			logger.debug("Dispatching chunk: " + processed);
-			ChunkRequest<T> request = new ChunkRequest<T>(processed, localState.getJobId(), localState.getSkipCount());
+			logger.debug("Dispatching chunk: " + items);
+			ChunkRequest<T> request = new ChunkRequest<T>(items, localState.getJobId(), localState.getSkipCount());
 			GenericMessage<ChunkRequest<T>> message = new GenericMessage<ChunkRequest<T>>(request);
 			target.send(message);
 			localState.expected++;
@@ -106,8 +76,20 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		// Short little timeout to look for an immediate reply.
 		getNextResult(1);
 
-		unbindTransactionResources();
+	}
 
+	/**
+	 * No-op.
+	 * @see org.springframework.batch.item.ItemWriter#flush()
+	 */
+	public void flush() throws FlushFailedException {
+	}
+
+	/**
+	 * No-op.
+	 * @see org.springframework.batch.item.ItemWriter#clear()
+	 */
+	public void clear() throws ClearFailedException {
 	}
 
 	@Override
@@ -179,7 +161,6 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * otherwise return null.
 	 */
 	private void getNextResult(long timeout) {
-		// TODO: use the timeout
 		Message<ChunkResponse> message = source.receive(timeout);
 		if (message != null) {
 			ChunkResponse payload = message.getPayload();
@@ -194,50 +175,6 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 				throw new AsynchronousFailureException("Failure or early completion detected in handler: " + result);
 			}
 		}
-	}
-
-	/**
-	 * Accessor for the list of processed items in this transaction.
-	 * 
-	 * @return the processed
-	 */
-	private List<T> getProcessed() {
-		Assert.state(TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED),
-				"Processed items not bound to transaction.");
-		@SuppressWarnings("unchecked")
-		List<T> processed = (List<T>) TransactionSynchronizationManager.getResource(ITEMS_PROCESSED);
-		return processed;
-	}
-
-	/**
-	 * Set up the {@link RepeatContext} as a transaction resource.
-	 * 
-	 * @param context the context to set
-	 */
-	private void bindTransactionResources() {
-		if (TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
-			return;
-		}
-		TransactionSynchronizationManager.bindResource(ITEMS_PROCESSED, new ArrayList<Object>());
-	}
-
-	/**
-	 * Remove the transaction resource associated with this context.
-	 */
-	private void unbindTransactionResources() {
-		if (!TransactionSynchronizationManager.hasResource(ITEMS_PROCESSED)) {
-			return;
-		}
-		TransactionSynchronizationManager.unbindResource(ITEMS_PROCESSED);
-	}
-
-	/**
-	 * Clear the buffer.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#clear()
-	 */
-	public void clear() throws ClearFailedException {
-		unbindTransactionResources();
 	}
 
 	private static class LocalState {

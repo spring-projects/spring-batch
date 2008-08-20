@@ -109,17 +109,10 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	// byte offset in file channel at last commit point
 	private long lastCommitPointPosition = 0;
 
-	// processed record count at last commit point
-	private long lastCommitPointRecordCount = 0;
-
 	// current count of processed records
 	private long currentRecordCount = 0;
 
 	private boolean saveState = true;
-
-	// holds the list of items for writing before they are actually written on
-	// #flush()
-	private List<T> buffer = new ArrayList<T>();
 
 	private List<? extends T> headers = new ArrayList<T>();
 
@@ -345,6 +338,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			}
 
 		}
+		
+		writer.flush();
 
 	}
 
@@ -384,8 +379,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			log.error(e);
 		}
 
-		flush();
 		try {
+			delegateEventWriter.flush();
 			endDocument(delegateEventWriter);
 			eventWriter.close();
 			channel.close();
@@ -399,15 +394,25 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
-	 * Write the value object to internal buffer.
+	 * Write the value objects and flush them to the file.
 	 * 
-	 * @param item the value object
-	 * @see #flush()
+	 * @param items the value object
 	 */
-	public void write(List<? extends T> item) {
+	public void write(List<? extends T> items) {
 
-		currentRecordCount+=item.size();
-		buffer.addAll(item);
+		currentRecordCount+=items.size();
+
+		for (T item : items) {
+			serializer.serializeObject(eventWriter, item);
+		}
+		try {
+			eventWriter.flush();
+		}
+		catch (XMLStreamException e) {
+			throw new FlushFailedException("Failed to flush the events", e);
+		}
+
+		lastCommitPointPosition = getPosition();
 	}
 
 	/**
@@ -468,28 +473,12 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * Writes buffered items to XML stream and marks restore point.
 	 */
 	public void flush() throws FlushFailedException {
-
-		for (T item : buffer) {
-			serializer.serializeObject(eventWriter, item);
-		}
-		try {
-			eventWriter.flush();
-		}
-		catch (XMLStreamException e) {
-			throw new FlushFailedException("Failed to flush the events", e);
-		}
-		buffer.clear();
-
-		lastCommitPointPosition = getPosition();
-		lastCommitPointRecordCount = currentRecordCount;
 	}
 
 	/**
 	 * Clear the output buffer
 	 */
 	public void clear() throws ClearFailedException {
-		currentRecordCount = lastCommitPointRecordCount;
-		buffer.clear();
 	}
 
 }

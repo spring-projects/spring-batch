@@ -63,15 +63,13 @@ public interface StepHandler {
 
 	/**
 	 * Implementations should delegate to an {@link ItemWriter}.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#flush()
+	 * @deprecated
 	 */
 	public void flush() throws FlushFailedException;
 
 	/**
 	 * Implementations should delegate to an {@link ItemWriter}.
-	 * 
-	 * @see org.springframework.batch.item.ItemWriter#clear()
+	 * @deprecated
 	 */
 	public void clear() throws ClearFailedException;
 

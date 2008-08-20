@@ -3,8 +3,6 @@ package org.springframework.batch.item.support;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -15,7 +13,7 @@ import org.springframework.batch.item.ItemWriter;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class CompositeItemWriter<T> implements ItemWriter<T> {
+public class CompositeItemWriter<T> extends AbstractItemWriter<T> {
 
 	private List<ItemWriter<? super T>> delegates;
 
@@ -29,18 +27,6 @@ public class CompositeItemWriter<T> implements ItemWriter<T> {
 	public void write(List<? extends  T> item) throws Exception {
 		for (ItemWriter<? super T> writer : delegates) {
 			writer.write(item);
-		}
-	}
-
-	public void clear() throws ClearFailedException {
-		for (ItemWriter<? super T> writer : delegates) {
-			writer.clear();
-		}
-	}
-
-	public void flush() throws FlushFailedException {
-		for (ItemWriter<? super  T> writer : delegates) {
-			writer.flush();
 		}
 	}
 

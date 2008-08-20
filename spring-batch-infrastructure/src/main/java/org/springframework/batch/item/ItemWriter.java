@@ -56,6 +56,7 @@ public interface ItemWriter<T> {
 	 * @throws FlushFailedException in case of an error.  If this exception is
 	 * thrown the writer may be in an inconsistent state and manual intervention
 	 * might be required to reconcile the data with persistent output.
+	 * @deprecated
 	 */
 	void flush() throws FlushFailedException;
 
@@ -65,6 +66,7 @@ public interface ItemWriter<T> {
 	 * @throws ClearFailedException in case of an error. If this exception is
 	 * thrown the writer may be in an inconsistent state and manual intervention
 	 * might be required to reconcile the data with persistent output.
+	 * @deprecated
 	 */
 	void clear() throws ClearFailedException;
 }

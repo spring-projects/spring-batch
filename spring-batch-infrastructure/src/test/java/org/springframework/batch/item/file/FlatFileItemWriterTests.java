@@ -198,49 +198,13 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals("1|2|", lineFromFile);
 	}
 
-	public void testRollback() throws Exception {
-		writer.open(executionContext);
-		writer.write(Collections.singletonList("testLine1"));
-		// rollback
-		rollback();
-		writer.flush();
-		writer.close(null);
-		String lineFromFile = readLine();
-		assertEquals(null, lineFromFile);
-	}
-
-	public void testCommit() throws Exception {
-		writer.open(executionContext);
-		writer.write(Collections.singletonList("testLine1"));
-		// rollback
-		commit();
-		writer.close(null);
-		String lineFromFile = readLine();
-		assertEquals("testLine1", lineFromFile);
-	}
-
 	public void testRestart() throws Exception {
 
 		writer.open(executionContext);
-
 		// write some lines
 		writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
-
-		// commit
-		commit();
-
-		// this will be rolled back...
-		writer.write(Collections.singletonList("this will be rolled back"));
-
-		// rollback
-		rollback();
-
 		// write more lines
 		writer.write(Arrays.asList(new String[] {"testLine4", "testLine5"}));
-
-		// commit
-		commit();
-
 		// get restart data
 		writer.update(executionContext);
 		// close template
@@ -248,19 +212,15 @@ public class FlatFileItemWriterTests extends TestCase {
 
 		// init with correct data
 		writer.open(executionContext);
-
 		// write more lines
 		writer.write(Arrays.asList(new String[] {"testLine6","testLine7","testLine8"}));
-
-		commit();
-
 		// get statistics
 		writer.update(executionContext);
 		// close template
 		writer.close(executionContext);
 
 		// verify what was written to the file
-		for (int i = 1; i < 9; i++) {
+		for (int i = 1; i <= 8; i++) {
 			assertEquals("testLine" + i, readLine());
 		}
 
