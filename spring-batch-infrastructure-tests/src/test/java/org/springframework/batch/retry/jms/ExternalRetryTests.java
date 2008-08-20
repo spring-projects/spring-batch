@@ -29,8 +29,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.AbstractItemReader;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -108,7 +108,7 @@ public class ExternalRetryTests {
 
 		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
 
-		final AbstractItemWriter<Object> writer = new AbstractItemWriter<Object>() {
+		final ItemWriter<Object> writer = new ItemWriter<Object>() {
 			public void write(final List<? extends Object> texts) {
 
 				for (Object text : texts) {

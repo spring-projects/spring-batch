@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.StringUtils;
 
@@ -28,7 +28,7 @@ public class ItemWriterChunkHandlerTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testVanillaHandleChunk() {
-		handler.setItemWriter(new AbstractItemWriter<Object>() {
+		handler.setItemWriter(new ItemWriter<Object>() {
 			public void write(List<? extends Object> items) throws Exception {
 				count+=items.size();
 			}
@@ -44,7 +44,7 @@ public class ItemWriterChunkHandlerTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetItemSkipPolicy() {
-		handler.setItemWriter(new AbstractItemWriter<Object>() {
+		handler.setItemWriter(new ItemWriter<Object>() {
 			public void write(List<? extends Object> items) throws Exception {
 				count+=items.size();
 				throw new RuntimeException("Planned failure");
@@ -62,7 +62,7 @@ public class ItemWriterChunkHandlerTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testRegisterSkipListener() {
-		handler.setItemWriter(new AbstractItemWriter<Object>() {
+		handler.setItemWriter(new ItemWriter<Object>() {
 			public void write(List<? extends Object> items) throws Exception {
 				count+=items.size();
 				throw new RuntimeException("Planned failure");

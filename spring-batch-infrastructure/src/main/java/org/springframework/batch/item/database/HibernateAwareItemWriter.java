@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.orm.hibernate3.HibernateOperations;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -29,11 +28,7 @@ import org.springframework.util.Assert;
  * {@link ItemWriter} that is aware of the Hibernate session and can take some
  * responsibilities to do with chunk boundaries away from a less smart
  * {@link ItemWriter} (the delegate). A delegate is required, and will be used
- * to do the actual writing of the item.<br/>
- * 
- * It is expected that {@link #write(List)} is called inside a transaction, and
- * that {@link #flush()} is then subsequently called before the transaction
- * commits, or {@link #clear()} before it rolls back.<br/>
+ * to do the actual writing of the item.<br/><br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
  * behaviour), so it can be used to write in multiple concurrent transactions.
@@ -45,7 +40,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class HibernateAwareItemWriter<T> extends AbstractItemWriter<T> implements InitializingBean {
+public class HibernateAwareItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private ItemWriter<? super T> delegate;
 

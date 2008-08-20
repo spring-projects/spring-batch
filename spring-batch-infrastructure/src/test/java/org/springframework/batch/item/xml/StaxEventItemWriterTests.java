@@ -110,7 +110,6 @@ public class StaxEventItemWriterTests {
 		writer.setHeaderItems(new Object[] {header1, header2});
 		writer.open(executionContext);
 		writer.write(items);
-		writer.flush();
 		String content = outputFileContent();
 		assertTrue("Wrong content: "+content, content.contains(("<!--" + header1 + "-->")));
 		assertTrue("Wrong content: "+content, content.contains(("<!--" + header2 + "-->")));

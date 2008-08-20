@@ -379,10 +379,6 @@ public class StepHandlerStep extends AbstractStep {
 			}
 		});
 
-		// Attempt to flush before the step execution and stream
-		// state are updated
-		itemHandler.flush();
-
 		return result;
 	}
 
@@ -405,7 +401,6 @@ public class StepHandlerStep extends AbstractStep {
 
 		try {
 			itemHandler.reset();
-			itemHandler.clear();
 			transactionManager.rollback(transaction);
 		}
 		catch (Exception e) {

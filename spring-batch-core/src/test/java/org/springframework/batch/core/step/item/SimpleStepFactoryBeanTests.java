@@ -40,7 +40,6 @@ import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
@@ -63,7 +62,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 
 	private List<String> written = new ArrayList<String>();
 
-	private ItemWriter<String> writer = new AbstractItemWriter<String>() {
+	private ItemWriter<String> writer = new ItemWriter<String>() {
 		public void write(List<? extends String> data) throws Exception {
 			written.addAll(data);
 		}
@@ -165,7 +164,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		 */
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		factory.setItemWriter(new AbstractItemWriter<String>() {
+		factory.setItemWriter(new ItemWriter<String>() {
 			public void write(List<? extends String> data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
@@ -198,7 +197,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	public void testExceptionTerminates() throws Exception {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
-		factory.setItemWriter(new AbstractItemWriter<String>() {
+		factory.setItemWriter(new ItemWriter<String>() {
 			public void write(List<? extends String> data) throws Exception {
 				throw new RuntimeException("Foo");
 			}
@@ -222,7 +221,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setExceptionHandler(new SimpleLimitExceptionHandler(1));
-		factory.setItemWriter(new AbstractItemWriter<String>() {
+		factory.setItemWriter(new ItemWriter<String>() {
 			int count = 0;
 
 			public void write(List<? extends String> data) throws Exception {

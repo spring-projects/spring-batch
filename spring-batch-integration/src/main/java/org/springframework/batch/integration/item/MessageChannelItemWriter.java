@@ -17,7 +17,7 @@ package org.springframework.batch.integration.item;
 
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
@@ -26,7 +26,7 @@ import org.springframework.integration.message.GenericMessage;
  * @author Dave Syer
  * 
  */
-public class MessageChannelItemWriter<T> extends AbstractItemWriter<T> {
+public class MessageChannelItemWriter<T> implements ItemWriter<T> {
 
 	private MessageChannel channel;
 

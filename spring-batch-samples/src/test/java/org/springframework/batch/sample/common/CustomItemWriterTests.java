@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 /**
@@ -45,7 +45,7 @@ public class CustomItemWriterTests {
 		assertEquals(3, itemWriter.getOutput().size());
 	}
 
-	public class CustomItemWriter<T> extends AbstractItemWriter<T> {
+	public class CustomItemWriter<T> implements ItemWriter<T> {
 
 		List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 

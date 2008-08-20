@@ -2,11 +2,11 @@ package org.springframework.batch.sample.domain.football.internal;
 
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.football.Player;
 import org.springframework.batch.sample.domain.football.PlayerDao;
 
-public class PlayerItemWriter extends AbstractItemWriter<Player> {
+public class PlayerItemWriter implements ItemWriter<Player> {
 
 	private PlayerDao playerDao;
 

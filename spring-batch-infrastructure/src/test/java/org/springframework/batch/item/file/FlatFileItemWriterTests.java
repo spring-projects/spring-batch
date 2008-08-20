@@ -16,6 +16,11 @@
 
 package org.springframework.batch.item.file;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -24,14 +29,14 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import junit.framework.TestCase;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -44,7 +49,7 @@ import org.springframework.util.ClassUtils;
  * @author Dave Syer
  * 
  */
-public class FlatFileItemWriterTests extends TestCase {
+public class FlatFileItemWriterTests {
 
 	// object under test
 	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
@@ -64,7 +69,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * Create temporary output file, define mock behaviour, set dependencies and
 	 * initialize the object under test
 	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 
 		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
 
@@ -78,7 +84,8 @@ public class FlatFileItemWriterTests extends TestCase {
 	/**
 	 * Release resources and delete the temporary output file
 	 */
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		if (reader != null) {
 			reader.close();
 		}
@@ -100,6 +107,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		return reader.readLine();
 	}
 
+	@Test
 	public void testWriteWithMultipleOpen() throws Exception {
 
 		writer.open(executionContext);
@@ -110,6 +118,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals("test2", readLine());
 	}
 
+	@Test
 	public void testOpenTwice() {
 		// opening the writer twice should cause no issues
 		writer.open(executionContext);
@@ -121,6 +130,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testWriteString() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
@@ -135,6 +145,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testWriteWithConverter() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
 			public String aggregate(String item) {
@@ -154,6 +165,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testWriteWithConverterAndString() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
 			public String aggregate(String item) {
@@ -171,6 +183,7 @@ public class FlatFileItemWriterTests extends TestCase {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testWriteRecord() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList("1"));
@@ -178,6 +191,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals("1", lineFromFile);
 	}
 
+	@Test
 	public void testWriteRecordWithrecordSeparator() throws Exception {
 		writer.setLineSeparator("|");
 		writer.open(executionContext);
@@ -186,6 +200,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals("1|2|", lineFromFile);
 	}
 
+	@Test
 	public void testRestart() throws Exception {
 
 		writer.open(executionContext);
@@ -217,6 +232,7 @@ public class FlatFileItemWriterTests extends TestCase {
 
 	}
 
+	@Test
 	public void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<String>();
 		writer.setLineAggregator(new PassThroughLineAggregator<String>());
@@ -237,6 +253,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
 		writer = new FlatFileItemWriter<String>();
 		try {
@@ -248,6 +265,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testDefaultStreamContext() throws Exception {
 		writer = new FlatFileItemWriter<String>();
 		writer.setResource(new FileSystemResource(outputFile));
@@ -261,6 +279,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(0, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".current.count"));
 	}
 
+	@Test
 	public void testWriteStringWithBogusEncoding() throws Exception {
 		writer.setEncoding("BOGUS");
 		try {
@@ -273,6 +292,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		writer.close(null);
 	}
 
+	@Test
 	public void testWriteStringWithEncodingAfterClose() throws Exception {
 		testWriteStringWithBogusEncoding();
 		writer.setEncoding("UTF-8");
@@ -283,6 +303,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
+	@Test
 	public void testWriteHeader() throws Exception {
 		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
@@ -296,6 +317,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
+	@Test
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
 		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);
@@ -314,6 +336,7 @@ public class FlatFileItemWriterTests extends TestCase {
 		assertEquals(null, lineFromFile);
 	}
 
+	@Test
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
 		writer.setHeaderLines(new String[] { "a", "b" });
 		writer.open(executionContext);

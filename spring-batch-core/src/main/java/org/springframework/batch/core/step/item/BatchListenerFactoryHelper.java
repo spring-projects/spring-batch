@@ -28,8 +28,6 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
 import org.springframework.batch.core.listener.CompositeItemReadListener;
 import org.springframework.batch.core.listener.CompositeItemWriteListener;
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.DelegatingItemReader;
@@ -95,6 +93,7 @@ abstract class BatchListenerFactoryHelper {
 		}
 
 		return new ItemWriter<T>() {
+
 			public void write(List<? extends T> items) throws Exception {
 
 				for (T item : items) {
@@ -110,13 +109,6 @@ abstract class BatchListenerFactoryHelper {
 				}
 			}
 
-			public void flush() throws FlushFailedException {
-				itemWriter.flush();
-			}
-
-			public void clear() throws ClearFailedException {
-				itemWriter.clear();
-			}
 		};
 
 	}

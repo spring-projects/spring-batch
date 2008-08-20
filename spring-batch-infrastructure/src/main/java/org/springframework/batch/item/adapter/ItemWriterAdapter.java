@@ -18,8 +18,6 @@ package org.springframework.batch.item.adapter;
 
 import java.util.List;
 
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 
 
@@ -38,20 +36,6 @@ public class ItemWriterAdapter<T> extends AbstractMethodInvokingDelegator<T> imp
     		invokeDelegateMethodWithArgument(item);			
 		}
     }
-
-    /*
-     * No-op, can't call more than one method.
-     * 
-     */
-	public void clear() throws ClearFailedException {
-	}
-
-    /*
-     * No-op, can't call more than one method.
-     * 
-     */
-	public void flush() throws FlushFailedException {
-	}
 	
 }
 

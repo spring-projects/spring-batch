@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
@@ -52,11 +51,6 @@ import org.springframework.util.ClassUtils;
  * {@link Resource} and must represent a writable file.<br/>
  * 
  * Uses buffered writer to improve performance.<br/>
- * 
- * <p>
- * Output lines are buffered until {@link #flush()} is called and only then the
- * actual writing to file occurs.
- * </p>
  * 
  * The implementation is *not* thread-safe.
  * 
@@ -273,9 +267,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 			executionContext.putLong(getKey(WRITTEN_STATISTICS_NAME), state.linesWritten);
 		}
-	}
-
-	public void flush() throws FlushFailedException {
 	}
 
 	// Returns object representing state.
@@ -499,9 +490,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			}
 		}
 
-	}
-
-	public void clear() throws ClearFailedException {
 	}
 
 }

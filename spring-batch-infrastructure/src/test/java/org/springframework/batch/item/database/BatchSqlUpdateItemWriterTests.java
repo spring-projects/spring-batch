@@ -103,12 +103,6 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		}
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()}
-	 * .
-	 * @throws Exception
-	 */
 	public void testWriteAndFlush() throws Exception {
 		ps.addBatch();
 		expectLastCall();
@@ -119,12 +113,6 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		assertTrue(list.contains("SQL"));
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#flush()}
-	 * .
-	 * @throws Exception
-	 */
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
 		ps.addBatch();
 		expectLastCall();

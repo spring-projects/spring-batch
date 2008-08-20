@@ -41,7 +41,7 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -112,7 +112,7 @@ public class StepHandlerStepIntegrationTests {
 	public void testStatusForCommitFailedException() throws Exception {
 
 		step.setItemHandler(new SimpleStepHandler<String>(getReader(new String[] { "a", "b", "c" }),
-				new AbstractItemWriter<String>() {
+				new ItemWriter<String>() {
 					public void write(List<? extends String> data) throws Exception {
 						TransactionSynchronizationManager
 								.registerSynchronization(new TransactionSynchronizationAdapter() {

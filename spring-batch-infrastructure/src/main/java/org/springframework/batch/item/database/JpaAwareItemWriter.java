@@ -6,7 +6,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
@@ -36,7 +35,7 @@ import org.springframework.util.Assert;
  * @author Thomas Risberg
  * 
  */
-public class JpaAwareItemWriter<T> extends AbstractItemWriter<T> implements InitializingBean {
+public class JpaAwareItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private ItemWriter<? super T> delegate;
 

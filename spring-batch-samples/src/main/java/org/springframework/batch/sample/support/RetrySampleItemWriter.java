@@ -2,7 +2,7 @@ package org.springframework.batch.sample.support;
 
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * Simulates temporary output trouble - requires to retry 3 times to pass
@@ -10,7 +10,7 @@ import org.springframework.batch.item.support.AbstractItemWriter;
  * 
  * @author Robert Kasanicky
  */
-public class RetrySampleItemWriter<T> extends AbstractItemWriter<T> {
+public class RetrySampleItemWriter<T> implements ItemWriter<T> {
 
 	private int counter = 0;
 

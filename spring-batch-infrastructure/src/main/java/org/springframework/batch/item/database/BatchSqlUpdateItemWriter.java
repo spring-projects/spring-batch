@@ -20,7 +20,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -52,7 +51,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class BatchSqlUpdateItemWriter<T> extends AbstractItemWriter<T> implements InitializingBean {
+public class BatchSqlUpdateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	private JdbcOperations jdbcTemplate;
 

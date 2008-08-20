@@ -26,11 +26,11 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemReader;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
 
 /**
@@ -90,7 +90,7 @@ public class ItemOrientedStepHandlerTests {
 	 * @author Dave Syer
 	 * 
 	 */
-	private final class StubItemWriter extends AbstractItemWriter<String> {
+	private final class StubItemWriter implements ItemWriter<String> {
 		private String values = "";
 
 		public void write(List<? extends String> items) throws Exception {

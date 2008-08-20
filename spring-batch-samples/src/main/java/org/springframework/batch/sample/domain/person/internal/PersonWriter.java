@@ -20,12 +20,12 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.person.Person;
 
 
 
-public class PersonWriter extends AbstractItemWriter<Person> {
+public class PersonWriter implements ItemWriter<Person> {
     private static Log log = LogFactory.getLog(PersonWriter.class);
  
     public void write(List<? extends Person> data) {

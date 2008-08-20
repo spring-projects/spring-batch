@@ -21,7 +21,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -42,7 +42,7 @@ public class HibernateAwareItemWriterTests extends TestCase {
 		};
 	}
 
-	private class StubItemWriter extends AbstractItemWriter<Object> {
+	private class StubItemWriter implements ItemWriter<Object> {
 		public void write(List<? extends Object> items) {
 			list.addAll(items);
 		}

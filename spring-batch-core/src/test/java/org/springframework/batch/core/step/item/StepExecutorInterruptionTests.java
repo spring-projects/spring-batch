@@ -33,8 +33,8 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.AbstractItemReader;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -45,7 +45,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	private JobExecution jobExecution;
 
-	private AbstractItemWriter<Object> itemWriter;
+	private ItemWriter<Object> itemWriter;
 	
 	private StepExecution stepExecution;
 
@@ -64,7 +64,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		jobExecution = jobRepository.createJobExecution(jobConfiguration, new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
-		itemWriter = new AbstractItemWriter<Object>() {
+		itemWriter = new ItemWriter<Object>() {
 			public void write(List<? extends Object> item) throws Exception {
 			}
 		};

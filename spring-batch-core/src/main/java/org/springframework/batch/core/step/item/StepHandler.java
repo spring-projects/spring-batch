@@ -16,8 +16,6 @@
 package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
@@ -60,17 +58,5 @@ public interface StepHandler {
 	 * @see org.springframework.batch.item.ItemReader#reset()
 	 */
 	void reset() throws ResetFailedException;
-
-	/**
-	 * Implementations should delegate to an {@link ItemWriter}.
-	 * @deprecated
-	 */
-	public void flush() throws FlushFailedException;
-
-	/**
-	 * Implementations should delegate to an {@link ItemWriter}.
-	 * @deprecated
-	 */
-	public void clear() throws ClearFailedException;
 
 }

@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
 
@@ -28,7 +28,7 @@ import org.springframework.batch.sample.domain.trade.TradeDao;
  * Delegates the actual writing to custom DAO delegate. Allows configurable
  * exception raising for testing skip and restart.
  */
-public class TradeWriter extends AbstractItemWriter<Trade> {
+public class TradeWriter implements ItemWriter<Trade> {
 	private static Log log = LogFactory.getLog(TradeWriter.class);
 
 	private TradeDao dao;

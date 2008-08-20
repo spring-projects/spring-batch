@@ -53,7 +53,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.support.AbstractItemReader;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
@@ -70,7 +69,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	private List<Serializable> list = new ArrayList<Serializable>();
 
-	ItemWriter<String> itemWriter = new AbstractItemWriter<String>() {
+	ItemWriter<String> itemWriter = new ItemWriter<String>() {
 		public void write(List<? extends String> data) throws Exception {
 			processed.addAll(data);
 		}

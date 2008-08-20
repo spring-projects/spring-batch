@@ -17,13 +17,13 @@ package org.springframework.batch.sample.support;
 
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * @author Dave Syer
  *
  */
-public class DummyItemWriter extends AbstractItemWriter<Object> {
+public class DummyItemWriter implements ItemWriter<Object> {
 
 	public void write(List<? extends Object> item) throws Exception {
 		// NO-OP

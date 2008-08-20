@@ -18,7 +18,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerDebit;
 import org.springframework.batch.sample.domain.trade.CustomerDebitDao;
 import org.springframework.batch.sample.domain.trade.Trade;
@@ -29,7 +29,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
  * 
  * @author Robert Kasanicky
  */
-public class CustomerUpdateWriter extends AbstractItemWriter<Trade> {
+public class CustomerUpdateWriter implements ItemWriter<Trade> {
 
 	private CustomerDebitDao dao;
 

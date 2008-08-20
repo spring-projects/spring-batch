@@ -3,7 +3,7 @@ package org.springframework.batch.sample.domain.trade.internal;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 
@@ -12,7 +12,7 @@ import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
  * 
  * @author Robert Kasanicky
  */
-public class CustomerCreditIncreaseWriter extends AbstractItemWriter<CustomerCredit> {
+public class CustomerCreditIncreaseWriter implements ItemWriter<CustomerCredit> {
 
 	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("1000");
 

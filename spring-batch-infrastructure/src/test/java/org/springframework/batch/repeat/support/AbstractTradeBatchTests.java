@@ -21,10 +21,10 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -67,7 +67,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		}
 	}
 
-	protected static class TradeWriter extends AbstractItemWriter<Trade> {
+	protected static class TradeWriter implements ItemWriter<Trade> {
 		int count = 0;
 
 		// This has to be synchronized because we are going to test the state

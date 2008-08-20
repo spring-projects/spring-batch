@@ -19,7 +19,6 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
@@ -41,9 +40,6 @@ import org.springframework.util.CollectionUtils;
  * 
  * This item writer also provides restart, statistics and transaction features
  * by implementing corresponding interfaces.
- * 
- * Output is buffered until {@link #flush()} is called - only then the actual
- * writing to file takes place.
  * 
  * The implementation is *not* thread-safe.
  * 
@@ -461,18 +457,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
 
-	}
-
-	/**
-	 * Writes buffered items to XML stream and marks restore point.
-	 */
-	public void flush() throws FlushFailedException {
-	}
-
-	/**
-	 * Clear the output buffer
-	 */
-	public void clear() throws ClearFailedException {
 	}
 
 }

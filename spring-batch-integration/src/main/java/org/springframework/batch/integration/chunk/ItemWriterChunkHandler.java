@@ -70,11 +70,9 @@ public class ItemWriterChunkHandler<T> implements ChunkHandler<T> {
 					}
 				}
 			}
-			itemWriter.flush();
 		}
 		catch (Exception e) {
 			logger.debug("Failed chunk", e);
-			itemWriter.clear();
 			// TODO: need to force rollback as well
 			return new ChunkResponse(ExitStatus.FAILED.addExitDescription(e.getClass().getName() + ": "
 					+ e.getMessage()), chunk.getJobId(), skipCount);

@@ -20,8 +20,6 @@ import java.util.Collections;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -140,18 +138,6 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 */
 	public void reset() throws ResetFailedException {
 		itemReader.reset();
-	}
-
-	/**
-	 * @throws ClearFailedException
-	 */
-	public void clear() throws ClearFailedException {
-	}
-
-	/**
-	 * @throws FlushFailedException
-	 */
-	public void flush() throws FlushFailedException {
 	}
 
 }

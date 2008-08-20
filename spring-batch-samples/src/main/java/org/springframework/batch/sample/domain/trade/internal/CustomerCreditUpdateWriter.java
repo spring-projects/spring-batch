@@ -18,11 +18,11 @@ package org.springframework.batch.sample.domain.trade.internal;
 
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 
-public class CustomerCreditUpdateWriter extends AbstractItemWriter<CustomerCredit> {
+public class CustomerCreditUpdateWriter implements ItemWriter<CustomerCredit> {
 	private double creditFilter = 800;
 
 	private CustomerCreditDao dao;

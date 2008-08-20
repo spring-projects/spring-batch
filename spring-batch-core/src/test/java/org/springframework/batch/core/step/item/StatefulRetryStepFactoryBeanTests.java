@@ -42,7 +42,6 @@ import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.AbstractItemReader;
-import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.policy.RetryCacheCapacityExceededException;
@@ -72,7 +71,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 	JobExecution jobExecution;
 
-	private ItemWriter<Object> processor = new AbstractItemWriter<Object>() {
+	private ItemWriter<Object> processor = new ItemWriter<Object>() {
 		public void write(List<? extends Object> data) throws Exception {
 			processed.addAll(data);
 		}
@@ -198,7 +197,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 			}
 		};
 
-		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
+		ItemWriter<Object> itemWriter = new ItemWriter<Object>() {
 			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				if (item.contains("b") || item.contains("d")) {
@@ -236,7 +235,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 				return item;
 			}
 		};
-		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
+		ItemWriter<Object> itemWriter = new ItemWriter<Object>() {
 			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
@@ -273,7 +272,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 				return item;
 			}
 		};
-		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
+		ItemWriter<Object> itemWriter = new ItemWriter<Object>() {
 			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
@@ -311,7 +310,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 				return item;
 			}
 		};
-		ItemWriter<Object> itemWriter = new AbstractItemWriter<Object>() {
+		ItemWriter<Object> itemWriter = new ItemWriter<Object>() {
 			public void write(List<? extends Object> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");

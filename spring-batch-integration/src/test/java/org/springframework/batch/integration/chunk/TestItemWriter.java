@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TestItemWriter<T> extends AbstractItemWriter<T> {
+public class TestItemWriter<T> implements ItemWriter<T> {
 
 	private static final Log logger = LogFactory.getLog(TestItemWriter.class);
 

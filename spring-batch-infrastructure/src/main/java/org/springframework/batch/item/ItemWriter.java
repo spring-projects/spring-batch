@@ -27,11 +27,10 @@ import java.util.List;
  * </p>
  * 
  * <p>
- * Due to the nature of batch processing, it is expected that most writers will
- * buffer output. A flush method is provided to the interface in order to ensure
- * that any buffers can be flushed before a transaction is committed. Along the
- * same lines, if a transaction has been rolled back, then the contents of any
- * buffers should be thrown away.
+ * The write method is responsible for making sure that any internal buffers are
+ * flushed. If a transaction is active it will also usually be necessary to
+ * discard the output on a subsequent rollback. The resource to which the writer
+ * is sending data should normally be able to handle this itself.
  * </p>
  * 
  * @author Dave Syer
@@ -40,33 +39,12 @@ import java.util.List;
 public interface ItemWriter<T> {
 
 	/**
-	 * Process the supplied data element. Will be called multiple times during a
-	 * larger batch operation. Will not be called with null data in normal
-	 * operation.
+	 * Process the supplied data element. Will not be called with any null items
+	 * in normal operation.
 	 * 
-	 * @throws Exception if there are errors. If the writer is used inside a
-	 * retry or a batch the framework will catch the exception and convert or
-	 * rethrow it as appropriate.
+	 * @throws Exception if there are errors. The framework will catch the
+	 * exception and convert or rethrow it as appropriate.
 	 */
 	void write(List<? extends T> items) throws Exception;
 
-	/**
-	 * Flush any buffers that are being held. This will usually be performed
-	 * prior to committing any transactions.
-	 * @throws FlushFailedException in case of an error.  If this exception is
-	 * thrown the writer may be in an inconsistent state and manual intervention
-	 * might be required to reconcile the data with persistent output.
-	 * @deprecated
-	 */
-	void flush() throws FlushFailedException;
-
-	/**
-	 * Clear any buffers that are being held. This will usually be performed
-	 * prior to rolling back any transactions.
-	 * @throws ClearFailedException in case of an error. If this exception is
-	 * thrown the writer may be in an inconsistent state and manual intervention
-	 * might be required to reconcile the data with persistent output.
-	 * @deprecated
-	 */
-	void clear() throws ClearFailedException;
 }

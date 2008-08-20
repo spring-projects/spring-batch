@@ -3,13 +3,13 @@ package org.springframework.batch.sample.support;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.validator.ValidationException;
 
 /**
  * Remembers all items written - useful for testing.
  */
-public class ItemTrackingItemWriter<T> extends AbstractItemWriter<T> {
+public class ItemTrackingItemWriter<T> implements ItemWriter<T> {
 
 	private List<T> items = new ArrayList<T>();
 
