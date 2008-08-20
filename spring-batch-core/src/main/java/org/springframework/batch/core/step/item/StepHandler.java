@@ -48,14 +48,12 @@ public interface StepHandler {
 	/**
 	 * Implementations should delegate to an {@link ItemReader}.
 	 * 
-	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	void mark() throws MarkFailedException;
 
 	/**
 	 * Implementations should delegate to an {@link ItemReader}.
 	 * 
-	 * @see org.springframework.batch.item.ItemReader#reset()
 	 */
 	void reset() throws ResetFailedException;
 

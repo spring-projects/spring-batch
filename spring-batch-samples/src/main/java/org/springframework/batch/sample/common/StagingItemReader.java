@@ -206,8 +206,6 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 	 * resources (using
 	 * {@link TransactionSynchronizationManager#bindResource(Object, Object)}),
 	 * so they are thread bound.
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() {
 		getBuffer().commit();

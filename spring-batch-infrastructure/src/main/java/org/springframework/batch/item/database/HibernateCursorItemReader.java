@@ -125,8 +125,6 @@ public class HibernateCursorItemReader<T> extends AbstractBufferedItemReaderItem
 	 * single-threaded environment. The state backing the mark is a single
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() {
 

@@ -126,7 +126,6 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	/**
 	 * @throws MarkFailedException
-	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
 	public void mark() throws MarkFailedException {
 		itemReader.mark();
@@ -134,7 +133,6 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	/**
 	 * @throws ResetFailedException
-	 * @see org.springframework.batch.item.ItemReader#reset()
 	 */
 	public void reset() throws ResetFailedException {
 		itemReader.reset();

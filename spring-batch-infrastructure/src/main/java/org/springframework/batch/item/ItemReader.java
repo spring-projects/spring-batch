@@ -58,6 +58,8 @@ public interface ItemReader<T> {
 	 * @throws MarkFailedException if there is a problem with the mark. If a
 	 * mark fails inside a transaction, it would be worrying, but not normally
 	 * fatal.
+	 * 
+	 * @deprecated
 	 */
 	void mark() throws MarkFailedException;
 
@@ -70,6 +72,8 @@ public interface ItemReader<T> {
 	 * reset fails inside a transaction, it would normally be fatal, and would
 	 * leave the stream in an inconsistent state. So while this is an unchecked
 	 * exception, it may be important for a client to catch it explicitly.
+	 * 
+	 * @deprecated
 	 */
 	void reset() throws ResetFailedException;
 

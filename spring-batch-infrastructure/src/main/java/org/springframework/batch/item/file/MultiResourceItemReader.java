@@ -167,8 +167,6 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 
 	/**
 	 * Switches to 'read from buffer' state.
-	 * 
-	 * @see ItemReader#reset()
 	 */
 	public void reset() throws ResetFailedException {
 		if (!itemBuffer.isEmpty()) {
