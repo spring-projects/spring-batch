@@ -53,10 +53,6 @@ public class MessageChannelItemWriterTests {
 		assertEquals(Required.class, annotations[0].annotationType());
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.integration.item.MessageChannelItemWriter#write(java.lang.Object)}.
-	 * @throws Exception 
-	 */
 	@Test
 	public void testWrite() throws Exception {
 		DirectChannel channel = new DirectChannel();
@@ -70,10 +66,6 @@ public class MessageChannelItemWriterTests {
 		assertEquals("foo", message.getPayload());
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.integration.item.MessageChannelItemWriter#write(java.lang.Object)}.
-	 * @throws Exception 
-	 */
 	@Test
 	public void testWriteWithRollback() throws Exception {
 		DirectChannel channel = new DirectChannel();
@@ -93,10 +85,6 @@ public class MessageChannelItemWriterTests {
 		}
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.integration.item.MessageChannelItemWriter#write(java.lang.Object)}.
-	 * @throws Exception 
-	 */
 	@Test
 	public void testWriteWithRollbackOnEndpoint() throws Exception {
 		DirectChannel channel = new DirectChannel();

@@ -17,57 +17,17 @@ package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
  * Factory bean for {@link Step} implementations allowing registration of
  * listeners and also direct injection of the {@link RepeatOperations} needed at
  * step and chunk level.
  * 
+ * @deprecated use the {@link SimpleStepFactoryBean} instead
+ * 
  * @author Dave Syer
  * 
  */
-public class RepeatOperationsStepFactoryBean<T,S> extends AbstractStepFactoryBean<T,S> {
-
-	private RepeatOperations chunkOperations = new RepeatTemplate();
-
-	private RepeatOperations stepOperations = new RepeatTemplate();
-
-	/**
-	 * The {@link RepeatOperations} to use for the outer loop of the batch
-	 * processing. Should be set up by the caller through a factory. Defaults to
-	 * a plain {@link RepeatTemplate}.
-	 * 
-	 * @param stepOperations a {@link RepeatOperations} instance.
-	 */
-	public void setStepOperations(RepeatOperations stepOperations) {
-		this.stepOperations = stepOperations;
-	}
-
-	/**
-	 * The {@link RepeatOperations} to use for the inner loop of the batch
-	 * processing. should be set up by the caller through a factory. defaults to
-	 * a plain {@link RepeatTemplate}.
-	 * 
-	 * @param chunkOperations a {@link RepeatOperations} instance.
-	 */
-	public void setChunkOperations(RepeatOperations chunkOperations) {
-		this.chunkOperations = chunkOperations;
-	}
-
-	/**
-	 * @param step
-	 * 
-	 */
-	protected void applyConfiguration(StepHandlerStep step) {
-
-		super.applyConfiguration(step);
-
-		RepeatOperations chunkOperations = BatchListenerFactoryHelper.addChunkListeners(this.chunkOperations, getListeners());
-		
-		step.setChunkOperations(chunkOperations);
-		step.setStepOperations(stepOperations);
-
-	}
+public class RepeatOperationsStepFactoryBean<T,S> extends SimpleStepFactoryBean<T,S> {
 
 }

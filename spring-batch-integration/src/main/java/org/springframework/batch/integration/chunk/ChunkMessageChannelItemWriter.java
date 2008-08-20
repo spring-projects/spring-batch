@@ -7,9 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
@@ -76,20 +74,6 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		// Short little timeout to look for an immediate reply.
 		getNextResult(1);
 
-	}
-
-	/**
-	 * No-op.
-	 * @see org.springframework.batch.item.ItemWriter#flush()
-	 */
-	public void flush() throws FlushFailedException {
-	}
-
-	/**
-	 * No-op.
-	 * @see org.springframework.batch.item.ItemWriter#clear()
-	 */
-	public void clear() throws ClearFailedException {
 	}
 
 	@Override
@@ -169,6 +153,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
 			localState.actual++;
+			// TODO: apply the skip count
 			ExitStatus result = payload.getExitStatus();
 			// TODO: check it can never be ExitStatus.FINISHED?
 			if (!result.isContinuable()) {

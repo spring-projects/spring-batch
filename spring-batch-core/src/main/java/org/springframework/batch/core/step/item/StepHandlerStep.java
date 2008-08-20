@@ -45,15 +45,9 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
  * Simple implementation of executing the step as a set of chunks, each chunk
- * surrounded by a transaction. The structure is therefore that of two nested
- * loops, with transaction boundary around the whole inner loop. The outer loop
- * is controlled by the step operations (
- * {@link #setStepOperations(RepeatOperations)}), and the inner loop by the
- * chunk operations ({@link #setChunkOperations(RepeatOperations)}). The inner
- * loop should always be executed in a single thread, so the chunk operations
- * should not do any concurrent execution. N.B. usually that means that the
- * chunk operations should be a {@link RepeatTemplate} (which is the
- * default).<br/>
+ * surrounded by a transaction. The structure is therefore that of a loop with
+ * transaction boundary inside the loop. The loop is controlled by the step
+ * operations ( {@link #setStepOperations(RepeatOperations)}).<br/>
  * 
  * Clients can use interceptors in the step operations to intercept or listen to
  * the iteration on a step-wide basis, for instance to get a callback when the
@@ -68,8 +62,6 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 public class StepHandlerStep extends AbstractStep {
 
 	private static final Log logger = LogFactory.getLog(StepHandlerStep.class);
-
-	private RepeatOperations chunkOperations = new RepeatTemplate();
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
 
@@ -174,17 +166,6 @@ public class StepHandlerStep extends AbstractStep {
 	}
 
 	/**
-	 * The {@link RepeatOperations} to use for the inner loop of the batch
-	 * processing. should be set up by the caller through a factory. defaults to
-	 * a plain {@link RepeatTemplate}.
-	 * 
-	 * @param chunkOperations a {@link RepeatOperations} instance.
-	 */
-	public void setChunkOperations(RepeatOperations chunkOperations) {
-		this.chunkOperations = chunkOperations;
-	}
-
-	/**
 	 * Setter for the {@link StepInterruptionPolicy}. The policy is used to
 	 * check whether an external request has been made to interrupt the job
 	 * execution.
@@ -234,9 +215,6 @@ public class StepHandlerStep extends AbstractStep {
 				final StepContribution contribution = stepExecution.createStepContribution();
 				// Before starting a new transaction, check for
 				// interruption.
-				if (stepExecution.isTerminateOnly()) {
-					context.setTerminateOnly();
-				}
 				interruptionPolicy.checkInterrupted(stepExecution);
 
 				ExitStatus exitStatus = ExitStatus.CONTINUABLE;
@@ -248,7 +226,7 @@ public class StepHandlerStep extends AbstractStep {
 				try {
 
 					try {
-						exitStatus = processChunk(stepExecution, contribution);
+						exitStatus = itemHandler.handle(contribution);
 					}
 					catch (Error e) {
 						if (transactionAttribute.rollbackOn(e)) {
@@ -349,37 +327,6 @@ public class StepHandlerStep extends AbstractStep {
 
 		});
 
-	}
-
-	/**
-	 * Execute a bunch of identical business logic operations all within a
-	 * transaction. The transaction is programmatically started and stopped
-	 * outside this method, so subclasses that override do not need to create a
-	 * transaction.
-	 * @param execution the current {@link StepExecution} which should be
-	 * treated as read-only for the purposes of this method.
-	 * @param contribution the current {@link StepContribution} which can accept
-	 * changes to be aggregated later into the step execution.
-	 * 
-	 * @return true if there is more data to process.
-	 */
-	protected ExitStatus processChunk(final StepExecution execution, final StepContribution contribution) {
-
-		ExitStatus result = chunkOperations.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-				if (execution.isTerminateOnly()) {
-					context.setTerminateOnly();
-				}
-				// check for interruption before each item as well
-				interruptionPolicy.checkInterrupted(execution);
-				ExitStatus exitStatus = itemHandler.handle(contribution);
-				// check for interruption after each item as well
-				interruptionPolicy.checkInterrupted(execution);
-				return exitStatus;
-			}
-		});
-
-		return result;
 	}
 
 	/**

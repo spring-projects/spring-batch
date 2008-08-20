@@ -72,6 +72,8 @@ public class StepHandlerStepIntegrationTests {
 
 	private JobRepository jobRepository;
 
+	private RepeatTemplate chunkOperations;
+
 	private ItemReader<String> getReader(String[] args) {
 		return new ListItemReader<String>(Arrays.asList(args));
 	}
@@ -88,19 +90,17 @@ public class StepHandlerStepIntegrationTests {
 		jobRepositoryFactoryBean.setTransactionManager(transactionManager);
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		jobRepository = (JobRepository) jobRepositoryFactoryBean.getObject();
-		RepeatTemplate template;
 
 		step = new StepHandlerStep("stepName");
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(transactionManager);
-		template = new RepeatTemplate();
+		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		step.setStepOperations(template);
 
 		// Only process one item:
-		template = new RepeatTemplate();
-		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		step.setChunkOperations(template);
+		chunkOperations = new RepeatTemplate();
+		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(1));
 
 		job = new JobSupport("FOO");
 
@@ -121,7 +121,7 @@ public class StepHandlerStepIntegrationTests {
 									}
 								});
 					}
-				}));
+				}, chunkOperations));
 
 		JobExecution jobExecution = jobRepository.createJobExecution(job, new JobParameters());
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);

@@ -29,7 +29,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -41,7 +40,6 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
@@ -93,9 +91,12 @@ public class StepHandlerStepTests extends TestCase {
 		return new ListItemReader<String>(Arrays.asList(args));
 	}
 
-	private AbstractStep getStep(String[] strings) throws Exception {
+	private StepHandlerStep getStep(String[] strings) throws Exception {
 		StepHandlerStep step = new StepHandlerStep("stepName");
-		step.setItemHandler(new SimpleStepHandler<String>(getReader(strings), itemWriter));
+		// Only process one item:
+		RepeatTemplate template = new RepeatTemplate();
+		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
+		step.setItemHandler(new SimpleStepHandler<String>(getReader(strings), itemWriter, template));
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
 		return step;
@@ -108,16 +109,11 @@ public class StepHandlerStepTests extends TestCase {
 
 		transactionManager = new ResourcelessTransactionManager();
 
-		RepeatTemplate template;
+		RepeatTemplate template = new RepeatTemplate();
+		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
 
-		step = (StepHandlerStep) getStep(new String[] { "foo", "bar", "spam" });
-		template = new RepeatTemplate();
-		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
+		step = getStep(new String[] { "foo", "bar", "spam" });
 		step.setStepOperations(template);
-		// Only process one item:
-		template = new RepeatTemplate();
-		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		step.setChunkOperations(template);
 
 		job = new JobSupport("FOO");
 		jobInstance = new JobInstance(new Long(0), new JobParameters(), job.getName());
@@ -179,25 +175,6 @@ public class StepHandlerStepTests extends TestCase {
 			assertEquals("stub exception", e.getCause().getMessage());
 		}
 		
-	}
-
-	public void testChunkExecutor() throws Exception {
-
-		RepeatTemplate template = new RepeatTemplate();
-
-		// Only process one item:
-		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		step.setChunkOperations(template);
-
-		JobExecution jobExecution = new JobExecution(jobInstance);
-
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		StepContribution contribution = stepExecution.createStepContribution();
-		step.processChunk(stepExecution, contribution);
-		assertEquals(1, processed.size());
-		assertEquals(0, stepExecution.getItemCount());
-		assertEquals(1, contribution.getItemCount());
-
 	}
 
 	public void testRepository() throws Exception {

@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -32,6 +33,8 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
  * @author Dave Syer
@@ -42,27 +45,34 @@ public class ItemOrientedStepHandlerTests {
 	private StubItemReader itemReader = new StubItemReader();
 
 	private StubItemWriter itemWriter = new StubItemWriter();
+	
+	private RepeatTemplate repeatTemplate = new RepeatTemplate();
+	
+	@Before
+	public void setUp() {
+		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
+	}
 
 	@Test
 	public void testHandle() throws Exception {
 		ItemOrientedStepHandler<String, String> handler = new ItemOrientedStepHandler<String, String>(itemReader,
-				new PassthroughItemProcessor<String>(), itemWriter);
-		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
-				123L, new JobParameters(), "job"))));
-		handler.handle(contribution);
-		assertEquals(1, itemReader.count);
-		assertEquals("1", itemWriter.values);
-	}
-
-	@Test
-	public void testHandleCompositeItem() throws Exception {
-		ItemOrientedStepHandler<String, String> handler = new ItemOrientedStepHandler<String, String>(itemReader,
-				new AgrgegateItemProcessor(), itemWriter);
+				new PassthroughItemProcessor<String>(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
 		handler.handle(contribution);
 		assertEquals(2, itemReader.count);
 		assertEquals("12", itemWriter.values);
+	}
+
+	@Test
+	public void testHandleCompositeItem() throws Exception {
+		ItemOrientedStepHandler<String, String> handler = new ItemOrientedStepHandler<String, String>(itemReader,
+				new AgrgegateItemProcessor(), itemWriter, repeatTemplate);
+		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
+				123L, new JobParameters(), "job"))));
+		handler.handle(contribution);
+		assertEquals(4, itemReader.count);
+		assertEquals("1234", itemWriter.values);
 	}
 
 	/**

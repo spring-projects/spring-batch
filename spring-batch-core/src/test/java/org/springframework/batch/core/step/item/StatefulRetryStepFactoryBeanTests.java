@@ -136,7 +136,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		factory.setItemReader(provider);
 		factory.setRetryLimit(10);
 		factory.setSkippableExceptionClasses(new Class[0]);
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);

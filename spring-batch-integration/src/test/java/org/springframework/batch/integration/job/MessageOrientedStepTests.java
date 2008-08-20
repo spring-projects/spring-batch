@@ -39,7 +39,6 @@ import org.springframework.integration.channel.ThreadLocalChannel;
 import org.springframework.integration.message.BlockingSource;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.MessageSource;
 import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.ReflectionUtils;
 
@@ -85,10 +84,6 @@ public class MessageOrientedStepTests {
 		assertEquals(Required.class, annotations[0].annotationType());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.integration.job.MessageOrientedStep#setSource(MessageSource)}.
-	 */
 	@Test
 	public void testSetReplyChannel() {
 		Method method = ReflectionUtils.findMethod(MessageOrientedStep.class, "setSource",

@@ -16,13 +16,18 @@
 
 package org.springframework.batch.core.step.item;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobExecution;
@@ -53,7 +58,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 /**
  * Tests for {@link SimpleStepFactoryBean}.
  */
-public class SimpleStepFactoryBeanTests extends TestCase {
+public class SimpleStepFactoryBeanTests {
 
 	private List<Exception> recovered = new ArrayList<Exception>();
 
@@ -76,37 +81,15 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		}
 	};
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 		job.setJobRepository(repository);
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
 	}
 
-	private SimpleStepFactoryBean<String,String> getStepFactory(String arg) throws Exception {
-		return getStepFactory(new String[] { arg });
-	}
-
-	private SimpleStepFactoryBean<String,String> getStepFactory(String arg0, String arg1) throws Exception {
-		return getStepFactory(new String[] { arg0, arg1 });
-	}
-
-	private SimpleStepFactoryBean<String,String> getStepFactory(String[] args) throws Exception {
-		SimpleStepFactoryBean<String,String> factory = new SimpleStepFactoryBean<String,String>();
-
-		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
-		items.addAll(Arrays.asList(args));
-		reader = new ListItemReader<String>(items);
-
-		factory.setItemReader(reader);
-		factory.setItemWriter(writer);
-		factory.setJobRepository(repository);
-		factory.setTransactionManager(new ResourcelessTransactionManager());
-		factory.setBeanName("stepName");
-		return factory;
-	}
-
+	@Test
 	public void testSimpleJob() throws Exception {
 
 		job.setSteps(new ArrayList<Step>());
@@ -125,6 +108,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertTrue(written.contains("foo"));
 	}
 
+	@Test
 	public void testSimpleConcurrentJob() throws Exception {
 
 		job.setSteps(new ArrayList<Step>());
@@ -144,12 +128,13 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertTrue(written.contains("foo"));
 	}
 
+	@Test
 	public void testSimpleJobWithItemListeners() throws Exception {
 
 		final List<Throwable> throwables = new ArrayList<Throwable>();
 
 		RepeatTemplate chunkOperations = new RepeatTemplate();
-		// Always handle the exception a check it is the right one...
+		// Always handle the exception to check it is the right one...
 		chunkOperations.setExceptionHandler(new ExceptionHandler() {
 			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
 				throwables.add(throwable);
@@ -179,8 +164,8 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 			}
 		} });
 
+		factory.setChunkOperations(chunkOperations);
 		StepHandlerStep step = (StepHandlerStep) factory.getObject();
-		step.setChunkOperations(chunkOperations);
 
 		job.setSteps(Collections.singletonList((Step) step));
 
@@ -194,6 +179,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertEquals(3, recovered.size());
 	}
 
+	@Test
 	public void testExceptionTerminates() throws Exception {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
@@ -217,6 +203,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
 
+	@Test
 	public void testExceptionHandler() throws Exception {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
@@ -240,6 +227,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
+	@Test
 	public void testChunkListeners() throws Exception {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
 		int commitInterval = 3;
@@ -282,11 +270,13 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	 * Commit interval specified is not allowed to be zero or negative.
 	 * @throws Exception
 	 */
+	@Test
 	public void testCommitIntervalMustBeGreaterThanZero() throws Exception {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo");
 		// nothing wrong here
 		factory.getObject();
 
+		factory = getStepFactory("foo");
 		// but exception expected after setting commit interval to value < 0
 		factory.setCommitInterval(-1);
 		try {
@@ -302,6 +292,7 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 	 * Commit interval specified is not allowed to be zero or negative.
 	 * @throws Exception
 	 */
+	@Test
 	public void testCommitIntervalAndCompletionPolicyBothSet() throws Exception {
 		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo");
 
@@ -318,4 +309,20 @@ public class SimpleStepFactoryBeanTests extends TestCase {
 		}
 
 	}
+	
+	private SimpleStepFactoryBean<String,String> getStepFactory(String... args) throws Exception {
+		SimpleStepFactoryBean<String,String> factory = new SimpleStepFactoryBean<String,String>();
+
+		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
+		items.addAll(Arrays.asList(args));
+		reader = new ListItemReader<String>(items);
+
+		factory.setItemReader(reader);
+		factory.setItemWriter(writer);
+		factory.setJobRepository(repository);
+		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.setBeanName("stepName");
+		return factory;
+	}
+	
 }

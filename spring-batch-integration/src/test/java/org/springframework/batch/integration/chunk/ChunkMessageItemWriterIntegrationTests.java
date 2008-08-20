@@ -53,7 +53,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Qualifier("replies")
 	private PollableChannel replies;
 
-	private SimpleStepFactoryBean<Object,Object> factory;
+	private SimpleStepFactoryBean<Object,Object> factory = new SimpleStepFactoryBean<Object,Object>();
 
 	private SimpleJobRepository jobRepository;
 
@@ -63,7 +63,6 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Before
 	public void setUp() {
 
-		factory = new SimpleStepFactoryBean<Object,Object>();
 		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(),
 				new MapJobExecutionDao(), new MapStepExecutionDao(), new MapExecutionContextDao());
 		factory.setJobRepository(jobRepository);

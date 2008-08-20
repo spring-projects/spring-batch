@@ -26,6 +26,10 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatCallback;
+import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
  * Simplest possible implementation of {@link StepHandler} with no skipping or
@@ -43,45 +47,57 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private ItemReader<? extends T> itemReader;
+	private final ItemReader<? extends T> itemReader;
 
-	private ItemProcessor<? super T, ? extends S> itemProcessor;
+	private final ItemProcessor<? super T, ? extends S> itemProcessor;
 
-	private ItemWriter<? super S> itemWriter;
+	private final ItemWriter<? super S> itemWriter;
+
+	private final RepeatOperations repeatOperations;
 
 	/**
 	 * @param itemReader
 	 * @param itemProcessor
 	 * @param itemWriter
+	 * @param repeatOperations
 	 */
 	public ItemOrientedStepHandler(ItemReader<? extends T> itemReader,
-			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter) {
+			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
+			RepeatOperations repeatOperations) {
 		super();
 		this.itemReader = itemReader;
 		this.itemProcessor = itemProcessor;
 		this.itemWriter = itemWriter;
+		this.repeatOperations = repeatOperations;
 	}
 
 	/**
 	 * Get the next item from {@link #read(StepContribution)} and if not null
 	 * pass the item to {@link #write(Object, StepContribution)}. If the
-	 * {@link ItemProcessor} returns null, the write is omitted and another
-	 * item taken from the reader.
+	 * {@link ItemProcessor} returns null, the write is omitted and another item
+	 * taken from the reader.
 	 * 
 	 * @see org.springframework.batch.core.step.item.StepHandler#handle(org.springframework.batch.core.StepContribution)
 	 */
-	public ExitStatus handle(StepContribution contribution) throws Exception {
-		boolean processed = false;
-		while (!processed) {
-			T item = read(contribution);
-			if (item == null) {
-				return ExitStatus.FINISHED;
+	public ExitStatus handle(final StepContribution contribution) throws Exception {
+
+		ExitStatus result = repeatOperations.iterate(new RepeatCallback() {
+			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
+				boolean processed = false;
+				while (!processed) {
+					T item = read(contribution);
+					if (item == null) {
+						return ExitStatus.FINISHED;
+					}
+					// TODO: segregate read / write / filter count
+					contribution.incrementItemCount();
+					processed = write(item, contribution);
+				}
+				return ExitStatus.CONTINUABLE;
 			}
-			// TODO: segregate read / write / filter count
-			contribution.incrementItemCount();
-			processed = write(item, contribution);
-		}
-		return ExitStatus.CONTINUABLE;
+		});
+
+		return result;
 	}
 
 	/**

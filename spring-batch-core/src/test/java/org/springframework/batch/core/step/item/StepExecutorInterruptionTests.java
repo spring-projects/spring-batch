@@ -68,17 +68,32 @@ public class StepExecutorInterruptionTests extends TestCase {
 			public void write(List<? extends Object> item) throws Exception {
 			}
 		};
-		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {
-			public Object read() throws Exception {
-				return null;
-			}
-		}, itemWriter));
 		stepExecution = new StepExecution(step.getName(), jobExecution);
 	}
 
-	public void testInterruptChunk() throws Exception {
-
+	public void testInterruptStep() throws Exception {
+	
 		Thread processingThread = createThread(stepExecution);
+
+		RepeatTemplate template = new RepeatTemplate();
+		// N.B, If we don't set the completion policy it might run forever
+		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
+		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {
+			public Object read() throws Exception {
+				// do something non-trivial (and not Thread.sleep())
+				double foo = 1;
+				for (int i = 2; i < 250; i++) {
+					foo = foo * i;
+				}
+				
+				if (foo != 1) {
+					return new Double(foo);
+				}
+				else {
+					return null;
+				}
+			}
+		}, itemWriter, template));
 
 		processingThread.start();
 		Thread.sleep(100);
@@ -94,14 +109,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 		assertFalse(processingThread.isAlive());
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 
-	}
-
-	public void testInterruptStep() throws Exception {
-		RepeatTemplate template = new RepeatTemplate();
-		// N.B, If we don't set the completion policy it might run forever
-		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setChunkOperations(template);
-		testInterruptChunk();
 	}
 
 	public void testInterruptOnInterruptedException() throws Exception {
@@ -176,23 +183,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 	 * @return
 	 */
 	private Thread createThread(final StepExecution stepExecution) {
-		step.setItemHandler(new SimpleStepHandler<Object>(new AbstractItemReader<Object>() {
-			public Object read() throws Exception {
-				// do something non-trivial (and not Thread.sleep())
-				double foo = 1;
-				for (int i = 2; i < 250; i++) {
-					foo = foo * i;
-				}
-
-				if (foo != 1) {
-					return new Double(foo);
-				}
-				else {
-					return null;
-				}
-			}
-		}, itemWriter));
-
 		Thread processingThread = new Thread() {
 			public void run() {
 				try {
