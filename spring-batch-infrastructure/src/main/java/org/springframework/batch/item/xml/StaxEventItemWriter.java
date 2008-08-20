@@ -106,9 +106,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	// XML event writer
 	private XMLEventWriter delegateEventWriter;
 
-	// byte offset in file channel at last commit point
-	private long lastCommitPointPosition = 0;
-
 	// current count of processed records
 	private long currentRecordCount = 0;
 
@@ -412,7 +409,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			throw new FlushFailedException("Failed to flush the events", e);
 		}
 
-		lastCommitPointPosition = getPosition();
 	}
 
 	/**
@@ -458,8 +454,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	private void setPosition(long newPosition) {
 
 		try {
-			Assert.state(channel.size() >= lastCommitPointPosition,
-					"Current file size is smaller than size at last commit");
 			channel.truncate(newPosition);
 			channel.position(newPosition);
 		}

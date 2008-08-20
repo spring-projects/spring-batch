@@ -132,7 +132,7 @@ public class FileUtilsTests {
 	public void testCouldntCreateFile(){
 
 		File file = new File("new file"){
-
+			
 			@Override
 			public boolean exists() {
 				return false;
@@ -142,8 +142,9 @@ public class FileUtilsTests {
 		try{
 			FileUtils.setUpOutputFile(file, false, false);
 			fail();
-		}catch(IllegalStateException ex){
-			assertEquals("Output file must exist", ex.getMessage());
+		}catch(ItemStreamException ex){
+			String message = ex.getMessage();
+			assertTrue("Wrong message: "+message, message.startsWith("Output file was not created"));
 		}finally{
 			file.delete();
 		}
