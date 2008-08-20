@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -92,10 +93,12 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional @Test
 	public void testSaveAndFindExecution() {
 		
+		
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);
 		stepExecution.setWriteSkipCount(5);
 		stepExecution.setRollbackCount(3);
+		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		dao.saveStepExecution(stepExecution);
 
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step.getName());
@@ -104,6 +107,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		assertEquals(stepExecution.getReadSkipCount(), retrieved.getReadSkipCount());
 		assertEquals(stepExecution.getWriteSkipCount(), retrieved.getWriteSkipCount());
 		assertEquals(stepExecution.getRollbackCount(), retrieved.getRollbackCount());
+		assertEquals(stepExecution.getLastUpdated(), retrieved.getLastUpdated());
 		
 		assertNull(dao.getStepExecution(jobExecution, "not-existing step"));
 	}
@@ -167,11 +171,13 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		Integer versionAfterSave = stepExecution.getVersion();
 
 		stepExecution.setStatus(BatchStatus.STOPPED);
+		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		dao.updateStepExecution(stepExecution);
 		assertEquals(versionAfterSave + 1, stepExecution.getVersion().intValue());
 
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step.getName());
 		assertEquals(stepExecution, retrieved);
+		assertEquals(stepExecution.getLastUpdated(), retrieved.getLastUpdated());
 		assertEquals(BatchStatus.STOPPED, retrieved.getStatus());
 	}
 
@@ -205,5 +211,4 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		}
 
 	}
-
 }

@@ -56,4 +56,5 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		assertTrue("Exit description should be truncated", retrievedAfterUpdate.getExitStatus().getExitDescription()
 				.length() < stepExecution.getExitStatus().getExitDescription().length());
 	}
+	
 }

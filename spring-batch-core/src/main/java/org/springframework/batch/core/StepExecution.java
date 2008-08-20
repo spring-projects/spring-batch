@@ -19,6 +19,8 @@ package org.springframework.batch.core;
 import java.util.Date;
 
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
@@ -54,6 +56,8 @@ public class StepExecution extends Entity {
 	private volatile Date startTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
+	
+	private volatile Date lastUpdated = null;
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
@@ -335,14 +339,27 @@ public class StepExecution extends Entity {
 		this.terminateOnly = true;
 	}
 
+	/**
+	 * @return the total number of items skipped.
+	 */
 	public int getSkipCount() {
 		return readSkipCount + writeSkipCount;
 	}
 
+	/**
+	 * Increment the number of items skipped in the {@link ItemReader} 
+	 * 
+	 * @param count - the number of skips to increment by.
+	 */
 	public void incrementReadSkipCountBy(int count) {
 		readSkipCount += count;
 	}
 	
+	/**
+	 * Increment the number of items skipped in the {@link ItemWriter} 
+	 * 
+	 * @param count - the number of skips to increment by.
+	 */
 	public void incrementWriteSkipCountBy(int count) {
 		writeSkipCount += count;
 	}
@@ -360,20 +377,54 @@ public class StepExecution extends Entity {
 		return jobExecution.getJobInstance().getJobParameters();
 	}
 
+	/**
+	 * @return the number of records skipped in the {@link ItemReader}
+	 */
 	public int getReadSkipCount() {
 		return readSkipCount;
 	}
 
+	/**
+	 * @return the number of records skipped in the {@link ItemWriter}
+	 */
 	public int getWriteSkipCount() {
 		return writeSkipCount;
 	}
 
+	/**
+	 * Set the number of records skipped in the {@link ItemReader}
+	 * 
+	 * @param readSkipCount
+	 */
 	public void setReadSkipCount(int readSkipCount) {
 		this.readSkipCount = readSkipCount;
 	}
 
+	/**
+	 * Set the number of records skipped in the {@link ItemWriter}
+	 * 
+	 * @param writeSkipCount
+	 */
 	public void setWriteSkipCount(int writeSkipCount) {
 		this.writeSkipCount = writeSkipCount;
 	}
 
+	/**
+	 * @return the Date representing the last time this execution was persisted.
+	 */
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+
+	/**
+	 * Set the time when the StepExecution was last updated before
+	 * persisting
+	 * 
+	 * @param lastUpdated
+	 */
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+
+	
 }
