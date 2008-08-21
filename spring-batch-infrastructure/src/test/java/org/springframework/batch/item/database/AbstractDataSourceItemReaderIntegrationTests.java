@@ -150,28 +150,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 	}
 
 	/*
-	 * Rollback scenario - input source rollbacks to last commit point.
-	 */
-	@Transactional @Test
-	public void testRollback() throws Exception {
-		getAsItemStream(reader).open(executionContext);
-		
-		Foo foo1 = reader.read();
-
-		commit();
-
-		Foo foo2 = reader.read();
-		Assert.state(!foo2.equals(foo1));
-
-		Foo foo3 = reader.read();
-		Assert.state(!foo2.equals(foo3));
-
-		rollback();
-
-		assertEquals(foo2, reader.read());
-	}
-
-	/*
 	 * Rollback scenario with restart - input source rollbacks to last
 	 * commit point.
 	 */
@@ -182,17 +160,13 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		
 		Foo foo1 = reader.read();
 
-		commit();
+		getAsItemStream(reader).update(executionContext);
 
 		Foo foo2 = reader.read();
 		Assert.state(!foo2.equals(foo1));
 
 		Foo foo3 = reader.read();
 		Assert.state(!foo2.equals(foo3));
-
-		rollback();
-
-		getAsItemStream(reader).update(executionContext);
 
 		// create new input source
 		reader = createItemReader();
@@ -220,10 +194,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		Foo foo3 = reader.read();
 		Assert.state(!foo2.equals(foo3));
 
-		rollback();
-
-		getAsItemStream(reader).update(executionContext);
-
 		// create new input source
 		reader = createItemReader();
 
@@ -238,19 +208,16 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		
 		getAsItemStream(reader).open(executionContext);
 		
+
 		Foo foo1 = reader.read();
 
-		commit();
+		getAsItemStream(reader).update(executionContext);
 
 		Foo foo2 = reader.read();
 		Assert.state(!foo2.equals(foo1));
 
 		Foo foo3 = reader.read();
 		Assert.state(!foo2.equals(foo3));
-
-		rollback();
-
-		getAsItemStream(reader).update(executionContext);
 
 		// create new input source
 		reader = createItemReader();
@@ -262,8 +229,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		
 		getAsItemStream(reader).update(executionContext);
 		
-		commit();
-		
 		// create new input source
 		reader = createItemReader();
 
@@ -273,14 +238,6 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 		Foo foo5 = reader.read();
 		assertEquals(4, foo4.getValue());
 		assertEquals(5, foo5.getValue());
-	}
-
-	private void commit() {
-		reader.mark();
-	}
-
-	private void rollback() {
-		reader.reset();
 	}
 
 	private ItemStream getAsItemStream(ItemReader<Foo> source) {

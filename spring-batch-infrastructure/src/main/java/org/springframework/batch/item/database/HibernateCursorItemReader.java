@@ -23,7 +23,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -51,7 +51,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractBufferedItemReaderItemStream<T> implements ItemStream,
+public class HibernateCursorItemReader<T> extends AbstractItemReaderItemStream<T> implements ItemStream,
 		InitializingBean {
 
 	private SessionFactory sessionFactory;

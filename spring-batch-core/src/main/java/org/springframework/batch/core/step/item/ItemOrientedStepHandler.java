@@ -26,8 +26,6 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -178,20 +176,6 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	protected final void doWrite(S item) throws Exception {
 		// TODO: increment write count
 		itemWriter.write(Collections.singletonList(item));
-	}
-
-	/**
-	 * @throws MarkFailedException
-	 */
-	public void mark() throws MarkFailedException {
-		itemReader.mark();
-	}
-
-	/**
-	 * @throws ResetFailedException
-	 */
-	public void reset() throws ResetFailedException {
-		itemReader.reset();
 	}
 
 	/**

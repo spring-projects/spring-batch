@@ -205,7 +205,6 @@ public class StepHandlerStep extends AbstractStep {
 	protected ExitStatus doExecute(final StepExecution stepExecution) throws Exception {
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
-		itemHandler.mark();
 
 		final ExceptionHolder fatalException = new ExceptionHolder();
 
@@ -281,7 +280,6 @@ public class StepHandlerStep extends AbstractStep {
 					}
 
 					try {
-						itemHandler.mark();
 						transactionManager.commit(transaction);
 					}
 					catch (Exception e) {
@@ -347,7 +345,6 @@ public class StepHandlerStep extends AbstractStep {
 		stepExecution.rollback();
 
 		try {
-			itemHandler.reset();
 			transactionManager.rollback(transaction);
 		}
 		catch (Exception e) {

@@ -1,10 +1,7 @@
 package org.springframework.batch.item.file;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
@@ -33,12 +30,9 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemReader<T> extends ExecutionContextUserSupport implements ItemReader<T>, ItemStream {
+public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
-	/**
-	 * Unique object instance that marks resource boundaries in the item buffer
-	 */
-	private static final Object END_OF_RESOURCE_MARKER = new Object();
+	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
 	private ResourceAwareItemReaderItemStream<T> delegate;
 
@@ -46,13 +40,7 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 
 	private MultiResourceIndex index = new MultiResourceIndex();
 
-	private List<Object> itemBuffer = new ArrayList<Object>();
-
-	private ListIterator<Object> itemBufferIterator = null;
-
-	private boolean shouldReadBuffer = false;
-
-	private boolean saveState = false;
+	private boolean saveState = true;
 
 	private Comparator<Resource> comparator = new Comparator<Resource>() {
 
@@ -66,7 +54,7 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 	};
 
 	public MultiResourceItemReader() {
-		setName(ClassUtils.getShortName(MultiResourceItemReader.class));
+		executionContextUserSupport.setName(ClassUtils.getShortName(MultiResourceItemReader.class));
 	}
 
 	/**
@@ -75,13 +63,7 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 
 		T item;
-		if (shouldReadBuffer) {
-			item = readBufferedItem();
-		}
-		else {
-			item = readNextItem();
-		}
-
+		item = readNextItem();
 		index.incrementItemCount();
 
 		return item;
@@ -103,7 +85,6 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 			if (index.currentResource >= resources.length) {
 				return null;
 			}
-			itemBuffer.add(END_OF_RESOURCE_MARKER);
 
 			delegate.close(new ExecutionContext());
 			delegate.setResource(resources[index.currentResource]);
@@ -112,31 +93,7 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 			item = delegate.read();
 		}
 
-		itemBuffer.add(item);
-
 		return item;
-	}
-
-	/**
-	 * Read next item from buffer while keeping track of the position within the
-	 * input for possible restart.
-	 * @return next item from buffer
-	 */
-	@SuppressWarnings("unchecked")
-	private T readBufferedItem() {
-
-		Object buffered = itemBufferIterator.next();
-		while (buffered == END_OF_RESOURCE_MARKER) {
-			index.incrementResourceCount();
-			buffered = itemBufferIterator.next();
-		}
-
-		if (!itemBufferIterator.hasNext()) {
-			// buffer is exhausted, continue reading from file
-			shouldReadBuffer = false;
-			itemBufferIterator = null;
-		}
-		return (T) buffered;
 	}
 
 	/**
@@ -144,36 +101,12 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 	 * call mark() on delegate so that it clears its buffers.
 	 */
 	public void mark() throws MarkFailedException {
-		emptyBuffer();
-
-		index.mark();
-
-		delegate.mark();
-	}
-
-	/**
-	 * Discard the buffered items that have already been read.
-	 */
-	private void emptyBuffer() {
-		if (!shouldReadBuffer) {
-			itemBuffer.clear();
-			itemBufferIterator = null;
-		}
-		else {
-			itemBuffer = itemBuffer.subList(itemBufferIterator.nextIndex(), itemBuffer.size());
-			itemBufferIterator = itemBuffer.listIterator();
-		}
 	}
 
 	/**
 	 * Switches to 'read from buffer' state.
 	 */
 	public void reset() throws ResetFailedException {
-		if (!itemBuffer.isEmpty()) {
-			shouldReadBuffer = true;
-			itemBufferIterator = itemBuffer.listIterator();
-		}
-		index.reset();
 	}
 
 	/**
@@ -181,10 +114,7 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 	 * and reset instance variable values.
 	 */
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
-		shouldReadBuffer = false;
-		itemBufferIterator = null;
 		index = new MultiResourceIndex();
-		itemBuffer.clear();
 		delegate.close(new ExecutionContext());
 	}
 
@@ -207,7 +137,6 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 		try {
 			for (int i = 0; i < index.currentItem; i++) {
 				delegate.read();
-				delegate.mark();
 			}
 		}
 		catch (Exception e) {
@@ -294,18 +223,18 @@ public class MultiResourceItemReader<T> extends ExecutionContextUserSupport impl
 		}
 
 		public void open(ExecutionContext ctx) {
-			if (ctx.containsKey(getKey(RESOURCE_KEY))) {
-				currentResource = Long.valueOf(ctx.getLong(getKey(RESOURCE_KEY))).intValue();
+			if (ctx.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
+				currentResource = Long.valueOf(ctx.getLong(executionContextUserSupport.getKey(RESOURCE_KEY))).intValue();
 			}
 
-			if (ctx.containsKey(getKey(ITEM_KEY))) {
-				currentItem = ctx.getLong(getKey(ITEM_KEY));
+			if (ctx.containsKey(executionContextUserSupport.getKey(ITEM_KEY))) {
+				currentItem = ctx.getLong(executionContextUserSupport.getKey(ITEM_KEY));
 			}
 		}
 
 		public void update(ExecutionContext ctx) {
-			ctx.putLong(getKey(RESOURCE_KEY), index.currentResource);
-			ctx.putLong(getKey(ITEM_KEY), index.currentItem);
+			ctx.putLong(executionContextUserSupport.getKey(RESOURCE_KEY), index.currentResource);
+			ctx.putLong(executionContextUserSupport.getKey(ITEM_KEY), index.currentItem);
 		}
 	}
 

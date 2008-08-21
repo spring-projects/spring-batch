@@ -77,14 +77,10 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		Foo foo2 = tested.read();
 		assertEquals(2, foo2.getValue());
 		
-		tested.mark();
+		testedAsStream().update(executionContext);
 		
 		Foo foo3 = tested.read();
 		assertEquals(3, foo3.getValue());
-		
-		tested.reset();
-
-		testedAsStream().update(executionContext);
 
 		// create new input source
 		tested = getItemReader();

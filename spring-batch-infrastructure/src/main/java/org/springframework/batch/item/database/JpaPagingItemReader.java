@@ -27,7 +27,7 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
@@ -58,7 +58,7 @@ import org.springframework.util.ClassUtils;
  *
  * @author Thomas Risberg
  */
-public class JpaPagingItemReader<T> extends AbstractBufferedItemReaderItemStream<T> implements InitializingBean {
+public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 

@@ -144,36 +144,6 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 		assertEquals(1, foo.getValue());
 	}
 
-	/*
-	 * Rollback scenario.
-	 */
-	@Transactional @Test
-	public void testRollback() throws Exception {
-		getAsItemStream(itemReader).open(executionContext);
-		Foo foo1 = itemReader.read();
-
-		commit();
-
-		Foo foo2 = itemReader.read();
-		Assert.state(!foo2.equals(foo1));
-
-		Foo foo3 = itemReader.read();
-		Assert.state(!foo2.equals(foo3));
-
-		rollback();
-
-		assertEquals(foo2, itemReader.read());
-	}
-
-
-	private void commit() {
-		itemReader.mark();
-	}
-
-	private void rollback() {
-		itemReader.reset();
-	}
-
 	private ItemStream getAsItemStream(ItemReader<Foo> source) {
 		return (ItemStream) source;
 	}

@@ -74,7 +74,6 @@ public class DelegatingItemReader<T> extends AbstractItemReader<T> implements In
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void mark() {
-		itemReader.mark();
 	}
 
 	/*
@@ -82,6 +81,5 @@ public class DelegatingItemReader<T> extends AbstractItemReader<T> implements In
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.ExecutionContext)
 	 */
 	public void reset() {
-		itemReader.reset();
 	}
 }

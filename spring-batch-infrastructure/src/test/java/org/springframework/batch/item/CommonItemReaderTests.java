@@ -50,51 +50,6 @@ public abstract class CommonItemReaderTests {
 	}
 
 	/**
-	 * Rollback scenario - reader resets to last marked point. Note the commit
-	 * interval can change dynamically.
-	 */
-	@Test
-	public void testReset() throws Exception {
-		Foo foo1 = tested.read();
-		assertEquals(1, foo1.getValue());
-
-		tested.mark();
-
-		Foo foo2 = tested.read();
-		assertEquals(2, foo2.getValue());
-
-		Foo foo3 = tested.read();
-		assertEquals(3, foo3.getValue());
-
-		tested.reset();
-
-		assertEquals(foo2, tested.read());
-
-		tested.mark();
-
-		assertEquals(foo3, tested.read());
-
-		tested.reset();
-
-		assertEquals(foo3, tested.read());
-
-		Foo foo4 = tested.read();
-		assertEquals(4, foo4.getValue());
-
-		tested.mark();
-
-		Foo foo5 = tested.read();
-		assertEquals(5, foo5.getValue());
-
-		tested.reset();
-
-		assertEquals(foo5, tested.read());
-
-		assertNull(tested.read());
-
-	}
-
-	/**
 	 * Empty input should be handled gracefully - null is returned on first
 	 * read.
 	 */

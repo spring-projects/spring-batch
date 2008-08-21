@@ -107,10 +107,11 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * Save restart data and restore from it.
 	 */
 	public void testRestart() throws Exception {
+
 		source.open(executionContext);
 		source.read();
 		source.update(executionContext);
-		System.out.println(executionContext);
+
 		assertEquals(1, executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
 		List<XMLEvent> expectedAfterRestart = source.read();
 
@@ -118,46 +119,12 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.open(executionContext);
 		List<XMLEvent> afterRestart = source.read();
 		assertEquals(expectedAfterRestart.size(), afterRestart.size());
-	}
 
-	// /**
-	// * Restore point must not exceed end of file, input source must not be
-	// already initialised when restoring.
-	// */
-	// public void testInvalidRestore() {
-	// ExecutionContext context = new ExecutionContext();
-	// context.putLong(ClassUtils.getShortName(StaxEventItemReader.class) +
-	// ".item.count", 100000);
-	// try {
-	// source.open(context);
-	// fail("Expected StreamException");
-	// } catch (Exception e) {
-	// // expected
-	// String message = e.getMessage();
-	// assertTrue("Wrong message: " + message, contains(message,
-	// "must be before"));
-	// }
-	// }
+	}
 
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close(executionContext);
 		source.update(executionContext);
-	}
-
-	/**
-	 * Rollback to last commited record.
-	 */
-	public void testRollback() throws Exception {
-		source.open(executionContext);
-		// rollback between deserializing records
-		List<XMLEvent> first = source.read();
-		source.mark();
-		List<XMLEvent> second = source.read();
-		assertFalse(first.equals(second));
-		source.reset();
-
-		assertEquals(second, source.read());
-
 	}
 
 	/**

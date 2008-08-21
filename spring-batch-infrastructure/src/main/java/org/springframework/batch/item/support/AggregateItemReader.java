@@ -97,11 +97,9 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 	}
 
 	public void mark() throws MarkFailedException {
-		itemReader.mark();
 	}
 
 	public void reset() throws ResetFailedException {
-		itemReader.reset();
 	}
 
 	public void setItemReader(ItemReader<AggregateItem<T>> itemReader) {

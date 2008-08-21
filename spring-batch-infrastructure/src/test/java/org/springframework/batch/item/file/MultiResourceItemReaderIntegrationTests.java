@@ -43,7 +43,8 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		tested.setComparator(new Comparator<Resource>() {
 			public int compare(Resource o1, Resource o2) {
 				return 0; // do not change ordering
-			}});
+			}
+		});
 		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
 	}
 
@@ -67,40 +68,67 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		tested.close(ctx);
 	}
 
-	/**
-	 * Read items with a couple of rollbacks, requiring to jump back to items
-	 * from previous resources.
-	 */
-	public void testReset() throws Exception {
+	public void testRestartWhenStateNotSaved() throws Exception {
+
+		tested.setSaveState(false);
 
 		tested.open(ctx);
 
 		assertEquals("1", readItem());
 
-		tested.mark();
+		tested.update(ctx);
 
 		assertEquals("2", readItem());
 		assertEquals("3", readItem());
 
-		tested.reset();
+		tested.close(ctx);
+
+		tested.open(ctx);
+
+		assertEquals("1", readItem());
+	}
+
+	/**
+	 * 
+	 * Read items with a couple of rollbacks, requiring to jump back to items
+	 * from previous resources.
+	 */
+	public void testRestartAcrossResourceBoundary() throws Exception {
+
+		tested.open(ctx);
+
+		assertEquals("1", readItem());
+
+		tested.update(ctx);
+
+		assertEquals("2", readItem());
+		assertEquals("3", readItem());
+
+		tested.close(ctx);
+
+		tested.open(ctx);
 
 		assertEquals("2", readItem());
 		assertEquals("3", readItem());
 		assertEquals("4", readItem());
 
-		tested.reset();
+		tested.close(ctx);
+
+		tested.open(ctx);
 
 		assertEquals("2", readItem());
 		assertEquals("3", readItem());
 		assertEquals("4", readItem());
 		assertEquals("5", readItem());
 
-		tested.mark();
+		tested.update(ctx);
 
 		assertEquals("6", readItem());
 		assertEquals("7", readItem());
 
-		tested.reset();
+		tested.close(ctx);
+
+		tested.open(ctx);
 
 		assertEquals("6", readItem());
 		assertEquals("7", readItem());
@@ -115,9 +143,6 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	 * Restore from saved state.
 	 */
 	public void testRestart() throws Exception {
-
-		itemReader.setSaveState(true);
-		tested.setSaveState(true);
 
 		tested.open(ctx);
 
@@ -146,14 +171,13 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	 * Resources are ordered according to injected comparator.
 	 */
 	public void testResourceOrderingWithCustomComparator() {
-		
+
 		Resource r1 = new ByteArrayResource("".getBytes(), "b");
 		Resource r2 = new ByteArrayResource("".getBytes(), "a");
 		Resource r3 = new ByteArrayResource("".getBytes(), "c");
-		
-		
-		Resource[] resources = new Resource[] {r1, r2, r3};
-		
+
+		Resource[] resources = new Resource[] { r1, r2, r3 };
+
 		Comparator<Resource> comp = new Comparator<Resource>() {
 
 			/**

@@ -11,7 +11,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.Assert;
 
 public class DrivingQueryItemReaderTests extends TestCase {
 
@@ -135,28 +134,6 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		assertEquals(1, foo.getValue());
 	}
 
-	/**
-	 * Rollback scenario.
-	 * 
-	 * @throws Exception
-	 */
-	public void testRollback() throws Exception {
-		getAsItemStream(itemReader).open(new ExecutionContext());
-		Foo foo1 = (Foo) itemReader.read();
-
-		commit();
-
-		Foo foo2 = (Foo) itemReader.read();
-		Assert.state(!foo2.equals(foo1));
-
-		Foo foo3 = (Foo) itemReader.read();
-		Assert.state(!foo2.equals(foo3));
-
-		rollback();
-
-		assertEquals(foo2, itemReader.read());
-	}
-
 	public void testRetriveZeroKeys() {
 
 		itemReader.setKeyCollector(new KeyCollector<Foo>() {
@@ -174,14 +151,6 @@ public class DrivingQueryItemReaderTests extends TestCase {
 		
 		assertNull(itemReader.read());
 
-	}
-
-	private void commit() {
-		itemReader.mark();
-	}
-
-	private void rollback() {
-		itemReader.reset();
 	}
 
 	private InitializingBean getAsInitializingBean(ItemReader<Foo> source) {

@@ -1,13 +1,13 @@
 package org.springframework.batch.item.database;
 
+import javax.sql.DataSource;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-
-import javax.sql.DataSource;
 
 class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, InitializingBean {
 
@@ -62,7 +62,6 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
 	 */
 	public void mark() {
-		itemReader.mark();
 	}
 
 	/*
@@ -70,6 +69,5 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
 	 */
 	public void reset() {
-		itemReader.reset();
 	}
 }

@@ -9,7 +9,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
-import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemReaderItemStream;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,7 +30,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader<T> extends AbstractBufferedItemReaderItemStream<T> implements
+public class StaxEventItemReader<T> extends AbstractItemReaderItemStream<T> implements
 		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private FragmentEventReader fragmentReader;

@@ -1,17 +1,11 @@
 package org.springframework.batch.item.support;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.Assert;
@@ -26,21 +20,11 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractBufferedItemReaderItemStream<T> implements ItemReader<T>, ItemStream {
+public abstract class AbstractItemReaderItemStream<T> implements ItemReader<T>, ItemStream {
 
 	private static final String READ_COUNT = "read.count";
 
 	private int currentItemCount = 0;
-
-	private int lastMarkedItemCount = 0;
-
-	private boolean shouldReadBuffer = false;
-
-	private List<T> itemBuffer = new ArrayList<T>();
-
-	private ListIterator<T> itemBufferIterator = null;
-
-	private int lastMarkedBufferIndex = 0;
 
 	private ExecutionContextUserSupport ecSupport = new ExecutionContextUserSupport();
 
@@ -75,24 +59,8 @@ public abstract class AbstractBufferedItemReaderItemStream<T> implements ItemRea
 	}
 
 	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
-
 		currentItemCount++;
-
-		if (shouldReadBuffer) {
-			if (itemBufferIterator.hasNext()) {
-				return itemBufferIterator.next();
-			}
-			else {
-				// buffer is exhausted, continue reading from file
-				shouldReadBuffer = false;
-				itemBufferIterator = null;
-			}
-		}
-
-		T item = doRead();
-		itemBuffer.add(item);
-
-		return item;
+		return doRead();
 	}
 
 	/**
@@ -100,28 +68,11 @@ public abstract class AbstractBufferedItemReaderItemStream<T> implements ItemRea
 	 * single-threaded environment. The state backing the mark is a single
 	 * counter, keeping track of the current position, so multiple threads
 	 * cannot be accommodated.
-	 * 
-	 * @see org.springframework.batch.item.support.AbstractItemReader#mark()
 	 */
-	public void mark() throws MarkFailedException {
-
-		if (!shouldReadBuffer) {
-			itemBuffer.clear();
-			itemBufferIterator = null;
-			lastMarkedBufferIndex = 0;
-		}
-		else {
-			lastMarkedBufferIndex = itemBufferIterator.nextIndex();
-		}
-
-		lastMarkedItemCount = currentItemCount;
+	public void mark() {
 	}
 
-	public void reset() throws ResetFailedException {
-
-		currentItemCount = lastMarkedItemCount;
-		shouldReadBuffer = true;
-		itemBufferIterator = itemBuffer.listIterator(lastMarkedBufferIndex);
+	public void reset() {
 	}
 
 	protected int getCurrentItemCount() {
@@ -134,12 +85,6 @@ public abstract class AbstractBufferedItemReaderItemStream<T> implements ItemRea
 
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
 		currentItemCount = 0;
-		lastMarkedItemCount = 0;
-		lastMarkedBufferIndex = 0;
-		itemBufferIterator = null;
-		shouldReadBuffer = false;
-		itemBuffer.clear();
-
 		try {
 			doClose();
 		}

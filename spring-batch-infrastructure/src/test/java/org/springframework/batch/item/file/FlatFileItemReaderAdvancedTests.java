@@ -16,8 +16,6 @@
 
 package org.springframework.batch.item.file;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -80,58 +78,6 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		return new ByteArrayResource(input.getBytes());
 	}
 
-	/**
-	 * Test rollback functionality
-	 * 
-	 * @throws IOException
-	 */
-	public void testReset() throws Exception {
-
-		reader.close(null);
-		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		reader.open(executionContext);
-
-		// read some records
-		reader.read(); // #1
-		reader.read(); // #2
-		// commit them
-		reader.mark();
-		// read next record
-		reader.read(); // # 3
-		// read next records
-		reader.reset();
-
-		// we should now process all records after first commit point
-		assertEquals("[testLine3]", reader.read().toString());
-
-	}
-
-	/**
-	 * Test skip and skipRollback functionality
-	 * 
-	 * @throws IOException
-	 */
-	public void testFailOnFirstChunk() throws Exception {
-
-		reader.close(null);
-		reader.setResource(getInputResource("testLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));
-		reader.open(executionContext);
-
-		// read some records
-		reader.read(); // #1
-		reader.read(); // #2
-		reader.read(); // #3
-		// rollback
-		reader.reset();
-		// read next record
-		reader.read(); // should be #1
-
-		// we should now process all records after first commit point, that are
-		// not marked as skipped
-		assertEquals("[testLine2]", reader.read().toString());
-
-	}
-
 	public void testRestart() throws Exception {
 
 		reader.close(null);
@@ -141,9 +87,6 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		// read some records
 		reader.read();
 		reader.read();
-		// commit them
-		reader.mark();
-		// read next two records
 		reader.read();
 		reader.read();
 

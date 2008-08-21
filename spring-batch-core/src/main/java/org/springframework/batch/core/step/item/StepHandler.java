@@ -18,8 +18,6 @@ package org.springframework.batch.core.step.item;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -44,17 +42,5 @@ public interface StepHandler {
 	 * continuable.
 	 */
 	ExitStatus handle(StepContribution contribution) throws Exception;
-
-	/**
-	 * Implementations should delegate to an {@link ItemReader}.
-	 * 
-	 */
-	void mark() throws MarkFailedException;
-
-	/**
-	 * Implementations should delegate to an {@link ItemReader}.
-	 * 
-	 */
-	void reset() throws ResetFailedException;
 
 }

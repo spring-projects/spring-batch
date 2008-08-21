@@ -69,13 +69,11 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 
 	private boolean initialized = false;
 
-	private List<T> keys;
+	private T currentKey = null;
 
 	private Iterator<T> keysIterator;
 
 	private int currentIndex = 0;
-
-	private int lastCommitIndex = 0;
 
 	private KeyCollector<T> keyCollector;
 
@@ -91,7 +89,6 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 	 * @param keys
 	 */
 	public DrivingQueryItemReader(List<T> keys) {
-		this.keys = keys;
 		this.keysIterator = keys.iterator();
 	}
 
@@ -105,7 +102,8 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 
 		if (keysIterator.hasNext()) {
 			currentIndex++;
-			return keysIterator.next();
+			currentKey = keysIterator.next();
+			return currentKey;
 		}
 
 		return null;
@@ -119,11 +117,7 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 	 * @return the current key.
 	 */
 	protected T getCurrentKey() {
-		if (initialized && currentIndex > 0) {
-			return keys.get(currentIndex - 1);
-		}
-
-		return null;
+		return currentKey;
 	}
 
 	/**
@@ -133,8 +127,6 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 	public void close(ExecutionContext executionContext) {
 		initialized = false;
 		currentIndex = 0;
-		lastCommitIndex = 0;
-		keys = null;
 		keysIterator = null;
 	}
 
@@ -147,9 +139,9 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 	 */
 	public void open(ExecutionContext executionContext) {
 
-		Assert.state(keys == null && !initialized, "Cannot open an already opened item reader"
+		Assert.state(keysIterator == null && !initialized, "Cannot open an already opened item reader"
 				+ ", call close() first.");
-		keys = keyCollector.retrieveKeys(executionContext);
+		List<T> keys = keyCollector.retrieveKeys(executionContext);
 		Assert.notNull(keys, "Keys must not be null");
 		keysIterator = keys.listIterator();
 		initialized = true;
@@ -177,26 +169,10 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 		this.keyCollector = keyCollector;
 	}
 
-	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
-	 */
 	public void mark() {
-		lastCommitIndex = currentIndex;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.io.support.AbstractTransactionalIoSource#reset
-	 * (org.springframework.batch.item.ExecutionContext)
-	 */
 	public void reset() {
-		keysIterator = keys.listIterator(lastCommitIndex);
-		currentIndex = lastCommitIndex;
 	}
 
 	public void setSaveState(boolean saveState) {
