@@ -173,12 +173,13 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 		this.databaseProductName = JdbcUtils.commonDatabaseName(
 				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString());
 		String topClause = "";
+		String limitCondition = "";
 		String limitClause = "";
 		if ("DB2".equals(databaseProductName)) {
 			limitClause = " FETCH FIRST " + pageSize + " ROWS ONLY";
 		}
 		else if ("Oracle".equals(databaseProductName)) {
-			limitClause = (whereClause == null ? " WHERE " : " AND ") + " ROWNUM <= " + pageSize;
+			limitCondition = "ROWNUM <= " + pageSize;
 		}
 		else if ("MySQL".equals(databaseProductName) || "PostgreSQL".equals(databaseProductName)) {
 			limitClause = " LIMIT " + pageSize;
@@ -199,10 +200,15 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 		}
 		this.orderClause = " ORDER BY SORT_KEY";
 		this.firstPageSql = "SELECT " + topClause + selectClause + ", " + sortKey + " AS SORT_KEY" +
-				" FROM " + fromClause + (whereClause == null ? "" : " WHERE " + whereClause) + orderClause + limitClause;
+				" FROM " + fromClause +
+				(whereClause == null ? "" : " WHERE " + whereClause) +
+				(limitCondition.length() == 0 ? "" : (whereClause == null ? " WHERE " : " AND ") + limitCondition) + 
+				orderClause + limitClause;
 		this.remainingPagesSql = "SELECT " + topClause + selectClause + ", " + sortKey + " AS SORT_KEY" +
 				" FROM " + fromClause + " WHERE " + sortKey + " > ?" +
-				(whereClause == null ? "" : " AND " + whereClause) + orderClause + limitClause;
+				(whereClause == null ? "" : " AND " + whereClause) +
+				(limitCondition.length() == 0 ? "" : " AND " + limitCondition) + 
+				orderClause + limitClause;
 	}
 
 
@@ -283,7 +289,8 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 		page = itemIndex / pageSize;
 		current = itemIndex % pageSize;
 
-		int lastRow = (page * pageSize) - 1;
+		int offset = (page * pageSize) - 1;
+		int lastRowNum = (page * pageSize);
 
 		logger.debug("Jumping to page " + page + " and index " + current);
 
@@ -298,11 +305,11 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 				windowClause = "ROW_NUMBER() OVER (ORDER BY " + sortKey + " ASC) AS ROW_NUMBER";
 			}
 			else if ("HSQL Database Engine".equals(databaseProductName)) {
-				topClause = "LIMIT " + lastRow + " 1 ";
+				topClause = "LIMIT " + offset + " 1 ";
 			}
 			else if ("MySQL".equals(databaseProductName) || "PostgreSQL".equals(databaseProductName) ||
 					"HSQL Database Engine".equals(databaseProductName)) {
-				limitClause = " LIMIT 1 OFFSET " + lastRow;
+				limitClause = " LIMIT 1 OFFSET " + offset;
 			}
 
 			String jumpToItemSql =
@@ -310,7 +317,7 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 					"SELECT " + (topClause.length() > 0 ? topClause : "") + sortKey + " AS SORT_KEY" +
 					(windowClause.length() > 0 ? ", " + windowClause : "") +
 					" FROM " + fromClause + (whereClause == null ? "" : " WHERE " + whereClause) +
-					(windowClause.length() > 0 ? ") WHERE ROW_NUMBER = " + lastRow : orderClause + limitClause);
+					(windowClause.length() > 0 ? ") WHERE ROW_NUMBER = " + lastRowNum : orderClause + limitClause);
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for jumping: [" + jumpToItemSql + "]");
