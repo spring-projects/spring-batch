@@ -89,12 +89,6 @@ public class DelegatingItemReaderTests extends TestCase {
 		public void open(ExecutionContext executionContext) {
 		}
 
-		public void mark() {
-		}
-
-		public void reset() {
-		}
-
 	}
 
 }

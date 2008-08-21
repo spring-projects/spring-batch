@@ -63,18 +63,6 @@ public abstract class AbstractItemReaderItemStream<T> implements ItemReader<T>, 
 		return doRead();
 	}
 
-	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
-	 */
-	public void mark() {
-	}
-
-	public void reset() {
-	}
-
 	protected int getCurrentItemCount() {
 		return currentItemCount;
 	}

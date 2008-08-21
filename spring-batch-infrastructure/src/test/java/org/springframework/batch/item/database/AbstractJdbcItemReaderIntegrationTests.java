@@ -1,7 +1,14 @@
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
+import javax.sql.DataSource;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -9,14 +16,8 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.Assert;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
-
-import javax.sql.DataSource;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Common scenarios for testing {@link ItemReader} implementations which read data from database.

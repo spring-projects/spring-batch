@@ -22,8 +22,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.ResetFailedException;
 
 /**
  * An {@link ItemReader} that delivers a list as its item, storing up objects
@@ -94,12 +92,6 @@ public class AggregateItemReader<T> implements ItemReader<List<T>> {
 		log.debug("Mapping: " + value);
 		holder.records.add(value.getItem());
 		return true;
-	}
-
-	public void mark() throws MarkFailedException {
-	}
-
-	public void reset() throws ResetFailedException {
 	}
 
 	public void setItemReader(ItemReader<AggregateItem<T>> itemReader) {

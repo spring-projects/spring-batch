@@ -73,11 +73,11 @@ import org.springframework.util.ClassUtils;
  * 
  * <p>
  * Transactions: The same ResultSet is held open regardless of commits or roll
- * backs in a surrounding transaction. This means that when such a transaction
- * is committed, the reader is notified through the {@link #mark()} and
- * {@link #reset()} so that it can save it's current row number. Later, if the
- * transaction is rolled back, the current row can be moved back to the same row
- * number as it was on when commit was called.
+ * backs in a surrounding transaction. When a transaction is committed, the
+ * reader will be notified through the {@link #update(ExecutionContext)} so that
+ * it can save it's current row number. Clients of this reader are responsible
+ * for buffering the items in the case that they need to be re-presented on a
+ * rollback.
  * </p>
  * 
  * <p>
@@ -259,7 +259,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemReaderItemStream<T> imp
 	private void moveCursorToRow(int row) {
 		try {
 			int count = 0;
-			while (row!=count && rs.next()) {
+			while (row != count && rs.next()) {
 				count++;
 			}
 		}
@@ -294,9 +294,8 @@ public class JdbcCursorItemReader<T> extends AbstractItemReaderItemStream<T> imp
 
 	/**
 	 * Sets the number of seconds the driver will wait for a
-	 * <code>Statement</code> object to execute to the given number of
-	 * seconds. If the limit is exceeded, an <code>SQLException</code> is
-	 * thrown.
+	 * <code>Statement</code> object to execute to the given number of seconds.
+	 * If the limit is exceeded, an <code>SQLException</code> is thrown.
 	 * 
 	 * @param queryTimeout seconds the new query timeout limit in seconds; zero
 	 * means there is no limit
@@ -359,9 +358,9 @@ public class JdbcCursorItemReader<T> extends AbstractItemReaderItemStream<T> imp
 	/**
 	 * Indicate whether the JDBC driver supports setting the absolute row on a
 	 * {@link ResultSet}. It is recommended that this is set to
-	 * <code>true</code> for JDBC drivers that supports ResultSet.absolute()
-	 * as it may improve performance, especially if a step fails while working
-	 * with a large data set.
+	 * <code>true</code> for JDBC drivers that supports ResultSet.absolute() as
+	 * it may improve performance, especially if a step fails while working with
+	 * a large data set.
 	 * 
 	 * @see ResultSet#absolute(int)
 	 * 

@@ -7,10 +7,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.core.io.Resource;
@@ -94,19 +92,6 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 		}
 
 		return item;
-	}
-
-	/**
-	 * Remove the longer needed items from buffer, mark the index position and
-	 * call mark() on delegate so that it clears its buffers.
-	 */
-	public void mark() throws MarkFailedException {
-	}
-
-	/**
-	 * Switches to 'read from buffer' state.
-	 */
-	public void reset() throws ResetFailedException {
 	}
 
 	/**

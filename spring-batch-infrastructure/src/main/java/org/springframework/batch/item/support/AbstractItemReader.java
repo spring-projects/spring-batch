@@ -17,8 +17,6 @@
 package org.springframework.batch.item.support;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.ResetFailedException;
 
 
 /**
@@ -28,9 +26,4 @@ import org.springframework.batch.item.ResetFailedException;
  */
 public abstract class AbstractItemReader<T> implements ItemReader<T> {
 
-	public void mark() throws MarkFailedException {
-	}
-	
-	public void reset() throws ResetFailedException {
-	}
 }

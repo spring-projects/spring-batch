@@ -136,7 +136,6 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		assertEquals("[testLine1testLine2]", reader.read().toString());
 		assertEquals("[testLine3testLine4]", reader.read().toString());
 		
-		reader.mark();
 		reader.update(executionContext);
 		
 		reader.close(executionContext);
@@ -156,15 +155,13 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		// read some records
 		reader.read();
 		reader.read();
-		// commit them
-		reader.mark();
+		// get restart data
+		reader.update(executionContext);
 		// read next two records
 		reader.read();
 		reader.read();
 
-		// get restart data
-		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
+		assertEquals(2, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
 		        + ".read.count"));
 		// close input
 		reader.close(executionContext);
@@ -175,11 +172,11 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.open(executionContext);
 
 		// read remaining records
-		assertEquals("[testLine5]", reader.read().toString());
-		assertEquals("[testLine6]", reader.read().toString());
+		assertEquals("[testLine3]", reader.read().toString());
+		assertEquals("[testLine4]", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
 		        + ".read.count"));
 	}
 
@@ -193,15 +190,13 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		// read some records
 		reader.read();
 		reader.read();
-		// commit them
-		reader.mark();
+		// get restart data
+		reader.update(executionContext);
 		// read next two records
 		reader.read();
 		reader.read();
 
-		// get restart data
-		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
+		assertEquals(2, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
 		        + ".read.count"));
 		// close input
 		reader.close(executionContext);
@@ -212,11 +207,11 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 		reader.open(executionContext);
 
 		// read remaining records
-		assertEquals("[testLine5]", reader.read().toString());
-		assertEquals("[testLine6]", reader.read().toString());
+		assertEquals("[testLine3]", reader.read().toString());
+		assertEquals("[testLine4]", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(6, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class)
 		        + ".read.count"));
 	}
 }

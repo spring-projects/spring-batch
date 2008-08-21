@@ -169,12 +169,6 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 		this.keyCollector = keyCollector;
 	}
 
-	public void mark() {
-	}
-
-	public void reset() {
-	}
-
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}

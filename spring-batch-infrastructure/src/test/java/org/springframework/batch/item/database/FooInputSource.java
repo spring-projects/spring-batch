@@ -57,17 +57,4 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 		itemReader.close(executionContext);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark(org.springframework.batch.item.StreamContext)
-	 */
-	public void mark() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset(org.springframework.batch.item.StreamContext)
-	 */
-	public void reset() {
-	}
 }

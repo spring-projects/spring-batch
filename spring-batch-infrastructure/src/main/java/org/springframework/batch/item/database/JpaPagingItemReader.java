@@ -99,15 +99,8 @@ public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> impl
 		this.queryString = queryString;
 	}
 
-	@Override
-	public void mark() {
-
-		super.mark();
-
-	}
-
 	/**
-	 * The number of entities to retreive at a time.
+	 * The number of entities to retrieve at a time.
 	 *
 	 * @param pageSize the number of rows to fetch, 10 by default
 	 * @see javax.persistence.Query#setMaxResults(int) 

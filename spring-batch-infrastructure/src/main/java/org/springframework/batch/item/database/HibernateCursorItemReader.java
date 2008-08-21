@@ -21,8 +21,10 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.support.AbstractItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -121,15 +123,11 @@ public class HibernateCursorItemReader<T> extends AbstractItemReaderItemStream<T
 	}
 
 	/**
-	 * Mark is supported as long as this {@link ItemStream} is used in a
-	 * single-threaded environment. The state backing the mark is a single
-	 * counter, keeping track of the current position, so multiple threads
-	 * cannot be accommodated.
+	 * Clears the session if not stateful and delegates to super class.
 	 */
-	public void mark() {
-
-		super.mark();
-
+	@Override
+	public void update(ExecutionContext executionContext) throws ItemStreamException {
+		super.update(executionContext);
 		if (!useStatelessSession) {
 			statefulSession.clear();
 		}
@@ -161,7 +159,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemReaderItemStream<T
 				item = data[0];
 			}
 
-			return (T)item;
+			return (T) item;
 		}
 		return null;
 	}

@@ -18,17 +18,15 @@ package org.springframework.batch.sample.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
-
-import junit.framework.TestCase;
 
 /**
  * Unit test class that was used as part of the Reference Documentation.  I'm only including it in the
@@ -63,15 +61,6 @@ public class CustomItemReaderTests extends TestCase {
 		assertNull(itemReader.read());
 	}
 	
-	public void testRollback() throws Exception{
-		
-		itemReader.mark();
-		assertEquals("1", itemReader.read());
-		assertEquals("2", itemReader.read());
-		itemReader.reset();
-		assertEquals("1", itemReader.read());
-	}
-	
 	public void testRestart() throws Exception{
 		
 		ExecutionContext executionContext = new ExecutionContext();
@@ -88,11 +77,10 @@ public class CustomItemReaderTests extends TestCase {
 		assertEquals("2", itemReader.read());
 	}
 
-	public class CustomItemReader<T> implements ItemReader<T>, ItemStream{
+	public class CustomItemReader<T> implements ItemReader<T>, ItemStream {
 
 		List<T> items;
 		int currentIndex = 0;
-		int lastMarkedIndex = 0;
 		private static final String CURRENT_INDEX = "current.index";
 		
 		public CustomItemReader(List<T> items) {
@@ -108,21 +96,12 @@ public class CustomItemReaderTests extends TestCase {
 			return null;
 		}
 		
-		public void mark() throws MarkFailedException {
-			lastMarkedIndex = currentIndex;
-		};
-
-		public void reset() throws ResetFailedException {
-			currentIndex = lastMarkedIndex;
-		}
-		
 		public void open(ExecutionContext executionContext) throws ItemStreamException {
 			if(executionContext.containsKey(CURRENT_INDEX)){
 				currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
 			}
 			else{
 				currentIndex = 0;
-				lastMarkedIndex = 0;
 			}
 		}
 
