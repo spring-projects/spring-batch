@@ -33,8 +33,10 @@ import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
+import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.core.AttributeAccessor;
 
 /**
  * @author Dave Syer
@@ -48,6 +50,8 @@ public class ItemOrientedStepHandlerTests {
 	
 	private RepeatTemplate repeatTemplate = new RepeatTemplate();
 	
+	private AttributeAccessor context = new RepeatContextSupport(null);
+	
 	@Before
 	public void setUp() {
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
@@ -59,7 +63,7 @@ public class ItemOrientedStepHandlerTests {
 				new PassthroughItemProcessor<String>(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
-		handler.handle(contribution);
+		handler.handle(contribution, context);
 		assertEquals(2, itemReader.count);
 		assertEquals("12", itemWriter.values);
 	}
@@ -70,7 +74,7 @@ public class ItemOrientedStepHandlerTests {
 				new AgrgegateItemProcessor(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
-		handler.handle(contribution);
+		handler.handle(contribution, context);
 		assertEquals(2, itemReader.count);
 		assertEquals("12", itemWriter.values);
 	}

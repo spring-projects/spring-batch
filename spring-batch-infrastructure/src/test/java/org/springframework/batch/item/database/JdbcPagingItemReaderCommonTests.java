@@ -1,7 +1,6 @@
 package org.springframework.batch.item.database;
 
 import org.junit.runner.RunWith;
-import org.junit.Test;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
@@ -11,7 +10,6 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
-import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;

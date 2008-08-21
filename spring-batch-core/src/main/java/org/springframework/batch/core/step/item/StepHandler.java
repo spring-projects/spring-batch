@@ -19,6 +19,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.core.AttributeAccessor;
 
 /**
  * Strategy for processing in a step. Bears a resemblance to {@link ItemReader}
@@ -37,10 +38,12 @@ public interface StepHandler {
 	 * not null process the item and return {@link ExitStatus#CONTINUABLE}. On
 	 * failure throws an exception.
 	 * 
-	 * @param contribution the current step context
+	 * @param contribution mutable state to be passed back to update the current
+	 * step execution
+	 * @param attributes attributes shared between invocations
 	 * @return an {@link ExitStatus} indicating whether processing is
 	 * continuable.
 	 */
-	ExitStatus handle(StepContribution contribution) throws Exception;
+	ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception;
 
 }

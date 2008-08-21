@@ -374,8 +374,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 			while (true) {
 				try {
-					T item = doRead();
-					return item==null ? null : new ReadWrapper<T>(item, skipCount);
+					return new ReadWrapper<T>(doRead(), skipCount);
 				}
 				catch (Exception e) {
 					try {

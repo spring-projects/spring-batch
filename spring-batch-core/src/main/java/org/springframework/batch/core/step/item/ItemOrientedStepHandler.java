@@ -30,7 +30,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.core.AttributeAccessor;
 
 /**
  * Simplest possible implementation of {@link StepHandler} with no skipping or
@@ -45,6 +45,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @author Robert Kasanicky
  */
 public class ItemOrientedStepHandler<T, S> implements StepHandler {
+
+	private static final String ITEM_BUFFER_KEY = ItemOrientedStepHandler.class.getName() + ".ITEM_BUFFER_KEY";
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -78,11 +80,12 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
 	 * taken from the reader.
 	 * 
-	 * @see org.springframework.batch.core.step.item.StepHandler#handle(org.springframework.batch.core.StepContribution)
+	 * @see org.springframework.batch.core.step.item.StepHandler#handle(org.springframework.batch.core.StepContribution,
+	 * AttributeAccessor)
 	 */
-	public ExitStatus handle(final StepContribution contribution) throws Exception {
+	public ExitStatus handle(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
-		final List<ReadWrapper<T>> buffer = getItemBuffer();
+		final List<ReadWrapper<T>> buffer = getItemBuffer(attributes);
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
@@ -91,10 +94,10 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 			result = repeatOperations.iterate(new RepeatCallback() {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 					ReadWrapper<T> item = read(contribution);
-					if (item == null) {
+					contribution.incrementReadSkipCount(item.getSkipCount());
+					if (item.getItem() == null) {
 						return ExitStatus.FINISHED;
 					}
-					contribution.incrementReadSkipCount(item.getSkipCount());
 					buffer.add(item);
 					return ExitStatus.CONTINUABLE;
 				}
@@ -127,19 +130,28 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 		for (S data : processed) {
 			write(data, contribution);
 		}
-		buffer.clear();
+
+		// On successful completion clear the attributes to signal that there is
+		// no more processing
+		clearAll(attributes);
 
 		logger.info("Contribution: " + contribution);
 		return result;
 
 	}
 
-	private List<ReadWrapper<T>> getItemBuffer() {
-		if (!TransactionSynchronizationManager.hasResource(this)) {
-			TransactionSynchronizationManager.bindResource(this, new ArrayList<ReadWrapper<T>>());
+	private void clearAll(AttributeAccessor attributes) {
+		for (String key : attributes.attributeNames()) {
+			attributes.removeAttribute(key);
+		}
+	}
+
+	private List<ReadWrapper<T>> getItemBuffer(AttributeAccessor attributes) {
+		if (!attributes.hasAttribute(ITEM_BUFFER_KEY)) {
+			attributes.setAttribute(ITEM_BUFFER_KEY, new ArrayList<ReadWrapper<T>>());
 		}
 		@SuppressWarnings("unchecked")
-		List<ReadWrapper<T>> resource = (List<ReadWrapper<T>>) TransactionSynchronizationManager.getResource(this);
+		List<ReadWrapper<T>> resource = (List<ReadWrapper<T>>) attributes.getAttribute(ITEM_BUFFER_KEY);
 		return resource;
 	}
 
@@ -148,8 +160,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * @return next item for writing
 	 */
 	protected ReadWrapper<T> read(StepContribution contribution) throws Exception {
-		T item = doRead();
-		return item==null ? null : new ReadWrapper<T>(item);
+		return new ReadWrapper<T>(doRead());
 	}
 
 	/**

@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -38,6 +41,8 @@ import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.core.AttributeAccessor;
+import org.springframework.core.AttributeAccessorSupport;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -206,12 +211,16 @@ public class StepHandlerStep extends AbstractStep {
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
-		final ExceptionHolder fatalException = new ExceptionHolder();
-
 		return stepOperations.iterate(new RepeatCallback() {
 
+			final Queue<AttributeAccessor> attributeQueue = new LinkedBlockingQueue<AttributeAccessor>();
+
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
-				final StepContribution contribution = stepExecution.createStepContribution();
+
+				ExceptionHolder fatalException = new ExceptionHolder();
+
+				StepContribution contribution = stepExecution.createStepContribution();
+
 				// Before starting a new transaction, check for
 				// interruption.
 				interruptionPolicy.checkInterrupted(stepExecution);
@@ -222,10 +231,16 @@ public class StepHandlerStep extends AbstractStep {
 
 				boolean locked = false;
 
+				AttributeAccessor attributes = attributeQueue.poll();
+				if (attributes == null) {
+					attributes = new AttributeAccessorSupport() {
+					};
+				}
+
 				try {
 
 					try {
-						exitStatus = itemHandler.handle(contribution);
+						exitStatus = itemHandler.handle(contribution, attributes);
 					}
 					catch (Error e) {
 						if (transactionAttribute.rollbackOn(e)) {
@@ -235,6 +250,13 @@ public class StepHandlerStep extends AbstractStep {
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
+						}
+					}
+					finally {
+						// Still some stuff to do with the data in this chunk,
+						// pass it back
+						if (attributes.attributeNames().length > 0) {
+							attributeQueue.add(attributes);
 						}
 					}
 
