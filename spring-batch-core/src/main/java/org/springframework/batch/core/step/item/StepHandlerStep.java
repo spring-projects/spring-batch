@@ -108,7 +108,7 @@ public class StepHandlerStep extends AbstractStep {
 	 * 
 	 * @param itemHandler the {@link StepHandler} to set
 	 */
-	public void setItemHandler(StepHandler itemHandler) {
+	public void setStepHandler(StepHandler itemHandler) {
 		this.itemHandler = itemHandler;
 	}
 

@@ -3,8 +3,6 @@ package org.springframework.batch.sample.domain.trade.internal;
 import java.math.BigDecimal;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.sample.domain.trade.Trade;
 
 /**
@@ -18,8 +16,6 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 	
 	private int counter = 0;
 
-	private int marked;
-	
 	public Trade read() throws Exception {
 		if (counter < limit) {
 			counter++;
@@ -46,20 +42,6 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 
 	public int getLimit() {
 		return limit;
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#mark()
-	 */
-	public void mark() throws MarkFailedException {
-		this.marked = this.counter;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemStream#reset()
-	 */
-	public void reset() throws ResetFailedException {
-		this.counter = this.marked;
 	}
 
 }

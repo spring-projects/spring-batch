@@ -78,7 +78,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setItemHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
+		step.setStepHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
@@ -115,7 +115,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		Thread processingThread = createThread(stepExecution);
 
-		step.setItemHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
+		step.setStepHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
 			public Object read() throws Exception {
 				return null;
 			}
@@ -152,7 +152,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void testLockNotReleasedIfChunkFails() throws Exception {
 
-		step.setItemHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
+		step.setStepHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
 			public Object read() throws Exception {
 				throw new RuntimeException("Planned!");
 			}

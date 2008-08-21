@@ -32,8 +32,6 @@ import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.MarkFailedException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.transform.LineAggregator;
@@ -187,13 +185,11 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			String line = lineAggregator.aggregate(item) + lineSeparator;
 			try {
 				state.write(line);
-			} catch (IOException e) {
-				throw new FlushFailedException(
-						"Could not write data.  The file may be corrupt.", e);
+			}
+			catch (IOException e) {
+				throw new FlushFailedException("Could not write data.  The file may be corrupt.", e);
 			}
 		}
-
-		state.mark();
 
 	}
 
@@ -240,8 +236,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				}
 			}
 			catch (IOException e) {
-				throw new FlushFailedException(
-						"Could not write headers.  The file may be corrupt.", e);
+				throw new FlushFailedException("Could not write headers.  The file may be corrupt.", e);
 			}
 		}
 	}
@@ -396,18 +391,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		}
 
 		/**
-		 * Mark the current position.
-		 */
-		public void mark() {
-			try {
-				lastMarkedByteOffsetPosition = this.position();
-			}
-			catch (IOException e) {
-				throw new MarkFailedException("Unable to get position for mark", e);
-			}
-		}
-
-		/**
 		 * Creates the buffered writer for the output file channel based on
 		 * configuration information.
 		 * @throws IOException
@@ -424,7 +407,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 			// in case of restarting reset position to last committed point
 			if (restarted) {
-				this.reset();
+				checkFileSize();
+				truncate();
 			}
 
 			initialized = true;
@@ -451,42 +435,20 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		}
 
 		/**
-		 * Resets the file writer's current position to the point stored in the
-		 * last marked byte offset position variable. It first checks to make
-		 * sure the current size of the file is not less than the byte position
-		 * to be moved to (if it is, throws an environment exception), then it
-		 * truncates the file to that reset position, and set the cursor to
-		 * start writing at that point.
-		 */
-		public void reset() throws ResetFailedException {
-			checkFileSize();
-			try {
-				getOutputState().truncate();
-			}
-			catch (IOException e) {
-				throw new ResetFailedException("Unable to truncate file", e);
-			}
-		}
-
-		/**
 		 * Checks (on setState) to make sure that the current output file's size
 		 * is not smaller than the last saved commit point. If it is, then the
 		 * file has been damaged in some way and whole task must be started over
 		 * again from the beginning.
+		 * @throws IOException if there is an IO problem
 		 */
-		private void checkFileSize() {
+		private void checkFileSize() throws IOException {
 			long size = -1;
 
-			try {
-				outputBufferedWriter.flush();
-				size = fileChannel.size();
-			}
-			catch (IOException e) {
-				throw new ResetFailedException("An Error occured while checking file size", e);
-			}
+			outputBufferedWriter.flush();
+			size = fileChannel.size();
 
 			if (size < lastMarkedByteOffsetPosition) {
-				throw new ResetFailedException("Current file size is smaller than size at last commit");
+				throw new ItemStreamException("Current file size is smaller than size at last commit");
 			}
 		}
 

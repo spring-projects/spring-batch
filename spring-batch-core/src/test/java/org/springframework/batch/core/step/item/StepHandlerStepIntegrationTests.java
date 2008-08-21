@@ -111,7 +111,7 @@ public class StepHandlerStepIntegrationTests {
 	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setItemHandler(new SimpleStepHandler<String>(getReader(new String[] { "a", "b", "c" }),
+		step.setStepHandler(new SimpleStepHandler<String>(getReader(new String[] { "a", "b", "c" }),
 				new ItemWriter<String>() {
 					public void write(List<? extends String> data) throws Exception {
 						TransactionSynchronizationManager

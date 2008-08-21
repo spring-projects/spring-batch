@@ -278,7 +278,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					writeSkipPolicy);
 			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
 
-			step.setItemHandler(itemHandler);
+			step.setStepHandler(itemHandler);
 
 		}
 

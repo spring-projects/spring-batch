@@ -481,7 +481,7 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 
 		step.setStepOperations(stepOperations);
 
-		step.setItemHandler(new ItemOrientedStepHandler<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations));
+		step.setStepHandler(new ItemOrientedStepHandler<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations));
 
 	}
 

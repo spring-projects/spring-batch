@@ -27,10 +27,8 @@ import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -429,12 +427,6 @@ public class SkipLimitStepFactoryBeanTests {
 			processed.add(item);
 			logger.debug("Returning [" + item + "] at count=" + counter);
 			return item;
-		}
-
-		public void mark() throws MarkFailedException {
-		}
-
-		public void reset() throws ResetFailedException {
 		}
 
 	}
