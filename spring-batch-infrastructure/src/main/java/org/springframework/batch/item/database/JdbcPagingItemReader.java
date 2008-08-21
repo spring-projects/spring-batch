@@ -153,7 +153,10 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 		this.parameterizedRowMapper = parameterizedRowMapper;
 	}
 
-	@Override
+	/**
+	 * Check mandatory properties.
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
 		Assert.hasLength(selectClause, "selectClause must be specified");
