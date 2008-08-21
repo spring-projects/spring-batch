@@ -33,6 +33,7 @@ public class JpaPagingItemReaderIntegrationTests extends AbstractDataSourceItemR
 		JpaPagingItemReader<Foo> inputSource = new JpaPagingItemReader<Foo>();
 		inputSource.setQueryString(jpqlQuery);
 		inputSource.setEntityManagerFactory(entityManagerFactory);
+		inputSource.setPageSize(3);
 		inputSource.afterPropertiesSet();
 		inputSource.setSaveState(true);
 

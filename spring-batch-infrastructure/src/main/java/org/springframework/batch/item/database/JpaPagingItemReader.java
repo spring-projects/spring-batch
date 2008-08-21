@@ -57,6 +57,7 @@ import org.springframework.util.ClassUtils;
  * The implementation is *not* thread-safe.
  *
  * @author Thomas Risberg
+ * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> implements InitializingBean {
 
@@ -102,8 +103,7 @@ public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> impl
 	/**
 	 * The number of entities to retrieve at a time.
 	 *
-	 * @param pageSize the number of rows to fetch, 10 by default
-	 * @see javax.persistence.Query#setMaxResults(int) 
+	 * @param pageSize the number of entities per page
 	 */
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
