@@ -17,12 +17,13 @@
 package org.springframework.batch.core.repository.support;
 
 import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -44,7 +45,7 @@ import org.springframework.batch.core.step.StepSupport;
  * @author Lucas Ward
  * 
  */
-public class SimpleJobRepositoryTests extends TestCase {
+public class SimpleJobRepositoryTests {
 
 	SimpleJobRepository jobRepository;
 
@@ -71,8 +72,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 	String databaseStep2;
 
 	List<String> steps;
+	
+	JobExecution jobExecution;
 
-
+	@Before
 	public void setUp() throws Exception {
 
 		jobExecutionDao = createMock(JobExecutionDao.class);
@@ -107,9 +110,10 @@ public class SimpleJobRepositoryTests extends TestCase {
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 
+		jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, job.getName()), new Long(1));
 	}
 
-
+	@Test
 	public void testSaveOrUpdateInvalidJobExecution() {
 
 		// failure scenario - must have job ID
@@ -123,6 +127,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testUpdateValidJobExecution() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, job.getName()), new Long(1));
@@ -134,6 +139,7 @@ public class SimpleJobRepositoryTests extends TestCase {
 		verify(jobExecutionDao);
 	}
 
+	@Test
 	public void testSaveOrUpdateStepExecutionException() {
 
 		StepExecution stepExecution = new StepExecution("stepName", null);
@@ -146,6 +152,37 @@ public class SimpleJobRepositoryTests extends TestCase {
 		catch (Exception ex) {
 			// expected
 		}
+	}
+	
+	@Test
+	public void testSaveStepExecutionSetsLastUpdated(){
+		
+		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
+		
+		long before = System.currentTimeMillis(); 
+		
+		jobRepository.add(stepExecution);
+		
+		assertNotNull(stepExecution.getLastUpdated());
+		
+		long lastUpdated = stepExecution.getLastUpdated().getTime();
+		assertTrue(lastUpdated > (before - 1000));
+	}
+	
+	@Test
+	public void testUpdateStepExecutionSetsLastUpdated(){
+		
+		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
+		stepExecution.setId(2343L);
+		
+		long before = System.currentTimeMillis(); 
+		
+		jobRepository.update(stepExecution);
+		
+		assertNotNull(stepExecution.getLastUpdated());
+		
+		long lastUpdated = stepExecution.getLastUpdated().getTime();
+		assertTrue(lastUpdated > (before - 1000));
 	}
 
 }

@@ -17,6 +17,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
@@ -225,6 +226,7 @@ public class SimpleJobRepository implements JobRepository {
 	public void add(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 
+		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		stepExecutionDao.saveStepExecution(stepExecution);
 	}
 
@@ -238,6 +240,7 @@ public class SimpleJobRepository implements JobRepository {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
 
+		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		stepExecutionDao.updateStepExecution(stepExecution);
 	}
 
