@@ -53,7 +53,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		final ExecutionContext executionContext = new ExecutionContext();
 
 		getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTION_CONTEXT),
-				new Object[] { executionId, Discriminator.JOB },
+				new Object[] { executionId, Discriminator.JOB.toString() },
 				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
@@ -70,7 +70,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		final ExecutionContext executionContext = new ExecutionContext();
 
 		getJdbcTemplate().getJdbcOperations().query(getQuery(FIND_EXECUTION_CONTEXT),
-				new Object[] { executionId, Discriminator.STEP },
+				new Object[] { executionId, Discriminator.STEP.toString() },
 				new ExecutionContextRowCallbackHandler(executionContext));
 
 		return executionContext;
