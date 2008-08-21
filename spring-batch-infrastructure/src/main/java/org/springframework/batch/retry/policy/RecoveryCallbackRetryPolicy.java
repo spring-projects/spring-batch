@@ -203,7 +203,6 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 		public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
 			// If there is no going back, then we can remove the history
 			retryContextCache.remove(key);
-			RepeatSynchronizationManager.setCompleteOnly();
 			if (recoverer != null) {
 				return recoverer.recover(context);
 			}

@@ -15,7 +15,10 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +32,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Simplest possible implementation of {@link StepHandler} with no skipping or
@@ -81,31 +84,74 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 */
 	public ExitStatus handle(final StepContribution contribution) throws Exception {
 
-		ExitStatus result = repeatOperations.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-				boolean processed = false;
-				while (!processed) {
-					T item = read(contribution);
+		final List<ReadWrapper<T>> buffer = getItemBuffer();
+
+		ExitStatus result = ExitStatus.CONTINUABLE;
+
+		if (buffer.isEmpty()) {
+
+			result = repeatOperations.iterate(new RepeatCallback() {
+				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
+					ReadWrapper<T> item = read(contribution);
 					if (item == null) {
 						return ExitStatus.FINISHED;
 					}
-					// TODO: segregate read / write / filter count
-					contribution.incrementItemCount();
-					processed = write(item, contribution);
+					contribution.incrementReadSkipCount(item.getSkipCount());
+					buffer.add(item);
+					return ExitStatus.CONTINUABLE;
 				}
-				return ExitStatus.CONTINUABLE;
-			}
-		});
+			});
 
+		}
+
+		List<S> processed = new ArrayList<S>();
+
+		for (Iterator<ReadWrapper<T>> iterator = buffer.iterator(); iterator.hasNext();) {
+
+			ReadWrapper<T> item = iterator.next();
+			S output = null;
+
+			// TODO: segregate read / write / filter count
+			// (this is read count)
+			contribution.incrementItemCount();
+			// TODO: processor listener
+			output = itemProcessor.process(item.getItem());
+
+			// TODO: increment filter count if this is null
+			if (output != null) {
+				processed.add(output);
+			}
+
+		}
+
+		// TODO: use ItemWriter interface properly
+		// TODO: make sure exceptions get handled by the appropriate handler
+		for (S data : processed) {
+			write(data, contribution);
+		}
+		buffer.clear();
+
+		logger.info("Contribution: " + contribution);
 		return result;
+
+	}
+
+	private List<ReadWrapper<T>> getItemBuffer() {
+		if (!TransactionSynchronizationManager.hasResource(this)) {
+			TransactionSynchronizationManager.bindResource(this, new ArrayList<ReadWrapper<T>>());
+		}
+		@SuppressWarnings("unchecked")
+		List<ReadWrapper<T>> resource = (List<ReadWrapper<T>>) TransactionSynchronizationManager.getResource(this);
+		return resource;
 	}
 
 	/**
 	 * @param contribution current context
 	 * @return next item for writing
 	 */
-	protected T read(StepContribution contribution) throws Exception {
-		return doRead();
+	protected ReadWrapper<T> read(StepContribution contribution) throws Exception {
+		T item = doRead();
+		return item==null ? null : new ReadWrapper<T>(item);
 	}
 
 	/**
@@ -120,24 +166,18 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * 
 	 * @param item the item to write
 	 * @param contribution current context
-	 * @return true if the item was written (as opposed to filtered)
 	 */
-	protected boolean write(T item, StepContribution contribution) throws Exception {
-		return doWrite(item);
+	protected void write(S item, StepContribution contribution) throws Exception {
+		doWrite(item);
 	}
 
 	/**
 	 * @param item
 	 * @throws Exception
 	 */
-	protected final boolean doWrite(T item) throws Exception {
-		S processed = itemProcessor.process(item);
-		if (processed != null) {
-			// TODO: increment filtered item count
-			itemWriter.write(Collections.singletonList(processed));
-			return true;
-		}
-		return false;
+	protected final void doWrite(S item) throws Exception {
+		// TODO: increment write count
+		itemWriter.write(Collections.singletonList(item));
 	}
 
 	/**
@@ -152,6 +192,49 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 */
 	public void reset() throws ResetFailedException {
 		itemReader.reset();
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	static protected class ReadWrapper<T> {
+
+		final private T item;
+
+		final private int skipCount;
+
+		/**
+		 * @param item
+		 */
+		public ReadWrapper(T item) {
+			this(item, 0);
+		}
+
+		/**
+		 * @param item
+		 * @param skipCount
+		 */
+		public ReadWrapper(T item, int skipCount) {
+			this.item = item;
+			this.skipCount = skipCount;
+		}
+
+		/**
+		 * @return the item we are wrapping
+		 */
+		public T getItem() {
+			return item;
+		}
+
+		/**
+		 * Public getter for the skipCount.
+		 * @return the skipCount
+		 */
+		public int getSkipCount() {
+			return skipCount;
+		}
+
 	}
 
 }

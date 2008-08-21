@@ -46,13 +46,9 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 /**
@@ -131,22 +127,6 @@ public class SimpleStepFactoryBeanTests {
 	@Test
 	public void testSimpleJobWithItemListeners() throws Exception {
 
-		final List<Throwable> throwables = new ArrayList<Throwable>();
-
-		RepeatTemplate chunkOperations = new RepeatTemplate();
-		// Always handle the exception to check it is the right one...
-		chunkOperations.setExceptionHandler(new ExceptionHandler() {
-			public void handleException(RepeatContext context, Throwable throwable) throws RuntimeException {
-				throwables.add(throwable);
-				assertEquals("Error!", throwable.getMessage());
-			}
-		});
-
-		/*
-		 * Each message fails once and the chunk (size=1) "rolls back"; then it
-		 * is recovered ("skipped") on the second attempt (see retry policy
-		 * definition above)...
-		 */
 		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
 		factory.setItemWriter(new ItemWriter<String>() {
@@ -164,19 +144,24 @@ public class SimpleStepFactoryBeanTests {
 			}
 		} });
 
-		factory.setChunkOperations(chunkOperations);
-		StepHandlerStep step = (StepHandlerStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
-		job.setSteps(Collections.singletonList((Step) step));
+		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
-		job.execute(jobExecution);
+		try {
+			job.execute(jobExecution);
+			fail("Expected RuntimeException");
+		} catch (RuntimeException e) {
+			// expected
+			assertEquals("Error!", e.getMessage());
+		}
 
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(0, written.size());
-		// provider should be exhausted
-		assertEquals(null, reader.read());
-		assertEquals(3, recovered.size());
+		// provider should be at second item
+		assertEquals("bar", reader.read());
+		assertEquals(1, recovered.size());
 	}
 
 	@Test
@@ -313,7 +298,7 @@ public class SimpleStepFactoryBeanTests {
 	private SimpleStepFactoryBean<String,String> getStepFactory(String... args) throws Exception {
 		SimpleStepFactoryBean<String,String> factory = new SimpleStepFactoryBean<String,String>();
 
-		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
+		List<String> items = new ArrayList<String>();
 		items.addAll(Arrays.asList(args));
 		reader = new ListItemReader<String>(items);
 

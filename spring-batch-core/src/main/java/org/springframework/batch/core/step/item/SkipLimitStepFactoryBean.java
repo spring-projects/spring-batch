@@ -368,22 +368,25 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * count
 		 * @return next item for processing
 		 */
-		protected T read(StepContribution contribution) throws Exception {
+		protected ReadWrapper<T> read(StepContribution contribution) throws Exception {
+			
+			int skipCount = 0;
 
 			while (true) {
 				try {
-					return doRead();
+					T item = doRead();
+					return item==null ? null : new ReadWrapper<T>(item, skipCount);
 				}
 				catch (Exception e) {
 					try {
 						if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 							// increment skip count and try again
-							contribution.incrementTemporaryReadSkipCount();
 							try {
+								skipCount++;
 								listener.onSkipInRead(e);
 							}
 							catch (RuntimeException ex) {
-								contribution.combineSkipCounts();
+								contribution.incrementReadSkipCount(skipCount);
 								throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 							}
 							logger.debug("Skipping failed input", e);
@@ -397,7 +400,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					catch (SkipLimitExceededException ex) {
 						// we are headed for a abnormal ending so bake in the
 						// skip count
-						contribution.combineSkipCounts();
+						contribution.incrementReadSkipCount(skipCount);
 						throw ex;
 					}
 				}
@@ -413,10 +416,12 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * exhausted. The listener callback (on write failure) will happen in
 		 * the next transaction automatically.<br/>
 		 */
-		protected boolean write(final T item, final StepContribution contribution) throws Exception {
+		@Override
+		protected void write(final S item, final StepContribution contribution) throws Exception {
 			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
 				public Object doWithRetry(RetryContext context) throws Throwable {
-					return doWrite(item);
+					doWrite(item);
+					return null;
 				}
 			}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item) : item);
 			retryCallback.setRecoveryCallback(new RecoveryCallback() {
@@ -431,10 +436,10 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
 						}
 					}
-					return true;
+					return null;
 				}
 			});
-			return (Boolean) retryOperations.execute(retryCallback);
+			retryOperations.execute(retryCallback);
 		}
 	}
 

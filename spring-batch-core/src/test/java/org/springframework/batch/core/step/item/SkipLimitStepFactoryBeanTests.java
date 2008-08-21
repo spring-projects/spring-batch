@@ -1,27 +1,30 @@
 package org.springframework.batch.core.step.item;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
-import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
@@ -38,7 +41,7 @@ import org.springframework.util.StringUtils;
 /**
  * Tests for {@link SkipLimitStepFactoryBean}.
  */
-public class SkipLimitStepFactoryBeanTests extends TestCase {
+public class SkipLimitStepFactoryBeanTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -58,7 +61,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	protected int count;
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		factory.setBeanName("stepName");
 		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
@@ -75,8 +79,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@Test
 	public void testSkip() throws Exception {
-		AbstractStep step = (AbstractStep) factory.getObject();
+
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
@@ -103,13 +109,14 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	 * Check skippable write exception does not cause rollback when included on
 	 * transaction attributes as "no rollback for".
 	 */
+	@Test
 	public void testSkipWithoutRethrow() throws Exception {
 		factory.setTransactionAttribute(new DefaultTransactionAttribute() {
 			public boolean rollbackOn(Throwable ex) {
 				return !(ex instanceof SkippableRuntimeException);
 			};
 		});
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
@@ -129,6 +136,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	 * Fatal exception should cause immediate termination regardless of other
 	 * skip settings (note the fatal exception is also classified as skippable).
 	 */
+	@Test
 	public void testFatalException() throws Exception {
 		factory.setFatalExceptionClasses(new Class[] { FatalRuntimeException.class });
 		factory.setItemWriter(new SkipWriterStub() {
@@ -137,7 +145,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			}
 		});
 
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		try {
@@ -152,11 +160,12 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
+	@Test
 	public void testSkipOverLimit() throws Exception {
 
 		factory.setSkipLimit(1);
 
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
@@ -182,17 +191,17 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
-	@SuppressWarnings("unchecked")
+	@Test
 	public void testSkipOverLimitOnRead() throws Exception {
 
-		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
-				.commaDelimitedListToSet("2,3,5"));
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
+				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
@@ -224,11 +233,11 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
-	@SuppressWarnings("unchecked")
+	@Test
 	public void testSkipListenerFailsOnRead() throws Exception {
 
-		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
-				.commaDelimitedListToSet("2,3,5"));
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
+				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
@@ -240,7 +249,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		} });
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
@@ -261,11 +270,11 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
-	@SuppressWarnings("unchecked")
+	@Test
 	public void testSkipListenerFailsOnWrite() throws Exception {
 
-		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
-				.commaDelimitedListToSet("2,3,5"));
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
+				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
@@ -277,7 +286,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		} });
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
@@ -289,8 +298,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			assertEquals("oops", e.getCause().getMessage());
 		}
 
-		assertEquals(1, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(3, stepExecution.getSkipCount());
+		assertEquals(2, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
 
 	}
@@ -298,16 +307,16 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
-	@SuppressWarnings("unchecked")
+	@Test
 	public void testSkipOnReadNotDoubleCounted() throws Exception {
 
-		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), StringUtils
-				.commaDelimitedListToSet("2,3,5"));
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
+				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
 
 		factory.setSkipLimit(4);
 		factory.setItemReader(reader);
 
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = jobExecution.createStepExecution(step);
 
@@ -325,19 +334,19 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
-	@SuppressWarnings("unchecked")
+	@Test
 	public void testSkipOnWriteNotDoubleCounted() throws Exception {
 
-		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7"), StringUtils
-				.commaDelimitedListToSet("2,3"));
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7"), Arrays
+				.asList(StringUtils.commaDelimitedListToStringArray("2,3")));
 
-		writer = new SkipWriterStub(StringUtils.commaDelimitedListToSet("4,5"));
+		writer = new SkipWriterStub(Arrays.asList(StringUtils.commaDelimitedListToStringArray("4,5")));
 
 		factory.setSkipLimit(4);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
 
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = jobExecution.createStepExecution(step);
 
@@ -354,15 +363,14 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 	}
 
-	@SuppressWarnings("unchecked")
+	@Test
 	public void testDefaultSkipPolicy() throws Exception {
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 		factory.setSkipLimit(1);
-		List<String> items = TransactionAwareProxyFactory.createTransactionalList();
-		items.addAll(Arrays.asList(new String[] { "a", "b", "c" }));
-		ItemReader provider = new ListItemReader(items) {
-			public Object read() {
-				Object item = super.read();
+		List<String> items = Arrays.asList(new String[] { "a", "b", "c" });
+		ItemReader<String> provider = new ListItemReader<String>(items) {
+			public String read() {
+				String item = super.read();
 				count++;
 				if ("b".equals(item)) {
 					throw new RuntimeException("Read error - planned failure.");
@@ -371,7 +379,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			}
 		};
 		factory.setItemReader(provider);
-		AbstractStep step = (AbstractStep) factory.getObject();
+		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
@@ -380,6 +388,8 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		// b is processed once and skipped, plus 1, plus c, plus the null at end
 		assertEquals(4, count);
 	}
+
+	// TODO: test with transactional reader (e.g. list with tx proxy)
 
 	/**
 	 * Simple item reader that supports skip functionality.
@@ -393,8 +403,6 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		private Collection<String> processed = new ArrayList<String>();
 
 		private int counter = -1;
-
-		private int marked = 0;
 
 		private final Collection<String> failures;
 
@@ -424,13 +432,9 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		}
 
 		public void mark() throws MarkFailedException {
-			logger.debug("Marked at count=" + counter);
-			marked = counter;
 		}
 
 		public void reset() throws ResetFailedException {
-			counter = marked;
-			logger.debug("Reset at count=" + counter);
 		}
 
 	}
@@ -442,6 +446,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		protected final Log logger = LogFactory.getLog(getClass());
 
+		// simulate transactional output
 		private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
 
 		private final Collection<String> failures;
@@ -456,12 +461,6 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		 */
 		public SkipWriterStub(Collection<String> failures) {
 			this.failures = failures;
-		}
-
-		public void clear() throws ClearFailedException {
-		}
-
-		public void flush() throws FlushFailedException {
 		}
 
 		public void write(List<? extends String> items) throws Exception {

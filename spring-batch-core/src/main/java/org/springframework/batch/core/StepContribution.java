@@ -16,8 +16,8 @@
 package org.springframework.batch.core;
 
 /**
- * Represents a contribution to a {@link StepExecution}, buffering changes
- * until they can be applied at a chunk boundary.
+ * Represents a contribution to a {@link StepExecution}, buffering changes until
+ * they can be applied at a chunk boundary.
  * 
  * @author Dave Syer
  * 
@@ -33,8 +33,6 @@ public class StepContribution {
 	private volatile int readSkipCount;
 
 	private volatile int writeSkipCount;
-
-	private volatile int uncommitedReadSkipCount;
 
 	/**
 	 * @param execution
@@ -76,17 +74,16 @@ public class StepContribution {
 
 	/**
 	 * @return the sum of skips accumulated in the parent {@link StepExecution}
-	 * and this <code>StepContribution</code>, including uncommitted read
-	 * skips.
+	 * and this <code>StepContribution</code>.
 	 */
 	public int getStepSkipCount() {
-		return uncommitedReadSkipCount + readSkipCount + writeSkipCount + parentSkipCount;
+		return readSkipCount + writeSkipCount + parentSkipCount;
 	}
 
 	/**
 	 * @return the number of skips collected in this
 	 * <code>StepContribution</code> (not including skips accumulated in the
-	 * parent {@link StepExecution}.
+	 * parent {@link StepExecution}).
 	 */
 	public int getSkipCount() {
 		return readSkipCount + writeSkipCount;
@@ -95,8 +92,15 @@ public class StepContribution {
 	/**
 	 * Increment the read skip count for this contribution
 	 */
-	public void incrementReadsSkipCount() {
+	public void incrementReadSkipCount() {
 		readSkipCount++;
+	}
+
+	/**
+	 * Increment the read skip count for this contribution
+	 */
+	public void incrementReadSkipCount(int count) {
+		readSkipCount += count;
 	}
 
 	/**
@@ -104,13 +108,6 @@ public class StepContribution {
 	 */
 	public void incrementWriteSkipCount() {
 		writeSkipCount++;
-	}
-
-	/**
-	 * Increment the counter for temporary skipped reads
-	 */
-	public void incrementTemporaryReadSkipCount() {
-		uncommitedReadSkipCount++;
 	}
 
 	/**
@@ -127,22 +124,14 @@ public class StepContribution {
 		return writeSkipCount;
 	}
 
-	/**
-	 * Add the temporary read skip count to read skip count and reset the
-	 * temporary counter.
-	 */
-	public void combineSkipCounts() {
-		readSkipCount += uncommitedReadSkipCount;
-		uncommitedReadSkipCount = 0;
-	}
-
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: items=" + itemCount + ", commits=" + commitCount + ", uncommitedReadSkips="
-				+ uncommitedReadSkipCount + ", readSkips=" + readSkipCount + "writeSkips=" + writeSkipCount + "]";
+		return "[StepContribution: items=" + itemCount + ", commits=" + commitCount + ", readSkips=" + readSkipCount
+				+ ", writeSkips=" + writeSkipCount + "]";
 	}
 
 }

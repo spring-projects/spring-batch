@@ -19,8 +19,6 @@ package org.springframework.batch.core;
 import java.util.Date;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
@@ -56,7 +54,7 @@ public class StepExecution extends Entity {
 	private volatile Date startTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
-	
+
 	private volatile Date lastUpdated = null;
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
@@ -311,8 +309,6 @@ public class StepExecution extends Entity {
 	public synchronized void apply(StepContribution contribution) {
 		itemCount += contribution.getItemCount();
 		commitCount += contribution.getCommitCount();
-		
-		contribution.combineSkipCounts();
 		readSkipCount += contribution.getReadSkipCount();
 		writeSkipCount += contribution.getWriteSkipCount();
 	}
@@ -347,7 +343,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Increment the number of items skipped in the {@link ItemReader} 
+	 * Increment the number of items skipped on read 
 	 * 
 	 * @param count - the number of skips to increment by.
 	 */
@@ -356,7 +352,7 @@ public class StepExecution extends Entity {
 	}
 	
 	/**
-	 * Increment the number of items skipped in the {@link ItemWriter} 
+	 * Increment the number of items skipped on write
 	 * 
 	 * @param count - the number of skips to increment by.
 	 */
@@ -378,21 +374,21 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * @return the number of records skipped in the {@link ItemReader}
+	 * @return the number of records skipped on read
 	 */
 	public int getReadSkipCount() {
 		return readSkipCount;
 	}
 
 	/**
-	 * @return the number of records skipped in the {@link ItemWriter}
+	 * @return the number of records skipped on write
 	 */
 	public int getWriteSkipCount() {
 		return writeSkipCount;
 	}
 
 	/**
-	 * Set the number of records skipped in the {@link ItemReader}
+	 * Set the number of records skipped on read
 	 * 
 	 * @param readSkipCount
 	 */
@@ -401,7 +397,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Set the number of records skipped in the {@link ItemWriter}
+	 * Set the number of records skipped on write
 	 * 
 	 * @param writeSkipCount
 	 */

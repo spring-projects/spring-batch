@@ -71,8 +71,8 @@ public class ItemOrientedStepHandlerTests {
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
 		handler.handle(contribution);
-		assertEquals(4, itemReader.count);
-		assertEquals("1234", itemWriter.values);
+		assertEquals(2, itemReader.count);
+		assertEquals("12", itemWriter.values);
 	}
 
 	/**
