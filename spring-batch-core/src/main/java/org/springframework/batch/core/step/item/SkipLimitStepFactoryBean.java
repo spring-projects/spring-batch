@@ -435,6 +435,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 						catch (RuntimeException ex) {
 							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
 						}
+					} else {
+						throw new RetryException("Non-skippable exception in recoverer", t);
 					}
 					return null;
 				}

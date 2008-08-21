@@ -287,6 +287,56 @@ public class StatefulRetryStepFactoryBeanTests {
 	}
 
 	@Test
+	public void testNonSkippableException() throws Exception {
+		
+		// Very specific skippable exception
+		factory.setSkippableExceptionClasses(new Class[] { UnsupportedOperationException.class });
+		// ...which is not retryable...
+		factory.setRetryableExceptionClasses(new Class<?>[0]);
+		
+		factory.setSkipLimit(1);
+		List<String> items = Arrays.asList(new String[] { "b" });
+		ItemReader<String> provider = new ListItemReader<String>(items) {
+			public String read() {
+				String item = super.read();
+				provided.add(item);
+				count++;
+				return item;
+			}
+		};
+		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+			public void write(List<? extends String> item) throws Exception {
+				processed.addAll(item);
+				logger.debug("Write Called! Item: [" + item + "]");
+				throw new RuntimeException("Write error - planned but not skippable.");
+			}
+		};
+		factory.setItemReader(provider);
+		factory.setItemWriter(itemWriter);
+		Step step = (Step) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		try {
+			step.execute(stepExecution);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Wrong message: "+message, message.contains("Write error - planned but not skippable."));
+		}
+
+		assertEquals(0, stepExecution.getSkipCount());
+		// [b]
+		assertEquals(1, provided.size());
+		// [b]
+		assertEquals(1, processed.size());
+		// []
+		assertEquals(0, recovered.size());
+		assertEquals(0, stepExecution.getItemCount());
+	}
+
+	@Test
 	public void testRetryPolicy() throws Exception {
 		factory.setRetryPolicy(new SimpleRetryPolicy(4));
 		factory.setSkipLimit(0);
