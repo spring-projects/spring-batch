@@ -19,7 +19,7 @@ public class AggregateItemReaderTests {
 	@Before
 	public void setUp() {
 		// create mock for input
-		input = new AbstractItemReader<AggregateItem<String>>() {
+		input = new ItemReader<AggregateItem<String>>() {
 
 			private int count = 0;
 

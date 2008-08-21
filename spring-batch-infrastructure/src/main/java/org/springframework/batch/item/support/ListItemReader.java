@@ -28,7 +28,7 @@ import org.springframework.batch.item.ItemReader;
  * @author Dave Syer
  * 
  */
-public class ListItemReader<T> extends AbstractItemReader<T> {
+public class ListItemReader<T> implements ItemReader<T> {
 
 	private List<T> list;
 

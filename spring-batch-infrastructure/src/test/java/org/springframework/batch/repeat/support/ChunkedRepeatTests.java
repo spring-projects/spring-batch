@@ -17,7 +17,6 @@
 package org.springframework.batch.repeat.support;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -147,7 +146,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 
 		while (!chunker.ready()) {
 
-			ItemReader<Trade> truncated = new AbstractItemReader<Trade>() {
+			ItemReader<Trade> truncated = new ItemReader<Trade>() {
 				int count = 0;
 
 				public Trade read() throws Exception {

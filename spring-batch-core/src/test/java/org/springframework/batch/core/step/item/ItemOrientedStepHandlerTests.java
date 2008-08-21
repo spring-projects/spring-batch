@@ -27,11 +27,11 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
-import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -114,7 +114,7 @@ public class ItemOrientedStepHandlerTests {
 	 * @author Dave Syer
 	 * 
 	 */
-	private final class StubItemReader extends AbstractItemReader<String> {
+	private final class StubItemReader implements ItemReader<String> {
 		private int count = 0;
 
 		public String read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {

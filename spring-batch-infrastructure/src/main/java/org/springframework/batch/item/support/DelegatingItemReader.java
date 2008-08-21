@@ -29,7 +29,7 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class DelegatingItemReader<T> extends AbstractItemReader<T> implements InitializingBean {
+public class DelegatingItemReader<T> implements ItemReader<T>, InitializingBean {
 
 	private ItemReader<T> itemReader;
 	

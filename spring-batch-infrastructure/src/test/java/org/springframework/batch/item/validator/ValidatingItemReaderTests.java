@@ -15,11 +15,13 @@
  */
 package org.springframework.batch.item.validator;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import junit.framework.TestCase;
 
-import static org.easymock.EasyMock.*;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.support.AbstractItemReader;
 
 /**
  * @author Lucas Ward
@@ -98,7 +100,7 @@ public class ValidatingItemReaderTests extends TestCase {
 		verify(validator);
 	}
 
-	private static class MockItemReader extends AbstractItemReader<Object> {
+	private static class MockItemReader implements ItemReader<Object> {
 
 		Object value;
 

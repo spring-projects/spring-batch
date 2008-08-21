@@ -28,9 +28,9 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -259,7 +259,7 @@ public class ExternalRetryTests {
 		return msgs;
 	}
 
-	private abstract class ItemReaderRecoverer<T> extends AbstractItemReader<T> implements ItemRecoverer {
+	private interface ItemReaderRecoverer<T> extends ItemReader<T>, ItemRecoverer {
 
 	}
 

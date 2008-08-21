@@ -50,7 +50,6 @@ import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.MarkFailedException;
 import org.springframework.batch.item.ResetFailedException;
-import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
@@ -192,7 +191,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	public void testIncrementRollbackCount() {
 
-		ItemReader<String> itemReader = new AbstractItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<String>() {
 
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -215,7 +214,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	public void testExitCodeDefaultClassification() throws Exception {
 
-		ItemReader<String> itemReader = new AbstractItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<String>() {
 
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -239,7 +238,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	public void testExitCodeCustomClassification() throws Exception {
 
-		ItemReader<String> itemReader = new AbstractItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<String>() {
 
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -352,7 +351,7 @@ public class StepHandlerStepTests extends TestCase {
 	 * Restartable.
 	 */
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
-		step.setItemHandler(new SimpleStepHandler<String>(new AbstractItemReader<String>() {
+		step.setItemHandler(new SimpleStepHandler<String>(new ItemReader<String>() {
 			public String read() throws Exception {
 				return "foo";
 			}
@@ -520,7 +519,7 @@ public class StepHandlerStepTests extends TestCase {
 
 		step.setInterruptionPolicy(interruptionPolicy);
 
-		ItemReader<String> itemReader = new AbstractItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<String>() {
 
 			public String read() throws Exception {
 				throw new RuntimeException();
@@ -550,7 +549,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	public void testStatusForNormalFailure() throws Exception {
 
-		ItemReader<String> itemReader = new AbstractItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<String>() {
 			public String read() throws Exception {
 				// Trigger a rollback
 				throw new RuntimeException("Foo");
@@ -577,7 +576,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	public void testStatusForErrorFailure() throws Exception {
 
-		ItemReader<String> itemReader = new AbstractItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<String>() {
 			public String read() throws Exception {
 				// Trigger a rollback
 				throw new Error("Foo");
@@ -604,7 +603,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	public void testStatusForResetFailedException() throws Exception {
 
-		ItemReader<String> itemReader = new AbstractItemReader<String>() {
+		ItemReader<String> itemReader = new ItemReader<String>() {
 			public String read() throws Exception {
 				// Trigger a rollback
 				throw new RuntimeException("Foo");

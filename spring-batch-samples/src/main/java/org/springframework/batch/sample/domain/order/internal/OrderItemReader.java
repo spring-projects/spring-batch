@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.sample.domain.order.Address;
 import org.springframework.batch.sample.domain.order.BillingInfo;
 import org.springframework.batch.sample.domain.order.Customer;
@@ -35,7 +34,7 @@ import org.springframework.batch.sample.domain.order.ShippingInfo;
  * @author peter.zozom
  * 
  */
-public class OrderItemReader extends AbstractItemReader<Order> {
+public class OrderItemReader implements ItemReader<Order> {
 	private static Log log = LogFactory.getLog(OrderItemReader.class);
 
 	private Order order;

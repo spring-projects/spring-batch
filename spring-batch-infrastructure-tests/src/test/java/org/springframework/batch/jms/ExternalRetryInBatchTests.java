@@ -16,23 +16,24 @@
 
 package org.springframework.batch.jms;
 
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
@@ -41,15 +42,15 @@ import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -151,6 +152,8 @@ public class ExternalRetryInBatchTests {
 									
 									callback.setRecoveryCallback(new RecoveryCallback() {
 										public Object recover(RetryContext context) {
+											// aggressive commit on a recovery
+											RepeatSynchronizationManager.setCompleteOnly();
 											return provider.recover(item, context.getLastThrowable());
 										}
 									});
@@ -210,7 +213,7 @@ public class ExternalRetryInBatchTests {
 		return msgs;
 	}
 
-	private abstract class ItemReaderRecoverer extends AbstractItemReader<Object> implements ItemRecoverer {
+	private interface ItemReaderRecoverer extends ItemReader<Object>, ItemRecoverer {
 
 	}
 }

@@ -45,7 +45,6 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.policy.RetryCacheCapacityExceededException;
@@ -339,7 +338,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		// set the cache limit lower than the number of unique un-recovered
 		// errors expected
 		factory.setCacheCapacity(2);
-		ItemReader<String> provider = new AbstractItemReader<String>() {
+		ItemReader<String> provider = new ItemReader<String>() {
 			public String read() {
 				String item = ""+count;
 				provided.add(item);

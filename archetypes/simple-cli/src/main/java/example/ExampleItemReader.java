@@ -1,12 +1,11 @@
 package example;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.support.AbstractItemReader;
 
 /**
  * {@link ItemReader} with hard-coded input data.
  */
-public class ExampleItemReader extends AbstractItemReader<String> {
+public class ExampleItemReader implements ItemReader<String> {
 	
 	private String[] input = {"Hello world!", null};
 	
