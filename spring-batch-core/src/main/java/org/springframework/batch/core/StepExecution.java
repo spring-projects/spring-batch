@@ -347,24 +347,6 @@ public class StepExecution extends Entity {
 	public void incrementCommitCount() {
 		commitCount++;
 	}
-	
-	/**
-	 * Increment the number of items skipped on read 
-	 * 
-	 * @param count - the number of skips to increment by.
-	 */
-	public void incrementReadSkipCountBy(int count) {
-		readSkipCount += count;
-	}
-	
-	/**
-	 * Increment the number of items skipped on write
-	 * 
-	 * @param count - the number of skips to increment by.
-	 */
-	public void incrementWriteSkipCountBy(int count) {
-		writeSkipCount += count;
-	}
 
 	/**
 	 * Convenience method to get the current job parameters.
