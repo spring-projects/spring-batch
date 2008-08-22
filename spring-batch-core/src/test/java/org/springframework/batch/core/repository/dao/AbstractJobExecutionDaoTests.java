@@ -198,14 +198,4 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		assertNull(value);
 	}
 	
-	@Transactional
-	@Test
-	public void testUpdateExecutionStatus(){
-		
-		dao.saveJobExecution(execution);
-		execution.setStatus(BatchStatus.COMPLETED);
-		dao.synchronizeStatus(execution);
-		assertEquals(BatchStatus.STARTING, execution.getStatus());
-	}
-
 }

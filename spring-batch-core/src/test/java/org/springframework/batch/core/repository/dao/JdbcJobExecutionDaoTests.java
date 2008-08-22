@@ -38,4 +38,13 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		return stepExecutionDao;
 	}
 	
+	@Transactional
+	@Test
+	public void testUpdateExecutionStatus(){
+		
+		dao.saveJobExecution(execution);
+		execution.setStatus(BatchStatus.COMPLETED);
+		dao.synchronizeStatus(execution);
+		assertEquals(BatchStatus.STARTING, execution.getStatus());
+	}
 }
