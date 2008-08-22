@@ -42,6 +42,8 @@ public class JobExecution extends Entity {
 	private volatile Date createTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
+	
+	private volatile Date lastUpdated = null;
 
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
@@ -222,4 +224,13 @@ public class JobExecution extends Entity {
 	void addStepExecution(StepExecution stepExecution) {
 		stepExecutions.add(stepExecution);
 	}
+
+	public Date getLastUpdated() {
+		return lastUpdated;
+	}
+
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
+	}
+	
 }

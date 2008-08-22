@@ -57,6 +57,7 @@ public class SimpleJobRepositoryIntegrationTests {
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParams);
 		firstExecution.setStartTime(new Date());
+		assertNotNull(firstExecution.getLastUpdated());
 
 		assertEquals(job.getName(), firstExecution.getJobInstance().getJobName());
 

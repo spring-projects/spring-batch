@@ -132,12 +132,13 @@ public class SimpleJobRepositoryTests {
 	public void testUpdateValidJobExecution() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, job.getName()), new Long(1));
-
 		// new execution - call update on job dao
 		jobExecutionDao.updateJobExecution(jobExecution);
 		replay(jobExecutionDao);
 		jobRepository.update(jobExecution);
 		verify(jobExecutionDao);
+		
+		assertNotNull(jobExecution.getLastUpdated());
 	}
 
 	@Test

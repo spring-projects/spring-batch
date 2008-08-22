@@ -40,28 +40,28 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
-			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 	
 	private static final String GET_STATUS = "SELECT STATUS from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ? where JOB_EXECUTION_ID = ?";
+			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ?, LAST_UPDATED = ? where JOB_EXECUTION_ID = ?";
 
-	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME from %PREFIX%JOB_EXECUTION"
-			+ " where JOB_INSTANCE_ID = ?";
+	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED" +
+			" from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?";
 
-	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME from %PREFIX%JOB_EXECUTION"
-			+ " where JOB_INSTANCE_ID = ? and CREATE_TIME = (SELECT max(CREATE_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
+	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED " +
+			"from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ? and CREATE_TIME = (SELECT max(CREATE_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
 
 	private static final String GET_INSTANCE_BY_EXECUTION_ID = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
-	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME from %PREFIX%JOB_EXECUTION"
-			+ " where JOB_EXECUTION_ID = ?";
+	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED" +
+			" from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
-	private static final String GET_RUNNING_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION"
-			+ " where END_TIME is NULL";
+	private static final String GET_RUNNING_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, " +
+			"JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION where END_TIME is NULL";
 
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
@@ -142,12 +142,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().isContinuable() ? "Y" : "N", jobExecution.getExitStatus().getExitCode(),
 				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(),
-				jobExecution.getCreateTime() };
+				jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
 		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR,
-						Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP });
+						Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),
 				jobExecution.getStatus().toString(), jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
 				jobExecution.getExitStatus().getExitCode(), exitDescription, jobExecution.getVersion(),
-				jobExecution.getCreateTime(), jobExecution.getId() };
+				jobExecution.getCreateTime(), jobExecution.getLastUpdated(), jobExecution.getId() };
 
 		if (jobExecution.getId() == null) {
 			throw new IllegalArgumentException("JobExecution ID cannot be null.  JobExecution must be saved "
@@ -205,7 +205,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				getQuery(UPDATE_JOB_EXECUTION),
 				parameters,
 				new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR, Types.VARCHAR, Types.VARCHAR,
-						Types.INTEGER, Types.TIMESTAMP, Types.INTEGER });
+						Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.INTEGER });
 	}
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
@@ -299,7 +299,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.setEndTime(rs.getTimestamp(3));
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(4)));
 			jobExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(5)), rs.getString(6), rs.getString(7)));
-			jobExecution.setCreateTime(rs.getDate(8));
+			jobExecution.setCreateTime(rs.getTimestamp(8));
+			jobExecution.setLastUpdated(rs.getTimestamp(9));
 			return jobExecution;
 		}
 

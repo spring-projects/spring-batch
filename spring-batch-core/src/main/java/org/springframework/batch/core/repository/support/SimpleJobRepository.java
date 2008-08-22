@@ -188,6 +188,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		jobExecution.setExecutionContext(executionContext);
+		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
@@ -214,6 +215,7 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(jobExecution.getJobId(), "JobExecution must have a Job ID set.");
 		Assert.notNull(jobExecution.getId(), "JobExecution must be already saved (have an id assigned).");
 
+		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		jobExecutionDao.updateJobExecution(jobExecution);
 	}
 

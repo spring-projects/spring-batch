@@ -50,11 +50,14 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	@Test
 	public void testSaveAndFind() {
 
+		execution.setStartTime(new Date(System.currentTimeMillis()));
+		execution.setLastUpdated(new Date(System.currentTimeMillis()));
 		dao.saveJobExecution(execution);
 
 		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
 		assertEquals(1, executions.size());
 		assertEquals(execution, executions.get(0));
+		assertExecutionsAreEqual(execution, executions.get(0));
 	}
 
 	/**
@@ -91,12 +94,14 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		execution.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(execution);
 
+		execution.setLastUpdated(new Date(0));
 		execution.setStatus(BatchStatus.COMPLETED);
 		dao.updateJobExecution(execution);
 
 		JobExecution updated = dao.findJobExecutions(jobInstance).get(0);
 		assertEquals(execution, updated);
 		assertEquals(BatchStatus.COMPLETED, updated.getStatus());
+		assertExecutionsAreEqual(execution, updated);
 	}
 
 	/**
@@ -136,9 +141,11 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	public void testFindRunningExecutions() {
 		JobExecution exec = new JobExecution(jobInstance);
 		exec.setCreateTime(new Date(0));
-		exec.setEndTime(new Date(0));
+		exec.setEndTime(new Date(1L));
+		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
 		exec = new JobExecution(jobInstance);
+		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution(new StepSupport("foo"));
 		dao.saveJobExecution(exec);
 		StepExecutionDao stepExecutionDao = getStepExecutionDao();
@@ -152,6 +159,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		assertEquals(1, values.size());
 		JobExecution value = values.iterator().next();
 		assertEquals(exec, value);
+		assertEquals(5L,  value.getLastUpdated().getTime());
 		assertEquals(1, value.getStepExecutions().size());
 	}
 
@@ -196,6 +204,21 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	public void testGetMissingExecution() {
 		JobExecution value = dao.getJobExecution(54321L);
 		assertNull(value);
+	}
+	
+	/*
+	 * Check to make sure the executions are equal.  Normally, comparing the id's is 
+	 * sufficient.  However, for testing purposes, especially of a dao, we need to make
+	 * sure all the fields are being stored/retrieved correctly.
+	 */
+	private void assertExecutionsAreEqual(JobExecution lhs, JobExecution rhs){
+		
+		assertEquals(lhs.getId(), rhs.getId());
+		assertEquals(lhs.getStartTime(), rhs.getStartTime());
+		assertEquals(lhs.getStatus(), rhs.getStatus());
+		assertEquals(lhs.getEndTime(), rhs.getEndTime());
+		assertEquals(lhs.getCreateTime(), rhs.getCreateTime());
+		assertEquals(lhs.getLastUpdated(), rhs.getLastUpdated());
 	}
 	
 }
