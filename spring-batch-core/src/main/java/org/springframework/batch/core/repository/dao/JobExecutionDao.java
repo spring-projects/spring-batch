@@ -60,5 +60,13 @@ public interface JobExecutionDao {
 	 * @return the {@link JobExecution} for given identifier.
 	 */
 	JobExecution getJobExecution(Long executionId);
+	
+	/**
+	 * Because it may be possible that the status of a JobExecution is updated while running,
+	 * the following method while synchronize only the status field.
+	 * 
+	 * @param jobExecution to be updated.
+	 */
+	void synchronizeStatus(JobExecution jobExecution);
 
 }

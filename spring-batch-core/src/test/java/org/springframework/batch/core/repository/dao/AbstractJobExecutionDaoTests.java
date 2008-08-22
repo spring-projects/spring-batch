@@ -1,6 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -196,4 +197,15 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution value = dao.getJobExecution(54321L);
 		assertNull(value);
 	}
+	
+	@Transactional
+	@Test
+	public void testUpdateExecutionStatus(){
+		
+		dao.saveJobExecution(execution);
+		execution.setStatus(BatchStatus.COMPLETED);
+		dao.synchronizeStatus(execution);
+		assertEquals(BatchStatus.STARTING, execution.getStatus());
+	}
+
 }

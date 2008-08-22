@@ -87,4 +87,9 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		return executionsById.get(executionId);
 	}
 
+	public void synchronizeStatus(JobExecution jobExecution) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

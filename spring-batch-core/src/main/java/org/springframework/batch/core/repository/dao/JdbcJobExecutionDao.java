@@ -43,6 +43,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
+	
+	private static final String GET_STATUS = "SELECT STATUS from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ? where JOB_EXECUTION_ID = ?";
@@ -268,6 +270,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		return result;
 	}
+	
+	public void synchronizeStatus(JobExecution jobExecution) {
+		
+		String status = getJdbcTemplate().queryForObject(getQuery(GET_STATUS), String.class, jobExecution.getId());
+		jobExecution.setStatus(BatchStatus.valueOf(status));
+	}
 
 	/**
 	 * Re-usable mapper for {@link JobExecution} instances.
@@ -296,5 +304,4 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 
 	}
-
 }

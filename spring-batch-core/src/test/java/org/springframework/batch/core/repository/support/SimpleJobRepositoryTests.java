@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -183,6 +184,17 @@ public class SimpleJobRepositoryTests {
 		
 		long lastUpdated = stepExecution.getLastUpdated().getTime();
 		assertTrue(lastUpdated > (before - 1000));
+	}
+	
+	@Test
+	public void testInterrupted(){
+		
+		jobExecution.setStatus(BatchStatus.STOPPING);
+		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
+		stepExecution.setId(323L);
+		
+		jobRepository.update(stepExecution);
+		assertTrue(stepExecution.isTerminateOnly());
 	}
 
 }

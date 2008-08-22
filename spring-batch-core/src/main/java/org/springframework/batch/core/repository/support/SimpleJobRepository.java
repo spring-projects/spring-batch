@@ -239,9 +239,11 @@ public class SimpleJobRepository implements JobRepository {
 	public void update(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
+		
 
 		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		stepExecutionDao.updateStepExecution(stepExecution);
+		checkForInterruption(stepExecution);
 	}
 
 	private void validateStepExecution(StepExecution stepExecution) {
@@ -303,6 +305,20 @@ public class SimpleJobRepository implements JobRepository {
 			}
 		}
 		return count;
+	}
+	
+	/* 
+	 * Check to determine whether or not the JobExecution that is the parent of the provided
+	 * StepExecution has been interrupted.  If, after synchronizing the status with the database,
+	 * the status has been updated to STOPPING, then the job has been interrupted.
+	 * 
+	 * @param stepExecution
+	 */
+	private void checkForInterruption(StepExecution stepExecution){
+		jobExecutionDao.synchronizeStatus(stepExecution.getJobExecution());
+		if(stepExecution.getJobExecution().getStatus() == BatchStatus.STOPPING){
+			stepExecution.setTerminateOnly();
+		}
 	}
 
 }
