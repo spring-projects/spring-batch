@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.tasklet;
+package org.springframework.batch.sample.common;
+
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.item.ItemWriter;
 
 /**
  * Simple module implementation that will always return true to indicate that
@@ -32,39 +32,29 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  * 
  */
-public class InfiniteLoopTasklet extends StepExecutionListenerSupport implements Tasklet {
+public class InfiniteLoopWriter extends StepExecutionListenerSupport implements
+		ItemWriter<Object> {
 
 	private StepExecution stepExecution;
 	private int count = 0;
-	private static final Log logger = LogFactory.getLog(InfiniteLoopTasklet.class);
+	private static final Log logger = LogFactory
+			.getLog(InfiniteLoopWriter.class);
 
 	/**
 	 * 
 	 */
-	public InfiniteLoopTasklet() {
+	public InfiniteLoopWriter() {
 		super();
 	}
 
-	public ExitStatus execute() throws Exception {
-		while(!stepExecution.isTerminateOnly()) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				throw new RuntimeException("Job interrupted.");
-			}
-			stepExecution.setItemCount(++count);
-			logger.info("Executing infinite loop, at count="+count);
+	public void write(List<? extends Object> items) throws Exception {
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new RuntimeException("Job interrupted.");
 		}
-		stepExecution.setStatus(BatchStatus.STOPPING);
-		return ExitStatus.FAILED;
+		stepExecution.setItemCount(++count);
+		logger.info("Executing infinite loop, at count=" + count);
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.listener.StepListenerSupport#beforeStep(org.springframework.batch.core.domain.StepExecution)
-	 */
-	public void beforeStep(StepExecution stepExecution) {
-		this.stepExecution = stepExecution;
-	}
-	
 }
