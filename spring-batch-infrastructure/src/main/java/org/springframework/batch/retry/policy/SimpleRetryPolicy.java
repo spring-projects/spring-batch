@@ -119,9 +119,9 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	}
 
 	/**
-	 * @see org.springframework.batch.retry.RetryPolicy#close(RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(RetryContext, boolean)
 	 */
-	public void close(RetryContext status) {
+	public void close(RetryContext status, boolean succeeded) {
 	}
 
 	/**

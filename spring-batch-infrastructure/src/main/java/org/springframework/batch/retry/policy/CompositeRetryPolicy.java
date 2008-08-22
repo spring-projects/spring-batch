@@ -68,15 +68,15 @@ public class CompositeRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * created. If any of them fails to close the exception is propagated (and
 	 * those later in the chain are closed before re-throwing).
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
 	 */
-	public void close(RetryContext context) {
+	public void close(RetryContext context, boolean succeeded) {
 		RetryContext[] contexts = ((CompositeRetryContext) context).contexts;
 		RetryPolicy[] policies = ((CompositeRetryContext) context).policies;
 		RuntimeException exception = null;
 		for (int i = 0; i < contexts.length; i++) {
 			try {
-				policies[i].close(contexts[i]);
+				policies[i].close(contexts[i], succeeded);
 			}
 			catch (RuntimeException e) {
 				if (exception==null) {
@@ -108,7 +108,7 @@ public class CompositeRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Delegate to the policies that were in operation when the context was
 	 * created.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
 	 */
 	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
 		RetryContext[] contexts = ((CompositeRetryContext) context).contexts;

@@ -106,7 +106,7 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 	public void testClose() throws Exception {
 		policy.setPolicyMap(Collections.singletonMap(ExceptionClassifierSupport.DEFAULT,
 				(RetryPolicy) new MockRetryPolicySupport() {
-					public void close(RetryContext context) {
+					public void close(RetryContext context, boolean succeeded) {
 						count++;
 					}
 				}));
@@ -114,12 +114,12 @@ public class ExceptionClassifierRetryPolicyTests extends TestCase {
 
 		// The mapped (child) policy hasn't been used yet, so if we close now
 		// we don't incur the possible expense of ceating the child context.
-		policy.close(context);
+		policy.close(context, true);
 		assertEquals(0, count); // not classified yet
 		// This forces a child context to be created and the child policy is
 		// then closed
 		policy.registerThrowable(context, new IllegalStateException());
-		policy.close(context);
+		policy.close(context, true);
 		assertEquals(1, count); // now classified
 	}
 

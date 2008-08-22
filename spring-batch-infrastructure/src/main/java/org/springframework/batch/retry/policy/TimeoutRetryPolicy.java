@@ -56,7 +56,7 @@ public class TimeoutRetryPolicy extends AbstractStatelessRetryPolicy {
 		return ((TimeoutRetryContext) context).isAlive();
 	}
 
-	public void close(RetryContext context) {
+	public void close(RetryContext context, boolean succeeded) {
 	}
 
 	public RetryContext open(RetryCallback callback, RetryContext parent) {

@@ -94,7 +94,6 @@ public class ExternalRetryPolicyTests extends TestCase {
 		}
 		catch (IllegalArgumentException e) {
 			// Expected
-			System.err.println(e.getMessage());
 			assertTrue(Pattern.matches(".*not.*Throwable.*", e.getMessage()));
 		}
 
@@ -192,7 +191,7 @@ public class ExternalRetryPolicyTests extends TestCase {
 			return attempts < retryLimit;
 		}
 
-		public void close(RetryContext context) {
+		public void close(RetryContext context, boolean succeeded) {
 			// do nothing
 		}
 

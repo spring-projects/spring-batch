@@ -87,10 +87,10 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 	/**
 	 * Delegates to the delegate context.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
 	 */
-	public void close(RetryContext context) {
-		((RetryPolicy) context).close(context);
+	public void close(RetryContext context, boolean succeeded) {
+		((RetryPolicy) context).close(context, succeeded);
 	}
 
 	/**
@@ -156,8 +156,11 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 			return delegate.canRetry(this.delegateContext);
 		}
 
-		public void close(RetryContext context) {
-			delegate.close(this.delegateContext);
+		public void close(RetryContext context, boolean succeeded) {
+			if (succeeded) {
+				retryContextCache.remove(key);
+				delegate.close(this.delegateContext, succeeded);
+			}
 		}
 
 		public RetryContext open(RetryCallback callback, RetryContext parent) {

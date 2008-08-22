@@ -81,11 +81,11 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	/**
 	 * Delegate to the policy currently activated in the context.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
 	 */
-	public void close(RetryContext context) {
+	public void close(RetryContext context, boolean succeeded) {
 		RetryPolicy policy = (RetryPolicy) context;
-		policy.close(context);
+		policy.close(context, succeeded);
 	}
 
 	/**
@@ -146,10 +146,10 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 			return policy.shouldRethrow(context);
 		}
 
-		public void close(RetryContext context) {
+		public void close(RetryContext context, boolean succeeded) {
 			// Only close those policies that have been used (opened):
 			for (RetryPolicy policy : contexts.keySet()) {
-				policy.close(getContext(policy));
+				policy.close(getContext(policy), succeeded);
 			}
 		}
 

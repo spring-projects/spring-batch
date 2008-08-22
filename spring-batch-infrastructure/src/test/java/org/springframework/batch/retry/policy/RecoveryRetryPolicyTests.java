@@ -109,7 +109,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		assertNotNull(context);
 		policy.registerThrowable(context, new Exception());
 		assertFalse(policy.canRetry(context));
-		policy.close(context);
+		policy.close(context, true);
 		// still can't retry, even if policy is closed
 		// (not that this would happen in practice)...
 		assertFalse(policy.canRetry(context));
@@ -129,14 +129,14 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		assertNotNull(context);
 		policy.registerThrowable(context, new Exception());
 		assertTrue(policy.canRetry(context));
-		policy.close(context);
+		policy.close(context, false);
 
 		// Second call...
 		context = policy.open(callback, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new Exception());
 		assertFalse(policy.canRetry(context));
-		policy.close(context);
+		policy.close(context, true);
 
 	}
 
@@ -229,7 +229,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 
 		// False before close...
 		assertFalse(policy.canRetry(context));
-		policy.close(context);
+		policy.close(context, true);
 		Object result = policy.handleRetryExhausted(context);
 		assertNull(result); // default result is null
 

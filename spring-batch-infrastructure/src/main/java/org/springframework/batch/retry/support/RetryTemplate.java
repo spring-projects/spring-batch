@@ -205,7 +205,7 @@ public class RetryTemplate implements RetryOperations {
 
 		}
 		finally {
-			retryPolicy.close(context);
+			retryPolicy.close(context, lastException==null);
 			doCloseInterceptors(callback, context, lastException);
 			RetrySynchronizationManager.clear();
 		}
