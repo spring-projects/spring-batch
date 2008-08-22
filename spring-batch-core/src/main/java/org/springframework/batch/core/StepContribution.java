@@ -28,8 +28,6 @@ public class StepContribution {
 
 	private final int parentSkipCount;
 
-	private volatile int commitCount;
-
 	private volatile int readSkipCount;
 
 	private volatile int writeSkipCount;
@@ -55,21 +53,6 @@ public class StepContribution {
 	 */
 	public int getItemCount() {
 		return itemCount;
-	}
-
-	/**
-	 * Increment the commit counter.
-	 */
-	public void incrementCommitCount() {
-		commitCount++;
-	}
-
-	/**
-	 * Public getter for the commit counter.
-	 * @return the commitCount
-	 */
-	public int getCommitCount() {
-		return commitCount;
 	}
 
 	/**
@@ -130,7 +113,7 @@ public class StepContribution {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: items=" + itemCount + ", commits=" + commitCount + ", readSkips=" + readSkipCount
+		return "[StepContribution: items=" + itemCount + ", readSkips=" + readSkipCount
 				+ ", writeSkips=" + writeSkipCount + "]";
 	}
 

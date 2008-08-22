@@ -125,9 +125,13 @@ public class StepExecutionTests extends TestCase {
 
 	public void testApplyContribution() throws Exception {
 		StepContribution contribution = execution.createStepContribution();
-		contribution.incrementCommitCount();
+		contribution.incrementReadSkipCount();
+		contribution.incrementWriteSkipCount();
+		contribution.incrementItemCount();
 		execution.apply(contribution);
-		assertEquals(1, execution.getCommitCount());
+		assertEquals(1, execution.getReadSkipCount());
+		assertEquals(1, execution.getWriteSkipCount());
+		assertEquals(1, execution.getItemCount());
 	}
 
 	public void testTerminateOnly() throws Exception {

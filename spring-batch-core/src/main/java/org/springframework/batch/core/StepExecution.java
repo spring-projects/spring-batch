@@ -308,7 +308,6 @@ public class StepExecution extends Entity {
 	 */
 	public synchronized void apply(StepContribution contribution) {
 		itemCount += contribution.getItemCount();
-		commitCount += contribution.getCommitCount();
 		readSkipCount += contribution.getReadSkipCount();
 		writeSkipCount += contribution.getWriteSkipCount();
 	}
@@ -342,6 +341,13 @@ public class StepExecution extends Entity {
 		return readSkipCount + writeSkipCount;
 	}
 
+	/**
+	 * Increment the number of commits
+	 */
+	public void incrementCommitCount() {
+		commitCount++;
+	}
+	
 	/**
 	 * Increment the number of items skipped on read 
 	 * 

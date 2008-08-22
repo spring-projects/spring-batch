@@ -264,7 +264,7 @@ public class StepHandlerStep extends AbstractStep {
 
 					}
 
-					contribution.incrementCommitCount();
+					stepExecution.incrementCommitCount();
 
 					// If the step operations are asynchronous then we need
 					// to synchronize changes to the step execution (at a

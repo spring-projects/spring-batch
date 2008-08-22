@@ -37,14 +37,4 @@ public class StepContributionTests extends TestCase {
 		assertEquals(1, contribution.getItemCount());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.StepContribution#incrementCommitCount()}.
-	 */
-	public void testIncrementCommitCount() {
-		assertEquals(0, contribution.getCommitCount());
-		contribution.incrementCommitCount();
-		assertEquals(1, contribution.getCommitCount());
-	}
-
 }

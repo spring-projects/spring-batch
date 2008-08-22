@@ -127,6 +127,7 @@ public class StepHandlerStepTests extends TestCase {
 		step.execute(stepExecution);
 		assertEquals(1, processed.size());
 		assertEquals(1, stepExecution.getItemCount());
+		assertEquals(1, stepExecution.getCommitCount());
 	}
 
 	/**
