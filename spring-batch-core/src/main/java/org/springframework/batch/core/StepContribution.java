@@ -134,4 +134,12 @@ public class StepContribution {
 				+ ", writeSkips=" + writeSkipCount + "]";
 	}
 
+	/**
+	 * @param contribution
+	 */
+	public void increment(StepContribution contribution) {
+		itemCount += contribution.getItemCount();
+		readSkipCount += contribution.getReadSkipCount();
+	}
+
 }

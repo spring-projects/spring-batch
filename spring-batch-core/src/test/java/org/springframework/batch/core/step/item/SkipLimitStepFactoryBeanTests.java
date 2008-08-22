@@ -343,14 +343,13 @@ public class SkipLimitStepFactoryBeanTests {
 		factory.setSkipLimit(4);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
+		factory.setCommitInterval(3); // includes all expected skips
 
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = jobExecution.createStepExecution(step);
 
 		step.execute(stepExecution);
-		System.err.println(writer.written);
-		System.err.println(reader.processed);
 		assertEquals(4, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
 		assertEquals(2, stepExecution.getWriteSkipCount());

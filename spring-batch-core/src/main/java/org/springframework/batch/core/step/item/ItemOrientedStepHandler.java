@@ -38,7 +38,7 @@ import org.springframework.core.AttributeAccessor;
  * {@link ItemWriter}.
  * 
  * Provides extension points by protected {@link #read(StepContribution)} and
- * {@link #write(Object, StepContribution)} methods that can be overriden to
+ * {@link #write(List, StepContribution)} methods that can be overriden to
  * provide more sophisticated behavior (e.g. skipping).
  * 
  * @author Dave Syer
@@ -46,7 +46,9 @@ import org.springframework.core.AttributeAccessor;
  */
 public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
-	private static final String ITEM_BUFFER_KEY = ItemOrientedStepHandler.class.getName() + ".ITEM_BUFFER_KEY";
+	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
+
+	private static final String OUTPUT_BUFFER_KEY = "OUTPUT_BUFFER_KEY";
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -76,7 +78,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	/**
 	 * Get the next item from {@link #read(StepContribution)} and if not null
-	 * pass the item to {@link #write(Object, StepContribution)}. If the
+	 * pass the item to {@link #write(List, StepContribution)}. If the
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
 	 * taken from the reader.
 	 * 
@@ -85,51 +87,53 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 */
 	public ExitStatus handle(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
-		final List<ReadWrapper<T>> buffer = getItemBuffer(attributes);
+		final List<ItemWrapper<T>> inputs = getInputBuffer(attributes);
+		final List<ItemWrapper<S>> outputs = getOutputBuffer(attributes);
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
-		if (buffer.isEmpty()) {
+		if (inputs.isEmpty() && outputs.isEmpty()) {
 
 			result = repeatOperations.iterate(new RepeatCallback() {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-					ReadWrapper<T> item = read(contribution);
+					ItemWrapper<T> item = read(contribution);
 					contribution.incrementReadSkipCount(item.getSkipCount());
 					if (item.getItem() == null) {
 						return ExitStatus.FINISHED;
 					}
-					buffer.add(item);
+					inputs.add(item);
 					return ExitStatus.CONTINUABLE;
 				}
 			});
 
+			storeInputs(attributes, inputs);
+
 		}
 
-		List<S> processed = new ArrayList<S>();
+		for (Iterator<ItemWrapper<T>> iterator = inputs.iterator(); iterator.hasNext();) {
 
-		for (Iterator<ReadWrapper<T>> iterator = buffer.iterator(); iterator.hasNext();) {
-
-			ReadWrapper<T> item = iterator.next();
+			ItemWrapper<T> item = iterator.next();
 			S output = null;
+
+			// TODO: processor listener
+			output = itemProcessor.process(item.getItem());
 
 			// TODO: segregate read / write / filter count
 			// (this is read count)
 			contribution.incrementItemCount();
-			// TODO: processor listener
-			output = itemProcessor.process(item.getItem());
 
 			// TODO: increment filter count if this is null
 			if (output != null) {
-				processed.add(output);
+				outputs.add(new ItemWrapper<S>(output));
 			}
 
 		}
 
+		storeOutputsAndClearInputs(attributes, outputs, contribution);
+
 		// TODO: use ItemWriter interface properly
 		// TODO: make sure exceptions get handled by the appropriate handler
-		for (S data : processed) {
-			write(data, contribution);
-		}
+		write(outputs, contribution);
 
 		// On successful completion clear the attributes to signal that there is
 		// no more processing
@@ -140,18 +144,65 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	}
 
+	/**
+	 * @param attributes
+	 */
+	private void clearInputs(AttributeAccessor attributes) {
+		attributes.removeAttribute(INPUT_BUFFER_KEY);
+	}
+
+	/**
+	 * @param attributes
+	 * @param inputs
+	 */
+	private void storeInputs(AttributeAccessor attributes, List<ItemWrapper<T>> inputs) {
+		store(attributes, INPUT_BUFFER_KEY, inputs);
+	}
+
+	/**
+	 * Savepoint at end of processing and before writing. The processed items
+	 * ready for output are stored so that if writing fails they can be picked
+	 * up again in the next try. The inputs are finished with so we can clear
+	 * their attribute.
+	 * 
+	 * @param attributes
+	 * @param outputs
+	 */
+	private void storeOutputsAndClearInputs(AttributeAccessor attributes, List<ItemWrapper<S>> outputs,
+			StepContribution contribution) {
+		store(attributes, OUTPUT_BUFFER_KEY, outputs);
+		clearInputs(attributes);
+	}
+
+	/**
+	 * @param attributes
+	 * @param inputBufferKey
+	 * @param outputs
+	 */
+	private <W> void store(AttributeAccessor attributes, String key, W value) {
+		attributes.setAttribute(key, value);
+	}
+
 	private void clearAll(AttributeAccessor attributes) {
 		for (String key : attributes.attributeNames()) {
 			attributes.removeAttribute(key);
 		}
 	}
 
-	private List<ReadWrapper<T>> getItemBuffer(AttributeAccessor attributes) {
-		if (!attributes.hasAttribute(ITEM_BUFFER_KEY)) {
-			attributes.setAttribute(ITEM_BUFFER_KEY, new ArrayList<ReadWrapper<T>>());
+	private List<ItemWrapper<T>> getInputBuffer(AttributeAccessor attributes) {
+		return getBuffer(attributes, INPUT_BUFFER_KEY);
+	}
+
+	private List<ItemWrapper<S>> getOutputBuffer(AttributeAccessor attributes) {
+		return getBuffer(attributes, OUTPUT_BUFFER_KEY);
+	}
+
+	private <W> List<W> getBuffer(AttributeAccessor attributes, String key) {
+		if (!attributes.hasAttribute(key)) {
+			return new ArrayList<W>();
 		}
 		@SuppressWarnings("unchecked")
-		List<ReadWrapper<T>> resource = (List<ReadWrapper<T>>) attributes.getAttribute(ITEM_BUFFER_KEY);
+		List<W> resource = (List<W>) attributes.getAttribute(key);
 		return resource;
 	}
 
@@ -159,8 +210,8 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * @param contribution current context
 	 * @return next item for writing
 	 */
-	protected ReadWrapper<T> read(StepContribution contribution) throws Exception {
-		return new ReadWrapper<T>(doRead());
+	protected ItemWrapper<T> read(StepContribution contribution) throws Exception {
+		return new ItemWrapper<T>(doRead());
 	}
 
 	/**
@@ -173,27 +224,29 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	/**
 	 * 
-	 * @param item the item to write
+	 * @param items the item to write
 	 * @param contribution current context
 	 */
-	protected void write(S item, StepContribution contribution) throws Exception {
-		doWrite(item);
+	protected void write(List<ItemWrapper<S>> items, StepContribution contribution) throws Exception {
+		for (ItemWrapper<S> item : items) {
+			doWrite(item);
+		}
 	}
 
 	/**
 	 * @param item
 	 * @throws Exception
 	 */
-	protected final void doWrite(S item) throws Exception {
+	protected final void doWrite(ItemWrapper<S> item) throws Exception {
 		// TODO: increment write count
-		itemWriter.write(Collections.singletonList(item));
+		itemWriter.write(Collections.singletonList(item.getItem()));
 	}
 
 	/**
 	 * @author Dave Syer
 	 * 
 	 */
-	static protected class ReadWrapper<T> {
+	static protected class ItemWrapper<T> {
 
 		final private T item;
 
@@ -202,7 +255,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 		/**
 		 * @param item
 		 */
-		public ReadWrapper(T item) {
+		public ItemWrapper(T item) {
 			this(item, 0);
 		}
 
@@ -210,7 +263,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 		 * @param item
 		 * @param skipCount
 		 */
-		public ReadWrapper(T item, int skipCount) {
+		public ItemWrapper(T item, int skipCount) {
 			this.item = item;
 			this.skipCount = skipCount;
 		}
@@ -228,6 +281,16 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 		 */
 		public int getSkipCount() {
 			return skipCount;
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return String.format("[%s,%d]", item, skipCount);
 		}
 
 	}

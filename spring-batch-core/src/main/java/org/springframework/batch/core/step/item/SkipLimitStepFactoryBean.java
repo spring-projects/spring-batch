@@ -274,8 +274,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 						}
 					});
 			StatefulRetryStepHandler<T, S> itemHandler = new StatefulRetryStepHandler<T, S>(getItemReader(),
-					getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate, itemKeyGenerator, readSkipPolicy,
-					writeSkipPolicy);
+					getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate, itemKeyGenerator,
+					readSkipPolicy, writeSkipPolicy);
 			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
 
 			step.setStepHandler(itemHandler);
@@ -327,9 +327,9 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * @param itemKeyGenerator
 		 */
 		public StatefulRetryStepHandler(ItemReader<? extends T> itemReader,
-				ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter, RepeatOperations chunkOperations, 
-				RetryOperations retryTemplate, ItemKeyGenerator itemKeyGenerator, ItemSkipPolicy readSkipPolicy,
-				ItemSkipPolicy writeSkipPolicy) {
+				ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
+				RepeatOperations chunkOperations, RetryOperations retryTemplate, ItemKeyGenerator itemKeyGenerator,
+				ItemSkipPolicy readSkipPolicy, ItemSkipPolicy writeSkipPolicy) {
 			super(itemReader, itemProcessor, itemWriter, chunkOperations);
 			this.retryOperations = retryTemplate;
 			this.itemKeyGenerator = itemKeyGenerator;
@@ -368,13 +368,13 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * count
 		 * @return next item for processing
 		 */
-		protected ReadWrapper<T> read(StepContribution contribution) throws Exception {
-			
+		protected ItemWrapper<T> read(StepContribution contribution) throws Exception {
+
 			int skipCount = 0;
 
 			while (true) {
 				try {
-					return new ReadWrapper<T>(doRead(), skipCount);
+					return new ItemWrapper<T>(doRead(), skipCount);
 				}
 				catch (Exception e) {
 					try {
@@ -410,37 +410,48 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		/**
 		 * Execute the business logic, delegating to the writer.<br/>
 		 * 
-		 * Process the item with the {@link ItemWriter} in a stateful retry. Any
+		 * Process the items with the {@link ItemWriter} in a stateful retry. Any
 		 * {@link SkipListener} provided is called when retry attempts are
 		 * exhausted. The listener callback (on write failure) will happen in
 		 * the next transaction automatically.<br/>
 		 */
 		@Override
-		protected void write(final S item, final StepContribution contribution) throws Exception {
-			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
-				public Object doWithRetry(RetryContext context) throws Throwable {
-					doWrite(item);
-					return null;
-				}
-			}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item) : item);
-			retryCallback.setRecoveryCallback(new RecoveryCallback() {
-				public Object recover(RetryContext context) {
-					Throwable t = context.getLastThrowable();
-					if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
-						contribution.incrementWriteSkipCount();
-						try {
-							listener.onSkipInWrite(item, t);
-						}
-						catch (RuntimeException ex) {
-							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
-						}
-					} else {
-						throw new RetryException("Non-skippable exception in recoverer", t);
+		protected void write(final List<ItemWrapper<S>> items, final StepContribution contribution) throws Exception {
+			
+			for (final ItemWrapper<S> item : new ArrayList<ItemWrapper<S>>(items)) {
+
+				RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
+					public Object doWithRetry(RetryContext context) throws Throwable {
+						doWrite(item);
+						return null;
 					}
-					return null;
-				}
-			});
-			retryOperations.execute(retryCallback);
+				}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item.getItem()) : item);
+
+				retryCallback.setRecoveryCallback(new RecoveryCallback() {
+
+					public Object recover(RetryContext context) {
+						Throwable t = context.getLastThrowable();
+						if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
+							contribution.incrementWriteSkipCount();
+							items.remove(item);
+							try {
+								listener.onSkipInWrite(item.getItem(), t);
+							}
+							catch (RuntimeException ex) {
+								throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
+							}
+						}
+						else {
+							throw new RetryException("Non-skippable exception in recoverer", t);
+						}
+						return null;
+
+					}
+				});
+
+				retryOperations.execute(retryCallback);
+
+			}
 		}
 	}
 

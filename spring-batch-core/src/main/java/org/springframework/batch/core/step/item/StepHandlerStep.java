@@ -233,8 +233,7 @@ public class StepHandlerStep extends AbstractStep {
 
 				AttributeAccessor attributes = attributeQueue.poll();
 				if (attributes == null) {
-					attributes = new AttributeAccessorSupport() {
-					};
+					attributes = new BasicAttributeAccessor();
 				}
 
 				try {
@@ -258,6 +257,11 @@ public class StepHandlerStep extends AbstractStep {
 						if (attributes.attributeNames().length > 0) {
 							attributeQueue.add(attributes);
 						}
+
+						// Apply the contribution to the step
+						// even if unsuccessful
+						stepExecution.apply(contribution);
+
 					}
 
 					contribution.incrementCommitCount();
@@ -273,10 +277,6 @@ public class StepHandlerStep extends AbstractStep {
 						stepExecution.setStatus(BatchStatus.STOPPED);
 						Thread.currentThread().interrupt();
 					}
-
-					// Apply the contribution to the step
-					// only if chunk was successful
-					stepExecution.apply(contribution);
 
 					try {
 						stream.update(stepExecution.getExecutionContext());
@@ -322,11 +322,11 @@ public class StepHandlerStep extends AbstractStep {
 
 				}
 				catch (Error e) {
-					processRollback(stepExecution, contribution, fatalException, transaction);
+					processRollback(stepExecution, fatalException, transaction);
 					throw e;
 				}
 				catch (Exception e) {
-					processRollback(stepExecution, contribution, fatalException, transaction);
+					processRollback(stepExecution, fatalException, transaction);
 					throw e;
 				}
 				finally {
@@ -351,15 +351,12 @@ public class StepHandlerStep extends AbstractStep {
 
 	/**
 	 * @param stepExecution
-	 * @param contribution
 	 * @param fatalException
 	 * @param transaction
 	 */
-	private void processRollback(final StepExecution stepExecution, final StepContribution contribution,
-			final ExceptionHolder fatalException, TransactionStatus transaction) {
+	private void processRollback(final StepExecution stepExecution, final ExceptionHolder fatalException,
+			TransactionStatus transaction) {
 
-		stepExecution.incrementReadSkipCountBy(contribution.getReadSkipCount());
-		stepExecution.incrementWriteSkipCountBy(contribution.getWriteSkipCount());
 		/*
 		 * Any exception thrown within the transaction should automatically
 		 * cause the transaction to rollback.
@@ -385,6 +382,13 @@ public class StepHandlerStep extends AbstractStep {
 			// the failure status.
 			getJobRepository().update(stepExecution);
 		}
+	}
+
+	/**
+	 * @author Dave Syer
+	 *
+	 */
+	private static final class BasicAttributeAccessor extends AttributeAccessorSupport {
 	}
 
 	private static class ExceptionHolder {
