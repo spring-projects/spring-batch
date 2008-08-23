@@ -18,7 +18,6 @@ package org.springframework.batch.repeat.exception;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +25,6 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextCounter;
 import org.springframework.batch.support.ExceptionClassifier;
 import org.springframework.batch.support.ExceptionClassifierSupport;
-import org.springframework.util.Assert;
 
 /**
  * Implementation of {@link ExceptionHandler} that rethrows when exceptions of a
@@ -41,9 +39,9 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
-	private ExceptionClassifier<String> exceptionClassifier = new ExceptionClassifierSupport();
+	private ExceptionClassifier<String,Throwable> exceptionClassifier = new ExceptionClassifierSupport();
 
-	private Map<Object, Integer> thresholds = new HashMap<Object, Integer>();
+	private Map<String, Integer> thresholds = new HashMap<String, Integer>();
 
 	private boolean useParent = false;
 
@@ -75,15 +73,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @param thresholds the threshold value map.
 	 */
-	public void setThresholds(Map<Object, Integer> thresholds) {
-		for (Entry<Object, Integer> entry : thresholds.entrySet()) {
-
-			if (!(entry.getKey() instanceof String)) {
-				logger.warn("Key in thresholds map is not of type String: " + entry.getKey());
-			}
-			Assert.state(entry.getValue() != null, "Threshold value must be of type Integer.  "
-					+ "Try using the value-type attribute if you care configuring this map via xml.");
-		}
+	public void setThresholds(Map<String, Integer> thresholds) {
 		this.thresholds = thresholds;
 	}
 
@@ -95,7 +85,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @param exceptionClassifier ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier<String> exceptionClassifier) {
+	public void setExceptionClassifier(ExceptionClassifier<String,Throwable> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 

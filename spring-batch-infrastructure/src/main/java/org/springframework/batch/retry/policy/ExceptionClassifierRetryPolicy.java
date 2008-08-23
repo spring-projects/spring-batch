@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  */
 public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy {
 
-	private ExceptionClassifier<String> exceptionClassifier = new ExceptionClassifierSupport();
+	private ExceptionClassifier<String,Throwable> exceptionClassifier = new ExceptionClassifierSupport();
 
 	private Map<String, RetryPolicy> policyMap = new HashMap<String, RetryPolicy>();
 
@@ -64,7 +64,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * 
 	 * @param exceptionClassifier ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier<String> exceptionClassifier) {
+	public void setExceptionClassifier(ExceptionClassifier<String,Throwable> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -113,7 +113,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 	private class ExceptionClassifierRetryContext extends RetryContextSupport implements RetryPolicy {
 
-		private ExceptionClassifier<String> exceptionClassifier;
+		private ExceptionClassifier<String,Throwable> exceptionClassifier;
 
 		// Dynamic: depends on the latest exception:
 		RetryPolicy policy;
@@ -126,7 +126,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 		Map<RetryPolicy, RetryContext> contexts = new HashMap<RetryPolicy, RetryContext>();
 
-		public ExceptionClassifierRetryContext(RetryContext parent, ExceptionClassifier<String> exceptionClassifier) {
+		public ExceptionClassifierRetryContext(RetryContext parent, ExceptionClassifier<String,Throwable> exceptionClassifier) {
 			super(parent);
 			this.exceptionClassifier = exceptionClassifier;
 			Object key = exceptionClassifier.getDefault();

@@ -22,24 +22,24 @@ package org.springframework.batch.support;
  * @author Dave Syer
  * 
  */
-public interface ExceptionClassifier<T> {
+public interface ExceptionClassifier<T,C> {
 
 	/**
 	 * Get a default value, normally the same as would be returned by
-	 * {@link #classify(Throwable)} with null argument.
+	 * {@link #classify(Object)} with null argument.
 	 * 
 	 * @return the default value.
 	 */
 	T getDefault();
 
 	/**
-	 * Classify the given exception and return a non-null object. The return
+	 * Classify the given object and return a non-null object. The return
 	 * type depends on the implementation but typically would be a key in a map
 	 * which the client maintains.
 	 * 
-	 * @param throwable the input exception. Can be null.
+	 * @param classifiable the input object. Can be null.
 	 * @return an object.
 	 */
-	T classify(Throwable throwable);
+	T classify(C classifiable);
 
 }

@@ -16,21 +16,15 @@
 
 package org.springframework.batch.retry.policy;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
 
 public class SimpleRetryPolicyTests extends TestCase {
-
-	public void testSetInvalidExceptionClass() throws Exception {
-		try {
-			new SimpleRetryPolicy().setRetryableExceptionClasses(new Class[] { String.class });
-			fail("Should only be able to set Exception classes.");
-		}
-		catch (IllegalArgumentException ex) {
-
-		}
-	}
 
 	public void testCanRetryIfNoException() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
@@ -38,13 +32,14 @@ public class SimpleRetryPolicyTests extends TestCase {
 		assertTrue(policy.canRetry(context));
 	}
 
+	@SuppressWarnings("unchecked")
 	public void testEmptyExceptionsNeverRetry() throws Exception {
 
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null, null);
 
 		// We can't retry any exceptions...
-		policy.setRetryableExceptionClasses(new Class[0]);
+		policy.setRetryableExceptionClasses(Collections.EMPTY_SET);
 
 		// ...so we can't retry this one...
 		policy.registerThrowable(context, new IllegalStateException());
@@ -92,12 +87,22 @@ public class SimpleRetryPolicyTests extends TestCase {
 
 	public void testFatalOverridesRetryable() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		policy.setFatalExceptionClasses(new Class[] {Exception.class});
-		policy.setRetryableExceptionClasses(new Class[] {RuntimeException.class});
+		policy.setFatalExceptionClasses(getClasses(Exception.class));
+		policy.setRetryableExceptionClasses(getClasses(RuntimeException.class));
 		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new RuntimeException("foo"));
 		assertFalse(policy.canRetry(context));
+	}
+
+	/**
+	 * @param cls
+	 * @return
+	 */
+	private Collection<Class<? extends Throwable>> getClasses(Class<? extends Throwable> cls) {
+		Collection<Class<? extends Throwable>> classes = new HashSet<Class<? extends Throwable>>();
+		classes.add(cls);
+		return classes;
 	}
 
 	public void testParent() throws Exception {

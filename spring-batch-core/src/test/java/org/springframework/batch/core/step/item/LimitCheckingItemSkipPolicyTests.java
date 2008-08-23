@@ -40,10 +40,9 @@ public class LimitCheckingItemSkipPolicyTests {
 	
 	@Before
 	public void setUp() throws Exception {
-		List<Class<?>> skippableExceptions = new ArrayList<Class<?>>();
+		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
 		skippableExceptions.add(FlatFileParseException.class);
-		List<Class<?>> fatalExceptions = new ArrayList<Class<?>>();
-		
+		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
 	}
 	

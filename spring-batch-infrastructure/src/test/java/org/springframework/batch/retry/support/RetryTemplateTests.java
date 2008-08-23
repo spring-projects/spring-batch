@@ -16,6 +16,8 @@
 
 package org.springframework.batch.retry.support;
 
+import java.util.HashSet;
+
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.ExhaustedRetryException;
@@ -96,7 +98,11 @@ public class RetryTemplateTests extends TestCase {
 		RetryTemplate template = new RetryTemplate();
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		template.setRetryPolicy(policy);
-		policy.setRetryableExceptionClasses(new Class[] { RuntimeException.class });
+		policy.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
+			{
+				add(RuntimeException.class);
+			}
+		});
 
 		int attempts = 3;
 

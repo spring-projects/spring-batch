@@ -16,7 +16,7 @@
 
 package org.springframework.batch.support;
 
-import org.springframework.batch.support.BinaryExceptionClassifier;
+import java.util.HashSet;
 
 import junit.framework.TestCase;
 
@@ -33,8 +33,11 @@ public class BinaryExceptionClassifierTests extends TestCase {
 	}
 
 	public void testClassifyExactMatch() {
-		classifier.setExceptionClasses(new Class[] {IllegalStateException.class});
+		classifier.setExceptionClasses(new HashSet<Class<? extends Throwable>>() {
+			{
+				add(IllegalStateException.class);
+			}
+		});
 		assertEquals(false, classifier.isDefault(new IllegalStateException("Foo")));
 	}
-
 }

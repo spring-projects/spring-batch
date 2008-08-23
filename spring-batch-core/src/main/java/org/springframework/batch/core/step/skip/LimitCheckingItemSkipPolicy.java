@@ -16,11 +16,11 @@
 package org.springframework.batch.core.step.skip;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.ArrayList;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -70,7 +70,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
 	private final int skipLimit;
 
-	private ExceptionClassifier<String> exceptionClassifier;
+	private ExceptionClassifier<String,Throwable> exceptionClassifier;
 
 	/**
 	 * Convenience constructor that assumes all exception types are skippable
@@ -80,7 +80,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	@SuppressWarnings("unchecked")
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
 		this(skipLimit,
-				new ArrayList<Class<?>>(){{add(Exception.class);}},
+				new HashSet<Class<? extends Throwable>>(){{add(Exception.class);}},
 				Collections.EMPTY_LIST);
 	}
 
@@ -92,14 +92,14 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * (non-critical)
 	 * @param fatalExceptions exception classes that should never be skipped
 	 */
-	public LimitCheckingItemSkipPolicy(int skipLimit, List<Class<?>> skippableExceptions, List<Class<?>>fatalExceptions) {
+	public LimitCheckingItemSkipPolicy(int skipLimit, Collection<Class<? extends Throwable>> skippableExceptions, Collection<Class<? extends Throwable>>fatalExceptions) {
 		this.skipLimit = skipLimit;
 		SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
-		Map<Class<?>, String> typeMap = new HashMap<Class<?>, String>();
-		for (Class<?> throwable : skippableExceptions) {
+		Map<Class<? extends Throwable>, String> typeMap = new HashMap<Class<? extends Throwable>, String>();
+		for (Class<? extends Throwable> throwable : skippableExceptions) {
 			typeMap.put(throwable, SKIP);
 		}
-		for (Class<?> throwable : fatalExceptions) {
+		for (Class<? extends Throwable> throwable : fatalExceptions) {
 			typeMap.put(throwable, NEVER_SKIP);
 		}
 		exceptionClassifier.setTypeMap(typeMap);

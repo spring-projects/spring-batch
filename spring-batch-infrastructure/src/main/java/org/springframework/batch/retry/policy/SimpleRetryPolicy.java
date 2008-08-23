@@ -16,6 +16,9 @@
 
 package org.springframework.batch.retry.policy;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
@@ -67,8 +70,13 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 */
 	public SimpleRetryPolicy(int maxAttempts) {
 		super();
-		setRetryableExceptionClasses(new Class[] { Exception.class });
-		setFatalExceptionClasses(new Class[] { Error.class });
+		Collection<Class<? extends Throwable>> classes;
+		classes = new HashSet<Class<? extends Throwable>>();
+		classes.add(Exception.class);
+		setRetryableExceptionClasses(classes);
+		classes = new HashSet<Class<? extends Throwable>>();
+		classes.add(Error.class);
+		setFatalExceptionClasses(classes);
 		this.maxAttempts = maxAttempts;
 	}
 
@@ -103,7 +111,7 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * 
 	 * @param retryableExceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setRetryableExceptionClasses(Class<?>[] retryableExceptionClasses) {
+	public final void setRetryableExceptionClasses(Collection<Class<? extends Throwable>> retryableExceptionClasses) {
 		retryableClassifier.setExceptionClasses(retryableExceptionClasses);
 	}
 
@@ -114,7 +122,7 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * 
 	 * @param fatalExceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setFatalExceptionClasses(Class<?>[] fatalExceptionClasses) {
+	public final void setFatalExceptionClasses(Collection<Class<? extends Throwable>> fatalExceptionClasses) {
 		fatalClassifier.setExceptionClasses(fatalExceptionClasses);
 	}
 

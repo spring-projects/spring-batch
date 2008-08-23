@@ -30,7 +30,7 @@ import org.springframework.util.Assert;
  */
 public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	
-	private Map<Class<?>, String> classified = new HashMap<Class<?>, String>();
+	private Map<Class<? extends Throwable>, String> classified = new HashMap<Class<? extends Throwable>, String>();
 
 	/**
 	 * Map of Throwable class types to keys for the classifier. Any subclass of
@@ -39,9 +39,9 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 	 * 
 	 * @param typeMap the typeMap to set
 	 */
-	public final void setTypeMap(Map<Class<?>, String> typeMap) {
-		Map<Class<?>, String> map = new HashMap<Class<?>, String>();
-		for (Map.Entry<Class<?>, String> entry : typeMap.entrySet()) {
+	public final void setTypeMap(Map<Class<? extends Throwable>, String> typeMap) {
+		Map<Class<? extends Throwable>, String> map = new HashMap<Class<? extends Throwable>, String>();
+		for (Map.Entry<Class<? extends Throwable>, String> entry : typeMap.entrySet()) {
 			addRetryableExceptionClass(entry.getKey(), entry.getValue(), map);
 		}
 		this.classified = map;
@@ -59,15 +59,15 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 			return super.classify(throwable);
 		}
 
-		Class<?> exceptionClass = throwable.getClass();
+		Class<? extends Throwable> exceptionClass = throwable.getClass();
 		if (classified.containsKey(exceptionClass)) {
 			return classified.get(exceptionClass);
 		}
 
 		// check for subclasses
-		Set<Class<?>> classes = new TreeSet<Class<?>>(new ClassComparator());
+		Set<Class<? extends Throwable>> classes = new TreeSet<Class<? extends Throwable>>(new ClassComparator());
 		classes.addAll(classified.keySet());
-		for (Class<?> cls : classes) {
+		for (Class<? extends Throwable> cls : classes) {
 			if (cls.isAssignableFrom(exceptionClass)) {
 				String value = classified.get(cls);
 				addRetryableExceptionClass(exceptionClass, value, this.classified);
@@ -78,7 +78,7 @@ public class SubclassExceptionClassifier extends ExceptionClassifierSupport {
 		return super.classify(throwable);
 	}
 
-	private void addRetryableExceptionClass(Class<?> exceptionClass, String classifiedAs, Map<Class<?>, String> map) {
+	private void addRetryableExceptionClass(Class<? extends Throwable> exceptionClass, String classifiedAs, Map<Class<? extends Throwable>, String> map) {
 		Assert.isAssignable(Throwable.class, exceptionClass);
 		map.put(exceptionClass, classifiedAs);
 	}

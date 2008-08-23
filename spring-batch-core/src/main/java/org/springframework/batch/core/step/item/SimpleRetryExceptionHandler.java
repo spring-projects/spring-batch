@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Collection;
+
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -52,13 +54,13 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * exception is encountered
 	 * @param exceptionHandler the delegate to use if an exception actually
 	 * needs to be handled
-	 * @param classes
+	 * @param fatalExceptionClasses
 	 */
-	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Class<?>[] classes) {
+	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Collection<Class<? extends Throwable>> fatalExceptionClasses) {
 		this.retryPolicy = retryPolicy;
 		this.exceptionHandler = exceptionHandler;
 		this.fatalExceptionClassifier = new BinaryExceptionClassifier();
-		fatalExceptionClassifier.setExceptionClasses(classes);
+		fatalExceptionClassifier.setExceptionClasses(fatalExceptionClasses);
 	}
 
 	/**

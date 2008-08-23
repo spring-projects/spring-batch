@@ -55,7 +55,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 				return "RuntimeException";
 			}
 		});
-		handler.setThresholds(Collections.singletonMap((Object)"RuntimeException", new Integer(1)));
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		RepeatContextCounter counter = new RepeatContextCounter(context, RethrowOnThresholdExceptionHandler.class.getName() + ".RuntimeException");
@@ -69,7 +69,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 				return "RuntimeException";
 			}
 		});
-		handler.setThresholds(Collections.singletonMap((Object)"RuntimeException", new Integer(2)));
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(2)));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		handler.handleException(context, new RuntimeException("Foo"));
@@ -88,7 +88,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 				return "RuntimeException";
 			}
 		});
-		handler.setThresholds(Collections.singletonMap((Object)"RuntimeException", new Integer(1)));
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
@@ -107,7 +107,7 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 				return "RuntimeException";
 			}
 		});
-		handler.setThresholds(Collections.singletonMap((Object)"RuntimeException", new Integer(1)));
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		handler.setUseParent(true);
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
@@ -119,17 +119,6 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
 		}
-	}
-	
-	public void testNotStringAsKey() throws Exception {
-		try {
-			handler.setThresholds(Collections.singletonMap((Object)RuntimeException.class, new Integer(1)));
-			// It's not an error, but not advised...
-		}
-		catch (RuntimeException e) {
-			throw e;
-		}
-		
 	}
 
 }

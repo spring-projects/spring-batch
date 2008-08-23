@@ -56,7 +56,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(LogOrRethrowExceptionHandler.class);
 
-	private ExceptionClassifier<String> exceptionClassifier = new ExceptionClassifierSupport() {
+	private ExceptionClassifier<String,Throwable> exceptionClassifier = new ExceptionClassifierSupport() {
 		public String classify(Throwable throwable) {
 			return RETHROW;
 		}
@@ -68,7 +68,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 * 
 	 * @param exceptionClassifier the ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier<String> exceptionClassifier) {
+	public void setExceptionClassifier(ExceptionClassifier<String,Throwable> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -81,7 +81,7 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
-		Object key = exceptionClassifier.classify(throwable);
+		String key = exceptionClassifier.classify(throwable);
 		if (ERROR.equals(key)) {
 			logger.error("Exception encountered in batch repeat.", throwable);
 		} else if (WARN.equals(key)) {

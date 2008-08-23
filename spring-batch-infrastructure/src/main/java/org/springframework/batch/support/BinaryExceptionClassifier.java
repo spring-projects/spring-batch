@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.support;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +42,9 @@ public class BinaryExceptionClassifier extends ExceptionClassifierSupport {
 	 * 
 	 * @param exceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setExceptionClasses(Class<?>[] exceptionClasses) {
-		Map<Class<?>, String> temp = new HashMap<Class<?>, String>();
-		for (Class<?> exceptionClass : exceptionClasses) {
+	public final void setExceptionClasses(Collection<Class<? extends Throwable>> exceptionClasses) {
+		Map<Class<? extends Throwable>, String> temp = new HashMap<Class<? extends Throwable>, String>();
+		for (Class<? extends Throwable> exceptionClass : exceptionClasses) {
 			temp.put(exceptionClass, NON_DEFAULT);
 		}
 		this.delegate.setTypeMap(temp);
@@ -55,7 +56,7 @@ public class BinaryExceptionClassifier extends ExceptionClassifierSupport {
 	 * 
 	 * @param throwable the Throwable to classify
 	 * @return true if it is default classified (i.e. not on the list provided
-	 * in {@link #setExceptionClasses(Class[])}.
+	 * in {@link #setExceptionClasses(Collection)}.
 	 */
 	public boolean isDefault(Throwable throwable) {
 		return classify(throwable).equals(DEFAULT);
@@ -67,7 +68,7 @@ public class BinaryExceptionClassifier extends ExceptionClassifierSupport {
 	 * of the throwable or one of its ancestors is on the exception class list
 	 * the classification is as {@link #NON_DEFAULT}.
 	 * 
-	 * @see #setExceptionClasses(Class[])
+	 * @see #setExceptionClasses(Collection)
 	 * @see ExceptionClassifierSupport#classify(Throwable)
 	 */
 	public String classify(Throwable throwable) {

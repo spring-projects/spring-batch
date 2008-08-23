@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.step.item.SimpleRetryExceptionHandler;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.SimpleLimitExceptionHandler;
@@ -37,6 +39,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
@@ -45,6 +48,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
 	protected void tearDown() throws Exception {
@@ -53,14 +57,20 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
+	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
+	 * .
 	 */
 	public void testRethrowWhenRetryExhausted() throws Throwable {
 
 		RetryPolicy retryPolicy = new NeverRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
 
-		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex, new Class[] { Error.class });
+		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex,
+				new HashSet<Class<? extends Throwable>>() {
+					{
+						add(Error.class);
+					}
+				});
 
 		// Then pretend to handle the exception in the parent context...
 		try {
@@ -79,14 +89,20 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
+	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
+	 * .
 	 */
 	public void testNoRethrowWhenRetryNotExhausted() throws Throwable {
 
 		RetryPolicy retryPolicy = new AlwaysRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
 
-		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex, new Class[] { Error.class });
+		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex,
+				new HashSet<Class<? extends Throwable>>() {
+					{
+						add(Error.class);
+					}
+				});
 
 		// Then pretend to handle the exception in the parent context...
 		handler.handleException(context.getParent(), ex);
@@ -97,14 +113,20 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}.
+	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
+	 * .
 	 */
 	public void testRethrowWhenFatal() throws Throwable {
 
 		RetryPolicy retryPolicy = new AlwaysRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
 
-		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex, new Class[] { RuntimeException.class });
+		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex,
+				new HashSet<Class<? extends Throwable>>() {
+					{
+						add(RuntimeException.class);
+					}
+				});
 
 		// Then pretend to handle the exception in the parent context...
 		try {
@@ -125,7 +147,8 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 	 * @param ex
 	 * @return
 	 */
-	private SimpleRetryExceptionHandler getHandlerAfterRetry(RetryPolicy retryPolicy, RuntimeException ex, Class<?>[] fatalExceptions) {
+	private SimpleRetryExceptionHandler getHandlerAfterRetry(RetryPolicy retryPolicy, RuntimeException ex,
+			Collection<Class<? extends Throwable>> fatalExceptions) {
 
 		// Always rethrow if the retry is exhausted
 		SimpleRetryExceptionHandler handler = new SimpleRetryExceptionHandler(retryPolicy,

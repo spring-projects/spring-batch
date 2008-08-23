@@ -118,7 +118,7 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * @param limit the limit
 	 */
 	public void setLimit(final int limit) {
-		delegate.setThresholds(new HashMap<Object, Integer>() {
+		delegate.setThresholds(new HashMap<String, Integer>() {
 			{
 				put(ExceptionClassifierSupport.DEFAULT, 0);
 				put(TX_INVALID, limit);

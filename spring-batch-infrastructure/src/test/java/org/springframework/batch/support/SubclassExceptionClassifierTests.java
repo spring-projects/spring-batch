@@ -33,28 +33,28 @@ public class SubclassExceptionClassifierTests extends TestCase {
 	}
 
 	public void testClassifyExactMatch() {
-		classifier.setTypeMap(new LinkedHashMap<Class<?>, String>() {{
+		classifier.setTypeMap(new LinkedHashMap<Class<? extends Throwable>, String>() {{
 			put(IllegalStateException.class, "foo");
 		}});
 		assertEquals("foo", classifier.classify(new IllegalStateException("Foo")));
 	}
 
 	public void testClassifySubclassMatch() {
-		classifier.setTypeMap(new LinkedHashMap<Class<?>, String>() {{
+		classifier.setTypeMap(new LinkedHashMap<Class<? extends Throwable>, String>() {{
 			put(RuntimeException.class, "foo");
 		}});
 		assertEquals("foo", classifier.classify(new IllegalStateException("Foo")));
 	}
 
 	public void testClassifySuperclassDoesNotMatch() {
-		classifier.setTypeMap(new LinkedHashMap<Class<?>, String>() {{
+		classifier.setTypeMap(new LinkedHashMap<Class<? extends Throwable>, String>() {{
 			put(IllegalStateException.class, "foo");
 		}});
 		assertEquals(classifier.getDefault(), classifier.classify(new RuntimeException("Foo")));
 	}
 
 	public void testClassifyAncestorMatch() {
-		classifier.setTypeMap(new LinkedHashMap<Class<?>, String>() {{
+		classifier.setTypeMap(new LinkedHashMap<Class<? extends Throwable>, String>() {{
 			put(Exception.class, "bar");
 			put(IllegalArgumentException.class, "foo");
 			put(RuntimeException.class, "bucket");
