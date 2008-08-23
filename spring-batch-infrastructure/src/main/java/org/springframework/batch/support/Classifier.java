@@ -17,7 +17,8 @@
 package org.springframework.batch.support;
 
 /**
- * Interface for a classifier of exceptions.
+ * Interface for a classifier. At its simplest a {@link Classifier} is just a
+ * map from objects of one type to objects of another type.
  * 
  * @author Dave Syer
  * 
@@ -33,9 +34,9 @@ public interface Classifier<C, T> {
 	T getDefault();
 
 	/**
-	 * Classify the given object and return a non-null object. The return
-	 * type depends on the implementation but typically would be a key in a map
-	 * which the client maintains.
+	 * Classify the given object and return a non-null object. The return type
+	 * depends on the implementation but typically would be a key in a map which
+	 * the client maintains.
 	 * 
 	 * @param classifiable the input object. Can be null.
 	 * @return an object.
