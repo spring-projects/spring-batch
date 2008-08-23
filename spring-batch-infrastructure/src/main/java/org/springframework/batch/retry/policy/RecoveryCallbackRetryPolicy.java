@@ -127,7 +127,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.policy.AbstractStatefulRetryPolicy#handleRetryExhausted(org.springframework.batch.retry.RetryContext)
 	 */
-	public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
+	public Object handleRetryExhausted(RetryContext context) throws Exception, ExhaustedRetryException {
 		return ((RetryPolicy) context).handleRetryExhausted(context);
 	}
 
@@ -202,7 +202,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
 		}
 
-		public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
+		public Object handleRetryExhausted(RetryContext context) throws Exception, ExhaustedRetryException {
 			// If there is no going back, then we can remove the history
 			retryContextCache.remove(key);
 			if (recoverer != null) {

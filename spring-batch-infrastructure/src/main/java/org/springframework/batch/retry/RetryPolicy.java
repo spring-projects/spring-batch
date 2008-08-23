@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry;
 
-
 /**
  * A {@link RetryPolicy} is responsible for allocating and managing resources
  * needed by {@link RetryOperations}. The {@link RetryPolicy} allows retry
@@ -57,8 +56,8 @@ public interface RetryPolicy {
 	RetryContext open(RetryCallback callback, RetryContext parent);
 
 	/**
-	 * @param context a retry status created by the {@link #open(RetryCallback, RetryContext)}
-	 * method of this manager.
+	 * @param context a retry status created by the
+	 * {@link #open(RetryCallback, RetryContext)} method of this manager.
 	 * @param succeeded true if the retry callback succeeded
 	 */
 	void close(RetryContext context, boolean succeeded);
@@ -81,6 +80,8 @@ public interface RetryPolicy {
 	 * @return an appropriate value possibly from the callback.
 	 * 
 	 * @throws ExhaustedRetryException if there is no recovery path.
+	 * @throws Exception in rare cases where the policy wants to propagate the
+	 * retryable exception
 	 */
-	Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException;
+	Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException, Exception;
 }

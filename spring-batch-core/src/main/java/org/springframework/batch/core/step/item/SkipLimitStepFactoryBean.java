@@ -31,6 +31,7 @@ import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
+import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.batch.support.SubclassExceptionClassifier;
@@ -76,6 +77,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 	private RetryPolicy retryPolicy;
 
+	private RetryContextCache retryContextCache;
+
 	/**
 	 * Setter for the retry policy. If this is specified the other retry
 	 * properties are ignored (retryLimit, backOffPolicy,
@@ -100,21 +103,31 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 	 * Public setter for the capacity of the cache in the retry policy. If more
 	 * items than this fail without being skipped or recovered an exception will
 	 * be thrown. This is to guard against inadvertent infinite loops generated
-	 * by item identity problems. If a large number of items are failing and not
-	 * being recognized as skipped, it usually signals a problem with the key
-	 * generation (often equals and hashCode in the item itself). So it is
-	 * better to enforce a strict limit than have weird looking errors, where a
-	 * skip limit is reached without anything being skipped.<br/>
+	 * by item identity problems.<br/>
 	 * 
 	 * The default value should be high enough and more for most purposes. To
 	 * breach the limit in a single-threaded step typically you have to have
 	 * this many failures in a single transaction. Defaults to the value in the
-	 * {@link MapRetryContextCache}.
+	 * {@link MapRetryContextCache}.<br/>
 	 * 
-	 * @param cacheCapacity the cacheCapacity to set
+	 * This property is ignored if the
+	 * {@link #setRetryContextCache(RetryContextCache)} is set directly.
+	 * 
+	 * @param cacheCapacity the cache capacity to set (greater than 0 else
+	 * ignored)
 	 */
 	public void setCacheCapacity(int cacheCapacity) {
 		this.cacheCapacity = cacheCapacity;
+	}
+
+	/**
+	 * Override the default retry context cache for retry of chunk processing.
+	 * If this property is set then {@link #setCacheCapacity(int)} is ignored.
+	 * 
+	 * @param retryContextCache the {@link RetryContextCache} to set
+	 */
+	public void setRetryContextCache(RetryContextCache retryContextCache) {
+		this.retryContextCache = retryContextCache;
 	}
 
 	/**
@@ -236,8 +249,14 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					return !getTransactionAttribute().rollbackOn(ex);
 				}
 			};
-			if (cacheCapacity > 0) {
-				recoveryCallbackRetryPolicy.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
+
+			if (retryContextCache == null) {
+				if (cacheCapacity > 0) {
+					recoveryCallbackRetryPolicy.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
+				}
+			}
+			else {
+				recoveryCallbackRetryPolicy.setRetryContextCache(retryContextCache);
 			}
 
 			RetryTemplate retryTemplate = new RetryTemplate();
@@ -410,48 +429,88 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		/**
 		 * Execute the business logic, delegating to the writer.<br/>
 		 * 
-		 * Process the items with the {@link ItemWriter} in a stateful retry. Any
-		 * {@link SkipListener} provided is called when retry attempts are
+		 * Process the items with the {@link ItemWriter} in a stateful retry.
+		 * Any {@link SkipListener} provided is called when retry attempts are
 		 * exhausted. The listener callback (on write failure) will happen in
 		 * the next transaction automatically.<br/>
 		 */
 		@Override
-		protected void write(final List<ItemWrapper<S>> items, final StepContribution contribution) throws Exception {
-			
-			for (final ItemWrapper<S> item : new ArrayList<ItemWrapper<S>>(items)) {
+		protected void write(final Chunk<S> chunk, StepContribution contribution) throws Exception {
 
-				RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(item, new RetryCallback() {
-					public Object doWithRetry(RetryContext context) throws Throwable {
-						doWrite(item);
-						return null;
-					}
-				}, itemKeyGenerator != null ? itemKeyGenerator.getKey(item.getItem()) : item);
-
-				retryCallback.setRecoveryCallback(new RecoveryCallback() {
-
-					public Object recover(RetryContext context) {
-						Throwable t = context.getLastThrowable();
-						if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
-							contribution.incrementWriteSkipCount();
-							items.remove(item);
-							try {
-								listener.onSkipInWrite(item.getItem(), t);
-							}
-							catch (RuntimeException ex) {
-								throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
-							}
-						}
-						else {
-							throw new RetryException("Non-skippable exception in recoverer", t);
-						}
-						return null;
-
-					}
-				});
-
-				retryOperations.execute(retryCallback);
-
+			if (!chunk.canRetry()) {
+				logger.debug("Run items: " + chunk.getItems());
+				runChunk(chunk, contribution);
 			}
+			else {
+				logger.debug(String.format("Retry items: %s", chunk.getItems()));
+				retryChunk(chunk, contribution);
+			}
+			chunk.rethrow();
+
+			chunk.clear();
+
+		}
+
+		/**
+		 * @param chunk
+		 */
+		private void runChunk(Chunk<S> chunk, final StepContribution contribution) throws Exception {
+			try {
+				doWrite(chunk.getItems());
+			}
+			catch (Exception e) {
+				chunk.rethrow(e);
+			}
+		}
+
+		/**
+		 * @param chunk
+		 */
+		private void retryChunk(final Chunk<S> chunk, final StepContribution contribution) throws Exception {
+
+			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(chunk, new RetryCallback() {
+				public Object doWithRetry(RetryContext context) throws Throwable {
+					doWrite(chunk.getItems());
+					return null;
+				}
+			}, chunk);
+
+			retryCallback.setRecoveryCallback(new RecoveryCallback() {
+
+				public Object recover(RetryContext context) throws Exception {
+
+					Exception t = (Exception) context.getLastThrowable();
+
+					if (!chunk.canSkip()) {
+						throw t;
+					}
+
+					if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
+						contribution.incrementWriteSkipCount();
+						S item = chunk.getSkippedItem();
+						try {
+							listener.onSkipInWrite(item, t);
+							return null;
+						}
+						catch (RuntimeException ex) {
+							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
+						}
+					}
+					else {
+						throw new RetryException("Non-skippable exception in recoverer", t);
+					}
+
+				}
+			});
+
+			try {
+				retryOperations.execute(retryCallback);
+			}
+			catch (Exception e) {
+				// only if the retry failed do we re-arrange the chunk
+				chunk.rethrow(e);
+			}
+
 		}
 	}
 

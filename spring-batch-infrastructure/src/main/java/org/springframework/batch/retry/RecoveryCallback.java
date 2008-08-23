@@ -28,7 +28,8 @@ public interface RecoveryCallback {
 	 * @param context the current retry context
 	 * @return an Object that can be used to replace the callback result that
 	 * failed
+	 * @throws Exception 
 	 */
-	Object recover(RetryContext context);
+	Object recover(RetryContext context) throws Exception;
 
 }

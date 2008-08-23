@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -38,8 +35,8 @@ import org.springframework.core.AttributeAccessor;
  * {@link ItemWriter}.
  * 
  * Provides extension points by protected {@link #read(StepContribution)} and
- * {@link #write(List, StepContribution)} methods that can be overriden to
- * provide more sophisticated behavior (e.g. skipping).
+ * {@link #write(Chunk, StepContribution)} methods that can be overriden to
+ * provide more sophisticated behaviour (e.g. skipping).
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -78,7 +75,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	/**
 	 * Get the next item from {@link #read(StepContribution)} and if not null
-	 * pass the item to {@link #write(List, StepContribution)}. If the
+	 * pass the item to {@link #write(Chunk, StepContribution)}. If the
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
 	 * taken from the reader.
 	 * 
@@ -87,8 +84,8 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 */
 	public ExitStatus handle(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
-		final List<ItemWrapper<T>> inputs = getInputBuffer(attributes);
-		final List<ItemWrapper<S>> outputs = getOutputBuffer(attributes);
+		final Chunk<T> inputs = getInputBuffer(attributes);
+		final Chunk<S> outputs = getOutputBuffer(attributes);
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
@@ -101,7 +98,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 					if (item.getItem() == null) {
 						return ExitStatus.FINISHED;
 					}
-					inputs.add(item);
+					inputs.add(item.getItem());
 					return ExitStatus.CONTINUABLE;
 				}
 			});
@@ -110,13 +107,10 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 		}
 
-		for (Iterator<ItemWrapper<T>> iterator = inputs.iterator(); iterator.hasNext();) {
-
-			ItemWrapper<T> item = iterator.next();
-			S output = null;
+		for (T item : inputs) {
 
 			// TODO: processor listener
-			output = itemProcessor.process(item.getItem());
+			S output = itemProcessor.process(item);
 
 			// TODO: segregate read / write / filter count
 			// (this is read count)
@@ -124,7 +118,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 			// TODO: increment filter count if this is null
 			if (output != null) {
-				outputs.add(new ItemWrapper<S>(output));
+				outputs.add(output);
 			}
 
 		}
@@ -137,7 +131,9 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 		// On successful completion clear the attributes to signal that there is
 		// no more processing
-		clearAll(attributes);
+		if (outputs.isEmpty()) {
+			clearAll(attributes);
+		}
 
 		logger.info("Contribution: " + contribution);
 		return result;
@@ -155,7 +151,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * @param attributes
 	 * @param inputs
 	 */
-	private void storeInputs(AttributeAccessor attributes, List<ItemWrapper<T>> inputs) {
+	private void storeInputs(AttributeAccessor attributes, Chunk<T> inputs) {
 		store(attributes, INPUT_BUFFER_KEY, inputs);
 	}
 
@@ -168,7 +164,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * @param attributes
 	 * @param outputs
 	 */
-	private void storeOutputsAndClearInputs(AttributeAccessor attributes, List<ItemWrapper<S>> outputs,
+	private void storeOutputsAndClearInputs(AttributeAccessor attributes, Chunk<S> outputs,
 			StepContribution contribution) {
 		store(attributes, OUTPUT_BUFFER_KEY, outputs);
 		clearInputs(attributes);
@@ -189,20 +185,25 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 		}
 	}
 
-	private List<ItemWrapper<T>> getInputBuffer(AttributeAccessor attributes) {
+	private Chunk<T> getInputBuffer(AttributeAccessor attributes) {
 		return getBuffer(attributes, INPUT_BUFFER_KEY);
 	}
 
-	private List<ItemWrapper<S>> getOutputBuffer(AttributeAccessor attributes) {
+	private Chunk<S> getOutputBuffer(AttributeAccessor attributes) {
 		return getBuffer(attributes, OUTPUT_BUFFER_KEY);
 	}
 
-	private <W> List<W> getBuffer(AttributeAccessor attributes, String key) {
+	/**
+	 * @param attributes
+	 * @param inputBufferKey
+	 * @return
+	 */
+	private <W> Chunk<W> getBuffer(AttributeAccessor attributes, String key) {
 		if (!attributes.hasAttribute(key)) {
-			return new ArrayList<W>();
+			return new Chunk<W>();
 		}
 		@SuppressWarnings("unchecked")
-		List<W> resource = (List<W>) attributes.getAttribute(key);
+		Chunk<W> resource = (Chunk<W>) attributes.getAttribute(key);
 		return resource;
 	}
 
@@ -224,22 +225,21 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	/**
 	 * 
-	 * @param items the item to write
+	 * @param chunk the items to write
 	 * @param contribution current context
 	 */
-	protected void write(List<ItemWrapper<S>> items, StepContribution contribution) throws Exception {
-		for (ItemWrapper<S> item : items) {
-			doWrite(item);
-		}
+	protected void write(Chunk<S> chunk, StepContribution contribution) throws Exception {
+		doWrite(chunk.getItems());
+		chunk.clear();
 	}
 
 	/**
-	 * @param item
+	 * @param items
 	 * @throws Exception
 	 */
-	protected final void doWrite(ItemWrapper<S> item) throws Exception {
+	protected final void doWrite(List<S> items) throws Exception {
+		itemWriter.write(items);
 		// TODO: increment write count
-		itemWriter.write(Collections.singletonList(item.getItem()));
 	}
 
 	/**

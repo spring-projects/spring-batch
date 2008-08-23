@@ -57,10 +57,18 @@ public abstract class AbstractStatefulRetryPolicy implements RetryPolicy {
 
 	/**
 	 * Return null. Subclasses should provide a recovery path if possible.
+	 * Subclasses are also encouraged not to declare throws Exception if they
+	 * can (e.g. in the plausible and common case that the recovery is a last
+	 * ditch effort to prevent a message going back to the middleware, for
+	 * instance). Any subclass that actually does throw an Exception of any type
+	 * should be aware that it will simply be propagated and the caller will
+	 * have top deal with it.
+	 * 
+	 * @throws Exception if the recovery path demands it
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#handleRetryExhausted(org.springframework.batch.retry.RetryContext)
 	 */
-	public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
+	public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException, Exception {
 		return null;
 	}
 

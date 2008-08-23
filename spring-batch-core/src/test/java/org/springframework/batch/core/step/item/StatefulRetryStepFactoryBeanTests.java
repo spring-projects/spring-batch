@@ -43,11 +43,11 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
-import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.retry.RetryException;
+import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryCacheCapacityExceededException;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -101,6 +101,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setRetryableExceptionClasses(new Class[] { Exception.class });
+		factory.setCommitInterval(1); // trivial by default
 
 		JobSupport job = new JobSupport("jobName");
 		job.setRestartable(true);
@@ -239,6 +240,60 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(7, provided.size());
 		// [a, b, b, b, b, b, c, d, d, d, d, d, e, f]
 		assertEquals(14, processed.size());
+		// [b, d]
+		assertEquals(2, recovered.size());
+	}
+
+	@Test
+	public void testSkipAndRetryWithWriteFailureAndNonTrivialCommitInterval() throws Exception {
+
+		factory.setCommitInterval(3);
+		factory.setSkippableExceptionClasses(new Class[] { RetryException.class });
+		factory.setListeners(new StepListener[] { new SkipListenerSupport() {
+			public void onSkipInWrite(Object item, Throwable t) {
+				recovered.add(item);
+				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
+			}
+		} });
+		factory.setSkipLimit(2);
+		List<String> items = Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" });
+		ItemReader<String> provider = new ListItemReader<String>(items) {
+			public String read() {
+				String item = super.read();
+				logger.debug("Read Called! Item: [" + item + "]");
+				provided.add(item);
+				count++;
+				return item;
+			}
+		};
+
+		ItemWriter<String> itemWriter = new ItemWriter<String>() {
+			public void write(List<? extends String> item) throws Exception {
+				logger.debug("Write Called! Item: [" + item + "]");
+				processed.addAll(item);
+				if (item.contains("b") || item.contains("d")) {
+					throw new RuntimeException("Write error - planned but recoverable.");
+				}
+			}
+		};
+		factory.setItemReader(provider);
+		factory.setItemWriter(itemWriter);
+		factory.setRetryLimit(5);
+		factory.setRetryableExceptionClasses(new Class[] { RuntimeException.class });
+		AbstractStep step = (AbstractStep) factory.getObject();
+		step.setName("mytest");
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		step.execute(stepExecution);
+
+		assertEquals(2, recovered.size());
+		assertEquals(2, stepExecution.getSkipCount());
+		assertEquals(2, stepExecution.getWriteSkipCount());
+
+		System.err.println(processed);
+		// [a, b, c, d, e, f, null]
+		assertEquals(7, provided.size());
+		// [a, b, a, b, b, b, b, b, b, c, a, c, d, d, d, d, d, e, f, e, f]
+		assertEquals(21, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());
 	}
@@ -386,9 +441,8 @@ public class StatefulRetryStepFactoryBeanTests {
 		factory.setCommitInterval(3);
 		// sufficiently high so we never hit it
 		factory.setSkipLimit(10);
-		// set the cache limit lower than the number of unique un-recovered
-		// errors expected
-		factory.setCacheCapacity(2);
+		// set the cache limit stupidly low
+		factory.setRetryContextCache(new MapRetryContextCache(0));
 		ItemReader<String> provider = new ItemReader<String>() {
 			public String read() {
 				String item = "" + count;
@@ -410,12 +464,6 @@ public class StatefulRetryStepFactoryBeanTests {
 		};
 		factory.setItemReader(provider);
 		factory.setItemWriter(itemWriter);
-		factory.setItemKeyGenerator(new ItemKeyGenerator() {
-			public Object getKey(Object item) {
-				// return random object so the cache fills up
-				return new Object();
-			}
-		});
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -427,14 +475,14 @@ public class StatefulRetryStepFactoryBeanTests {
 			// expected
 		}
 
-		// We added a bogus key generator so no items are actually skipped
+		// We added a bogus cache so no items are actually skipped
 		// because they aren't recognised as eligible
 		assertEquals(0, stepExecution.getSkipCount());
 		// only one item processed but three (the commit interval) were provided
 		// [0, 1, 2]
 		assertEquals(3, provided.size());
-		// [0, 0, 0]
-		assertEquals(3, processed.size());
+		// [0]
+		assertEquals(1, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 	}
