@@ -80,7 +80,7 @@ class Chunk<W> implements Iterable<W> {
 		int size = items.size();
 		Exception throwable = exception;
 		if (exception != null && !skipped) {
-			if (current == 0 && last == size) {
+			if (isComplete()) {
 				// we tried all items and there was no exception
 				exception = null;
 			}
@@ -101,6 +101,13 @@ class Chunk<W> implements Iterable<W> {
 		if (throwable != null) {
 			throw throwable;
 		}
+	}
+
+	/**
+	 * @return true if the current item slice includes all items
+	 */
+	public boolean isComplete() {
+		return current == 0 && last == items.size();
 	}
 
 	/**

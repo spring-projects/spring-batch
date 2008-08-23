@@ -35,7 +35,7 @@ import org.junit.runners.Parameterized.Parameters;
  * 
  */
 @RunWith(Parameterized.class)
-public class ChunkTests {
+public class AlmostStatefulRetryChunkTests {
 
 	private enum CallType {
 		RUN, RETRY;
@@ -55,7 +55,7 @@ public class ChunkTests {
 
 	private Object lastCallType;
 
-	public ChunkTests(String[] args, int limit) {
+	public AlmostStatefulRetryChunkTests(String[] args, int limit) {
 		chunk = new Chunk<String>();
 		for (String string : args) {
 			chunk.add(string);
@@ -64,7 +64,7 @@ public class ChunkTests {
 	}
 
 	@Test
-	public void testSimpleScenario() throws Exception {
+	public void testRetry() throws Exception {
 		logger.debug("Starting simple scenario");
 		List<String> items = new ArrayList<String>(chunk.getItems());
 		items.removeAll(Collections.singleton("fail"));
@@ -108,6 +108,7 @@ public class ChunkTests {
 	 */
 	private void retryChunk(Chunk<String> chunk) throws Exception {
 		try {
+			// N.B. a classic stateful retry goes straight to recovery here
 			doWrite(chunk);
 			retryAttempts = 0;
 		}
@@ -117,7 +118,8 @@ public class ChunkTests {
 				retryAttempts = 0;
 				if (chunk.canSkip()) {
 					chunk.getSkippedItem();
-				} else {
+				}
+				else {
 					throw e;
 				}
 			}
