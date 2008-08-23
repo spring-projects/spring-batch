@@ -20,11 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
-import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.Classifier;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 
 /**
- * Implementation of {@link ExceptionHandler} based on an {@link ExceptionClassifier}. The classifier determines
+ * Implementation of {@link ExceptionHandler} based on an {@link Classifier}. The classifier determines
  * whether to log the exception or rethrow it. The keys in the classifier must be the same as the static contants in
  * this class.
  * 
@@ -34,41 +34,41 @@ import org.springframework.batch.support.ExceptionClassifierSupport;
 public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	/**
-	 * Key for {@link ExceptionClassifier} signalling that the throwable should be rethrown. If the throwable is not a
+	 * Key for {@link Classifier} signalling that the throwable should be rethrown. If the throwable is not a
 	 * RuntimeException it is wrapped in a {@link RepeatException}.
 	 */
 	public static final String RETHROW = "rethrow";
 
 	/**
-	 * Key for {@link ExceptionClassifier} signalling that the throwable should be logged at debug level.
+	 * Key for {@link Classifier} signalling that the throwable should be logged at debug level.
 	 */
 	public static final String DEBUG = "debug";
 
 	/**
-	 * Key for {@link ExceptionClassifier} signalling that the throwable should be logged at warn level.
+	 * Key for {@link Classifier} signalling that the throwable should be logged at warn level.
 	 */
 	public static final String WARN = "warn";
 
 	/**
-	 * Key for {@link ExceptionClassifier} signalling that the throwable should be logged at error level.
+	 * Key for {@link Classifier} signalling that the throwable should be logged at error level.
 	 */
 	public static final String ERROR = "error";
 
 	protected final Log logger = LogFactory.getLog(LogOrRethrowExceptionHandler.class);
 
-	private ExceptionClassifier<String,Throwable> exceptionClassifier = new ExceptionClassifierSupport() {
+	private Classifier<Throwable, String> exceptionClassifier = new ExceptionClassifierSupport() {
 		public String classify(Throwable throwable) {
 			return RETHROW;
 		}
 	};
 
 	/**
-	 * Setter for the {@link ExceptionClassifier} used by this handler. The default is to map all throwable instances to
+	 * Setter for the {@link Classifier} used by this handler. The default is to map all throwable instances to
 	 * {@link #RETHROW}.
 	 * 
 	 * @param exceptionClassifier the ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier<String,Throwable> exceptionClassifier) {
+	public void setExceptionClassifier(Classifier<Throwable,String> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 

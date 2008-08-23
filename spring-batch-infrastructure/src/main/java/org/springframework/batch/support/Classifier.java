@@ -22,7 +22,7 @@ package org.springframework.batch.support;
  * @author Dave Syer
  * 
  */
-public interface ExceptionClassifier<T,C> {
+public interface Classifier<C, T> {
 
 	/**
 	 * Get a default value, normally the same as would be returned by

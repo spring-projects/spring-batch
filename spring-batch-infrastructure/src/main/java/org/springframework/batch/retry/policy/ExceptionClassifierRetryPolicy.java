@@ -24,7 +24,7 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.Classifier;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 import org.springframework.util.Assert;
 
@@ -37,7 +37,7 @@ import org.springframework.util.Assert;
  */
 public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy {
 
-	private ExceptionClassifier<String,Throwable> exceptionClassifier = new ExceptionClassifierSupport();
+	private Classifier<Throwable, String> exceptionClassifier = new ExceptionClassifierSupport();
 
 	private Map<String, RetryPolicy> policyMap = new HashMap<String, RetryPolicy>();
 
@@ -51,7 +51,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * running application.
 	 * 
 	 * @param policyMap a map of String to {@link RetryPolicy} that will be
-	 * applied to the result of the {@link ExceptionClassifier} to locate a
+	 * applied to the result of the {@link Classifier} to locate a
 	 * policy.
 	 */
 	public void setPolicyMap(Map<String, RetryPolicy> policyMap) {
@@ -64,7 +64,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * 
 	 * @param exceptionClassifier ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier<String,Throwable> exceptionClassifier) {
+	public void setExceptionClassifier(Classifier<Throwable,String> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -113,7 +113,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 	private class ExceptionClassifierRetryContext extends RetryContextSupport implements RetryPolicy {
 
-		private ExceptionClassifier<String,Throwable> exceptionClassifier;
+		private Classifier<Throwable, String> exceptionClassifier;
 
 		// Dynamic: depends on the latest exception:
 		RetryPolicy policy;
@@ -126,7 +126,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 
 		Map<RetryPolicy, RetryContext> contexts = new HashMap<RetryPolicy, RetryContext>();
 
-		public ExceptionClassifierRetryContext(RetryContext parent, ExceptionClassifier<String,Throwable> exceptionClassifier) {
+		public ExceptionClassifierRetryContext(RetryContext parent, Classifier<Throwable,String> exceptionClassifier) {
 			super(parent);
 			this.exceptionClassifier = exceptionClassifier;
 			Object key = exceptionClassifier.getDefault();

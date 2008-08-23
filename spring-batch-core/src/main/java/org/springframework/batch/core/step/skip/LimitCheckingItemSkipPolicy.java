@@ -25,7 +25,7 @@ import java.util.Map;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.FlatFileParseException;
-import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.Classifier;
 import org.springframework.batch.support.SubclassExceptionClassifier;
 
 /**
@@ -70,7 +70,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
 	private final int skipLimit;
 
-	private ExceptionClassifier<String,Throwable> exceptionClassifier;
+	private Classifier<Throwable,String> exceptionClassifier;
 
 	/**
 	 * Convenience constructor that assumes all exception types are skippable

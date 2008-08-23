@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link ExceptionClassifier} that has only two classes of exception.
+ * A {@link Classifier} that has only two classes of exception.
  * Provides convenient methods for setting up and querying the classification
  * with boolean return type.
  * 

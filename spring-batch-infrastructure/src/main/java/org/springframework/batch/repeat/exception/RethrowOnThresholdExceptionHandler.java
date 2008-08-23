@@ -23,12 +23,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextCounter;
-import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.Classifier;
 import org.springframework.batch.support.ExceptionClassifierSupport;
 
 /**
  * Implementation of {@link ExceptionHandler} that rethrows when exceptions of a
- * given type reach a threshold. Requires an {@link ExceptionClassifier} that
+ * given type reach a threshold. Requires an {@link Classifier} that
  * maps exception types to unique keys, and also a map from those keys to
  * threshold values (Integer type).
  * 
@@ -39,7 +39,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
-	private ExceptionClassifier<String,Throwable> exceptionClassifier = new ExceptionClassifierSupport();
+	private Classifier<Throwable,String> exceptionClassifier = new ExceptionClassifierSupport();
 
 	private Map<String, Integer> thresholds = new HashMap<String, Integer>();
 
@@ -68,7 +68,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
 	/**
 	 * A map from classifier keys to a threshold value of type Integer. The keys
-	 * are usually String literals, depending on the {@link ExceptionClassifier}
+	 * are usually String literals, depending on the {@link Classifier}
 	 * implementation used.
 	 * 
 	 * @param thresholds the threshold value map.
@@ -78,14 +78,14 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	}
 
 	/**
-	 * Setter for the {@link ExceptionClassifier} used by this handler. The
+	 * Setter for the {@link Classifier} used by this handler. The
 	 * default is to map all throwable instances to
 	 * {@link ExceptionClassifierSupport#DEFAULT}, which are then mapped to a
 	 * threshold of 0 by the {@link #setThresholds(Map)} map.
 	 * 
 	 * @param exceptionClassifier ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(ExceptionClassifier<String,Throwable> exceptionClassifier) {
+	public void setExceptionClassifier(Classifier<Throwable, String> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 

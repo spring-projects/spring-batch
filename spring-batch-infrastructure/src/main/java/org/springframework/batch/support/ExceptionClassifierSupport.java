@@ -17,13 +17,13 @@
 package org.springframework.batch.support;
 
 /**
- * Base class for {@link ExceptionClassifier} implementations. Provides default
+ * Base class for {@link Classifier} implementations. Provides default
  * behaviour and some convenience members, like constants.
  * 
  * @author Dave Syer
  * 
  */
-public class ExceptionClassifierSupport implements ExceptionClassifier<String,Throwable> {
+public class ExceptionClassifierSupport implements Classifier<Throwable,String> {
 
 	/**
 	 * Default classification key.
@@ -33,7 +33,7 @@ public class ExceptionClassifierSupport implements ExceptionClassifier<String,Th
 	/**
 	 * Always returns the value of {@link #DEFAULT}.
 	 * 
-	 * @see org.springframework.batch.support.ExceptionClassifier#classify(Object)
+	 * @see org.springframework.batch.support.Classifier#classify(Object)
 	 */
 	public String classify(Throwable throwable) {
 		return DEFAULT;
@@ -42,7 +42,7 @@ public class ExceptionClassifierSupport implements ExceptionClassifier<String,Th
 	/**
 	 * Wrapper for a call to {@link #classify(Throwable)} with argument null.
 	 * 
-	 * @see org.springframework.batch.support.ExceptionClassifier#getDefault()
+	 * @see org.springframework.batch.support.Classifier#getDefault()
 	 */
 	public String getDefault() {
 		return classify(null);
