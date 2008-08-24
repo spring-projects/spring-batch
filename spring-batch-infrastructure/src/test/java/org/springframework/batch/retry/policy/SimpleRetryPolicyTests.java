@@ -77,14 +77,6 @@ public class SimpleRetryPolicyTests extends TestCase {
 		assertEquals("foo", context.getLastThrowable().getMessage());
 	}
 
-	public void testDefaultFatal() throws Exception {
-		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null, null);
-		assertNotNull(context);
-		policy.registerThrowable(context, new Error("foo"));
-		assertFalse(policy.canRetry(context));
-	}
-
 	public void testFatalOverridesRetryable() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		policy.setFatalExceptionClasses(getClasses(Exception.class));

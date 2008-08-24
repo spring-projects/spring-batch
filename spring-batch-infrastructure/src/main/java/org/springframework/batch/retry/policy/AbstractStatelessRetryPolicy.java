@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry.policy;
 
-import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 
@@ -49,9 +48,8 @@ public abstract class AbstractStatelessRetryPolicy implements RetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#handleRetryExhausted(org.springframework.batch.retry.RetryContext)
 	 */
-	public Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException {
-		throw new ExhaustedRetryException("Retry exhausted after last attempt with no recovery path.", context
-				.getLastThrowable());
+	public Object handleRetryExhausted(RetryContext context) throws Exception {
+		throw context.getLastThrowable();
 	}
 
 }

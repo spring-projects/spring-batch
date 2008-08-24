@@ -103,9 +103,9 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * Delegate to the policy currently activated in the context.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * java.lang.Throwable)
+	 * Exception)
 	 */
-	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 		RetryPolicy policy = (RetryPolicy) context;
 		policy.registerThrowable(context, throwable);
 		((RetryContextSupport) context).registerThrowable(throwable);
@@ -158,7 +158,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 			return this;
 		}
 
-		public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+		public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 			policy = getPolicy(exceptionClassifier.classify(throwable));
 			this.context = getContext(policy);
 			policy.registerThrowable(this.context, throwable);

@@ -63,7 +63,7 @@ public class TimeoutRetryPolicy extends AbstractStatelessRetryPolicy {
 		return new TimeoutRetryContext(parent, timeout);
 	}
 
-	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 		((RetryContextSupport) context).registerThrowable(throwable);
 		// otherwise no-op - we only time out, otherwise retry everything...
 	}

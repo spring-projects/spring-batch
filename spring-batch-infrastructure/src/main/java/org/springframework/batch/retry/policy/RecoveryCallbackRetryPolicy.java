@@ -115,9 +115,9 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 	 * implemented by subclasses), and remove the current item from the history.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * java.lang.Throwable)
+	 * Exception)
 	 */
-	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 		((RetryPolicy) context).registerThrowable(context, throwable);
 		// The throwable is stored in the delegate context.
 	}
@@ -185,7 +185,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 			return null;
 		}
 
-		public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+		public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 			// TODO: this comparison assumes that hashCode is the limiting
 			// factor. Actually the cache should be able to decide for us.
 			if (this.initialHashCode != key.hashCode()) {
@@ -213,7 +213,7 @@ public class RecoveryCallbackRetryPolicy extends AbstractStatefulRetryPolicy {
 			return null;
 		}
 
-		public Throwable getLastThrowable() {
+		public Exception getLastThrowable() {
 			return delegateContext.getLastThrowable();
 		}
 

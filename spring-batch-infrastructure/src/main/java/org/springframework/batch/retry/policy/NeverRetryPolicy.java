@@ -64,9 +64,9 @@ public class NeverRetryPolicy extends AbstractStatelessRetryPolicy {
 	/**
 	 * Do nothing.
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * java.lang.Throwable)
+	 * Exception)
 	 */
-	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 		((NeverRetryContext) context).setFinished();
 		((RetryContextSupport) context).registerThrowable(throwable);
 	}

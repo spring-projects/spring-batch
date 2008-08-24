@@ -125,7 +125,7 @@ public class RetryListenerTests extends TestCase {
 					throw new IllegalStateException("foo");
 				}
 			});
-			fail("Expected TerminatedRetryException");
+			fail("Expected IllegalStateException");
 		}
 		catch (IllegalStateException e) {
 			assertEquals("foo", e.getMessage());

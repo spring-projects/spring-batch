@@ -32,7 +32,7 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * @author Dave Syer
  * 
  */
-public class ExternalRetryIntergrationTests {
+public class StatefulRetryIntegrationTests {
 
 	@Test
 	public void testExternalRetryWithFailAndNoRetry() throws Exception {
@@ -64,12 +64,12 @@ public class ExternalRetryIntergrationTests {
 			result = retryTemplate.execute(recoveryCallback);
 			// We always get a second attempt...
 		}
-		catch (IllegalArgumentException e) {
+		catch (RuntimeException e) {
 			// This is now the "exhausted" message:
 			assertNotNull(e.getMessage());
 			// But if template is external we should
 			// swallow the exception when retry is impossible.
-			fail("Did not expect IllegalArgumentException");
+			fail("Did not expect RuntimeException: "+e);
 		}
 
 		assertFalse(cache.containsKey("foo"));

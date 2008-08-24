@@ -27,7 +27,7 @@ public interface RetryOperations {
 
 	/**
 	 * Execute the supplied {@link RetryCallback} with the configured retry
-	 * semantics.  See implementations for configuration details.
+	 * semantics. See implementations for configuration details.
 	 * 
 	 * @return the value returned by the {@link RetryCallback} upon successful
 	 * invocation.
@@ -35,5 +35,16 @@ public interface RetryOperations {
 	 * {@link RetryCallback} upon unsuccessful retry.
 	 */
 	Object execute(RetryCallback retryCallback) throws Exception;
+
+	/**
+	 * Execute the supplied {@link RetryCallback} with a fallback on exhausted
+	 * retry to the {@link RecoveryCallback}. See implementations for configuration details.
+	 * 
+	 * @return the value returned by the {@link RetryCallback} upon successful
+	 * invocation, and that returned by the {@link RecoveryCallback} otherwise.
+	 * @throws Exception any {@link Exception} raised by the
+	 * {@link RecoveryCallback} upon unsuccessful retry.
+	 */
+	Object execute(RetryCallback retryCallback, RecoveryCallback recoveryCallback) throws Exception;
 
 }

@@ -201,7 +201,7 @@ public class ExternalRetryPolicyTests extends TestCase {
 			return context;
 		}
 
-		public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+		public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 			((RetryContextSupport) context).registerThrowable(throwable);
 			attempts++;
 		}

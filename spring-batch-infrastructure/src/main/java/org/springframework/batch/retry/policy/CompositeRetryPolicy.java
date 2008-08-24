@@ -110,7 +110,7 @@ public class CompositeRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
 	 */
-	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 		RetryContext[] contexts = ((CompositeRetryContext) context).contexts;
 		RetryPolicy[] policies = ((CompositeRetryContext) context).policies;
 		for (int i = 0; i < contexts.length; i++) {

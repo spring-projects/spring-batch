@@ -70,7 +70,7 @@ public interface RetryPolicy {
 	 * @throws TerminatedRetryException if the status is set to terminate only.
 	 * 
 	 */
-	void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException;
+	void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException;
 
 	/**
 	 * Handle an exhausted retry. Default will be to throw an exception, but

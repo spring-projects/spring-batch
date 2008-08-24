@@ -75,7 +75,6 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 		classes.add(Exception.class);
 		setRetryableExceptionClasses(classes);
 		classes = new HashSet<Class<? extends Throwable>>();
-		classes.add(Error.class);
 		setFatalExceptionClasses(classes);
 		this.maxAttempts = maxAttempts;
 	}
@@ -136,9 +135,9 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Update the status with another attempted retry and the latest exception.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * java.lang.Throwable)
+	 * Exception)
 	 */
-	public void registerThrowable(RetryContext context, Throwable throwable) {
+	public void registerThrowable(RetryContext context, Exception throwable) {
 		SimpleRetryContext simpleContext = ((SimpleRetryContext) context);
 		simpleContext.registerThrowable(throwable);
 	}

@@ -61,7 +61,7 @@ public class RetryTemplateTests extends TestCase {
 
 	public void testNoSuccessRetry() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
-		// Somthing that won't be thrwon by JUnit...
+		// Something that won't be thrown by JUnit...
 		callback.setExceptionToThrow(new IllegalArgumentException());
 		callback.setAttemptsBeforeSuccess(Integer.MAX_VALUE);
 		RetryTemplate retryTemplate = new RetryTemplate();
@@ -143,7 +143,7 @@ public class RetryTemplateTests extends TestCase {
 					throw new IllegalStateException("Retry this operation");
 				}
 			});
-			fail("Expected TerminatedRetryException");
+			fail("Expected ExhaustedRetryException");
 		}
 		catch (ExhaustedRetryException ex) {
 			// Expected for internal retry policy (external would recover
@@ -216,7 +216,7 @@ public class RetryTemplateTests extends TestCase {
 		MockRetryCallback callback = new MockRetryCallback();
 		int attempts = 3;
 		callback.setAttemptsBeforeSuccess(attempts);
-		callback.setExceptionToThrow(new IllegalArgumentException());
+		callback.setExceptionToThrow(new IllegalArgumentException("exhausted"));
 
 		RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy() {
@@ -229,9 +229,9 @@ public class RetryTemplateTests extends TestCase {
 		});
 		try {
 			retryTemplate.execute(callback);
-			fail("Expected ExhaustedRetryException");
+			fail("Expected IllegalArgumentException");
 		}
-		catch (ExhaustedRetryException e) {
+		catch (IllegalArgumentException e) {
 			assertTrue(e.getMessage().indexOf("exhausted") >= 0);
 		}
 	}

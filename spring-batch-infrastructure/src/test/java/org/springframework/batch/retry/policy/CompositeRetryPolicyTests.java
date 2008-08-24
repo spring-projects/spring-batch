@@ -63,7 +63,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 				return !errorRegistered;
 			}
 
-			public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+			public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 				errorRegistered = true;
 			}
 		} });

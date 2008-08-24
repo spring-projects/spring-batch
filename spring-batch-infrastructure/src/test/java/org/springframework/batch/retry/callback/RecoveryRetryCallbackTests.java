@@ -116,7 +116,7 @@ public class RecoveryRetryCallbackTests extends TestCase {
 		});
 		assertEquals(0, calls.size());
 		template.setRetryPolicy(new NeverRetryPolicy() {
-			public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
+			public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
 				// ...register the failed item
 				calls.add("item=" + callback.getKey());
 				// Call the base class method so that the next attempt is a
