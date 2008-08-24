@@ -15,11 +15,18 @@
  */
 package org.springframework.batch.container.jms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import javax.jms.Message;
 import javax.jms.MessageListener;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -27,14 +34,10 @@ import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.ContextConfiguration;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Dave Syer
@@ -54,19 +57,18 @@ public class BatchMessageListenerContainerIntegrationTests {
 
 	private volatile int count;
 
+	@After
 	@Before
-	public void onSetUp() throws Exception {
+	public void drainQueue() throws Exception {
+		container.stop();
 		while(jmsTemplate.receiveAndConvert("queue")!=null) {
 			// do nothing
 		}
 	}
 
-	@After
-	public void onTearDown() throws Exception {
-		container.stop();
-		while(jmsTemplate.receiveAndConvert("queue")!=null) {
-			// do nothing
-		}
+	@AfterClass
+	public static void giveContainerTimeToStop() throws Exception {
+		Thread.sleep(1000);
 	}
 
 	@Test
@@ -122,7 +124,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 			public void onMessage(final Message msg) {
 				try {
 					RecoveryRetryCallback callback = new RecoveryRetryCallback(msg, new RetryCallback() {
-						public Object doWithRetry(RetryContext context) throws Throwable {
+						public Object doWithRetry(RetryContext context) throws Exception {
 							count++;
 							throw new RuntimeException("planned failure: " + msg);
 						}

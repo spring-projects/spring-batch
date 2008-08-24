@@ -123,7 +123,7 @@ public class SynchronousTests {
 		assertNotNull(text);
 
 		retryTemplate.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext status) throws Throwable {
+			public Object doWithRetry(RetryContext status) throws Exception {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
@@ -173,7 +173,7 @@ public class SynchronousTests {
 		final Object item = provider.read();
 
 		retryTemplate.execute(new RecoveryRetryCallback(item, new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
@@ -234,7 +234,7 @@ public class SynchronousTests {
 
 				try {
 					retryTemplate.execute(new RetryCallback() {
-						public Object doWithRetry(RetryContext status) throws Throwable {
+						public Object doWithRetry(RetryContext status) throws Exception {
 
 							TransactionTemplate nestedTxTemplate = new TransactionTemplate(transactionManager);
 							nestedTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
@@ -289,7 +289,7 @@ public class SynchronousTests {
 		assertInitialState();
 
 		retryTemplate.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext status) throws Throwable {
+			public Object doWithRetry(RetryContext status) throws Exception {
 
 				// use REQUIRES_NEW  so that the retry executes in its own transaction
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -337,7 +337,7 @@ public class SynchronousTests {
 		try {
 
 			retryTemplate.execute(new RetryCallback() {
-				public Object doWithRetry(RetryContext status) throws Throwable {
+				public Object doWithRetry(RetryContext status) throws Exception {
 
 					// use REQUIRES_NEW  so that the retry executes in its own transaction
 					TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);

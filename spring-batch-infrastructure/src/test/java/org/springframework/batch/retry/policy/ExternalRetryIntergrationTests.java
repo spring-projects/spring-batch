@@ -121,7 +121,7 @@ public class ExternalRetryIntergrationTests {
 	private final class MockRetryCallback implements RetryCallback {
 		int attempts = 0;
 
-		public Object doWithRetry(RetryContext context) throws Throwable {
+		public Object doWithRetry(RetryContext context) throws Exception {
 			attempts++;
 			if (attempts < 2) {
 				throw new RuntimeException();

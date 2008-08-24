@@ -139,7 +139,7 @@ public class ExternalRetryInBatchTests {
 									}
 									
 									RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
-										public Object doWithRetry(RetryContext context) throws Throwable {
+										public Object doWithRetry(RetryContext context) throws Exception {
 											// No need for transaction here: the whole batch will roll
 											// back. When it comes back for recovery this code is not
 											// executed...

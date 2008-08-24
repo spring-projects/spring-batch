@@ -105,7 +105,7 @@ public class RecoveryRetryCallback implements RetryCallback {
 		this.forceRefresh = forceRefresh;
 	}
 
-	public Object doWithRetry(RetryContext context) throws Throwable {
+	public Object doWithRetry(RetryContext context) throws Exception {
 		return callback.doWithRetry(context);
 		// N.B. code used to check here for isExhaustedOnly and throw exception.
 		// This is unnecessary because the callback could just throw the

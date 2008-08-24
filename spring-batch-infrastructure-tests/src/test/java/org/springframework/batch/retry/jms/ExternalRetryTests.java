@@ -130,7 +130,7 @@ public class ExternalRetryTests {
 					try {
 						final Object item = provider.read();
 						RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
-							public Object doWithRetry(RetryContext context) throws Throwable {
+							public Object doWithRetry(RetryContext context) throws Exception {
 								writer.write(Collections.singletonList(item));
 								return null;
 							}
@@ -158,7 +158,7 @@ public class ExternalRetryTests {
 				try {
 					final Object item = provider.read();
 					RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
-						public Object doWithRetry(RetryContext context) throws Throwable {
+						public Object doWithRetry(RetryContext context) throws Exception {
 							writer.write(Collections.singletonList(item));
 							return null;
 						}
@@ -193,7 +193,7 @@ public class ExternalRetryTests {
 
 		final Object item = provider.read();
 		final RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
 				throw new RuntimeException("Rollback!");
 			}

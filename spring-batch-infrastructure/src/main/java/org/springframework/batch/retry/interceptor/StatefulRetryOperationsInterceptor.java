@@ -174,8 +174,19 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 			this.invocation = invocation;
 		}
 
-		public Object doWithRetry(RetryContext context) throws Throwable {
-			return invocation.proceed();
+		public Object doWithRetry(RetryContext context) throws Exception {
+			try {
+				return invocation.proceed();
+			}
+			catch (Exception e) {
+				throw e;
+			}
+			catch (Error e) {
+				throw e;
+			}
+			catch (Throwable e) {
+				throw new IllegalStateException(e);
+			}
 		}
 	}
 

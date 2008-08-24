@@ -57,7 +57,7 @@ public class RecoveryRetryCallbackTests extends TestCase {
 			}
 		};
 		callback = new RecoveryRetryCallback("foo", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -73,7 +73,7 @@ public class RecoveryRetryCallbackTests extends TestCase {
 		// We can use the policy to intercept the context and do something with
 		// the item...
 		callback = new RecoveryRetryCallback("bar", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				throw new IllegalStateException("Detected bar");
 			}
@@ -109,7 +109,7 @@ public class RecoveryRetryCallbackTests extends TestCase {
 		// We can use the policy to intercept the context and do something with
 		// the item...
 		callback = new RecoveryRetryCallback("bar", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				throw new IllegalStateException("Detected bar");
 			}

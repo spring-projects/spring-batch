@@ -24,7 +24,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
@@ -167,17 +166,17 @@ public class RetryTemplate implements RetryOperations {
 					lastException = null;
 					return callback.doWithRetry(context);
 				}
-				catch (Throwable ex) {
-					Throwable throwable = unwrapIfRethrown(ex);
-					lastException = throwable;
+				catch (Exception e) {
 
-					doOnErrorInterceptors(callback, context, throwable);
+					lastException = e;
 
-					retryPolicy.registerThrowable(context, throwable);
+					doOnErrorInterceptors(callback, context, e);
+
+					retryPolicy.registerThrowable(context, e);
 
 					if (retryPolicy.shouldRethrow(context)) {
 						logger.debug("Rethrow in retry for policy: count=" + context.getRetryCount());
-						rethrow(throwable);
+						throw e;
 					}
 
 				}
@@ -190,7 +189,7 @@ public class RetryTemplate implements RetryOperations {
 					// back off was prevented by another thread - fail the
 					// retry
 					logger.debug("Abort retry because interrupted: count=" + context.getRetryCount());
-					rethrow(e);
+					throw e;
 				}
 
 				/*
@@ -233,46 +232,6 @@ public class RetryTemplate implements RetryOperations {
 		for (int i = listeners.length; i-- > 0;) {
 			listeners[i].onError(context, callback, throwable);
 		}
-	}
-
-	/**
-	 * Re-throw the exception directly if possible, wrap custom Throwables into
-	 * {@link UnclassifiedRetryException}.
-	 */
-	private static void rethrow(Throwable throwable) throws Exception {
-		if (throwable instanceof Exception) {
-			throw (Exception) throwable;
-		}
-		else if (throwable instanceof Error) {
-			throw (Error) throwable;
-		}
-		else {
-			throw new UnclassifiedRetryException("Unclassified Throwable encountered", throwable);
-		}
-	}
-
-	/**
-	 * Undo the wrapping done in {@link #rethrow(Throwable)}
-	 */
-	private static Throwable unwrapIfRethrown(Throwable throwable) {
-		if (throwable instanceof UnclassifiedRetryException) {
-			return throwable.getCause();
-		}
-		else {
-			return throwable;
-		}
-	}
-
-	/**
-	 * Runtime exception wrapper for Throwables that are neither Exception nor
-	 * Error.
-	 */
-	private static class UnclassifiedRetryException extends RetryException {
-
-		public UnclassifiedRetryException(String msg, Throwable cause) {
-			super(msg, cause);
-		}
-
 	}
 
 }

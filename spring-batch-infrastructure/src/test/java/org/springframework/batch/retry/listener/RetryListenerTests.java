@@ -51,7 +51,7 @@ public class RetryListenerTests extends TestCase {
 			}
 		} });
 		template.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				return null;
 			}
 		});
@@ -69,7 +69,7 @@ public class RetryListenerTests extends TestCase {
 		});
 		try {
 			template.execute(new RetryCallback() {
-				public Object doWithRetry(RetryContext context) throws Throwable {
+				public Object doWithRetry(RetryContext context) throws Exception {
 					count++;
 					return null;
 				}
@@ -97,7 +97,7 @@ public class RetryListenerTests extends TestCase {
 			}
 		} });
 		template.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				return null;
 			}
 		});
@@ -120,7 +120,7 @@ public class RetryListenerTests extends TestCase {
 		} });
 		try {
 			template.execute(new RetryCallback() {
-				public Object doWithRetry(RetryContext context) throws Throwable {
+				public Object doWithRetry(RetryContext context) throws Exception {
 					count++;
 					throw new IllegalStateException("foo");
 				}
@@ -147,7 +147,7 @@ public class RetryListenerTests extends TestCase {
 			}
 		});
 		template.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				if (count++ < 1)
 					throw new RuntimeException("Retry!");
 				return null;

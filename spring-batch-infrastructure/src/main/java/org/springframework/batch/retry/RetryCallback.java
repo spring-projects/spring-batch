@@ -30,6 +30,7 @@ public interface RetryCallback {
 	 * semantics when an operation is retried.
 	 * @param context the current retry context.
 	 * @return the result of the successful operation.
+	 * @throws Exception TODO
 	 */
-	Object doWithRetry(RetryContext context) throws Throwable;
+	Object doWithRetry(RetryContext context) throws Exception;
 }

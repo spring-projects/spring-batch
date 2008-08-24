@@ -43,7 +43,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 
 		final StringHolder item = new StringHolder("foo");
 		RetryCallback writer = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				list.add(item.string);
 				return item;
@@ -59,7 +59,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 	public void testOpenWithWrongCallbackType() {
 		try {
 			policy.open(new RetryCallback() {
-				public Object doWithRetry(RetryContext context) throws Throwable {
+				public Object doWithRetry(RetryContext context) throws Exception {
 					return null;
 				}
 			}, null);
@@ -74,7 +74,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		policy.setDelegate(new AlwaysRetryPolicy());
 
 		RetryContext context = policy.open(new RecoveryRetryCallback("foo", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -88,7 +88,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 	public void testRegisterThrowable() {
 		policy.setDelegate(new NeverRetryPolicy());
 		RetryContext context = policy.open(new RecoveryRetryCallback("foo", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -101,7 +101,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 	public void testClose() throws Exception {
 		policy.setDelegate(new NeverRetryPolicy());
 		RetryContext context = policy.open(new RecoveryRetryCallback("foo", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -117,7 +117,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 
 	public void testOpenTwice() throws Exception {
 		RecoveryRetryCallback callback = new RecoveryRetryCallback("foo", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -145,7 +145,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		policy.setDelegate(new SimpleRetryPolicy(1));
 		final String input = "foo";
 		RecoveryRetryCallback callback = new RecoveryRetryCallback(input, new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				return null;
 			}
 		});
@@ -184,7 +184,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		policy.setDelegate(new SimpleRetryPolicy(1));
 		final String input = "foo";
 		RecoveryRetryCallback callback = new RecoveryRetryCallback(input, new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				throw new RuntimeException("Barf!");
 			}
 		});
@@ -214,7 +214,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 
 	public void testExhaustedClearsHistoryAfterLastAttempt() throws Exception {
 		RecoveryRetryCallback callback = new RecoveryRetryCallback("foo", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -242,7 +242,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		policy = new RecoveryCallbackRetryPolicy();
 		policy.setDelegate(new SimpleRetryPolicy(1));
 		RetryContext context = policy.open(new RecoveryRetryCallback("foo", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -257,7 +257,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 
 	public void testRetryCountPreservedBetweenRetries() throws Exception {
 		RecoveryRetryCallback callback = new RecoveryRetryCallback("bar", new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				return null;
 			}
@@ -282,7 +282,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		final StringHolder item = new StringHolder("bar");
 
 		RetryCallback writer = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				// This simulates what happens if someone uses a primary key
 				// for hasCode and equals and then relies on default key
 				// generator
@@ -320,7 +320,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		final StringHolder item = new StringHolder("foo");
 
 		RetryCallback writer = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				list.add(item.string);
 				return item;
@@ -349,7 +349,7 @@ public class RecoveryRetryPolicyTests extends TestCase {
 		final StringHolder item = new StringHolder("foo");
 
 		RetryCallback writer = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Throwable {
+			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				list.add(item.string);
 				return item;
