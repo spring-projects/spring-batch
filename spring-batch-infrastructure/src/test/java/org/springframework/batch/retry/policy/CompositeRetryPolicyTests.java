@@ -29,7 +29,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 
 	public void testEmptyPolicies() throws Exception {
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
 	}
@@ -37,7 +37,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 	public void testTrivialPolicies() throws Exception {
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
 		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport(), new MockRetryPolicySupport() });
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
 	}
@@ -49,7 +49,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 				return false;
 			}
 		} });
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		assertFalse(policy.canRetry(context));
 	}
@@ -67,7 +67,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 				errorRegistered = true;
 			}
 		} });
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, null);
@@ -86,7 +86,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 				list.add("2");
 			}
 		} });
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		policy.close(context, true);
 		assertEquals(2, list.size());
@@ -105,7 +105,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 				list.add("2");
 			}
 		} });
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		try {
 			policy.close(context, true);
@@ -119,7 +119,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 	public void testRetryCount() throws Exception {
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
 		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport(), new MockRetryPolicySupport() });
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -130,8 +130,8 @@ public class CompositeRetryPolicyTests extends TestCase {
 
 	public void testParent() throws Exception {
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
-		RetryContext context = policy.open(null, null);
-		RetryContext child = policy.open(null, context);
+		RetryContext context = policy.open(null);
+		RetryContext child = policy.open(context);
 		assertNotSame(child, context);
 		assertSame(context, child.getParent());
 	}

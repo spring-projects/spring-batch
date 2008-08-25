@@ -195,8 +195,7 @@ public class RetryTemplate implements RetryOperations {
 		BackOffPolicy backOffPolicy = this.backOffPolicy;
 
 		// Allow the retry policy to initialise itself...
-		// TODO: catch and rethrow abnormal retry exception?
-		RetryContext context = open(retryCallback, retryPolicy, state);
+		RetryContext context = open(retryPolicy, state);
 
 		// Make sure the context is available globally for clients who need
 		// it...
@@ -323,21 +322,18 @@ public class RetryTemplate implements RetryOperations {
 	}
 
 	/**
-	 * @param retryCallback
 	 * @param retryPolicy
 	 * @return a retry context
 	 */
-	protected RetryContext open(RetryCallback retryCallback, RetryPolicy retryPolicy, RetryState state) {
-
-		// TODO: we don't need the callback here
+	protected RetryContext open(RetryPolicy retryPolicy, RetryState state) {
 
 		if (state == null) {
-			return doOpenInternal(retryCallback, retryPolicy);
+			return doOpenInternal(retryPolicy);
 		}
 
 		Object key = state.getKey();
 		if (state.isForceRefresh()) {
-			return doOpenInternal(retryCallback, retryPolicy);
+			return doOpenInternal(retryPolicy);
 		}
 		else if (retryContextCache.containsKey(key)) {
 
@@ -352,20 +348,19 @@ public class RetryTemplate implements RetryOperations {
 		}
 		else {
 
-			// The cache is only ued if there is a failure.
-			return doOpenInternal(retryCallback, retryPolicy);
+			// The cache is only used if there is a failure.
+			return doOpenInternal(retryPolicy);
 
 		}
 
 	}
 
 	/**
-	 * @param retryCallback
 	 * @param retryPolicy
 	 * @return
 	 */
-	private RetryContext doOpenInternal(RetryCallback retryCallback, RetryPolicy retryPolicy) {
-		return retryPolicy.open(retryCallback, RetrySynchronizationManager.getContext());
+	private RetryContext doOpenInternal(RetryPolicy retryPolicy) {
+		return retryPolicy.open(RetrySynchronizationManager.getContext());
 	}
 
 	/**

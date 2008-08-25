@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry.policy;
 
-import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
@@ -30,7 +29,7 @@ import org.springframework.batch.retry.context.RetryContextSupport;
  * @author Dave Syer
  * 
  */
-public class NeverRetryPolicy extends AbstractStatelessRetryPolicy {
+public class NeverRetryPolicy implements RetryPolicy {
 
 	/**
 	 * Returns false after the first exception. So there is always one try, and
@@ -55,9 +54,9 @@ public class NeverRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Return a context that can respond to early termination requests, but does
 	 * nothing else.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback, RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(RetryContext)
 	 */
-	public RetryContext open(RetryCallback callback, RetryContext parent) {
+	public RetryContext open(RetryContext parent) {
 		return new NeverRetryContext(parent);
 	}
 

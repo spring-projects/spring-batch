@@ -36,28 +36,19 @@ public interface RetryPolicy {
 	boolean canRetry(RetryContext context);
 
 	/**
-	 * @param context the current context.
-	 * @return true if the policy determines that the last exception should be
-	 * re-thrown.
-	 */
-	boolean shouldRethrow(RetryContext context);
-
-	/**
 	 * Acquire resources needed for the retry operation. The callback is passed
 	 * in so that marker interfaces can be used and a manager can collaborate
 	 * with the callback to set up some state in the status token.
-	 * 
-	 * @param callback the {@link RetryCallback} that will execute the unit of
-	 * work for this retry.
 	 * @param parent the parent context if we are in a nested retry.
+	 * 
 	 * @return a {@link RetryContext} object specific to this manager.
 	 * 
 	 */
-	RetryContext open(RetryCallback callback, RetryContext parent);
+	RetryContext open(RetryContext parent);
 
 	/**
 	 * @param context a retry status created by the
-	 * {@link #open(RetryCallback, RetryContext)} method of this manager.
+	 * {@link #open(RetryContext)} method of this manager.
 	 * @param succeeded true if the retry callback succeeded
 	 */
 	void close(RetryContext context, boolean succeeded);
@@ -72,16 +63,4 @@ public interface RetryPolicy {
 	 */
 	void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException;
 
-	/**
-	 * Handle an exhausted retry. Default will be to throw an exception, but
-	 * implementations may provide recovery path.
-	 * 
-	 * @param context the current retry context.
-	 * @return an appropriate value possibly from the callback.
-	 * 
-	 * @throws ExhaustedRetryException if there is no recovery path.
-	 * @throws Exception in rare cases where the policy wants to propagate the
-	 * retryable exception
-	 */
-	Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException, Exception;
 }

@@ -16,7 +16,6 @@
 
 package org.springframework.batch.retry.policy;
 
-import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
@@ -24,12 +23,12 @@ import org.springframework.batch.retry.context.RetryContextSupport;
 
 /**
  * A {@link RetryPolicy} that allows a retry only if it hasn't timed out. The
- * clock is started on a call to {@link #open(RetryCallback, RetryContext)}.
+ * clock is started on a call to {@link #open(RetryContext)}.
  * 
  * @author Dave Syer
  * 
  */
-public class TimeoutRetryPolicy extends AbstractStatelessRetryPolicy {
+public class TimeoutRetryPolicy implements RetryPolicy {
 
 	/**
 	 * Default value for timeout (milliseconds).
@@ -59,7 +58,7 @@ public class TimeoutRetryPolicy extends AbstractStatelessRetryPolicy {
 	public void close(RetryContext context, boolean succeeded) {
 	}
 
-	public RetryContext open(RetryCallback callback, RetryContext parent) {
+	public RetryContext open(RetryContext parent) {
 		return new TimeoutRetryContext(parent, timeout);
 	}
 

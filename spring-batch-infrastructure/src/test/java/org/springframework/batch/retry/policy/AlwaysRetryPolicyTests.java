@@ -24,7 +24,7 @@ public class AlwaysRetryPolicyTests extends TestCase {
 
 	public void testSimpleOperations() throws Exception {
 		AlwaysRetryPolicy policy = new AlwaysRetryPolicy();
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, null);
@@ -35,7 +35,7 @@ public class AlwaysRetryPolicyTests extends TestCase {
 
 	public void testRetryCount() throws Exception {
 		AlwaysRetryPolicy policy = new AlwaysRetryPolicy();
-		RetryContext context = policy.open(null, null);
+		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -46,8 +46,8 @@ public class AlwaysRetryPolicyTests extends TestCase {
 
 	public void testParent() throws Exception {
 		AlwaysRetryPolicy policy = new AlwaysRetryPolicy();
-		RetryContext context = policy.open(null, null);
-		RetryContext child = policy.open(null, context);
+		RetryContext context = policy.open(null);
+		RetryContext child = policy.open(context);
 		assertNotSame(child, context);
 		assertSame(context, child.getParent());
 	}

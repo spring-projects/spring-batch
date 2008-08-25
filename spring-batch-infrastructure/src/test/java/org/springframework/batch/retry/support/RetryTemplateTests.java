@@ -212,30 +212,6 @@ public class RetryTemplateTests extends TestCase {
 		}
 	}
 
-	public void testFallThroughToEndUnsuccessfully() throws Exception {
-		MockRetryCallback callback = new MockRetryCallback();
-		int attempts = 3;
-		callback.setAttemptsBeforeSuccess(attempts);
-		callback.setExceptionToThrow(new IllegalArgumentException("exhausted"));
-
-		RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new NeverRetryPolicy() {
-			public boolean shouldRethrow(RetryContext context) {
-				// The opposite of normal...
-				// cause the retry to drop through to the end
-				// neither throwing exception nor returning successfully.
-				return false;
-			}
-		});
-		try {
-			retryTemplate.execute(callback);
-			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalArgumentException e) {
-			assertTrue(e.getMessage().indexOf("exhausted") >= 0);
-		}
-	}
-
 	private static class MockRetryCallback implements RetryCallback {
 
 		private int attempts;

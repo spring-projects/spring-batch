@@ -19,7 +19,6 @@ package org.springframework.batch.retry.policy;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.TerminatedRetryException;
@@ -35,7 +34,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy {
+public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 
 	private Classifier<Throwable, String> exceptionClassifier = new ExceptionClassifierSupport();
 
@@ -92,11 +91,10 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 	 * Create an active context that proxies a retry policy by chosing a target
 	 * from the policy map.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
-	 * RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(RetryContext)
 	 */
-	public RetryContext open(RetryCallback callback, RetryContext parent) {
-		return new ExceptionClassifierRetryContext(parent, exceptionClassifier).open(callback, parent);
+	public RetryContext open(RetryContext parent) {
+		return new ExceptionClassifierRetryContext(parent, exceptionClassifier).open(parent);
 	}
 
 	/**
@@ -121,9 +119,6 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		// Dynamic: depends on the policy:
 		RetryContext context;
 
-		// The same for the life of the context:
-		RetryCallback callback;
-
 		Map<RetryPolicy, RetryContext> contexts = new HashMap<RetryPolicy, RetryContext>();
 
 		public ExceptionClassifierRetryContext(RetryContext parent, Classifier<Throwable,String> exceptionClassifier) {
@@ -142,10 +137,6 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 			return policy.canRetry(this.context);
 		}
 
-		public boolean shouldRethrow(RetryContext context) {
-			return policy.shouldRethrow(context);
-		}
-
 		public void close(RetryContext context, boolean succeeded) {
 			// Only close those policies that have been used (opened):
 			for (RetryPolicy policy : contexts.keySet()) {
@@ -153,8 +144,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 			}
 		}
 
-		public RetryContext open(RetryCallback callback, RetryContext parent) {
-			this.callback = callback;
+		public RetryContext open(RetryContext parent) {
 			return this;
 		}
 
@@ -167,7 +157,7 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 		private RetryContext getContext(RetryPolicy policy) {
 			RetryContext context = contexts.get(policy);
 			if (context == null) {
-				context = policy.open(callback, null);
+				context = policy.open(null);
 				contexts.put(policy, context);
 			}
 			return context;
@@ -177,11 +167,6 @@ public class ExceptionClassifierRetryPolicy extends AbstractStatelessRetryPolicy
 			RetryPolicy result = policyMap.get(key);
 			Assert.notNull(result, "Could not locate policy for key=[" + key + "].");
 			return result;
-		}
-
-		public Object handleRetryExhausted(RetryContext context) throws UnsupportedOperationException {
-			// Not called...
-			throw new UnsupportedOperationException("Not supported - this code should be unreachable.");
 		}
 
 	}

@@ -19,8 +19,8 @@ package org.springframework.batch.retry.policy;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.support.BinaryExceptionClassifier;
 
@@ -41,7 +41,7 @@ import org.springframework.batch.support.BinaryExceptionClassifier;
  * @author Rob Harrop
  * 
  */
-public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
+public class SimpleRetryPolicy implements RetryPolicy {
 
 	/**
 	 * The default limit to the number of attempts for a new policy.
@@ -143,10 +143,9 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	 * Get a status object that can be used to track the current operation
 	 * according to this policy. Has to be aware of the latest exception and the
 	 * number of attempts.
-	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
-	 * RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(RetryContext)
 	 */
-	public RetryContext open(RetryCallback callback, RetryContext parent) {
+	public RetryContext open(RetryContext parent) {
 		return new SimpleRetryContext(parent);
 	}
 

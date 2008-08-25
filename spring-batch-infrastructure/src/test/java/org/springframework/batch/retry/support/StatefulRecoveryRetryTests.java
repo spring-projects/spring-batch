@@ -50,17 +50,7 @@ public class StatefulRecoveryRetryTests {
 
 	@Test
 	public void testOpenSunnyDay() throws Exception {
-
-		final StringHolder item = new StringHolder("foo");
-		RetryCallback writer = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
-				count++;
-				list.add(item.string);
-				return item;
-			}
-		};
-
-		RetryContext context = retryTemplate.open(writer, new NeverRetryPolicy(), new RetryState("foo"));
+		RetryContext context = retryTemplate.open(new NeverRetryPolicy(), new RetryState("foo"));
 		assertNotNull(context);
 		// we haven't called the processor yet...
 		assertEquals(0, count);
@@ -70,12 +60,7 @@ public class StatefulRecoveryRetryTests {
 	public void testRegisterThrowable() {
 		NeverRetryPolicy retryPolicy = new NeverRetryPolicy();
 		RetryState state = new RetryState("foo");
-		RetryContext context = retryTemplate.open(new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
-				count++;
-				return null;
-			}
-		}, retryPolicy, state);
+		RetryContext context = retryTemplate.open(retryPolicy, state);
 		assertNotNull(context);
 		retryTemplate.registerThrowable(retryPolicy, state, context, new Exception());
 		assertFalse(retryPolicy.canRetry(context));
@@ -85,12 +70,7 @@ public class StatefulRecoveryRetryTests {
 	public void testClose() throws Exception {
 		NeverRetryPolicy retryPolicy = new NeverRetryPolicy();
 		RetryState state = new RetryState("foo");
-		RetryContext context = retryTemplate.open(new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
-				count++;
-				return null;
-			}
-		}, retryPolicy, state);
+		RetryContext context = retryTemplate.open(retryPolicy, state);
 		assertNotNull(context);
 		retryTemplate.registerThrowable(retryPolicy, state, context, new Exception());
 		assertFalse(retryPolicy.canRetry(context));
@@ -170,7 +150,7 @@ public class StatefulRecoveryRetryTests {
 			// expected
 		}
 
-		RetryContext context = retryTemplate.open(callback, retryPolicy, state);
+		RetryContext context = retryTemplate.open(retryPolicy, state);
 		// True after exhausted - the history is reset...
 		assertTrue(retryPolicy.canRetry(context));
 	}
@@ -203,7 +183,7 @@ public class StatefulRecoveryRetryTests {
 			assertTrue("Message doesn't contain 'inconsistent': " + message, message.indexOf("inconsistent") >= 0);
 		}
 
-		RetryContext context = retryTemplate.open(callback, retryPolicy, state);
+		RetryContext context = retryTemplate.open(retryPolicy, state);
 		// True after exhausted - the history is reset...
 		assertEquals(0, context.getRetryCount());
 
@@ -270,7 +250,7 @@ public class StatefulRecoveryRetryTests {
 		}
 		retryTemplate.execute(callback, recoveryCallback, state);
 
-		RetryContext context = retryTemplate.open(callback, retryPolicy, state);
+		RetryContext context = retryTemplate.open(retryPolicy, state);
 		// True after exhausted - the history is reset...
 		assertEquals(0, context.getRetryCount());
 
