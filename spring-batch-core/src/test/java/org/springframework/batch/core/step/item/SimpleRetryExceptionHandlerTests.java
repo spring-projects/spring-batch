@@ -155,7 +155,7 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 				new SimpleLimitExceptionHandler(0), fatalExceptions);
 
 		// Simulate a failed retry...
-		RetryContext retryContext = retryPolicy.open(null, null);
+		RetryContext retryContext = retryPolicy.open(null);
 		retryPolicy.registerThrowable(retryContext, ex);
 		handler.close(retryContext, null, ex);
 		return handler;
