@@ -44,8 +44,8 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 				add(IllegalStateException.class);
 			}
 		});
-		RecoveryCallback recoveryCallback = new RecoveryCallback() {
-			public Object recover(RetryContext context) throws Exception {
+		RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
+			public String recover(RetryContext context) throws Exception {
 				return "bar";
 			}
 		};
@@ -77,8 +77,8 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 				add(IllegalStateException.class);
 			}
 		});
-		RecoveryCallback recoveryCallback = new RecoveryCallback() {
-			public Object recover(RetryContext context) throws Exception {
+		RecoveryCallback<String>recoveryCallback = new RecoveryCallback<String>() {
+			public String recover(RetryContext context) throws Exception {
 				return "bar";
 			}
 		};
@@ -98,15 +98,15 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 		assertEquals("bar", result);
 	}
 
-	private static class MockRetryCallback implements RetryCallback {
+	private static class MockRetryCallback implements RetryCallback<String> {
 
 		private int attempts;
 
 		private Exception exceptionToThrow = new Exception();
 
-		public Object doWithRetry(RetryContext context) throws Exception {
+		public String doWithRetry(RetryContext context) throws Exception {
 			this.attempts++;
-			// Otherwise just barf...
+			// Just barf...
 			throw this.exceptionToThrow;
 		}
 

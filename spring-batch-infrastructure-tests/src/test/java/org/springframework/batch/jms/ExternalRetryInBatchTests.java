@@ -82,13 +82,13 @@ public class ExternalRetryInBatchTests {
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		provider = new ItemReaderRecoverer() {
-			public Object read() {
+			public String read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
 			}
 
-			public Object recover(Object data, Throwable cause) {
+			public String recover(String data, Throwable cause) {
 				recovered.add(data);
 				return data;
 			}
@@ -131,14 +131,14 @@ public class ExternalRetryInBatchTests {
 
 								public ExitStatus doInIteration(RepeatContext context) throws Exception {
 
-									final Object item = provider.read();
+									final String item = provider.read();
 									
 									if (item==null) {
 										return ExitStatus.FINISHED;
 									}
 									
-									RetryCallback callback = new RetryCallback() {
-										public Object doWithRetry(RetryContext context) throws Exception {
+									RetryCallback<String> callback = new RetryCallback<String>() {
+										public String doWithRetry(RetryContext context) throws Exception {
 											// No need for transaction here: the whole batch will roll
 											// back. When it comes back for recovery this code is not
 											// executed...
@@ -149,8 +149,8 @@ public class ExternalRetryInBatchTests {
 										}
 									};
 									
-									RecoveryCallback recoveryCallback = new RecoveryCallback() {
-										public Object recover(RetryContext context) {
+									RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
+										public String recover(RetryContext context) {
 											// aggressive commit on a recovery
 											RepeatSynchronizationManager.setCompleteOnly();
 											return provider.recover(item, context.getLastThrowable());
@@ -212,7 +212,7 @@ public class ExternalRetryInBatchTests {
 		return msgs;
 	}
 
-	private interface ItemReaderRecoverer extends ItemReader<Object>, ItemRecoverer {
+	private interface ItemReaderRecoverer extends ItemReader<String>, ItemRecoverer<String,String> {
 
 	}
 }

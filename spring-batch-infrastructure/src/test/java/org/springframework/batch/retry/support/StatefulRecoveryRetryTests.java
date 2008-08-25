@@ -94,13 +94,13 @@ public class StatefulRecoveryRetryTests {
 		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
 		final String input = "foo";
 		RetryState state = new RetryState(input);
-		RetryCallback callback = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
+		RetryCallback<String> callback = new RetryCallback<String>() {
+			public String doWithRetry(RetryContext context) throws Exception {
 				throw new RuntimeException("Barf!");
 			}
 		};
-		RecoveryCallback recoveryCallback = new RecoveryCallback() {
-			public Object recover(RetryContext context) {
+		RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
+			public String recover(RetryContext context) {
 				count++;
 				list.add(input);
 				return input;
@@ -128,8 +128,8 @@ public class StatefulRecoveryRetryTests {
 
 		final String input = "foo";
 		RetryState state = new RetryState(input);
-		RetryCallback callback = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
+		RetryCallback<String> callback = new RetryCallback<String>() {
+			public String doWithRetry(RetryContext context) throws Exception {
 				throw new RuntimeException("Barf!");
 			}
 		};
@@ -163,8 +163,8 @@ public class StatefulRecoveryRetryTests {
 		final StringHolder item = new StringHolder("bar");
 		RetryState state = new RetryState(item);
 
-		RetryCallback callback = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
+		RetryCallback<StringHolder> callback = new RetryCallback<StringHolder>() {
+			public StringHolder doWithRetry(RetryContext context) throws Exception {
 				// This simulates what happens if someone uses a primary key
 				// for hashCode and equals and then relies on default key
 				// generator
@@ -195,7 +195,7 @@ public class StatefulRecoveryRetryTests {
 		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
 		retryTemplate.setRetryContextCache(new MapRetryContextCache(1));
 
-		RetryCallback callback = new RetryCallback() {
+		RetryCallback<Object> callback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				throw new RuntimeException("Barf!");
@@ -229,13 +229,13 @@ public class StatefulRecoveryRetryTests {
 		final StringHolder item = new StringHolder("foo");
 		RetryState state = new RetryState(item);
 
-		RetryCallback callback = new RetryCallback() {
+		RetryCallback<Object> callback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {
 				count++;
 				throw new RuntimeException("Barf!");
 			}
 		};
-		RecoveryCallback recoveryCallback = new RecoveryCallback() {
+		RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 			public Object recover(RetryContext context) throws Exception {
 				return null;
 			}
@@ -260,36 +260,18 @@ public class StatefulRecoveryRetryTests {
 
 		private String string;
 
-		/**
-		 * @param string
-		 */
 		public StringHolder(String string) {
 			this.string = string;
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
 		public boolean equals(Object obj) {
 			return string.equals(((StringHolder) obj).string);
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#hashCode()
-		 */
 		public int hashCode() {
 			return string.hashCode();
 		}
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#toString()
-		 */
 		public String toString() {
 			return "String: " + string + " (hash = " + hashCode() + ")";
 		}

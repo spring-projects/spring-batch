@@ -403,16 +403,13 @@ public class PollableSourceRetryTests {
 	 */
 	private StatefulRetryOperationsInterceptor getRetryOperationsInterceptor(ItemKeyGenerator itemKeyGenerator) {
 		StatefulRetryOperationsInterceptor advice = new StatefulRetryOperationsInterceptor();
-		advice.setRecoverer(new ItemRecoverer() {
+		advice.setRecoverer(new ItemRecoverer<Boolean, Object[]>() {
 			@SuppressWarnings("unchecked")
-			public Object recover(Object data, Throwable cause) {
+			public Boolean recover(Object[] data, Throwable cause) {
 				if (data == null) {
 					return false;
 				}
-				if (data.getClass().isArray()) {
-					data = ((Object[]) data)[0];
-				}
-				String payload = ((Message<String>) data).getPayload();
+				String payload = ((Message<String>) data[0]).getPayload();
 				logger.debug("Recovering: " + payload);
 				recovered.add(payload);
 				return true;

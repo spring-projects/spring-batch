@@ -86,7 +86,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * @see org.springframework.batch.retry.RetryListener#close(org.springframework.batch.retry.RetryContext,
 	 * org.springframework.batch.retry.RetryCallback, java.lang.Throwable)
 	 */
-	public void close(RetryContext context, RetryCallback callback, Throwable throwable) {
+	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
 			getRepeatContext().setAttribute(EXHAUSTED, "true");
 		}

@@ -20,8 +20,8 @@ import junit.framework.TestCase;
 
 public class ItemRecoveryHandlerTests extends TestCase {
 
-	ItemRecoverer recoverer = new ItemRecoverer() {
-		public Object recover(Object data, Throwable cause) {
+	ItemRecoverer<String, String> recoverer = new ItemRecoverer<String,String>() {
+		public String recover(String data, Throwable cause) {
 			return null;
 		}
 	};

@@ -79,7 +79,7 @@ public class ExternalRetryTests {
 				return text;
 			}
 
-			public Object recover(Object data, Throwable cause) {
+			public String recover(String data, Throwable cause) {
 				recovered.add(data);
 				return data;
 			}
@@ -126,7 +126,7 @@ public class ExternalRetryTests {
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						final Object item = provider.read();
-						RetryCallback callback = new RetryCallback() {
+						RetryCallback<Object> callback = new RetryCallback<Object>() {
 							public Object doWithRetry(RetryContext context) throws Exception {
 								writer.write(Collections.singletonList(item));
 								return null;
@@ -153,8 +153,8 @@ public class ExternalRetryTests {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
-					final Object item = provider.read();
-					RetryCallback callback = new RetryCallback() {
+					final String item = provider.read();
+					RetryCallback<Object> callback = new RetryCallback<Object>() {
 						public Object doWithRetry(RetryContext context) throws Exception {
 							writer.write(Collections.singletonList(item));
 							return null;
@@ -186,25 +186,25 @@ public class ExternalRetryTests {
 
 		assertInitialState();
 
-		final Object item = provider.read();
-		final RetryCallback callback = new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
+		final String item = provider.read();
+		final RetryCallback<String> callback = new RetryCallback<String>() {
+			public String doWithRetry(RetryContext context) throws Exception {
 				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
 				throw new RuntimeException("Rollback!");
 			}
 		};
 
-		final RecoveryCallback recoveryCallback = new RecoveryCallback() {
-			public Object recover(RetryContext context) {
+		final RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
+			public String recover(RetryContext context) {
 				return provider.recover(item, context.getLastThrowable());
 			}
 		};
 
-		Object result = "start";
+		String result = "start";
 
 		for (int i = 0; i < 4; i++) {
 			try {
-				result = new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+				result = (String) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 						try {
 							return retryTemplate.execute(callback, recoveryCallback, new RetryState(item));
@@ -254,7 +254,7 @@ public class ExternalRetryTests {
 		return msgs;
 	}
 
-	private interface ItemReaderRecoverer<T> extends ItemReader<T>, ItemRecoverer {
+	private interface ItemReaderRecoverer<T> extends ItemReader<T>, ItemRecoverer<T,T> {
 
 	}
 

@@ -113,10 +113,10 @@ public class StatefulRetryIntegrationTests {
 	 * @author Dave Syer
 	 * 
 	 */
-	private final class MockRetryCallback implements RetryCallback {
+	private final class MockRetryCallback implements RetryCallback<String> {
 		int attempts = 0;
 
-		public Object doWithRetry(RetryContext context) throws Exception {
+		public String doWithRetry(RetryContext context) throws Exception {
 			attempts++;
 			if (attempts < 2) {
 				throw new RuntimeException();

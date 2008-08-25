@@ -432,7 +432,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 */
 		private void retryChunk(final Chunk<S> chunk, final StepContribution contribution) throws Exception {
 
-			RetryCallback retryCallback = new RetryCallback() {
+			RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext context) throws Exception {
 					doWrite(chunk.getItems());
 					// TODO: if there is an exception marked as no rollback it
@@ -441,7 +441,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				}
 			};
 
-			RecoveryCallback recoveryCallback = new RecoveryCallback() {
+			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
 				public Object recover(RetryContext context) throws Exception {
 

@@ -22,7 +22,7 @@ package org.springframework.batch.retry;
  * 
  * @since 1.1
  */
-public interface RecoveryCallback {
+public interface RecoveryCallback<T> {
 
 	/**
 	 * @param context the current retry context
@@ -30,6 +30,6 @@ public interface RecoveryCallback {
 	 * failed
 	 * @throws Exception 
 	 */
-	Object recover(RetryContext context) throws Exception;
+	T recover(RetryContext context) throws Exception;
 
 }

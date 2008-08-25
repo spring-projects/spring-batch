@@ -137,7 +137,7 @@ public class RetryTemplateTests extends TestCase {
 	public void testEarlyTermination() throws Exception {
 		try {
 			RetryTemplate retryTemplate = new RetryTemplate();
-			retryTemplate.execute(new RetryCallback() {
+			retryTemplate.execute(new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext status) throws Exception {
 					status.setExhaustedOnly();
 					throw new IllegalStateException("Retry this operation");
@@ -155,11 +155,11 @@ public class RetryTemplateTests extends TestCase {
 	public void testNestedContexts() throws Exception {
 		RetryTemplate outer = new RetryTemplate();
 		final RetryTemplate inner = new RetryTemplate();
-		outer.execute(new RetryCallback() {
+		outer.execute(new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext status) throws Exception {
 				context = status;
 				count++;
-				Object result = inner.execute(new RetryCallback() {
+				Object result = inner.execute(new RetryCallback<Object>() {
 					public Object doWithRetry(RetryContext status) throws Exception {
 						count++;
 						assertNotNull(context);
@@ -180,7 +180,7 @@ public class RetryTemplateTests extends TestCase {
 		RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		try {
-			retryTemplate.execute(new RetryCallback() {
+			retryTemplate.execute(new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext context) throws Exception {
 					throw new Error("Realllly bad!");
 				}
@@ -200,7 +200,7 @@ public class RetryTemplateTests extends TestCase {
 			}
 		});
 		try {
-			retryTemplate.execute(new RetryCallback() {
+			retryTemplate.execute(new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext context) throws Exception {
 					throw new RuntimeException("Bad!");
 				}
@@ -212,7 +212,7 @@ public class RetryTemplateTests extends TestCase {
 		}
 	}
 
-	private static class MockRetryCallback implements RetryCallback {
+	private static class MockRetryCallback implements RetryCallback<Object> {
 
 		private int attempts;
 

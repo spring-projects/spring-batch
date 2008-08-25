@@ -16,12 +16,13 @@
 
 package org.springframework.batch.item;
 
+
 /**
  * Strategy interface for recovery action when processing of an item fails.<br/>
  * 
  * @author Dave Syer
  */
-public interface ItemRecoverer {
+public interface ItemRecoverer<T,S> {
 
 	/**
 	 * Recover gracefully from an error. Clients can call this if processing of
@@ -33,7 +34,7 @@ public interface ItemRecoverer {
 	 *            the item that failed.
 	 * @param cause
 	 *            the cause of the failure that led to this recovery.
-	 * @return true if recovery was successful.
+	 * @return the value to be returned to the caller
 	 */
-	Object recover(Object data, Throwable cause);
+	T recover(S data, Throwable cause);
 }

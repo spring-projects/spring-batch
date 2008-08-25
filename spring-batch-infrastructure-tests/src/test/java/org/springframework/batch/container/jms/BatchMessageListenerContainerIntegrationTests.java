@@ -122,14 +122,14 @@ public class BatchMessageListenerContainerIntegrationTests {
 		container.setMessageListener(new MessageListener() {
 			public void onMessage(final Message msg) {
 				try {
-					RetryCallback callback = new RetryCallback() {
-						public Object doWithRetry(RetryContext context) throws Exception {
+					RetryCallback<Message> callback = new RetryCallback<Message>() {
+						public Message doWithRetry(RetryContext context) throws Exception {
 							count++;
 							throw new RuntimeException("planned failure: " + msg);
 						}
 					};
-					RecoveryCallback recoveryCallback = new RecoveryCallback() {
-						public Object recover(RetryContext context) {
+					RecoveryCallback<Message> recoveryCallback = new RecoveryCallback<Message>() {
+						public Message recover(RetryContext context) {
 							recovered++;
 							return msg;
 						}

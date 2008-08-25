@@ -124,12 +124,12 @@ public class SynchronousTests {
 		final String text = (String) jmsTemplate.receiveAndConvert("queue");
 		assertNotNull(text);
 
-		retryTemplate.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext status) throws Exception {
+		retryTemplate.execute(new RetryCallback<String>() {
+			public String doWithRetry(RetryContext status) throws Exception {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				return transactionTemplate.execute(new TransactionCallback() {
+				return (String) transactionTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 
 						list.add(text);
@@ -146,7 +146,7 @@ public class SynchronousTests {
 			}
 		});
 
-		// Verify the state after stransactional processing is complete
+		// Verify the state after transactional processing is complete
 
 		List<String> msgs = getMessages();
 
@@ -174,12 +174,12 @@ public class SynchronousTests {
 
 		final Object item = provider.read();
 
-		retryTemplate.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext context) throws Exception {
+		retryTemplate.execute(new RetryCallback<String>() {
+			public String doWithRetry(RetryContext context) throws Exception {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-				return transactionTemplate.execute(new TransactionCallback() {
+				return (String) transactionTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 
 						list.add(item);
@@ -235,12 +235,12 @@ public class SynchronousTests {
 				final String text = (String) jmsTemplate.receiveAndConvert("queue");
 
 				try {
-					retryTemplate.execute(new RetryCallback() {
-						public Object doWithRetry(RetryContext status) throws Exception {
+					retryTemplate.execute(new RetryCallback<String>() {
+						public String doWithRetry(RetryContext status) throws Exception {
 
 							TransactionTemplate nestedTxTemplate = new TransactionTemplate(transactionManager);
 							nestedTxTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_NESTED);
-							return nestedTxTemplate.execute(new TransactionCallback() {
+							return (String) nestedTxTemplate.execute(new TransactionCallback() {
 								public Object doInTransaction(TransactionStatus nestedStatus) {
 
 									list.add(text);
@@ -290,13 +290,13 @@ public class SynchronousTests {
 
 		assertInitialState();
 
-		retryTemplate.execute(new RetryCallback() {
-			public Object doWithRetry(RetryContext status) throws Exception {
+		retryTemplate.execute(new RetryCallback<String>() {
+			public String doWithRetry(RetryContext status) throws Exception {
 
 				// use REQUIRES_NEW  so that the retry executes in its own transaction
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 				transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
-				return transactionTemplate.execute(new TransactionCallback() {
+				return (String) transactionTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 
 						// The receive is inside the retry and the
@@ -338,16 +338,16 @@ public class SynchronousTests {
 
 		try {
 
-			retryTemplate.execute(new RetryCallback() {
-				public Object doWithRetry(RetryContext status) throws Exception {
+			retryTemplate.execute(new RetryCallback<String>() {
+				public String doWithRetry(RetryContext status) throws Exception {
 
 					// use REQUIRES_NEW  so that the retry executes in its own transaction
 					TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 					transactionTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
-					return transactionTemplate.execute(new TransactionCallback() {
+					return (String) transactionTemplate.execute(new TransactionCallback() {
 						public Object doInTransaction(TransactionStatus status) {
 
-							// The receieve is inside the retry and the
+							// The receive is inside the retry and the
 							// transaction...
 							final String text = (String) jmsTemplate.receiveAndConvert("queue");
 							list.add(text);
@@ -372,7 +372,7 @@ public class SynchronousTests {
 			// expected
 		}
 
-		// Verify the state after stransactional processing is complete
+		// Verify the state after transactional processing is complete
 
 		List<String> msgs = getMessages();
 

@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class JmsItemReader<T> implements ItemReader<T>, ItemRecoverer, ItemKeyGenerator,
+public class JmsItemReader<T> implements ItemReader<T>, ItemRecoverer<T,T>, ItemKeyGenerator,
 		NewItemIdentifier {
 
 	protected Log logger = LogFactory.getLog(getClass());
@@ -120,7 +120,7 @@ public class JmsItemReader<T> implements ItemReader<T>, ItemRecoverer, ItemKeyGe
 	 * @see org.springframework.batch.item.ItemRecoverer#recover(Object,
 	 * Throwable)
 	 */
-	public Object recover(Object item, Throwable cause) {
+	public T recover(T item, Throwable cause) {
 		try {
 			if (errorDestination != null) {
 				jmsTemplate.convertAndSend(errorDestination, item);

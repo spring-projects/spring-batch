@@ -28,13 +28,13 @@ import org.springframework.batch.retry.RetryListener;
  */
 public class RetryListenerSupport implements RetryListener {
 
-	public void close(RetryContext context, RetryCallback callback, Throwable throwable) {
+	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 	}
 
-	public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
+	public <T> void onError(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 	}
 
-	public boolean open(RetryContext context, RetryCallback callback) {
+	public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
 		return true;
 	}
 

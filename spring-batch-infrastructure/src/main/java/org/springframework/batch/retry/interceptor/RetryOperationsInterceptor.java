@@ -52,7 +52,7 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
-		return this.retryOperations.execute(new RetryCallback() {
+		return this.retryOperations.execute(new RetryCallback<Object>() {
 
 			public Object doWithRetry(RetryContext context) throws Exception {
 

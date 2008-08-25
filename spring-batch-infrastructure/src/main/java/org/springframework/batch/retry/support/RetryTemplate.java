@@ -135,7 +135,7 @@ public class RetryTemplate implements RetryOperations {
 	 * @throws TerminatedRetryException if the retry has been manually
 	 * terminated through the {@link RetryContext}.
 	 */
-	public final Object execute(RetryCallback retryCallback) throws Exception {
+	public final <T> T execute(RetryCallback<T> retryCallback) throws Exception {
 		return doExecute(retryCallback, null, null);
 	}
 
@@ -150,7 +150,7 @@ public class RetryTemplate implements RetryOperations {
 	 * @throws TerminatedRetryException if the retry has been manually
 	 * terminated through the {@link RetryContext}.
 	 */
-	public final Object execute(RetryCallback retryCallback, RecoveryCallback recoveryCallback) throws Exception {
+	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback) throws Exception {
 		return doExecute(retryCallback, recoveryCallback, null);
 	}
 
@@ -163,7 +163,7 @@ public class RetryTemplate implements RetryOperations {
 	 * 
 	 * @throws ExhaustedRetryException if the retry has been exhausted.
 	 */
-	public final Object execute(RetryCallback retryCallback, RetryState retryState) throws Exception,
+	public final <T> T execute(RetryCallback<T> retryCallback, RetryState retryState) throws Exception,
 			ExhaustedRetryException {
 		return doExecute(retryCallback, null, retryState);
 	}
@@ -175,7 +175,7 @@ public class RetryTemplate implements RetryOperations {
 	 * @see org.springframework.batch.retry.RetryOperations#execute(RetryCallback,
 	 * RetryState)
 	 */
-	public final Object execute(RetryCallback retryCallback, RecoveryCallback recoveryCallback, RetryState retryState)
+	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback, RetryState retryState)
 			throws Exception, ExhaustedRetryException {
 		return doExecute(retryCallback, recoveryCallback, retryState);
 	}
@@ -188,7 +188,7 @@ public class RetryTemplate implements RetryOperations {
 	 * RecoveryCallback, RetryState)
 	 * @throws ExhaustedRetryException if the retry has been exhausted.
 	 */
-	protected Object doExecute(RetryCallback retryCallback, RecoveryCallback recoveryCallback, RetryState state)
+	protected <T> T doExecute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback, RetryState state)
 			throws Exception, ExhaustedRetryException {
 
 		RetryPolicy retryPolicy = this.retryPolicy;
@@ -369,7 +369,7 @@ public class RetryTemplate implements RetryOperations {
 	 * @throws Exception if the callback does, and if there is no callback then
 	 * definitely the last exception from the context
 	 */
-	protected Object handleRetryExhausted(RecoveryCallback recoveryCallback, RetryContext context, RetryState state)
+	protected <T> T handleRetryExhausted(RecoveryCallback<T> recoveryCallback, RetryContext context, RetryState state)
 			throws Exception {
 		if (state != null) {
 			retryContextCache.remove(state.getKey());
@@ -401,7 +401,7 @@ public class RetryTemplate implements RetryOperations {
 		return state != null;
 	}
 
-	private boolean doOpenInterceptors(RetryCallback callback, RetryContext context) {
+	private <T> boolean doOpenInterceptors(RetryCallback<T> callback, RetryContext context) {
 
 		boolean result = true;
 
@@ -413,13 +413,13 @@ public class RetryTemplate implements RetryOperations {
 
 	}
 
-	private void doCloseInterceptors(RetryCallback callback, RetryContext context, Throwable lastException) {
+	private <T> void doCloseInterceptors(RetryCallback<T> callback, RetryContext context, Throwable lastException) {
 		for (int i = listeners.length; i-- > 0;) {
 			listeners[i].close(context, callback, lastException);
 		}
 	}
 
-	private void doOnErrorInterceptors(RetryCallback callback, RetryContext context, Throwable throwable) {
+	private <T> void doOnErrorInterceptors(RetryCallback<T> callback, RetryContext context, Throwable throwable) {
 		for (int i = listeners.length; i-- > 0;) {
 			listeners[i].onError(context, callback, throwable);
 		}

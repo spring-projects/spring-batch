@@ -59,7 +59,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 	private ItemKeyGenerator keyGenerator;
 
-	private ItemRecoverer recoverer;
+	private ItemRecoverer<? extends Object,Object[]> recoverer;
 
 	private NewItemIdentifier newItemIdentifier;
 
@@ -84,7 +84,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 * 
 	 * @param recoverer the {@link ItemRecoverer} to set
 	 */
-	public void setRecoverer(ItemRecoverer recoverer) {
+	public void setRecoverer(ItemRecoverer<? extends Object,Object[]> recoverer) {
 		this.recoverer = recoverer;
 	}
 
@@ -143,7 +143,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 		RetryState retryState = new RetryState(keyGenerator != null ? keyGenerator.getKey(item) : item, newItemIdentifier != null ? newItemIdentifier.isNew(item) : false );
 
-		Object result = retryTemplate.execute(new MethodInvocationRetryCallback(invocation), new ItemRecovererCallback(item, recoverer), retryState);
+		Object result = retryTemplate.execute(new MethodInvocationRetryCallback(invocation), new ItemRecovererCallback(args, recoverer), retryState);
 
 		logger.debug("Exiting proxied method in stateful retry with result: (" + result + ")");
 
@@ -155,7 +155,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static final class MethodInvocationRetryCallback implements RetryCallback {
+	private static final class MethodInvocationRetryCallback implements RetryCallback<Object> {
 		/**
 		 * 
 		 */
@@ -188,23 +188,23 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static final class ItemRecovererCallback implements RecoveryCallback {
+	private static final class ItemRecovererCallback implements RecoveryCallback<Object> {
 
-		private final Object item;
+		private final Object[] args;
 
-		private final ItemRecoverer recoverer;
+		private final ItemRecoverer<? extends Object,Object[]> recoverer;
 
 		/**
-		 * @param item the item that failed.
+		 * @param args the item that failed.
 		 */
-		private ItemRecovererCallback(Object item, ItemRecoverer recoverer) {
-			this.item = item;
+		private ItemRecovererCallback(Object[] args, ItemRecoverer<? extends Object,Object[]> recoverer) {
+			this.args = args;
 			this.recoverer = recoverer;
 		}
 
 		public Object recover(RetryContext context) {
 			if (recoverer != null) {
-				return recoverer.recover(item, context.getLastThrowable());
+				return recoverer.recover(args, context.getLastThrowable());
 			}
 			throw new ExhaustedRetryException("Retry was exhausted but there was no recovery path.");
 		}

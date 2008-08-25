@@ -170,10 +170,10 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 			assertTrue("Wrong message: " + message, message.startsWith("Not enough calls"));
 		}
 		assertEquals(1, count);
-		interceptor.setRecoverer(new ItemRecoverer() {
-			public Object recover(Object data, Throwable cause) {
+		interceptor.setRecoverer(new ItemRecoverer<Object, Object[]>() {
+			public Object recover(Object[] data, Throwable cause) {
 				count++;
-				return data;
+				return null;
 			}
 		});
 		service.service("foo");
@@ -192,10 +192,10 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 			assertTrue("Wrong message: " + message, message.startsWith("Not enough calls"));
 		}
 		assertEquals(1, count);
-		interceptor.setRecoverer(new ItemRecoverer() {
-			public Object recover(Object data, Throwable cause) {
+		interceptor.setRecoverer(new ItemRecoverer<Collection<String>, Object[]>() {
+			public Collection<String> recover(Object[] data, Throwable cause) {
 				count++;
-				return Collections.singleton(data);
+				return Collections.singleton((String)data[0]);
 			}
 		});
 		Collection<String> result = transformer.transform("foo");
