@@ -13,24 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item;
+package org.springframework.batch.item.jms;
+
+import org.easymock.EasyMock;
+import org.junit.Test;
+import org.springframework.jms.core.JmsOperations;
 
 /**
- * Extension of the {@link ItemReader} interface that allows items to be
- * identified and tagged by a unique key.
- * 
  * @author Dave Syer
  * 
  */
-public interface ItemKeyGenerator {
+public class JmsMethodInvocationRecovererTests {
 
-	/**
-	 * Get a unique identifier for the item that can be used to cache it between
-	 * calls if necessary, and then identify it later.
-	 * 
-	 * @param item the current item.
-	 * @return a unique identifier.
-	 */
-	Object getKey(Object item);
+	private JmsMethodInvocationRecoverer<String> itemReader = new JmsMethodInvocationRecoverer<String>();
+
+	@Test
+	public void testRecoverWithNoDestination() throws Exception {
+		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
+		jmsTemplate.convertAndSend("foo");
+		EasyMock.replay(jmsTemplate);
+
+		itemReader.setJmsTemplate(jmsTemplate);
+		itemReader.recover(new Object[] { "foo" }, null);
+
+		EasyMock.verify(jmsTemplate);
+	}
 
 }

@@ -16,19 +16,21 @@
 
 package org.springframework.batch.item;
 
+import org.springframework.batch.retry.interceptor.MethodInvocationRecoverer;
+
 import junit.framework.TestCase;
 
 public class ItemRecoveryHandlerTests extends TestCase {
 
-	ItemRecoverer<String, String> recoverer = new ItemRecoverer<String,String>() {
-		public String recover(String data, Throwable cause) {
+	MethodInvocationRecoverer<String> recoverer = new MethodInvocationRecoverer<String>() {
+		public String recover(Object[] data, Throwable cause) {
 			return null;
 		}
 	};
 
 	public void testRecover() throws Exception {
 		try {
-			recoverer.recover("foo", null);
+			recoverer.recover(new Object[]{"foo"}, null);
 		} catch (Exception e) {
 			fail("Unexpected Exception");
 		}

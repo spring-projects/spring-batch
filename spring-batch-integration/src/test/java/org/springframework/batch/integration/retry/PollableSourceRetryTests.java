@@ -15,10 +15,10 @@ import org.junit.Test;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
-import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.retry.interceptor.MethodArgumentsKeyGenerator;
+import org.springframework.batch.retry.interceptor.MethodInvocationRecoverer;
 import org.springframework.batch.retry.interceptor.StatefulRetryOperationsInterceptor;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -51,16 +51,13 @@ public class PollableSourceRetryTests {
 		processed.add(str);
 	}
 
-	ItemKeyGenerator itemKeyGenerator = new ItemKeyGenerator() {
+	MethodArgumentsKeyGenerator methodArgumentsKeyGenerator = new MethodArgumentsKeyGenerator() {
 		@SuppressWarnings("unchecked")
-		public Object getKey(Object item) {
+		public Object getKey(Object[] item) {
 			if (item == null) {
 				return "NULL";
 			}
-			if (item.getClass().isArray()) {
-				item = ((Object[]) item)[0];
-			}
-			return ((Message<Object>) item).getPayload();
+			return ((Message<Object>) item[0]).getPayload();
 		}
 	};
 
@@ -266,7 +263,7 @@ public class PollableSourceRetryTests {
 		MessageTarget target = getChannel(handler);
 		// this was the old dispatch advice chain
 		target = (MessageTarget) getProxy(target, MessageTarget.class,
-				new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }, "send");
+				new Advice[] { getRetryOperationsInterceptor(methodArgumentsKeyGenerator) }, "send");
 		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
@@ -309,7 +306,7 @@ public class PollableSourceRetryTests {
 		MessageTarget target = getChannel(handler);
 		// this was the old dispatch advice chain
 		target = (MessageTarget) getProxy(target, MessageTarget.class,
-				new Advice[] { getRetryOperationsInterceptor(itemKeyGenerator) }, "send");
+				new Advice[] { getRetryOperationsInterceptor(methodArgumentsKeyGenerator) }, "send");
 		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 3);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
@@ -398,12 +395,12 @@ public class PollableSourceRetryTests {
 	}
 
 	/**
-	 * @param itemKeyGenerator
+	 * @param methodArgumentsKeyGenerator
 	 * @return
 	 */
-	private StatefulRetryOperationsInterceptor getRetryOperationsInterceptor(ItemKeyGenerator itemKeyGenerator) {
+	private StatefulRetryOperationsInterceptor getRetryOperationsInterceptor(MethodArgumentsKeyGenerator methodArgumentsKeyGenerator) {
 		StatefulRetryOperationsInterceptor advice = new StatefulRetryOperationsInterceptor();
-		advice.setRecoverer(new ItemRecoverer<Boolean, Object[]>() {
+		advice.setRecoverer(new MethodInvocationRecoverer<Boolean>() {
 			@SuppressWarnings("unchecked")
 			public Boolean recover(Object[] data, Throwable cause) {
 				if (data == null) {
@@ -415,7 +412,7 @@ public class PollableSourceRetryTests {
 				return true;
 			}
 		});
-		advice.setKeyGenerator(itemKeyGenerator);
+		advice.setKeyGenerator(methodArgumentsKeyGenerator);
 		return advice;
 	}
 

@@ -23,7 +23,6 @@ import static org.junit.Assert.fail;
 import java.util.Date;
 
 import javax.jms.Message;
-import javax.jms.Queue;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -106,84 +105,4 @@ public class JmsItemReaderTests {
 		EasyMock.verify(jmsTemplate);
 	}
 
-	@Test
-	public void testRecoverWithNoDestination() throws Exception {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
-		EasyMock.replay(jmsTemplate);
-
-		itemReader.setJmsTemplate(jmsTemplate);
-		itemReader.setItemType(String.class);
-		itemReader.recover("foo", null);
-
-		EasyMock.verify(jmsTemplate);
-	}
-
-	@Test
-	public void testErrorQueueWithDestinationName() throws Exception {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
-		jmsTemplate.convertAndSend("queue", "foo");
-		EasyMock.expectLastCall();
-		EasyMock.replay(jmsTemplate);
-
-		itemReader.setJmsTemplate(jmsTemplate);
-		itemReader.setItemType(String.class);
-		itemReader.setErrorDestinationName("queue");
-		itemReader.recover("foo", null);
-
-		EasyMock.verify(jmsTemplate);
-	}
-
-	@Test
-	public void testErrorQueueWithDestination() throws Exception {
-		JmsOperations jmsTemplate = EasyMock.createMock(JmsOperations.class);
-		Queue queue = EasyMock.createMock(Queue.class);
-		jmsTemplate.convertAndSend(queue, "foo");
-		EasyMock.expectLastCall();
-		EasyMock.replay(jmsTemplate, queue);
-
-		itemReader.setJmsTemplate(jmsTemplate);
-		itemReader.setItemType(String.class);
-		itemReader.setErrorDestination(queue);
-		itemReader.recover("foo", null);
-
-		EasyMock.verify(jmsTemplate, queue);
-	}
-
-	@Test
-	public void testGetKeyFromMessage() throws Exception {
-		Message message = EasyMock.createMock(Message.class);
-		EasyMock.expect(message.getJMSMessageID()).andReturn("foo");
-		EasyMock.replay(message);
-
-		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
-		itemReader.setItemType(Message.class);
-		assertEquals("foo", itemReader.getKey(message));
-
-		EasyMock.verify(message);
-	}
-
-	@Test
-	public void testGetKeyFromNonMessage() throws Exception {
-		itemReader.setItemType(String.class);
-		assertEquals("foo", itemReader.getKey("foo"));
-	}
-
-	@Test
-	public void testIsNewForMessage() throws Exception {
-		Message message = EasyMock.createMock(Message.class);
-		EasyMock.expect(message.getJMSRedelivered()).andReturn(true);
-		EasyMock.replay(message);
-
-		JmsItemReader<Message> itemReader = new JmsItemReader<Message>();
-		itemReader.setItemType(Message.class);
-		assertEquals(false, itemReader.isNew(message));
-		
-		EasyMock.verify(message);
-	}
-
-	@Test
-	public void testIsNewForNonMessage() throws Exception {
-		itemReader.setItemType(String.class);
-		assertEquals(false, itemReader.isNew("foo"));
-	}
 }

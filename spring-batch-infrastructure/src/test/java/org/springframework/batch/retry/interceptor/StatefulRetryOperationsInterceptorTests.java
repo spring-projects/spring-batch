@@ -27,7 +27,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.target.SingletonTargetSource;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.policy.AlwaysRetryPolicy;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
@@ -170,7 +169,7 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 			assertTrue("Wrong message: " + message, message.startsWith("Not enough calls"));
 		}
 		assertEquals(1, count);
-		interceptor.setRecoverer(new ItemRecoverer<Object, Object[]>() {
+		interceptor.setRecoverer(new MethodInvocationRecoverer<Object>() {
 			public Object recover(Object[] data, Throwable cause) {
 				count++;
 				return null;
@@ -192,7 +191,7 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 			assertTrue("Wrong message: " + message, message.startsWith("Not enough calls"));
 		}
 		assertEquals(1, count);
-		interceptor.setRecoverer(new ItemRecoverer<Collection<String>, Object[]>() {
+		interceptor.setRecoverer(new MethodInvocationRecoverer<Collection<String>>() {
 			public Collection<String> recover(Object[] data, Throwable cause) {
 				count++;
 				return Collections.singleton((String)data[0]);

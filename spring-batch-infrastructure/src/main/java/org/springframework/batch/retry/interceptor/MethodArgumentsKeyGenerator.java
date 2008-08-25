@@ -13,25 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.retry.interceptor;
 
-package org.springframework.batch.item;
+import org.springframework.batch.item.ItemReader;
 
 /**
- * Strategy interface to distinguish a new item from one that has been processed
- * before and one that has not, e.g. by examining a message flag.
+ * Extension of the {@link ItemReader} interface that allows items to be
+ * identified and tagged by a unique key.
  * 
  * @author Dave Syer
  * 
  */
-public interface NewItemIdentifier {
+public interface MethodArgumentsKeyGenerator {
 
 	/**
-	 * Inspect the item and determine if it has never been processed before.
-	 * The safest choice when the answer is indeterminate is 'false'.
+	 * Get a unique identifier for the item that can be used to cache it between
+	 * calls if necessary, and then identify it later.
 	 * 
 	 * @param item the current item.
-	 * @return true if the item is known to have never been processed before.
+	 * @return a unique identifier.
 	 */
-	boolean isNew(Object item);
+	Object getKey(Object[] item);
 
 }

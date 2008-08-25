@@ -20,9 +20,6 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.ItemKeyGenerator;
-import org.springframework.batch.item.ItemRecoverer;
-import org.springframework.batch.item.NewItemIdentifier;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
@@ -40,8 +37,8 @@ import org.springframework.util.ObjectUtils;
  * a method on a service if it fails. The argument to the service method is
  * treated as an item to be remembered in case the call fails. So the retry
  * operation is stateful, and the item that failed is tracked by its unique key
- * (via {@link ItemKeyGenerator}) until the retry is exhausted, at which point
- * the {@link ItemRecoverer} is called.<br/>
+ * (via {@link MethodArgumentsKeyGenerator}) until the retry is exhausted, at which point
+ * the {@link MethodInvocationRecoverer} is called.<br/>
  * 
  * The main use case for this is where the service is transactional, via a
  * transaction interceptor on the interceptor chain. In this case the retry (and
@@ -57,11 +54,11 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 	private transient Log logger = LogFactory.getLog(getClass());
 
-	private ItemKeyGenerator keyGenerator;
+	private MethodArgumentsKeyGenerator keyGenerator;
 
-	private ItemRecoverer<? extends Object,Object[]> recoverer;
+	private MethodInvocationRecoverer<? extends Object> recoverer;
 
-	private NewItemIdentifier newItemIdentifier;
+	private NewMethodArgumentsIdentifier newMethodArgumentsIdentifier;
 
 	private final RetryTemplate retryTemplate = new RetryTemplate();
 
@@ -74,7 +71,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Public setter for the {@link ItemRecoverer} to use if the retry is
+	 * Public setter for the {@link MethodInvocationRecoverer} to use if the retry is
 	 * exhausted. The recoverer should be able to return an object of the same
 	 * type as the target object because its return value will be used to return
 	 * to the caller in the case of a recovery.<br/>
@@ -82,13 +79,13 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 * If no recoverer is set then an exhausted retry will result in an
 	 * {@link ExhaustedRetryException}.
 	 * 
-	 * @param recoverer the {@link ItemRecoverer} to set
+	 * @param recoverer the {@link MethodInvocationRecoverer} to set
 	 */
-	public void setRecoverer(ItemRecoverer<? extends Object,Object[]> recoverer) {
+	public void setRecoverer(MethodInvocationRecoverer<? extends Object> recoverer) {
 		this.recoverer = recoverer;
 	}
 
-	public void setKeyGenerator(ItemKeyGenerator keyGenerator) {
+	public void setKeyGenerator(MethodArgumentsKeyGenerator keyGenerator) {
 		this.keyGenerator = keyGenerator;
 	}
 
@@ -103,29 +100,29 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	}
 
 	/**
-	 * Public setter for the {@link NewItemIdentifier}. Only set this if the
+	 * Public setter for the {@link NewMethodArgumentsIdentifier}. Only set this if the
 	 * arguments to the intercepted method can be inspected to find out if they
 	 * have never been processed before.
-	 * @param newItemIdentifier the {@link NewItemIdentifier} to set
+	 * @param newMethodArgumentsIdentifier the {@link NewMethodArgumentsIdentifier} to set
 	 */
-	public void setNewItemIdentifier(NewItemIdentifier newItemIdentifier) {
-		this.newItemIdentifier = newItemIdentifier;
+	public void setNewItemIdentifier(NewMethodArgumentsIdentifier newMethodArgumentsIdentifier) {
+		this.newMethodArgumentsIdentifier = newMethodArgumentsIdentifier;
 	}
 
 	/**
 	 * Wrap the method invocation in a stateful retry with the policy and other
 	 * helpers provided. If there is a failure the exception will generally be
 	 * re-thrown. The only time it is not re-thrown is when retry is exhausted
-	 * and the recovery path is taken (though the {@link ItemRecoverer} provided
+	 * and the recovery path is taken (though the {@link MethodInvocationRecoverer} provided
 	 * if there is one). In that case the value returned from the method
 	 * invocation will be the value returned by the recoverer (so the return
 	 * type for that should be the same as the intercepted method).
 	 * 
 	 * @see org.aopalliance.intercept.MethodInterceptor#invoke(org.aopalliance.intercept.MethodInvocation)
-	 * @see ItemRecoverer#recover(Object, Throwable)
+	 * @see MethodInvocationRecoverer#recover(Object[], Throwable)
 	 * 
 	 * @throws ExhaustedRetryException if the retry is exhausted and no
-	 * {@link ItemRecoverer} is provided.
+	 * {@link MethodInvocationRecoverer} is provided.
 	 */
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
@@ -141,7 +138,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 		}
 		final Object item = arg;
 
-		RetryState retryState = new RetryState(keyGenerator != null ? keyGenerator.getKey(item) : item, newItemIdentifier != null ? newItemIdentifier.isNew(item) : false );
+		RetryState retryState = new RetryState(keyGenerator != null ? keyGenerator.getKey(args) : item, newMethodArgumentsIdentifier != null ? newMethodArgumentsIdentifier.isNew(args) : false );
 
 		Object result = retryTemplate.execute(new MethodInvocationRetryCallback(invocation), new ItemRecovererCallback(args, recoverer), retryState);
 
@@ -192,12 +189,12 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 		private final Object[] args;
 
-		private final ItemRecoverer<? extends Object,Object[]> recoverer;
+		private final MethodInvocationRecoverer<? extends Object> recoverer;
 
 		/**
 		 * @param args the item that failed.
 		 */
-		private ItemRecovererCallback(Object[] args, ItemRecoverer<? extends Object,Object[]> recoverer) {
+		private ItemRecovererCallback(Object[] args, MethodInvocationRecoverer<? extends Object> recoverer) {
 			this.args = args;
 			this.recoverer = recoverer;
 		}

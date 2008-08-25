@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item;
-
+package org.springframework.batch.retry.interceptor;
 
 /**
- * Strategy interface for recovery action when processing of an item fails.<br/>
+ * Strategy interface to distinguish new arguments from ones that have been
+ * processed before, e.g. by examining a message flag.
  * 
  * @author Dave Syer
+ * 
  */
-public interface ItemRecoverer<T,S> {
+public interface NewMethodArgumentsIdentifier {
 
 	/**
-	 * Recover gracefully from an error. Clients can call this if processing of
-	 * the item throws an unexpected exception. Caller can use the return value
-	 * to decide whether to try more corrective action or perhaps throw an
-	 * exception.
+	 * Inspect the arguments and determine if they have never been processed
+	 * before. The safest choice when the answer is indeterminate is 'false'.
 	 * 
-	 * @param data
-	 *            the item that failed.
-	 * @param cause
-	 *            the cause of the failure that led to this recovery.
-	 * @return the value to be returned to the caller
+	 * @param args the current method arguments.
+	 * @return true if the item is known to have never been processed before.
 	 */
-	T recover(S data, Throwable cause);
+	boolean isNew(Object[] args);
+
 }

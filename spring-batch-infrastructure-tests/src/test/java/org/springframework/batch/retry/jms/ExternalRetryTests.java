@@ -29,7 +29,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
@@ -55,7 +54,7 @@ public class ExternalRetryTests {
 
 	private RetryTemplate retryTemplate;
 
-	private ItemReaderRecoverer<String> provider;
+	private ItemReader<String> provider;
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
@@ -72,16 +71,11 @@ public class ExternalRetryTests {
 		getMessages(); // drain queue
 		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
-		provider = new ItemReaderRecoverer<String>() {
+		provider = new ItemReader<String>() {
 			public String read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
-			}
-
-			public String recover(String data, Throwable cause) {
-				recovered.add(data);
-				return data;
 			}
 		};
 		retryTemplate = new RetryTemplate();
@@ -196,7 +190,8 @@ public class ExternalRetryTests {
 
 		final RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
 			public String recover(RetryContext context) {
-				return provider.recover(item, context.getLastThrowable());
+				recovered.add(item);
+				return item;
 			}
 		};
 
@@ -252,10 +247,6 @@ public class ExternalRetryTests {
 				msgs.add(next);
 		}
 		return msgs;
-	}
-
-	private interface ItemReaderRecoverer<T> extends ItemReader<T>, ItemRecoverer<T,T> {
-
 	}
 
 }

@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemRecoverer;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -63,7 +62,7 @@ public class ExternalRetryInBatchTests {
 	@Autowired
 	private RepeatTemplate repeatTemplate;
 
-	private ItemReaderRecoverer provider;
+	private ItemReader<String> provider;
 
 	private SimpleJdbcTemplate jdbcTemplate;
 
@@ -81,16 +80,11 @@ public class ExternalRetryInBatchTests {
 		jdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		provider = new ItemReaderRecoverer() {
+		provider = new ItemReader<String>() {
 			public String read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
-			}
-
-			public String recover(String data, Throwable cause) {
-				recovered.add(data);
-				return data;
 			}
 		};
 		retryTemplate = new RetryTemplate();
@@ -109,7 +103,7 @@ public class ExternalRetryInBatchTests {
 
 	private List<String> list = new ArrayList<String>();
 
-	private List<Object> recovered = new ArrayList<Object>();
+	private List<String> recovered = new ArrayList<String>();
 
 	@Test
 	public void testExternalRetryRecoveryInBatch() throws Exception {
@@ -153,7 +147,8 @@ public class ExternalRetryInBatchTests {
 										public String recover(RetryContext context) {
 											// aggressive commit on a recovery
 											RepeatSynchronizationManager.setCompleteOnly();
-											return provider.recover(item, context.getLastThrowable());
+											recovered.add(item);
+											return item;
 										}
 									};
 
@@ -212,7 +207,4 @@ public class ExternalRetryInBatchTests {
 		return msgs;
 	}
 
-	private interface ItemReaderRecoverer extends ItemReader<String>, ItemRecoverer<String,String> {
-
-	}
 }
