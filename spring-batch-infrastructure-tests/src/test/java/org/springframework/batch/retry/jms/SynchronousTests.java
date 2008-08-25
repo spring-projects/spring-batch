@@ -33,7 +33,6 @@ import org.springframework.batch.item.jms.JmsItemReader;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -196,9 +195,9 @@ public class SynchronousTests {
 				});
 
 			}
-		}, new RetryState(item));
+		});
 
-		// Verify the state after stransactional processing is complete
+		// Verify the state after transactional processing is complete
 
 		List<String> msgs = getMessages();
 
