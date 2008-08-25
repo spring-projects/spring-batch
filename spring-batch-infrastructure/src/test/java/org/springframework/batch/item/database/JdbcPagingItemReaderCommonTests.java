@@ -6,6 +6,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -24,10 +25,12 @@ public class JdbcPagingItemReaderCommonTests extends CommonItemStreamItemReaderT
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		JdbcPagingItemReader<Foo> reader = new JdbcPagingItemReader<Foo>();
-		reader.setSelectClause("select ID, NAME, VALUE");
-		reader.setFromClause("from T_FOOS");
-		reader.setSortKey("ID");
 		reader.setDataSource(dataSource);
+		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
+		queryProvider.setSelectClause("select ID, NAME, VALUE");
+		queryProvider.setFromClause("from T_FOOS");
+		queryProvider.setSortKey("ID");
+		reader.setQueryProvider(queryProvider);
 		reader.setParameterizedRowMapper(
 				new ParameterizedRowMapper<Foo>() {
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
@@ -49,10 +52,13 @@ public class JdbcPagingItemReaderCommonTests extends CommonItemStreamItemReaderT
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		JdbcPagingItemReader<Foo> reader = (JdbcPagingItemReader<Foo>) tested;
 		reader.close(new ExecutionContext());
-		reader.setSelectClause("select ID, NAME, VALUE");
-		reader.setFromClause("from T_FOOS");
-		reader.setWhereClause("where id = -1");
 		reader.setDataSource(dataSource);
+		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
+		queryProvider.setSelectClause("select ID, NAME, VALUE");
+		queryProvider.setFromClause("from T_FOOS");
+		queryProvider.setWhereClause("where ID = -1");
+		queryProvider.setSortKey("ID");
+		reader.setQueryProvider(queryProvider);
 		reader.setPageSize(3);
 		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());

@@ -5,6 +5,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import java.sql.ResultSet;
@@ -22,10 +23,12 @@ public class JdbcPagingItemReaderIntegrationTests extends AbstractDataSourceItem
 	protected ItemReader<Foo> createItemReader() throws Exception {
 
 		JdbcPagingItemReader<Foo> inputSource = new JdbcPagingItemReader<Foo>();
-		inputSource.setSelectClause("select ID, NAME, VALUE");
-		inputSource.setFromClause("from T_FOOS");
-		inputSource.setSortKey("ID");
 		inputSource.setDataSource(dataSource);
+		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
+		queryProvider.setSelectClause("select ID, NAME, VALUE");
+		queryProvider.setFromClause("from T_FOOS");
+		queryProvider.setSortKey("ID");
+		inputSource.setQueryProvider(queryProvider);
 		inputSource.setParameterizedRowMapper(
 				new ParameterizedRowMapper<Foo>() {
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {

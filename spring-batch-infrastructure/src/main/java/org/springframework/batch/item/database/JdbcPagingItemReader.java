@@ -1,6 +1,22 @@
+/*
+ * Copyright 2006-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.support.AbstractItemReaderItemStream;
+import org.springframework.batch.item.database.support.PagingQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.Assert;
@@ -9,9 +25,6 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.jdbc.support.MetaDataAccessException;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,12 +38,13 @@ import java.sql.SQLException;
  * {@link org.springframework.batch.item.ItemReader} for reading database records using JDBC in a paging
  * fashion.
  *
- * It executes the SQL built from values specified for {@link #setSelectClause(String)} (String)},
- * {@link #setFromClause(String)} (String)} and {@link #setWhereClause(String)} (String)} to retrieve requested data.
- * The query is executed using paged requests of a size specified in {@link #setPageSize(int)}.  Additional pages
- * are requested when needed as {@link #read()} method is called, returning an object corresponding to current position.
+ * It executes the SQL built by the {@link PagingQueryProvider} to retrieve requested data.
+ * The query is executed using paged requests of a size specified in {@link #setPageSize(int)}.
+ * Additional pages are requested when needed as {@link #read()} method is called, returning an
+ * object corresponding to current position.
  *
- * The performance of the paging depends on the database specific features available to limit the number of returned rows.
+ * The performance of the paging depends on the database specific features available to limit the number
+ * of returned rows.
  *
  * Setting a fairly large page size and using a commit interval that matches the page size should provide
  * better performance.
@@ -46,21 +60,11 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 
 	private DataSource dataSource;
 
+	private PagingQueryProvider queryProvider;
+
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	private ParameterizedRowMapper<T> parameterizedRowMapper;
-
-	private String databaseProductName;
-
-	private String selectClause;
-
-	private String fromClause;
-
-	private String whereClause;
-
-	private String sortKey;
-
-	private String orderClause;
 
 	private String firstPageSql;
 
@@ -86,53 +90,8 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 		this.dataSource = dataSource;
 	}
 
-	/**
-	 * @param selectClause SELECT clause part of SQL query string
-	 */
-	public void setSelectClause(String selectClause) {
-		String keyWord = "select ";
-		String temp = selectClause.trim();
-		if (temp.toLowerCase().startsWith(keyWord) && temp.length() > keyWord.length()) {
-			this.selectClause = temp.substring(keyWord.length());
-		}
-		else {
-			this.selectClause = temp;
-		}
-	}
-
-	/**
-	 * @param fromClause FROM clause part of SQL query string
-	 */
-	public void setFromClause(String fromClause) {
-		String keyWord = "from ";
-		String temp = fromClause.trim();
-		if (temp.toLowerCase().startsWith(keyWord) && temp.length() > keyWord.length()) {
-			this.fromClause = temp.substring(keyWord.length());
-		}
-		else {
-			this.fromClause = temp;
-		}
-	}
-
-	/**
-	 * @param whereClause WHERE clause part of SQL query string
-	 */
-	public void setWhereClause(String whereClause) {
-		String keyWord = "where ";
-		String temp = whereClause.trim();
-		if (temp.toLowerCase().startsWith(keyWord) && temp.length() > keyWord.length()) {
-			this.whereClause = temp.substring(keyWord.length());
-		}
-		else {
-			this.whereClause = temp;
-		}
-	}
-
-	/**
-	 * @param sortKey key to use to sort and limit page content
-	 */
-	public void setSortKey(String sortKey) {
-		this.sortKey = sortKey;
+	public void setQueryProvider(PagingQueryProvider queryProvider) {
+		this.queryProvider = queryProvider;
 	}
 
 	/**
@@ -159,58 +118,14 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource);
-		Assert.hasLength(selectClause, "selectClause must be specified");
-		Assert.hasLength(fromClause, "fromClause must be specified");
-		Assert.hasLength(sortKey, "sortKey must be specified");
 		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.setMaxRows(pageSize);
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(jdbcTemplate);
-		initializeSqlStatements();
+		Assert.notNull(queryProvider);
+		this.firstPageSql = queryProvider.generateFirstPageQuery(pageSize);
+		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(pageSize);
 	}
-
-	private void initializeSqlStatements() throws MetaDataAccessException {
-		this.databaseProductName = JdbcUtils.commonDatabaseName(
-				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString());
-		String topClause = "";
-		String limitCondition = "";
-		String limitClause = "";
-		if ("DB2".equals(databaseProductName)) {
-			limitClause = " FETCH FIRST " + pageSize + " ROWS ONLY";
-		}
-		else if ("Oracle".equals(databaseProductName)) {
-			limitCondition = "ROWNUM <= " + pageSize;
-		}
-		else if ("MySQL".equals(databaseProductName) || "PostgreSQL".equals(databaseProductName)) {
-			limitClause = " LIMIT " + pageSize;
-		}
-		else if ("Microsoft SQL Server".equals(databaseProductName) || "Sybase".equals(databaseProductName) ||
-				"HSQL Database Engine".equals(databaseProductName)) {
-			topClause = "TOP " + pageSize + " ";
-		}
-		else if ("Apache Derby".equals(databaseProductName)) {
-			String version = JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseVersion").toString();
-			if ("10.4.1.3".compareTo(version) > 0) {
-				throw new InvalidDataAccessResourceUsageException(databaseProductName + " version " + version + " is not supported");
-			}
-			// Derby doesn't support TOP or LIMIT -- maxRows will limit the rows retrieved
-		}
-		else {
-			throw new InvalidDataAccessResourceUsageException(databaseProductName + " is not a supported database");
-		}
-		this.orderClause = " ORDER BY SORT_KEY";
-		this.firstPageSql = "SELECT " + topClause + selectClause + ", " + sortKey + " AS SORT_KEY" +
-				" FROM " + fromClause +
-				(whereClause == null ? "" : " WHERE " + whereClause) +
-				(limitCondition.length() == 0 ? "" : (whereClause == null ? " WHERE " : " AND ") + limitCondition) + 
-				orderClause + limitClause;
-		this.remainingPagesSql = "SELECT " + topClause + selectClause + ", " + sortKey + " AS SORT_KEY" +
-				" FROM " + fromClause + " WHERE " + sortKey + " > ?" +
-				(whereClause == null ? "" : " AND " + whereClause) +
-				(limitCondition.length() == 0 ? "" : " AND " + limitCondition) + 
-				orderClause + limitClause;
-	}
-
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -289,35 +204,13 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 		page = itemIndex / pageSize;
 		current = itemIndex % pageSize;
 
-		int offset = (page * pageSize) - 1;
-		int lastRowNum = (page * pageSize);
-
 		logger.debug("Jumping to page " + page + " and index " + current);
 
 		if (page > 0) {
 
-			String windowClause = "";
-			String topClause = "";
-			String limitClause = "";
-			if ("DB2".equals(databaseProductName) || "Oracle".equals(databaseProductName) ||
-					"Microsoft SQL Server".equals(databaseProductName) || "Sybase".equals(databaseProductName) ||
-					"Apache Derby".equals(databaseProductName)) {
-				windowClause = "ROW_NUMBER() OVER (ORDER BY " + sortKey + " ASC) AS ROW_NUMBER";
-			}
-			else if ("HSQL Database Engine".equals(databaseProductName)) {
-				topClause = "LIMIT " + offset + " 1 ";
-			}
-			else if ("MySQL".equals(databaseProductName) || "PostgreSQL".equals(databaseProductName) ||
-					"HSQL Database Engine".equals(databaseProductName)) {
-				limitClause = " LIMIT 1 OFFSET " + offset;
-			}
+			String jumpToItemSql;
 
-			String jumpToItemSql =
-					(windowClause.length() > 0 ? "SELECT * FROM ( " : "") +
-					"SELECT " + (topClause.length() > 0 ? topClause : "") + sortKey + " AS SORT_KEY" +
-					(windowClause.length() > 0 ? ", " + windowClause : "") +
-					" FROM " + fromClause + (whereClause == null ? "" : " WHERE " + whereClause) +
-					(windowClause.length() > 0 ? ") WHERE ROW_NUMBER = " + lastRowNum : orderClause + limitClause);
+			jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, pageSize);
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for jumping: [" + jumpToItemSql + "]");

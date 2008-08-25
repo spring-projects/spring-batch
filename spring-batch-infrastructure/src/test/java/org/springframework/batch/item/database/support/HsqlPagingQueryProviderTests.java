@@ -15,38 +15,37 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-import org.junit.Before;
+import org.junit.Assert;
 
 /**
  * @author Thomas Risberg
  */
-public class SqlWindowingPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
+public class HsqlPagingQueryProviderTests extends AbstractSqlPagingQueryProviderTests {
 
-	public SqlWindowingPagingQueryProviderTests() {
-		pagingQueryProvider = new SqlWindowingPagingQueryProvider();
+	public HsqlPagingQueryProviderTests() {
+		pagingQueryProvider = new HsqlPagingQueryProvider();
 	}
 
-	@Test @Override
+	@Test
+	@Override
 	public void testGenerateFirstPageQuery() {
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER <= 100";
+		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
-		assertEquals("", sql, s);
+		Assert.assertEquals("", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE id > ? AND bar = 1) WHERE ROW_NUMBER <= 100";
+		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE id > ? AND bar = 1";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
-		assertEquals("", sql, s);
+		Assert.assertEquals("", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 100";
+		String sql = "SELECT LIMIT 99 1 id AS SORT_KEY FROM foo WHERE bar = 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
-		assertEquals("", sql, s);
+		Assert.assertEquals("", sql, s);
 	}
 }
