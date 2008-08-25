@@ -98,9 +98,6 @@ public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 	public boolean canRetry(RetryContext context) {
 		SimpleRetryContext simpleContext = ((SimpleRetryContext) context);
 		Throwable t = simpleContext.getLastThrowable();
-		// N.B. since the contract is defined to include the initial attempt
-		// in the count, we have to subtract one from the max attempts in this
-		// test
 		return (t == null || retryForException(t)) && simpleContext.getRetryCount() < maxAttempts;
 	}
 

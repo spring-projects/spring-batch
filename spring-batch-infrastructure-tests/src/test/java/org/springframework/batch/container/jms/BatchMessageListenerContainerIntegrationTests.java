@@ -30,9 +30,8 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
-import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -119,23 +118,23 @@ public class BatchMessageListenerContainerIntegrationTests {
 	@Test
 	public void testFailureAndRecovery() throws Exception {
 		final RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(new NeverRetryPolicy()));
+		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		container.setMessageListener(new MessageListener() {
 			public void onMessage(final Message msg) {
 				try {
-					RecoveryRetryCallback callback = new RecoveryRetryCallback(msg, new RetryCallback() {
+					RetryCallback callback = new RetryCallback() {
 						public Object doWithRetry(RetryContext context) throws Exception {
 							count++;
 							throw new RuntimeException("planned failure: " + msg);
 						}
-					}, msg.getJMSMessageID());
-					callback.setRecoveryCallback(new RecoveryCallback() {
+					};
+					RecoveryCallback recoveryCallback = new RecoveryCallback() {
 						public Object recover(RetryContext context) {
 							recovered++;
 							return msg;
 						}
-					});
-					retryTemplate.execute(callback);
+					};
+					retryTemplate.execute(callback, recoveryCallback, new RetryState(msg.getJMSMessageID()));
 				}
 				catch (Exception e) {
 					throw (RuntimeException) e;

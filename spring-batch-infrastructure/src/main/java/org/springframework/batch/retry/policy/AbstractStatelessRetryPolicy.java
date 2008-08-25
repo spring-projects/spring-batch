@@ -26,9 +26,10 @@ import org.springframework.batch.retry.RetryPolicy;
  * state outside the context.
  * 
  * @see RetryPolicy#handleRetryExhausted(RetryContext)
- * @see AbstractStatefulRetryPolicy
  * 
  * @author Dave Syer
+ * 
+ * @deprecated TODO: remove this base class
  * 
  */
 public abstract class AbstractStatelessRetryPolicy implements RetryPolicy {

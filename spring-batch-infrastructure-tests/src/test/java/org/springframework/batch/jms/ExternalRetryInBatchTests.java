@@ -38,8 +38,7 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.RecoveryRetryCallback;
-import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,7 +115,7 @@ public class ExternalRetryInBatchTests {
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(new SimpleRetryPolicy(1)));
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
 
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
@@ -138,7 +137,7 @@ public class ExternalRetryInBatchTests {
 										return ExitStatus.FINISHED;
 									}
 									
-									RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+									RetryCallback callback = new RetryCallback() {
 										public Object doWithRetry(RetryContext context) throws Exception {
 											// No need for transaction here: the whole batch will roll
 											// back. When it comes back for recovery this code is not
@@ -148,17 +147,17 @@ public class ExternalRetryInBatchTests {
 													list.size(), item);
 											throw new RuntimeException("Rollback!");
 										}
-									});
+									};
 									
-									callback.setRecoveryCallback(new RecoveryCallback() {
+									RecoveryCallback recoveryCallback = new RecoveryCallback() {
 										public Object recover(RetryContext context) {
 											// aggressive commit on a recovery
 											RepeatSynchronizationManager.setCompleteOnly();
 											return provider.recover(item, context.getLastThrowable());
 										}
-									});
+									};
 
-									retryTemplate.execute(callback);
+									retryTemplate.execute(callback, recoveryCallback, new RetryState(item));
 									
 									return ExitStatus.CONTINUABLE;
 

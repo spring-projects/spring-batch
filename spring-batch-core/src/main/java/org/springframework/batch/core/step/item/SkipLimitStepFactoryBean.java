@@ -13,7 +13,6 @@ import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
-import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -26,12 +25,11 @@ import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
-import org.springframework.batch.retry.callback.RecoveryRetryCallback;
 import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
-import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
@@ -68,8 +66,6 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		fatalExceptionClasses.add(Error.class);
 		skippableExceptionClasses.add(Exception.class);
 	}
-
-	private ItemKeyGenerator itemKeyGenerator;
 
 	private int cacheCapacity = 0;
 
@@ -194,17 +190,6 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 	}
 
 	/**
-	 * Public setter for the {@link ItemKeyGenerator}. This is used to identify
-	 * failed items so they can be skipped if encountered again, generally in
-	 * another transaction.
-	 * 
-	 * @param itemKeyGenerator the {@link ItemKeyGenerator} to set.
-	 */
-	public void setItemKeyGenerator(ItemKeyGenerator itemKeyGenerator) {
-		this.itemKeyGenerator = itemKeyGenerator;
-	}
-
-	/**
 	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and
 	 * and exception handler.
 	 */
@@ -242,6 +227,11 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				retryPolicy = classifierRetryPolicy;
 
 			}
+			RetryTemplate retryTemplate = new RetryTemplate();
+			if (backOffPolicy != null) {
+				retryTemplate.setBackOffPolicy(backOffPolicy);
+			}
+			retryTemplate.setRetryPolicy(retryPolicy);
 
 			// Co-ordinate the retry policy with the exception handler:
 			RepeatOperations stepOperations = getStepOperations();
@@ -250,28 +240,17 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 						getExceptionHandler(), fatalExceptionClasses));
 			}
 
-			RecoveryCallbackRetryPolicy recoveryCallbackRetryPolicy = new RecoveryCallbackRetryPolicy(retryPolicy) {
-				protected boolean recoverForException(Throwable ex) {
-					return !getTransactionAttribute().rollbackOn(ex);
-				}
-			};
-
 			if (retryContextCache == null) {
 				if (cacheCapacity > 0) {
-					recoveryCallbackRetryPolicy.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
+					retryTemplate.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
 				}
 			}
 			else {
-				recoveryCallbackRetryPolicy.setRetryContextCache(retryContextCache);
+				retryTemplate.setRetryContextCache(retryContextCache);
 			}
 
-			RetryTemplate retryTemplate = new RetryTemplate();
 			if (retryListeners != null) {
 				retryTemplate.setListeners(retryListeners);
-			}
-			retryTemplate.setRetryPolicy(recoveryCallbackRetryPolicy);
-			if (retryPolicy == null && backOffPolicy != null) {
-				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 
 			List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>(
@@ -282,8 +261,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
 			StatefulRetryStepHandler<T, S> itemHandler = new StatefulRetryStepHandler<T, S>(getItemReader(),
-					getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate, itemKeyGenerator,
-					readSkipPolicy, writeSkipPolicy);
+					getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate, readSkipPolicy,
+					writeSkipPolicy);
 			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
 
 			step.setStepHandler(itemHandler);
@@ -320,8 +299,6 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 		final private RetryOperations retryOperations;
 
-		final private ItemKeyGenerator itemKeyGenerator;
-
 		final private CompositeSkipListener listener = new CompositeSkipListener();
 
 		final private ItemSkipPolicy readSkipPolicy;
@@ -332,15 +309,13 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * @param itemReader
 		 * @param itemWriter
 		 * @param retryTemplate
-		 * @param itemKeyGenerator
 		 */
 		public StatefulRetryStepHandler(ItemReader<? extends T> itemReader,
 				ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
-				RepeatOperations chunkOperations, RetryOperations retryTemplate, ItemKeyGenerator itemKeyGenerator,
-				ItemSkipPolicy readSkipPolicy, ItemSkipPolicy writeSkipPolicy) {
+				RepeatOperations chunkOperations, RetryOperations retryTemplate, ItemSkipPolicy readSkipPolicy,
+				ItemSkipPolicy writeSkipPolicy) {
 			super(itemReader, itemProcessor, itemWriter, chunkOperations);
 			this.retryOperations = retryTemplate;
-			this.itemKeyGenerator = itemKeyGenerator;
 			this.readSkipPolicy = readSkipPolicy;
 			this.writeSkipPolicy = writeSkipPolicy;
 		}
@@ -457,14 +432,16 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 */
 		private void retryChunk(final Chunk<S> chunk, final StepContribution contribution) throws Exception {
 
-			RecoveryRetryCallback retryCallback = new RecoveryRetryCallback(chunk, new RetryCallback() {
+			RetryCallback retryCallback = new RetryCallback() {
 				public Object doWithRetry(RetryContext context) throws Exception {
 					doWrite(chunk.getItems());
+					// TODO: if there is an exception marked as no rollback it
+					// should get treated as stateless
 					return null;
 				}
-			}, chunk);
+			};
 
-			retryCallback.setRecoveryCallback(new RecoveryCallback() {
+			RecoveryCallback recoveryCallback = new RecoveryCallback() {
 
 				public Object recover(RetryContext context) throws Exception {
 
@@ -490,10 +467,10 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					}
 
 				}
-			});
+			};
 
 			try {
-				retryOperations.execute(retryCallback);
+				retryOperations.execute(retryCallback, recoveryCallback, new RetryState(chunk));
 			}
 			catch (Exception e) {
 				// only if the retry failed do we re-arrange the chunk

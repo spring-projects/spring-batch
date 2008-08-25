@@ -23,9 +23,10 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 
 /**
@@ -38,38 +39,34 @@ public class StatefulRetryIntegrationTests {
 	public void testExternalRetryWithFailAndNoRetry() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 
-		RecoveryRetryCallback recoveryCallback = new RecoveryRetryCallback("foo", callback);
+		RetryState retryState = new RetryState("foo");
 
 		RetryTemplate retryTemplate = new RetryTemplate();
-		RecoveryCallbackRetryPolicy retryPolicy = new RecoveryCallbackRetryPolicy(new SimpleRetryPolicy(1));
 		MapRetryContextCache cache = new MapRetryContextCache();
-		retryPolicy.setRetryContextCache(cache);
-		retryTemplate.setRetryPolicy(retryPolicy);
+		retryTemplate.setRetryContextCache(cache);
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
 
 		assertFalse(cache.containsKey("foo"));
 
-		Object result = "start_foo";
 		try {
-			result = retryTemplate.execute(recoveryCallback);
+			retryTemplate.execute(callback, retryState);
 			// The first failed attempt we expect to retry...
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
-			assertNull(e.getMessage());
+			assertEquals(null, e.getMessage());
 		}
 
 		assertTrue(cache.containsKey("foo"));
 
 		try {
-			result = retryTemplate.execute(recoveryCallback);
-			// We always get a second attempt...
+			retryTemplate.execute(callback, retryState);
+			// We don't get a second attempt...
+			fail("Expected ExhaustedRetryException");
 		}
-		catch (RuntimeException e) {
+		catch (ExhaustedRetryException e) {
 			// This is now the "exhausted" message:
 			assertNotNull(e.getMessage());
-			// But if template is external we should
-			// swallow the exception when retry is impossible.
-			fail("Did not expect RuntimeException: "+e);
 		}
 
 		assertFalse(cache.containsKey("foo"));
@@ -77,26 +74,24 @@ public class StatefulRetryIntegrationTests {
 		// Callback is called once: the recovery path should be called in
 		// handleRetryExhausted (so not in this test)...
 		assertEquals(1, callback.attempts);
-		assertEquals(null, result);
 	}
 
 	@Test
 	public void testExternalRetryWithSuccessOnRetry() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 
-		RecoveryRetryCallback recoveryCallback = new RecoveryRetryCallback("foo", callback);
+		RetryState retryState = new RetryState("foo");
 
 		RetryTemplate retryTemplate = new RetryTemplate();
-		RecoveryCallbackRetryPolicy retryPolicy = new RecoveryCallbackRetryPolicy(new SimpleRetryPolicy(2));
 		MapRetryContextCache cache = new MapRetryContextCache();
-		retryPolicy.setRetryContextCache(cache);
-		retryTemplate.setRetryPolicy(retryPolicy);
+		retryTemplate.setRetryContextCache(cache);
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2));
 
 		assertFalse(cache.containsKey("foo"));
 
 		Object result = "start_foo";
 		try {
-			result = retryTemplate.execute(recoveryCallback);
+			result = retryTemplate.execute(callback, retryState);
 			// The first failed attempt we expect to retry...
 			fail("Expected RuntimeException");
 		}
@@ -106,7 +101,7 @@ public class StatefulRetryIntegrationTests {
 
 		assertTrue(cache.containsKey("foo"));
 
-		result = retryTemplate.execute(recoveryCallback);
+		result = retryTemplate.execute(callback, retryState);
 
 		assertFalse(cache.containsKey("foo"));
 

@@ -16,35 +16,38 @@
 
 package org.springframework.batch.retry.jms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sql.DataSource;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.jms.JmsItemReader;
 import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
-import org.springframework.transaction.TransactionStatus;
+import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.junit.runner.RunWith;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.sql.DataSource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -172,7 +175,7 @@ public class SynchronousTests {
 
 		final Object item = provider.read();
 
-		retryTemplate.execute(new RecoveryRetryCallback(item, new RetryCallback() {
+		retryTemplate.execute(new RetryCallback() {
 			public Object doWithRetry(RetryContext context) throws Exception {
 
 				TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
@@ -193,7 +196,7 @@ public class SynchronousTests {
 				});
 
 			}
-		}));
+		}, new RetryState(item));
 
 		// Verify the state after stransactional processing is complete
 

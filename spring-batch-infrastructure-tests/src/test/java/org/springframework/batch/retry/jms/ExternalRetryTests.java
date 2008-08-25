@@ -34,8 +34,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.callback.RecoveryRetryCallback;
-import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -106,8 +105,6 @@ public class ExternalRetryTests {
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
-
 		final ItemWriter<Object> writer = new ItemWriter<Object>() {
 			public void write(final List<? extends Object> texts) {
 
@@ -129,13 +126,13 @@ public class ExternalRetryTests {
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						final Object item = provider.read();
-						RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+						RetryCallback callback = new RetryCallback() {
 							public Object doWithRetry(RetryContext context) throws Exception {
 								writer.write(Collections.singletonList(item));
 								return null;
 							}
-						});
-						return retryTemplate.execute(callback);
+						};
+						return retryTemplate.execute(callback, new RetryState(item));
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e.getMessage(), e);
@@ -157,13 +154,13 @@ public class ExternalRetryTests {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
 					final Object item = provider.read();
-					RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+					RetryCallback callback = new RetryCallback() {
 						public Object doWithRetry(RetryContext context) throws Exception {
 							writer.write(Collections.singletonList(item));
 							return null;
 						}
-					});
-					return retryTemplate.execute(callback);
+					};
+					return retryTemplate.execute(callback, new RetryState(item));
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e.getMessage(), e);
@@ -189,21 +186,19 @@ public class ExternalRetryTests {
 
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
-
 		final Object item = provider.read();
-		final RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+		final RetryCallback callback = new RetryCallback() {
 			public Object doWithRetry(RetryContext context) throws Exception {
 				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
 				throw new RuntimeException("Rollback!");
 			}
-		});
+		};
 
-		callback.setRecoveryCallback(new RecoveryCallback() {
+		final RecoveryCallback recoveryCallback = new RecoveryCallback() {
 			public Object recover(RetryContext context) {
 				return provider.recover(item, context.getLastThrowable());
 			}
-		});
+		};
 
 		Object result = "start";
 
@@ -212,7 +207,7 @@ public class ExternalRetryTests {
 				result = new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 						try {
-							return retryTemplate.execute(callback);
+							return retryTemplate.execute(callback, recoveryCallback, new RetryState(item));
 						}
 						catch (Exception e) {
 							throw new RuntimeException(e.getMessage(), e);

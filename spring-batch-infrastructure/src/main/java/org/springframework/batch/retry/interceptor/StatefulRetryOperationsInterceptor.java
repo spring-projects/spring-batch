@@ -29,9 +29,8 @@ import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
-import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -71,7 +70,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 */
 	public StatefulRetryOperationsInterceptor() {
 		super();
-		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(new NeverRetryPolicy()));
+		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 	}
 
 	/**
@@ -100,7 +99,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 	 * @param retryPolicy the retryPolicy to set
 	 */
 	public void setRetryPolicy(RetryPolicy retryPolicy) {
-		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(retryPolicy));
+		retryTemplate.setRetryPolicy(retryPolicy);
 	}
 
 	/**
@@ -142,14 +141,9 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 		}
 		final Object item = arg;
 
-		RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new MethodInvocationRetryCallback(invocation),
-				keyGenerator != null ? keyGenerator.getKey(item) : item);
-		callback.setRecoveryCallback(new ItemRecovererCallback(item, recoverer));
-		if (newItemIdentifier != null) {
-			callback.setForceRefresh(newItemIdentifier.isNew(item));
-		}
+		RetryState retryState = new RetryState(keyGenerator != null ? keyGenerator.getKey(item) : item, newItemIdentifier != null ? newItemIdentifier.isNew(item) : false );
 
-		Object result = retryTemplate.execute(callback);
+		Object result = retryTemplate.execute(new MethodInvocationRetryCallback(invocation), new ItemRecovererCallback(item, recoverer), retryState);
 
 		logger.debug("Exiting proxied method in stateful retry with result: (" + result + ")");
 

@@ -38,7 +38,8 @@ public interface RetryOperations {
 
 	/**
 	 * Execute the supplied {@link RetryCallback} with a fallback on exhausted
-	 * retry to the {@link RecoveryCallback}. See implementations for configuration details.
+	 * retry to the {@link RecoveryCallback}. See implementations for
+	 * configuration details.
 	 * 
 	 * @return the value returned by the {@link RetryCallback} upon successful
 	 * invocation, and that returned by the {@link RecoveryCallback} otherwise.
@@ -46,5 +47,41 @@ public interface RetryOperations {
 	 * {@link RecoveryCallback} upon unsuccessful retry.
 	 */
 	Object execute(RetryCallback retryCallback, RecoveryCallback recoveryCallback) throws Exception;
+
+	/**
+	 * A simple stateful retry. Execute the supplied {@link RetryCallback} with
+	 * a target object for the attempt identified by the {@link RetryState}.
+	 * Exceptions thrown by the callback are always propagated immediately so
+	 * the state is required to be able to identify the previous attempt, if
+	 * there is one - hence the state is required. Normal patterns would see
+	 * this method being used inside a transaction, where the callback might
+	 * invalidate the transaction if it fails.<br/><br/>
+	 * 
+	 * See implementations for configuration details.
+	 * 
+	 * @return the value returned by the {@link RetryCallback} upon successful
+	 * invocation, and that returned by the {@link RecoveryCallback} otherwise.
+	 * @throws Exception any {@link Exception} raised by the
+	 * {@link RecoveryCallback}.
+	 * @throws ExhaustedRetryException if the last attempt for this state has
+	 * already been reached
+	 */
+	Object execute(RetryCallback retryCallback, RetryState retryState) throws Exception, ExhaustedRetryException;
+
+	/**
+	 * A stateful retry with a recovery path. Execute the supplied
+	 * {@link RetryCallback} with a fallback on exhausted retry to the
+	 * {@link RecoveryCallback} and a target object for the retry attempt
+	 * identified by the {@link RetryState}.
+	 * 
+	 * @see #execute(RetryCallback, RetryState)
+	 * 
+	 * @return the value returned by the {@link RetryCallback} upon successful
+	 * invocation, and that returned by the {@link RecoveryCallback} otherwise.
+	 * @throws Exception any {@link Exception} raised by the
+	 * {@link RecoveryCallback} upon unsuccessful retry.
+	 */
+	Object execute(RetryCallback retryCallback, RecoveryCallback recoveryCallback, RetryState retryState)
+			throws Exception;
 
 }
