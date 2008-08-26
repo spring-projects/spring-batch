@@ -43,9 +43,9 @@ public class NeverRetryPolicy implements RetryPolicy {
 	/**
 	 * Do nothing.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
 	 */
-	public void close(RetryContext context, boolean succeeded) {
+	public void close(RetryContext context) {
 		// no-op
 	}
 

@@ -30,7 +30,7 @@ public class TimeoutRetryPolicyTests extends TestCase {
 		assertTrue(policy.canRetry(context));
 		Thread.sleep(200);
 		assertFalse(policy.canRetry(context));
-		policy.close(context, true);
+		policy.close(context);
 	}
 
 	public void testRetryCount() throws Exception {

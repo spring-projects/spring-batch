@@ -79,11 +79,11 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 	/**
 	 * Delegate to the policy currently activated in the context.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
 	 */
-	public void close(RetryContext context, boolean succeeded) {
+	public void close(RetryContext context) {
 		RetryPolicy policy = (RetryPolicy) context;
-		policy.close(context, succeeded);
+		policy.close(context);
 	}
 
 	/**
@@ -136,10 +136,10 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 			return policy.canRetry(this.context);
 		}
 
-		public void close(RetryContext context, boolean succeeded) {
+		public void close(RetryContext context) {
 			// Only close those policies that have been used (opened):
 			for (RetryPolicy policy : contexts.keySet()) {
-				policy.close(getContext(policy), succeeded);
+				policy.close(getContext(policy));
 			}
 		}
 

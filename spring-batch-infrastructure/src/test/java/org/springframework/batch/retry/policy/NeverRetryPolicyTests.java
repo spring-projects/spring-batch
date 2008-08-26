@@ -31,7 +31,7 @@ public class NeverRetryPolicyTests extends TestCase {
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, null);
 		assertFalse(policy.canRetry(context));
-		policy.close(context, true);
+		policy.close(context);
 		assertFalse(policy.canRetry(context));
 	}
 

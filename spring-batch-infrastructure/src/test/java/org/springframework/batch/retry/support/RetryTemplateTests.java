@@ -16,11 +16,17 @@
 
 package org.springframework.batch.retry.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
+
 import java.util.HashSet;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.batch.retry.ExhaustedRetryException;
+import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.backoff.BackOffContext;
@@ -32,14 +38,15 @@ import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 
 /**
  * @author Rob Harrop
- * @since 2.1
+ * @author Dave Syer
  */
-public class RetryTemplateTests extends TestCase {
+public class RetryTemplateTests {
 
 	RetryContext context;
 
 	int count = 0;
 
+	@Test
 	public void testSuccessfulRetry() throws Exception {
 		for (int x = 1; x <= 10; x++) {
 			MockRetryCallback callback = new MockRetryCallback();
@@ -51,6 +58,23 @@ public class RetryTemplateTests extends TestCase {
 		}
 	}
 
+	@Test
+	public void testSuccessfulRecovery() throws Exception {
+		MockRetryCallback callback = new MockRetryCallback();
+		callback.setAttemptsBeforeSuccess(3);
+		RetryTemplate retryTemplate = new RetryTemplate();
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2));
+		final Object value = new Object();
+		Object result = retryTemplate.execute(callback, new RecoveryCallback<Object>() {
+			public Object recover(RetryContext context) throws Exception {
+				return value;
+			}
+		});
+		assertEquals(2, callback.attempts);
+		assertEquals(value, result);		
+	}
+
+	@Test
 	public void testAlwaysTryAtLeastOnce() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 		RetryTemplate retryTemplate = new RetryTemplate();
@@ -59,6 +83,7 @@ public class RetryTemplateTests extends TestCase {
 		assertEquals(1, callback.attempts);
 	}
 
+	@Test
 	public void testNoSuccessRetry() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 		// Something that won't be thrown by JUnit...
@@ -79,6 +104,7 @@ public class RetryTemplateTests extends TestCase {
 		fail("Expected IllegalArgumentException");
 	}
 
+	@Test
 	public void testDefaultConfigWithExceptionSubclass() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 		int attempts = 3;
@@ -91,6 +117,7 @@ public class RetryTemplateTests extends TestCase {
 		assertEquals(attempts, callback.attempts);
 	}
 
+	@Test
 	public void testSetExceptions() throws Exception {
 		RetryTemplate template = new RetryTemplate();
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
@@ -119,6 +146,7 @@ public class RetryTemplateTests extends TestCase {
 		assertEquals(attempts, callback.attempts);
 	}
 
+	@Test
 	public void testBackOffInvoked() throws Exception {
 		for (int x = 1; x <= 10; x++) {
 			MockRetryCallback callback = new MockRetryCallback();
@@ -134,6 +162,7 @@ public class RetryTemplateTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testEarlyTermination() throws Exception {
 		try {
 			RetryTemplate retryTemplate = new RetryTemplate();
@@ -152,6 +181,7 @@ public class RetryTemplateTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testNestedContexts() throws Exception {
 		RetryTemplate outer = new RetryTemplate();
 		final RetryTemplate inner = new RetryTemplate();
@@ -176,6 +206,7 @@ public class RetryTemplateTests extends TestCase {
 		assertEquals(2, count);
 	}
 
+	@Test
 	public void testRethrowError() throws Exception {
 		RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
@@ -192,6 +223,7 @@ public class RetryTemplateTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testBackOffInterrupted() throws Exception {
 		RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setBackOffPolicy(new StatelessBackOffPolicy() {
@@ -211,7 +243,7 @@ public class RetryTemplateTests extends TestCase {
 			assertEquals("foo", e.getMessage());
 		}
 	}
-
+	
 	private static class MockRetryCallback implements RetryCallback<Object> {
 
 		private int attempts;

@@ -29,7 +29,7 @@ public class AlwaysRetryPolicyTests extends TestCase {
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, null);
 		assertTrue(policy.canRetry(context));
-		policy.close(context, true);
+		policy.close(context);
 		assertTrue(policy.canRetry(context));
 	}
 

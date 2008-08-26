@@ -77,17 +77,17 @@ public class CompositeRetryPolicyTests extends TestCase {
 		final List<String> list = new ArrayList<String>();
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
 		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport() {
-			public void close(RetryContext context, boolean succeeded) {
+			public void close(RetryContext context) {
 				list.add("1");
 			}
 		}, new MockRetryPolicySupport() {
-			public void close(RetryContext context, boolean succeeded) {
+			public void close(RetryContext context) {
 				list.add("2");
 			}
 		} });
 		RetryContext context = policy.open(null);
 		assertNotNull(context);
-		policy.close(context, true);
+		policy.close(context);
 		assertEquals(2, list.size());
 	}
 
@@ -95,19 +95,19 @@ public class CompositeRetryPolicyTests extends TestCase {
 		final List<String> list = new ArrayList<String>();
 		CompositeRetryPolicy policy = new CompositeRetryPolicy();
 		policy.setPolicies(new RetryPolicy[] { new MockRetryPolicySupport() {
-			public void close(RetryContext context, boolean succeeded) {
+			public void close(RetryContext context) {
 				list.add("1");
 				throw new RuntimeException("Pah!");
 			}
 		}, new MockRetryPolicySupport() {
-			public void close(RetryContext context, boolean succeeded) {
+			public void close(RetryContext context) {
 				list.add("2");
 			}
 		} });
 		RetryContext context = policy.open(null);
 		assertNotNull(context);
 		try {
-			policy.close(context, true);
+			policy.close(context);
 			fail("Expected RuntimeException");
 		} catch (RuntimeException e) {
 			assertEquals("Pah!", e.getMessage());

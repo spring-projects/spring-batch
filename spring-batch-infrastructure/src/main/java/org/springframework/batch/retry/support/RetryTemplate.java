@@ -175,8 +175,8 @@ public class RetryTemplate implements RetryOperations {
 	 * @see org.springframework.batch.retry.RetryOperations#execute(RetryCallback,
 	 * RetryState)
 	 */
-	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback, RetryState retryState)
-			throws Exception, ExhaustedRetryException {
+	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback,
+			RetryState retryState) throws Exception, ExhaustedRetryException {
 		return doExecute(retryCallback, recoveryCallback, retryState);
 	}
 
@@ -282,6 +282,9 @@ public class RetryTemplate implements RetryOperations {
 	}
 
 	/**
+	 * Clean up the cache if necessary and close the context provided (if the
+	 * flag indicates that processing was successful).
+	 * 
 	 * @param context
 	 * @param state
 	 * @param succeeded
@@ -290,11 +293,11 @@ public class RetryTemplate implements RetryOperations {
 		if (state != null) {
 			if (succeeded) {
 				retryContextCache.remove(state.getKey());
-				retryPolicy.close(context, succeeded);
+				retryPolicy.close(context);
 			}
 		}
 		else {
-			retryPolicy.close(context, succeeded);
+			retryPolicy.close(context);
 		}
 	}
 
@@ -307,23 +310,23 @@ public class RetryTemplate implements RetryOperations {
 	protected void registerThrowable(RetryPolicy retryPolicy, RetryState state, RetryContext context, Exception e) {
 		if (state != null) {
 			Object key = state.getKey();
-			// TODO: this comparison assumes that hashCode is the limiting
-			// factor. Actually the cache should be able to decide for us.
-			// if (initialHashCode != key.hashCode()) {
-			// throw new RetryException(
-			// "Inconsistent state for failed item key: hashCode has changed. "
-			// +
-			// "Consider whether equals() or hashCode() for the item might be inconsistent, "
-			// + "or if you need to supply a better ItemKeyGenerator");
-			// }
+			if (context.getRetryCount() > 0 && !retryContextCache.containsKey(key)) {
+				throw new RetryException("Inconsistent state for failed item key: cache key has changed. "
+						+ "Consider whether equals() or hashCode() for the key might be inconsistent, "
+						+ "or if you need to supply a better key");
+			}
 			retryContextCache.put(key, context);
 		}
 		retryPolicy.registerThrowable(context, e);
 	}
 
 	/**
-	 * @param retryPolicy
-	 * @return a retry context
+	 * Delegate to the {@link RetryPolicy} having checked in the cache for an
+	 * existing value if the state is not null.
+	 * 
+	 * @param retryPolicy a {@link RetryPolicy} to delegate the context creation
+	 * @return a retry context, either a new one or the one used last time the
+	 * same state was encountered
 	 */
 	protected RetryContext open(RetryPolicy retryPolicy, RetryState state) {
 
@@ -364,17 +367,22 @@ public class RetryTemplate implements RetryOperations {
 	}
 
 	/**
+	 * Actions to take after final attempt has failed. If there is state clean
+	 * up the cache. If there is a recovery callback, execute that and return
+	 * its result. Otherwise throw an exception.
+	 * 
 	 * @param recoveryCallback the callback for recovery (might be null)
 	 * @param context the current retry context
-	 * @throws Exception if the callback does, and if there is no callback then
-	 * definitely the last exception from the context
+	 * @throws Exception if the callback does, and if there is no callback and
+	 * the state is null then the last exception from the context
+	 * @throws ExhaustedRetryException if the state is not null and there is no
+	 * recovery callback
 	 */
 	protected <T> T handleRetryExhausted(RecoveryCallback<T> recoveryCallback, RetryContext context, RetryState state)
 			throws Exception {
 		if (state != null) {
 			retryContextCache.remove(state.getKey());
 		}
-		// TODO: test this when state==null
 		if (recoveryCallback != null) {
 			return recoveryCallback.recover(context);
 		}
@@ -389,13 +397,13 @@ public class RetryTemplate implements RetryOperations {
 	/**
 	 * Extension point for subclasses to decide on behaviour after catching an
 	 * exception in a {@link RetryCallback}. Normal stateless behaviour is not
-	 * to rethrow, and if there is state we rethrow if the policy can still
-	 * retry.
+	 * to rethrow, and if there is state we rethrow.
 	 * 
 	 * @param retryPolicy
 	 * @param context the current context
 	 * 
-	 * @return false but subclasses might choose otherwise
+	 * @return true if the state is not null but subclasses might choose
+	 * otherwise
 	 */
 	protected boolean shouldRethrow(RetryPolicy retryPolicy, RetryContext context, RetryState state) {
 		return state != null;

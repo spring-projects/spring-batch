@@ -123,9 +123,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	}
 
 	/**
-	 * @see org.springframework.batch.retry.RetryPolicy#close(RetryContext, boolean)
+	 * @see org.springframework.batch.retry.RetryPolicy#close(RetryContext)
 	 */
-	public void close(RetryContext status, boolean succeeded) {
+	public void close(RetryContext status) {
 	}
 
 	/**

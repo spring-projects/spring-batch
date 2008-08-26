@@ -49,9 +49,8 @@ public interface RetryPolicy {
 	/**
 	 * @param context a retry status created by the
 	 * {@link #open(RetryContext)} method of this manager.
-	 * @param succeeded true if the retry callback succeeded
 	 */
-	void close(RetryContext context, boolean succeeded);
+	void close(RetryContext context);
 
 	/**
 	 * Called once per retry attempt, after the callback fails.

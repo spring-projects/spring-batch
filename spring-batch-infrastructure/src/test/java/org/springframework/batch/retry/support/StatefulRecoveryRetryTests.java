@@ -174,13 +174,23 @@ public class StatefulRecoveryRetryTests {
 		};
 
 		try {
-			// TODO: test this
-			// retryTemplate.execute(callback, state);
-			// fail("Expected RetryException");
+			retryTemplate.execute(callback, state);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException ex) {
+			String message = ex.getMessage();
+			assertEquals("Barf!", message);
+		}
+		// Only fails second attempt because the algorithm to detect
+		// inconsistent has codes relies on the cache having been used for this
+		// item already...
+		try {
+			retryTemplate.execute(callback, state);
+			fail("Expected RetryException");
 		}
 		catch (RetryException ex) {
 			String message = ex.getMessage();
-			assertTrue("Message doesn't contain 'inconsistent': " + message, message.indexOf("inconsistent") >= 0);
+			assertTrue("Message doesn't contain 'inconsistent': " + message, message.contains("inconsistent"));
 		}
 
 		RetryContext context = retryTemplate.open(retryPolicy, state);

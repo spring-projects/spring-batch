@@ -54,7 +54,7 @@ public class TimeoutRetryPolicy implements RetryPolicy {
 		return ((TimeoutRetryContext) context).isAlive();
 	}
 
-	public void close(RetryContext context, boolean succeeded) {
+	public void close(RetryContext context) {
 	}
 
 	public RetryContext open(RetryContext parent) {
