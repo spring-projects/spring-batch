@@ -18,7 +18,10 @@ package org.springframework.batch.item.jms;
 
 import javax.jms.Message;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
 
@@ -33,8 +36,37 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class JmsItemReader<T> extends MessageTypeAccessor<T> implements ItemReader<T> {
+public class JmsItemReader<T> implements ItemReader<T> {
 
+	protected Log logger = LogFactory.getLog(getClass());
+
+	protected Class<? extends T> itemType;
+
+	protected JmsOperations jmsTemplate;
+
+	/**
+	 * Setter for jms template.
+	 * 
+	 * @param jmsTemplate a {@link JmsOperations} instance
+	 */
+	public void setJmsTemplate(JmsOperations jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
+	}
+
+	/**
+	 * Set the expected type of incoming message payloads. Set this to
+	 * {@link Message} to receive the raw underlying message.
+	 * 
+	 * @param itemType the java class of the items to be delivered. Typically
+	 * the same as the class parameter
+	 * 
+	 * @throws IllegalStateException if the message payload is of the wrong
+	 * type.
+	 */
+	public void setItemType(Class<? extends T> itemType) {
+		this.itemType = itemType;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
