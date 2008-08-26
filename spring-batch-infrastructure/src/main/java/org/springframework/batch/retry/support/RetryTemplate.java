@@ -406,6 +406,7 @@ public class RetryTemplate implements RetryOperations {
 	 * otherwise
 	 */
 	protected boolean shouldRethrow(RetryPolicy retryPolicy, RetryContext context, RetryState state) {
+		// TODO: allow stateless behaviour to take over for certain exception types
 		return state != null;
 	}
 
