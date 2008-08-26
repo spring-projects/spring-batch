@@ -20,6 +20,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.core.step.handler.StepHandler;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -58,6 +60,8 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	private final RepeatOperations repeatOperations;
 
+	final private MulticasterBatchListener listener = new MulticasterBatchListener();
+
 	/**
 	 * @param itemReader
 	 * @param itemProcessor
@@ -85,6 +89,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 */
 	public ExitStatus handle(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
+		// TODO: check flags to see if these need to be saved or not (e.g. JMS not)
 		final Chunk<T> inputs = getInputBuffer(attributes);
 		final Chunk<S> outputs = getOutputBuffer(attributes);
 
@@ -221,7 +226,16 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * @throws Exception
 	 */
 	protected final T doRead() throws Exception {
-		return itemReader.read();
+		try {
+			listener.beforeRead();
+			T item = itemReader.read();
+			listener.afterRead(item);
+			return item;
+		}
+		catch (Exception e) {
+			listener.onReadError(e);
+			throw e;
+		}
 	}
 
 	/**
@@ -239,8 +253,46 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * @throws Exception
 	 */
 	protected final void doWrite(List<S> items) throws Exception {
-		itemWriter.write(items);
-		// TODO: increment write count
+		try {
+			listener.beforeWrite(items);
+			itemWriter.write(items);
+			// TODO: increment write count
+			listener.afterWrite(items);
+		}
+		catch (Exception e) {
+			listener.onWriteError(e, items);
+			throw e;
+		}
+	}
+
+	/**
+	 * Register some {@link StepListener}s with the handler. Each will get
+	 * the callbacks in the order specified at the correct stage.
+	 * 
+	 * @param listeners
+	 */
+	public void setListeners(StepListener[] listeners) {
+		for (StepListener listener : listeners) {
+			registerListener(listener);
+		}
+	}
+
+	/**
+	 * Register a listener for callbacks at the appropriate stages in a 
+	 * process.
+	 * 
+	 * @param listener a {@link StepListener}
+	 */
+	public void registerListener(StepListener listener) {
+		this.listener.register(listener);
+	}
+
+	/**
+	 * Public getter for the listener.
+	 * @return the listener
+	 */
+	protected MulticasterBatchListener getListener() {
+		return listener;
 	}
 
 	/**

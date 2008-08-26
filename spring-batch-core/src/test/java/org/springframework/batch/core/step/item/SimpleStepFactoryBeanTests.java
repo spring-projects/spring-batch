@@ -56,7 +56,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
  */
 public class SimpleStepFactoryBeanTests {
 
-	private List<Exception> recovered = new ArrayList<Exception>();
+	private List<Exception> listened = new ArrayList<Exception>();
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 			new MapStepExecutionDao(), new MapExecutionContextDao());
@@ -136,11 +136,11 @@ public class SimpleStepFactoryBeanTests {
 		});
 		factory.setListeners(new StepListener[] { new ItemListenerSupport() {
 			public void onReadError(Exception ex) {
-				recovered.add(ex);
+				listened.add(ex);
 			}
 
 			public void onWriteError(Exception ex, Object item) {
-				recovered.add(ex);
+				listened.add(ex);
 			}
 		} });
 
@@ -161,7 +161,7 @@ public class SimpleStepFactoryBeanTests {
 		assertEquals(0, written.size());
 		// provider should be at second item
 		assertEquals("bar", reader.read());
-		assertEquals(1, recovered.size());
+		assertEquals(1, listened.size());
 	}
 
 	@Test

@@ -314,11 +314,10 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getWriteSkipCount());
 
-		System.err.println(processed);
 		// [a, b, c, d, e, f, null]
 		assertEquals(7, provided.size());
-		// [a, b, a, b, b, b, b, b, b, c, a, c, d, d, d, d, d, e, f, e, f]
-		assertEquals(21, processed.size());
+		// [a, b, c, a, b, c, b, b, b, b, b, c, a, c, d, e, f, d, d, d, d, e, f, e, f]
+		assertEquals(25, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());
 	}
@@ -511,11 +510,10 @@ public class StatefulRetryStepFactoryBeanTests {
 		// We added a bogus cache so no items are actually skipped
 		// because they aren't recognised as eligible
 		assertEquals(0, stepExecution.getSkipCount());
-		// only one item processed but three (the commit interval) were provided
 		// [0, 1, 2]
 		assertEquals(3, provided.size());
-		// [0]
-		assertEquals(1, processed.size());
+		// [0, 1, 2]
+		assertEquals(3, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 	}

@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.listener.CompositeSkipListener;
 import org.springframework.batch.core.step.handler.StepHandlerStep;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
@@ -261,12 +260,12 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-			StatefulRetryStepHandler<T, S> itemHandler = new StatefulRetryStepHandler<T, S>(getItemReader(),
+			ItemOrientedStepHandler<T, S> stepHandler = new StatefulRetryStepHandler<T, S>(getItemReader(),
 					getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate, readSkipPolicy,
 					writeSkipPolicy);
-			itemHandler.setSkipListeners(BatchListenerFactoryHelper.getSkipListeners(getListeners()));
+			stepHandler.setListeners(getListeners());
 
-			step.setStepHandler(itemHandler);
+			step.setStepHandler(stepHandler);
 
 		}
 
@@ -296,11 +295,9 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class StatefulRetryStepHandler<T, S> extends ItemOrientedStepHandler<T, S> {
+	static class StatefulRetryStepHandler<T, S> extends ItemOrientedStepHandler<T, S> {
 
 		final private RetryOperations retryOperations;
-
-		final private CompositeSkipListener listener = new CompositeSkipListener();
 
 		final private ItemSkipPolicy readSkipPolicy;
 
@@ -319,29 +316,6 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			this.retryOperations = retryTemplate;
 			this.readSkipPolicy = readSkipPolicy;
 			this.writeSkipPolicy = writeSkipPolicy;
-		}
-
-		/**
-		 * Register some {@link SkipListener}s with the handler. Each will get
-		 * the callbacks in the order specified at the correct stage if a skip
-		 * occurs.
-		 * 
-		 * @param listeners
-		 */
-		public void setSkipListeners(SkipListener[] listeners) {
-			for (SkipListener listener : listeners) {
-				registerSkipListener(listener);
-			}
-		}
-
-		/**
-		 * Register a listener for callbacks at the appropriate stages in a skip
-		 * process.
-		 * 
-		 * @param listener a {@link SkipListener}
-		 */
-		public void registerSkipListener(SkipListener listener) {
-			this.listener.register(listener);
 		}
 
 		/**
@@ -366,7 +340,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 							// increment skip count and try again
 							try {
 								skipCount++;
-								listener.onSkipInRead(e);
+								getListener().onSkipInRead(e);
 							}
 							catch (RuntimeException ex) {
 								contribution.incrementReadSkipCount(skipCount);
@@ -456,7 +430,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 						contribution.incrementWriteSkipCount();
 						S item = chunk.getSkippedItem();
 						try {
-							listener.onSkipInWrite(item, t);
+							getListener().onSkipInWrite(item, t);
 							return null;
 						}
 						catch (RuntimeException ex) {

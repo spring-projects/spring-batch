@@ -16,21 +16,12 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
-import org.springframework.batch.core.listener.CompositeItemReadListener;
-import org.springframework.batch.core.listener.CompositeItemWriteListener;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.DelegatingItemReader;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.listener.RepeatListenerSupport;
@@ -44,74 +35,6 @@ import org.springframework.util.Assert;
  * 
  */
 abstract class BatchListenerFactoryHelper {
-
-	/**
-	 * @param itemReader
-	 * @param listeners
-	 */
-	public static <T> ItemReader<T> getItemReader(ItemReader<T> itemReader, StepListener[] listeners) {
-
-		final CompositeItemReadListener multicaster = new CompositeItemReadListener();
-
-		for (int i = 0; i < listeners.length; i++) {
-			StepListener listener = listeners[i];
-			if (listener instanceof ItemReadListener) {
-				multicaster.register((ItemReadListener) listener);
-			}
-		}
-
-		itemReader = new DelegatingItemReader<T>(itemReader) {
-			public T read() throws Exception {
-				try {
-					multicaster.beforeRead();
-					T item = super.read();
-					multicaster.afterRead(item);
-					return item;
-				}
-				catch (Exception e) {
-					multicaster.onReadError(e);
-					throw e;
-				}
-			}
-		};
-
-		return itemReader;
-	}
-
-	/**
-	 * @param itemWriter
-	 * @param listeners
-	 */
-	public static <T> ItemWriter<T> getItemWriter(final ItemWriter<T> itemWriter, StepListener[] listeners) {
-		final CompositeItemWriteListener multicaster = new CompositeItemWriteListener();
-
-		for (int i = 0; i < listeners.length; i++) {
-			StepListener listener = listeners[i];
-			if (listener instanceof ItemWriteListener) {
-				multicaster.register((ItemWriteListener) listener);
-			}
-		}
-
-		return new ItemWriter<T>() {
-
-			public void write(List<? extends T> items) throws Exception {
-
-				for (T item : items) {
-					try {
-						multicaster.beforeWrite(item);
-						itemWriter.write(Collections.singletonList(item));
-						multicaster.afterWrite(item);
-					}
-					catch (Exception e) {
-						multicaster.onWriteError(e, item);
-						throw e;
-					}
-				}
-			}
-
-		};
-
-	}
 
 	/**
 	 * @param chunkOperations
@@ -168,20 +91,6 @@ abstract class BatchListenerFactoryHelper {
 			}
 		}
 		return list.toArray(new StepExecutionListener[list.size()]);
-	}
-
-	/**
-	 * @param listeners
-	 */
-	public static SkipListener[] getSkipListeners(StepListener[] listeners) {
-		List<SkipListener> list = new ArrayList<SkipListener>();
-		for (int i = 0; i < listeners.length; i++) {
-			StepListener listener = listeners[i];
-			if (listener instanceof SkipListener) {
-				list.add((SkipListener) listener);
-			}
-		}
-		return list.toArray(new SkipListener[list.size()]);
 	}
 
 }

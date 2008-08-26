@@ -21,7 +21,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.handler.StepHandler;
 import org.springframework.batch.core.step.handler.StepHandlerStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -93,8 +92,6 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	private int commitInterval = 0;
 
 	private TaskExecutor taskExecutor;
-
-	private StepHandler stepHandler;
 
 	private RepeatOperations stepOperations;
 
@@ -387,22 +384,6 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public getter for the {@link StepHandler}.
-	 * @return the {@link StepHandler}
-	 */
-	protected StepHandler getStepHandler() {
-		return stepHandler;
-	}
-
-	/**
-	 * Public setter for the {@link StepHandler}.
-	 * @param stepHandler the {@link StepHandler} to set
-	 */
-	protected void setStepHandler(StepHandler stepHandler) {
-		this.stepHandler = stepHandler;
-	}
-
-	/**
 	 * @param step
 	 * 
 	 */
@@ -450,13 +431,6 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 		}
 
 		StepExecutionListener[] stepListeners = BatchListenerFactoryHelper.getStepListeners(listeners);
-		itemReader = BatchListenerFactoryHelper.getItemReader(itemReader, listeners);
-		itemWriter = BatchListenerFactoryHelper.getItemWriter(itemWriter, listeners);
-
-		// In case they are used by subclasses:
-		setItemReader(itemReader);
-		setItemWriter(itemWriter);
-
 		step.setStepExecutionListeners(stepListeners);
 
 		if (chunkOperations == null) {
@@ -483,7 +457,9 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 
 		step.setStepOperations(stepOperations);
 
-		step.setStepHandler(new ItemOrientedStepHandler<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations));
+		ItemOrientedStepHandler<T,S> stepHandler = new ItemOrientedStepHandler<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations);
+		stepHandler.setListeners(getListeners());
+		step.setStepHandler(stepHandler);
 
 	}
 
