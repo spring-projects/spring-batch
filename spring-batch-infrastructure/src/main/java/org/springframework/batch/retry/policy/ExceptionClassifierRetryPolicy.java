@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.support.Classifier;
 import org.springframework.batch.support.ExceptionClassifierSupport;
@@ -103,7 +102,7 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
 	 * Exception)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) {
 		RetryPolicy policy = (RetryPolicy) context;
 		policy.registerThrowable(context, throwable);
 		((RetryContextSupport) context).registerThrowable(throwable);
@@ -148,7 +147,7 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 			return this;
 		}
 
-		public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
+		public void registerThrowable(RetryContext context, Exception throwable) {
 			policy = getPolicy(exceptionClassifier.classify(throwable));
 			this.context = getContext(policy);
 			policy.registerThrowable(this.context, throwable);

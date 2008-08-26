@@ -18,7 +18,6 @@ package org.springframework.batch.retry.policy;
 
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
 
 /**
@@ -65,7 +64,7 @@ public class NeverRetryPolicy implements RetryPolicy {
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
 	 * Exception)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) {
 		((NeverRetryContext) context).setFinished();
 		((RetryContextSupport) context).registerThrowable(throwable);
 	}

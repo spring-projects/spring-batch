@@ -133,7 +133,7 @@ public class RetryTemplate implements RetryOperations {
 	 * @see org.springframework.batch.retry.RetryOperations#execute(org.springframework.batch.retry.RetryCallback)
 	 * 
 	 * @throws TerminatedRetryException if the retry has been manually
-	 * terminated through the {@link RetryContext}.
+	 * terminated by a listener.
 	 */
 	public final <T> T execute(RetryCallback<T> retryCallback) throws Exception {
 		return doExecute(retryCallback, null, null);
@@ -148,7 +148,7 @@ public class RetryTemplate implements RetryOperations {
 	 * org.springframework.batch.retry.RecoveryCallback)
 	 * 
 	 * @throws TerminatedRetryException if the retry has been manually
-	 * terminated through the {@link RetryContext}.
+	 * terminated by a listener.
 	 */
 	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback) throws Exception {
 		return doExecute(retryCallback, recoveryCallback, null);

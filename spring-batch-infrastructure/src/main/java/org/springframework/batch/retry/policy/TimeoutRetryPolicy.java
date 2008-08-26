@@ -18,7 +18,6 @@ package org.springframework.batch.retry.policy;
 
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
 
 /**
@@ -62,7 +61,7 @@ public class TimeoutRetryPolicy implements RetryPolicy {
 		return new TimeoutRetryContext(parent, timeout);
 	}
 
-	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) {
 		((RetryContextSupport) context).registerThrowable(throwable);
 		// otherwise no-op - we only time out, otherwise retry everything...
 	}

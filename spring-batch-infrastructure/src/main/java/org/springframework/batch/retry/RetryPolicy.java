@@ -58,9 +58,7 @@ public interface RetryPolicy {
 	 * 
 	 * @param context the current status object.
 	 * 
-	 * @throws TerminatedRetryException if the status is set to terminate only.
-	 * 
 	 */
-	void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException;
+	void registerThrowable(RetryContext context, Exception throwable);
 
 }

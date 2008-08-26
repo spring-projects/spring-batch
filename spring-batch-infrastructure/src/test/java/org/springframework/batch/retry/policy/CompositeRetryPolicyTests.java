@@ -23,7 +23,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.TerminatedRetryException;
 
 public class CompositeRetryPolicyTests extends TestCase {
 
@@ -63,7 +62,7 @@ public class CompositeRetryPolicyTests extends TestCase {
 				return !errorRegistered;
 			}
 
-			public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
+			public void registerThrowable(RetryContext context, Exception throwable) {
 				errorRegistered = true;
 			}
 		} });

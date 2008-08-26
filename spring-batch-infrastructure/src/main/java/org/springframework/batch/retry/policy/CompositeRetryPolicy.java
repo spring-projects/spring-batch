@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
 
 /**
@@ -108,7 +107,7 @@ public class CompositeRetryPolicy implements RetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext, boolean)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) throws TerminatedRetryException {
+	public void registerThrowable(RetryContext context, Exception throwable) {
 		RetryContext[] contexts = ((CompositeRetryContext) context).contexts;
 		RetryPolicy[] policies = ((CompositeRetryContext) context).policies;
 		for (int i = 0; i < contexts.length; i++) {
