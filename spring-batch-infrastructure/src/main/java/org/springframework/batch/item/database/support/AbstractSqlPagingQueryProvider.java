@@ -15,22 +15,19 @@
  */
 package org.springframework.batch.item.database.support;
 
-import org.springframework.util.Assert;
-import org.springframework.jdbc.support.MetaDataAccessException;
-import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
-
 import javax.sql.DataSource;
+
+import org.springframework.util.Assert;
 
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided SQL paging query providers.
  *
  * Any implementation must provide a way to specify the select clause, from clause and optionally a where clause. 
  * In addition a way to specify a single column sort key must also be provided. This sort key will be used to 
- * provide the paging functinality. It is recommended that there should be an index for the sort key to provide 
+ * provide the paging functionality. It is recommended that there should be an index for the sort key to provide 
  * better performance.
  *
- * Provides properties and preperation for the mandatory "selectClause" and "fromClause" as well as for the
+ * Provides properties and preparation for the mandatory "selectClause" and "fromClause" as well as for the
  * optional "whereClause".  Also provides property for the mandatory "sortKey".
  *
  * @author Thomas Risberg
@@ -84,7 +81,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 *
-	 * @return
+	 * @return SQL "from" clause
 	 */
 	protected String getFromClause() {
 		return fromClause;
@@ -106,7 +103,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 *
-	 * @return
+	 * @return WHERE clause part of SQL query string
 	 */
 	protected String getWhereClause() {
 		return whereClause;
@@ -121,7 +118,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 *
-	 * @return
+	 * @return sortKey key to use to sort and limit page content
 	 */
 	protected String getSortKey() {
 		return sortKey;

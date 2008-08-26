@@ -27,7 +27,6 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.sql.Connection;
 
 /**

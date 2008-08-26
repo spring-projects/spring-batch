@@ -18,7 +18,6 @@ package org.springframework.batch.item.database.support;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-import org.junit.Before;
 
 /**
  * @author Thomas Risberg

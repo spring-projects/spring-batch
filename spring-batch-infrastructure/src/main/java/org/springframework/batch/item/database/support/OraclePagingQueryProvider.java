@@ -1,10 +1,5 @@
 package org.springframework.batch.item.database.support;
 
-import org.springframework.jdbc.support.JdbcUtils;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
-
-import javax.sql.DataSource;
-
 /**
  * Oracle implementation of a  {@link org.springframework.batch.item.database.support.PagingQueryProvider} using
  * database specific features.
