@@ -30,7 +30,7 @@ import org.springframework.batch.core.listener.ItemListenerSupport;
  * @author Lucas Ward
  * 
  */
-public class DefaultItemFailureHandler extends ItemListenerSupport<Object> {
+public class DefaultItemFailureHandler extends ItemListenerSupport<Object,Object> {
 
 	protected static final Log logger = LogFactory
 			.getLog(DefaultItemFailureHandler.class);

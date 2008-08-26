@@ -31,18 +31,18 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class MulticasterBatchListener<S> implements StepExecutionListener, ChunkListener, ItemReadListener,
-		ItemWriteListener<S>, SkipListener {
+public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
+		ItemWriteListener<S>, SkipListener<S> {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
 	private CompositeChunkListener chunkListener = new CompositeChunkListener();
 
-	private CompositeItemReadListener itemReadListener = new CompositeItemReadListener();
+	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<T>();
 
 	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
 
-	private CompositeSkipListener skipListener = new CompositeSkipListener();
+	private CompositeSkipListener<S> skipListener = new CompositeSkipListener<S>();
 
 	/**
 	 * Initialise the listener instance.
@@ -55,12 +55,11 @@ public class MulticasterBatchListener<S> implements StepExecutionListener, Chunk
 	 * Register each of the objects as listeners. Once registered, calls to the
 	 * {@link MulticasterBatchListener} broadcast to the individual listeners.
 	 * 
-	 * @param listeners an array of listener objects of types known to the
-	 * multicaster.
+	 * @param listeners listener objects of types known to the multicaster.
 	 */
-	public void setListeners(StepListener[] listeners) {
-		for (int i = 0; i < listeners.length; i++) {
-			register(listeners[i]);
+	public void setListeners(List<? extends StepListener> listeners) {
+		for (StepListener stepListener : listeners) {
+			register(stepListener);
 		}
 	}
 
@@ -157,7 +156,7 @@ public class MulticasterBatchListener<S> implements StepExecutionListener, Chunk
 	 * @param item
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#afterRead(java.lang.Object)
 	 */
-	public void afterRead(Object item) {
+	public void afterRead(T item) {
 		try {
 			itemReadListener.afterRead(item);
 		}
@@ -246,7 +245,7 @@ public class MulticasterBatchListener<S> implements StepExecutionListener, Chunk
 	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object,
 	 * java.lang.Throwable)
 	 */
-	public void onSkipInWrite(Object item, Throwable t) {
+	public void onSkipInWrite(S item, Throwable t) {
 		skipListener.onSkipInWrite(item, t);
 	}
 

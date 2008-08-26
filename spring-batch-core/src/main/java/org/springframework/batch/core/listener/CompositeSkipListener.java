@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.core.Ordered;
@@ -25,17 +25,17 @@ import org.springframework.core.Ordered;
  * @author Dave Syer
  * 
  */
-public class CompositeSkipListener implements SkipListener {
+public class CompositeSkipListener<S> implements SkipListener<S> {
 
-	private OrderedComposite<SkipListener> listeners = new OrderedComposite<SkipListener>();
+	private OrderedComposite<SkipListener<? super S>> listeners = new OrderedComposite<SkipListener<? super S>>();
 
 	/**
 	 * Public setter for the listeners.
 	 * 
 	 * @param listeners
 	 */
-	public void setListeners(SkipListener[] listeners) {
-		this.listeners.setItems(Arrays.asList(listeners));
+	public void setListeners(List<? extends SkipListener<? super S>> listeners) {
+		this.listeners.setItems(listeners);
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class CompositeSkipListener implements SkipListener {
 	 * 
 	 * @param listener
 	 */
-	public void register(SkipListener listener) {
+	public void register(SkipListener<? super S> listener) {
 		listeners.add(listener);
 	}
 
@@ -53,8 +53,8 @@ public class CompositeSkipListener implements SkipListener {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	public void onSkipInRead(Throwable t) {
-		for (Iterator<SkipListener> iterator = listeners.iterator(); iterator.hasNext();) {
-			SkipListener listener = (SkipListener) iterator.next();
+		for (Iterator<SkipListener<? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
+			SkipListener<? super S> listener = iterator.next();
 			listener.onSkipInRead(t);
 		}
 	}
@@ -65,9 +65,9 @@ public class CompositeSkipListener implements SkipListener {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
 	 * java.lang.Throwable)
 	 */
-	public void onSkipInWrite(Object item, Throwable t) {
-		for (Iterator<SkipListener> iterator = listeners.iterator(); iterator.hasNext();) {
-			SkipListener listener = (SkipListener) iterator.next();
+	public void onSkipInWrite(S item, Throwable t) {
+		for (Iterator<SkipListener<? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
+			SkipListener<? super S> listener = iterator.next();
 			listener.onSkipInWrite(item, t);
 		}
 	}

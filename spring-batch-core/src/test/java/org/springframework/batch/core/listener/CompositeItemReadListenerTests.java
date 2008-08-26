@@ -15,12 +15,15 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.listener.CompositeItemReadListener;
 
 /**
  * @author Lucas Ward
@@ -28,14 +31,14 @@ import org.springframework.batch.core.listener.CompositeItemReadListener;
  */
 public class CompositeItemReadListenerTests {
 	
-	ItemReadListener listener;
-	CompositeItemReadListener compositeListener;
+	ItemReadListener<Object> listener;
+	CompositeItemReadListener<Object> compositeListener;
 	
+	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-	
 		listener = createMock(ItemReadListener.class);
-		compositeListener = new CompositeItemReadListener();
+		compositeListener = new CompositeItemReadListener<Object>();
 		compositeListener.register(listener);
 	}
 	
@@ -68,8 +71,12 @@ public class CompositeItemReadListenerTests {
 	}
 
 	@Test
-	public void testSetListners() throws Exception {
-		compositeListener.setListeners(new ItemReadListener[] {listener});
+	public void testSetListeners() throws Exception {
+		compositeListener.setListeners(new ArrayList<ItemReadListener<? super Object>>() {
+			{
+				add(listener);
+			}
+		});
 		listener.beforeRead();
 		replay(listener);
 		compositeListener.beforeRead();

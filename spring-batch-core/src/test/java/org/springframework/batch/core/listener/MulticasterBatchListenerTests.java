@@ -18,12 +18,12 @@ package org.springframework.batch.core.listener;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -32,7 +32,7 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class MulticasterBatchListenerTests {
 
-	private MulticasterBatchListener<String> multicast = new MulticasterBatchListener<String>();
+	private MulticasterBatchListener<Integer, String> multicast = new MulticasterBatchListener<Integer, String>();
 
 	private int count = 0;
 
@@ -43,20 +43,15 @@ public class MulticasterBatchListenerTests {
 		multicast.register(new CountingStepListenerSupport());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#setListeners(org.springframework.batch.core.StepListener[])}
-	 * .
-	 */
 	@Test
 	public void testSetListeners() {
-		multicast.setListeners(new StepListener[] { new StepListenerSupport<String>() {
+		multicast.setListeners(Arrays.asList(new StepListenerSupport<Integer, String>() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				count++;
 				return super.afterStep(stepExecution);
 			}
-		} });
+		}));
 		multicast.afterStep(null);
 		// setListeners is cumulative (should be OK if used for DI)
 		assertEquals(2, count);
@@ -69,7 +64,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testRegister() {
-		multicast.register(new StepListenerSupport<String>() {
+		multicast.register(new StepListenerSupport<Integer, String>() {
 			@Override
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				count++;
@@ -502,7 +497,7 @@ public class MulticasterBatchListenerTests {
 	 * @author Dave Syer
 	 * 
 	 */
-	private final class CountingStepListenerSupport extends StepListenerSupport<String> {
+	private final class CountingStepListenerSupport extends StepListenerSupport<Integer, String> {
 		@Override
 		public void onReadError(Exception ex) {
 			count++;
@@ -536,7 +531,7 @@ public class MulticasterBatchListenerTests {
 		 * (java.lang.Object)
 		 */
 		@Override
-		public void afterRead(Object item) {
+		public void afterRead(Integer item) {
 			count++;
 			if (error) {
 				throw new RuntimeException("listener error");

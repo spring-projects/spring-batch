@@ -43,7 +43,7 @@ class OrderedComposite<S> {
 	 * 
 	 * @param items
 	 */
-	public void setItems(List<S> items) {
+	public void setItems(List<? extends S> items) {
 		unordered.clear();
 		ordered.clear();
 		for (S s : items) {

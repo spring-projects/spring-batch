@@ -60,7 +60,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 	private final RepeatOperations repeatOperations;
 
-	final private MulticasterBatchListener<S> listener = new MulticasterBatchListener<S>();
+	final private MulticasterBatchListener<T,S> listener = new MulticasterBatchListener<T,S>();
 
 	/**
 	 * @param itemReader
@@ -291,7 +291,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * Public getter for the listener.
 	 * @return the listener
 	 */
-	protected MulticasterBatchListener<S> getListener() {
+	protected MulticasterBatchListener<T,S> getListener() {
 		return listener;
 	}
 

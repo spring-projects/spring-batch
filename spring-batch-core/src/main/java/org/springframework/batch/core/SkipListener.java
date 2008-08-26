@@ -23,7 +23,7 @@ package org.springframework.batch.core;
  * @author Robert Kasanicky
  * 
  */
-public interface SkipListener extends StepListener {
+public interface SkipListener<S> extends StepListener {
 
 	/**
 	 * Callback for a failure on read that is legal, so is not going to be
@@ -44,6 +44,6 @@ public interface SkipListener extends StepListener {
 	 * @param item the failed item
 	 * @param t the cause of the failure
 	 */
-	void onSkipInWrite(Object item, Throwable t);
+	void onSkipInWrite(S item, Throwable t);
 
 }

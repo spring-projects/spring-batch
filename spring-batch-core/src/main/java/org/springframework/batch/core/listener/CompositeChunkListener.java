@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.core.Ordered;
@@ -34,8 +34,8 @@ public class CompositeChunkListener implements ChunkListener {
 	 * 
 	 * @param listeners
 	 */
-	public void setListeners(ChunkListener[] listeners) {
-		this.listeners.setItems(Arrays.asList(listeners));
+	public void setListeners(List<? extends ChunkListener> listeners) {
+		this.listeners.setItems(listeners);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class CompositeChunkListener implements ChunkListener {
 	 */
 	public void afterChunk() {
 		for (Iterator<ChunkListener> iterator = listeners.iterator(); iterator.hasNext();) {
-			ChunkListener listener = (ChunkListener) iterator.next();
+			ChunkListener listener = iterator.next();
 			listener.afterChunk();
 		}
 	}
@@ -67,7 +67,7 @@ public class CompositeChunkListener implements ChunkListener {
 	 */
 	public void beforeChunk() {
 		for (Iterator<ChunkListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			ChunkListener listener = (ChunkListener) iterator.next();
+			ChunkListener listener = iterator.next();
 			listener.beforeChunk();
 		}
 	}

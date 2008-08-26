@@ -31,8 +31,8 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  *
  */
-public class StepListenerSupport<S> implements StepExecutionListener, ChunkListener,
-		ItemReadListener, ItemWriteListener<S> {
+public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkListener,
+		ItemReadListener<T>, ItemWriteListener<S> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
@@ -69,7 +69,7 @@ public class StepListenerSupport<S> implements StepExecutionListener, ChunkListe
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
 	 */
-	public void afterRead(Object item) {
+	public void afterRead(T item) {
 	}
 
 	/* (non-Javadoc)

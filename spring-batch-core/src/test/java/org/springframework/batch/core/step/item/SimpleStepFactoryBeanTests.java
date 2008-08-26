@@ -134,7 +134,7 @@ public class SimpleStepFactoryBeanTests {
 				throw new RuntimeException("Error!");
 			}
 		});
-		factory.setListeners(new StepListener[] { new ItemListenerSupport<String>() {
+		factory.setListeners(new StepListener[] { new ItemListenerSupport<String,String>() {
 			@Override
 			public void onReadError(Exception ex) {
 				listened.add(ex);

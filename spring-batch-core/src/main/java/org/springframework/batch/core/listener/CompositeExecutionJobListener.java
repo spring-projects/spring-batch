@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
@@ -35,8 +35,8 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 * 
 	 * @param listeners
 	 */
-	public void setListeners(JobExecutionListener[] listeners) {
-		this.listeners.setItems(Arrays.asList(listeners));
+	public void setListeners(List<? extends JobExecutionListener> listeners) {
+		this.listeners.setItems(listeners);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 */
 	public void afterJob(JobExecution jobExecution) {
 		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			JobExecutionListener listener = (JobExecutionListener) iterator.next();
+			JobExecutionListener listener = iterator.next();
 			listener.afterJob(jobExecution);
 		}
 	}
@@ -67,7 +67,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 */
 	public void beforeJob(JobExecution jobExecution) {
 		for (Iterator<JobExecutionListener> iterator = listeners.iterator(); iterator.hasNext();) {
-			JobExecutionListener listener = (JobExecutionListener) iterator.next();
+			JobExecutionListener listener = iterator.next();
 			listener.beforeJob(jobExecution);
 		}
 	}
@@ -80,7 +80,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 */
 	public void onError(JobExecution jobExecution, Throwable e) {
 		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			JobExecutionListener listener = (JobExecutionListener) iterator.next();
+			JobExecutionListener listener = iterator.next();
 			listener.onError(jobExecution, e);
 		}
 
@@ -93,7 +93,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 */
 	public void onInterrupt(JobExecution jobExecution) {
 		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			JobExecutionListener listener = (JobExecutionListener) iterator.next();
+			JobExecutionListener listener = iterator.next();
 			listener.onInterrupt(jobExecution);
 		}
 

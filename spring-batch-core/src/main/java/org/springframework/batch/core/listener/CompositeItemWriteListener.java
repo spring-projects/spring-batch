@@ -35,7 +35,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * 
 	 * @param itemWriteListeners
 	 */
-	public void setListeners(List<ItemWriteListener<? super S>> itemWriteListeners) {
+	public void setListeners(List<? extends ItemWriteListener<? super S>> itemWriteListeners) {
 		this.listeners.setItems(itemWriteListeners);
 	}
 

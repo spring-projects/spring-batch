@@ -28,7 +28,7 @@ import org.springframework.batch.core.ItemWriteListener;
  * @author Lucas Ward
  *
  */
-public class ItemListenerSupport<S> implements ItemWriteListener<S>, ItemReadListener {
+public class ItemListenerSupport<T,S> implements ItemWriteListener<S>, ItemReadListener<T> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
@@ -51,7 +51,7 @@ public class ItemListenerSupport<S> implements ItemWriteListener<S>, ItemReadLis
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
 	 */
-	public void afterRead(Object item) {
+	public void afterRead(T item) {
 	}
 
 	/* (non-Javadoc)

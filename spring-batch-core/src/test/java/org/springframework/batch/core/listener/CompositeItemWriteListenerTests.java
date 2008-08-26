@@ -74,7 +74,7 @@ public class CompositeItemWriteListenerTests {
 	}
 
 	@Test
-	public void testSetListners() throws Exception {
+	public void testSetListeners() throws Exception {
 		compositeListener.setListeners(new ArrayList<ItemWriteListener<? super Object>>() {
 			{
 				add(listener);
