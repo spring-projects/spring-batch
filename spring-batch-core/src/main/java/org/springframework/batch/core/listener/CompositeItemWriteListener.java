@@ -28,14 +28,14 @@ import org.springframework.core.Ordered;
  */
 public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 
-	private OrderedComposite<ItemWriteListener<S>> listeners = new OrderedComposite<ItemWriteListener<S>>();
+	private OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<ItemWriteListener<? super S>>();
 
 	/**
 	 * Public setter for the listeners.
 	 * 
 	 * @param itemWriteListeners
 	 */
-	public void setListeners(List<ItemWriteListener<S>> itemWriteListeners) {
+	public void setListeners(List<ItemWriteListener<? super S>> itemWriteListeners) {
 		this.listeners.setItems(itemWriteListeners);
 	}
 
@@ -44,7 +44,7 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * 
 	 * @param itemWriteListener
 	 */
-	public void register(ItemWriteListener<S> itemWriteListener) {
+	public void register(ItemWriteListener<? super S> itemWriteListener) {
 		listeners.add(itemWriteListener);
 	}
 
@@ -54,8 +54,8 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * @see ItemWriteListener#afterWrite(java.util.List)
 	 */
 	public void afterWrite(List<? extends S> items) {
-		for (Iterator<ItemWriteListener<S>> iterator = listeners.reverse(); iterator.hasNext();) {
-			ItemWriteListener<S> listener = iterator.next();
+		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
+			ItemWriteListener<? super S> listener = iterator.next();
 			listener.afterWrite(items);
 		}
 	}
@@ -66,8 +66,8 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * @see ItemWriteListener#beforeWrite(List)
 	 */
 	public void beforeWrite(List<? extends S> items) {
-		for (Iterator<ItemWriteListener<S>> iterator = listeners.iterator(); iterator.hasNext();) {
-			ItemWriteListener<S> listener = iterator.next();
+		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
+			ItemWriteListener<? super S> listener = iterator.next();
 			listener.beforeWrite(items);
 		}
 	}
@@ -78,8 +78,8 @@ public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
 	 * @see ItemWriteListener#onWriteError(Exception, List)
 	 */
 	public void onWriteError(Exception ex, List<? extends S> items) {
-		for (Iterator<ItemWriteListener<S>> iterator = listeners.reverse(); iterator.hasNext();) {
-			ItemWriteListener<S> listener = iterator.next();
+		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
+			ItemWriteListener<? super S> listener = iterator.next();
 			listener.onWriteError(ex, items);
 		}
 	}

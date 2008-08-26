@@ -63,7 +63,7 @@ public class MulticasterBatchListener<S> implements StepExecutionListener, Chunk
 			register(listeners[i]);
 		}
 	}
-	
+
 	/**
 	 * Register the listener for callbacks on the appropriate interfaces
 	 * implemented. Any {@link StepListener} can be provided, or an
