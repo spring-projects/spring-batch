@@ -123,6 +123,7 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 		jdbcTemplate.setMaxRows(pageSize);
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(jdbcTemplate);
 		Assert.notNull(queryProvider);
+		queryProvider.init(dataSource);
 		this.firstPageSql = queryProvider.generateFirstPageQuery(pageSize);
 		this.remainingPagesSql = queryProvider.generateRemainingPagesQuery(pageSize);
 	}

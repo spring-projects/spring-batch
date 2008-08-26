@@ -24,6 +24,7 @@ package org.springframework.batch.item.database.support;
  */
 public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
+	@Override
 	public String generateFirstPageQuery(int pageSize) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
@@ -35,6 +36,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		return sql.toString();
 	}
 
+	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
@@ -47,6 +49,7 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		return sql.toString();
 	}
 
+	@Override
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int lastRowNum = (page * pageSize);
