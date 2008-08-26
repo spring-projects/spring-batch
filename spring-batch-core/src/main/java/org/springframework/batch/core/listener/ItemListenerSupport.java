@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.List;
+
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 
@@ -26,24 +28,24 @@ import org.springframework.batch.core.ItemWriteListener;
  * @author Lucas Ward
  *
  */
-public class ItemListenerSupport implements ItemWriteListener, ItemReadListener {
+public class ItemListenerSupport<S> implements ItemWriteListener<S>, ItemReadListener {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
 	 */
-	public void afterWrite(Object item) {
+	public void afterWrite(List<? extends S> item) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemWriteListener#beforeWrite(java.lang.Object)
 	 */
-	public void beforeWrite(Object item) {
+	public void beforeWrite(List<? extends S> item) {
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemWriteListener#onWriteError(java.lang.Exception, java.lang.Object)
 	 */
-	public void onWriteError(Exception ex, Object item) {
+	public void onWriteError(Exception ex, List<? extends S> item) {
 	}
 
 	/* (non-Javadoc)

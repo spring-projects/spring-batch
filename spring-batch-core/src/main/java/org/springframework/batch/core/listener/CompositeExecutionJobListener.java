@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.batch.core.JobExecution;
@@ -27,7 +28,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeExecutionJobListener implements JobExecutionListener {
 
-	private OrderedComposite listeners = new OrderedComposite();
+	private OrderedComposite<JobExecutionListener> listeners = new OrderedComposite<JobExecutionListener>();
 
 	/**
 	 * Public setter for the listeners.
@@ -35,7 +36,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 * @param listeners
 	 */
 	public void setListeners(JobExecutionListener[] listeners) {
-		this.listeners.setItems(listeners);
+		this.listeners.setItems(Arrays.asList(listeners));
 	}
 
 	/**
@@ -53,7 +54,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 * @see org.springframework.batch.core.JobExecutionListener#afterJob(org.springframework.batch.core.JobExecution)
 	 */
 	public void afterJob(JobExecution jobExecution) {
-		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.afterJob(jobExecution);
 		}
@@ -65,7 +66,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 * @see org.springframework.batch.core.JobExecutionListener#beforeJob(org.springframework.batch.core.JobExecution)
 	 */
 	public void beforeJob(JobExecution jobExecution) {
-		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<JobExecutionListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.beforeJob(jobExecution);
 		}
@@ -78,7 +79,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 * java.lang.Throwable)
 	 */
 	public void onError(JobExecution jobExecution, Throwable e) {
-		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.onError(jobExecution, e);
 		}
@@ -91,7 +92,7 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	 * @see org.springframework.batch.core.JobExecutionListener#onInterrupt(org.springframework.batch.core.JobExecution)
 	 */
 	public void onInterrupt(JobExecution jobExecution) {
-		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			JobExecutionListener listener = (JobExecutionListener) iterator.next();
 			listener.onInterrupt(jobExecution);
 		}

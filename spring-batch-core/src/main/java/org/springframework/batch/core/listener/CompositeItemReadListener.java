@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.batch.core.ItemReadListener;
@@ -27,7 +28,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeItemReadListener implements ItemReadListener {
 
-	private OrderedComposite listeners = new OrderedComposite();
+	private OrderedComposite<ItemReadListener> listeners = new OrderedComposite<ItemReadListener>();
 
 	/**
 	 * Public setter for the listeners.
@@ -35,7 +36,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @param itemReadListeners
 	 */
 	public void setListeners(ItemReadListener[] itemReadListeners) {
-		this.listeners.setItems(itemReadListeners);
+		this.listeners.setItems(Arrays.asList(itemReadListeners));
 	}
 
 	/**
@@ -53,7 +54,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @see org.springframework.batch.core.ItemReadListener#afterRead(java.lang.Object)
 	 */
 	public void afterRead(Object item) {
-		for (Iterator<Object> iterator = listeners.reverse(); iterator.hasNext();) {
+		for (Iterator<ItemReadListener> iterator = listeners.reverse(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.afterRead(item);
 		}
@@ -65,7 +66,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @see org.springframework.batch.core.ItemReadListener#beforeRead()
 	 */
 	public void beforeRead() {
-		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<ItemReadListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.beforeRead();
 		}
@@ -77,7 +78,7 @@ public class CompositeItemReadListener implements ItemReadListener {
 	 * @see org.springframework.batch.core.ItemReadListener#onReadError(java.lang.Exception)
 	 */
 	public void onReadError(Exception ex) {
-		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<ItemReadListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.onReadError(ex);
 		}

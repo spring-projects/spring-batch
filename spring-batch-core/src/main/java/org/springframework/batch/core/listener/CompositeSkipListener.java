@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.batch.core.SkipListener;
@@ -26,7 +27,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeSkipListener implements SkipListener {
 
-	private OrderedComposite listeners = new OrderedComposite();
+	private OrderedComposite<SkipListener> listeners = new OrderedComposite<SkipListener>();
 
 	/**
 	 * Public setter for the listeners.
@@ -34,7 +35,7 @@ public class CompositeSkipListener implements SkipListener {
 	 * @param listeners
 	 */
 	public void setListeners(SkipListener[] listeners) {
-		this.listeners.setItems(listeners);
+		this.listeners.setItems(Arrays.asList(listeners));
 	}
 
 	/**
@@ -52,7 +53,7 @@ public class CompositeSkipListener implements SkipListener {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	public void onSkipInRead(Throwable t) {
-		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<SkipListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			SkipListener listener = (SkipListener) iterator.next();
 			listener.onSkipInRead(t);
 		}
@@ -65,7 +66,7 @@ public class CompositeSkipListener implements SkipListener {
 	 * java.lang.Throwable)
 	 */
 	public void onSkipInWrite(Object item, Throwable t) {
-		for (Iterator<Object> iterator = listeners.iterator(); iterator.hasNext();) {
+		for (Iterator<SkipListener> iterator = listeners.iterator(); iterator.hasNext();) {
 			SkipListener listener = (SkipListener) iterator.next();
 			listener.onSkipInWrite(item, t);
 		}

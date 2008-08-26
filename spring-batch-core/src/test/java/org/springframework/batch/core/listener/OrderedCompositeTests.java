@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.core.Ordered;
@@ -23,27 +24,31 @@ import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class OrderedCompositeTests extends TestCase {
-	
-	private OrderedComposite list = new OrderedComposite();
+
+	private OrderedComposite<Object> list = new OrderedComposite<Object>();
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#setItems(java.lang.Object[])}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.listener.OrderedComposite#setItems(java.util.List)}
+	 * .
 	 */
 	public void testSetItems() {
-		list.setItems(new String[] {"1", "2"});
+		list.setItems(Arrays.asList(new Object[] { "1", "2" }));
 		Iterator<Object> iterator = list.iterator();
 		assertEquals("1", iterator.next());
 		assertEquals("2", iterator.next());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}
+	 * .
 	 */
 	public void testAdd() {
-		list.setItems(new String[] {"1"});
+		list.setItems(Arrays.asList((Object) "1"));
 		list.add("3");
 		Iterator<Object> iterator = list.iterator();
 		assertEquals("1", iterator.next());
@@ -51,10 +56,12 @@ public class OrderedCompositeTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}
+	 * .
 	 */
 	public void testAddOrdered() {
-		list.setItems(new String[] {"1"});
+		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
 			public int getOrder() {
 				return 0;
@@ -66,10 +73,12 @@ public class OrderedCompositeTests extends TestCase {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}
+	 * .
 	 */
 	public void testAddMultipleOrdered() {
-		list.setItems(new String[] {"1"});
+		list.setItems(Arrays.asList((Object) "1"));
 		list.add(new Ordered() {
 			public int getOrder() {
 				return 1;

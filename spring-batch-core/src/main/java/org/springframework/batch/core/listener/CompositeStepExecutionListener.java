@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.batch.core.StepExecution;
@@ -29,7 +30,7 @@ import org.springframework.core.Ordered;
  */
 public class CompositeStepExecutionListener implements StepExecutionListener {
 
-	private OrderedComposite list = new OrderedComposite();
+	private OrderedComposite<StepExecutionListener> list = new OrderedComposite<StepExecutionListener>();
 
 	/**
 	 * Public setter for the listeners.
@@ -37,7 +38,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * @param listeners
 	 */
 	public void setListeners(StepExecutionListener[] listeners) {
-		list.setItems(listeners);
+		list.setItems(Arrays.asList(listeners));
 	}
 
 	/**
@@ -56,7 +57,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		ExitStatus status = null;
-		for (Iterator<Object> iterator = list.reverse(); iterator.hasNext();) {
+		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
 			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			ExitStatus close = listener.afterStep(stepExecution);
 			status = status != null ? status.and(close) : close;
@@ -70,7 +71,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
-		for (Iterator<Object> iterator = list.iterator(); iterator.hasNext();) {
+		for (Iterator<StepExecutionListener> iterator = list.iterator(); iterator.hasNext();) {
 			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			listener.beforeStep(stepExecution);
 		}
@@ -84,7 +85,7 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 	 */
 	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 		ExitStatus status = null;
-		for (Iterator<Object> iterator = list.reverse(); iterator.hasNext();) {
+		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
 			StepExecutionListener listener = (StepExecutionListener) iterator.next();
 			ExitStatus close = listener.onErrorInStep(stepExecution, e);
 			status = status != null ? status.and(close) : close;

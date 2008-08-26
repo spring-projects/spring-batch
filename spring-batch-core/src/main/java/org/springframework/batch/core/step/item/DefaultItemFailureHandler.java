@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.listener.ItemListenerSupport;
@@ -28,16 +30,12 @@ import org.springframework.batch.core.listener.ItemListenerSupport;
  * @author Lucas Ward
  * 
  */
-public class DefaultItemFailureHandler extends ItemListenerSupport {
+public class DefaultItemFailureHandler extends ItemListenerSupport<Object> {
 
 	protected static final Log logger = LogFactory
 			.getLog(DefaultItemFailureHandler.class);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.domain.ItemFailureLog#log(java.util.List)
-	 */
+	@Override
 	public void onReadError(Exception ex) {
 		try {
 			logger.error("Error encountered while reading", ex);
@@ -47,7 +45,8 @@ public class DefaultItemFailureHandler extends ItemListenerSupport {
 		}
 	}
 
-	public void onWriteError(Exception ex, Object item) {
+	@Override
+	public void onWriteError(Exception ex, List<? extends Object> item) {
 		try {
 			logger.error("Error encountered while writing item: [ " + item + "]", ex);
 		} catch (Exception exception) {

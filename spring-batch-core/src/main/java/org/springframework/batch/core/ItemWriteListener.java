@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core;
 
+import java.util.List;
+
 import org.springframework.batch.item.ItemWriter;
 
 /**
@@ -23,30 +25,31 @@ import org.springframework.batch.item.ItemWriter;
  * @author Lucas Ward
  * 
  */
-public interface ItemWriteListener extends StepListener {
+public interface ItemWriteListener<S> extends StepListener {
 
 	/**
 	 * Called before {@link ItemWriter#write(java.util.List)}
 	 * 
-	 * @param item to be written
+	 * @param items to be written
 	 */
-	void beforeWrite(Object item);
+	void beforeWrite(List<? extends S> items);
 
 	/**
-	 * Called after {@link ItemWriter#write(java.util.List)}  If  the item is last in a
-	 * chunk, this will be called before any transaction is committed, and
+	 * Called after {@link ItemWriter#write(java.util.List)} If the item is last
+	 * in a chunk, this will be called before any transaction is committed, and
 	 * before {@link ChunkListener#afterChunk()}
-	 * @param item written item
+	 * @param items written items
 	 */
-	void afterWrite(Object item);
+	void afterWrite(List<? extends S> items);
 
 	/**
-	 * Called if an error occurs while trying to write.
+	 * Called if an error occurs while trying to write. Will be called inside a
+	 * transaction, but the transaction will normally be rolled back. There is
+	 * no way to identify from this callback which of the items (if any) caused
+	 * the error.
 	 * 
-	 * @param ex
-	 *            thrown from {@link ItemWriter}
-	 * @param item
-	 *            attempted to be written.
+	 * @param exception thrown from {@link ItemWriter}
+	 * @param items attempted to be written.
 	 */
-	void onWriteError(Exception ex, Object item);
+	void onWriteError(Exception exception, List<? extends S> items);
 }

@@ -15,12 +15,14 @@
  */
 package org.springframework.batch.core.listener;
 
-import org.springframework.batch.core.StepListener;
+import java.util.List;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -29,8 +31,8 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  *
  */
-public class StepListenerSupport implements StepExecutionListener, ChunkListener,
-		ItemReadListener, ItemWriteListener {
+public class StepListenerSupport<S> implements StepExecutionListener, ChunkListener,
+		ItemReadListener, ItemWriteListener<S> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
@@ -83,21 +85,21 @@ public class StepListenerSupport implements StepExecutionListener, ChunkListener
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
+	 * @see org.springframework.batch.core.ItemWriteListener#afterWrite(java.util.List)
 	 */
-	public void afterWrite(Object item) {
+	public void afterWrite(List<? extends S> items) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemWriteListener#beforeWrite(java.lang.Object)
+	 * @see org.springframework.batch.core.ItemWriteListener#beforeWrite(java.util.List)
 	 */
-	public void beforeWrite(Object item) {
+	public void beforeWrite(List<? extends S> items) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemWriteListener#onWriteError(java.lang.Exception, java.lang.Object)
+	 * @see org.springframework.batch.core.ItemWriteListener#onWriteError(java.lang.Exception, java.util.List)
 	 */
-	public void onWriteError(Exception ex, Object item) {
+	public void onWriteError(Exception exception, List<? extends S> items) {
 	}
 
 }

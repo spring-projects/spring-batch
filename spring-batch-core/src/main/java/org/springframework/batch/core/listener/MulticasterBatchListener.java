@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.List;
+
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
@@ -29,8 +31,8 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class MulticasterBatchListener implements StepExecutionListener, ChunkListener, ItemReadListener,
-		ItemWriteListener, SkipListener {
+public class MulticasterBatchListener<S> implements StepExecutionListener, ChunkListener, ItemReadListener,
+		ItemWriteListener<S>, SkipListener {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
@@ -38,7 +40,7 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 
 	private CompositeItemReadListener itemReadListener = new CompositeItemReadListener();
 
-	private CompositeItemWriteListener itemWriteListener = new CompositeItemWriteListener();
+	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
 
 	private CompositeSkipListener skipListener = new CompositeSkipListener();
 
@@ -61,7 +63,7 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 			register(listeners[i]);
 		}
 	}
-
+	
 	/**
 	 * Register the listener for callbacks on the appropriate interfaces
 	 * implemented. Any {@link StepListener} can be provided, or an
@@ -78,6 +80,7 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 			this.itemReadListener.register((ItemReadListener) listener);
 		}
 		if (listener instanceof ItemWriteListener) {
+			// TODO: make this type safe somehow?
 			this.itemWriteListener.register((ItemWriteListener) listener);
 		}
 		if (listener instanceof SkipListener) {
@@ -191,11 +194,11 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 
 	/**
 	 * 
-	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#afterWrite(Object)
+	 * @see ItemWriteListener#afterWrite(List)
 	 */
-	public void afterWrite(Object item) {
+	public void afterWrite(List<? extends S> items) {
 		try {
-			itemWriteListener.afterWrite(item);
+			itemWriteListener.afterWrite(items);
 		}
 		catch (RuntimeException e) {
 			throw new StepListenerFailedException("Error in afterWrite.", e);
@@ -203,12 +206,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 	}
 
 	/**
-	 * @param item
-	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#beforeWrite(java.lang.Object)
+	 * @param items
+	 * @see ItemWriteListener#beforeWrite(List)
 	 */
-	public void beforeWrite(Object item) {
+	public void beforeWrite(List<? extends S> items) {
 		try {
-			itemWriteListener.beforeWrite(item);
+			itemWriteListener.beforeWrite(items);
 		}
 		catch (RuntimeException e) {
 			throw new StepListenerFailedException("Error in beforeWrite.", e);
@@ -217,13 +220,12 @@ public class MulticasterBatchListener implements StepExecutionListener, ChunkLis
 
 	/**
 	 * @param ex
-	 * @param item
-	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#onWriteError(java.lang.Exception,
-	 * java.lang.Object)
+	 * @param items
+	 * @see ItemWriteListener#onWriteError(Exception, List)
 	 */
-	public void onWriteError(Exception ex, Object item) {
+	public void onWriteError(Exception ex, List<? extends S> items) {
 		try {
-			itemWriteListener.onWriteError(ex, item);
+			itemWriteListener.onWriteError(ex, items);
 		}
 		catch (RuntimeException e) {
 			throw new StepListenerFailedException("Error in onWriteError.", ex, e);
