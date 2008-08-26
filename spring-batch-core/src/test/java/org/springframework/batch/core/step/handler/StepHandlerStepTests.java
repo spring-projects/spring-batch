@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step.handler;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -42,6 +47,7 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
+import org.springframework.batch.core.step.handler.StepHandlerStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -58,7 +64,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
-public class StepHandlerStepTests extends TestCase {
+public class StepHandlerStepTests {
 
 	List<String> processed = new ArrayList<String>();
 
@@ -99,7 +105,8 @@ public class StepHandlerStepTests extends TestCase {
 		return step;
 	}
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		MapJobInstanceDao.clear();
 		MapStepExecutionDao.clear();
 		MapJobExecutionDao.clear();
@@ -119,6 +126,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	}
 
+	@Test
 	public void testStepExecutor() throws Exception {
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
@@ -133,6 +141,7 @@ public class StepHandlerStepTests extends TestCase {
 	/**
 	 * StepExecution should be updated after every chunk commit.
 	 */
+	@Test
 	public void testStepExecutionUpdates() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(jobInstance);
@@ -153,6 +162,7 @@ public class StepHandlerStepTests extends TestCase {
 	/**
 	 * Failure to update StepExecution after chunk commit is fatal.
 	 */
+	@Test
 	public void testStepExecutionUpdateFailure() throws Exception {
 
 		JobExecution jobExecution = new JobExecution(jobInstance);
@@ -175,6 +185,7 @@ public class StepHandlerStepTests extends TestCase {
 		
 	}
 
+	@Test
 	public void testRepository() throws Exception {
 
 		SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
@@ -188,6 +199,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals(1, processed.size());
 	}
 
+	@Test
 	public void testIncrementRollbackCount() {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
@@ -211,6 +223,7 @@ public class StepHandlerStepTests extends TestCase {
 
 	}
 
+	@Test
 	public void testExitCodeDefaultClassification() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
@@ -235,6 +248,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testExitCodeCustomClassification() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
@@ -270,6 +284,7 @@ public class StepHandlerStepTests extends TestCase {
 	 * make sure a job that has never been executed before, but does have
 	 * saveExecutionAttributes = true, doesn't have restoreFrom called on it.
 	 */
+	@Test
 	public void testNonRestartedJob() throws Exception {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		step.setStepHandler(new SimpleStepHandler<String>(tasklet, itemWriter));
@@ -283,6 +298,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertTrue(tasklet.isGetExecutionAttributesCalled());
 	}
 
+	@Test
 	public void testSuccessfulExecutionWithExecutionContext() throws Exception {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -299,6 +315,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals(3, list.size());
 	}
 
+	@Test
 	public void testSuccessfulExecutionWithFailureOnSaveOfExecutionContext() throws Exception {
 		final JobExecution jobExecution = new JobExecution(jobInstance);
 		final StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -328,6 +345,7 @@ public class StepHandlerStepTests extends TestCase {
 	 * set to false, doesn't have restore or getExecutionAttributes called on
 	 * it.
 	 */
+	@Test
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
 		step.setStepHandler(new SimpleStepHandler<String>(tasklet, itemWriter));
@@ -349,6 +367,7 @@ public class StepHandlerStepTests extends TestCase {
 	 * nothing will be restored because the Tasklet does not implement
 	 * Restartable.
 	 */
+	@Test
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
 		step.setStepHandler(new SimpleStepHandler<String>(new ItemReader<String>() {
 			public String read() throws Exception {
@@ -361,6 +380,7 @@ public class StepHandlerStepTests extends TestCase {
 		step.execute(stepExecution);
 	}
 
+	@Test
 	public void testStreamManager() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			public String read() throws Exception {
@@ -385,6 +405,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals("bar", stepExecution.getExecutionContext().getString("foo"));
 	}
 
+	@Test
 	public void testDirectlyInjectedItemStream() throws Exception {
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			public void update(ExecutionContext executionContext) {
@@ -401,6 +422,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals("bar", stepExecution.getExecutionContext().getString("foo"));
 	}
 
+	@Test
 	public void testDirectlyInjectedListener() throws Exception {
 		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
 			public void beforeStep(StepExecution stepExecution) {
@@ -418,6 +440,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals(2, list.size());
 	}
 
+	@Test
 	public void testListenerCalledBeforeStreamOpened() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			public void beforeStep(StepExecution stepExecution) {
@@ -435,6 +458,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testAfterStep() throws Exception {
 
 		final ExitStatus customStatus = new ExitStatus(false, "custom code");
@@ -459,6 +483,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals(customStatus.getExitDescription(), returnedStatus.getExitDescription());
 	}
 
+	@Test
 	public void testDirectlyInjectedListenerOnError() throws Exception {
 		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
 			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
@@ -483,6 +508,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals(1, list.size());
 	}
 
+	@Test
 	public void testDirectlyInjectedStreamWhichIsAlsoReader() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			public String read() throws Exception {
@@ -507,6 +533,7 @@ public class StepHandlerStepTests extends TestCase {
 		assertEquals("bar", stepExecution.getExecutionContext().getString("foo"));
 	}
 
+	@Test
 	public void testStatusForInterruptedException() {
 
 		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
@@ -546,6 +573,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStatusForNormalFailure() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
@@ -573,6 +601,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStatusForErrorFailure() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
@@ -600,6 +629,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStatusForResetFailedException() throws Exception {
 
 		ItemReader<String> itemReader = new ItemReader<String>() {
@@ -635,6 +665,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
 		step.setTransactionManager(new ResourcelessTransactionManager() {
@@ -665,6 +696,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStatusForFinalUpdateFailedException() throws Exception {
 
 		step.setJobRepository(new JobRepositorySupport());
@@ -693,6 +725,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStatusForCloseFailedException() throws Exception {
 
 		MockRestartableItemReader itemReader = new MockRestartableItemReader() {
@@ -732,6 +765,7 @@ public class StepHandlerStepTests extends TestCase {
 	 * commiting first chunk - otherwise ItemStreams won't recognize it is
 	 * restart scenario on next run.
 	 */
+	@Test
 	public void testRestartAfterFailureInFirstChunk() throws Exception {
 		MockRestartableItemReader reader = new MockRestartableItemReader() {
 			public String read() throws Exception {
@@ -756,6 +790,7 @@ public class StepHandlerStepTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStepToCompletion() throws Exception {
 
 		RepeatTemplate template = new RepeatTemplate();
@@ -777,6 +812,7 @@ public class StepHandlerStepTests extends TestCase {
 	 * causes step to fail.
 	 * @throws JobInterruptedException
 	 */
+	@Test
 	public void testStepFailureInAfterStepCallback() throws JobInterruptedException {
 		StepExecutionListener listener = new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {

@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.tasklet;
+package org.springframework.batch.core.step.handler;
 
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.core.AttributeAccessor;
 
 /**
- * A {@link Tasklet} that wraps a method in a POJO. By default the return value
- * is {@link ExitStatus#FINISHED} unless the delegate POJO itself returns an
- * {@link ExitStatus}. The POJO method is usually going to have no arguments,
+ * A {@link StepHandler} that wraps a method in a POJO. By default the return
+ * value is {@link ExitStatus#FINISHED} unless the delegate POJO itself returns
+ * an {@link ExitStatus}. The POJO method is usually going to have no arguments,
  * but a static argument or array of arguments can be used by setting the
  * arguments property.
  * 
@@ -30,15 +32,16 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class TaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
+public class StepHandlerAdapter extends AbstractMethodInvokingDelegator<Object> implements StepHandler {
 
 	/**
 	 * Delegate execution to the target object and translate the return value to
-	 * an {@link ExitStatus} by invoking a method in the delegate POJO.
+	 * an {@link ExitStatus} by invoking a method in the delegate POJO. Ignores
+	 * the {@link StepContribution} and the attributes.
 	 * 
-	 * @see org.springframework.batch.core.step.tasklet.Tasklet#execute()
+	 * @see StepHandler#handle(StepContribution, AttributeAccessor)
 	 */
-	public ExitStatus execute() throws Exception {
+	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		return mapResult(invokeDelegateMethod());
 	}
 

@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -17,10 +17,9 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
-public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+public class HandlerJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
-	@Autowired
-	private Resource directory;
+	private Resource directory = new FileSystemResource("target/test-outputs/test-dir");
 	
 	/*
 	 * Create the directory and some files in it.

@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step.handler;
 
+import org.springframework.batch.core.step.handler.StepHandler;
+import org.springframework.batch.core.step.item.ItemOrientedStepHandler;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassthroughItemProcessor;

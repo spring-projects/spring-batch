@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.tasklet;
+package org.springframework.batch.core.step.handler;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,9 +25,9 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  *
  */
-public class TaskletAdapterTests {
+public class StepHandlerAdapterTests {
 	
-	private TaskletAdapter tasklet = new TaskletAdapter();
+	private StepHandlerAdapter tasklet = new StepHandlerAdapter();
 	private Object result = null;
 	
 	public ExitStatus execute() {
@@ -38,41 +38,28 @@ public class TaskletAdapterTests {
 		return result ;
 	}
 
-	/* (non-Javadoc) 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception {
 		tasklet.setTargetObject(this);
-		tasklet.setTargetMethod("execute");
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.core.step.tasklet.TaskletAdapter#execute()}.
-	 * @throws Exception 
-	 */
 	@Test
 	public void testExecuteWithExitStatus() throws Exception {
-		assertEquals(ExitStatus.NOOP, tasklet.execute());
+		tasklet.setTargetMethod("execute");
+		assertEquals(ExitStatus.NOOP, tasklet.handle(null,null));
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.core.step.tasklet.TaskletAdapter#mapResult(java.lang.Object)}.
-	 */
 	@Test
 	public void testMapResultWithNull() throws Exception {
 		tasklet.setTargetMethod("process");
-		assertEquals(ExitStatus.FINISHED, tasklet.execute());
+		assertEquals(ExitStatus.FINISHED, tasklet.handle(null,null));
 	}
 
-	/**
-	 * Test method for {@link org.springframework.batch.core.step.tasklet.TaskletAdapter#mapResult(java.lang.Object)}.
-	 */	
 	@Test
 	public void testMapResultWithNonNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		this.result = "foo";
-		assertEquals(ExitStatus.FINISHED, tasklet.execute());
+		assertEquals(ExitStatus.FINISHED, tasklet.handle(null,null));
 	}
 
 }

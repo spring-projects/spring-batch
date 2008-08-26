@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.tasklet;
+package org.springframework.batch.core.step.handler;
 
 import java.util.concurrent.Callable;
 
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.AttributeAccessor;
 import org.springframework.util.Assert;
 
 /**
  * Adapts a {@link Callable}&lt;{@link ExitStatus}&gt; to the
- * {@link Tasklet} interface.
+ * {@link StepHandler} interface.
  * 
  * @author Dave Syer
  * 
  */
-public class CallableTaskletAdapter implements Tasklet, InitializingBean {
+public class CallableStepHandlerAdapter implements StepHandler, InitializingBean {
 
 	private Callable<ExitStatus> callable;
 	
@@ -50,10 +52,11 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	}
 
 	/**
-	 * Execute the provided Callable and return its {@link ExitStatus}.
-	 * @see org.springframework.batch.core.step.tasklet.Tasklet#execute()
+	 * Execute the provided Callable and return its {@link ExitStatus}.  Ignores
+	 * the {@link StepContribution} and the attributes.
+	 * @see StepHandler#handle(StepContribution, AttributeAccessor)
 	 */
-	public ExitStatus execute() throws Exception {
+	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		return callable.call();
 	}
 

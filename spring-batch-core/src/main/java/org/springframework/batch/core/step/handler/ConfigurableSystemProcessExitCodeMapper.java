@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.common;
+package org.springframework.batch.core.step.handler;
 
 import java.util.Map;
 

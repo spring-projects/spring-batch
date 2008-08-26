@@ -33,11 +33,10 @@
 		<property name="steps" ref="step" />
 	</bean>
 
-	<bean id="step" class="org.springframework.batch.core.step.tasklet.TaskletStep">
-		<property name="tasklet">
-			<bean class="org.springframework.batch.integration.job.TestTasklet" />
+	<bean id="step" parent="handlerStep">
+		<property name="stepHandler">
+			<bean class="org.springframework.batch.integration.job.TestStepHandler" />
 		</property>
-		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
 </beans>

@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.handler.StepHandler;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -79,7 +80,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
 	 * taken from the reader.
 	 * 
-	 * @see org.springframework.batch.core.step.item.StepHandler#handle(org.springframework.batch.core.StepContribution,
+	 * @see org.springframework.batch.core.step.handler.StepHandler#handle(org.springframework.batch.core.StepContribution,
 	 * AttributeAccessor)
 	 */
 	public ExitStatus handle(final StepContribution contribution, AttributeAccessor attributes) throws Exception {

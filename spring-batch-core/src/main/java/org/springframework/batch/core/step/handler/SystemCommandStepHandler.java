@@ -1,19 +1,20 @@
-package org.springframework.batch.sample.common;
+package org.springframework.batch.core.step.handler;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.lang.time.StopWatch;
 import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.AttributeAccessor;
 import org.springframework.util.Assert;
 
 /**
- * {@link Tasklet} that executes a system command.
+ * {@link StepHandler} that executes a system command.
  * 
  * The system command is executed in a new thread - timeout value is required to
  * be set, so that the batch job does not hang forever if the external process
@@ -30,7 +31,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class SystemCommandTasklet extends StepExecutionListenerSupport implements Tasklet, InitializingBean {
+public class SystemCommandStepHandler extends StepExecutionListenerSupport implements StepHandler, InitializingBean {
 
 	private String command;
 
@@ -45,12 +46,12 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	private long checkInterval = 1000;
 
 	private StepExecution execution = null;
-
+	
 	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
-	public ExitStatus execute() throws Exception {
+	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		ExecutorThread executorThread = new ExecutorThread();
 		executorThread.start();
 

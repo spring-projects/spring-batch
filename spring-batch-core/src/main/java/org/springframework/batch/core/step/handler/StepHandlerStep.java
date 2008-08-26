@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.step.handler;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -79,7 +79,7 @@ public class StepHandlerStep extends AbstractStep {
 
 	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
-	private StepHandler itemHandler;
+	private StepHandler stepHandler;
 
 	private StepExecutionSynchronizer synchronizer;
 
@@ -111,10 +111,10 @@ public class StepHandlerStep extends AbstractStep {
 	/**
 	 * Public setter for the {@link StepHandler}.
 	 * 
-	 * @param itemHandler the {@link StepHandler} to set
+	 * @param stepHandler the {@link StepHandler} to set
 	 */
-	public void setStepHandler(StepHandler itemHandler) {
-		this.itemHandler = itemHandler;
+	public void setStepHandler(StepHandler stepHandler) {
+		this.stepHandler = stepHandler;
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class StepHandlerStep extends AbstractStep {
 				try {
 
 					try {
-						exitStatus = itemHandler.handle(contribution, attributes);
+						exitStatus = stepHandler.handle(contribution, attributes);
 					}
 					catch (Error e) {
 						if (transactionAttribute.rollbackOn(e)) {

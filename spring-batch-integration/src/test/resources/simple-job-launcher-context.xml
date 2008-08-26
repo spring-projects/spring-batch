@@ -26,9 +26,10 @@
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="restartable" value="true" />
 	</bean>
-	<bean id="taskletStep"
-		class="org.springframework.batch.core.step.tasklet.TaskletStep"
+	<bean id="handlerStep"
+		class="org.springframework.batch.core.step.handler.StepHandlerStep"
 		abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="allowStartIfComplete" value="true" />
 	</bean>

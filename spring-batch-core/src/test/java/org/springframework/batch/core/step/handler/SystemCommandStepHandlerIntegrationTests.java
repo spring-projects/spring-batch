@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.common;
+package org.springframework.batch.core.step.handler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -19,13 +19,13 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
 /**
- * Tests for {@link SystemCommandTasklet}.
+ * Tests for {@link SystemCommandStepHandler}.
  */
-public class SystemCommandTaskletIntegrationTests {
+public class SystemCommandStepHandlerIntegrationTests {
 
-	private static final Log log = LogFactory.getLog(SystemCommandTaskletIntegrationTests.class);
+	private static final Log log = LogFactory.getLog(SystemCommandStepHandlerIntegrationTests.class);
 
-	private SystemCommandTasklet tasklet = new SystemCommandTasklet();
+	private SystemCommandStepHandler tasklet = new SystemCommandStepHandler();
 
 	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(
 			1L, new JobParameters(), "systemCommandJob")));
@@ -53,7 +53,7 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		ExitStatus exitStatus = tasklet.execute();
+		ExitStatus exitStatus = tasklet.handle(null,null);
 
 		assertEquals(ExitStatus.FINISHED, exitStatus);
 	}
@@ -68,7 +68,7 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		ExitStatus exitStatus = tasklet.execute();
+		ExitStatus exitStatus = tasklet.handle(null,null);
 
 		assertEquals(ExitStatus.FAILED, exitStatus);
 	}
@@ -85,7 +85,7 @@ public class SystemCommandTaskletIntegrationTests {
 
 		log.info("Executing command: " + command);
 		try {
-			tasklet.execute();
+			tasklet.handle(null,null);
 			fail();
 		}
 		catch (SystemCommandException e) {
@@ -105,7 +105,7 @@ public class SystemCommandTaskletIntegrationTests {
 
 		stepExecution.setTerminateOnly();
 		try {
-			tasklet.execute();
+			tasklet.handle(null,null);
 			fail();
 		}
 		catch (JobInterruptedException e) {

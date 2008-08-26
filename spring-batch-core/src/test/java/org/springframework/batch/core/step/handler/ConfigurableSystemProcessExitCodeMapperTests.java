@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.common;
+package org.springframework.batch.core.step.handler;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.batch.core.step.handler.ConfigurableSystemProcessExitCodeMapper;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

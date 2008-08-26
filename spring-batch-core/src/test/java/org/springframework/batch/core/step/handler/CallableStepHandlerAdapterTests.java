@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.tasklet;
+package org.springframework.batch.core.step.handler;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -22,22 +22,19 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.springframework.batch.repeat.ExitStatus;
-public class CallableTaskletAdapterTests {
-	
-	private CallableTaskletAdapter adapter = new CallableTaskletAdapter();
 
-	/**
-	 * Test method for {@link org.springframework.batch.core.step.tasklet.CallableTaskletAdapter#execute()}.
-	 * @throws Exception 
-	 */
+public class CallableStepHandlerAdapterTests {
+	
+	private CallableStepHandlerAdapter adapter = new CallableStepHandlerAdapter();
+
 	@Test
-	public void testExecute() throws Exception {
+	public void testHandle() throws Exception {
 		adapter.setCallable(new Callable<ExitStatus>() {
 			public ExitStatus call() throws Exception {
 				return ExitStatus.FINISHED;
 			}
 		});
-		assertEquals(ExitStatus.FINISHED, adapter.execute());
+		assertEquals(ExitStatus.FINISHED, adapter.handle(null,null));
 	}
 
 	@Test

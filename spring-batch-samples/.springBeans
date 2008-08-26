@@ -34,7 +34,6 @@
 		<config>src/main/resources/jobs/skipSampleJob.xml</config>
 		<config>src/main/resources/jobs/multilineOrderInputTokenizers.xml</config>
 		<config>src/main/resources/jobs/multilineOrderOutputAggregators.xml</config>
-		<config>src/main/resources/jobs/taskletJob.xml</config>
 		<config>src/main/resources/jobs/compositeItemWriterSampleJob.xml</config>
 		<config>src/main/resources/jobs/multiResourceJob.xml</config>
 		<config>src/main/resources/jobs/jobExecutionContextSample.xml</config>
@@ -261,7 +260,6 @@
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/jobs/taskletJob.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
