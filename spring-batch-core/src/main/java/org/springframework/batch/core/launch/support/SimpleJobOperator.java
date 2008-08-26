@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -45,6 +46,7 @@ import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
@@ -52,6 +54,7 @@ import org.springframework.util.Assert;
 
 /**
  * @author Dave Syer
+ * @author Lucas Ward
  * 
  */
 public class SimpleJobOperator implements JobOperator, InitializingBean {
@@ -67,6 +70,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	private JobExplorer jobExplorer;
 
 	private JobLauncher jobLauncher;
+	
+	private JobRepository jobRepository;
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
 
@@ -105,6 +110,10 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 */
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
+	}
+	
+	public void setJobRepository(JobRepository jobRepository) {
+		this.jobRepository = jobRepository;
 	}
 
 	/**
@@ -356,7 +365,20 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
 	public boolean stop(long executionId) throws NoSuchJobExecutionException {
-		throw new UnsupportedOperationException("See BATCH-453 for implementation.");
+		
+		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+		
+		if(jobExecution == null){
+			throw new NoSuchJobExecutionException("No JobExecution found for id: [" + executionId + "]");
+		}
+		
+		//Indicate the execution should be stopped by setting it's status to 'STOPPING'.  It is assumed that
+		//the step implementation will check this status at chunk boundaries.
+		jobExecution.setStatus(BatchStatus.STOPPING);
+		jobRepository.update(jobExecution);
+		
+		// TODO: I'm not sure that we can really know if the execution stopped
+		return true;
 	}
 
 }

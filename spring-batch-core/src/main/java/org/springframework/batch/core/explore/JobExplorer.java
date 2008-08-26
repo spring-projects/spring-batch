@@ -44,7 +44,7 @@ public interface JobExplorer {
 
 	/**
 	 * @param executionId
-	 * @return the {@link JobExecution} with this id, or null
+	 * @return the {@link JobExecution} with this id, or null if not found
 	 */
 	JobExecution getJobExecution(Long executionId);
 

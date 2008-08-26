@@ -18,6 +18,7 @@ package org.springframework.batch.core.launch.support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.easymock.EasyMock.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import java.util.Set;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -46,6 +48,7 @@ import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.batch.core.launch.NoSuchJobInstanceException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.support.PropertiesConverter;
@@ -61,6 +64,8 @@ public class SimpleJobOperatorTests {
 	protected Job job;
 
 	private JobExplorer jobExplorer;
+	
+	private JobRepository jobRepository;
 
 	private JobParameters jobParameters;
 
@@ -108,6 +113,9 @@ public class SimpleJobOperatorTests {
 		jobExplorer = EasyMock.createNiceMock(JobExplorer.class);
 
 		jobOperator.setJobExplorer(jobExplorer);
+		
+		jobRepository = createMock(JobRepository.class);
+		jobOperator.setJobRepository(jobRepository);
 
 		jobOperator.setJobParametersConverter(new DefaultJobParametersConverter() {
 			@Override
@@ -134,17 +142,6 @@ public class SimpleJobOperatorTests {
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
-			// expected
-		}
-	}
-
-	@Test
-	public void testStop() throws Exception {
-		try {
-			jobOperator.stop(123L);
-			fail("Expected UnsupportedOperationException");
-		}
-		catch (UnsupportedOperationException e) {
 			// expected
 		}
 	}
@@ -377,6 +374,21 @@ public class SimpleJobOperatorTests {
 			// expected
 		}
 		EasyMock.verify(jobExplorer);
+	}
+	
+	@Test
+	public void testStop() throws Exception{
+		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		jobExplorer.getJobExecution(111L);
+		expectLastCall().andReturn(jobExecution);
+		jobRepository.update(jobExecution);
+		replay(jobExplorer);
+		replay(jobRepository);
+		jobOperator.stop(111L);
+		verify(jobExplorer);
+		verify(jobRepository);
+		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
 
 }
