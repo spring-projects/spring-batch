@@ -337,7 +337,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				}
 				catch (Exception e) {
 					try {
-						if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+						if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount() + skipCount)) {
 							// increment skip count and try again
 							try {
 								skipCount++;

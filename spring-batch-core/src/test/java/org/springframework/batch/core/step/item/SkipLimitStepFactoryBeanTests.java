@@ -405,6 +405,49 @@ public class SkipLimitStepFactoryBeanTests {
 		assertEquals(4, count);
 	}
 
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
+	public void testSkipOverLimitOnReadWithAllSkipsAtEnd() throws Exception {
+
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"), Arrays
+				.asList(StringUtils.commaDelimitedListToStringArray("6,12,13,14,15")));
+
+		factory.setCommitInterval(5);
+		factory.setSkipLimit(3);
+		factory.setItemReader(reader);
+		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
+			{
+				add(Exception.class);
+			}
+		});
+
+		Step step = (Step) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipLimitExceededException.");
+		}
+		catch (SkipLimitExceededException e) {
+		}
+
+		assertEquals("bad skip count", 3, stepExecution.getSkipCount());
+		assertEquals("bad read skip count", 2, stepExecution.getReadSkipCount());
+		assertEquals("bad write skip count", 1, stepExecution.getWriteSkipCount());
+
+		// writer did not skip "6" as it never made it to writer, only "4" did
+		assertFalse(reader.processed.contains("6"));
+		assertTrue(reader.processed.contains("4"));
+
+		// only "1" was ever committed
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5,7,8,9,10,11"));
+		assertEquals(expectedOutput, writer.written);
+
+	}
+
 	// TODO: test with transactional reader (e.g. list with tx proxy)
 
 	/**
