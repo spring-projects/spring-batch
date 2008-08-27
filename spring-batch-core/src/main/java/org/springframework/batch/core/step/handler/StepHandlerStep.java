@@ -260,6 +260,7 @@ public class StepHandlerStep extends AbstractStep {
 
 						// Apply the contribution to the step
 						// even if unsuccessful
+						logger.debug("Applying contribution: " + contribution);
 						stepExecution.apply(contribution);
 
 					}
@@ -312,6 +313,7 @@ public class StepHandlerStep extends AbstractStep {
 					}
 
 					try {
+						logger.debug("Saving step execution after commit: " + stepExecution);
 						getJobRepository().update(stepExecution);
 					}
 					catch (Exception e) {

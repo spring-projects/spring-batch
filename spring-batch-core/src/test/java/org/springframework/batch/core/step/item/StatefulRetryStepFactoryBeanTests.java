@@ -52,7 +52,9 @@ import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryCacheCapacityExceededException;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Dave Syer
@@ -70,6 +72,8 @@ public class StatefulRetryStepFactoryBeanTests {
 
 	private List<Object> provided = new ArrayList<Object>();
 
+	private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
+	
 	int count = 0;
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
@@ -137,8 +141,7 @@ public class StatefulRetryStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSuccessfulRetryWithReadFailure() throws Exception {
-		List<String> items = Arrays.asList(new String[] { "a", "b", "c" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
+		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c")) {
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -177,8 +180,7 @@ public class StatefulRetryStepFactoryBeanTests {
 			}
 		});
 		factory.setSkipLimit(2);
-		List<String> items = Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
+		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
 			public String read() {
 				String item = super.read();
 				count++;
@@ -216,8 +218,7 @@ public class StatefulRetryStepFactoryBeanTests {
 			}
 		} });
 		factory.setSkipLimit(2);
-		List<String> items = Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
+		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
 			public String read() {
 				String item = super.read();
 				logger.debug("Read Called! Item: [" + item + "]");
@@ -231,6 +232,7 @@ public class StatefulRetryStepFactoryBeanTests {
 			public void write(List<? extends String> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				processed.addAll(item);
+				written.addAll(item);
 				if (item.contains("b") || item.contains("d")) {
 					throw new RuntimeException("Write error - planned but recoverable.");
 				}
@@ -253,10 +255,13 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getWriteSkipCount());
 
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,c,e,f"));
+		assertEquals(expectedOutput, written);
+
 		// [a, b, c, d, e, f, null]
 		assertEquals(7, provided.size());
-		// [a, b, b, b, b, b, c, d, d, d, d, d, e, f]
-		assertEquals(14, processed.size());
+		// [a, b, b, b, b, b, b, c, d, d, d, d, d, d, e, f]
+		assertEquals(16, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());
 	}
@@ -277,8 +282,7 @@ public class StatefulRetryStepFactoryBeanTests {
 			}
 		} });
 		factory.setSkipLimit(2);
-		List<String> items = Arrays.asList(new String[] { "a", "b", "c", "d", "e", "f" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
+		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
 			public String read() {
 				String item = super.read();
 				logger.debug("Read Called! Item: [" + item + "]");
@@ -292,6 +296,7 @@ public class StatefulRetryStepFactoryBeanTests {
 			public void write(List<? extends String> item) throws Exception {
 				logger.debug("Write Called! Item: [" + item + "]");
 				processed.addAll(item);
+				written.addAll(item);
 				if (item.contains("b") || item.contains("d")) {
 					throw new RuntimeException("Write error - planned but recoverable.");
 				}
@@ -314,10 +319,13 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getWriteSkipCount());
 
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,c,e,f"));
+		assertEquals(expectedOutput, written);
+
 		// [a, b, c, d, e, f, null]
 		assertEquals(7, provided.size());
-		// [a, b, c, a, b, c, b, b, b, b, b, c, a, c, d, e, f, d, d, d, d, e, f, e, f]
-		assertEquals(25, processed.size());
+		// [a, b, c, a, b, c, a, b, c, a, b, c, a, b, c, a, b, a, c, d, e, f, d, e, f, d, e, f, d, e, f, d, e, f, d, e, f]
+		assertEquals(37, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());
 	}
@@ -331,8 +339,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		});
 		factory.setRetryLimit(4);
 		factory.setSkipLimit(0);
-		List<String> items = Arrays.asList(new String[] { "b" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
+		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("b")) {
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -343,6 +350,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			public void write(List<? extends String> item) throws Exception {
 				processed.addAll(item);
+				written.addAll(item);
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}
@@ -360,11 +368,15 @@ public class StatefulRetryStepFactoryBeanTests {
 			// expected
 		}
 
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
+		assertEquals(expectedOutput, written);
+
 		assertEquals(0, stepExecution.getSkipCount());
 		// [b]
 		assertEquals(1, provided.size());
-		// [b, b, b, b]
-		assertEquals(4, processed.size());
+		// the failed items are tried one more time than the limit (TODO: maybe fix this?)
+		// [b, b, b, b, b]
+		assertEquals(5, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getItemCount());
@@ -383,8 +395,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		factory.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>());
 
 		factory.setSkipLimit(1);
-		List<String> items = Arrays.asList(new String[] { "b" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
+		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("b")) {
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -395,6 +406,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			public void write(List<? extends String> item) throws Exception {
 				processed.addAll(item);
+				written.addAll(item);
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but not skippable.");
 			}
@@ -414,11 +426,14 @@ public class StatefulRetryStepFactoryBeanTests {
 			assertTrue("Wrong message: " + message, message.contains("Write error - planned but not skippable."));
 		}
 
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
+		assertEquals(expectedOutput, written);
+
 		assertEquals(0, stepExecution.getSkipCount());
 		// [b]
 		assertEquals(1, provided.size());
-		// [b]
-		assertEquals(1, processed.size());
+		// [b, b]
+		assertEquals(2, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getItemCount());
@@ -428,8 +443,7 @@ public class StatefulRetryStepFactoryBeanTests {
 	public void testRetryPolicy() throws Exception {
 		factory.setRetryPolicy(new SimpleRetryPolicy(4));
 		factory.setSkipLimit(0);
-		List<String> items = Arrays.asList(new String[] { "b" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
+		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("b")) {
 			public String read() {
 				String item = super.read();
 				provided.add(item);
@@ -440,6 +454,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		ItemWriter<String> itemWriter = new ItemWriter<String>() {
 			public void write(List<? extends String> item) throws Exception {
 				processed.addAll(item);
+				written.addAll(item);
 				logger.debug("Write Called! Item: [" + item + "]");
 				throw new RuntimeException("Write error - planned but retryable.");
 			}
@@ -457,11 +472,14 @@ public class StatefulRetryStepFactoryBeanTests {
 			// expected
 		}
 
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
+		assertEquals(expectedOutput, written);
+
 		assertEquals(0, stepExecution.getSkipCount());
 		// [b]
 		assertEquals(1, provided.size());
-		// [b, b, b, b]
-		assertEquals(4, processed.size());
+		// [b, b, b, b, b]
+		assertEquals(5, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getItemCount());

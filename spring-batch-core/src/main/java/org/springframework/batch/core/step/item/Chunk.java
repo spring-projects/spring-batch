@@ -5,9 +5,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.springframework.util.Assert;
-
 /**
+ * Encapsulation of a list of items to be processed and possibly a list of
+ * failed items to be skipped. To mark an item as skipped clients should iterate
+ * over the chunk using the {@link #iterator()} method, and if there is a
+ * failure call {@link ChunkIterator#remove(Exception)} on the iterator. The
+ * skipped items are then available through the chunk.
+ * 
  * @author Dave Syer
  * 
  */
@@ -15,13 +19,7 @@ class Chunk<W> implements Iterable<W> {
 
 	private List<W> items = new ArrayList<W>();
 
-	private int current = 0;
-
-	private int last = 0;
-
-	private Exception exception = null;
-
-	private boolean skipped = false;
+	private List<SkippedItem<W>> skips = new ArrayList<SkippedItem<W>>();
 
 	/**
 	 * Add the item to the chunk.
@@ -29,7 +27,6 @@ class Chunk<W> implements Iterable<W> {
 	 */
 	public void add(W item) {
 		items.add(item);
-		last++;
 	}
 
 	/**
@@ -37,15 +34,20 @@ class Chunk<W> implements Iterable<W> {
 	 */
 	public void clear() {
 		items.clear();
-		last = 0;
-		current = 0;
 	}
 
 	/**
 	 * @return a copy of the items to be processed as an unmodifiable list
 	 */
 	public List<W> getItems() {
-		return Collections.unmodifiableList(new ArrayList<W>(items.subList(current, last)));
+		return Collections.unmodifiableList(new ArrayList<W>(items));
+	}
+
+	/**
+	 * @return a copy of the skips as an unmodifiable list
+	 */
+	public List<SkippedItem<W>> getSkips() {
+		return Collections.unmodifiableList(new ArrayList<SkippedItem<W>>(skips));
 	}
 
 	/**
@@ -59,92 +61,8 @@ class Chunk<W> implements Iterable<W> {
 	 * Get an unmodifiable iterator for the underlying items.
 	 * @see java.lang.Iterable#iterator()
 	 */
-	public Iterator<W> iterator() {
-		return getItems().iterator();
-	}
-
-	/**
-	 * @return true if the chunk is ready for a retry attempt
-	 */
-	public boolean canRetry() {
-		return exception == null || canSkip();
-	}
-
-	/**
-	 * Re-throw the last exception if there was one, and reset. Subsequent calls
-	 * would do nothing until {@link #rethrow(Exception)} is called.
-	 * 
-	 * @throws Exception if there is a last exception
-	 */
-	public void rethrow() throws Exception {
-		int size = items.size();
-		Exception throwable = exception;
-		if (exception != null && !skipped) {
-			if (isComplete()) {
-				// we tried all items and there was no exception
-				exception = null;
-			}
-			else {
-				// we tried some but not all elements with no exception
-				current = last;
-			}
-		}
-		if (skipped) {
-			skipped = false;
-		}
-		last = size; // reset end point of scan
-		if (current == size) {
-			// we scanned all the elements
-			current = 0;
-			exception = null;
-		}
-		if (throwable != null) {
-			throw throwable;
-		}
-	}
-
-	/**
-	 * @return true if the current item slice includes all items
-	 */
-	public boolean isComplete() {
-		return current == 0 && last == items.size();
-	}
-
-	/**
-	 * Get the skipped item and remove it from the backing list.
-	 * @return the item that can be skipped
-	 */
-	public W getSkippedItem() {
-		Assert.state(canSkip(), "To remove a skipped item it has to be unique");
-		W item = items.remove(current);
-		if (last > items.size()) {
-			last = items.size();
-		}
-		skipped = true;
-		return item;
-	}
-
-	/**
-	 * @param e an exception to register and re-throw
-	 * @throws Exception the exception passed in
-	 */
-	public void rethrow(Exception e) throws Exception {
-		exception = e;
-		// narrow the search for the failed item
-		last = current + (last - current) / 2;
-		// ... unless it would lead to processing no data
-		if (last==current) {
-			last = current + 1;
-		}
-		throw e;
-	}
-
-	/**
-	 * @return true if there is a single item waiting, so it can be identified
-	 * and passed to listeners
-	 */
-	public boolean canSkip() {
-		return current == last - 1 && current < items.size();
+	public ChunkIterator iterator() {
+		return new ChunkIterator(items);
 	}
 
 	/*
@@ -154,7 +72,86 @@ class Chunk<W> implements Iterable<W> {
 	 */
 	@Override
 	public String toString() {
-		return String.format("items=%s, canSkip=%s, current=%d, last=%d", items, canSkip(), current, last);
+		return String.format("[items=%s, skips=%s]", items, skips);
+	}
+
+	/**
+	 * Special iterator for a chunk providing the {@link #remove(Exception)}
+	 * method for dynamically removing an item abd adding it to the skips.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	public class ChunkIterator implements Iterator<W> {
+
+		final private Iterator<W> iterator;
+
+		private W next;
+
+		public ChunkIterator(List<W> items) {
+			iterator = items.iterator();
+		}
+
+		public boolean hasNext() {
+			return iterator.hasNext();
+		}
+
+		public W next() {
+			next = iterator.next();
+			return next;
+		}
+
+		public void remove(Exception e) {
+			if (next != null) {
+				skips.add(new SkippedItem<W>(next, e));
+			}
+			iterator.remove();
+		}
+
+		public void remove() {
+			throw new UnsupportedOperationException("To remove an item you must provide an exception.");
+		}
+
+	}
+
+	/**
+	 * Wrapper for a skipped item and its exception.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	public static class SkippedItem<T> {
+
+		final private Exception exception;
+
+		final private T item;
+
+		public SkippedItem(T item, Exception e) {
+			this.item = item;
+			this.exception = e;
+		}
+
+		/**
+		 * Public getter for the exception.
+		 * @return the exception
+		 */
+		public Exception getException() {
+			return exception;
+		}
+
+		/**
+		 * Public getter for the item.
+		 * @return the item
+		 */
+		public T getItem() {
+			return item;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("[exception=%s, item=%s]", exception, item);
+		}
+
 	}
 
 }

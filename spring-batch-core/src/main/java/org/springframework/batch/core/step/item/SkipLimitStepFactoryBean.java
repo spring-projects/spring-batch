@@ -2,6 +2,7 @@ package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -374,38 +375,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * the next transaction automatically.<br/>
 		 */
 		@Override
-		protected void write(final Chunk<S> chunk, StepContribution contribution) throws Exception {
-
-			if (!chunk.canRetry()) {
-				logger.debug("Run items: " + chunk.getItems());
-				runChunk(chunk, contribution);
-			}
-			else {
-				logger.debug(String.format("Retry items: %s", chunk.getItems()));
-				retryChunk(chunk, contribution);
-			}
-			chunk.rethrow();
-
-			chunk.clear();
-
-		}
-
-		/**
-		 * @param chunk
-		 */
-		private void runChunk(Chunk<S> chunk, final StepContribution contribution) throws Exception {
-			try {
-				doWrite(chunk.getItems());
-			}
-			catch (Exception e) {
-				chunk.rethrow(e);
-			}
-		}
-
-		/**
-		 * @param chunk
-		 */
-		private void retryChunk(final Chunk<S> chunk, final StepContribution contribution) throws Exception {
+		protected void write(final Chunk<S> chunk, final StepContribution contribution) throws Exception {
 
 			RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext context) throws Exception {
@@ -422,35 +392,41 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 					Exception t = (Exception) context.getLastThrowable();
 
-					if (!chunk.canSkip()) {
-						throw t;
+					for (Chunk<S>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
+						S item = iterator.next();
+						try {
+							doWrite(Collections.singletonList(item));
+						}
+						catch (Exception e) {
+							if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
+								iterator.remove(e);
+								contribution.incrementWriteSkipCount();
+								throw e;
+							}
+							else {
+								throw new RetryException("Non-skippable exception in recoverer", t);
+							}
+						}
 					}
 
-					if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
-						contribution.incrementWriteSkipCount();
-						S item = chunk.getSkippedItem();
-						try {
-							getListener().onSkipInWrite(item, t);
-							return null;
-						}
-						catch (RuntimeException ex) {
-							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, t);
-						}
-					}
-					else {
-						throw new RetryException("Non-skippable exception in recoverer", t);
-					}
+					return null;
 
 				}
 			};
 
-			try {
-				retryOperations.execute(retryCallback, recoveryCallback, new RetryState(chunk));
+			retryOperations.execute(retryCallback, recoveryCallback, new RetryState(chunk));
+
+			for (Chunk.SkippedItem<S> skip : chunk.getSkips()) {
+				Exception exception = skip.getException();
+				try {
+					getListener().onSkipInWrite(skip.getItem(), exception);
+				}
+				catch (RuntimeException e) {
+					throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
+				}
 			}
-			catch (Exception e) {
-				// only if the retry failed do we re-arrange the chunk
-				chunk.rethrow(e);
-			}
+
+			chunk.clear();
 
 		}
 	}

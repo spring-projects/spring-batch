@@ -48,7 +48,7 @@ public class StepExecution extends Entity {
 	private volatile int rollbackCount = 0;
 
 	private volatile int readSkipCount = 0;
-	
+
 	private volatile int writeSkipCount = 0;
 
 	private volatile Date startTime = new Date(System.currentTimeMillis());
@@ -234,38 +234,6 @@ public class StepExecution extends Entity {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.lang.Object)
-	 */
-	public boolean equals(Object obj) {
-
-		Object jobExecutionId = getJobExecutionId();
-		if (jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
-			return super.equals(obj);
-		}
-		StepExecution other = (StepExecution) obj;
-
-		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
-	 */
-	public int hashCode() {
-		Object jobExecutionId = getJobExecutionId();
-		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0) + 91
-				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
-	}
-
-	public String toString() {
-		return super.toString() + ", name=" + stepName + ", itemCount=" + itemCount + ", commitCount="
-				+ commitCount + ", rollbackCount=" + rollbackCount;
-	}
-
 	/**
 	 * @param exitStatus
 	 */
@@ -401,8 +369,7 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Set the time when the StepExecution was last updated before
-	 * persisting
+	 * Set the time when the StepExecution was last updated before persisting
 	 * 
 	 * @param lastUpdated
 	 */
@@ -410,5 +377,40 @@ public class StepExecution extends Entity {
 		this.lastUpdated = lastUpdated;
 	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.container.common.domain.Entity#equals(java.
+	 * lang.Object)
+	 */
+	public boolean equals(Object obj) {
+
+		Object jobExecutionId = getJobExecutionId();
+		if (jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
+			return super.equals(obj);
+		}
+		StepExecution other = (StepExecution) obj;
+
+		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
+	 */
+	public int hashCode() {
+		Object jobExecutionId = getJobExecutionId();
+		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0) + 91
+				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
+	}
+
+	public String toString() {
+		return super.toString()
+				+ String.format(", name=%s, itemCount=%d, readSkipCount=%d, writeSkipCount=%d"
+						+ ", commitCount=%d, rollbackCount=%d", stepName, itemCount, readSkipCount, writeSkipCount,
+						commitCount, rollbackCount);
+	}
+
 }

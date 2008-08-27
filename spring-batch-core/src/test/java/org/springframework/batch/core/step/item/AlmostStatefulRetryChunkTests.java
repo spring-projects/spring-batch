@@ -37,10 +37,6 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class AlmostStatefulRetryChunkTests {
 
-	private enum CallType {
-		RUN, RETRY;
-	}
-
 	private Log logger = LogFactory.getLog(getClass());
 
 	private final Chunk<String> chunk;
@@ -52,8 +48,6 @@ public class AlmostStatefulRetryChunkTests {
 	private static final int BACKSTOP_LIMIT = 1000;
 
 	private int count = 0;
-
-	private Object lastCallType;
 
 	public AlmostStatefulRetryChunkTests(String[] args, int limit) {
 		chunk = new Chunk<String>();
@@ -67,64 +61,68 @@ public class AlmostStatefulRetryChunkTests {
 	public void testRetry() throws Exception {
 		logger.debug("Starting simple scenario");
 		List<String> items = new ArrayList<String>(chunk.getItems());
+		int before = items.size();
 		items.removeAll(Collections.singleton("fail"));
 		boolean error = true;
 		while (error && count++ < BACKSTOP_LIMIT) {
 			try {
-				if (!chunk.canRetry()) {
-					// success
-					logger.debug("Run items: " + chunk.getItems());
-					lastCallType = CallType.RUN;
-					runChunk(chunk);
-				}
-				else {
-					logger.debug(String.format("Retry (attempts=%d) items: %s", retryAttempts, chunk.getItems()));
-					lastCallType = CallType.RETRY;
-					try {
-						retryChunk(chunk);
-					}
-					catch (Exception e) {
-						chunk.rethrow(e);
-					}
-
-				}
-				chunk.rethrow();
+				statefulRetry(chunk);
 				error = false;
 			}
 			catch (Exception e) {
 				error = true;
 			}
 		}
-		logger.debug("Items: " + chunk.getItems());
+		logger.debug("Chunk: " + chunk);
 		assertTrue("Backstop reached.  Probably an infinite loop...", count < BACKSTOP_LIMIT);
-		assertEquals(CallType.RETRY, lastCallType);
 		assertFalse(chunk.getItems().contains("fail"));
 		assertEquals(items, chunk.getItems());
+		assertEquals(before-chunk.getItems().size(), chunk.getSkips().size());
 	}
 
 	/**
 	 * @param chunk
 	 * @throws Exception
 	 */
-	private void retryChunk(Chunk<String> chunk) throws Exception {
-		try {
-			// N.B. a classic stateful retry goes straight to recovery here
-			doWrite(chunk);
-			retryAttempts = 0;
-		}
-		catch (Exception e) {
-			if (++retryAttempts > retryLimit) {
-				// recovery
+	private void statefulRetry(Chunk<String> chunk) throws Exception {
+		if (retryAttempts <= retryLimit) {
+			try {
+				// N.B. a classic stateful retry goes straight to recovery here
+				logger.debug(String.format("Retry (attempts=%d) chunk: %s", retryAttempts, chunk));
+				doWrite(chunk.getItems());
 				retryAttempts = 0;
-				if (chunk.canSkip()) {
-					chunk.getSkippedItem();
-				}
-				else {
-					throw e;
-				}
 			}
-			else {
+			catch (Exception e) {
+				retryAttempts++;
 				// stateful retry always rethrow
+				throw e;
+			}
+		}
+		else {
+			try {
+				logger.debug(String.format("Recover (attempts=%d) chunk: %s", retryAttempts, chunk));
+				recover(chunk);
+			}
+			finally {
+				retryAttempts = 0;
+			}
+		}
+		// recovery
+		return;
+
+	}
+
+	/**
+	 * @param chunk
+	 * @throws Exception
+	 */
+	private void recover(Chunk<String> chunk) throws Exception {
+		for (Chunk<String>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
+			String string = iterator.next();
+			try {
+				doWrite(Collections.singletonList(string));
+			} catch (Exception e) {
+				iterator.remove(e);
 				throw e;
 			}
 		}
@@ -134,21 +132,7 @@ public class AlmostStatefulRetryChunkTests {
 	 * @param chunk
 	 * @throws Exception
 	 */
-	private void runChunk(Chunk<String> chunk) throws Exception {
-		try {
-			doWrite(chunk);
-		}
-		catch (Exception e) {
-			chunk.rethrow(e);
-		}
-	}
-
-	/**
-	 * @param chunk
-	 * @throws Exception
-	 */
-	private void doWrite(Chunk<String> chunk) throws Exception {
-		List<String> items = chunk.getItems();
+	private void doWrite(List<String> items) throws Exception {
 		if (items.contains("fail")) {
 			throw new Exception();
 		}

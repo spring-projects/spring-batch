@@ -108,6 +108,11 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 					return ExitStatus.CONTINUABLE;
 				}
 			});
+			
+			// If there is no input we don't have to do anything more
+			if (inputs.isEmpty()) {
+				return result;
+			}
 
 			storeInputs(attributes, inputs);
 
@@ -141,7 +146,6 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 			clearAll(attributes);
 		}
 
-		logger.info("Contribution: " + contribution);
 		return result;
 
 	}

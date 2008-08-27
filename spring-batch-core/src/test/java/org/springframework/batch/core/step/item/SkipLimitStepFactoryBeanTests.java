@@ -93,7 +93,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 		// only write exception caused rollback, but more than once because it
 		// has to go back and split the chunk up to isolate the failed item
-		assertEquals(3, stepExecution.getRollbackCount());
+		assertEquals(2, stepExecution.getRollbackCount());
 
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertTrue(reader.processed.contains("4"));
@@ -229,8 +229,8 @@ public class SkipLimitStepFactoryBeanTests {
 		assertFalse(reader.processed.contains("2"));
 		assertTrue(reader.processed.contains("4"));
 
-		// "1" was sent to writer but never comitted
-		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
+		// only "1" was ever committed
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
 		assertEquals(expectedOutput, writer.written);
 
 	}
@@ -333,16 +333,14 @@ public class SkipLimitStepFactoryBeanTests {
 
 		StepExecution stepExecution = jobExecution.createStepExecution(step);
 
-		// TODO: uncomment this!
-		// step.execute(stepExecution);
-		// assertEquals(4, stepExecution.getSkipCount());
-		// assertEquals(3, stepExecution.getReadSkipCount());
-		// assertEquals(1, stepExecution.getWriteSkipCount());
-		//
-		// // skipped 2,3,4,5
-		// List<String> expectedOutput =
-		// Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
-		// assertEquals(expectedOutput, writer.written);
+		step.execute(stepExecution);
+		assertEquals(4, stepExecution.getSkipCount());
+		assertEquals(3, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
+
+		// skipped 2,3,4,5
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
+		assertEquals(expectedOutput, writer.written);
 
 	}
 
@@ -366,16 +364,14 @@ public class SkipLimitStepFactoryBeanTests {
 
 		StepExecution stepExecution = jobExecution.createStepExecution(step);
 
-		// TODO: uncomment this!
-		// step.execute(stepExecution);
-		// assertEquals(4, stepExecution.getSkipCount());
-		// assertEquals(2, stepExecution.getReadSkipCount());
-		// assertEquals(2, stepExecution.getWriteSkipCount());
-		//
-		// // skipped 2,3,4,5
-		// List<String> expectedOutput =
-		// Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
-		// assertEquals(expectedOutput, writer.written);
+		step.execute(stepExecution);
+		assertEquals(4, stepExecution.getSkipCount());
+		assertEquals(2, stepExecution.getReadSkipCount());
+		assertEquals(2, stepExecution.getWriteSkipCount());
+
+		// skipped 2,3,4,5
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
+		assertEquals(expectedOutput, writer.written);
 
 	}
 

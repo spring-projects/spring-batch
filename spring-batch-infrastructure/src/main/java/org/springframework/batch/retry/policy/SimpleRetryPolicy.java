@@ -96,9 +96,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * attempts so far is less than the limit.
 	 */
 	public boolean canRetry(RetryContext context) {
-		SimpleRetryContext simpleContext = ((SimpleRetryContext) context);
-		Throwable t = simpleContext.getLastThrowable();
-		return (t == null || retryForException(t)) && simpleContext.getRetryCount() < maxAttempts;
+		Throwable t = context.getLastThrowable();
+		return (t == null || retryForException(t)) && context.getRetryCount() < maxAttempts;
 	}
 
 	/**
