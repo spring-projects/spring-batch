@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<bean id="test-job"
+		class="org.springframework.batch.core.job.SimpleJob">
+		<property name="jobRepository">
+			<bean class="org.springframework.batch.core.step.JobRepositorySupport" />
+		</property>
+		<property name="steps">
+			<bean id="step1"
+				class="org.springframework.batch.core.step.item.SimpleStepFactoryBean">
+				<property name="itemReader">
+					<bean
+						class="org.springframework.batch.item.support.ListItemReader">
+						<constructor-arg value="foo,bar,spam" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean
+						class="org.springframework.batch.core.launch.EmptyItemWriter" />
+				</property>
+				<property name="jobRepository">
+					<bean
+						class="org.springframework.batch.core.step.JobRepositorySupport" />
+				</property>
+				<property name="transactionManager">
+					<bean
+						class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="test-job2" 
+		class="org.springframework.batch.core.job.SimpleJob">
+		<property name="jobRepository">
+			<bean class="org.springframework.batch.core.step.JobRepositorySupport" />
+		</property>
+		<property name="steps">
+			<bean id="step2"
+				class="org.springframework.batch.core.step.item.SimpleStepFactoryBean">
+				<property name="itemReader">
+					<bean
+						class="org.springframework.batch.item.support.ListItemReader">
+						<constructor-arg value="foo,bar,spam" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean
+						class="org.springframework.batch.core.launch.EmptyItemWriter" />
+				</property>
+				<property name="jobRepository">
+					<bean
+						class="org.springframework.batch.core.step.JobRepositorySupport" />
+				</property>
+				<property name="transactionManager">
+					<bean
+						class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+</beans>
