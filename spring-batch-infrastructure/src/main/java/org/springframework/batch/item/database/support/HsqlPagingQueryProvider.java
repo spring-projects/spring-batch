@@ -29,6 +29,7 @@ public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		sql.append("SELECT ").append("TOP ").append(pageSize).append(" ").append(getSelectClause());
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();
 	}
@@ -40,6 +41,7 @@ public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(" WHERE ").append(getSortKey()).append(" > ?");
 		sql.append(getWhereClause() == null ? "" : " AND " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();
 	}
@@ -53,6 +55,7 @@ public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		sql.append("SELECT LIMIT ").append(offset).append(" 1 ").append(getSortKey()).append(" AS SORT_KEY");
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();
 	}

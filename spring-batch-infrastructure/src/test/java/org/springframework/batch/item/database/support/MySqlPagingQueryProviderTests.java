@@ -30,21 +30,21 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 	@Test
 	@Override
 	public void testGenerateFirstPageQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 LIMIT 100";
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE id > ? AND bar = 1 LIMIT 100";
+		String sql = "SELECT id, name, age FROM foo WHERE id > ? AND bar = 1 ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 LIMIT 99 1";
+		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		Assert.assertEquals("", sql, s);
 	}

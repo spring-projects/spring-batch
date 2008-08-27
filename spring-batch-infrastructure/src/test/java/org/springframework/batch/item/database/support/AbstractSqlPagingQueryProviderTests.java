@@ -28,7 +28,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 
 	@Before
-	public void onSetUp() {
+	public void setUp() {
 		if (pagingQueryProvider == null) {
 			throw new IllegalArgumentException("pagingQuery{rovider can't be null");
 		}

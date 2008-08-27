@@ -16,6 +16,7 @@ public class OraclePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(" WHERE ROWNUM <= ").append(pageSize);
 		sql.append(getWhereClause() == null ? "" : " AND " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();
 	}
@@ -28,6 +29,7 @@ public class OraclePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		sql.append(" WHERE ").append(getSortKey()).append(" > ?");
 		sql.append(" AND ROWNUM <= ").append(pageSize);
 		sql.append(getWhereClause() == null ? "" : " AND " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();
 	}

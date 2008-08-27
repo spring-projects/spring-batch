@@ -15,6 +15,7 @@ public class SqlServerPagingQueryProvider extends SqlWindowingPagingQueryProvide
 		sql.append("SELECT ").append("TOP ").append(pageSize).append(" ").append(getSelectClause());
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();
 	}
@@ -26,6 +27,7 @@ public class SqlServerPagingQueryProvider extends SqlWindowingPagingQueryProvide
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(" WHERE ").append(getSortKey()).append(" > ?");
 		sql.append(getWhereClause() == null ? "" : " AND " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();
 	}

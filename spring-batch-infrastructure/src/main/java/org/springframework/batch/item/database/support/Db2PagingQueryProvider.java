@@ -15,6 +15,7 @@ public class Db2PagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		sql.append("SELECT ").append(getSelectClause());
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 		sql.append(" FETCH FIRST ").append(pageSize).append(" ROWS ONLY");
 
 		return sql.toString();
@@ -27,6 +28,7 @@ public class Db2PagingQueryProvider extends SqlWindowingPagingQueryProvider {
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(" WHERE ").append(getSortKey()).append(" > ?");
 		sql.append(getWhereClause() == null ? "" : " AND " + getWhereClause());
+		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 		sql.append(" FETCH FIRST ").append(pageSize).append(" ROWS ONLY");
 
 		return sql.toString();
