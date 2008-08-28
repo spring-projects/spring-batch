@@ -34,18 +34,21 @@ import org.springframework.batch.core.repository.dao.StepExecutionDao;
  * <p>
  * 
  * @author Dave Syer
+ * @author Lucas Ward
  * 
  * @see JobExplorer
  * @see JobInstanceDao
  * @see JobExecutionDao
  * @see StepExecutionDao
- * 
+ * @since 2.0
  */
 public class SimpleJobExplorer implements JobExplorer {
 
 	private JobInstanceDao jobInstanceDao;
 
 	private JobExecutionDao jobExecutionDao;
+	
+	private StepExecutionDao stepExecutionDao;
 
 	/**
 	 * Provide default constructor with low visibility in case user wants to use
@@ -54,31 +57,42 @@ public class SimpleJobExplorer implements JobExplorer {
 	SimpleJobExplorer() {
 	}
 
-	public SimpleJobExplorer(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao) {
+	public SimpleJobExplorer(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao, StepExecutionDao stepExecutionDao) {
 		super();
 		this.jobInstanceDao = jobInstanceDao;
 		this.jobExecutionDao = jobExecutionDao;
+		this.stepExecutionDao = stepExecutionDao;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.explore.JobExplorer#findJobExecutions(org.springframework.batch.core.JobInstance)
 	 */
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
-		return jobExecutionDao.findJobExecutions(jobInstance);
+		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
+		for(JobExecution jobExecution:executions){
+			getJobExecutionDependencies(jobExecution);
+		}
+		return executions;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.explore.JobExplorer#findRunningJobExecutions(java.lang.String)
 	 */
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
-		return jobExecutionDao.findRunningJobExecutions(jobName);
+		Set<JobExecution> executions = jobExecutionDao.findRunningJobExecutions(jobName);
+		for(JobExecution jobExecution:executions){
+			getJobExecutionDependencies(jobExecution);
+		}
+		return executions;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.explore.JobExplorer#getJobExecution(java.lang.Long)
 	 */
 	public JobExecution getJobExecution(Long executionId) {
-		return jobExecutionDao.getJobExecution(executionId);
+		JobExecution jobExecution = jobExecutionDao.getJobExecution(executionId);
+		getJobExecutionDependencies(jobExecution);
+		return jobExecution;
 	}
 
 	/* (non-Javadoc)
@@ -100,6 +114,17 @@ public class SimpleJobExplorer implements JobExplorer {
 	 */
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
 		return jobInstanceDao.getJobInstance(jobName, jobParameters)!=null;
+	}
+	
+	/*
+	 * Find all dependencies for a JobExecution, including JobInstance (which requires JobParameters)
+	 * plus StepExecutions
+	 */
+	private void getJobExecutionDependencies(JobExecution jobExecution){
+		
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
+		stepExecutionDao.getStepExecutions(jobExecution);
+		jobExecution.setJobInstance(jobInstance);
 	}
 
 }

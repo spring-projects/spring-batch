@@ -16,7 +16,7 @@
 
 package org.springframework.batch.core.exlore.support;
 
-import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.*;
 
 import java.util.Collections;
 
@@ -30,6 +30,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.explore.support.SimpleJobExplorer;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
 
 /**
  * Test {@link SimpleJobExplorer}. 
@@ -44,6 +45,8 @@ public class SimpleJobExplorerTests extends TestCase {
 	JobExecutionDao jobExecutionDao;
 	
 	JobInstanceDao jobInstanceDao;
+	
+	StepExecutionDao stepExecutionDao;
 
 	JobInstance jobInstance = new JobInstance(111L, new JobParameters(), "job");
 	
@@ -53,72 +56,76 @@ public class SimpleJobExplorerTests extends TestCase {
 
 		jobExecutionDao = createMock(JobExecutionDao.class);
 		jobInstanceDao = createMock(JobInstanceDao.class);
+		stepExecutionDao = createMock(StepExecutionDao.class);
 
-		jobExplorer = new SimpleJobExplorer(jobInstanceDao, jobExecutionDao);
+		jobExplorer = new SimpleJobExplorer(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 
 	}
 
 	@Test
 	public void testGetJobExecution() throws Exception {
-		jobExecutionDao.getJobExecution(123L);
-		EasyMock.expectLastCall().andReturn(jobExecution);
-		EasyMock.replay(jobExecutionDao, jobInstanceDao);
+		expect(jobExecutionDao.getJobExecution(123L)).andReturn(jobExecution);
+		expect(jobInstanceDao.getJobInstance(jobExecution)).andReturn(jobInstance);
+		expect(stepExecutionDao.getStepExecutions(jobExecution)).andReturn(null);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		jobExplorer.getJobExecution(123L);
-		EasyMock.verify(jobExecutionDao, jobInstanceDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 	@Test
 	public void testFindRunningJobExecutions() throws Exception {
-		jobExecutionDao.findRunningJobExecutions("job");
-		EasyMock.expectLastCall().andReturn(Collections.singleton(jobExecution));
-		EasyMock.replay(jobExecutionDao, jobInstanceDao);
+		expect(jobExecutionDao.findRunningJobExecutions("job")).andReturn(Collections.singleton(jobExecution));
+		expect(jobInstanceDao.getJobInstance(jobExecution)).andReturn(jobInstance);
+		expect(stepExecutionDao.getStepExecutions(jobExecution)).andReturn(null);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		jobExplorer.findRunningJobExecutions("job");
-		EasyMock.verify(jobExecutionDao, jobInstanceDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 	@Test
 	public void testFindJobExecutions() throws Exception {
-		jobExecutionDao.findJobExecutions(jobInstance);
-		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobExecution));
-		EasyMock.replay(jobExecutionDao, jobInstanceDao);
+		expect(jobExecutionDao.findJobExecutions(jobInstance)).andReturn(Collections.singletonList(jobExecution));
+		expect(jobInstanceDao.getJobInstance(jobExecution)).andReturn(jobInstance);
+		expect(stepExecutionDao.getStepExecutions(jobExecution)).andReturn(null);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		jobExplorer.findJobExecutions(jobInstance);
-		EasyMock.verify(jobExecutionDao, jobInstanceDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 	@Test
 	public void testGetJobInstance() throws Exception {
 		jobInstanceDao.getJobInstance(111L);
 		EasyMock.expectLastCall().andReturn(jobInstance);
-		EasyMock.replay(jobExecutionDao, jobInstanceDao);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		jobExplorer.getJobInstance(111L);
-		EasyMock.verify(jobExecutionDao, jobInstanceDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 	@Test
 	public void testGetLastJobInstances() throws Exception {
 		jobInstanceDao.getLastJobInstances("foo", 1);
 		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobInstance));
-		EasyMock.replay(jobExecutionDao, jobInstanceDao);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		jobExplorer.getLastJobInstances("foo", 1);
-		EasyMock.verify(jobExecutionDao, jobInstanceDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 	@Test
 	public void testIsJobInstanceFalse() throws Exception {
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
 		EasyMock.expectLastCall().andReturn(null);
-		EasyMock.replay(jobExecutionDao, jobInstanceDao);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		assertFalse(jobExplorer.isJobInstanceExists("foo", new JobParameters()));
-		EasyMock.verify(jobExecutionDao, jobInstanceDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 	@Test
 	public void testIsJobInstanceTrue() throws Exception {
 		jobInstanceDao.getJobInstance("foo", new JobParameters());
 		EasyMock.expectLastCall().andReturn(jobInstance);
-		EasyMock.replay(jobExecutionDao, jobInstanceDao);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		assertTrue(jobExplorer.isJobInstanceExists("foo", new JobParameters()));
-		EasyMock.verify(jobExecutionDao, jobInstanceDao);
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 }

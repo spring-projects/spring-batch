@@ -4,6 +4,8 @@ import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
+import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
+import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
@@ -23,9 +25,15 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean {
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		return new MapJobInstanceDao();
 	}
+	
+	@Override
+	protected StepExecutionDao createStepExecutionDao() throws Exception {
+		// TODO Auto-generated method stub
+		return new MapStepExecutionDao();
+	}
 
 	public Object getObject() throws Exception {
-		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao());
+		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao());
 	}
 
 }

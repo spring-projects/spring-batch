@@ -64,7 +64,7 @@ public class SimpleJobLauncherTests {
 	@Test
 	public void testRun() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(null);
+		JobExecution jobExecution = new JobExecution(null, null);
 
 		expect(jobRepository.createJobExecution(job, jobParameters)).andReturn(jobExecution);
 

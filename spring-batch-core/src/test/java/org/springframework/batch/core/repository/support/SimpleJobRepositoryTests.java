@@ -118,7 +118,7 @@ public class SimpleJobRepositoryTests {
 	public void testSaveOrUpdateInvalidJobExecution() {
 
 		// failure scenario - must have job ID
-		JobExecution jobExecution = new JobExecution(null);
+		JobExecution jobExecution = new JobExecution(null, null);
 		try {
 			jobRepository.update(jobExecution);
 			fail();

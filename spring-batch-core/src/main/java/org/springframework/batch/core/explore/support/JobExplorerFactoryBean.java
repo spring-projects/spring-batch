@@ -99,7 +99,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	private Object getTarget() throws Exception {
-		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao());
+		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao());
 	}
 
 	@Override
@@ -118,8 +118,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "JOB_EXECUTION_SEQ"));
-		dao.setJobInstanceDao(createJobInstanceDao());
-		dao.setStepExecutionDao(createStepExecutionDao());
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;

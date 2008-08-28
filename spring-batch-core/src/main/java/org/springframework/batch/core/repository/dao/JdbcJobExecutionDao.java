@@ -55,8 +55,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED " +
 			"from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ? and CREATE_TIME = (SELECT max(CREATE_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
 
-	private static final String GET_INSTANCE_BY_EXECUTION_ID = "SELECT JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
-
 	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED" +
 			" from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
@@ -66,10 +64,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private DataFieldMaxValueIncrementer jobExecutionIncrementer;
-
-	private JobInstanceDao jobInstanceDao;
-
-	private StepExecutionDao stepExecutionDao;
 
 	/**
 	 * Public setter for the exit message length in database. Do not set this if
@@ -90,27 +84,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		this.jobExecutionIncrementer = jobExecutionIncrementer;
 	}
 
-	/**
-	 * Public setter for the {@link JobInstanceDao}.
-	 * @param jobInstanceDao the {@link JobInstanceDao} to set
-	 */
-	public void setJobInstanceDao(JobInstanceDao jobInstanceDao) {
-		this.jobInstanceDao = jobInstanceDao;
-	}
-
-	/**
-	 * Public setter for the {@link StepExecutionDao}.
-	 * @param stepExecutionDao the {@link StepExecutionDao} to set
-	 */
-	public void setStepExecutionDao(StepExecutionDao stepExecutionDao) {
-		this.stepExecutionDao = stepExecutionDao;
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		Assert.notNull(jobExecutionIncrementer);
-		Assert.notNull(jobInstanceDao);
-		Assert.notNull(stepExecutionDao);
 	}
 
 	public List<JobExecution> findJobExecutions(final JobInstance job) {
@@ -233,11 +209,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	public JobExecution getJobExecution(Long executionId) {
 		try {
-			Long instanceId = getJdbcTemplate().queryForLong(getQuery(GET_INSTANCE_BY_EXECUTION_ID), executionId);
-			JobInstance jobInstance = jobInstanceDao.getJobInstance(instanceId);
 			JobExecution jobExecution = getJdbcTemplate().queryForObject(getQuery(GET_EXECUTION_BY_ID),
-					new JobExecutionRowMapper(jobInstance), executionId);
-			stepExecutionDao.getStepExecutions(jobExecution);
+					new JobExecutionRowMapper(), executionId);
 			return jobExecution;
 		}
 		catch (EmptyResultDataAccessException e) {
@@ -256,17 +229,11 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		final Set<JobExecution> result = new HashSet<JobExecution>();
 		RowCallbackHandler handler = new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
-				Long instanceId = rs.getLong("JOB_INSTANCE_ID");
-				JobInstance jobInstance = jobInstanceDao.getJobInstance(instanceId);
-				JobExecutionRowMapper mapper = new JobExecutionRowMapper(jobInstance);
+				JobExecutionRowMapper mapper = new JobExecutionRowMapper();
 				result.add(mapper.mapRow(rs, 0));
 			}
 		};
 		getJdbcTemplate().getJdbcOperations().query(getQuery(GET_RUNNING_EXECUTIONS), handler);
-
-		for (JobExecution jobExecution : result) {
-			stepExecutionDao.getStepExecutions(jobExecution);
-		}
 
 		return result;
 	}
@@ -285,16 +252,26 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 */
 	private class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
 
-		private JobInstance job;
-
-		public JobExecutionRowMapper(JobInstance job) {
-			super();
-			this.job = job;
+		private JobInstance jobInstance;
+		
+		public JobExecutionRowMapper() {
 		}
-
+		
+		public JobExecutionRowMapper(JobInstance jobInstance) {
+			this.jobInstance = jobInstance;
+		}
+		
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
-			JobExecution jobExecution = new JobExecution(job);
-			jobExecution.setId(new Long(rs.getLong(1)));
+			Long id = new Long(rs.getLong(1));
+			JobExecution jobExecution; 
+				
+			if(jobInstance ==  null){	
+				jobExecution = new JobExecution(id);
+			}
+			else{
+				jobExecution = new JobExecution(jobInstance, id);
+			}
+			
 			jobExecution.setStartTime(rs.getTimestamp(2));
 			jobExecution.setEndTime(rs.getTimestamp(3));
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(4)));

@@ -22,7 +22,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 
 	private static final long DATE = 777;
 
-	private JobInstanceDao dao = new MapJobInstanceDao();
+	protected JobInstanceDao dao = new MapJobInstanceDao();
 
 	private String fooJob = "foo";
 
@@ -148,6 +148,11 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 		jobInstance = dao.createJobInstance("testVersion", new JobParameters());
 
 		assertNotNull(jobInstance.getVersion());
+	}
+	
+	
+	public void testGetJobInstanceByExecutionId(){
+		
 	}
 
 }

@@ -160,7 +160,6 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution value = values.iterator().next();
 		assertEquals(exec, value);
 		assertEquals(5L,  value.getLastUpdated().getTime());
-		assertEquals(1, value.getStepExecutions().size());
 	}
 
 	/**
@@ -193,7 +192,6 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution value = dao.getJobExecution(exec.getId());
 
 		assertEquals(exec, value);
-		assertEquals(1, value.getStepExecutions().size());
 	}
 
 	/**

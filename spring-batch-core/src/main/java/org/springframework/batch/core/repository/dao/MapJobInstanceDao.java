@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -83,6 +84,10 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		});
 		int length = count>list.size() ? list.size() : count;
 		return list.subList(0, length);
+	}
+
+	public JobInstance getJobInstance(JobExecution jobExecution) {
+		return jobExecution.getJobInstance();
 	}
 
 }

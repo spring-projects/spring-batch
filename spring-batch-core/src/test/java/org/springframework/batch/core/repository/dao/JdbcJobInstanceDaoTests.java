@@ -1,7 +1,11 @@
 package org.springframework.batch.core.repository.dao;
 
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.Assert;
 import org.junit.runner.RunWith;
 
 
@@ -14,5 +18,16 @@ public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
 		return (JobInstanceDao) applicationContext.getBean("jobInstanceDao");
 	}
-	
+
+	public void testFindJobInstanceByExecution(){
+		
+		JobExecutionDao jobExecutionDao = (JobExecutionDao) applicationContext.getBean("jobExecutionDao");
+		
+		JobInstance jobInstance = dao.createJobInstance("testInstance", new JobParameters());
+		JobExecution jobExecution = new JobExecution(jobInstance, 2L);
+		jobExecutionDao.saveJobExecution(jobExecution);
+		
+		JobInstance returnedInstance = dao.getJobInstance(jobExecution);
+		Assert.assertEquals(jobInstance, returnedInstance);
+	}
 }

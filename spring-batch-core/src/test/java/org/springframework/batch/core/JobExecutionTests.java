@@ -100,7 +100,7 @@ public class JobExecutionTests extends TestCase {
 	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
 	public void testGetJobIdForNullJob() {
-		execution = new JobExecution(null);
+		execution = new JobExecution(null, null);
 		assertEquals(null, execution.getJobId());
 	}
 

@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class JobExecution extends Entity {
 
-	private final JobInstance jobInstance;
+	private JobInstance jobInstance;
 
 	private volatile transient Collection<StepExecution> stepExecutions = new HashSet<StepExecution>();
 
@@ -68,11 +68,19 @@ public class JobExecution extends Entity {
 	public JobExecution(JobInstance job) {
 		this(job, null);
 	}
+	
+	public JobExecution(Long id){
+		super(id);
+	}
 
 	public Date getEndTime() {
 		return endTime;
 	}
 
+	public void setJobInstance(JobInstance jobInstance) {
+		this.jobInstance = jobInstance;
+	}
+	
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}

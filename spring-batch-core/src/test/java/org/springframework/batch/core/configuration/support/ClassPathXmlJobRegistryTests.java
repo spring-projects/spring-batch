@@ -14,7 +14,12 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
-
+/**
+ * 
+ * 
+ * @author Lucas Ward
+ *
+ */
 public class ClassPathXmlJobRegistryTests {
 
 	ClassPathXmlJobRegistry registry;

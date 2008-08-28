@@ -23,8 +23,6 @@
 	<bean id="jobExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcJobExecutionDao">
 		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" />
-		<property name="jobInstanceDao" ref="jobInstanceDao" />
-		<property name="stepExecutionDao" ref="stepExecutionDao" />
 	</bean>
 
 	<bean id="stepExecutionDao" class="org.springframework.batch.core.repository.dao.JdbcStepExecutionDao">
