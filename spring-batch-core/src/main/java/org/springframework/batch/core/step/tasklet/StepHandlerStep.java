@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,6 +25,7 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
@@ -83,6 +84,13 @@ public class StepHandlerStep extends AbstractStep {
 	private StepExecutionSynchronizer synchronizer;
 
 	/**
+	 * Default constructor.
+	 */
+	public StepHandlerStep() {
+		this(null);
+	}
+
+	/**
 	 * @param name
 	 */
 	public StepHandlerStep(String name) {
@@ -114,6 +122,9 @@ public class StepHandlerStep extends AbstractStep {
 	 */
 	public void setStepHandler(StepHandler stepHandler) {
 		this.stepHandler = stepHandler;
+		if (stepHandler instanceof StepExecutionListener) {
+			registerStepExecutionListener((StepExecutionListener) stepHandler);
+		}
 	}
 
 	/**
@@ -195,9 +206,9 @@ public class StepHandlerStep extends AbstractStep {
 	 * Process the step and update its context so that progress can be monitored
 	 * by the caller. The step is broken down into chunks, each one executing in
 	 * a transaction. The step and its execution and execution context are all
-	 * given an up to date {@link BatchStatus}, and the {@link JobRepository} is
-	 * used to store the result. Various reporting information are also added to
-	 * the current context (the {@link RepeatContext} governing the step
+	 * given an up to date {@link BatchStatus}, and the {@link JobRepository}
+	 * is used to store the result. Various reporting information are also added
+	 * to the current context (the {@link RepeatContext} governing the step
 	 * execution, which would normally be available to the caller somehow
 	 * through the step's {@link ExecutionContext}.<br/>
 	 * 
@@ -369,8 +380,8 @@ public class StepHandlerStep extends AbstractStep {
 		}
 		catch (Exception e) {
 			/*
-			 * If we already failed to commit, it doesn't help to do this again
-			 * - it's better to allow the CommitFailedException to propagate
+			 * If we already failed to commit, it doesn't help to do this again -
+			 * it's better to allow the CommitFailedException to propagate
 			 */
 			if (!fatalException.hasException()) {
 				fatalException.setException(e);

@@ -11,11 +11,11 @@
 	<bean id="jobExecutionContextSample" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="step1" parent="handlerStep">
-					<property name="tasklet" ref="sender" />
+				<bean id="step1" parent="taskletStep">
+					<property name="stepHandler" ref="sender" />
 				</bean>
-				<bean id="step2" parent="handlerStep">
-					<property name="tasklet" ref="receiver" />
+				<bean id="step2" parent="taskletStep">
+					<property name="stepHandler" ref="receiver" />
 				</bean>
 			</list>
 		</property>

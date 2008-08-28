@@ -16,7 +16,7 @@
 package org.springframework.batch.integration.job;
 
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.handler.StepHandler;
+import org.springframework.batch.core.step.tasklet.StepHandler;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.AttributeAccessor;
 

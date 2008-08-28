@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;

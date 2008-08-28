@@ -1,8 +1,9 @@
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.springframework.batch.core.step.tasklet.SimpleSystemProcessExitCodeMapper;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

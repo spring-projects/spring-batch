@@ -44,7 +44,7 @@ import org.springframework.batch.retry.policy.SimpleRetryPolicy;
  * Template class that simplifies the execution of operations with retry
  * semantics. <br/> Retryable operations are encapsulated in implementations of
  * the {@link RetryCallback} interface and are executed using one of the
- * supplied {@link #execute} methods. <br/>
+ * supplied execute methods. <br/>
  * 
  * By default, an operation is retried if is throws any {@link Exception} or
  * subclass of {@link Exception}. This behaviour can be changed by using the

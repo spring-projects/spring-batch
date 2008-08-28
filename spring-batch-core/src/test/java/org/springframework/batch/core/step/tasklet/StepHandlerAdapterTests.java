@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.step.tasklet.StepHandlerAdapter;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**

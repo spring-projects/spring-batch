@@ -21,7 +21,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.handler.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.StepHandlerStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;

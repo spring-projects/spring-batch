@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -39,7 +39,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.core.step.handler.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.StepHandlerStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

@@ -9,11 +9,11 @@ import java.util.List;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.handler.StepHandlerStep;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
+import org.springframework.batch.core.step.tasklet.StepHandlerStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;

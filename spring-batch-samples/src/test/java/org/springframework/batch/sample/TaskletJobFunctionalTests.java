@@ -17,7 +17,7 @@ import org.springframework.util.Assert;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
-public class HandlerJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private Resource directory = new FileSystemResource("target/test-outputs/test-dir");
 	

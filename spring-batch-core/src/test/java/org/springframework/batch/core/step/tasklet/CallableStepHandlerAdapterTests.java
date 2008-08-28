@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
+import org.springframework.batch.core.step.tasklet.CallableStepHandlerAdapter;
 import org.springframework.batch.repeat.ExitStatus;
 
 public class CallableStepHandlerAdapterTests {

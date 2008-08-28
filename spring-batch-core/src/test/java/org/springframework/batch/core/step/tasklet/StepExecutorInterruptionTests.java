@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
-import org.springframework.batch.core.step.handler.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.StepHandlerStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;

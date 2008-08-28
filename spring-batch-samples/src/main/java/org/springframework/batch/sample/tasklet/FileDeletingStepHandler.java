@@ -2,7 +2,7 @@ package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.step.handler.StepHandler;
+import org.springframework.batch.core.step.tasklet.StepHandler;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.AttributeAccessor;

@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.handler.StepHandler;
+import org.springframework.batch.core.step.tasklet.StepHandler;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.AttributeAccessor;

@@ -13,19 +13,19 @@
 
 		The second step illustrates executing a system command.
 	</description>
-	<bean id="handlerJob" parent="simpleJob">
+	<bean id="taskletJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<bean id="deleteFilesInDir" parent="handlerStep">
-					<property name="tasklet">
+				<bean id="deleteFilesInDir" parent="taskletStep">
+					<property name="stepHandler">
 						<bean class="org.springframework.batch.sample.tasklet.FileDeletingStepHandler">
-							<property name="resources" value="target/test-outputs/test-dir/*" />
+							<property name="resources" value="file:target/test-outputs/test-dir/*" />
 						</bean>
 					</property>
 				</bean>
-				<bean id="executeSystemCommand" parent="handlerStep">
-					<property name="tasklet">
-						<bean class="org.springframework.batch.core.step.handler.SystemCommandStepHandler">
+				<bean id="executeSystemCommand" parent="taskletStep">
+					<property name="stepHandler">
+						<bean class="org.springframework.batch.core.step.tasklet.SystemCommandStepHandler">
 							<property name="command" value="java -version" />
 							<!-- 5 second timeout for the command to complete -->
 							<property name="timeout" value="5000" />

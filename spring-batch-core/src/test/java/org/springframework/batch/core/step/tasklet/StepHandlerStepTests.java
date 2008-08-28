@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -47,7 +47,7 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
-import org.springframework.batch.core.step.handler.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.StepHandlerStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;

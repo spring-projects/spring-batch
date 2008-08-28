@@ -1,4 +1,4 @@
-package org.springframework.batch.core.step.handler;
+package org.springframework.batch.core.step.tasklet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,6 +15,9 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.step.tasklet.SystemCommandException;
+import org.springframework.batch.core.step.tasklet.SystemCommandStepHandler;
+import org.springframework.batch.core.step.tasklet.SystemProcessExitCodeMapper;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
