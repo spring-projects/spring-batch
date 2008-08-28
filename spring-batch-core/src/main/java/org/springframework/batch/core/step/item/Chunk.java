@@ -65,6 +65,13 @@ class Chunk<W> implements Iterable<W> {
 		return new ChunkIterator(items);
 	}
 
+	/**
+	 * @return the number of items (excluding skips)
+	 */
+	public int size() {
+		return items.size();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -102,9 +109,15 @@ class Chunk<W> implements Iterable<W> {
 		}
 
 		public void remove(Exception e) {
-			if (next != null) {
-				skips.add(new SkippedItem<W>(next, e));
+			if (next == null) {
+				if (iterator.hasNext()) {
+					next = iterator.next();
+				}
+				else {
+					return;
+				}
 			}
+			skips.add(new SkippedItem<W>(next, e));
 			iterator.remove();
 		}
 

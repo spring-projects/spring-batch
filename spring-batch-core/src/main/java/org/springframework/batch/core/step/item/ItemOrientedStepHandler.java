@@ -79,6 +79,36 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	}
 
 	/**
+	 * Register some {@link StepListener}s with the handler. Each will get
+	 * the callbacks in the order specified at the correct stage.
+	 * 
+	 * @param listeners
+	 */
+	public void setListeners(StepListener[] listeners) {
+		for (StepListener listener : listeners) {
+			registerListener(listener);
+		}
+	}
+
+	/**
+	 * Register a listener for callbacks at the appropriate stages in a 
+	 * process.
+	 * 
+	 * @param listener a {@link StepListener}
+	 */
+	public void registerListener(StepListener listener) {
+		this.listener.register(listener);
+	}
+
+	/**
+	 * Public getter for the listener.
+	 * @return the listener
+	 */
+	protected MulticasterBatchListener<T,S> getListener() {
+		return listener;
+	}
+
+	/**
 	 * Get the next item from {@link #read(StepContribution)} and if not null
 	 * pass the item to {@link #write(Chunk, StepContribution)}. If the
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
@@ -117,21 +147,9 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 			storeInputs(attributes, inputs);
 
 		}
-
-		for (T item : inputs) {
-
-			// TODO: processor listener
-			S output = itemProcessor.process(item);
-
-			// TODO: segregate read / write / filter count
-			// (this is read count)
-			contribution.incrementItemCount();
-
-			// TODO: increment filter count if this is null
-			if (output != null) {
-				outputs.add(output);
-			}
-
+		
+		if (!inputs.isEmpty()) {
+			process(contribution, inputs, outputs);
 		}
 
 		storeOutputsAndClearInputs(attributes, outputs, contribution);
@@ -148,6 +166,96 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 
 		return result;
 
+	}
+
+	/**
+	 * @param contribution current context
+	 * @return next item for writing
+	 */
+	protected ItemWrapper<T> read(StepContribution contribution) throws Exception {
+		return new ItemWrapper<T>(doRead());
+	}
+
+	/**
+	 * @return item
+	 * @throws Exception
+	 */
+	protected final T doRead() throws Exception {
+		try {
+			listener.beforeRead();
+			T item = itemReader.read();
+			listener.afterRead(item);
+			return item;
+		}
+		catch (Exception e) {
+			listener.onReadError(e);
+			throw e;
+		}
+	}
+
+	/**
+	 * 
+	 * @param inputs the items to process
+	 * @param outputs the items to write
+	 * @param contribution current context
+	 */
+	protected void process(StepContribution contribution, Chunk<T> inputs, Chunk<S> outputs) throws Exception {
+		for (T item : inputs) {
+			S output = doProcess(item);
+			// TODO: segregate read / write / filter count
+			// (this is read count)
+			contribution.incrementItemCount();
+			// TODO: increment filter count if this is null
+			if (output != null) {
+				outputs.add(output);
+			}
+		}
+		inputs.clear();
+	}
+
+	/**
+	 * @param item the input item
+	 * @return the result of the processing
+	 * @throws Exception
+	 */
+	protected S doProcess(T item) throws Exception {
+		try {
+			listener.beforeProcess(item);
+			S result = itemProcessor.process(item);
+			listener.afterProcess(item, result);
+			return result;
+		}
+		catch (Exception e) {
+			listener.onProcessError(item, e);
+			throw e;
+		}
+	}
+
+	/**
+	 * 
+	 * @param chunk the items to write
+	 * @param contribution current context
+	 */
+	protected void write(Chunk<S> chunk, StepContribution contribution) throws Exception {
+		doWrite(chunk.getItems());
+		chunk.clear();
+	}
+
+	/**
+	 * @param items
+	 * @throws Exception
+	 */
+	protected final void doWrite(List<S> items) throws Exception {
+		try {
+			listener.beforeWrite(items);
+			itemWriter.write(items);
+			// TODO: increment write count
+			listener.afterWrite(items);
+		}
+		catch (Exception e) {
+			listener.onWriteError(e, items);
+			throw e;
+		}
 	}
 
 	/**
@@ -215,88 +323,6 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 		@SuppressWarnings("unchecked")
 		Chunk<W> resource = (Chunk<W>) attributes.getAttribute(key);
 		return resource;
-	}
-
-	/**
-	 * @param contribution current context
-	 * @return next item for writing
-	 */
-	protected ItemWrapper<T> read(StepContribution contribution) throws Exception {
-		return new ItemWrapper<T>(doRead());
-	}
-
-	/**
-	 * @return item
-	 * @throws Exception
-	 */
-	protected final T doRead() throws Exception {
-		try {
-			listener.beforeRead();
-			T item = itemReader.read();
-			listener.afterRead(item);
-			return item;
-		}
-		catch (Exception e) {
-			listener.onReadError(e);
-			throw e;
-		}
-	}
-
-	/**
-	 * 
-	 * @param chunk the items to write
-	 * @param contribution current context
-	 */
-	protected void write(Chunk<S> chunk, StepContribution contribution) throws Exception {
-		doWrite(chunk.getItems());
-		chunk.clear();
-	}
-
-	/**
-	 * @param items
-	 * @throws Exception
-	 */
-	protected final void doWrite(List<S> items) throws Exception {
-		try {
-			listener.beforeWrite(items);
-			itemWriter.write(items);
-			// TODO: increment write count
-			listener.afterWrite(items);
-		}
-		catch (Exception e) {
-			listener.onWriteError(e, items);
-			throw e;
-		}
-	}
-
-	/**
-	 * Register some {@link StepListener}s with the handler. Each will get
-	 * the callbacks in the order specified at the correct stage.
-	 * 
-	 * @param listeners
-	 */
-	public void setListeners(StepListener[] listeners) {
-		for (StepListener listener : listeners) {
-			registerListener(listener);
-		}
-	}
-
-	/**
-	 * Register a listener for callbacks at the appropriate stages in a 
-	 * process.
-	 * 
-	 * @param listener a {@link StepListener}
-	 */
-	public void registerListener(StepListener listener) {
-		this.listener.register(listener);
-	}
-
-	/**
-	 * Public getter for the listener.
-	 * @return the listener
-	 */
-	protected MulticasterBatchListener<T,S> getListener() {
-		return listener;
 	}
 
 	/**

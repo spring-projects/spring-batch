@@ -18,6 +18,7 @@ package org.springframework.batch.core.listener;
 import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.SkipListener;
@@ -32,13 +33,15 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
-		ItemWriteListener<S>, SkipListener<S> {
+		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<S> {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
 	private CompositeChunkListener chunkListener = new CompositeChunkListener();
 
 	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<T>();
+
+	private CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<T, S>();
 
 	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
 
@@ -76,14 +79,60 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 			this.chunkListener.register((ChunkListener) listener);
 		}
 		if (listener instanceof ItemReadListener) {
+			// TODO: make this type safe somehow?
 			this.itemReadListener.register((ItemReadListener) listener);
 		}
+		if (listener instanceof ItemProcessListener) {
+			this.itemProcessListener.register((ItemProcessListener) listener);
+		}
 		if (listener instanceof ItemWriteListener) {
-			// TODO: make this type safe somehow?
 			this.itemWriteListener.register((ItemWriteListener) listener);
 		}
 		if (listener instanceof SkipListener) {
 			this.skipListener.register((SkipListener) listener);
+		}
+	}
+
+	/**
+	 * @param item
+	 * @param result
+	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#afterProcess(java.lang.Object,
+	 * java.lang.Object)
+	 */
+	public void afterProcess(T item, S result) {
+		try {
+			itemProcessListener.afterProcess(item, result);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in afterProcess.", e);
+		}
+	}
+
+	/**
+	 * @param item
+	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#beforeProcess(java.lang.Object)
+	 */
+	public void beforeProcess(T item) {
+		try {
+			itemProcessListener.beforeProcess(item);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in beforeProcess.", e);
+		}
+	}
+
+	/**
+	 * @param item
+	 * @param ex
+	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#onProcessError(java.lang.Object,
+	 * java.lang.Exception)
+	 */
+	public void onProcessError(T item, Exception ex) {
+		try {
+			itemProcessListener.onProcessError(item, ex);
+		}
+		catch (RuntimeException e) {
+			throw new StepListenerFailedException("Error in onProcessError.", e);
 		}
 	}
 

@@ -26,7 +26,7 @@ public class RetrySampleItemWriterTests {
 		processor.write(Collections.singletonList(item));
 
 		try {
-			processor.write(Arrays.asList(new Object[] { item, item, item }));
+			processor.write(Arrays.asList(item, item, item));
 			fail();
 		}
 		catch (RuntimeException e) {
@@ -35,6 +35,6 @@ public class RetrySampleItemWriterTests {
 
 		processor.write(Collections.singletonList(item));
 
-		assertEquals(4, processor.getCounter());
+		assertEquals(5, processor.getCounter());
 	}
 }

@@ -390,7 +390,13 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 				public Object recover(RetryContext context) throws Exception {
 
-					Exception t = (Exception) context.getLastThrowable();
+					// small optimisation: if there was only one item, then we
+					// don't have to try writing it again to see if it fails...
+					if (chunk.size() == 1) {
+						Exception e = (Exception) context.getLastThrowable();
+						checkSkipPolicy(contribution, chunk.iterator(), e);
+						return null;
+					}
 
 					for (Chunk<S>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
 						S item = iterator.next();
@@ -398,19 +404,24 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 							doWrite(Collections.singletonList(item));
 						}
 						catch (Exception e) {
-							if (writeSkipPolicy.shouldSkip(t, contribution.getStepSkipCount())) {
-								iterator.remove(e);
-								contribution.incrementWriteSkipCount();
-								throw e;
-							}
-							else {
-								throw new RetryException("Non-skippable exception in recoverer", t);
-							}
+							checkSkipPolicy(contribution, iterator, e);
+							throw e;
 						}
 					}
 
 					return null;
 
+				}
+
+				private void checkSkipPolicy(final StepContribution contribution, Chunk<S>.ChunkIterator iterator,
+						Exception e) throws Exception {
+					if (writeSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+						contribution.incrementWriteSkipCount();
+						iterator.remove(e);
+					}
+					else {
+						throw new RetryException("Non-skippable exception in recoverer", e);
+					}
 				}
 			};
 

@@ -73,7 +73,7 @@ public class StatefulRetryStepFactoryBeanTests {
 	private List<Object> provided = new ArrayList<Object>();
 
 	private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
-	
+
 	int count = 0;
 
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
@@ -260,8 +260,8 @@ public class StatefulRetryStepFactoryBeanTests {
 
 		// [a, b, c, d, e, f, null]
 		assertEquals(7, provided.size());
-		// [a, b, b, b, b, b, b, c, d, d, d, d, d, d, e, f]
-		assertEquals(16, processed.size());
+		// [a, b, b, b, b, b, c, d, d, d, d, d, e, f]
+		assertEquals(14, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());
 	}
@@ -324,7 +324,8 @@ public class StatefulRetryStepFactoryBeanTests {
 
 		// [a, b, c, d, e, f, null]
 		assertEquals(7, provided.size());
-		// [a, b, c, a, b, c, a, b, c, a, b, c, a, b, c, a, b, a, c, d, e, f, d, e, f, d, e, f, d, e, f, d, e, f, d, e, f]
+		// [a, b, c, a, b, c, a, b, c, a, b, c, a, b, c, a, b, a, c, d, e, f, d,
+		// e, f, d, e, f, d, e, f, d, e, f, d, e, f]
 		assertEquals(37, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());
@@ -374,9 +375,10 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(0, stepExecution.getSkipCount());
 		// [b]
 		assertEquals(1, provided.size());
-		// the failed items are tried one more time than the limit (TODO: maybe fix this?)
-		// [b, b, b, b, b]
-		assertEquals(5, processed.size());
+		// the failed items are tried up to the limit (but only precisely so if
+		// the commit interval is 1)
+		// [b, b, b, b]
+		assertEquals(4, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getItemCount());
@@ -432,8 +434,8 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(0, stepExecution.getSkipCount());
 		// [b]
 		assertEquals(1, provided.size());
-		// [b, b]
-		assertEquals(2, processed.size());
+		// [b]
+		assertEquals(1, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getItemCount());
@@ -478,8 +480,8 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(0, stepExecution.getSkipCount());
 		// [b]
 		assertEquals(1, provided.size());
-		// [b, b, b, b, b]
-		assertEquals(5, processed.size());
+		// [b, b, b, b]
+		assertEquals(4, processed.size());
 		// []
 		assertEquals(0, recovered.size());
 		assertEquals(1, stepExecution.getItemCount());

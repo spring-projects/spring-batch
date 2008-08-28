@@ -42,7 +42,6 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.core.AttributeAccessor;
-import org.springframework.core.AttributeAccessorSupport;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -384,13 +383,6 @@ public class StepHandlerStep extends AbstractStep {
 			// the failure status.
 			getJobRepository().update(stepExecution);
 		}
-	}
-
-	/**
-	 * @author Dave Syer
-	 *
-	 */
-	private static final class BasicAttributeAccessor extends AttributeAccessorSupport {
 	}
 
 	private static class ExceptionHolder {
