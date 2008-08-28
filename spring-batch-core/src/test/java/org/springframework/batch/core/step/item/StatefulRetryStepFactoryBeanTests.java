@@ -260,6 +260,45 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(0, stepExecution.getItemCount().intValue());
 	}
 
+	public void testRetryWithSkipLimitBreach() throws Exception {
+		factory.setRetryLimit(0);
+		factory.setSkipLimit(2);
+		factory.setCommitInterval(3);
+		List items = TransactionAwareProxyFactory.createTransactionalList();
+		items.addAll(Arrays.asList(new String[] { "a", "b", "c", "d", "e" }));
+		ItemReader provider = new ListItemReader(items) {
+			public Object read() {
+				Object item = super.read();
+				count++;
+				return item;
+			}
+		};
+		ItemWriter itemWriter = new AbstractItemWriter() {
+			public void write(Object item) throws Exception {
+				logger.debug("Write Called! Item: [" + item + "]");
+				throw new RuntimeException("Write error - planned but retryable.");
+			}
+		};
+		factory.setItemReader(provider);
+		factory.setItemWriter(itemWriter);
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		try {
+			step.execute(stepExecution);
+			fail("Expected SkipLimitExceededException");
+		}
+		catch (SkipLimitExceededException e) {
+			// expected
+		}
+
+		assertEquals(2, stepExecution.getSkipCount());
+		// One chunk read twice
+		assertEquals(6, count);
+		// Crapped out after two skips 
+		assertEquals(2, stepExecution.getItemCount().intValue());
+	}
+
 	public void testRetryPolicy() throws Exception {
 		factory.setRetryPolicy(new SimpleRetryPolicy(4));
 		factory.setSkipLimit(0);
