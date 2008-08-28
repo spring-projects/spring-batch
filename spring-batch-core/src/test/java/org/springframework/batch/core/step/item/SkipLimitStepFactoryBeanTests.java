@@ -246,7 +246,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport() {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				throw new RuntimeException("oops");
@@ -287,9 +287,9 @@ public class SkipLimitStepFactoryBeanTests {
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport() {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
 			@Override
-			public void onSkipInWrite(Object item, Throwable t) {
+			public void onSkipInWrite(String item, Throwable t) {
 				throw new RuntimeException("oops");
 			}
 		} });

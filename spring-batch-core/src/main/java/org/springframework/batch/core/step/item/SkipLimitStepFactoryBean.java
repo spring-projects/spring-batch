@@ -261,9 +261,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-			ChunkOrientedTasklet<T, S> tasklet = new StatefulRetryTasklet<T, S>(getItemReader(),
-					getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate, readSkipPolicy,
-					writeSkipPolicy);
+			ChunkOrientedTasklet<T, S> tasklet = new StatefulRetryTasklet<T, S>(getItemReader(), getItemProcessor(),
+					getItemWriter(), getChunkOperations(), retryTemplate, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 			tasklet.setListeners(getListeners());
 
 			step.setTasklet(tasklet);
@@ -304,6 +303,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 		final private ItemSkipPolicy writeSkipPolicy;
 
+		final private ItemSkipPolicy processSkipPolicy;
+
 		/**
 		 * @param itemReader
 		 * @param itemWriter
@@ -312,11 +313,12 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		public StatefulRetryTasklet(ItemReader<? extends T> itemReader,
 				ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 				RepeatOperations chunkOperations, RetryOperations retryTemplate, ItemSkipPolicy readSkipPolicy,
-				ItemSkipPolicy writeSkipPolicy) {
+				ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
 			super(itemReader, itemProcessor, itemWriter, chunkOperations);
 			this.retryOperations = retryTemplate;
 			this.readSkipPolicy = readSkipPolicy;
 			this.writeSkipPolicy = writeSkipPolicy;
+			this.processSkipPolicy = processSkipPolicy;
 		}
 
 		/**
@@ -363,6 +365,79 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					}
 				}
 			}
+
+		}
+
+		/**
+		 * Incorporate retry into the item processor stage.
+		 * 
+		 * @see org.springframework.batch.core.step.item.ChunkOrientedTasklet#process(org.springframework.batch.core.StepContribution,
+		 * org.springframework.batch.core.step.item.Chunk,
+		 * org.springframework.batch.core.step.item.Chunk)
+		 */
+		@Override
+		protected void process(final StepContribution contribution, final Chunk<T> inputs, final Chunk<S> outputs)
+				throws Exception {
+
+			int filtered = 0;
+
+			for (final Chunk<T>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
+				
+				final T item = iterator.next();
+				
+				RetryCallback<S> retryCallback = new RetryCallback<S>() {
+
+					public S doWithRetry(RetryContext context) throws Exception {
+						contribution.incrementItemCount();
+						S output = doProcess(item);
+						return output;
+					}
+
+				};
+
+				RecoveryCallback<S> recoveryCallback = new RecoveryCallback<S>() {
+
+					public S recover(RetryContext context) throws Exception {
+						Exception e = context.getLastThrowable();
+						if (processSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+							contribution.incrementProcessSkipCount();
+							iterator.remove(e);
+						}
+						else {
+							throw new RetryException("Non-skippable exception in recoverer", e);
+						}
+						// Unless we reached the end of the chunk we need to rethrow
+						if (iterator.hasNext()) {
+							throw e;
+						}
+						return null;
+					}
+					
+				};
+
+				S output = retryOperations.execute(retryCallback, recoveryCallback, new RetryState(inputs));
+				// TODO: increment filter count if this is null
+				if (output != null) {
+					outputs.add(output);
+				} else {
+					filtered++;
+				}
+
+			}
+
+			for (Chunk.SkippedItem<T> skip : inputs.getSkips()) {
+				Exception exception = skip.getException();
+				try {
+					getListener().onSkipInProcess(skip.getItem(), exception);
+				}
+				catch (RuntimeException e) {
+					throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
+				}
+			}
+			
+			contribution.incrementFilterCount(filtered);
+
+			inputs.clear();
 
 		}
 

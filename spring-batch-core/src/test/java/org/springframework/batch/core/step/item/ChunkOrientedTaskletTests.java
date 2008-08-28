@@ -16,6 +16,7 @@
 package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
+import org.springframework.batch.item.validator.ValidationException;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -47,11 +49,11 @@ public class ChunkOrientedTaskletTests {
 	private StubItemReader itemReader = new StubItemReader();
 
 	private StubItemWriter itemWriter = new StubItemWriter();
-	
+
 	private RepeatTemplate repeatTemplate = new RepeatTemplate();
-	
+
 	private AttributeAccessor context = new RepeatContextSupport(null);
-	
+
 	@Before
 	public void setUp() {
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
@@ -69,6 +71,25 @@ public class ChunkOrientedTaskletTests {
 	}
 
 	@Test
+	public void testHandleWithItemProcessorFailure() throws Exception {
+		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
+				new StubItemProcessor(), itemWriter, repeatTemplate);
+		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
+				123L, new JobParameters(), "job"))));
+		try {
+			handler.execute(contribution, context);
+			fail("Expected ValidationException");
+		}
+		catch (ValidationException e) {
+			// expected
+		}
+		assertEquals(2, itemReader.count);
+		assertEquals(2, contribution.getItemCount());
+		assertEquals(0, contribution.getFilterCount());
+		assertEquals("", itemWriter.values);
+	}
+
+	@Test
 	public void testHandleCompositeItem() throws Exception {
 		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
 				new AgrgegateItemProcessor(), itemWriter, repeatTemplate);
@@ -76,6 +97,8 @@ public class ChunkOrientedTaskletTests {
 				123L, new JobParameters(), "job"))));
 		handler.execute(contribution, context);
 		assertEquals(2, itemReader.count);
+		assertEquals(2, contribution.getItemCount());
+		assertEquals(1, contribution.getFilterCount());
 		assertEquals("12", itemWriter.values);
 	}
 
@@ -104,12 +127,25 @@ public class ChunkOrientedTaskletTests {
 	 * @author Dave Syer
 	 * 
 	 */
+	private static class StubItemProcessor implements ItemProcessor<String, String> {
+		public String process(String item) throws Exception {
+			if ("2".equals(item)) {
+				throw new ValidationException("Planned failure");
+			}
+			return item;
+		}
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
 	private final class StubItemWriter implements ItemWriter<String> {
 		private String values = "";
 
 		public void write(List<? extends String> items) throws Exception {
 			for (String item : items) {
-				values += item;				
+				values += item;
 			}
 		}
 	}

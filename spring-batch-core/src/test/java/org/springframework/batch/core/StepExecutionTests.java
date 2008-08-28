@@ -119,6 +119,11 @@ public class StepExecutionTests extends TestCase {
 		assertEquals(123, execution.getItemCount());
 	}
 
+	public void testGetFilterCount() {
+		execution.setFilterCount(123);
+		assertEquals(123, execution.getFilterCount());
+	}
+
 	public void testGetJobExecution() throws Exception {
 		assertNotNull(execution.getJobExecution());
 	}

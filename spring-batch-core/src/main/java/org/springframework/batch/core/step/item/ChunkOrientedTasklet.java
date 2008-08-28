@@ -200,16 +200,19 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	 * @param contribution current context
 	 */
 	protected void process(StepContribution contribution, Chunk<T> inputs, Chunk<S> outputs) throws Exception {
+		int filtered = 0;
 		for (T item : inputs) {
-			S output = doProcess(item);
 			// TODO: segregate read / write / filter count
 			// (this is read count)
 			contribution.incrementItemCount();
-			// TODO: increment filter count if this is null
+			S output = doProcess(item);
 			if (output != null) {
 				outputs.add(output);
+			} else {
+				filtered++;
 			}
 		}
+		contribution.incrementFilterCount(filtered);
 		inputs.clear();
 	}
 

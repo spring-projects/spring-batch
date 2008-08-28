@@ -412,7 +412,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInRead() {
-		multicast.register(new SkipListenerSupport() {
+		multicast.register(new SkipListenerSupport<Object,Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				count++;
@@ -430,7 +430,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInReadFails() {
-		multicast.register(new SkipListenerSupport() {
+		multicast.register(new SkipListenerSupport<Object,Object>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				count++;
@@ -456,7 +456,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInWrite() {
-		multicast.register(new SkipListenerSupport() {
+		multicast.register(new SkipListenerSupport<Object,Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
 				count++;
@@ -474,7 +474,7 @@ public class MulticasterBatchListenerTests {
 	 */
 	@Test
 	public void testOnSkipInWriteFails() {
-		multicast.register(new SkipListenerSupport() {
+		multicast.register(new SkipListenerSupport<Object,Object>() {
 			@Override
 			public void onSkipInWrite(Object item, Throwable t) {
 				count++;
@@ -483,6 +483,50 @@ public class MulticasterBatchListenerTests {
 		});
 		try {
 			multicast.onSkipInWrite(null, new RuntimeException("bar"));
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException e) {
+			// expected
+			String message = e.getMessage();
+			assertEquals("Wrong message: " + message, "foo", message);
+		}
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)}
+	 * .
+	 */
+	@Test
+	public void testOnSkipInProcess() {
+		multicast.register(new SkipListenerSupport<Object,Object>() {
+			@Override
+			public void onSkipInProcess(Object item, Throwable t) {
+				count++;
+				super.onSkipInWrite(item, t);
+			}
+		});
+		multicast.onSkipInProcess(null, new RuntimeException("foo"));
+		assertEquals(1, count);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)}
+	 * .
+	 */
+	@Test
+	public void testOnSkipInProcessFails() {
+		multicast.register(new SkipListenerSupport<Object,Object>() {
+			@Override
+			public void onSkipInProcess(Object item, Throwable t) {
+				count++;
+				throw new RuntimeException("foo");
+			}
+		});
+		try {
+			multicast.onSkipInProcess(null, new RuntimeException("bar"));
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {

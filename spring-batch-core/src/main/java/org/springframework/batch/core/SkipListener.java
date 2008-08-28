@@ -23,7 +23,7 @@ package org.springframework.batch.core;
  * @author Robert Kasanicky
  * 
  */
-public interface SkipListener<S> extends StepListener {
+public interface SkipListener<T,S> extends StepListener {
 
 	/**
 	 * Callback for a failure on read that is legal, so is not going to be
@@ -36,7 +36,7 @@ public interface SkipListener<S> extends StepListener {
 
 	/**
 	 * This item failed on write with the given exception, and a skip was called
-	 * for. The callback occurs immediately after the item is marked for future
+	 * for. The callback occurs immediately after the item is marked for 
 	 * skipping and is called only once for the same item, regardless of
 	 * rollbacks (chunk may be re-processed several times or the exception on
 	 * write may not cause rollback at all).
@@ -45,5 +45,17 @@ public interface SkipListener<S> extends StepListener {
 	 * @param t the cause of the failure
 	 */
 	void onSkipInWrite(S item, Throwable t);
+
+	/**
+	 * This item failed on processing with the given exception, and a skip was called
+	 * for. The callback occurs immediately after the item is marked for 
+	 * skipping and is called only once for the same item, regardless of
+	 * rollbacks (chunk may be re-processed several times or the exception on
+	 * write may not cause rollback at all).
+	 * 
+	 * @param item the failed item
+	 * @param t the cause of the failure
+	 */
+	void onSkipInProcess(T item, Throwable t);
 
 }

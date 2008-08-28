@@ -33,7 +33,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  */
 public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
-		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<S> {
+		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T,S> {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
@@ -45,7 +45,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 
 	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
 
-	private CompositeSkipListener<S> skipListener = new CompositeSkipListener<S>();
+	private CompositeSkipListener<T,S> skipListener = new CompositeSkipListener<T,S>();
 
 	/**
 	 * Initialise the listener instance.
@@ -296,6 +296,15 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 */
 	public void onSkipInWrite(S item, Throwable t) {
 		skipListener.onSkipInWrite(item, t);
+	}
+
+	/**
+	 * @param item
+	 * @param t
+	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInProcess(Object, Throwable)
+	 */
+	public void onSkipInProcess(T item, Throwable t) {
+		skipListener.onSkipInProcess(item, t);
 	}
 
 }

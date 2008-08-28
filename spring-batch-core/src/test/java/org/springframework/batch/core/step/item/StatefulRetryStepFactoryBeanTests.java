@@ -211,8 +211,8 @@ public class StatefulRetryStepFactoryBeanTests {
 				add(RetryException.class);
 			}
 		});
-		factory.setListeners(new StepListener[] { new SkipListenerSupport() {
-			public void onSkipInWrite(Object item, Throwable t) {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
+			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
 			}
@@ -275,8 +275,8 @@ public class StatefulRetryStepFactoryBeanTests {
 				add(RetryException.class);
 			}
 		});
-		factory.setListeners(new StepListener[] { new SkipListenerSupport() {
-			public void onSkipInWrite(Object item, Throwable t) {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
+			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
 			}

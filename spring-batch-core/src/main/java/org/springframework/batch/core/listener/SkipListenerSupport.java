@@ -23,7 +23,7 @@ import org.springframework.batch.core.SkipListener;
  * @author Dave Syer
  *
  */
-public class SkipListenerSupport implements SkipListener {
+public class SkipListenerSupport<T,S> implements SkipListener<T,S> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
@@ -34,8 +34,13 @@ public class SkipListenerSupport implements SkipListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
 	 */
-	public void onSkipInWrite(Object item, Throwable t) {
+	public void onSkipInWrite(S item, Throwable t) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.SkipListener#onSkipInProcess(java.lang.Object, java.lang.Throwable)
+	 */
+	public void onSkipInProcess(T item, Throwable t) {		
+	}
 
 }

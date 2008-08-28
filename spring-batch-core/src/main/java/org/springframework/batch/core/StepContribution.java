@@ -16,8 +16,8 @@
 package org.springframework.batch.core;
 
 /**
- * Represents a contribution to a {@link StepExecution}, buffering changes until
- * they can be applied at a chunk boundary.
+ * Represents a contribution to a {@link StepExecution}, buffering changes
+ * until they can be applied at a chunk boundary.
  * 
  * @author Dave Syer
  * 
@@ -26,17 +26,28 @@ public class StepContribution {
 
 	private volatile int itemCount = 0;
 
+	private volatile int filterCount = 0;
+
 	private final int parentSkipCount;
 
 	private volatile int readSkipCount;
 
 	private volatile int writeSkipCount;
 
+	private volatile int processSkipCount;
+
 	/**
 	 * @param execution
 	 */
 	public StepContribution(StepExecution execution) {
 		this.parentSkipCount = execution.getSkipCount();
+	}
+
+	/**
+	 * Increment the counter for the number of items processed.
+	 */
+	public void incrementFilterCount(int count) {
+		filterCount+=count;
 	}
 
 	/**
@@ -56,11 +67,19 @@ public class StepContribution {
 	}
 
 	/**
+	 * Public getter for the filter counter.
+	 * @return the filter counter
+	 */
+	public int getFilterCount() {
+		return filterCount;
+	}
+
+	/**
 	 * @return the sum of skips accumulated in the parent {@link StepExecution}
 	 * and this <code>StepContribution</code>.
 	 */
 	public int getStepSkipCount() {
-		return readSkipCount + writeSkipCount + parentSkipCount;
+		return readSkipCount + writeSkipCount + processSkipCount + parentSkipCount;
 	}
 
 	/**
@@ -69,7 +88,7 @@ public class StepContribution {
 	 * parent {@link StepExecution}).
 	 */
 	public int getSkipCount() {
-		return readSkipCount + writeSkipCount;
+		return readSkipCount + writeSkipCount + processSkipCount;
 	}
 
 	/**
@@ -94,6 +113,21 @@ public class StepContribution {
 	}
 
 	/**
+	 * 
+	 */
+	public void incrementProcessSkipCount() {
+		processSkipCount++;
+	}
+
+	/**
+	 * @param contribution
+	 */
+	public void increment(StepContribution contribution) {
+		itemCount += contribution.getItemCount();
+		readSkipCount += contribution.getReadSkipCount();
+	}
+
+	/**
 	 * @return the read skip count
 	 */
 	public int getReadSkipCount() {
@@ -107,22 +141,22 @@ public class StepContribution {
 		return writeSkipCount;
 	}
 
+	/**
+	 * Public getter for the process skip count.
+	 * @return the process skip count
+	 */
+	public int getProcessSkipCount() {
+		return processSkipCount;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: items=" + itemCount + ", readSkips=" + readSkipCount
-				+ ", writeSkips=" + writeSkipCount + "]";
-	}
-
-	/**
-	 * @param contribution
-	 */
-	public void increment(StepContribution contribution) {
-		itemCount += contribution.getItemCount();
-		readSkipCount += contribution.getReadSkipCount();
+		return "[StepContribution: items=" + itemCount + "filtered=" + filterCount + ", readSkips=" + readSkipCount
+				+ ", writeSkips=" + writeSkipCount + ", processSkips=" + processSkipCount + "]";
 	}
 
 }

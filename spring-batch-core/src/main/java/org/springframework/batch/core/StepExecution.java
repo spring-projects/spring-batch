@@ -63,6 +63,8 @@ public class StepExecution extends Entity {
 
 	private volatile boolean terminateOnly;
 
+	private int filterCount;
+
 	/**
 	 * Constructor with mandatory properties.
 	 * 
@@ -146,9 +148,9 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Returns the current number of items processed for this execution
+	 * Returns the current number of items input for this execution
 	 * 
-	 * @return the current number of items processed for this execution
+	 * @return the current number of items input for this execution
 	 */
 	public int getItemCount() {
 		return itemCount;
@@ -170,6 +172,23 @@ public class StepExecution extends Entity {
 	 */
 	public int getRollbackCount() {
 		return rollbackCount;
+	}
+
+	/**
+	 * Returns the current number of items filtered out of this execution
+	 * 
+	 * @return the current number of items filtered out of this execution
+	 */
+	public int getFilterCount() {
+		return filterCount;
+	}
+	
+	/**
+	 * Public setter for the number of items filtered out of this execution.
+	 * @param filterCount the number of items filtered out of this execution to set
+	 */
+	public void setFilterCount(int filterCount) {
+		this.filterCount = filterCount;
 	}
 
 	/**
@@ -278,6 +297,7 @@ public class StepExecution extends Entity {
 		itemCount += contribution.getItemCount();
 		readSkipCount += contribution.getReadSkipCount();
 		writeSkipCount += contribution.getWriteSkipCount();
+		filterCount += contribution.getFilterCount();
 	}
 
 	/**
