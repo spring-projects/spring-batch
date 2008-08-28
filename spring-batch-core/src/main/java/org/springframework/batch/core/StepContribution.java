@@ -155,7 +155,7 @@ public class StepContribution {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: items=" + itemCount + "filtered=" + filterCount + ", readSkips=" + readSkipCount
+		return "[StepContribution: items=" + itemCount + ", filtered=" + filterCount + ", readSkips=" + readSkipCount
 				+ ", writeSkips=" + writeSkipCount + ", processSkips=" + processSkipCount + "]";
 	}
 
