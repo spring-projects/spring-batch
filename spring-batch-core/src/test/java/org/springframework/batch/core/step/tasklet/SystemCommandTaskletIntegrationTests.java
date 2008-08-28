@@ -16,19 +16,19 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.tasklet.SystemCommandException;
-import org.springframework.batch.core.step.tasklet.SystemCommandStepHandler;
+import org.springframework.batch.core.step.tasklet.SystemCommandTasklet;
 import org.springframework.batch.core.step.tasklet.SystemProcessExitCodeMapper;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
 /**
- * Tests for {@link SystemCommandStepHandler}.
+ * Tests for {@link SystemCommandTasklet}.
  */
-public class SystemCommandStepHandlerIntegrationTests {
+public class SystemCommandTaskletIntegrationTests {
 
-	private static final Log log = LogFactory.getLog(SystemCommandStepHandlerIntegrationTests.class);
+	private static final Log log = LogFactory.getLog(SystemCommandTaskletIntegrationTests.class);
 
-	private SystemCommandStepHandler tasklet = new SystemCommandStepHandler();
+	private SystemCommandTasklet tasklet = new SystemCommandTasklet();
 
 	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(
 			1L, new JobParameters(), "systemCommandJob")));
@@ -56,7 +56,7 @@ public class SystemCommandStepHandlerIntegrationTests {
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		ExitStatus exitStatus = tasklet.handle(null,null);
+		ExitStatus exitStatus = tasklet.execute(null,null);
 
 		assertEquals(ExitStatus.FINISHED, exitStatus);
 	}
@@ -71,7 +71,7 @@ public class SystemCommandStepHandlerIntegrationTests {
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		ExitStatus exitStatus = tasklet.handle(null,null);
+		ExitStatus exitStatus = tasklet.execute(null,null);
 
 		assertEquals(ExitStatus.FAILED, exitStatus);
 	}
@@ -88,7 +88,7 @@ public class SystemCommandStepHandlerIntegrationTests {
 
 		log.info("Executing command: " + command);
 		try {
-			tasklet.handle(null,null);
+			tasklet.execute(null,null);
 			fail();
 		}
 		catch (SystemCommandException e) {
@@ -108,7 +108,7 @@ public class SystemCommandStepHandlerIntegrationTests {
 
 		stepExecution.setTerminateOnly();
 		try {
-			tasklet.handle(null,null);
+			tasklet.execute(null,null);
 			fail();
 		}
 		catch (JobInterruptedException e) {

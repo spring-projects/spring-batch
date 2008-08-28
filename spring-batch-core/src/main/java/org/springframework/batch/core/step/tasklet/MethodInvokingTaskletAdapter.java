@@ -21,7 +21,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * A {@link StepHandler} that wraps a method in a POJO. By default the return
+ * A {@link Tasklet} that wraps a method in a POJO. By default the return
  * value is {@link ExitStatus#FINISHED} unless the delegate POJO itself returns
  * an {@link ExitStatus}. The POJO method is usually going to have no arguments,
  * but a static argument or array of arguments can be used by setting the
@@ -32,16 +32,16 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public class StepHandlerAdapter extends AbstractMethodInvokingDelegator<Object> implements StepHandler {
+public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegator<Object> implements Tasklet {
 
 	/**
 	 * Delegate execution to the target object and translate the return value to
 	 * an {@link ExitStatus} by invoking a method in the delegate POJO. Ignores
 	 * the {@link StepContribution} and the attributes.
 	 * 
-	 * @see StepHandler#handle(StepContribution, AttributeAccessor)
+	 * @see Tasklet#execute(StepContribution, AttributeAccessor)
 	 */
-	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		return mapResult(invokeDelegateMethod());
 	}
 

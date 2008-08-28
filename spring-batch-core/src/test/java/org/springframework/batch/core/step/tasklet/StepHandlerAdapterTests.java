@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.step.tasklet.StepHandlerAdapter;
+import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -28,7 +28,7 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class StepHandlerAdapterTests {
 	
-	private StepHandlerAdapter tasklet = new StepHandlerAdapter();
+	private MethodInvokingTaskletAdapter tasklet = new MethodInvokingTaskletAdapter();
 	private Object result = null;
 	
 	public ExitStatus execute() {
@@ -47,20 +47,20 @@ public class StepHandlerAdapterTests {
 	@Test
 	public void testExecuteWithExitStatus() throws Exception {
 		tasklet.setTargetMethod("execute");
-		assertEquals(ExitStatus.NOOP, tasklet.handle(null,null));
+		assertEquals(ExitStatus.NOOP, tasklet.execute(null,null));
 	}
 
 	@Test
 	public void testMapResultWithNull() throws Exception {
 		tasklet.setTargetMethod("process");
-		assertEquals(ExitStatus.FINISHED, tasklet.handle(null,null));
+		assertEquals(ExitStatus.FINISHED, tasklet.execute(null,null));
 	}
 
 	@Test
 	public void testMapResultWithNonNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		this.result = "foo";
-		assertEquals(ExitStatus.FINISHED, tasklet.handle(null,null));
+		assertEquals(ExitStatus.FINISHED, tasklet.execute(null,null));
 	}
 
 }

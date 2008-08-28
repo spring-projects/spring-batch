@@ -21,12 +21,12 @@ import static org.junit.Assert.fail;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.springframework.batch.core.step.tasklet.CallableStepHandlerAdapter;
+import org.springframework.batch.core.step.tasklet.CallableTaskletAdapter;
 import org.springframework.batch.repeat.ExitStatus;
 
-public class CallableStepHandlerAdapterTests {
+public class CallableTaskletAdapterTests {
 	
-	private CallableStepHandlerAdapter adapter = new CallableStepHandlerAdapter();
+	private CallableTaskletAdapter adapter = new CallableTaskletAdapter();
 
 	@Test
 	public void testHandle() throws Exception {
@@ -35,7 +35,7 @@ public class CallableStepHandlerAdapterTests {
 				return ExitStatus.FINISHED;
 			}
 		});
-		assertEquals(ExitStatus.FINISHED, adapter.handle(null,null));
+		assertEquals(ExitStatus.FINISHED, adapter.execute(null,null));
 	}
 
 	@Test

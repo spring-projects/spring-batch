@@ -42,7 +42,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public class ItemOrientedStepHandlerTests {
+public class ChunkOrientedTaskletTests {
 
 	private StubItemReader itemReader = new StubItemReader();
 
@@ -59,22 +59,22 @@ public class ItemOrientedStepHandlerTests {
 
 	@Test
 	public void testHandle() throws Exception {
-		ItemOrientedStepHandler<String, String> handler = new ItemOrientedStepHandler<String, String>(itemReader,
+		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
 				new PassthroughItemProcessor<String>(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
-		handler.handle(contribution, context);
+		handler.execute(contribution, context);
 		assertEquals(2, itemReader.count);
 		assertEquals("12", itemWriter.values);
 	}
 
 	@Test
 	public void testHandleCompositeItem() throws Exception {
-		ItemOrientedStepHandler<String, String> handler = new ItemOrientedStepHandler<String, String>(itemReader,
+		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
 				new AgrgegateItemProcessor(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
-		handler.handle(contribution, context);
+		handler.execute(contribution, context);
 		assertEquals(2, itemReader.count);
 		assertEquals("12", itemWriter.values);
 	}

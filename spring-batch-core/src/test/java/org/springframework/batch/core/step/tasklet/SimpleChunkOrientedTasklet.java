@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.springframework.batch.core.step.item.ItemOrientedStepHandler;
-import org.springframework.batch.core.step.tasklet.StepHandler;
+import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
@@ -25,13 +25,13 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 
 /**
- * Simplest possible implementation of {@link StepHandler} with no skipping or
+ * Simplest possible implementation of {@link Tasklet} with no skipping or
  * recovering or processing. Just delegates all calls to the provided
  * {@link ItemReader} and {@link ItemWriter}.
  * 
  * @author Dave Syer
  */
-public class SimpleStepHandler<T> extends ItemOrientedStepHandler<T, T> {
+public class SimpleChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T, T> {
 
 	/**
 	 * 
@@ -45,17 +45,17 @@ public class SimpleStepHandler<T> extends ItemOrientedStepHandler<T, T> {
 
 	/**
 	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
-	 * instance of {@link ItemOrientedStepHandler}.
+	 * instance of {@link ChunkOrientedTasklet}.
 	 */
-	public SimpleStepHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
+	public SimpleChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
 		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter, repeatTemplate);
 	}
 
 	/**
 	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
-	 * instance of {@link ItemOrientedStepHandler}.
+	 * instance of {@link ChunkOrientedTasklet}.
 	 */
-	public SimpleStepHandler(ItemReader<T> itemReader, ItemWriter<T> itemWriter, RepeatOperations repeatOperations) {
+	public SimpleChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter, RepeatOperations repeatOperations) {
 		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter, repeatOperations);
 	}
 

@@ -16,7 +16,7 @@
 package org.springframework.batch.integration.job;
 
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.tasklet.StepHandler;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.AttributeAccessor;
 
@@ -24,13 +24,13 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public class TestStepHandler implements StepHandler {
+public class TestTasklet implements Tasklet {
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 */
-	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		return ExitStatus.FINISHED;
 	}
 

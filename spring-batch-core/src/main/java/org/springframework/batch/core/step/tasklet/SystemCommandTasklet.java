@@ -14,7 +14,7 @@ import org.springframework.core.AttributeAccessor;
 import org.springframework.util.Assert;
 
 /**
- * {@link StepHandler} that executes a system command.
+ * {@link Tasklet} that executes a system command.
  * 
  * The system command is executed in a new thread - timeout value is required to
  * be set, so that the batch job does not hang forever if the external process
@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class SystemCommandStepHandler extends StepExecutionListenerSupport implements StepHandler, InitializingBean {
+public class SystemCommandTasklet extends StepExecutionListenerSupport implements Tasklet, InitializingBean {
 
 	private String command;
 
@@ -51,7 +51,7 @@ public class SystemCommandStepHandler extends StepExecutionListenerSupport imple
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
-	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		ExecutorThread executorThread = new ExecutorThread();
 		executorThread.start();
 

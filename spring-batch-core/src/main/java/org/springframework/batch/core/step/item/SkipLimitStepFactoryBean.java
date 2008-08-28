@@ -13,7 +13,7 @@ import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
-import org.springframework.batch.core.step.tasklet.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -194,7 +194,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and
 	 * and exception handler.
 	 */
-	protected void applyConfiguration(StepHandlerStep step) {
+	protected void applyConfiguration(TaskletStep step) {
 		super.applyConfiguration(step);
 
 		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
@@ -261,12 +261,12 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-			ItemOrientedStepHandler<T, S> stepHandler = new StatefulRetryStepHandler<T, S>(getItemReader(),
+			ChunkOrientedTasklet<T, S> tasklet = new StatefulRetryTasklet<T, S>(getItemReader(),
 					getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate, readSkipPolicy,
 					writeSkipPolicy);
-			stepHandler.setListeners(getListeners());
+			tasklet.setListeners(getListeners());
 
-			step.setStepHandler(stepHandler);
+			step.setTasklet(tasklet);
 
 		}
 
@@ -296,7 +296,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 	 * @author Dave Syer
 	 * 
 	 */
-	static class StatefulRetryStepHandler<T, S> extends ItemOrientedStepHandler<T, S> {
+	static class StatefulRetryTasklet<T, S> extends ChunkOrientedTasklet<T, S> {
 
 		final private RetryOperations retryOperations;
 
@@ -309,7 +309,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * @param itemWriter
 		 * @param retryTemplate
 		 */
-		public StatefulRetryStepHandler(ItemReader<? extends T> itemReader,
+		public StatefulRetryTasklet(ItemReader<? extends T> itemReader,
 				ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 				RepeatOperations chunkOperations, RetryOperations retryTemplate, ItemSkipPolicy readSkipPolicy,
 				ItemSkipPolicy writeSkipPolicy) {

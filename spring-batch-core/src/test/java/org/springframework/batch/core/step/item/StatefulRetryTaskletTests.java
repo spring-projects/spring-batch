@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.step.item.SkipLimitStepFactoryBean.StatefulRetryStepHandler;
+import org.springframework.batch.core.step.item.SkipLimitStepFactoryBean.StatefulRetryTasklet;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.tasklet.BasicAttributeAccessor;
@@ -47,7 +47,7 @@ import org.springframework.batch.retry.support.RetryTemplate;
  * @author Dave Syer
  * 
  */
-public class StatefulRetryStepHandlerTests {
+public class StatefulRetryTaskletTests {
 	
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -59,7 +59,7 @@ public class StatefulRetryStepHandlerTests {
 
 	protected List<String> written = new ArrayList<String>();
 
-	private StatefulRetryStepHandler<Integer, String> handler;
+	private StatefulRetryTasklet<Integer, String> handler;
 
 	private RepeatTemplate chunkOperations = new RepeatTemplate();
 
@@ -101,16 +101,16 @@ public class StatefulRetryStepHandlerTests {
 
 	@Test
 	public void testBasicHandle() throws Exception {
-		handler = new StatefulRetryStepHandler<Integer, String>(itemReader, itemProcessor, itemWriter, chunkOperations,
+		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, itemWriter, chunkOperations,
 				retryTemplate, readSkipPolicy, writeSkipPolicy);
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		handler.handle(contribution, new BasicAttributeAccessor());
+		handler.execute(contribution, new BasicAttributeAccessor());
 		assertEquals(limit, contribution.getItemCount());
 	}
 
 	@Test
 	public void testSkipOnRead() throws Exception {
-		handler = new StatefulRetryStepHandler<Integer, String>(new ItemReader<Integer>() {
+		handler = new StatefulRetryTasklet<Integer, String>(new ItemReader<Integer>() {
 			public Integer read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 				throw new RuntimeException("Barf!");
 			}
@@ -119,7 +119,7 @@ public class StatefulRetryStepHandlerTests {
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
 		try {
-			handler.handle(contribution, attributes);
+			handler.execute(contribution, attributes);
 			fail("Expected SkipLimitExceededException");
 		}
 		catch (SkipLimitExceededException e) {
@@ -131,7 +131,7 @@ public class StatefulRetryStepHandlerTests {
 
 	@Test
 	public void testSkipSingleItemOnWrite() throws Exception {
-		handler = new StatefulRetryStepHandler<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
+		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
 			public void write(List<? extends String> items) throws Exception {
 				written.addAll(items);
 				throw new RuntimeException("Barf!");
@@ -141,14 +141,14 @@ public class StatefulRetryStepHandlerTests {
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
 		try {
-			handler.handle(contribution, attributes);
+			handler.execute(contribution, attributes);
 			fail("Expected RuntimeException");
 		}
 		catch (Exception e) {
 			assertEquals("Barf!", e.getMessage());
 		}
 		assertTrue(attributes.hasAttribute("OUTPUT_BUFFER_KEY"));
-		handler.handle(contribution, attributes);
+		handler.execute(contribution, attributes);
 		assertEquals(1, contribution.getItemCount());
 		assertEquals(1, contribution.getWriteSkipCount());
 		assertEquals(1, written.size());
@@ -156,7 +156,7 @@ public class StatefulRetryStepHandlerTests {
 
 	@Test
 	public void testSkipMultipleItems() throws Exception {
-		handler = new StatefulRetryStepHandler<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
+		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
 			public void write(List<? extends String> items) throws Exception {
 				logger.debug("Writing items: "+items);
 				written.addAll(items);
@@ -170,7 +170,7 @@ public class StatefulRetryStepHandlerTests {
 		// Count to 3: (try + skip + skip) 
 		for (int i = 0; i < 3; i++) {
 			try {
-				handler.handle(contribution, attributes);
+				handler.execute(contribution, attributes);
 				fail("Expected RuntimeException on i="+i);
 			}
 			catch (Exception e) {
@@ -182,18 +182,18 @@ public class StatefulRetryStepHandlerTests {
 		Chunk<String> chunk = (Chunk<String>) attributes.getAttribute("OUTPUT_BUFFER_KEY");
 		assertEquals(1, chunk.getSkips().size());
 		// The last recovery for this chunk...
-		handler.handle(contribution, attributes);
+		handler.execute(contribution, attributes);
 
 		attributes = new BasicAttributeAccessor();
 		try {
-			handler.handle(contribution, attributes);
+			handler.execute(contribution, attributes);
 			fail("Expected RuntimeException on i=");
 		}
 		catch (Exception e) {
 			assertEquals("Barf!", e.getMessage());
 		}
 		try {
-			handler.handle(contribution, attributes);
+			handler.execute(contribution, attributes);
 			fail("Expected SkipLimitExceededException");
 		}
 		catch (SkipLimitExceededException e) {

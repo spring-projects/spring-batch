@@ -39,7 +39,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.core.step.tasklet.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -59,9 +59,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
-public class StepHandlerStepIntegrationTests {
+public class ChunkOrientedStepIntegrationTests {
 
-	private StepHandlerStep step;
+	private TaskletStep step;
 
 	private Job job;
 
@@ -92,7 +92,7 @@ public class StepHandlerStepIntegrationTests {
 		jobRepositoryFactoryBean.afterPropertiesSet();
 		jobRepository = (JobRepository) jobRepositoryFactoryBean.getObject();
 
-		step = new StepHandlerStep("stepName");
+		step = new TaskletStep("stepName");
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(transactionManager);
 		RepeatTemplate template = new RepeatTemplate();
@@ -112,7 +112,7 @@ public class StepHandlerStepIntegrationTests {
 	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setStepHandler(new SimpleStepHandler<String>(getReader(new String[] { "a", "b", "c" }),
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
 				new ItemWriter<String>() {
 					public void write(List<? extends String> data) throws Exception {
 						TransactionSynchronizationManager

@@ -16,34 +16,30 @@
 package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * Strategy for processing in a step. Bears a resemblance to {@link ItemReader}
- * and {@link ItemWriter} because part of the contract of the processor is that
- * it should delegate calls to those interfaces.
+ * Strategy for processing in a step.
  * 
  * @author Dave Syer
  * 
  */
-public interface StepHandler {
+public interface Tasklet {
 
 	/**
 	 * Given the current context in the form of a step contribution, do whatever
-	 * is necessary to process this unit inside a chunk. Implementations obtain
-	 * the item and return {@link ExitStatus#FINISHED} if it is null. If it is
-	 * not null process the item and return {@link ExitStatus#CONTINUABLE}. On
-	 * failure throws an exception.
+	 * is necessary to process this unit inside a transaction. Implementations
+	 * return {@link ExitStatus#FINISHED} if finished. If not they return
+	 * {@link ExitStatus#CONTINUABLE}. On failure throws an exception.
 	 * 
 	 * @param contribution mutable state to be passed back to update the current
 	 * step execution
-	 * @param attributes attributes shared between invocations
+	 * @param attributes attributes shared between invocations but not between
+	 * restarts
 	 * @return an {@link ExitStatus} indicating whether processing is
 	 * continuable.
 	 */
-	ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception;
+	ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception;
 
 }

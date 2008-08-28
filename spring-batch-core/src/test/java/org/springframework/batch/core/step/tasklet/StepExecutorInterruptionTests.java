@@ -33,7 +33,7 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
-import org.springframework.batch.core.step.tasklet.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -42,7 +42,7 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 
 public class StepExecutorInterruptionTests extends TestCase {
 
-	private StepHandlerStep step;
+	private TaskletStep step;
 
 	private JobExecution jobExecution;
 
@@ -59,7 +59,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 				new MapStepExecutionDao(), new MapExecutionContextDao());
 
 		JobSupport jobConfiguration = new JobSupport();
-		step = new StepHandlerStep("interruptedStep");
+		step = new TaskletStep("interruptedStep");
 		jobConfiguration.addStep(step);
 		jobConfiguration.setBeanName("testJob");
 		jobExecution = jobRepository.createJobExecution(jobConfiguration, new JobParameters());
@@ -79,7 +79,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		// N.B, If we don't set the completion policy it might run forever
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
-		step.setStepHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
+		step.setTasklet(new SimpleChunkOrientedTasklet<Object>(new ItemReader<Object>() {
 			public Object read() throws Exception {
 				// do something non-trivial (and not Thread.sleep())
 				double foo = 1;
@@ -116,7 +116,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		Thread processingThread = createThread(stepExecution);
 
-		step.setStepHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
+		step.setTasklet(new SimpleChunkOrientedTasklet<Object>(new ItemReader<Object>() {
 			public Object read() throws Exception {
 				return null;
 			}
@@ -153,7 +153,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	public void testLockNotReleasedIfChunkFails() throws Exception {
 
-		step.setStepHandler(new SimpleStepHandler<Object>(new ItemReader<Object>() {
+		step.setTasklet(new SimpleChunkOrientedTasklet<Object>(new ItemReader<Object>() {
 			public Object read() throws Exception {
 				throw new RuntimeException("Planned!");
 			}

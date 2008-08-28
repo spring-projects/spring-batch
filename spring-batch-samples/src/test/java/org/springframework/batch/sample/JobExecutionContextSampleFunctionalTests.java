@@ -3,8 +3,8 @@ package org.springframework.batch.sample;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.runner.RunWith;
-import org.springframework.batch.sample.tasklet.DummyMessageReceivingStepHandler;
-import org.springframework.batch.sample.tasklet.DummyMessageSendingStepHandler;
+import org.springframework.batch.sample.tasklet.DummyMessageReceivingTasklet;
+import org.springframework.batch.sample.tasklet.DummyMessageSendingTasklet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -14,10 +14,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class JobExecutionContextSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	@Autowired
-	private DummyMessageSendingStepHandler sender;
+	private DummyMessageSendingTasklet sender;
 
 	@Autowired
-	private DummyMessageReceivingStepHandler receiver;
+	private DummyMessageReceivingTasklet receiver;
 
 	protected void validatePostConditions() throws Exception {
 		assertEquals(sender.getMessage(), receiver.getReceivedMessage());

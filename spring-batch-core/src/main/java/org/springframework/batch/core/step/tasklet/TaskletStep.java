@@ -25,7 +25,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
@@ -49,10 +48,11 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 
 /**
- * Simple implementation of executing the step as a set of chunks, each chunk
- * surrounded by a transaction. The structure is therefore that of a loop with
- * transaction boundary inside the loop. The loop is controlled by the step
- * operations ( {@link #setStepOperations(RepeatOperations)}).<br/>
+ * Simple implementation of executing the step as a call to a {@link Tasklet},
+ * possibly repeated, and each call surrounded by a transaction. The structure
+ * is therefore that of a loop with transaction boundary inside the loop. The
+ * loop is controlled by the step operations (
+ * {@link #setStepOperations(RepeatOperations)}).<br/><br/>
  * 
  * Clients can use interceptors in the step operations to intercept or listen to
  * the iteration on a step-wide basis, for instance to get a callback when the
@@ -64,9 +64,9 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * @author Ben Hale
  * @author Robert Kasanicky
  */
-public class StepHandlerStep extends AbstractStep {
+public class TaskletStep extends AbstractStep {
 
-	private static final Log logger = LogFactory.getLog(StepHandlerStep.class);
+	private static final Log logger = LogFactory.getLog(TaskletStep.class);
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
 
@@ -79,21 +79,21 @@ public class StepHandlerStep extends AbstractStep {
 
 	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
 
-	private StepHandler stepHandler;
+	private Tasklet tasklet;
 
 	private StepExecutionSynchronizer synchronizer;
 
 	/**
 	 * Default constructor.
 	 */
-	public StepHandlerStep() {
+	public TaskletStep() {
 		this(null);
 	}
 
 	/**
 	 * @param name
 	 */
-	public StepHandlerStep(String name) {
+	public TaskletStep(String name) {
 		super(name);
 		synchronizer = new StepExecutionSynchronizerFactory().getStepExecutionSynchronizer();
 	}
@@ -116,14 +116,14 @@ public class StepHandlerStep extends AbstractStep {
 	}
 
 	/**
-	 * Public setter for the {@link StepHandler}.
+	 * Public setter for the {@link Tasklet}.
 	 * 
-	 * @param stepHandler the {@link StepHandler} to set
+	 * @param tasklet the {@link Tasklet} to set
 	 */
-	public void setStepHandler(StepHandler stepHandler) {
-		this.stepHandler = stepHandler;
-		if (stepHandler instanceof StepExecutionListener) {
-			registerStepExecutionListener((StepExecutionListener) stepHandler);
+	public void setTasklet(Tasklet tasklet) {
+		this.tasklet = tasklet;
+		if (tasklet instanceof StepExecutionListener) {
+			registerStepExecutionListener((StepExecutionListener) tasklet);
 		}
 	}
 
@@ -249,7 +249,7 @@ public class StepHandlerStep extends AbstractStep {
 				try {
 
 					try {
-						exitStatus = stepHandler.handle(contribution, attributes);
+						exitStatus = tasklet.execute(contribution, attributes);
 					}
 					catch (Error e) {
 						if (transactionAttribute.rollbackOn(e)) {

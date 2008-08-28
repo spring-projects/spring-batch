@@ -2,7 +2,7 @@ package org.springframework.batch.sample.tasklet;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.step.tasklet.StepHandler;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.AttributeAccessor;
@@ -15,11 +15,11 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public class FileDeletingStepHandler implements StepHandler, InitializingBean {
+public class FileDeletingTasklet implements Tasklet, InitializingBean {
 
 	private Resource[] resources;
 
-	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		for (Resource resource : resources) {
 			boolean deleted = resource.getFile().delete();
 			if (!deleted) {

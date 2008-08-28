@@ -21,7 +21,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.tasklet.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -262,7 +262,7 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	 * @see org.springframework.beans.factory.FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
-		StepHandlerStep step = new StepHandlerStep(getName());
+		TaskletStep step = new TaskletStep(getName());
 		applyConfiguration(step);
 		return step;
 	}
@@ -387,7 +387,7 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	 * @param step
 	 * 
 	 */
-	protected void applyConfiguration(StepHandlerStep step) {
+	protected void applyConfiguration(TaskletStep step) {
 
 		Assert.notNull(getItemReader(), "ItemReader must be provided");
 		Assert.notNull(getItemWriter(), "ItemWriter must be provided");
@@ -457,9 +457,9 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 
 		step.setStepOperations(stepOperations);
 
-		ItemOrientedStepHandler<T,S> stepHandler = new ItemOrientedStepHandler<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations);
-		stepHandler.setListeners(getListeners());
-		step.setStepHandler(stepHandler);
+		ChunkOrientedTasklet<T,S> tasklet = new ChunkOrientedTasklet<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations);
+		tasklet.setListeners(getListeners());
+		step.setTasklet(tasklet);
 
 	}
 

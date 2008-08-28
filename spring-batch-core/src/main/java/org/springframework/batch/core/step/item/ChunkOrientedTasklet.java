@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
-import org.springframework.batch.core.step.tasklet.StepHandler;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -33,7 +33,7 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * Simplest possible implementation of {@link StepHandler} with no skipping or
+ * Simplest possible implementation of {@link Tasklet} with no skipping or
  * recovering. Just delegates all calls to the provided {@link ItemReader} and
  * {@link ItemWriter}.
  * 
@@ -44,7 +44,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class ItemOrientedStepHandler<T, S> implements StepHandler {
+public class ChunkOrientedTasklet<T, S> implements Tasklet {
 
 	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
@@ -68,7 +68,7 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * @param itemWriter
 	 * @param repeatOperations
 	 */
-	public ItemOrientedStepHandler(ItemReader<? extends T> itemReader,
+	public ChunkOrientedTasklet(ItemReader<? extends T> itemReader,
 			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 			RepeatOperations repeatOperations) {
 		super();
@@ -114,10 +114,10 @@ public class ItemOrientedStepHandler<T, S> implements StepHandler {
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
 	 * taken from the reader.
 	 * 
-	 * @see org.springframework.batch.core.step.tasklet.StepHandler#handle(org.springframework.batch.core.StepContribution,
+	 * @see org.springframework.batch.core.step.tasklet.Tasklet#execute(org.springframework.batch.core.StepContribution,
 	 * AttributeAccessor)
 	 */
-	public ExitStatus handle(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
 		// TODO: check flags to see if these need to be saved or not (e.g. JMS not)
 		final Chunk<T> inputs = getInputBuffer(attributes);

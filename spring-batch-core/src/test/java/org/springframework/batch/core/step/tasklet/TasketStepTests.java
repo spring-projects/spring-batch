@@ -47,7 +47,7 @@ import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
-import org.springframework.batch.core.step.tasklet.StepHandlerStep;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -64,7 +64,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
-public class StepHandlerStepTests {
+public class TasketStepTests {
 
 	List<String> processed = new ArrayList<String>();
 
@@ -76,7 +76,7 @@ public class StepHandlerStepTests {
 		}
 	};
 
-	private StepHandlerStep step;
+	private TaskletStep step;
 
 	private Job job;
 
@@ -94,12 +94,12 @@ public class StepHandlerStepTests {
 		return new ListItemReader<String>(Arrays.asList(args));
 	}
 
-	private StepHandlerStep getStep(String[] strings) throws Exception {
-		StepHandlerStep step = new StepHandlerStep("stepName");
+	private TaskletStep getStep(String[] strings) throws Exception {
+		TaskletStep step = new TaskletStep("stepName");
 		// Only process one item:
 		RepeatTemplate template = new RepeatTemplate();
 		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
-		step.setStepHandler(new SimpleStepHandler<String>(getReader(strings), itemWriter, template));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(getReader(strings), itemWriter, template));
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
 		return step;
@@ -210,7 +210,7 @@ public class StepHandlerStepTests {
 
 		};
 
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
@@ -235,7 +235,7 @@ public class StepHandlerStepTests {
 
 		};
 
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
@@ -260,7 +260,7 @@ public class StepHandlerStepTests {
 
 		};
 
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
 			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
 				return ExitStatus.FAILED.addExitDescription("FOO");
@@ -287,7 +287,7 @@ public class StepHandlerStepTests {
 	@Test
 	public void testNonRestartedJob() throws Exception {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		step.setStepHandler(new SimpleStepHandler<String>(tasklet, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(tasklet, itemWriter));
 		step.registerStream(tasklet);
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -348,7 +348,7 @@ public class StepHandlerStepTests {
 	@Test
 	public void testNoSaveExecutionAttributesRestartableJob() {
 		MockRestartableItemReader tasklet = new MockRestartableItemReader();
-		step.setStepHandler(new SimpleStepHandler<String>(tasklet, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(tasklet, itemWriter));
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
@@ -369,7 +369,7 @@ public class StepHandlerStepTests {
 	 */
 	@Test
 	public void testRestartJobOnNonRestartableTasklet() throws Exception {
-		step.setStepHandler(new SimpleStepHandler<String>(new ItemReader<String>() {
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(new ItemReader<String>() {
 			public String read() throws Exception {
 				return "foo";
 			}
@@ -391,7 +391,7 @@ public class StepHandlerStepTests {
 				executionContext.putString("foo", "bar");
 			}
 		};
-		step.setStepHandler(new SimpleStepHandler<String>(reader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(reader, itemWriter));
 		step.registerStream(reader);
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -491,7 +491,7 @@ public class StepHandlerStepTests {
 				return null;
 			}
 		});
-		step.setStepHandler(new SimpleStepHandler<String>(new MockRestartableItemReader() {
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(new MockRestartableItemReader() {
 			public String read() throws Exception {
 				throw new RuntimeException("FOO");
 			}
@@ -519,7 +519,7 @@ public class StepHandlerStepTests {
 				executionContext.putString("foo", "bar");
 			}
 		};
-		step.setStepHandler(new SimpleStepHandler<String>(reader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(reader, itemWriter));
 		step.setStreams(new ItemStream[] { reader });
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -554,7 +554,7 @@ public class StepHandlerStepTests {
 
 		};
 
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -582,7 +582,7 @@ public class StepHandlerStepTests {
 				throw new RuntimeException("Foo");
 			}
 		};
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -610,7 +610,7 @@ public class StepHandlerStepTests {
 				throw new Error("Foo");
 			}
 		};
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
@@ -638,7 +638,7 @@ public class StepHandlerStepTests {
 				throw new RuntimeException("Foo");
 			}
 		};
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 		step.setTransactionManager(new ResourcelessTransactionManager() {
 			protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
 				// Simulate failure on rollback when stream resets
@@ -735,7 +735,7 @@ public class StepHandlerStepTests {
 				throw new RuntimeException("Bar");
 			}
 		};
-		step.setStepHandler(new SimpleStepHandler<String>(itemReader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(itemReader, itemWriter));
 		step.registerStream(itemReader);
 
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
@@ -773,7 +773,7 @@ public class StepHandlerStepTests {
 				throw new RuntimeException("CRASH!");
 			}
 		};
-		step.setStepHandler(new SimpleStepHandler<String>(reader, itemWriter));
+		step.setTasklet(new SimpleChunkOrientedTasklet<String>(reader, itemWriter));
 		step.registerStream(reader);
 
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));

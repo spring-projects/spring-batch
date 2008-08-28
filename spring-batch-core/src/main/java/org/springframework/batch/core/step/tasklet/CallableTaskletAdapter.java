@@ -25,12 +25,12 @@ import org.springframework.util.Assert;
 
 /**
  * Adapts a {@link Callable}&lt;{@link ExitStatus}&gt; to the
- * {@link StepHandler} interface.
+ * {@link Tasklet} interface.
  * 
  * @author Dave Syer
  * 
  */
-public class CallableStepHandlerAdapter implements StepHandler, InitializingBean {
+public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 
 	private Callable<ExitStatus> callable;
 	
@@ -54,9 +54,9 @@ public class CallableStepHandlerAdapter implements StepHandler, InitializingBean
 	/**
 	 * Execute the provided Callable and return its {@link ExitStatus}.  Ignores
 	 * the {@link StepContribution} and the attributes.
-	 * @see StepHandler#handle(StepContribution, AttributeAccessor)
+	 * @see Tasklet#execute(StepContribution, AttributeAccessor)
 	 */
-	public ExitStatus handle(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		return callable.call();
 	}
 
