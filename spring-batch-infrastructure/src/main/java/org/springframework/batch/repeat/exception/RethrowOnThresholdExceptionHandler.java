@@ -24,24 +24,27 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextCounter;
 import org.springframework.batch.support.Classifier;
-import org.springframework.batch.support.ExceptionClassifierSupport;
+import org.springframework.batch.support.SubclassClassifier;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Implementation of {@link ExceptionHandler} that rethrows when exceptions of a
- * given type reach a threshold. Requires an {@link Classifier} that
- * maps exception types to unique keys, and also a map from those keys to
- * threshold values (Integer type).
+ * given type reach a threshold. Requires an {@link Classifier} that maps
+ * exception types to unique keys, and also a map from those keys to threshold
+ * values (Integer type).
  * 
  * @author Dave Syer
  * 
  */
 public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 
+	protected static final IntegerHolder ZERO = new IntegerHolder(0);
+
 	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
-	private Classifier<Throwable,String> exceptionClassifier = new ExceptionClassifierSupport();
-
-	private Map<String, Integer> thresholds = new HashMap<String, Integer>();
+	private Classifier<? super Throwable, IntegerHolder> exceptionClassifier = new Classifier<Throwable, IntegerHolder>() {
+		public RethrowOnThresholdExceptionHandler.IntegerHolder classify(Throwable classifiable) { return ZERO;}
+	};
 
 	private boolean useParent = false;
 
@@ -63,30 +66,19 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 */
 	public RethrowOnThresholdExceptionHandler() {
 		super();
-		thresholds.put(ExceptionClassifierSupport.DEFAULT, 0);
 	}
 
 	/**
-	 * A map from classifier keys to a threshold value of type Integer. The keys
-	 * are usually String literals, depending on the {@link Classifier}
-	 * implementation used.
+	 * A map from exception classes to a threshold value of type Integer.
 	 * 
 	 * @param thresholds the threshold value map.
 	 */
-	public void setThresholds(Map<String, Integer> thresholds) {
-		this.thresholds = thresholds;
-	}
-
-	/**
-	 * Setter for the {@link Classifier} used by this handler. The
-	 * default is to map all throwable instances to
-	 * {@link ExceptionClassifierSupport#DEFAULT}, which are then mapped to a
-	 * threshold of 0 by the {@link #setThresholds(Map)} map.
-	 * 
-	 * @param exceptionClassifier ExceptionClassifier to use
-	 */
-	public void setExceptionClassifier(Classifier<Throwable, String> exceptionClassifier) {
-		this.exceptionClassifier = exceptionClassifier;
+	public void setThresholds(Map<Class<? extends Throwable>, Integer> thresholds) {
+		Map<Class<? extends Throwable>, IntegerHolder> typeMap = new HashMap<Class<? extends Throwable>, IntegerHolder>();
+		for (Class<? extends Throwable> type : thresholds.keySet()) {
+			typeMap.put(type, new IntegerHolder(thresholds.get(type)));
+		}
+		exceptionClassifier = new SubclassClassifier<Throwable, IntegerHolder>(typeMap, ZERO);
 	}
 
 	/**
@@ -99,21 +91,55 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
-		Object key = exceptionClassifier.classify(throwable);
+		IntegerHolder key = exceptionClassifier.classify(throwable);
+		
 		RepeatContextCounter counter = getCounter(context, key);
 		counter.increment();
 		int count = counter.getCount();
-		Integer threshold = thresholds.get(key);
-		if (threshold == null || count > threshold) {
+		int threshold = key.getValue();
+		if (count > threshold) {
 			throw throwable;
 		}
 
 	}
 
-	private RepeatContextCounter getCounter(RepeatContext context, Object key) {
-		String attribute = RethrowOnThresholdExceptionHandler.class.getName() + "." + key.toString();
+	private RepeatContextCounter getCounter(RepeatContext context, IntegerHolder key) {
+		String attribute = RethrowOnThresholdExceptionHandler.class.getName() + "." + key;
 		// Creates a new counter and stores it in the correct context:
 		return new RepeatContextCounter(context, attribute, useParent);
+	}
+
+	/**
+	 * @author Dave Syer
+	 * 
+	 */
+	private static class IntegerHolder {
+
+		private final int value;
+
+		/**
+		 * @param value
+		 */
+		public IntegerHolder(int value) {
+			this.value = value;
+		}
+		
+		/**
+		 * Public getter for the value.
+		 * @return the value
+		 */
+		public int getValue() {
+			return value;
+		}
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return ObjectUtils.getIdentityHexString(this)+"."+value;
+		}
+
 	}
 
 }

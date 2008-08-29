@@ -16,60 +16,60 @@
 
 package org.springframework.batch.repeat.exception;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.context.RepeatContextCounter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.support.ExceptionClassifierSupport;
 
-public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
+public class RethrowOnThresholdExceptionHandlerTests {
 
 	private RethrowOnThresholdExceptionHandler handler = new RethrowOnThresholdExceptionHandler();
+
 	private RepeatContext parent = new RepeatContextSupport(null);
+
 	private RepeatContext context = new RepeatContextSupport(parent);
-	
+
+	@Test
 	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
 
+	@Test
 	public void testError() throws Throwable {
 		try {
 			handler.handleException(context, new Error("Foo"));
 			fail("Expected Error");
-		} catch (Error e) {
+		}
+		catch (Error e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
-	
+
+	@Test
 	public void testNotRethrownWithThreshold() throws Throwable {
-		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public String classify(Throwable throwable) {
-				return "RuntimeException";
-			}
-		});
-		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
-		RepeatContextCounter counter = new RepeatContextCounter(context, RethrowOnThresholdExceptionHandler.class.getName() + ".RuntimeException");
+		AtomicInteger counter = (AtomicInteger) context.getAttribute(context.attributeNames()[0]);
 		assertNotNull(counter);
-		assertEquals(1, counter.getCount());
+		assertEquals(1, counter.get());
 	}
-	
+
+	@Test
 	public void testRethrowOnThreshold() throws Throwable {
-		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public String classify(Throwable throwable) {
-				return "RuntimeException";
-			}
-		});
-		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(2)));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 2));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		handler.handleException(context, new RuntimeException("Foo"));
@@ -81,14 +81,10 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
-	
+
+	@Test
 	public void testNotUseParent() throws Throwable {
-		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public String classify(Throwable throwable) {
-				return "RuntimeException";
-			}
-		});
-		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
@@ -101,13 +97,9 @@ public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testUseParent() throws Throwable {
-		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public String classify(Throwable throwable) {
-				return "RuntimeException";
-			}
-		});
-		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
+		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
 		handler.setUseParent(true);
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));

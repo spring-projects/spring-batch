@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,16 +80,16 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		
 		// assertTrue(((Resource)applicationContext.getBean("customerFileLocator")).exists());
 		
-		customers = new ArrayList<Customer>() {{add(new Customer("customer1", (credits.get("customer1") - 98.34)));
-			add(new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)));
-			add(new Customer("customer3", (credits.get("customer3") - 109.25)));
-			add(new Customer("customer4", credits.get("customer4") - 123.39));}};
+		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
+				new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)),
+				new Customer("customer3", (credits.get("customer3") - 109.25)),
+				new Customer("customer4", credits.get("customer4") - 123.39));
 
-		trades = new ArrayList<Trade>() {{add(new Trade("UK21341EAH45", 978, new BigDecimal("98.34"), "customer1"));
-			add(new Trade("UK21341EAH46", 112, new BigDecimal("18.12"), "customer2"));
-			add(new Trade("UK21341EAH47", 245, new BigDecimal("12.78"), "customer2"));
-			add(new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"));
-			add(new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));}};
+		trades = Arrays.asList(new Trade("UK21341EAH45", 978, new BigDecimal("98.34"), "customer1"),
+				new Trade("UK21341EAH46", 112, new BigDecimal("18.12"), "customer2"),
+				new Trade("UK21341EAH47", 245, new BigDecimal("12.78"), "customer2"),
+				new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"),
+				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
 			
 		// check content of the trade table
 		simpleJdbcTemplate.getJdbcOperations().query(GET_TRADES, new RowCallbackHandler() {

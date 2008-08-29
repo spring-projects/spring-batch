@@ -19,7 +19,7 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -74,11 +74,8 @@ public class CompositeItemProcessListenerTests {
 
 	@Test
 	public void testSetListeners() throws Exception {
-		compositeListener.setListeners(new ArrayList<ItemProcessListener<? super Object, ? super Object>>() {
-			{
-				add(listener);
-			}
-		});
+		compositeListener.setListeners(Collections
+				.<ItemProcessListener<? super Object, ? super Object>> singletonList(listener));
 		listener.beforeProcess(null);
 		replay(listener);
 		compositeListener.beforeProcess(null);

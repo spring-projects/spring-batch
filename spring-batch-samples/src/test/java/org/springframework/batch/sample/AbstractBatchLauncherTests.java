@@ -42,7 +42,7 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 
 	protected ApplicationContext applicationContext;
 
-	protected JobLauncher launcher;
+	private JobLauncher launcher;
 
 	private Job job;
 
@@ -77,6 +77,14 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		launcher.run(job, jobParameters);
+		getLauncher().run(job, jobParameters);
+	}
+
+	/**
+	 * Public getter for the launcher.
+	 * @return the launcher
+	 */
+	protected JobLauncher getLauncher() {
+		return launcher;
 	}
 }

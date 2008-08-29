@@ -16,10 +16,13 @@
 
 package org.springframework.batch.repeat.exception;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.support.ExceptionClassifierSupport;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Simple implementation of exception handler which looks for given exception
@@ -32,24 +35,37 @@ import org.springframework.batch.support.ExceptionClassifierSupport;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class SimpleLimitExceptionHandler implements ExceptionHandler {
-
-	/**
-	 * Name of exception classifier key for the nominated exception types.
-	 */
-	private static final String TX_INVALID = "TX_INVALID";
-
-	/**
-	 * Name of exception classifier key for the fatal exception types (not
-	 * counted, immediately rethrown).
-	 */
-	private static final String FATAL = "FATAL";
+public class SimpleLimitExceptionHandler implements ExceptionHandler, InitializingBean {
 
 	private RethrowOnThresholdExceptionHandler delegate = new RethrowOnThresholdExceptionHandler();
 
-	private Class<?>[] exceptionClasses = new Class[] { Exception.class };
+	private Collection<Class<? extends Throwable>> exceptionClasses = Collections
+			.<Class<? extends Throwable>> singleton(Exception.class);
 
-	private Class<?>[] fatalExceptionClasses = new Class[] { Error.class };
+	private Collection<Class<? extends Throwable>> fatalExceptionClasses = Collections
+			.<Class<? extends Throwable>> singleton(Error.class);
+
+	private int limit = 0;
+
+	/**
+	 * Apply the provided properties to create a delegate handler.
+	 * 
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		if (limit <= 0) {
+			return;
+		}
+		Map<Class<? extends Throwable>, Integer> thresholds = new HashMap<Class<? extends Throwable>, Integer>();
+		for (Class<? extends Throwable> type : exceptionClasses) {
+			thresholds.put(type, limit);
+		}
+		// do the fatalExceptionClasses last so they override the others
+		for (Class<? extends Throwable> type : fatalExceptionClasses) {
+			thresholds.put(type, 0);
+		}
+		delegate.setThresholds(thresholds);
+	}
 
 	/**
 	 * Flag to indicate the the exception counters should be shared between
@@ -67,12 +83,12 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	/**
 	 * Convenience constructor for the {@link SimpleLimitExceptionHandler} to
 	 * set the limit.
-	 *
+	 * 
 	 * @param limit the limit
 	 */
 	public SimpleLimitExceptionHandler(int limit) {
 		this();
-		setLimit(limit);
+		this.limit = limit;
 	}
 
 	/**
@@ -80,28 +96,13 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 */
 	public SimpleLimitExceptionHandler() {
 		super();
-		delegate.setExceptionClassifier(new ExceptionClassifierSupport() {
-			public String classify(Throwable throwable) {
-				for (Class<?> fatalExceptionClass : fatalExceptionClasses) {
-					if (fatalExceptionClass.isAssignableFrom(throwable.getClass())) {
-						return FATAL;
-					}
-				}
-				for (Class<?> exceptionClass : exceptionClasses) {
-					if (exceptionClass.isAssignableFrom(throwable.getClass())) {
-						return TX_INVALID;
-					}
-				}
-				return super.classify(throwable);
-			}
-		});
 	}
 
 	/**
 	 * Rethrows only if the limit is breached for this context on the exception
 	 * type specified.
 	 * 
-	 * @see #setExceptionClasses(Class[])
+	 * @see #setExceptionClasses(Collection)
 	 * @see #setLimit(int)
 	 * 
 	 * @see org.springframework.batch.repeat.exception.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
@@ -118,34 +119,28 @@ public class SimpleLimitExceptionHandler implements ExceptionHandler {
 	 * @param limit the limit
 	 */
 	public void setLimit(final int limit) {
-		delegate.setThresholds(new HashMap<String, Integer>() {
-			{
-				put(ExceptionClassifierSupport.DEFAULT, 0);
-				put(TX_INVALID, limit);
-				put(FATAL, 0);
-			}
-		});
+		this.limit = limit;
 	}
 
 	/**
-	 * Setter for the Throwable exceptionClasses that this handler counts.
-	 * Defaults to {@link Exception}. If more exceptionClasses are specified
-	 * handler uses single counter that is incremented when one of the
-	 * recognized exception exceptionClasses is handled.
+	 * Setter for the exception classes that this handler counts. Defaults to
+	 * {@link Exception}. If more exceptionClasses are specified handler uses
+	 * single counter that is incremented when one of the recognized exception
+	 * exceptionClasses is handled.
 	 * @param classes exceptionClasses
 	 */
-	public void setExceptionClasses(Class<?>[] classes) {
+	public void setExceptionClasses(Collection<Class<? extends Throwable>> classes) {
 		this.exceptionClasses = classes;
 	}
 
 	/**
-	 * Setter for the Throwable exceptionClasses that shouldn't be counted, but
-	 * rethrown immediately. This list has higher priority than
-	 * {@link #setExceptionClasses(Class[])}.
+	 * Setter for the exception classes that shouldn't be counted, but rethrown
+	 * immediately. This list has higher priority than
+	 * {@link #setExceptionClasses(Collection)}.
 	 * 
 	 * @param fatalExceptionClasses defaults to {@link Error}
 	 */
-	public void setFatalExceptionClasses(Class<?>[] fatalExceptionClasses) {
+	public void setFatalExceptionClasses(Collection<Class<? extends Throwable>> fatalExceptionClasses) {
 		this.fatalExceptionClasses = fatalExceptionClasses;
 	}
 

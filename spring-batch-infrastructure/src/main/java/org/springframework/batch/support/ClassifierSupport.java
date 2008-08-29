@@ -17,35 +17,32 @@
 package org.springframework.batch.support;
 
 /**
- * Base class for {@link Classifier} implementations. Provides default
- * behaviour and some convenience members, like constants.
+ * Base class for {@link Classifier} implementations. Provides default behaviour
+ * and some convenience members, like constants.
  * 
  * @author Dave Syer
  * 
  */
-public class ExceptionClassifierSupport implements Classifier<Throwable,String> {
+public class ClassifierSupport<C, T> implements Classifier<C, T> {
+
+	final private T defaultValue;
 
 	/**
-	 * Default classification key.
+	 * @param defaultValue
 	 */
-	public static final String DEFAULT = "default";
-
-	/**
-	 * Always returns the value of {@link #DEFAULT}.
-	 * 
-	 * @see org.springframework.batch.support.Classifier#classify(Object)
-	 */
-	public String classify(Throwable throwable) {
-		return DEFAULT;
+	public ClassifierSupport(T defaultValue) {
+		super();
+		this.defaultValue = defaultValue;
 	}
 
 	/**
-	 * Wrapper for a call to {@link #classify(Throwable)} with argument null.
+	 * Always returns the default value. This is the main extension point for
+	 * subclasses, so it must be able to classify null.
 	 * 
-	 * @see org.springframework.batch.support.Classifier#getDefault()
+	 * @see org.springframework.batch.support.Classifier#classify(Object)
 	 */
-	public String getDefault() {
-		return classify(null);
+	public T classify(C throwable) {
+		return defaultValue;
 	}
 
 }

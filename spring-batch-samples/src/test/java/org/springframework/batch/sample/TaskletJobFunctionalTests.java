@@ -1,14 +1,16 @@
 package org.springframework.batch.sample;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.Assert;
 
 /**
  * Deletes files in the given directory.
@@ -19,13 +21,13 @@ import org.springframework.util.Assert;
 @ContextConfiguration()
 public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
-	private Resource directory = new FileSystemResource("target/test-outputs/test-dir");
+	private static Resource directory = new FileSystemResource("target/test-outputs/test-dir");
 	
 	/*
 	 * Create the directory and some files in it.
 	 */
-	@Before
-	public void onSetUp() throws Exception {
+	@BeforeClass
+	public static void onSetUp() throws Exception {
 		File dir = directory.getFile();
 		dir.mkdirs();
 		new File(dir, "file1").createNewFile();
@@ -37,8 +39,8 @@ public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTe
 	 */
 	@Override
 	protected void validatePreConditions() throws Exception {
-		Assert.state(directory.getFile().isDirectory());
-		Assert.state(directory.getFile().listFiles().length > 0);
+		assertTrue(directory.getFile().isDirectory());
+		assertTrue(directory.getFile().listFiles().length > 0);
 	}
 
 	/**
@@ -46,8 +48,8 @@ public class TaskletJobFunctionalTests extends AbstractValidatingBatchLauncherTe
 	 */
 	@Override
 	protected void validatePostConditions() throws Exception {
-		Assert.state(directory.getFile().isDirectory());
-		Assert.state(directory.getFile().listFiles().length == 0);
+		assertTrue(directory.getFile().isDirectory());
+		assertEquals(0, directory.getFile().listFiles().length);
 	}
 
 }

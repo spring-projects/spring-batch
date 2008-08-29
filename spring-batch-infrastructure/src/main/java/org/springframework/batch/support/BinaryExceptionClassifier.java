@@ -20,59 +20,65 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A {@link Classifier} that has only two classes of exception.
- * Provides convenient methods for setting up and querying the classification
- * with boolean return type.
+ * A {@link Classifier} for exceptions that has only two classes (true and
+ * false). Classifies objects according to their inheritance relation with the
+ * supplied types. If the object to be classified is one of the provided types,
+ * or is a subclass of one of the types, then the non-default value is returned
+ * (usually true).
+ * 
+ * @see SubclassClassifier
  * 
  * @author Dave Syer
  * 
  */
-public class BinaryExceptionClassifier extends ExceptionClassifierSupport {
+public class BinaryExceptionClassifier extends SubclassClassifier<Throwable, Boolean> {
 
 	/**
-	 * The classifier result for a non-default exception.
+	 * Create a binary exception classifier with the provided default value.
+	 * @param defaultValue
 	 */
-	public static final String NON_DEFAULT = "NON_DEFAULT";
-
-	private SubclassExceptionClassifier delegate = new SubclassExceptionClassifier();
+	public BinaryExceptionClassifier(boolean defaultValue) {
+		super(defaultValue);
+	}
 
 	/**
-	 * Set the special exceptions. Any exception on the list, or subclasses
-	 * thereof, will be classified as non-default.
+	 * Create a binary exception classifier with the default value false.
+	 */
+	public BinaryExceptionClassifier() {
+		this(false);
+	}
+
+	/**
+	 * Create a binary exception classifier with the provided classes and their
+	 * subclasses. The mapped value for these exceptions will be the one
+	 * provided (which will be the opposite of the default).
+	 * @param value
+	 */
+	public BinaryExceptionClassifier(Collection<Class<? extends Throwable>> exceptionClasses, boolean value) {
+		this(!value);
+		setTypes(exceptionClasses);
+	}
+
+	/**
+	 * Create a binary exception classifier with the default value false and
+	 * value mapping true for the provided classes and their subclasses.
+	 */
+	public BinaryExceptionClassifier(Collection<Class<? extends Throwable>> exceptionClasses) {
+		this(exceptionClasses, true);
+	}
+
+	/**
+	 * Set of Throwable class types to keys for the classifier. Any subclass of
+	 * the type provided will be classified as of non-default type.
 	 * 
-	 * @param exceptionClasses defaults to {@link Exception}.
+	 * @param types the types to classify as non-default
 	 */
-	public final void setExceptionClasses(Collection<Class<? extends Throwable>> exceptionClasses) {
-		Map<Class<? extends Throwable>, String> temp = new HashMap<Class<? extends Throwable>, String>();
-		for (Class<? extends Throwable> exceptionClass : exceptionClasses) {
-			temp.put(exceptionClass, NON_DEFAULT);
+	public final void setTypes(Collection<Class<? extends Throwable>> types) {
+		Map<Class<? extends Throwable>, Boolean> map = new HashMap<Class<? extends Throwable>, Boolean>();
+		for (Class<? extends Throwable> type : types) {
+			map.put(type, !getDefault());
 		}
-		this.delegate.setTypeMap(temp);
-	}
-
-	/**
-	 * Convenience method to return boolean if the throwable is classified as
-	 * default.
-	 * 
-	 * @param throwable the Throwable to classify
-	 * @return true if it is default classified (i.e. not on the list provided
-	 * in {@link #setExceptionClasses(Collection)}.
-	 */
-	public boolean isDefault(Throwable throwable) {
-		return classify(throwable).equals(DEFAULT);
-	}
-
-	/**
-	 * Returns either {@link ExceptionClassifierSupport#DEFAULT} or
-	 * {@link #NON_DEFAULT} depending on the type of the throwable. If the type
-	 * of the throwable or one of its ancestors is on the exception class list
-	 * the classification is as {@link #NON_DEFAULT}.
-	 * 
-	 * @see #setExceptionClasses(Collection)
-	 * @see ExceptionClassifierSupport#classify(Throwable)
-	 */
-	public String classify(Throwable throwable) {
-		return delegate.classify(throwable);
+		setTypeMap(map);
 	}
 
 }

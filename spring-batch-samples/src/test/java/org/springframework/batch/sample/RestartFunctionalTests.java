@@ -94,7 +94,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	private void runJobForRestartTest() throws Exception {
 		// The second time we run the job it needs to be a new instance so we
 		// need to make the parameters unique...
-		launcher.run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
+		getLauncher().run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
 				.stringToProperties("force.new.job.parameters=true")));
 	}
 

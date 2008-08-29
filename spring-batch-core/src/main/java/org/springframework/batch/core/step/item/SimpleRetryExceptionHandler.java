@@ -60,7 +60,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 		this.retryPolicy = retryPolicy;
 		this.exceptionHandler = exceptionHandler;
 		this.fatalExceptionClassifier = new BinaryExceptionClassifier();
-		fatalExceptionClassifier.setExceptionClasses(fatalExceptionClasses);
+		fatalExceptionClassifier.setTypes(fatalExceptionClasses);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		// Only bother to check the delegate exception handler if we know that
 		// retry is exhausted
-		if (!fatalExceptionClassifier.isDefault(throwable) || context.hasAttribute(EXHAUSTED)) {
+		if (fatalExceptionClassifier.classify(throwable) || context.hasAttribute(EXHAUSTED)) {
 			exceptionHandler.handleException(context, throwable);
 		}
 	}

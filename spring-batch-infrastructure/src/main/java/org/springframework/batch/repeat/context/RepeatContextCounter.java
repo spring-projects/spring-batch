@@ -33,15 +33,15 @@ import org.springframework.util.Assert;
  */
 public class RepeatContextCounter {
 
-	private String countKey;
+	final private String countKey;
 
 	/**
 	 * Flag to indicate whether the count is stored at the level of the parent
 	 * context, or just local to the current context. Default value is false.
 	 */
-	private boolean useParent = false;
+	final private boolean useParent;
 
-	private RepeatContext context;
+	final private RepeatContext context;
 
 	/**
 	 * Increment the counter.
@@ -82,7 +82,7 @@ public class RepeatContextCounter {
 
 		super();
 		
-		Assert.notNull(context, "The context must be provided");
+		Assert.notNull(context, "The context must be provided to initialize a counter");
 
 		this.countKey = countKey;
 		this.useParent = useParent;

@@ -54,7 +54,7 @@
 		class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
-			value="SELECT id, quantity, price, customer from TRADE" />
+			value="SELECT isin, quantity, price, customer from TRADE" />
 		<property name="mapper">
 			<bean
 				class="org.springframework.batch.sample.domain.trade.internal.TradeRowMapper" />

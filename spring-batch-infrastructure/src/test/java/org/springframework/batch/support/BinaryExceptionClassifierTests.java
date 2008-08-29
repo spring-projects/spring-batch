@@ -16,8 +16,7 @@
 
 package org.springframework.batch.support;
 
-import java.util.HashSet;
-
+import java.util.Collections;
 import junit.framework.TestCase;
 
 public class BinaryExceptionClassifierTests extends TestCase {
@@ -25,19 +24,36 @@ public class BinaryExceptionClassifierTests extends TestCase {
 	BinaryExceptionClassifier classifier = new BinaryExceptionClassifier();
 
 	public void testClassifyNullIsDefault() {
-		assertTrue(classifier.isDefault(null));
+		assertFalse(classifier.classify(null));
+	}
+
+	public void testFalseIsDefault() {
+		assertFalse(classifier.getDefault());
+	}
+
+	public void testDefaultProvided() {
+		classifier = new BinaryExceptionClassifier(true);
+		assertTrue(classifier.getDefault());
 	}
 
 	public void testClassifyRandomException() {
-		assertTrue(classifier.isDefault(new IllegalStateException("foo")));
+		assertFalse(classifier.classify(new IllegalStateException("foo")));
 	}
 
 	public void testClassifyExactMatch() {
-		classifier.setExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(IllegalStateException.class);
-			}
-		});
-		assertEquals(false, classifier.isDefault(new IllegalStateException("Foo")));
+		classifier.setTypes(Collections.<Class<? extends Throwable>> singleton(IllegalStateException.class));
+		assertTrue(classifier.classify(new IllegalStateException("Foo")));
+	}
+
+	public void testTypesProvidedInConstructor() {
+		classifier = new BinaryExceptionClassifier(Collections
+				.<Class<? extends Throwable>> singleton(IllegalStateException.class));
+		assertTrue(classifier.classify(new IllegalStateException("Foo")));
+	}
+
+	public void testTypesProvidedInConstructorWithNonDefault() {
+		classifier = new BinaryExceptionClassifier(Collections
+				.<Class<? extends Throwable>> singleton(IllegalStateException.class), false);
+		assertFalse(classifier.classify(new IllegalStateException("Foo")));
 	}
 }

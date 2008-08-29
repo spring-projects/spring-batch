@@ -23,7 +23,8 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.support.Classifier;
-import org.springframework.batch.support.ExceptionClassifierSupport;
+import org.springframework.batch.support.ClassifierSupport;
+import org.springframework.batch.support.SubclassClassifier;
 import org.springframework.util.Assert;
 
 /**
@@ -35,34 +36,32 @@ import org.springframework.util.Assert;
  */
 public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 
-	private Classifier<Throwable, String> exceptionClassifier = new ExceptionClassifierSupport();
-
-	private Map<String, RetryPolicy> policyMap = new HashMap<String, RetryPolicy>();
-
-	public ExceptionClassifierRetryPolicy() {
-		policyMap.put(ExceptionClassifierSupport.DEFAULT, new NeverRetryPolicy());
-	}
+	private Classifier<Throwable, RetryPolicy> exceptionClassifier = new ClassifierSupport<Throwable, RetryPolicy>(
+			new NeverRetryPolicy());
 
 	/**
 	 * Setter for policy map. This property should not be changed dynamically -
 	 * set it once, e.g. in configuration, and then don't change it during a
-	 * running application.
+	 * running application. Either this property or the exception classifier
+	 * directly should be set, but not both.
 	 * 
-	 * @param policyMap a map of String to {@link RetryPolicy} that will be
-	 * applied to the result of the {@link Classifier} to locate a
-	 * policy.
+	 * @param policyMap a map of String to {@link RetryPolicy} that will be used
+	 * to create a {@link Classifier} to locate a policy.
 	 */
-	public void setPolicyMap(Map<String, RetryPolicy> policyMap) {
-		this.policyMap = policyMap;
+	public void setPolicyMap(Map<Class<? extends Throwable>, RetryPolicy> policyMap) {
+		SubclassClassifier<Throwable, RetryPolicy> subclassClassifier = new SubclassClassifier<Throwable, RetryPolicy>(
+				policyMap, (RetryPolicy) new NeverRetryPolicy());
+		this.exceptionClassifier = subclassClassifier;
 	}
 
 	/**
 	 * Setter for an exception classifier. The classifier is responsible for
-	 * translating exceptions to keys in the policy map.
+	 * translating exceptions to concrete retry policies. Either this property
+	 * or the policy map should be used, but not both.
 	 * 
 	 * @param exceptionClassifier ExceptionClassifier to use
 	 */
-	public void setExceptionClassifier(Classifier<Throwable,String> exceptionClassifier) {
+	public void setExceptionClassifier(Classifier<Throwable, RetryPolicy> exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
@@ -110,22 +109,20 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 
 	private class ExceptionClassifierRetryContext extends RetryContextSupport implements RetryPolicy {
 
-		private Classifier<Throwable, String> exceptionClassifier;
+		final private Classifier<Throwable, RetryPolicy> exceptionClassifier;
 
 		// Dynamic: depends on the latest exception:
-		RetryPolicy policy;
+		private RetryPolicy policy;
 
 		// Dynamic: depends on the policy:
-		RetryContext context;
+		private RetryContext context;
 
-		Map<RetryPolicy, RetryContext> contexts = new HashMap<RetryPolicy, RetryContext>();
+		final private Map<RetryPolicy, RetryContext> contexts = new HashMap<RetryPolicy, RetryContext>();
 
-		public ExceptionClassifierRetryContext(RetryContext parent, Classifier<Throwable,String> exceptionClassifier) {
+		public ExceptionClassifierRetryContext(RetryContext parent,
+				Classifier<Throwable, RetryPolicy> exceptionClassifier) {
 			super(parent);
 			this.exceptionClassifier = exceptionClassifier;
-			Object key = exceptionClassifier.getDefault();
-			policy = getPolicy(key);
-			Assert.notNull(policy, "Could not locate default policy: key=[" + key + "].");
 		}
 
 		public boolean canRetry(RetryContext context) {
@@ -139,7 +136,7 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 		public void close(RetryContext context) {
 			// Only close those policies that have been used (opened):
 			for (RetryPolicy policy : contexts.keySet()) {
-				policy.close(getContext(policy));
+				policy.close(getContext(policy, context.getParent()));
 			}
 		}
 
@@ -148,24 +145,19 @@ public class ExceptionClassifierRetryPolicy implements RetryPolicy {
 		}
 
 		public void registerThrowable(RetryContext context, Exception throwable) {
-			policy = getPolicy(exceptionClassifier.classify(throwable));
-			this.context = getContext(policy);
+			policy = exceptionClassifier.classify(throwable);
+			Assert.notNull(policy, "Could not locate policy for exception=[" + throwable + "].");
+			this.context = getContext(policy, context.getParent());
 			policy.registerThrowable(this.context, throwable);
 		}
 
-		private RetryContext getContext(RetryPolicy policy) {
+		private RetryContext getContext(RetryPolicy policy, RetryContext parent) {
 			RetryContext context = contexts.get(policy);
 			if (context == null) {
-				context = policy.open(null);
+				context = policy.open(parent);
 				contexts.put(policy, context);
 			}
 			return context;
-		}
-
-		private RetryPolicy getPolicy(Object key) {
-			RetryPolicy result = policyMap.get(key);
-			Assert.notNull(result, "Could not locate policy for key=[" + key + "].");
-			return result;
 		}
 
 	}

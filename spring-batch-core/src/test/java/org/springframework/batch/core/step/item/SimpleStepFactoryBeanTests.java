@@ -108,7 +108,7 @@ public class SimpleStepFactoryBeanTests {
 	public void testSimpleConcurrentJob() throws Exception {
 
 		job.setSteps(new ArrayList<Step>());
-		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo", "bar");
+		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo", "bar");
 		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		factory.setThrottleLimit(1);
 
@@ -127,14 +127,14 @@ public class SimpleStepFactoryBeanTests {
 	@Test
 	public void testSimpleJobWithItemListeners() throws Exception {
 
-		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
 		factory.setItemWriter(new ItemWriter<String>() {
 			public void write(List<? extends String> data) throws Exception {
 				throw new RuntimeException("Error!");
 			}
 		});
-		factory.setListeners(new StepListener[] { new ItemListenerSupport<String,String>() {
+		factory.setListeners(new StepListener[] { new ItemListenerSupport<String, String>() {
 			@Override
 			public void onReadError(Exception ex) {
 				listened.add(ex);
@@ -154,7 +154,8 @@ public class SimpleStepFactoryBeanTests {
 		try {
 			job.execute(jobExecution);
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			// expected
 			assertEquals("Error!", e.getMessage());
 		}
@@ -168,7 +169,7 @@ public class SimpleStepFactoryBeanTests {
 
 	@Test
 	public void testExceptionTerminates() throws Exception {
-		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
 		factory.setItemWriter(new ItemWriter<String>() {
 			public void write(List<? extends String> data) throws Exception {
@@ -192,9 +193,11 @@ public class SimpleStepFactoryBeanTests {
 
 	@Test
 	public void testExceptionHandler() throws Exception {
-		SimpleStepFactoryBean<String,String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 		factory.setBeanName("exceptionStep");
-		factory.setExceptionHandler(new SimpleLimitExceptionHandler(1));
+		SimpleLimitExceptionHandler exceptionHandler = new SimpleLimitExceptionHandler(1);
+		exceptionHandler.afterPropertiesSet();
+		factory.setExceptionHandler(exceptionHandler);
 		factory.setItemWriter(new ItemWriter<String>() {
 			int count = 0;
 
@@ -208,9 +211,9 @@ public class SimpleStepFactoryBeanTests {
 		job.setSteps(Collections.singletonList((Step) step));
 
 		JobExecution jobExecution = repository.createJobExecution(job, new JobParameters());
-		
+
 		job.execute(jobExecution);
-		
+
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}
 
@@ -219,7 +222,7 @@ public class SimpleStepFactoryBeanTests {
 		String[] items = new String[] { "1", "2", "3", "4", "5", "6", "7" };
 		int commitInterval = 3;
 
-		SimpleStepFactoryBean<String,String> factory = getStepFactory(items);
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(items);
 		class CountingChunkListener implements ChunkListener {
 			int beforeCount = 0;
 
@@ -259,7 +262,7 @@ public class SimpleStepFactoryBeanTests {
 	 */
 	@Test
 	public void testCommitIntervalMustBeGreaterThanZero() throws Exception {
-		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo");
+		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo");
 		// nothing wrong here
 		factory.getObject();
 
@@ -281,7 +284,7 @@ public class SimpleStepFactoryBeanTests {
 	 */
 	@Test
 	public void testCommitIntervalAndCompletionPolicyBothSet() throws Exception {
-		SimpleStepFactoryBean<String,String> factory = getStepFactory("foo");
+		SimpleStepFactoryBean<String, String> factory = getStepFactory("foo");
 
 		// but exception expected after setting commit interval and completion
 		// policy
@@ -296,9 +299,9 @@ public class SimpleStepFactoryBeanTests {
 		}
 
 	}
-	
-	private SimpleStepFactoryBean<String,String> getStepFactory(String... args) throws Exception {
-		SimpleStepFactoryBean<String,String> factory = new SimpleStepFactoryBean<String,String>();
+
+	private SimpleStepFactoryBean<String, String> getStepFactory(String... args) throws Exception {
+		SimpleStepFactoryBean<String, String> factory = new SimpleStepFactoryBean<String, String>();
 
 		List<String> items = new ArrayList<String>();
 		items.addAll(Arrays.asList(args));
@@ -311,5 +314,5 @@ public class SimpleStepFactoryBeanTests {
 		factory.setBeanName("stepName");
 		return factory;
 	}
-	
+
 }

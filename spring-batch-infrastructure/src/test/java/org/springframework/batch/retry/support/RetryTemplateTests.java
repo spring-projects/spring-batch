@@ -22,19 +22,21 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
-import java.util.HashSet;
+import java.util.Collections;
 
 import org.junit.Test;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.backoff.BackOffContext;
 import org.springframework.batch.retry.backoff.BackOffInterruptedException;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.backoff.StatelessBackOffPolicy;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
+import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
  * @author Rob Harrop
@@ -71,7 +73,7 @@ public class RetryTemplateTests {
 			}
 		});
 		assertEquals(2, callback.attempts);
-		assertEquals(value, result);		
+		assertEquals(value, result);
 	}
 
 	@Test
@@ -118,15 +120,27 @@ public class RetryTemplateTests {
 	}
 
 	@Test
+	public void testRollbackClassifierOverridesRetryPolicy() throws Exception {
+		MockRetryCallback callback = new MockRetryCallback();
+		int attempts = 3;
+		callback.setAttemptsBeforeSuccess(attempts);
+		callback.setExceptionToThrow(new IllegalArgumentException());
+
+		RetryTemplate retryTemplate = new RetryTemplate();
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts));
+		BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(Collections
+				.<Class<? extends Throwable>> singleton(IllegalArgumentException.class), false);
+		retryTemplate.setRollbackClassifier(classifier);
+		retryTemplate.execute(callback, new RetryState("foo"));
+		assertEquals(attempts, callback.attempts);
+	}
+
+	@Test
 	public void testSetExceptions() throws Exception {
 		RetryTemplate template = new RetryTemplate();
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		template.setRetryPolicy(policy);
-		policy.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(RuntimeException.class);
-			}
-		});
+		policy.setRetryableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(RuntimeException.class));
 
 		int attempts = 3;
 
@@ -243,7 +257,7 @@ public class RetryTemplateTests {
 			assertEquals("foo", e.getMessage());
 		}
 	}
-	
+
 	private static class MockRetryCallback implements RetryCallback<Object> {
 
 		private int attempts;

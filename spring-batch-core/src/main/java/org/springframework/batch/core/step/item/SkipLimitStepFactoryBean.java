@@ -30,11 +30,9 @@ import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
-import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.batch.support.SubclassExceptionClassifier;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -214,17 +212,11 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				simpleRetryPolicy.setFatalExceptionClasses(fatalExceptionClasses);
 
 				ExceptionClassifierRetryPolicy classifierRetryPolicy = new ExceptionClassifierRetryPolicy();
-				SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
-				HashMap<Class<? extends Throwable>, String> exceptionTypeMap = new HashMap<Class<? extends Throwable>, String>();
+				HashMap<Class<? extends Throwable>, RetryPolicy> exceptionTypeMap = new HashMap<Class<? extends Throwable>, RetryPolicy>();
 				for (Class<? extends Throwable> cls : retryableExceptionClasses) {
-					exceptionTypeMap.put(cls, "retry");
+					exceptionTypeMap.put(cls, simpleRetryPolicy);
 				}
-				exceptionClassifier.setTypeMap(exceptionTypeMap);
-				HashMap<String, RetryPolicy> retryPolicyMap = new HashMap<String, RetryPolicy>();
-				retryPolicyMap.put("retry", simpleRetryPolicy);
-				retryPolicyMap.put("default", new NeverRetryPolicy());
-				classifierRetryPolicy.setPolicyMap(retryPolicyMap);
-				classifierRetryPolicy.setExceptionClassifier(exceptionClassifier);
+				classifierRetryPolicy.setPolicyMap(exceptionTypeMap);
 				retryPolicy = classifierRetryPolicy;
 
 			}

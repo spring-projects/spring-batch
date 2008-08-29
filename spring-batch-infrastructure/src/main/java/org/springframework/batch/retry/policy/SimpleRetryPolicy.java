@@ -107,7 +107,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * @param retryableExceptionClasses defaults to {@link Exception}.
 	 */
 	public final void setRetryableExceptionClasses(Collection<Class<? extends Throwable>> retryableExceptionClasses) {
-		retryableClassifier.setExceptionClasses(retryableExceptionClasses);
+		retryableClassifier.setTypes(retryableExceptionClasses);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * @param fatalExceptionClasses defaults to {@link Exception}.
 	 */
 	public final void setFatalExceptionClasses(Collection<Class<? extends Throwable>> fatalExceptionClasses) {
-		fatalClassifier.setExceptionClasses(fatalExceptionClasses);
+		fatalClassifier.setTypes(fatalExceptionClasses);
 	}
 
 	/**
@@ -162,6 +162,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * retryable.
 	 */
 	private boolean retryForException(Throwable ex) {
-		return fatalClassifier.isDefault(ex) && !retryableClassifier.isDefault(ex);
+		return !fatalClassifier.classify(ex) && retryableClassifier.classify(ex);
 	}
 }

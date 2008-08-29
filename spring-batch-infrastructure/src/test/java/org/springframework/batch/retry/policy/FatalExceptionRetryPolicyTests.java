@@ -16,7 +16,8 @@
 
 package org.springframework.batch.retry.policy;
 
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -38,12 +39,10 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 		retryTemplate.setRetryPolicy(policy);
 
 		// ...but make sure certain exceptions are fatal
-		policy.setFatalExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(IllegalArgumentException.class);
-				add(IllegalStateException.class);
-			}
-		});
+		@SuppressWarnings("unchecked")
+		List<Class<? extends Throwable>> list = Arrays.<Class<? extends Throwable>> asList(IllegalArgumentException.class,
+				IllegalStateException.class);
+		policy.setFatalExceptionClasses(list);
 		RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
 			public String recover(RetryContext context) throws Exception {
 				return "bar";
@@ -71,13 +70,11 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy(3);
 		retryTemplate.setRetryPolicy(policy);
 
-		policy.setFatalExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(IllegalArgumentException.class);
-				add(IllegalStateException.class);
-			}
-		});
-		RecoveryCallback<String>recoveryCallback = new RecoveryCallback<String>() {
+		@SuppressWarnings("unchecked")
+		List<Class<? extends Throwable>> list = Arrays.<Class<? extends Throwable>> asList(
+				IllegalArgumentException.class, IllegalStateException.class);
+		policy.setFatalExceptionClasses(list);
+		RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
 			public String recover(RetryContext context) throws Exception {
 				return "bar";
 			}

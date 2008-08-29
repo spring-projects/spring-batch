@@ -52,7 +52,7 @@ public class ExecutionContext implements Serializable {
 	 * @param map Initial contents of context.
 	 */
 	public ExecutionContext(Map<String, Object> map) {
-		this.map = map;
+		this.map = new HashMap<String, Object>(map);
 	}
 
 	/**

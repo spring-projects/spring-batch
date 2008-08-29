@@ -16,7 +16,7 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 
 import junit.framework.TestCase;
 
@@ -57,20 +57,15 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
-	 * .
+	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)} .
 	 */
 	public void testRethrowWhenRetryExhausted() throws Throwable {
 
 		RetryPolicy retryPolicy = new NeverRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
 
-		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex,
-				new HashSet<Class<? extends Throwable>>() {
-					{
-						add(Error.class);
-					}
-				});
+		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex, Collections
+				.<Class<? extends Throwable>> singleton(Error.class));
 
 		// Then pretend to handle the exception in the parent context...
 		try {
@@ -89,20 +84,15 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
-	 * .
+	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)} .
 	 */
 	public void testNoRethrowWhenRetryNotExhausted() throws Throwable {
 
 		RetryPolicy retryPolicy = new AlwaysRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
 
-		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex,
-				new HashSet<Class<? extends Throwable>>() {
-					{
-						add(Error.class);
-					}
-				});
+		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex, Collections
+				.<Class<? extends Throwable>> singleton(Error.class));
 
 		// Then pretend to handle the exception in the parent context...
 		handler.handleException(context.getParent(), ex);
@@ -113,20 +103,15 @@ public class SimpleRetryExceptionHandlerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)}
-	 * .
+	 * {@link org.springframework.batch.core.step.item.SimpleRetryExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext, java.lang.Throwable)} .
 	 */
 	public void testRethrowWhenFatal() throws Throwable {
 
 		RetryPolicy retryPolicy = new AlwaysRetryPolicy();
 		RuntimeException ex = new RuntimeException("foo");
 
-		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex,
-				new HashSet<Class<? extends Throwable>>() {
-					{
-						add(RuntimeException.class);
-					}
-				});
+		SimpleRetryExceptionHandler handler = getHandlerAfterRetry(retryPolicy, ex, Collections
+				.<Class<? extends Throwable>> singleton(RuntimeException.class));
 
 		// Then pretend to handle the exception in the parent context...
 		try {

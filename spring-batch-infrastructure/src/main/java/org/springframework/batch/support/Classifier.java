@@ -26,20 +26,12 @@ package org.springframework.batch.support;
 public interface Classifier<C, T> {
 
 	/**
-	 * Get a default value, normally the same as would be returned by
-	 * {@link #classify(Object)} with null argument.
-	 * 
-	 * @return the default value.
-	 */
-	T getDefault();
-
-	/**
-	 * Classify the given object and return a non-null object. The return type
-	 * depends on the implementation but typically would be a key in a map which
-	 * the client maintains.
+	 * Classify the given object and return an object. The return type depends
+	 * on the implementation.
 	 * 
 	 * @param classifiable the input object. Can be null.
-	 * @return an object.
+	 * @return an object. Can be null, but implementations should declare if
+	 * this is the case.
 	 */
 	T classify(C classifiable);
 

@@ -46,7 +46,7 @@ public class DatabaseShutdownFunctionalTests extends AbstractBatchLauncherTests 
 
 		final JobParameters jobParameters = new JobParameters();
 		
-		JobExecution jobExecution = launcher.run(getJob(), jobParameters);
+		JobExecution jobExecution = getLauncher().run(getJob(), jobParameters);
 		
 		Thread.sleep(1000);
 

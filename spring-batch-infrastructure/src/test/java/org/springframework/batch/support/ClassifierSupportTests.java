@@ -16,20 +16,18 @@
 
 package org.springframework.batch.support;
 
-import org.springframework.batch.support.ExceptionClassifierSupport;
-
 import junit.framework.TestCase;
 
-public class ExceptionClassifierSupportTests extends TestCase {
+public class ClassifierSupportTests extends TestCase {
 
 	public void testClassifyNullIsDefault() {
-		ExceptionClassifierSupport classifier = new ExceptionClassifierSupport();
-		assertEquals(classifier.classify(null), classifier.getDefault());
+		ClassifierSupport<String,String> classifier = new ClassifierSupport<String,String>("foo");
+		assertEquals(classifier.classify(null), "foo");
 	}
 
 	public void testClassifyRandomException() {
-		ExceptionClassifierSupport classifier = new ExceptionClassifierSupport();
-		assertEquals(classifier.classify(new IllegalStateException("Foo")), classifier.getDefault());
+		ClassifierSupport<Throwable,String> classifier = new ClassifierSupport<Throwable,String>("foo");
+		assertEquals(classifier.classify(new IllegalStateException("Foo")), classifier.classify(null));
 	}
 
 }

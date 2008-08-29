@@ -11,7 +11,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.stream.XMLEventFactory;
@@ -48,7 +47,7 @@ public class StaxEventItemWriterTests {
 	// test item for writing to output
 	private Object item = new Object() {
 		public String toString() {
-			return ClassUtils.getShortName(StaxEventItemWriter.class)+"-testString";
+			return ClassUtils.getShortName(StaxEventItemWriter.class) + "-testString";
 		}
 	};
 
@@ -73,7 +72,7 @@ public class StaxEventItemWriterTests {
 		writer.write(items);
 		writer.close(executionContext);
 		String content = outputFileContent();
-		assertTrue("Wrong content: "+content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
 
 	/**
@@ -96,7 +95,7 @@ public class StaxEventItemWriterTests {
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = outputFileContent();
-		
+
 		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
 	}
 
@@ -107,13 +106,13 @@ public class StaxEventItemWriterTests {
 	public void testWriteWithHeader() throws Exception {
 		Object header1 = new Object();
 		Object header2 = new Object();
-		writer.setHeaderItems(new Object[] {header1, header2});
+		writer.setHeaderItems(new Object[] { header1, header2 });
 		writer.open(executionContext);
 		writer.write(items);
 		String content = outputFileContent();
-		assertTrue("Wrong content: "+content, content.contains(("<!--" + header1 + "-->")));
-		assertTrue("Wrong content: "+content, content.contains(("<!--" + header2 + "-->")));
-		assertTrue("Wrong content: "+content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, content.contains(("<!--" + header1 + "-->")));
+		assertTrue("Wrong content: " + content, content.contains(("<!--" + header2 + "-->")));
+		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
 
 	/**
@@ -123,8 +122,7 @@ public class StaxEventItemWriterTests {
 	public void testStreamContext() throws Exception {
 		writer.open(executionContext);
 		final int NUMBER_OF_RECORDS = 10;
-		assertFalse(executionContext.containsKey(ClassUtils.getShortName(StaxEventItemWriter.class)
-				+ ".record.count"));
+		assertFalse(executionContext.containsKey(ClassUtils.getShortName(StaxEventItemWriter.class) + ".record.count"));
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
 			writer.write(items);
 			writer.update(executionContext);
@@ -141,25 +139,21 @@ public class StaxEventItemWriterTests {
 	@Test
 	public void testOpenAndClose() throws Exception {
 		writer.setRootTagName("testroot");
-		writer.setRootElementAttributes(new HashMap<String, String>() {
-			{
-				put("attribute", "value");
-			}
-		});
+		writer.setRootElementAttributes(Collections.<String, String> singletonMap("attribute", "value"));
 		writer.open(executionContext);
 		writer.close(null);
 		String content = outputFileContent();
 		assertTrue(content.contains("<testroot attribute=\"value\">"));
 		assertTrue(content.endsWith("</testroot>"));
 	}
-	
+
 	@Test
 	public void testNonExistantResource() throws Exception {
 		Resource doesntExist = createMock(Resource.class);
 		expect(doesntExist.getFile()).andReturn(File.createTempFile("arbitrary", null));
 		expect(doesntExist.exists()).andReturn(false);
 		replay(doesntExist);
-		
+
 		writer.setResource(doesntExist);
 
 		try {

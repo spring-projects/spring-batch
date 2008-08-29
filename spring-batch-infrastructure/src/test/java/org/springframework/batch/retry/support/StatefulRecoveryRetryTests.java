@@ -23,6 +23,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -39,6 +40,8 @@ import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
+import org.springframework.batch.support.BinaryExceptionClassifier;
+import org.springframework.dao.DataAccessException;
 
 public class StatefulRecoveryRetryTests {
 
@@ -114,6 +117,37 @@ public class StatefulRecoveryRetryTests {
 		catch (Exception e) {
 			// expected...
 		}
+		// On the second retry, the recovery path is taken...
+		result = retryTemplate.execute(callback, recoveryCallback, state);
+		assertEquals(input, result); // default result is the item
+		assertEquals(1, count);
+		assertEquals(input, list.get(0));
+	}
+
+	@Test
+	public void testSwitchToStatelessForNoRollback() throws Exception {
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
+		// Roll back for these:
+		BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(Collections
+				.<Class<? extends Throwable>> singleton(DataAccessException.class));
+		// ...but not these:
+		assertFalse(classifier.classify(new RuntimeException()));
+		retryTemplate.setRollbackClassifier(classifier);
+		final String input = "foo";
+		RetryState state = new RetryState(input);
+		RetryCallback<String> callback = new RetryCallback<String>() {
+			public String doWithRetry(RetryContext context) throws Exception {
+				throw new RuntimeException("Barf!");
+			}
+		};
+		RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
+			public String recover(RetryContext context) {
+				count++;
+				list.add(input);
+				return input;
+			}
+		};
+		Object result = null;
 		// On the second retry, the recovery path is taken...
 		result = retryTemplate.execute(callback, recoveryCallback, state);
 		assertEquals(input, result); // default result is the item

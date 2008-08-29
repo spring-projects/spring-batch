@@ -46,12 +46,9 @@ public class SkipLimitStepFactoryBeanTests {
 
 	private SkipLimitStepFactoryBean<String, String> factory = new SkipLimitStepFactoryBean<String, String>();
 
-	private Collection<Class<? extends Throwable>> skippableExceptions = new HashSet<Class<? extends Throwable>>() {
-		{
-			add(SkippableException.class);
-			add(SkippableRuntimeException.class);
-		}
-	};
+	@SuppressWarnings("unchecked")
+	private Collection<Class<? extends Throwable>> skippableExceptions = new HashSet<Class<? extends Throwable>>(Arrays
+			.<Class<? extends Throwable>> asList(SkippableException.class, SkippableRuntimeException.class));
 
 	private SkipReaderStub reader = new SkipReaderStub();
 
@@ -139,11 +136,8 @@ public class SkipLimitStepFactoryBeanTests {
 	 */
 	@Test
 	public void testFatalException() throws Exception {
-		factory.setFatalExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(FatalRuntimeException.class);
-			}
-		});
+		factory.setFatalExceptionClasses(Collections
+				.<Class<? extends Throwable>> singleton(FatalRuntimeException.class));
 		factory.setItemWriter(new SkipWriterStub() {
 			public void write(List<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
@@ -204,11 +198,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -246,17 +236,13 @@ public class SkipLimitStepFactoryBeanTests {
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				throw new RuntimeException("oops");
 			}
 		} });
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -287,17 +273,13 @@ public class SkipLimitStepFactoryBeanTests {
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			@Override
 			public void onSkipInWrite(String item, Throwable t) {
 				throw new RuntimeException("oops");
 			}
 		} });
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -377,11 +359,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 	@Test
 	public void testDefaultSkipPolicy() throws Exception {
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
 		factory.setSkipLimit(1);
 		List<String> items = Arrays.asList(new String[] { "a", "b", "c" });
 		ItemReader<String> provider = new ListItemReader<String>(items) {
@@ -411,17 +389,13 @@ public class SkipLimitStepFactoryBeanTests {
 	@Test
 	public void testSkipOverLimitOnReadWithAllSkipsAtEnd() throws Exception {
 
-		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"), Arrays
-				.asList(StringUtils.commaDelimitedListToStringArray("6,12,13,14,15")));
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"),
+				Arrays.asList(StringUtils.commaDelimitedListToStringArray("6,12,13,14,15")));
 
 		factory.setCommitInterval(5);
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
