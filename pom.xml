@@ -14,10 +14,10 @@
 		<module>spring-batch-infrastructure</module>
 		<module>spring-batch-infrastructure-tests</module>
 		<module>spring-batch-core</module>
-		<!-- <module>spring-batch-samples</module> -->
+		<module>spring-batch-samples</module>
 		<!--		<module>spring-batch-integration</module>-->
 		<module>docs</module>
-		<!-- <module>archetypes</module> -->
+		<module>archetypes</module>
 	</modules>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
