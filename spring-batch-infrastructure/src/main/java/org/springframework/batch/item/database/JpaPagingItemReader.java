@@ -17,7 +17,6 @@
 package org.springframework.batch.item.database;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -27,8 +26,6 @@ import javax.persistence.Query;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.item.support.AbstractItemReaderItemStream;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -59,7 +56,7 @@ import org.springframework.util.ClassUtils;
  * @author Thomas Risberg
  * @since 2.0
  */
-public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> implements InitializingBean {
+public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -68,16 +65,6 @@ public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> impl
 	private final Map<String,Object> jpaPropertyMap = new HashMap<String,Object>();
 
 	private String queryString;
-
-	private boolean initialized = false;
-
-	private int current = 0;
-
-	private int page = 0;
-
-	private int pageSize = 10;
-
-	private List<T> entities;
 
 	public JpaPagingItemReader() {
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
@@ -88,9 +75,9 @@ public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> impl
 	}
 
 	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
 		Assert.notNull(entityManagerFactory);
 		Assert.hasLength(queryString);
-		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 	}
 
 	/**
@@ -100,80 +87,34 @@ public class JpaPagingItemReader<T> extends AbstractItemReaderItemStream<T> impl
 		this.queryString = queryString;
 	}
 
-	/**
-	 * The number of entities to retrieve at a time.
-	 *
-	 * @param pageSize the number of entities per page
-	 */
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
-	}
-
 	@Override
 	@SuppressWarnings("unchecked")
-	protected T doRead() throws Exception {
+	protected void doReadPage() {
+		//TODO: add support for parameter map
 
-		if (entities == null || current >= pageSize) {
-			EntityManager entityManager =
-					entityManagerFactory.createEntityManager(jpaPropertyMap);
-			if (entityManager == null) {
-				throw new DataAccessResourceFailureException("Unable to obtain an EntityManager");
-			}
-
-			EntityTransaction tx = entityManager.getTransaction();
-			tx.begin();
-			
-			Query query = entityManager.createQuery(queryString)
-					.setFirstResult(page * pageSize)
-					.setMaxResults(pageSize);
-
-			entities = query.getResultList();
-
-			entityManager.flush();
-			entityManager.clear();
-
-			tx.commit();
-			
-			if (current >= pageSize) {
-				current = 0;
-			}
-			page++;
+		EntityManager entityManager =
+				entityManagerFactory.createEntityManager(jpaPropertyMap);
+		if (entityManager == null) {
+			throw new DataAccessResourceFailureException("Unable to obtain an EntityManager");
 		}
 
-		if (current < entities.size()) {
-			return entities.get(current++);
-		}
-		else {
-			return null;
-		}
+		EntityTransaction tx = entityManager.getTransaction();
+		tx.begin();
 
+		Query query = entityManager.createQuery(queryString)
+				.setFirstResult(page * pageSize)
+				.setMaxResults(pageSize);
+
+		results = query.getResultList();
+
+		entityManager.flush();
+		entityManager.clear();
+
+		tx.commit();
 	}
 
 	@Override
-	protected void doOpen() throws Exception {
-
-		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
-
-		initialized = true;
-
-	}
-
-	@Override
-	protected void doClose() throws Exception {
-
-		initialized = false;
-
-	}
-
-
-	@Override
-	protected void jumpToItem(int itemIndex) throws Exception {
-
-		page = itemIndex / pageSize;
-		current = itemIndex % pageSize;
-
-		logger.debug("Jumping to page " + page + " and index " + current);
-
+	protected void doJumpToPage(int itemIndex) {
 	}
 
 }

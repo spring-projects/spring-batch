@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.item.support.AbstractItemReaderItemStream;
 import org.springframework.batch.item.database.support.PagingQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.ClassUtils;
@@ -29,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.sql.DataSource;
-import java.util.List;
 import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -54,7 +52,7 @@ import java.sql.SQLException;
  * @author Thomas Risberg
  * @since 2.0
  */
-public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> implements InitializingBean {
+public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -70,17 +68,7 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 
 	private String remainingPagesSql;
 
-	private boolean initialized = false;
-
-	private int current = 0;
-
-	private int page = 0;
-
-	private int pageSize = 10;
-
 	private Object startAfterValue;
-
-	private List<T> results;
 
 	public JdbcPagingItemReader() {
 		setName(ClassUtils.getShortName(JdbcPagingItemReader.class));
@@ -92,15 +80,6 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 
 	public void setQueryProvider(PagingQueryProvider queryProvider) {
 		this.queryProvider = queryProvider;
-	}
-
-	/**
-	 * The number of rows to retreive at a time.
-	 *
-	 * @param pageSize the number of rows to fetch per page
-	 */
-	public void setPageSize(int pageSize) {
-		this.pageSize = pageSize;
 	}
 
 	/**
@@ -117,8 +96,8 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
 		Assert.notNull(dataSource);
-		Assert.isTrue(pageSize > 0, "pageSize must be greater than zero");
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 		jdbcTemplate.setMaxRows(pageSize);
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(jdbcTemplate);
@@ -129,88 +108,50 @@ public class JdbcPagingItemReader<T> extends AbstractItemReaderItemStream<T> imp
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	protected T doRead() throws Exception {
+	protected void doReadPage() {
+		//TODO: add support for parameter map
 
-		if (results == null || current >= pageSize) {
-
-			if (results == null) {
-				results = new ArrayList();
-			}
-			else {
-				results.clear();
-			}
-
-			if (page == 0) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("SQL used for reading first page: [" + firstPageSql + "]");
-				}
-				simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
-						new RowCallbackHandler() {
-							public void processRow(ResultSet rs) throws SQLException {
-								startAfterValue = rs.getObject(1);
-								results.add(parameterizedRowMapper.mapRow(rs, results.size()));
-							}
-						});
-			}
-			else {
-				if (logger.isDebugEnabled()) {
-					logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
-				}
-				simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
-						new Object[] {startAfterValue},
-						new RowCallbackHandler() {
-							public void processRow(ResultSet rs) throws SQLException {
-								startAfterValue = rs.getObject(1);
-								results.add(parameterizedRowMapper.mapRow(rs, results.size()));
-							}
-						});
-			}
-
-			if (current >= pageSize) {
-				current = 0;
-			}
-			page++;
-		}
-
-		if (current < results.size()) {
-			return results.get(current++);
+		if (results == null) {
+			results = new ArrayList<T>();
 		}
 		else {
-			return null;
+			results.clear();
+		}
+
+		if (page == 0) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("SQL used for reading first page: [" + firstPageSql + "]");
+			}
+			simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
+					new RowCallbackHandler() {
+						public void processRow(ResultSet rs) throws SQLException {
+							startAfterValue = rs.getObject(1);
+							results.add(parameterizedRowMapper.mapRow(rs, results.size()));
+						}
+					});
+		}
+		else {
+			if (logger.isDebugEnabled()) {
+				logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
+			}
+			simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
+					new Object[] {startAfterValue},
+					new RowCallbackHandler() {
+						public void processRow(ResultSet rs) throws SQLException {
+							startAfterValue = rs.getObject(1);
+							results.add(parameterizedRowMapper.mapRow(rs, results.size()));
+						}
+					});
 		}
 
 	}
 
 	@Override
-	protected void doOpen() throws Exception {
-
-		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
-
-		initialized = true;
-
-	}
-
-	@Override
-	protected void doClose() throws Exception {
-
-		initialized = false;
-
-	}
-
-
-	@Override
-	protected void jumpToItem(int itemIndex) throws Exception {
-
-		page = itemIndex / pageSize;
-		current = itemIndex % pageSize;
-
-		logger.debug("Jumping to page " + page + " and index " + current);
+	protected void doJumpToPage(int itemIndex) {
 
 		if (page > 0) {
 
 			String jumpToItemSql;
-
 			jumpToItemSql = queryProvider.generateJumpToItemQuery(itemIndex, pageSize);
 
 			if (logger.isDebugEnabled()) {
