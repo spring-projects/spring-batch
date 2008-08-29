@@ -3,8 +3,6 @@ package org.springframework.batch.core.repository.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
-import java.util.HashMap;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;

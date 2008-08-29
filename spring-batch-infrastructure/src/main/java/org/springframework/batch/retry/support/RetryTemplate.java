@@ -448,6 +448,8 @@ public class RetryTemplate implements RetryOperations {
 	protected boolean shouldRethrow(RetryPolicy retryPolicy, RetryContext context, RetryState state) {
 		// Allow stateless behaviour to take over for certain exception types
 		if (rollbackClassifier != null) {
+			// TODO: remove this.  Make it part of the stateful execution parameters?
+			// Then we wouldn't have to make assertions about the stateless case. 
 			boolean rollback = rollbackClassifier.classify(context.getLastThrowable());
 			if (rollback && state == null && retryPolicy.canRetry(context)) {
 				throw new RetryException("Inconsistent configuration.  The retry policy says we can retry but "

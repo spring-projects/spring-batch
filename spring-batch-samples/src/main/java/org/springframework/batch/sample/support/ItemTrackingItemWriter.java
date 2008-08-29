@@ -28,6 +28,7 @@ public class ItemTrackingItemWriter<T> implements ItemWriter<T> {
 		counter += items.size();
 		if (current < failure && counter >= failure) {
 			failed = items.get(failure-current-1);
+			this.items.remove(failed);
 			throw new ValidationException("validation failed");
 		}
 	}

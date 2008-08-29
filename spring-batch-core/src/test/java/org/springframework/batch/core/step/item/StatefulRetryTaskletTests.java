@@ -42,6 +42,7 @@ import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.batch.support.Classifier;
 
 /**
  * @author Dave Syer
@@ -84,6 +85,12 @@ public class StatefulRetryTaskletTests {
 	};
 
 	private RetryTemplate retryTemplate = new RetryTemplate();
+	
+	private Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
+		public Boolean classify(Throwable classifiable) {
+			return true;
+		}
+	};
 
 	private ItemSkipPolicy readSkipPolicy = new ItemSkipPolicy() {
 		public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
@@ -105,7 +112,7 @@ public class StatefulRetryTaskletTests {
 	@Test
 	public void testBasicHandle() throws Exception {
 		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, itemWriter, chunkOperations,
-				retryTemplate, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+				retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		handler.execute(contribution, new BasicAttributeAccessor());
 		assertEquals(limit, contribution.getItemCount());
@@ -117,7 +124,7 @@ public class StatefulRetryTaskletTests {
 			public Integer read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 				throw new RuntimeException("Barf!");
 			}
-		}, itemProcessor, itemWriter, chunkOperations, retryTemplate, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		}, itemProcessor, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
@@ -139,7 +146,7 @@ public class StatefulRetryTaskletTests {
 				written.addAll(items);
 				throw new RuntimeException("Barf!");
 			}
-		}, chunkOperations, retryTemplate, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
@@ -165,7 +172,7 @@ public class StatefulRetryTaskletTests {
 				written.addAll(items);
 				throw new RuntimeException("Barf!");
 			}
-		}, chunkOperations, retryTemplate, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
@@ -217,7 +224,7 @@ public class StatefulRetryTaskletTests {
 				throw new RuntimeException("Barf!");
 			}
 		}
-		, itemWriter, chunkOperations, retryTemplate, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();

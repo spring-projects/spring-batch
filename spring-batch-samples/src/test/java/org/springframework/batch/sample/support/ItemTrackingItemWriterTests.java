@@ -51,9 +51,10 @@ public class ItemTrackingItemWriterTests {
 		catch (ValidationException e) {
 			// expected
 		}
-		assertEquals(3, writer.getItems().size());
+		// the failed item is removed
+		assertEquals(2, writer.getItems().size());
 		writer.write(Arrays.asList("a", "e", "c"));
-		assertEquals(6, writer.getItems().size());
+		assertEquals(5, writer.getItems().size());
 		try {
 			writer.write(Arrays.asList("f", "b", "g"));
 			fail("Expected ValidationException");
@@ -61,7 +62,8 @@ public class ItemTrackingItemWriterTests {
 		catch (ValidationException e) {
 			// expected
 		}
-		assertEquals(6, writer.getItems().size());
+		// barf immediately if a failure is detected
+		assertEquals(5, writer.getItems().size());
 	}
 
 }

@@ -33,6 +33,7 @@ import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
+import org.springframework.batch.support.Classifier;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -225,6 +226,12 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 			retryTemplate.setRetryPolicy(retryPolicy);
+			Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
+				public Boolean classify(Throwable classifiable) {
+					return getTransactionAttribute().rollbackOn(classifiable);
+				}
+			};
+			retryTemplate.setRollbackClassifier(rollbackClassifier);
 
 			// Co-ordinate the retry policy with the exception handler:
 			RepeatOperations stepOperations = getStepOperations();
@@ -254,7 +261,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
 			ChunkOrientedTasklet<T, S> tasklet = new StatefulRetryTasklet<T, S>(getItemReader(), getItemProcessor(),
-					getItemWriter(), getChunkOperations(), retryTemplate, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+					getItemWriter(), getChunkOperations(), retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 			tasklet.setListeners(getListeners());
 
 			step.setTasklet(tasklet);
@@ -297,6 +304,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 		final private ItemSkipPolicy processSkipPolicy;
 
+		final private Classifier<Throwable, Boolean> rollbackClassifier;
+
 		/**
 		 * @param itemReader
 		 * @param itemWriter
@@ -304,10 +313,11 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 */
 		public StatefulRetryTasklet(ItemReader<? extends T> itemReader,
 				ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
-				RepeatOperations chunkOperations, RetryOperations retryTemplate, ItemSkipPolicy readSkipPolicy,
+				RepeatOperations chunkOperations, RetryOperations retryTemplate, Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
 				ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
 			super(itemReader, itemProcessor, itemWriter, chunkOperations);
 			this.retryOperations = retryTemplate;
+			this.rollbackClassifier = rollbackClassifier;
 			this.readSkipPolicy = readSkipPolicy;
 			this.writeSkipPolicy = writeSkipPolicy;
 			this.processSkipPolicy = processSkipPolicy;
@@ -472,7 +482,9 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 						}
 						catch (Exception e) {
 							checkSkipPolicy(contribution, iterator, e);
-							throw e;
+							if (rollbackClassifier.classify(e)) {
+								throw e;
+							}
 						}
 					}
 
