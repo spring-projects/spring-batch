@@ -4,7 +4,6 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.Assert;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 

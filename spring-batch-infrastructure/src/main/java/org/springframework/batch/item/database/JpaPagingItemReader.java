@@ -24,8 +24,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -57,8 +55,6 @@ import org.springframework.util.ClassUtils;
  * @since 2.0
  */
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
-
-	protected Log logger = LogFactory.getLog(getClass());
 
 	private EntityManagerFactory entityManagerFactory;
 
