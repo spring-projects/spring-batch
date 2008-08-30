@@ -19,7 +19,7 @@ class Chunk<W> implements Iterable<W> {
 
 	private List<W> items = new ArrayList<W>();
 
-	private List<SkippedItem<W>> skips = new ArrayList<SkippedItem<W>>();
+	private List<ItemWrapper<W>> skips = new ArrayList<ItemWrapper<W>>();
 
 	/**
 	 * Add the item to the chunk.
@@ -46,8 +46,8 @@ class Chunk<W> implements Iterable<W> {
 	/**
 	 * @return a copy of the skips as an unmodifiable list
 	 */
-	public List<SkippedItem<W>> getSkips() {
-		return Collections.unmodifiableList(new ArrayList<SkippedItem<W>>(skips));
+	public List<ItemWrapper<W>> getSkips() {
+		return Collections.unmodifiableList(new ArrayList<ItemWrapper<W>>(skips));
 	}
 
 	/**
@@ -117,52 +117,12 @@ class Chunk<W> implements Iterable<W> {
 					return;
 				}
 			}
-			skips.add(new SkippedItem<W>(next, e));
+			skips.add(new ItemWrapper<W>(next, e));
 			iterator.remove();
 		}
 
 		public void remove() {
 			throw new UnsupportedOperationException("To remove an item you must provide an exception.");
-		}
-
-	}
-
-	/**
-	 * Wrapper for a skipped item and its exception.
-	 * 
-	 * @author Dave Syer
-	 * 
-	 */
-	public static class SkippedItem<T> {
-
-		final private Exception exception;
-
-		final private T item;
-
-		public SkippedItem(T item, Exception e) {
-			this.item = item;
-			this.exception = e;
-		}
-
-		/**
-		 * Public getter for the exception.
-		 * @return the exception
-		 */
-		public Exception getException() {
-			return exception;
-		}
-
-		/**
-		 * Public getter for the item.
-		 * @return the item
-		 */
-		public T getItem() {
-			return item;
-		}
-
-		@Override
-		public String toString() {
-			return String.format("[exception=%s, item=%s]", exception, item);
 		}
 
 	}

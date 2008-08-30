@@ -120,7 +120,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
 		// TODO: check flags to see if these need to be saved or not (e.g. JMS not)
-		final Chunk<T> inputs = getInputBuffer(attributes);
+		final Chunk<ItemWrapper<T>> inputs = getInputBuffer(attributes);
 		final Chunk<S> outputs = getOutputBuffer(attributes);
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
@@ -134,7 +134,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 					if (item.getItem() == null) {
 						return ExitStatus.FINISHED;
 					}
-					inputs.add(item.getItem());
+					inputs.add(item);
 					return ExitStatus.CONTINUABLE;
 				}
 			});
@@ -199,9 +199,9 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	 * @param outputs the items to write
 	 * @param contribution current context
 	 */
-	protected void process(StepContribution contribution, Chunk<T> inputs, Chunk<S> outputs) throws Exception {
+	protected void process(StepContribution contribution, Chunk<ItemWrapper<T>> inputs, Chunk<S> outputs) throws Exception {
 		int filtered = 0;
-		for (T item : inputs) {
+		for (ItemWrapper<T> item : inputs) {
 			// TODO: segregate read / write / filter count
 			// (this is read count)
 			contribution.incrementItemCount();
@@ -217,11 +217,12 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	}
 
 	/**
-	 * @param item the input item
+	 * @param wrapper the input item
 	 * @return the result of the processing
 	 * @throws Exception
 	 */
-	protected S doProcess(T item) throws Exception {
+	protected S doProcess(ItemWrapper<T> wrapper) throws Exception {
+		T item = wrapper.getItem();
 		try {
 			listener.beforeProcess(item);
 			S result = itemProcessor.process(item);
@@ -272,7 +273,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	 * @param attributes
 	 * @param inputs
 	 */
-	private void storeInputs(AttributeAccessor attributes, Chunk<T> inputs) {
+	private void storeInputs(AttributeAccessor attributes, Chunk<ItemWrapper<T>> inputs) {
 		store(attributes, INPUT_BUFFER_KEY, inputs);
 	}
 
@@ -306,7 +307,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 		}
 	}
 
-	private Chunk<T> getInputBuffer(AttributeAccessor attributes) {
+	private Chunk<ItemWrapper<T>> getInputBuffer(AttributeAccessor attributes) {
 		return getBuffer(attributes, INPUT_BUFFER_KEY);
 	}
 
@@ -326,59 +327,6 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 		@SuppressWarnings("unchecked")
 		Chunk<W> resource = (Chunk<W>) attributes.getAttribute(key);
 		return resource;
-	}
-
-	/**
-	 * @author Dave Syer
-	 * 
-	 */
-	static protected class ItemWrapper<T> {
-
-		final private T item;
-
-		final private int skipCount;
-
-		/**
-		 * @param item
-		 */
-		public ItemWrapper(T item) {
-			this(item, 0);
-		}
-
-		/**
-		 * @param item
-		 * @param skipCount
-		 */
-		public ItemWrapper(T item, int skipCount) {
-			this.item = item;
-			this.skipCount = skipCount;
-		}
-
-		/**
-		 * @return the item we are wrapping
-		 */
-		public T getItem() {
-			return item;
-		}
-
-		/**
-		 * Public getter for the skipCount.
-		 * @return the skipCount
-		 */
-		public int getSkipCount() {
-			return skipCount;
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#toString()
-		 */
-		@Override
-		public String toString() {
-			return String.format("[%s,%d]", item, skipCount);
-		}
-
 	}
 
 }

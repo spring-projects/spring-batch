@@ -58,6 +58,13 @@ public class StepContribution {
 	}
 
 	/**
+	 * Increment the counter for the number of items processed.
+	 */
+	public void incrementItemCount(int count) {
+		itemCount+=count;
+	}
+
+	/**
 	 * Public access to the item counter.
 	 * 
 	 * @return the item counter.

@@ -49,7 +49,7 @@ import org.springframework.batch.support.Classifier;
  * 
  */
 public class StatefulRetryTaskletTests {
-	
+
 	private Log logger = LogFactory.getLog(getClass());
 
 	private int count = 0;
@@ -61,7 +61,7 @@ public class StatefulRetryTaskletTests {
 	private List<String> written = new ArrayList<String>();
 
 	private List<Integer> processed = new ArrayList<Integer>();
-	
+
 	private StatefulRetryTasklet<Integer, String> handler;
 
 	private RepeatTemplate chunkOperations = new RepeatTemplate();
@@ -85,7 +85,7 @@ public class StatefulRetryTaskletTests {
 	};
 
 	private RetryTemplate retryTemplate = new RetryTemplate();
-	
+
 	private Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
 		public Boolean classify(Throwable classifiable) {
 			return true;
@@ -102,7 +102,6 @@ public class StatefulRetryTaskletTests {
 	};
 
 	private ItemSkipPolicy writeSkipPolicy = readSkipPolicy;
-
 
 	@Before
 	public void setUp() {
@@ -124,7 +123,8 @@ public class StatefulRetryTaskletTests {
 			public Integer read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 				throw new RuntimeException("Barf!");
 			}
-		}, itemProcessor, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		}, itemProcessor, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy,
+				writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
@@ -168,7 +168,7 @@ public class StatefulRetryTaskletTests {
 	public void testSkipMultipleItemsOnWrite() throws Exception {
 		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
 			public void write(List<? extends String> items) throws Exception {
-				logger.debug("Writing items: "+items);
+				logger.debug("Writing items: " + items);
 				written.addAll(items);
 				throw new RuntimeException("Barf!");
 			}
@@ -176,12 +176,12 @@ public class StatefulRetryTaskletTests {
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
-		
-		// Count to 3: (try + skip + skip) 
+
+		// Count to 3: (try + skip + skip)
 		for (int i = 0; i < 3; i++) {
 			try {
 				handler.execute(contribution, attributes);
-				fail("Expected RuntimeException on i="+i);
+				fail("Expected RuntimeException on i=" + i);
 			}
 			catch (Exception e) {
 				assertEquals("Barf!", e.getMessage());
@@ -216,24 +216,64 @@ public class StatefulRetryTaskletTests {
 	}
 
 	@Test
-	public void testSkipMultipleItemsOnProcess() throws Exception {
+	public void testSkipSingleItemOnProcess() throws Exception {
 		handler = new StatefulRetryTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
 			public String process(Integer item) throws Exception {
-				logger.debug("Processing item: "+item);
+				logger.debug("Processing item: " + item);
+				processed.add(item);
+				if (item == 3) {
+					throw new RuntimeException("Barf!");
+				}
+				return "p" + item;
+			}
+		}, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy,
+				writeSkipPolicy);
+		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(3));
+		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
+		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
+
+		// try
+		try {
+			handler.execute(contribution, attributes);
+			fail("Expected RuntimeException");
+		}
+		catch (Exception e) {
+			assertEquals("Barf!", e.getMessage());
+		}
+		assertTrue(attributes.hasAttribute("INPUT_BUFFER_KEY"));
+
+		@SuppressWarnings("unchecked")
+		Chunk<Integer> chunk = (Chunk<Integer>) attributes.getAttribute("INPUT_BUFFER_KEY");
+
+		// skip...
+		handler.execute(contribution, attributes);
+		assertEquals(1, chunk.getSkips().size());
+
+		assertEquals(2, contribution.getItemCount());
+		assertEquals(1, contribution.getProcessSkipCount());
+		assertEquals(5, processed.size());
+		assertEquals("[p1, p2]", written.toString());
+	}
+
+	@Test
+	public void testSkipOverLimitOnProcess() throws Exception {
+		handler = new StatefulRetryTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
+			public String process(Integer item) throws Exception {
+				logger.debug("Processing item: " + item);
 				processed.add(item);
 				throw new RuntimeException("Barf!");
 			}
-		}
-		, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		}, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy,
+				writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
-		
-		// Count to 3: (try + skip + try) 
-		for (int i = 0; i < 3; i++) {
+
+		// Count to 3: (try + skip + try)
+		for (int i = 0; i < 2; i++) {
 			try {
 				handler.execute(contribution, attributes);
-				fail("Expected RuntimeException on i="+i);
+				fail("Expected RuntimeException on i=" + i);
 			}
 			catch (Exception e) {
 				assertEquals("Barf!", e.getMessage());
@@ -264,8 +304,9 @@ public class StatefulRetryTaskletTests {
 			// expected
 		}
 		assertTrue(attributes.hasAttribute("INPUT_BUFFER_KEY"));
-		assertEquals(3, contribution.getItemCount());
+		assertEquals(0, contribution.getItemCount());
 		assertEquals(2, contribution.getProcessSkipCount());
+		// Just before the skip at the end we process once more
 		assertEquals(3, processed.size());
 	}
 }

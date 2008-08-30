@@ -261,7 +261,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
 			ChunkOrientedTasklet<T, S> tasklet = new StatefulRetryTasklet<T, S>(getItemReader(), getItemProcessor(),
-					getItemWriter(), getChunkOperations(), retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+					getItemWriter(), getChunkOperations(), retryTemplate, rollbackClassifier, readSkipPolicy,
+					writeSkipPolicy, writeSkipPolicy);
 			tasklet.setListeners(getListeners());
 
 			step.setTasklet(tasklet);
@@ -313,7 +314,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 */
 		public StatefulRetryTasklet(ItemReader<? extends T> itemReader,
 				ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
-				RepeatOperations chunkOperations, RetryOperations retryTemplate, Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
+				RepeatOperations chunkOperations, RetryOperations retryTemplate,
+				Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
 				ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
 			super(itemReader, itemProcessor, itemWriter, chunkOperations);
 			this.retryOperations = retryTemplate;
@@ -378,20 +380,19 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * org.springframework.batch.core.step.item.Chunk)
 		 */
 		@Override
-		protected void process(final StepContribution contribution, final Chunk<T> inputs, final Chunk<S> outputs)
+		protected void process(final StepContribution contribution, final Chunk<ItemWrapper<T>> inputs, final Chunk<S> outputs)
 				throws Exception {
 
 			int filtered = 0;
 
-			for (final Chunk<T>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
-				
-				final T item = iterator.next();
-				
+			for (final Chunk<ItemWrapper<T>>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
+
+				final ItemWrapper<T> wrapper = iterator.next();
+
 				RetryCallback<S> retryCallback = new RetryCallback<S>() {
 
 					public S doWithRetry(RetryContext context) throws Exception {
-						contribution.incrementItemCount();
-						S output = doProcess(item);
+						S output = doProcess(wrapper);
 						return output;
 					}
 
@@ -400,43 +401,40 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				RecoveryCallback<S> recoveryCallback = new RecoveryCallback<S>() {
 
 					public S recover(RetryContext context) throws Exception {
-						Exception e = context.getLastThrowable();
+						Exception e = (Exception) context.getLastThrowable();
 						if (processSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 							contribution.incrementProcessSkipCount();
 							iterator.remove(e);
+							return null;
 						}
 						else {
-							throw new RetryException("Non-skippable exception in recoverer", e);
+							throw new RetryException("Non-skippable exception in recoverer while processing", e);
 						}
-						// Unless we reached the end of the chunk we need to rethrow
-						if (iterator.hasNext()) {
-							throw e;
-						}
-						return null;
 					}
-					
+
 				};
 
-				S output = retryOperations.execute(retryCallback, recoveryCallback, new RetryState(inputs));
-				// TODO: increment filter count if this is null
+				S output = retryOperations.execute(retryCallback, recoveryCallback, new RetryState(wrapper));
 				if (output != null) {
 					outputs.add(output);
-				} else {
+				}
+				else {
 					filtered++;
 				}
 
 			}
 
-			for (Chunk.SkippedItem<T> skip : inputs.getSkips()) {
+			for (ItemWrapper<ItemWrapper<T>> skip : inputs.getSkips()) {
 				Exception exception = skip.getException();
 				try {
-					getListener().onSkipInProcess(skip.getItem(), exception);
+					getListener().onSkipInProcess(skip.getItem().getItem(), exception);
 				}
 				catch (RuntimeException e) {
 					throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
 				}
 			}
-			
+
+			contribution.incrementItemCount(inputs.size());
 			contribution.incrementFilterCount(filtered);
 
 			inputs.clear();
@@ -457,8 +455,6 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext context) throws Exception {
 					doWrite(chunk.getItems());
-					// TODO: if there is an exception marked as no rollback it
-					// should get treated as stateless
 					return null;
 				}
 			};
@@ -506,7 +502,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 			retryOperations.execute(retryCallback, recoveryCallback, new RetryState(chunk));
 
-			for (Chunk.SkippedItem<S> skip : chunk.getSkips()) {
+			for (ItemWrapper<S> skip : chunk.getSkips()) {
 				Exception exception = skip.getException();
 				try {
 					getListener().onSkipInWrite(skip.getItem(), exception);
