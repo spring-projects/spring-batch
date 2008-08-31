@@ -9,6 +9,8 @@ import org.springframework.batch.item.ExecutionContext;
  * 
  * @author Lucas Ward
  * @see DrivingQueryItemReader
+ * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
+ * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
 public interface KeyCollector<T> {
 

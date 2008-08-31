@@ -52,6 +52,8 @@ import org.springframework.util.StringUtils;
  * 
  * TODO this class has nothing to do with "multiple columns" other than default
  * values form keyMapper and preparedStatementSetter. This should be sorted out for 2.0
+ * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
+ * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
 public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
 

@@ -25,6 +25,8 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * @author Robert Kasanicky
  * @author Lucas Ward
  * @see DrivingQueryItemReader
+ * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
+ * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
 public class IbatisKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
 

@@ -64,6 +64,8 @@ import org.springframework.util.Assert;
  * 
  * 
  * @author Lucas Ward
+ * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
+ * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
 public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBean, ItemStream {
 

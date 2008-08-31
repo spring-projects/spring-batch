@@ -51,6 +51,8 @@ import org.springframework.util.StringUtils;
  * 
  * @author Lucas Ward
  * @see SingleColumnRowMapper
+ * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
+ * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
 public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
 
