@@ -62,12 +62,23 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private String queryString;
 
+	private Map<String, Object> parameterValues;
+
 	public JpaPagingItemReader() {
 		setName(ClassUtils.getShortName(JpaPagingItemReader.class));
 	}
 
 	public void setEntityManagerFactory(EntityManagerFactory entityManagerFactory) {
 		this.entityManagerFactory = entityManagerFactory;
+	}
+
+	/**
+	 * The parameter values to be used for the query execution.
+	 *
+	 * @param parameterValues the values keyed by the parameter named used in the query string.
+	 */
+	public void setParameterValues(Map<String, Object> parameterValues) {
+		this.parameterValues = parameterValues;
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -86,7 +97,6 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
-		//TODO: add support for parameter map
 
 		EntityManager entityManager =
 				entityManagerFactory.createEntityManager(jpaPropertyMap);
@@ -100,6 +110,12 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		Query query = entityManager.createQuery(queryString)
 				.setFirstResult(page * pageSize)
 				.setMaxResults(pageSize);
+
+		if (parameterValues != null) {
+			for (Map.Entry<String, Object> me : parameterValues.entrySet()) {
+				query.setParameter(me.getKey(), me.getValue());
+			}
+		}
 
 		results = query.getResultList();
 

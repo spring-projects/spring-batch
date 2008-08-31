@@ -27,6 +27,11 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -55,6 +60,8 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	private DataSource dataSource;
 
 	private PagingQueryProvider queryProvider;
+
+	private Map<String, Object> parameterValues;
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
@@ -88,6 +95,18 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	/**
+	 * The parameter values to be used for the query execution.  If you use named parameters then the
+	 * key should be the name used in the query clause.  If you use "?" placeholders then the key should be
+	 * the relative index that the parameter appears in the query string built using the select, from and
+	 * where cluases specified.
+	 *
+	 * @param parameterValues the values keyed by the parameter named/index used in the query string.
+	 */
+	public void setParameterValues(Map<String, Object> parameterValues) {
+		this.parameterValues = parameterValues;
+	}
+
+	/**
 	 * Check mandatory properties.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
@@ -105,7 +124,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	@Override
 	protected void doReadPage() {
-		//TODO: add support for parameter map
 
 		if (results == null) {
 			results = new ArrayList<T>();
@@ -118,26 +136,43 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading first page: [" + firstPageSql + "]");
 			}
-			simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
-					new RowCallbackHandler() {
-						public void processRow(ResultSet rs) throws SQLException {
-							startAfterValue = rs.getObject(1);
-							results.add(parameterizedRowMapper.mapRow(rs, results.size()));
-						}
-					});
+			if (parameterValues != null && parameterValues.size() > 0) {
+				if (this.queryProvider.isUsingNamedParameters()) {
+					simpleJdbcTemplate.getNamedParameterJdbcOperations().query(firstPageSql,
+							getParameterMap(parameterValues, null),
+							new RowCallbackHandler() {
+								public void processRow(ResultSet rs) throws SQLException {
+									startAfterValue = rs.getObject(1);
+									results.add(parameterizedRowMapper.mapRow(rs, results.size()));
+								}
+							});
+				}
+				else {
+					simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
+							getParameterList(parameterValues, null).toArray(),
+							new PagingRowCallbackHandler());
+				}
+			}
+			else {
+				simpleJdbcTemplate.getJdbcOperations().query(firstPageSql,
+						new PagingRowCallbackHandler());
+			}
+
 		}
 		else {
 			if (logger.isDebugEnabled()) {
 				logger.debug("SQL used for reading remaining pages: [" + remainingPagesSql + "]");
 			}
-			simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
-					new Object[] {startAfterValue},
-					new RowCallbackHandler() {
-						public void processRow(ResultSet rs) throws SQLException {
-							startAfterValue = rs.getObject(1);
-							results.add(parameterizedRowMapper.mapRow(rs, results.size()));
-						}
-					});
+			if (this.queryProvider.isUsingNamedParameters()) {
+				simpleJdbcTemplate.getNamedParameterJdbcOperations().query(remainingPagesSql,
+						getParameterMap(parameterValues, startAfterValue),
+						new PagingRowCallbackHandler());
+			}
+			else {
+				simpleJdbcTemplate.getJdbcOperations().query(remainingPagesSql,
+						getParameterList(parameterValues, startAfterValue).toArray(),
+						new PagingRowCallbackHandler());
+			}
 		}
 
 	}
@@ -163,6 +198,44 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 		}
 
+	}
+
+	private Map<String, Object> getParameterMap(Map<String, Object> values, Object sortKeyValue) {
+		Map<String, Object> parameterMap = new LinkedHashMap<String, Object>();
+		if (values != null) {
+			parameterMap.putAll(values);
+		}
+		if (sortKeyValue != null) {
+			parameterMap.put("_sortKey", sortKeyValue);
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("Using parameterMap:" + parameterMap);
+		}
+		System.out.println();
+		return parameterMap;
+	}
+
+	private List<Object> getParameterList(Map<String, Object> values, Object sortKeyValue) {
+		SortedMap<String, Object> sm = new TreeMap<String, Object>();
+		if (values != null) {
+			sm.putAll(values);
+		}
+		List<Object> parameterList = new ArrayList<Object>();
+		parameterList.addAll(sm.values());
+		if (sortKeyValue != null) {
+			parameterList.add(sortKeyValue);
+		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("Using parameterList:" + parameterList);
+		}
+		return parameterList;
+	}
+
+	private class PagingRowCallbackHandler implements RowCallbackHandler {
+		public void processRow(ResultSet rs) throws SQLException {
+			startAfterValue = rs.getObject(1);
+			results.add(parameterizedRowMapper.mapRow(rs, results.size()));
+		}
 	}
 
 }

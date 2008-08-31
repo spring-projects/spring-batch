@@ -61,4 +61,17 @@ public interface PagingQueryProvider {
 	 */
 	String generateJumpToItemQuery(int itemIndex, int pageSize);
 
+	/**
+	 * The number of parameters that are declared in the query
+	 * @return number of parameters
+	 */
+	int getParameterCount();
+
+	/**
+	 * Indicate whether the generated queries use named parameter syntax.
+	 *
+	 * @return true if named parameter syntax is used
+	 */
+	boolean isUsingNamedParameters();
+
 }

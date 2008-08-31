@@ -18,6 +18,10 @@ package org.springframework.batch.item.database.support;
 import javax.sql.DataSource;
 
 import org.springframework.util.Assert;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Abstract SQL Paging Query Provider to serve as a base class for all provided SQL paging query providers.
@@ -42,6 +46,11 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	private String whereClause;
 
 	private String sortKey;
+
+	private int parameterCount;
+
+	private boolean usingNamedParameters;
+
 
 	/**
 	 * @param selectClause SELECT clause part of SQL query string
@@ -124,6 +133,24 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		return sortKey;
 	}
 
+
+	public int getParameterCount() {
+		return parameterCount;
+	}
+
+	public boolean isUsingNamedParameters() {
+		return usingNamedParameters;
+	}
+
+	/**
+	 *
+	 * @return place holder for sortKey. Will vary depending on whethernamed parameters or traditional placeholders
+	 * are used in query strings.
+	 */
+	protected String getSortKeyPlaceHolder() {
+		return usingNamedParameters ? ":_sortKey" : "?";
+	}
+
 	/**
 	 * Check mandatory properties.
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
@@ -133,6 +160,20 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		Assert.hasLength(selectClause, "selectClause must be specified");
 		Assert.hasLength(fromClause, "fromClause must be specified");
 		Assert.hasLength(sortKey, "sortKey must be specified");
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT ").append(selectClause);
+		sql.append(" FROM ").append(fromClause);
+		if (whereClause != null) {
+			sql.append(" WHERE ").append(whereClause);
+		}
+		List<String> namedParameters = new ArrayList<String>();
+		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql.toString(), namedParameters);
+		if (namedParameters.size() > 0) {
+			if (parameterCount != namedParameters.size()) {
+				throw new InvalidDataAccessApiUsageException("You can't use both named parameters and classic \"?\" placeholders: " + sql);
+			}
+			usingNamedParameters = true;
+		}
 	}
 
 	public abstract String generateFirstPageQuery(int pageSize);

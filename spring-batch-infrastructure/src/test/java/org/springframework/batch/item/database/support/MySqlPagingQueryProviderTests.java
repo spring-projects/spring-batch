@@ -37,7 +37,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE id > ? AND bar = 1 ORDER BY id ASC LIMIT 100";
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? ORDER BY id ASC LIMIT 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}

@@ -232,7 +232,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemReaderItemStream<T> imp
 	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
 	 * warnings (at debug level).
 	 * 
-	 * @param warning the warnings object from the current statement. May be
+	 * @param warnings the warnings object from the current statement. May be
 	 * <code>null</code>, in which case this method does nothing.
 	 * 
 	 * @see org.springframework.jdbc.SQLWarningException

@@ -22,6 +22,10 @@
   	select ID, NAME, VALUE from T_FOOS
   </select>
 
+  <select id="getFoos3AndUp" resultMap="fooResult">
+  	select ID, NAME, VALUE from T_FOOS where VALUE >= #limit#
+  </select>
+
   <select id="getAllFooIdsRestart" resultClass="int">
   	select ID from T_FOOS where ID > #id#
   </select>

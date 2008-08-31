@@ -39,8 +39,12 @@ public class HsqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append("TOP ").append(pageSize).append(" ").append(getSelectClause());
 		sql.append(" FROM ").append(getFromClause());
-		sql.append(" WHERE ").append(getSortKey()).append(" > ?");
-		sql.append(getWhereClause() == null ? "" : " AND " + getWhereClause());
+		sql.append(" WHERE ");
+		if (getWhereClause() != null) {
+			sql.append(getWhereClause());
+			sql.append(" AND ");
+		}
+		sql.append(getSortKey()).append(" > ").append(getSortKeyPlaceHolder());
 		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
 
 		return sql.toString();

@@ -36,6 +36,8 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private SqlMapClientTemplate sqlMapClientTemplate;
 
+	private Map<String, Object> parameterValues;
+
 	public IbatisPagingItemReader() {
 		setName(ClassUtils.getShortName(IbatisPagingItemReader.class));
 	}
@@ -47,6 +49,16 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	public void setQueryId(String queryId) {
 		this.queryId = queryId;
 	}
+
+	/**
+	 * The parameter values to be used for the query execution.
+	 *
+	 * @param parameterValues the values keyed by the parameter named used in the query string.
+	 */
+	public void setParameterValues(Map<String, Object> parameterValues) {
+		this.parameterValues = parameterValues;
+	}
+
 
 	/**
 	 * Check mandatory properties.
@@ -62,8 +74,10 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void doReadPage() {
-		//TODO: add support for parameter map
 		Map<String, Object> parameters = new HashMap<String, Object>();
+		if (parameterValues != null) {
+			parameters.putAll(parameterValues);
+		}
 		results = sqlMapClientTemplate.queryForList(queryId, parameters, (page * pageSize), pageSize);
 	}
 

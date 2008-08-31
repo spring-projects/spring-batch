@@ -87,7 +87,7 @@ public class DerbyPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE id > ? AND bar = 1) WHERE ROW_NUMBER <= 100";
+		String sql = "SELECT * FROM ( SELECT id, name, age, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1 AND id > ?) WHERE ROW_NUMBER <= 100";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}

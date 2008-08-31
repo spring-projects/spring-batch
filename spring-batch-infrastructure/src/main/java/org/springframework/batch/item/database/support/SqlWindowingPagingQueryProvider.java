@@ -42,8 +42,13 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		sql.append("SELECT * FROM ( ");
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
 		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey()).append(" ASC) AS ROW_NUMBER");
-		sql.append(" FROM ").append(getFromClause()).append(" WHERE ").append(getSortKey()).append(" > ?");
-		sql.append(getWhereClause() == null ? "" : " AND " + getWhereClause());
+		sql.append(" FROM ").append(getFromClause());
+		sql.append(" WHERE ");
+		if (getWhereClause() != null) {
+			sql.append(getWhereClause());
+			sql.append(" AND ");
+		}
+		sql.append(getSortKey()).append(" > ").append(getSortKeyPlaceHolder());
 		sql.append(") WHERE ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();

@@ -22,7 +22,7 @@ public class Db2PagingQueryProviderTests extends AbstractSqlPagingQueryProviderT
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT id, name, age FROM foo WHERE id > ? AND bar = 1 ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
+		String sql = "SELECT id, name, age FROM foo WHERE bar = 1 AND id > ? ORDER BY id ASC FETCH FIRST 100 ROWS ONLY";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}

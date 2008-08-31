@@ -22,7 +22,7 @@ public class SqlServerPagingQueryProviderTests extends AbstractSqlPagingQueryPro
 
 	@Test @Override
 	public void testGenerateRemainingPagesQuery() {
-		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE id > ? AND bar = 1 ORDER BY id ASC";
+		String sql = "SELECT TOP 100 id, name, age FROM foo WHERE bar = 1 AND id > ? ORDER BY id ASC";
 		String s = pagingQueryProvider.generateRemainingPagesQuery(pageSize);
 		Assert.assertEquals("", sql, s);
 	}
