@@ -35,8 +35,7 @@ public interface JobExecutionDao {
 	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Return all {@link JobExecution} for given {@link JobInstance}, sorted
-	 * backwards by creation order (so the first element is the most recent).
+	 * Return all {@link JobExecution} for given {@link JobInstance}.
 	 * 
 	 * @param jobInstance
 	 * @return list of jobExecutions.
