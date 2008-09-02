@@ -16,7 +16,7 @@
 package org.springframework.batch.core;
 
 /**
- * Batch domain interface representing the configuration of a step. As with the (@link Job), a {@link Step} is meant to
+ * Batch domain interface representing the configuration of a step. As with the {@link Job}, a {@link Step} is meant to
  * explicitly represent a the configuration of a step by a developer, but also the ability to execute the step.
  * 
  * @author Dave Syer

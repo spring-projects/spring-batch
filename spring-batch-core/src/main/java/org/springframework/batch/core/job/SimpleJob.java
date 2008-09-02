@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInstance;
@@ -32,7 +33,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simple implementation of (@link Job} interface providing the ability to run a
+ * Simple implementation of {@link Job} interface providing the ability to run a
  * {@link JobExecution}. Sequentially executes a job by iterating through its
  * list of steps.
  * 

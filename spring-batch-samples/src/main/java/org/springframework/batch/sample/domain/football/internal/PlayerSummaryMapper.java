@@ -22,7 +22,7 @@ import org.springframework.batch.sample.domain.football.PlayerSummary;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 /**
- * RowMapper used to map a ResultSet to a (@link PlayerSummary)
+ * RowMapper used to map a ResultSet to a {@link PlayerSummary}
  * 
  * @author Lucas Ward
  *

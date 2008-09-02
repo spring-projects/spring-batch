@@ -2017,7 +2017,7 @@
 
   public class FooTransformer implements ItemProcessor{
 
-    //Preform simple transformation, convert a Foo to a Barr
+    //Perform simple transformation, convert a Foo to a Bar
     public Object transform(Object item) throws Exception {
       assertTrue(item instanceof Foo);
       Foo foo = (Foo)item;
@@ -2097,7 +2097,7 @@
 
   public class FooTransformer implements ItemTransformer{
 
-    //Preform simple transformation, convert a Foo to a Barr
+    //Perform simple transformation, convert a Foo to a Bar
     public Object transform(Object item) throws Exception {
       assertTrue(item instanceof Foo);
       Foo foo = (Foo)item;

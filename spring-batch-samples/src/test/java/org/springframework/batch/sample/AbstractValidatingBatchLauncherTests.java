@@ -17,9 +17,10 @@
 package org.springframework.batch.sample;
 
 import org.junit.Test;
+import org.springframework.context.Lifecycle;
 
 /**
- * Abstract TestCase that automatically starts a Spring (@link Lifecycle) after
+ * Abstract TestCase that automatically starts a Spring {@link Lifecycle} after
  * obtaining it automatically via autowiring by type.
  *
  * This implemenation is based on JUnit4 and SpringJUnit4ClassRunner being used
