@@ -16,11 +16,13 @@
 
 package org.springframework.batch.item.file.transform;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import org.junit.Test;
 import org.springframework.batch.item.file.mapping.FieldSet;
 
-public class FixedLengthTokenizerTests extends TestCase {
+public class FixedLengthTokenizerTests {
 
 	private FixedLengthTokenizer tokenizer = new FixedLengthTokenizer();
 
@@ -30,10 +32,12 @@ public class FixedLengthTokenizerTests extends TestCase {
 	 * if null or empty string is tokenized, tokenizer returns empty fieldset 
 	 * (with no tokens).
 	 */
+	@Test
 	public void testTokenizeEmptyString() {
 		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,10),new Range(11,15)});
 		try{ 
 			tokenizer.tokenize("");
+			fail("Expected IncorrectLineLengthException");
 		}
 		catch(IncorrectLineLengthException ex){
 			assertEquals(15, ex.getExpectedLength());
@@ -41,15 +45,18 @@ public class FixedLengthTokenizerTests extends TestCase {
 		}
 	}
 	
+	@Test
 	public void testEmptyStringWithNoRanges(){
 		tokenizer.setColumns(new Range[]{});
 		tokenizer.tokenize("");
 	}
 	
+	@Test
 	public void testTokenizeSmallerStringThanRanges() {
 		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,10),new Range(11,15)});
 		try{
 			tokenizer.tokenize("12345");
+			fail("Expected IncorrectLineLengthException");
 		}
 		catch(IncorrectLineLengthException ex){
 			assertEquals(15, ex.getExpectedLength());
@@ -58,14 +65,25 @@ public class FixedLengthTokenizerTests extends TestCase {
 		
 	}
 
+	@Test
+	public void testTokenizeSmallerStringThanRangesWithWhitespace() {
+		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
+		FieldSet tokens = tokenizer.tokenize("12345     ");
+		assertEquals("12345", tokens.readString(0));
+		assertEquals("", tokens.readString(1));
+	}
+
+	@Test
 	public void testTokenizeNullString() {
 		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,10),new Range(11,15)});
 		try{
 			tokenizer.tokenize(null);
+			fail("Expected IncorrectLineLengthException");
 		}
 		catch(IncorrectLineLengthException ex){}
 	}
 
+	@Test
 	public void testTokenizeRegularUse() {
 		tokenizer.setColumns(new Range[] {new Range(1,2),new Range(3,7),new Range(8,12)});
 		// test shorter line as defined by record descriptor
@@ -77,6 +95,7 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals("12345", tokens.readString(2));
 	}
 	
+	@Test
 	public void testNormalLength() throws Exception {
 		tokenizer.setColumns(new Range[] {new Range(1,10),new Range(11,25),new Range(26,30)});
 		// test shorter line as defined by record descriptor
@@ -88,11 +107,13 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals(line.substring(25).trim(), tokens.readString(2));		
 	}
 	
+	@Test
 	public void testLongerLines() throws Exception {
 		tokenizer.setColumns(new Range[] {new Range(1,10),new Range(11,25),new Range(26,30)});
 		line = "H1        12345678       1234567890";
 		try{
 			tokenizer.tokenize(line);
+			fail("Expected IncorrectLineLengthException");
 		}
 		catch(IncorrectLineLengthException ex){
 			assertEquals(30, ex.getExpectedLength());
@@ -100,6 +121,7 @@ public class FixedLengthTokenizerTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testNonAdjacentRangesUnsorted() throws Exception {
 		tokenizer.setColumns(new Range[] {new Range(14,28), new Range(34,38), new Range(1,10)});
 		// test normal length
@@ -111,6 +133,7 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals(line.substring(33, 38).trim(), tokens.readString(1));		
 	}
 	
+	@Test
 	public void testAnotherTypeOfRecord() throws Exception {
 		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,15),new Range(16,25),new Range(26,27)});
 		// test another type of record
@@ -123,6 +146,7 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals(line.substring(25).trim(), tokens.readString(3));		
 	}
 	
+	@Test
 	public void testFillerAtEnd() throws Exception {
 		tokenizer.setColumns(new Range[] {new Range(1,5),new Range(6,15),new Range(16,25),new Range(26,27),new Range(34)});
 		// test another type of record
@@ -135,6 +159,7 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals(line.substring(25, 27).trim(), tokens.readString(3));		
 	}
 
+	@Test
 	public void testTokenizerInvalidSetup() {
 		tokenizer.setNames(new String[] {"a", "b"});
 		tokenizer.setColumns(new Range[] {new Range(1,5)});
