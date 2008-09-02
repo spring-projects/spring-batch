@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.launch;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -43,9 +42,7 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	List<Object> list;
 
 	public void afterPropertiesSet() throws Exception {
-		TransactionAwareProxyFactory<List<Object>> factory = new TransactionAwareProxyFactory<List<Object>>(
-				new ArrayList<Object>());
-		list = factory.createInstance();
+		list = TransactionAwareProxyFactory.createTransactionalList();
 	}
 
 	public void setFailurePoint(int failurePoint) {

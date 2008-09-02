@@ -5,7 +5,6 @@ import org.junit.internal.runners.JUnit4ClassRunner;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.database.support.IbatisKeyCollector;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
 import org.springframework.core.io.ClassPathResource;
 import com.ibatis.sqlmap.client.SqlMapClient;

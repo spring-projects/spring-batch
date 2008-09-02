@@ -3,13 +3,11 @@ package org.springframework.batch.item.database;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 import java.sql.ResultSet;
 import java.sql.SQLException;

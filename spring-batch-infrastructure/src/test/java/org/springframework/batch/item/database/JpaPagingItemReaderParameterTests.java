@@ -5,12 +5,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.ibatis.sqlmap.client.SqlMapClient;
-
 import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 

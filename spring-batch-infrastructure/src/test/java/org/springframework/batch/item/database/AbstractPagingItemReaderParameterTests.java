@@ -4,15 +4,11 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.Assert;
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-
 import javax.sql.DataSource;
 
 /**

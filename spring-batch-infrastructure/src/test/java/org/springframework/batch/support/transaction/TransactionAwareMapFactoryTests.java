@@ -27,8 +27,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class TransactionAwareMapFactoryTests extends TestCase {
 
-	TransactionAwareProxyFactory<Map<String, String>> factory;
-
 	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
 	Map<String, String> map;
@@ -38,8 +36,7 @@ public class TransactionAwareMapFactoryTests extends TestCase {
 		seed.put("foo", "oof");
 		seed.put("bar", "bar");
 		seed.put("spam", "maps");
-		factory = new TransactionAwareProxyFactory<Map<String, String>>(seed);
-		map = (Map<String, String>) factory.createInstance();
+		map = TransactionAwareProxyFactory.createTransactionalMap(seed);
 	}
 
 	public void testAdd() {

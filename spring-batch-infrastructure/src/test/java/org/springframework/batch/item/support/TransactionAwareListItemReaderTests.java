@@ -32,17 +32,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class TransactionAwareListItemReaderTests extends TestCase {
 
-	// TransactionAwareListItemProvider provider = new
-	// TransactionAwareListItemProvider(Arrays.asList(new String[] { "a",
-	// "b", "c" }));
-	ListItemReader<String> reader;
+	private ListItemReader<String> reader;
 
 	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
 		super.setUp();
-		TransactionAwareProxyFactory factory = new TransactionAwareProxyFactory(Arrays.asList(new String[] { "a", "b",
-				"c" }));
-		reader = new ListItemReader<String>((List<String>) factory.createInstance());
+		reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("a", "b", "c")));
 	}
 
 	public void testNext() throws Exception {

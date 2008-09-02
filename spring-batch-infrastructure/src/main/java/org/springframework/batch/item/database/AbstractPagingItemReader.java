@@ -8,7 +8,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Abstract {@link org.springframework.batch.item.ItemReader} for to extend when reading database records in a paging

@@ -16,6 +16,7 @@
 
 package org.springframework.batch.support.transaction;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,10 +24,15 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 public class TransactionAwareProxyFactoryTests extends TestCase {
-	
+
 	public void testCreateList() throws Exception {
 		List<String> list = TransactionAwareProxyFactory.createTransactionalList();
 		list.add("foo");
+		assertEquals(1, list.size());
+	}
+
+	public void testCreateListWithValues() throws Exception {
+		List<String> list = TransactionAwareProxyFactory.createTransactionalList(Collections.singletonList("foo"));
 		assertEquals(1, list.size());
 	}
 
@@ -35,19 +41,22 @@ public class TransactionAwareProxyFactoryTests extends TestCase {
 		set.add("foo");
 		assertEquals(1, set.size());
 	}
-	
+
+	public void testCreateSetWithValues() throws Exception {
+		Set<String> list = TransactionAwareProxyFactory.createTransactionalSet(Collections.singleton("foo"));
+		assertEquals(1, list.size());
+	}
+
 	public void testCreateMap() throws Exception {
 		Map<String, String> map = TransactionAwareProxyFactory.createTransactionalMap();
 		map.put("foo", "bar");
 		assertEquals(1, map.size());
 	}
 
-	public void testCreateUnsupported() throws Exception {
-		try {
-			new TransactionAwareProxyFactory<Object>(new Object()).createInstance();
-			fail("Expected UnsupportedOperationException");
-		} catch (UnsupportedOperationException e) {
-			// expected
-		}
+	public void testCreateMapWithValues() throws Exception {
+		Map<String, String> map = TransactionAwareProxyFactory.createTransactionalMap(Collections.singletonMap("foo",
+				"bar"));
+		assertEquals(1, map.size());
 	}
+
 }

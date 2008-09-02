@@ -27,15 +27,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class TransactionAwareListFactoryTests extends TestCase {
 
-	TransactionAwareProxyFactory<List<String>> factory = new TransactionAwareProxyFactory<List<String>>(Arrays.asList(new String[] { "foo",
-			"bar", "spam" }));
-
 	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
 	List<String> list;
 
 	protected void setUp() throws Exception {
-		list = (List<String>) factory.createInstance();
+		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("foo", "bar", "spam"));
 	}
 
 	public void testAdd() {

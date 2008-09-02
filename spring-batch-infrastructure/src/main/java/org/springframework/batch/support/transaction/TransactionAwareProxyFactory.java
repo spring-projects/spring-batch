@@ -50,7 +50,7 @@ public class TransactionAwareProxyFactory<T> {
 
 	private T target;
 
-	public TransactionAwareProxyFactory(T target) {
+	private TransactionAwareProxyFactory(T target) {
 		super();
 		this.target = begin(target);
 	}
@@ -99,7 +99,7 @@ public class TransactionAwareProxyFactory<T> {
 		}
 	}
 
-	public T createInstance() {
+	private T createInstance() {
 		ProxyFactory factory = new ProxyFactory(target);
 		factory.addAdvice(new MethodInterceptor() {
 			
@@ -137,13 +137,28 @@ public class TransactionAwareProxyFactory<T> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public static <K,V> Map<K,V> createTransactionalMap(Map<K,V> map) {
+		return (Map<K,V>) new TransactionAwareProxyFactory(map).createInstance();
+	}
+
+	@SuppressWarnings("unchecked")
 	public static <T> Set<T> createTransactionalSet() {
 		return (Set<T>) new TransactionAwareProxyFactory(new HashSet<T>()).createInstance();
 	}
 
 	@SuppressWarnings("unchecked")
+	public static <T> Set<T> createTransactionalSet(Set<T> set) {
+		return (Set<T>) new TransactionAwareProxyFactory(set).createInstance();
+	}
+
+	@SuppressWarnings("unchecked")
 	public static <T> List<T> createTransactionalList() {
 		return (List<T>) new TransactionAwareProxyFactory(new ArrayList<T>()).createInstance();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> createTransactionalList(List<T> list) {
+		return (List<T>) new TransactionAwareProxyFactory(list).createInstance();
 	}
 
 	private class TargetSynchronization extends TransactionSynchronizationAdapter {
