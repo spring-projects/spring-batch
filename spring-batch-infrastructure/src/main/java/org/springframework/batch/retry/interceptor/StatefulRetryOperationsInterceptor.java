@@ -21,13 +21,14 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.ExhaustedRetryException;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
+import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -138,7 +139,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 		}
 		final Object item = arg;
 
-		RetryState retryState = new RetryState(keyGenerator != null ? keyGenerator.getKey(args) : item, newMethodArgumentsIdentifier != null ? newMethodArgumentsIdentifier.isNew(args) : false );
+		RetryState retryState = new DefaultRetryState(keyGenerator != null ? keyGenerator.getKey(args) : item, newMethodArgumentsIdentifier != null ? newMethodArgumentsIdentifier.isNew(args) : false );
 
 		Object result = retryTemplate.execute(new MethodInvocationRetryCallback(invocation), new ItemRecovererCallback(args, recoverer), retryState);
 

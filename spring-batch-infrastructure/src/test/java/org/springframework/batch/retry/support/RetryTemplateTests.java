@@ -29,7 +29,6 @@ import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.backoff.BackOffContext;
 import org.springframework.batch.retry.backoff.BackOffInterruptedException;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
@@ -130,8 +129,7 @@ public class RetryTemplateTests {
 		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts));
 		BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(Collections
 				.<Class<? extends Throwable>> singleton(IllegalArgumentException.class), false);
-		retryTemplate.setRollbackClassifier(classifier);
-		retryTemplate.execute(callback, new RetryState("foo"));
+		retryTemplate.execute(callback, new DefaultRetryState("foo",classifier));
 		assertEquals(attempts, callback.attempts);
 	}
 

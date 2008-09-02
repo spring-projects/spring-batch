@@ -33,7 +33,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
+import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -126,7 +126,7 @@ public class ExternalRetryTests {
 								return null;
 							}
 						};
-						return retryTemplate.execute(callback, new RetryState(item));
+						return retryTemplate.execute(callback, new DefaultRetryState(item));
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e.getMessage(), e);
@@ -154,7 +154,7 @@ public class ExternalRetryTests {
 							return null;
 						}
 					};
-					return retryTemplate.execute(callback, new RetryState(item));
+					return retryTemplate.execute(callback, new DefaultRetryState(item));
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e.getMessage(), e);
@@ -202,7 +202,7 @@ public class ExternalRetryTests {
 				result = (String) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 						try {
-							return retryTemplate.execute(callback, recoveryCallback, new RetryState(item));
+							return retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
 						}
 						catch (Exception e) {
 							throw new RuntimeException(e.getMessage(), e);

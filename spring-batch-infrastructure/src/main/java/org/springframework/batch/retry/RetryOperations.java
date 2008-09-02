@@ -16,6 +16,8 @@
 
 package org.springframework.batch.retry;
 
+import org.springframework.batch.retry.support.DefaultRetryState;
+
 /**
  * Defines the basic set of operations implemented by {@link RetryOperations} to
  * execute operations with configurable retry behaviour.
@@ -50,7 +52,7 @@ public interface RetryOperations {
 
 	/**
 	 * A simple stateful retry. Execute the supplied {@link RetryCallback} with
-	 * a target object for the attempt identified by the {@link RetryState}.
+	 * a target object for the attempt identified by the {@link DefaultRetryState}.
 	 * Exceptions thrown by the callback are always propagated immediately so
 	 * the state is required to be able to identify the previous attempt, if
 	 * there is one - hence the state is required. Normal patterns would see
@@ -72,7 +74,7 @@ public interface RetryOperations {
 	 * A stateful retry with a recovery path. Execute the supplied
 	 * {@link RetryCallback} with a fallback on exhausted retry to the
 	 * {@link RecoveryCallback} and a target object for the retry attempt
-	 * identified by the {@link RetryState}.
+	 * identified by the {@link DefaultRetryState}.
 	 * 
 	 * @see #execute(RetryCallback, RetryState)
 	 * 

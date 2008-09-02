@@ -30,8 +30,8 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
+import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -134,7 +134,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 							return msg;
 						}
 					};
-					retryTemplate.execute(callback, recoveryCallback, new RetryState(msg.getJMSMessageID()));
+					retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(msg.getJMSMessageID()));
 				}
 				catch (Exception e) {
 					throw (RuntimeException) e;

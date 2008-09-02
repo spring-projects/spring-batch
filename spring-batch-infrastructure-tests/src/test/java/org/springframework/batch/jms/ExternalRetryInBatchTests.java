@@ -37,8 +37,8 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
+import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
@@ -152,7 +152,7 @@ public class ExternalRetryInBatchTests {
 										}
 									};
 
-									retryTemplate.execute(callback, recoveryCallback, new RetryState(item));
+									retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
 									
 									return ExitStatus.CONTINUABLE;
 

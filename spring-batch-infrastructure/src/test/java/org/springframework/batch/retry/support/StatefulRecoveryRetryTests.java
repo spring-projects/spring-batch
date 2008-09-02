@@ -31,12 +31,12 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.retry.ExhaustedRetryException;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
@@ -53,7 +53,7 @@ public class StatefulRecoveryRetryTests {
 
 	@Test
 	public void testOpenSunnyDay() throws Exception {
-		RetryContext context = retryTemplate.open(new NeverRetryPolicy(), new RetryState("foo"));
+		RetryContext context = retryTemplate.open(new NeverRetryPolicy(), new DefaultRetryState("foo"));
 		assertNotNull(context);
 		// we haven't called the processor yet...
 		assertEquals(0, count);
@@ -62,7 +62,7 @@ public class StatefulRecoveryRetryTests {
 	@Test
 	public void testRegisterThrowable() {
 		NeverRetryPolicy retryPolicy = new NeverRetryPolicy();
-		RetryState state = new RetryState("foo");
+		RetryState state = new DefaultRetryState("foo");
 		RetryContext context = retryTemplate.open(retryPolicy, state);
 		assertNotNull(context);
 		retryTemplate.registerThrowable(retryPolicy, state, context, new Exception());
@@ -72,7 +72,7 @@ public class StatefulRecoveryRetryTests {
 	@Test
 	public void testClose() throws Exception {
 		NeverRetryPolicy retryPolicy = new NeverRetryPolicy();
-		RetryState state = new RetryState("foo");
+		RetryState state = new DefaultRetryState("foo");
 		RetryContext context = retryTemplate.open(retryPolicy, state);
 		assertNotNull(context);
 		retryTemplate.registerThrowable(retryPolicy, state, context, new Exception());
@@ -96,7 +96,7 @@ public class StatefulRecoveryRetryTests {
 	public void testRecover() throws Exception {
 		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
 		final String input = "foo";
-		RetryState state = new RetryState(input);
+		RetryState state = new DefaultRetryState(input);
 		RetryCallback<String> callback = new RetryCallback<String>() {
 			public String doWithRetry(RetryContext context) throws Exception {
 				throw new RuntimeException("Barf!");
@@ -132,9 +132,8 @@ public class StatefulRecoveryRetryTests {
 				.<Class<? extends Throwable>> singleton(DataAccessException.class));
 		// ...but not these:
 		assertFalse(classifier.classify(new RuntimeException()));
-		retryTemplate.setRollbackClassifier(classifier);
 		final String input = "foo";
-		RetryState state = new RetryState(input);
+		RetryState state = new DefaultRetryState(input,classifier);
 		RetryCallback<String> callback = new RetryCallback<String>() {
 			public String doWithRetry(RetryContext context) throws Exception {
 				throw new RuntimeException("Barf!");
@@ -161,7 +160,7 @@ public class StatefulRecoveryRetryTests {
 		retryTemplate.setRetryPolicy(retryPolicy);
 
 		final String input = "foo";
-		RetryState state = new RetryState(input);
+		RetryState state = new DefaultRetryState(input);
 		RetryCallback<String> callback = new RetryCallback<String>() {
 			public String doWithRetry(RetryContext context) throws Exception {
 				throw new RuntimeException("Barf!");
@@ -195,7 +194,7 @@ public class StatefulRecoveryRetryTests {
 		RetryPolicy retryPolicy = new SimpleRetryPolicy(3);
 		retryTemplate.setRetryPolicy(retryPolicy);
 		final StringHolder item = new StringHolder("bar");
-		RetryState state = new RetryState(item);
+		RetryState state = new DefaultRetryState(item);
 
 		RetryCallback<StringHolder> callback = new RetryCallback<StringHolder>() {
 			public StringHolder doWithRetry(RetryContext context) throws Exception {
@@ -247,7 +246,7 @@ public class StatefulRecoveryRetryTests {
 		};
 
 		try {
-			retryTemplate.execute(callback, new RetryState("foo"));
+			retryTemplate.execute(callback, new DefaultRetryState("foo"));
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
@@ -255,7 +254,7 @@ public class StatefulRecoveryRetryTests {
 		}
 
 		try {
-			retryTemplate.execute(callback, new RetryState("bar"));
+			retryTemplate.execute(callback, new DefaultRetryState("bar"));
 			fail("Expected RetryException");
 		}
 		catch (RetryException e) {
@@ -271,7 +270,7 @@ public class StatefulRecoveryRetryTests {
 		retryTemplate.setRetryPolicy(retryPolicy);
 		retryTemplate.setRetryContextCache(new MapRetryContextCache(2));
 		final StringHolder item = new StringHolder("foo");
-		RetryState state = new RetryState(item);
+		RetryState state = new DefaultRetryState(item);
 
 		RetryCallback<Object> callback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {

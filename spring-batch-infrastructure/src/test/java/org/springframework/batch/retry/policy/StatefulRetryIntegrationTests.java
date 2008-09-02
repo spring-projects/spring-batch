@@ -24,9 +24,10 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.springframework.batch.retry.ExhaustedRetryException;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
+import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 
 /**
@@ -39,7 +40,7 @@ public class StatefulRetryIntegrationTests {
 	public void testExternalRetryWithFailAndNoRetry() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 
-		RetryState retryState = new RetryState("foo");
+		RetryState retryState = new DefaultRetryState("foo");
 
 		RetryTemplate retryTemplate = new RetryTemplate();
 		MapRetryContextCache cache = new MapRetryContextCache();
@@ -80,7 +81,7 @@ public class StatefulRetryIntegrationTests {
 	public void testExternalRetryWithSuccessOnRetry() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 
-		RetryState retryState = new RetryState("foo");
+		RetryState retryState = new DefaultRetryState("foo");
 
 		RetryTemplate retryTemplate = new RetryTemplate();
 		MapRetryContextCache cache = new MapRetryContextCache();

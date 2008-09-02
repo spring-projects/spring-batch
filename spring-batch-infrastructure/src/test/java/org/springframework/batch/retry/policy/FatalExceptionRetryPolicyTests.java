@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryState;
+import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 
 public class FatalExceptionRetryPolicyTests extends TestCase {
@@ -82,14 +82,14 @@ public class FatalExceptionRetryPolicyTests extends TestCase {
 
 		Object result = null;
 		try {
-			retryTemplate.execute(callback, recoveryCallback, new RetryState("foo"));
+			retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState("foo"));
 			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
 			// If stateful we have to always rethrow. Clients who want special
 			// cases have to implement them in the callback
 		}
-		result = retryTemplate.execute(callback, recoveryCallback, new RetryState("foo"));
+		result = retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState("foo"));
 		// Callback is called once: the recovery path should also be called
 		assertEquals(1, callback.attempts);
 		assertEquals("bar", result);

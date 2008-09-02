@@ -23,6 +23,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.ExhaustedRetryException;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -30,7 +31,6 @@ import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.backoff.BackOffContext;
 import org.springframework.batch.retry.backoff.BackOffInterruptedException;
@@ -39,7 +39,6 @@ import org.springframework.batch.retry.backoff.NoBackOffPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.support.Classifier;
 
 /**
  * Template class that simplifies the execution of operations with retry
@@ -78,45 +77,6 @@ public class RetryTemplate implements RetryOperations {
 	private volatile RetryListener[] listeners = new RetryListener[0];
 
 	private RetryContextCache retryContextCache = new MapRetryContextCache();
-
-	private Classifier<? super Throwable, Boolean> rollbackClassifier = null;
-
-	/**
-	 * Public setter for the rollback classifier. This classifier answers its
-	 * default if the exception provided should not cause a rollback. I.e.
-	 * anything other than the default will lead to a rollback.<br/><br/>
-	 * 
-	 * The decision whether to rollback or not is unrelated to that of the
-	 * {@link RetryPolicy}, but the policy can be accidentally inconsistent
-	 * with the rollback decision. E.g. in a stateless retry the policy might be
-	 * configured to allow retry on a rollback, but that wouldn't make sense - a
-	 * stateful retry should have been used. The best we can do in such
-	 * circumstances is throw a {@link RetryException} from
-	 * {@link #execute(RetryCallback)} or
-	 * {@link #execute(RetryCallback, RecoveryCallback)}. The recovery path
-	 * will not be taken in such situations.<br/><br/>
-	 * 
-	 * For stateless retry it is often adequate to use the default behaviour, as
-	 * long as one is careful with the retry policy (exceptions which should
-	 * cause rollback are still not really retryable in a transactional
-	 * setting).<br/><br/>
-	 * 
-	 * For stateful retry adding a classifier will allow an optimisation:
-	 * exceptions which are not marked for rollback can still be retried, but
-	 * without paying the cost of a rollback. Effectively one is overriding the
-	 * stateful quality of the retry dynamically, according to the exception
-	 * type.<br/><br/>
-	 * 
-	 * Example usage would be for a stateful retry to specify a validation exception as not for rollback
-	 * 
-	 * If not set then the default is to rollback for all exceptions when the
-	 * retry is stateful, and for none when it is stateless.
-	 * 
-	 * @param rollbackClassifier the rollback classifier to set
-	 */
-	public void setRollbackClassifier(Classifier<? super Throwable, Boolean> rollbackClassifier) {
-		this.rollbackClassifier = rollbackClassifier;
-	}
 
 	/**
 	 * Public setter for the {@link RetryContextCache}.
@@ -446,20 +406,12 @@ public class RetryTemplate implements RetryOperations {
 	 * otherwise
 	 */
 	protected boolean shouldRethrow(RetryPolicy retryPolicy, RetryContext context, RetryState state) {
-		// Allow stateless behaviour to take over for certain exception types
-		if (rollbackClassifier != null) {
-			// TODO: remove this.  Make it part of the stateful execution parameters?
-			// Then we wouldn't have to make assertions about the stateless case. 
-			boolean rollback = rollbackClassifier.classify(context.getLastThrowable());
-			if (rollback && state == null && retryPolicy.canRetry(context)) {
-				throw new RetryException("Inconsistent configuration.  The retry policy says we can retry but "
-						+ "the exception has been marked for rollback.", context.getLastThrowable());
-			}
-			return rollback;
+		if (state == null) {
+			return false;
 		}
-		// If no classifier is provided, just assume the all exceptions are for
-		// rollback if the execution is stateful, and none otherwise.
-		return state != null;
+		else {
+			return state.rollbackFor(context.getLastThrowable());
+		}
 	}
 
 	private <T> boolean doOpenInterceptors(RetryCallback<T> callback, RetryContext context) {
