@@ -1,13 +1,13 @@
 package org.springframework.batch.item.database;
 
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.IbatisKeyCollector;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
-import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
@@ -15,6 +15,8 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * Tests for {@link IbatisDrivingQueryItemReader}
  *
  * @author Robert Kasanicky
+ * 
+ * @deprecated
  */
 @SuppressWarnings("unchecked")
 @RunWith(SpringJUnit4ClassRunner.class)
