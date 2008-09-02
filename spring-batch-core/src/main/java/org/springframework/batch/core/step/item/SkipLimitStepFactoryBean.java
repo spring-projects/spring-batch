@@ -26,12 +26,12 @@ import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
+import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.batch.support.Classifier;
 
@@ -231,7 +231,6 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					return getTransactionAttribute().rollbackOn(classifiable);
 				}
 			};
-			retryTemplate.setRollbackClassifier(rollbackClassifier);
 
 			// Co-ordinate the retry policy with the exception handler:
 			RepeatOperations stepOperations = getStepOperations();
@@ -414,7 +413,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 				};
 
-				S output = retryOperations.execute(retryCallback, recoveryCallback, new RetryState(wrapper));
+				S output = retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(wrapper, rollbackClassifier));
 				if (output != null) {
 					outputs.add(output);
 				}
@@ -500,7 +499,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				}
 			};
 
-			retryOperations.execute(retryCallback, recoveryCallback, new RetryState(chunk));
+			retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(chunk,rollbackClassifier));
 
 			for (ItemWrapper<S> skip : chunk.getSkips()) {
 				Exception exception = skip.getException();
