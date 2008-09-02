@@ -14,13 +14,15 @@
 
 	<import resource="classpath:simple-job-launcher-context.xml" />
 
-	<integration:message-bus auto-create-channels="true" />
+	<integration:message-bus/>
 	<integration:annotation-driven />
-	<integration:direct-channel id="requests" />
-	<integration:direct-channel id="jobs" />
-	<integration:thread-local-channel id="response" />
+	<integration:channel id="requests" />
+	<integration:channel id="jobs" />
+	<integration:channel id="response">
+		<integration:queue capacity="UNBOUNDED"/>
+	</integration:channel>
 
-	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" return-address-overrides="true" />
+	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler"/>
 	<integration:service-activator input-channel="none" output-channel="jobs" ref="jobRequestConverter" />
 
 	<bean id="jobRequestConverter" class="org.springframework.batch.integration.launch.JobRequestConverter" />

@@ -15,14 +15,15 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 	<import resource="classpath:/simple-job-launcher-context.xml" />
 	<integration:annotation-driven/>
-	<integration:message-bus auto-create-channels="true" />
+	<integration:message-bus/>
 	<integration:channel id="requests" />
-	<integration:channel id="replies" />
+	<integration:channel id="replies">
+		<integration:queue capacity="UNBOUNDED"/>
+	</integration:channel>
 	<bean id="job" parent="simpleJob">
 		<property name="steps">
-			<bean
+			<bean id="stepController"
 				class="org.springframework.batch.integration.job.MessageOrientedStep">
-				<property name="name" value="TODO: I shouldn't have to set this"/>
 				<property name="target" ref="requests" />
 				<property name="source" ref="replies" />
 				<property name="jobRepository" ref="jobRepository" />

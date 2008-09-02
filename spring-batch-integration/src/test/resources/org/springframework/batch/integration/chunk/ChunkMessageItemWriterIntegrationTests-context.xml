@@ -11,7 +11,7 @@
                                  http://www.springframework.org/schema/tx
                                  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-	<message-bus auto-create-channels="true" />
+	<message-bus/>
 
 	<annotation-driven />
 
@@ -22,9 +22,16 @@
 		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 	<tx:annotation-driven />
 
-	<beans:bean id="chunkHandler" class="org.springframework.batch.integration.chunk.ItemWriterChunkHandler">
-		<beans:property name="itemWriter">
-			<beans:bean class="org.springframework.batch.integration.chunk.TestItemWriter"></beans:bean>
+	<beans:bean id="chunkHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
+		<beans:property name="chunkProcessor">
+			<beans:bean class="org.springframework.batch.integration.chunk.SimpleChunkProcessor">
+				<beans:property name="itemWriter">
+					<beans:bean class="org.springframework.batch.integration.chunk.TestItemWriter" />
+				</beans:property>
+				<beans:property name="itemProcessor">
+					<beans:bean class="org.springframework.batch.item.support.PassthroughItemProcessor" />
+				</beans:property>
+			</beans:bean>
 		</beans:property>
 	</beans:bean>
 

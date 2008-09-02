@@ -8,7 +8,7 @@
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
                                  http://www.springframework.org/schema/context
                                  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
-	<message-bus auto-create-channels="true" />
+	<message-bus/>
 	<channel id="jobs" />
 
 </beans:beans>
