@@ -202,10 +202,9 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	protected void process(StepContribution contribution, Chunk<ItemWrapper<T>> inputs, Chunk<S> outputs) throws Exception {
 		int filtered = 0;
 		for (ItemWrapper<T> item : inputs) {
-			// TODO: segregate read / write / filter count
-			// (this is read count)
-			contribution.incrementItemCount();
+			
 			contribution.incrementReadCount();
+			
 			S output = doProcess(item);
 			if (output != null) {
 				outputs.add(output);

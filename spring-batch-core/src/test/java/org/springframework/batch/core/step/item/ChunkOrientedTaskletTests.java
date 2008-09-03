@@ -84,7 +84,7 @@ public class ChunkOrientedTaskletTests {
 			// expected
 		}
 		assertEquals(2, itemReader.count);
-		assertEquals(2, contribution.getItemCount());
+		assertEquals(2, contribution.getReadCount());
 		assertEquals(0, contribution.getFilterCount());
 		assertEquals("", itemWriter.values);
 	}
@@ -97,7 +97,6 @@ public class ChunkOrientedTaskletTests {
 				123L, new JobParameters(), "job"))));
 		handler.execute(contribution, context);
 		assertEquals(2, itemReader.count);
-		assertEquals(2, contribution.getItemCount());
 		assertEquals(2, contribution.getReadCount());
 		assertEquals(1, contribution.getFilterCount());
 		assertEquals(1, contribution.getWriteCount());

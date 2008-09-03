@@ -135,7 +135,7 @@ public class StatefulRetryTaskletTests {
 		catch (SkipLimitExceededException e) {
 			// expected
 		}
-		assertEquals(0, contribution.getItemCount());
+		assertEquals(0, contribution.getReadCount());
 		assertEquals(2, contribution.getReadSkipCount());
 	}
 
@@ -304,7 +304,7 @@ public class StatefulRetryTaskletTests {
 			// expected
 		}
 		assertTrue(attributes.hasAttribute("INPUT_BUFFER_KEY"));
-		assertEquals(0, contribution.getItemCount());
+		assertEquals(0, contribution.getReadCount());
 		assertEquals(2, contribution.getProcessSkipCount());
 		// Just before the skip at the end we process once more
 		assertEquals(3, processed.size());

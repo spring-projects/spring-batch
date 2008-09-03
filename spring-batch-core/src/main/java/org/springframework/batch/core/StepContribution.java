@@ -16,16 +16,14 @@
 package org.springframework.batch.core;
 
 /**
- * Represents a contribution to a {@link StepExecution}, buffering changes
- * until they can be applied at a chunk boundary.
+ * Represents a contribution to a {@link StepExecution}, buffering changes until
+ * they can be applied at a chunk boundary.
  * 
  * @author Dave Syer
  * 
  */
 public class StepContribution {
 
-	private volatile int itemCount = 0;
-	
 	private volatile int readCount = 0;
 
 	private volatile int writeCount = 0;
@@ -51,37 +49,23 @@ public class StepContribution {
 	 * Increment the counter for the number of items processed.
 	 */
 	public void incrementFilterCount(int count) {
-		filterCount+=count;
+		filterCount += count;
 	}
 
-	/**
-	 * Increment the counter for the number of items processed.
-	 */
-	public void incrementItemCount() {
-		itemCount++;
-	}
-
-	/**
-	 * Increment the counter for the number of items processed.
-	 */
-	public void incrementItemCount(int count) {
-		itemCount += count;
-	}
-	
 	/**
 	 * Increment the counter for the number of items read.
 	 */
 	public void incrementReadCount() {
 		readCount++;
 	}
-	
+
 	/**
 	 * Increment the counter for the number of items read.
 	 */
 	public void incrementReadCount(int count) {
 		readCount += count;
 	}
-	
+
 	/**
 	 * Increment the counter for the number of items written.
 	 */
@@ -89,15 +73,6 @@ public class StepContribution {
 		writeCount++;
 	}
 
-	/**
-	 * Public access to the item counter.
-	 * 
-	 * @return the item counter.
-	 */
-	public int getItemCount() {
-		return itemCount;
-	}
-	
 	/**
 	 * Public access to the read counter.
 	 * 
@@ -197,8 +172,9 @@ public class StepContribution {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: items=" + itemCount + ", filtered=" + filterCount + ", readSkips=" + readSkipCount
-				+ ", writeSkips=" + writeSkipCount + ", processSkips=" + processSkipCount + "]";
+		return "[StepContribution: read=" + readCount + ", written=" + writeCount + ", filtered=" + filterCount
+				+ ", readSkips=" + readSkipCount + ", writeSkips=" + writeSkipCount + ", processSkips="
+				+ processSkipCount + "]";
 	}
 
 }
