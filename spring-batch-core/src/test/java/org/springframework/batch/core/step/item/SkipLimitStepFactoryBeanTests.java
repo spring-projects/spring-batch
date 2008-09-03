@@ -313,7 +313,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = jobExecution.createStepExecution(step);
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());
@@ -344,7 +344,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = jobExecution.createStepExecution(step);
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());

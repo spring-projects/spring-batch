@@ -104,7 +104,7 @@ public class MessageOrientedStepTests {
 		try {
 			step.setExecutionTimeout(1000);
 			step.setPollingInterval(100);
-			step.execute(jobExecution.createStepExecution(step));
+			step.execute(jobExecution.createStepExecution(step.getName()));
 			fail("Expected StepExecutionTimeoutException");
 		}
 		catch (StepExecutionTimeoutException e) {
@@ -123,7 +123,7 @@ public class MessageOrientedStepTests {
 				return replyChannel.send(message);
 			}
 		});
-		step.execute(jobExecution.createStepExecution(step));
+		step.execute(jobExecution.createStepExecution(step.getName()));
 	}
 
 	@Test
@@ -136,7 +136,7 @@ public class MessageOrientedStepTests {
 			}
 		});
 		try {
-			step.execute(jobExecution.createStepExecution(step));
+			step.execute(jobExecution.createStepExecution(step.getName()));
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
@@ -153,7 +153,7 @@ public class MessageOrientedStepTests {
 		// Send a message to the reply channel to simulate step that we were
 		// waiting for when we failed on the last execution.
 		replyChannel.send(new GenericMessage<JobExecutionRequest>(jobExecutionRequest));
-		StepExecution stepExecution = jobExecution.createStepExecution(step);
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		stepExecution.getExecutionContext().putString(MessageOrientedStep.WAITING, "true");
 		step.execute(stepExecution);
 	}

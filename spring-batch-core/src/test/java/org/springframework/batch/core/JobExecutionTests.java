@@ -20,7 +20,6 @@ import java.util.Date;
 import junit.framework.TestCase;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -128,12 +127,12 @@ public class JobExecutionTests extends TestCase {
 
 	public void testAddAndRemoveStepExecution() throws Exception {
 		assertEquals(0, execution.getStepExecutions().size());
-		execution.createStepExecution(new StepSupport("stepName"));
+		execution.createStepExecution("step");
 		assertEquals(1, execution.getStepExecutions().size());
 	}
 	
 	public void testStop() throws Exception {
-		StepExecution stepExecution = execution.createStepExecution(new StepSupport("stepName"));
+		StepExecution stepExecution = execution.createStepExecution("step");
 		assertFalse(stepExecution.isTerminateOnly());
 		execution.stop();
 		assertTrue(stepExecution.isTerminateOnly());

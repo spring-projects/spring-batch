@@ -69,7 +69,7 @@ public class StepExecutionMessageHandler {
 		JobExecution jobExecution = request.getJobExecution();
 		JobInstance jobInstance = jobExecution.getJobInstance();
 
-		StepExecution stepExecution = jobExecution.createStepExecution(step);
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		try {
 
 			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);

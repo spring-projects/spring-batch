@@ -14,7 +14,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.step.StepSupport;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -146,7 +145,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		dao.saveJobExecution(exec);
 		exec = new JobExecution(jobInstance);
 		exec.setLastUpdated(new Date(5L));
-		exec.createStepExecution(new StepSupport("foo"));
+		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
 		StepExecutionDao stepExecutionDao = getStepExecutionDao();
 		if (stepExecutionDao != null) {
@@ -180,7 +179,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	public void testGetExecution() {
 		JobExecution exec = new JobExecution(jobInstance);
 		exec.setCreateTime(new Date(0));
-		exec.createStepExecution(new StepSupport("foo"));
+		exec.createStepExecution("step");
 
 		dao.saveJobExecution(exec);
 		StepExecutionDao stepExecutionDao = getStepExecutionDao();

@@ -64,7 +64,7 @@ public class StepExecutionResourceProxyTests extends TestCase {
 		jobInstance = new JobInstance(new Long(0), new JobParameters(), "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
-		stepExecution = jobExecution.createStepExecution(step);
+		stepExecution = jobExecution.createStepExecution(step.getName());
 		resource.beforeStep(stepExecution);
 
 	}
@@ -99,7 +99,7 @@ public class StepExecutionResourceProxyTests extends TestCase {
 				.toJobParameters(), "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
-		resource.beforeStep(jobExecution.createStepExecution(step));
+		resource.beforeStep(jobExecution.createStepExecution(step.getName()));
 		doTestPathName("spam-foo", "foo" + pathsep + "data" + pathsep);
 	}
 

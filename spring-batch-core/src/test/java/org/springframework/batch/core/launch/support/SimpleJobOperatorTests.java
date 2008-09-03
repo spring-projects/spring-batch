@@ -50,7 +50,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.support.PropertiesConverter;
 
 /**
@@ -234,8 +233,8 @@ public class SimpleJobOperatorTests {
 		jobParameters = new JobParameters();
 		jobExplorer.getJobExecution(111L);
 		JobExecution jobExecution = new JobExecution(new JobInstance(123L, jobParameters, job.getName()), 111L);
-		jobExecution.createStepExecution(new StepSupport("step1"));
-		jobExecution.createStepExecution(new StepSupport("step2"));
+		jobExecution.createStepExecution("step1");
+		jobExecution.createStepExecution("step2");
 		jobExecution.getStepExecutions().iterator().next().setId(21L);
 		EasyMock.expectLastCall().andReturn(jobExecution);
 		EasyMock.replay(jobExplorer);

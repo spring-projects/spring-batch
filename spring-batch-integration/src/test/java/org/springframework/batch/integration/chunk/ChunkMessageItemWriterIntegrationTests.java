@@ -324,7 +324,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job,
 				new JobParametersBuilder().addLong("job.counter", jobCounter++)
 						.toJobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step);
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		return stepExecution;
 	}
 

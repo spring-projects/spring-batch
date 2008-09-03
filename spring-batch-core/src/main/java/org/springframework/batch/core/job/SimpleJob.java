@@ -81,7 +81,7 @@ public class SimpleJob extends AbstractJob {
 
 					startedCount++;
 					updateStatus(execution, BatchStatus.STARTED);
-					currentStepExecution = execution.createStepExecution(step);
+					currentStepExecution = execution.createStepExecution(step.getName());
 
 					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step);
 
