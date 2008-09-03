@@ -25,6 +25,10 @@ package org.springframework.batch.core;
 public class StepContribution {
 
 	private volatile int itemCount = 0;
+	
+	private volatile int readCount = 0;
+
+	private volatile int writeCount = 0;
 
 	private volatile int filterCount = 0;
 
@@ -61,7 +65,21 @@ public class StepContribution {
 	 * Increment the counter for the number of items processed.
 	 */
 	public void incrementItemCount(int count) {
-		itemCount+=count;
+		itemCount += count;
+	}
+	
+	/**
+	 * Increment the counter for the number of items read.
+	 */
+	public void incrementReadCount() {
+		readCount++;
+	}
+	
+	/**
+	 * Increment the counter for the number of items written.
+	 */
+	public void incrementWriteCount() {
+		writeCount++;
 	}
 
 	/**
@@ -71,6 +89,24 @@ public class StepContribution {
 	 */
 	public int getItemCount() {
 		return itemCount;
+	}
+	
+	/**
+	 * Public access to the read counter.
+	 * 
+	 * @return the item counter.
+	 */
+	public int getReadCount() {
+		return readCount;
+	}
+
+	/**
+	 * Public access to the write counter.
+	 * 
+	 * @return the item counter.
+	 */
+	public int getWriteCount() {
+		return writeCount;
 	}
 
 	/**

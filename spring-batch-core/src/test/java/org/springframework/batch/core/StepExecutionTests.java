@@ -133,10 +133,16 @@ public class StepExecutionTests extends TestCase {
 		contribution.incrementReadSkipCount();
 		contribution.incrementWriteSkipCount();
 		contribution.incrementItemCount();
+		contribution.incrementReadCount();
+		contribution.incrementWriteCount();
+		contribution.incrementFilterCount(1);
 		execution.apply(contribution);
 		assertEquals(1, execution.getReadSkipCount());
 		assertEquals(1, execution.getWriteSkipCount());
 		assertEquals(1, execution.getItemCount());
+		assertEquals(1, execution.getReadCount());
+		assertEquals(1, execution.getWriteCount());
+		assertEquals(1, execution.getFilterCount());
 	}
 
 	public void testTerminateOnly() throws Exception {

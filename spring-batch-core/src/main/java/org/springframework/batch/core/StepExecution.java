@@ -42,6 +42,10 @@ public class StepExecution extends Entity {
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
 	private volatile int itemCount = 0;
+	
+	private volatile int readCount = 0;
+
+	private volatile int writeCount = 0;
 
 	private volatile int commitCount = 0;
 
@@ -63,7 +67,7 @@ public class StepExecution extends Entity {
 
 	private volatile boolean terminateOnly;
 
-	private int filterCount;
+	private volatile int filterCount;
 
 	/**
 	 * Constructor with mandatory properties.
@@ -163,6 +167,42 @@ public class StepExecution extends Entity {
 	 */
 	public void setItemCount(int itemCount) {
 		this.itemCount = itemCount;
+	}
+	
+	/**
+	 * Returns the current number of items read for this execution
+	 * 
+	 * @return the current number of items read for this execution
+	 */
+	public int getReadCount() {
+		return readCount;
+	}
+
+	/**
+	 * Sets the current number of read items for this execution
+	 * 
+	 * @param readCount the current number of read items for this execution
+	 */
+	public void setReadCount(int readCount) {
+		this.readCount = readCount;
+	}
+
+	/**
+	 * Returns the current number of items written for this execution
+	 * 
+	 * @return the current number of items written for this execution
+	 */
+	public int getWriteCount() {
+		return writeCount;
+	}
+
+	/**
+	 * Sets the current number of written items for this execution
+	 * 
+	 * @param writeCount the current number of written items for this execution
+	 */
+	public void setWriteCount(int writeCount) {
+		this.writeCount = writeCount;
 	}
 
 	/**
@@ -298,6 +338,8 @@ public class StepExecution extends Entity {
 		readSkipCount += contribution.getReadSkipCount();
 		writeSkipCount += contribution.getWriteSkipCount();
 		filterCount += contribution.getFilterCount();
+		readCount += contribution.getReadCount();
+		writeCount += contribution.getWriteCount();
 	}
 
 	/**

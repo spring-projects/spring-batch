@@ -332,6 +332,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * count
 		 * @return next item for processing
 		 */
+		@Override
 		protected ItemWrapper<T> read(StepContribution contribution) throws Exception {
 
 			int skipCount = 0;
@@ -453,7 +454,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 			RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext context) throws Exception {
-					doWrite(chunk.getItems());
+					doWrite(chunk.getItems(), contribution);
 					return null;
 				}
 			};
@@ -473,7 +474,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					for (Chunk<S>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
 						S item = iterator.next();
 						try {
-							doWrite(Collections.singletonList(item));
+							doWrite(Collections.singletonList(item), contribution);
 						}
 						catch (Exception e) {
 							checkSkipPolicy(contribution, iterator, e);

@@ -92,21 +92,24 @@ public class ChunkOrientedTaskletTests {
 	@Test
 	public void testHandleCompositeItem() throws Exception {
 		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
-				new AgrgegateItemProcessor(), itemWriter, repeatTemplate);
+				new AggregateItemProcessor(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
 		handler.execute(contribution, context);
 		assertEquals(2, itemReader.count);
 		assertEquals(2, contribution.getItemCount());
+		assertEquals(2, contribution.getReadCount());
 		assertEquals(1, contribution.getFilterCount());
+		assertEquals(1, contribution.getWriteCount());
 		assertEquals("12", itemWriter.values);
 	}
+	
 
 	/**
 	 * @author Dave Syer
 	 * 
 	 */
-	private final class AgrgegateItemProcessor implements ItemProcessor<String, String> {
+	private final class AggregateItemProcessor implements ItemProcessor<String, String> {
 		private int count = 0;
 
 		private String value = "";

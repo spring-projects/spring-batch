@@ -205,6 +205,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 			// TODO: segregate read / write / filter count
 			// (this is read count)
 			contribution.incrementItemCount();
+			contribution.incrementReadCount();
 			S output = doProcess(item);
 			if (output != null) {
 				outputs.add(output);
@@ -241,7 +242,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	 * @param contribution current context
 	 */
 	protected void write(Chunk<S> chunk, StepContribution contribution) throws Exception {
-		doWrite(chunk.getItems());
+		doWrite(chunk.getItems(), contribution);
 		chunk.clear();
 	}
 
@@ -249,11 +250,11 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	 * @param items
 	 * @throws Exception
 	 */
-	protected final void doWrite(List<S> items) throws Exception {
+	protected final void doWrite(List<S> items, StepContribution contribution) throws Exception {
 		try {
 			listener.beforeWrite(items);
 			itemWriter.write(items);
-			// TODO: increment write count
+			contribution.incrementWriteCount();
 			listener.afterWrite(items);
 		}
 		catch (Exception e) {
