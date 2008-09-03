@@ -76,6 +76,13 @@ public class StepContribution {
 	}
 	
 	/**
+	 * Increment the counter for the number of items read.
+	 */
+	public void incrementReadCount(int count) {
+		readCount += count;
+	}
+	
+	/**
 	 * Increment the counter for the number of items written.
 	 */
 	public void incrementWriteCount() {
@@ -160,14 +167,6 @@ public class StepContribution {
 	 */
 	public void incrementProcessSkipCount() {
 		processSkipCount++;
-	}
-
-	/**
-	 * @param contribution
-	 */
-	public void increment(StepContribution contribution) {
-		itemCount += contribution.getItemCount();
-		readSkipCount += contribution.getReadSkipCount();
 	}
 
 	/**

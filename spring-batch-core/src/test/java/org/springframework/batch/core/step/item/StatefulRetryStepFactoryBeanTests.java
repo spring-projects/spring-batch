@@ -168,7 +168,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(2, processed.size());
 		// []
 		assertEquals(0, recovered.size());
-		assertEquals(2, stepExecution.getItemCount());
+		assertEquals(2, stepExecution.getReadCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
 	}
 
@@ -200,7 +200,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(2, stepExecution.getSkipCount());
 		// b is processed once and skipped, plus 1, plus c, plus the null at end
 		assertEquals(7, count);
-		assertEquals(4, stepExecution.getItemCount());
+		assertEquals(4, stepExecution.getReadCount());
 	}
 
 	@Test
@@ -381,7 +381,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(4, processed.size());
 		// []
 		assertEquals(0, recovered.size());
-		assertEquals(1, stepExecution.getItemCount());
+		assertEquals(1, stepExecution.getReadCount());
 	}
 
 	@Test
@@ -438,7 +438,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(1, processed.size());
 		// []
 		assertEquals(0, recovered.size());
-		assertEquals(1, stepExecution.getItemCount());
+		assertEquals(1, stepExecution.getReadCount());
 	}
 
 	@Test
@@ -484,7 +484,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		assertEquals(4, processed.size());
 		// []
 		assertEquals(0, recovered.size());
-		assertEquals(1, stepExecution.getItemCount());
+		assertEquals(1, stepExecution.getReadCount());
 	}
 
 	@Test

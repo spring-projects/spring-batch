@@ -110,15 +110,6 @@ public class StepExecutionTests extends TestCase {
 		assertEquals(123, execution.getCommitCount());
 	}
 
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.StepExecution#getItemCount()}.
-	 */
-	public void testGetTaskCount() {
-		execution.setItemCount(123);
-		assertEquals(123, execution.getItemCount());
-	}
-
 	public void testGetFilterCount() {
 		execution.setFilterCount(123);
 		assertEquals(123, execution.getFilterCount());
@@ -132,14 +123,12 @@ public class StepExecutionTests extends TestCase {
 		StepContribution contribution = execution.createStepContribution();
 		contribution.incrementReadSkipCount();
 		contribution.incrementWriteSkipCount();
-		contribution.incrementItemCount();
 		contribution.incrementReadCount();
 		contribution.incrementWriteCount();
 		contribution.incrementFilterCount(1);
 		execution.apply(contribution);
 		assertEquals(1, execution.getReadSkipCount());
 		assertEquals(1, execution.getWriteSkipCount());
-		assertEquals(1, execution.getItemCount());
 		assertEquals(1, execution.getReadCount());
 		assertEquals(1, execution.getWriteCount());
 		assertEquals(1, execution.getFilterCount());
@@ -162,7 +151,9 @@ public class StepExecutionTests extends TestCase {
 	}
 
 	public void testToString() throws Exception {
-		assertTrue("Should contain item count: " + execution.toString(), execution.toString().indexOf("item") >= 0);
+		assertTrue("Should contain read count: " + execution.toString(), execution.toString().indexOf("read") >= 0);
+		assertTrue("Should contain write count: " + execution.toString(), execution.toString().indexOf("write") >= 0);
+		assertTrue("Should contain filter count: " + execution.toString(), execution.toString().indexOf("filter") >= 0);
 		assertTrue("Should contain commit count: " + execution.toString(), execution.toString().indexOf("commit") >= 0);
 		assertTrue("Should contain rollback count: " + execution.toString(),
 				execution.toString().indexOf("rollback") >= 0);

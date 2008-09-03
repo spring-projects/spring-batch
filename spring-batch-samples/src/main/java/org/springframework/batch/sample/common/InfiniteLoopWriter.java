@@ -54,7 +54,7 @@ public class InfiniteLoopWriter extends StepExecutionListenerSupport implements
 			Thread.currentThread().interrupt();
 			throw new RuntimeException("Job interrupted.");
 		}
-		stepExecution.setItemCount(++count);
+		stepExecution.setWriteCount(++count);
 		logger.info("Executing infinite loop, at count=" + count);
 	}
 }

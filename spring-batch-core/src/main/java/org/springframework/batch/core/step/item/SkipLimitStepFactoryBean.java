@@ -434,7 +434,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				}
 			}
 
-			contribution.incrementItemCount(inputs.size());
+			contribution.incrementReadCount(inputs.size());
 			contribution.incrementFilterCount(filtered);
 
 			inputs.clear();

@@ -134,7 +134,7 @@ public class TasketStepTests {
 
 		step.execute(stepExecution);
 		assertEquals(1, processed.size());
-		assertEquals(1, stepExecution.getItemCount());
+		assertEquals(1, stepExecution.getReadCount());
 		assertEquals(1, stepExecution.getCommitCount());
 	}
 
@@ -155,7 +155,7 @@ public class TasketStepTests {
 		step.execute(stepExecution);
 
 		assertEquals(3, processed.size());
-		assertEquals(3, stepExecution.getItemCount());
+		assertEquals(3, stepExecution.getReadCount());
 		assertTrue(3 <= jobRepository.updateCount);
 	}
 
@@ -804,7 +804,7 @@ public class TasketStepTests {
 
 		step.execute(stepExecution);
 		assertEquals(3, processed.size());
-		assertEquals(3, stepExecution.getItemCount());
+		assertEquals(3, stepExecution.getReadCount());
 	}
 
 	/**
@@ -845,7 +845,7 @@ public class TasketStepTests {
 		public void update(StepExecution stepExecution) {
 			updateCount++;
 			if (updateCount <= 3) {
-				assertEquals(updateCount, stepExecution.getItemCount());
+				assertEquals(updateCount, stepExecution.getReadCount());
 			}
 		}
 

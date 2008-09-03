@@ -29,7 +29,7 @@ import org.springframework.batch.repeat.ExitStatus;
 public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		if (stepExecution.getItemCount() == 0) {
+		if (stepExecution.getReadCount() == 0) {
 			throw new NoWorkFoundException("Step has not processed any items");
 		}
 		return stepExecution.getExitStatus();

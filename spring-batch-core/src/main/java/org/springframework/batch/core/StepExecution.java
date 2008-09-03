@@ -41,8 +41,6 @@ public class StepExecution extends Entity {
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private volatile int itemCount = 0;
-	
 	private volatile int readCount = 0;
 
 	private volatile int writeCount = 0;
@@ -149,24 +147,6 @@ public class StepExecution extends Entity {
 	 */
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
-	}
-
-	/**
-	 * Returns the current number of items input for this execution
-	 * 
-	 * @return the current number of items input for this execution
-	 */
-	public int getItemCount() {
-		return itemCount;
-	}
-
-	/**
-	 * Sets the current number of processed items for this execution
-	 * 
-	 * @param itemCount the current number of processed items for this execution
-	 */
-	public void setItemCount(int itemCount) {
-		this.itemCount = itemCount;
 	}
 	
 	/**
@@ -334,7 +314,6 @@ public class StepExecution extends Entity {
 	 * @param contribution
 	 */
 	public synchronized void apply(StepContribution contribution) {
-		itemCount += contribution.getItemCount();
 		readSkipCount += contribution.getReadSkipCount();
 		writeSkipCount += contribution.getWriteSkipCount();
 		filterCount += contribution.getFilterCount();
@@ -470,8 +449,8 @@ public class StepExecution extends Entity {
 
 	public String toString() {
 		return super.toString()
-				+ String.format(", name=%s, itemCount=%d, readSkipCount=%d, writeSkipCount=%d"
-						+ ", commitCount=%d, rollbackCount=%d", stepName, itemCount, readSkipCount, writeSkipCount,
+				+ String.format(", name=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
+						+ ", commitCount=%d, rollbackCount=%d", stepName, readCount, filterCount, writeCount, readSkipCount, writeSkipCount,
 						commitCount, rollbackCount);
 	}
 

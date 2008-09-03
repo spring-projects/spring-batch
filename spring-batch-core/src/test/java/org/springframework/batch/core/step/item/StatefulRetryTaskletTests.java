@@ -114,7 +114,7 @@ public class StatefulRetryTaskletTests {
 				retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		handler.execute(contribution, new BasicAttributeAccessor());
-		assertEquals(limit, contribution.getItemCount());
+		assertEquals(limit, contribution.getReadCount());
 	}
 
 	@Test
@@ -159,7 +159,7 @@ public class StatefulRetryTaskletTests {
 		}
 		assertTrue(attributes.hasAttribute("OUTPUT_BUFFER_KEY"));
 		handler.execute(contribution, attributes);
-		assertEquals(1, contribution.getItemCount());
+		assertEquals(1, contribution.getReadCount());
 		assertEquals(1, contribution.getWriteSkipCount());
 		assertEquals(1, written.size());
 	}
@@ -210,7 +210,7 @@ public class StatefulRetryTaskletTests {
 			// expected
 		}
 		assertTrue(attributes.hasAttribute("OUTPUT_BUFFER_KEY"));
-		assertEquals(3, contribution.getItemCount());
+		assertEquals(3, contribution.getReadCount());
 		assertEquals(2, contribution.getWriteSkipCount());
 		assertEquals(5, written.size());
 	}
@@ -249,7 +249,7 @@ public class StatefulRetryTaskletTests {
 		handler.execute(contribution, attributes);
 		assertEquals(1, chunk.getSkips().size());
 
-		assertEquals(2, contribution.getItemCount());
+		assertEquals(2, contribution.getReadCount());
 		assertEquals(1, contribution.getProcessSkipCount());
 		assertEquals(5, processed.size());
 		assertEquals("[p1, p2]", written.toString());

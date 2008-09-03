@@ -99,7 +99,7 @@ public class SkipLimitStepFactoryBeanTests {
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
 		assertEquals(expectedOutput, writer.written);
 
-		assertEquals(4, stepExecution.getItemCount());
+		assertEquals(4, stepExecution.getReadCount());
 
 	}
 
@@ -126,7 +126,7 @@ public class SkipLimitStepFactoryBeanTests {
 		// no rollbacks
 		assertEquals(0, stepExecution.getRollbackCount());
 
-		assertEquals(4, stepExecution.getItemCount());
+		assertEquals(4, stepExecution.getReadCount());
 
 	}
 
