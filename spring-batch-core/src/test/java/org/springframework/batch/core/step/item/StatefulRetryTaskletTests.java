@@ -211,6 +211,7 @@ public class StatefulRetryTaskletTests {
 		}
 		assertTrue(attributes.hasAttribute("OUTPUT_BUFFER_KEY"));
 		assertEquals(3, contribution.getReadCount());
+		assertEquals(0, contribution.getFilterCount());
 		assertEquals(2, contribution.getWriteSkipCount());
 		assertEquals(5, written.size());
 	}
