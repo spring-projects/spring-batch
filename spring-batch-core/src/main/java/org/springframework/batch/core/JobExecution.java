@@ -33,7 +33,7 @@ public class JobExecution extends Entity {
 
 	private JobInstance jobInstance;
 
-	private volatile transient Collection<StepExecution> stepExecutions = new HashSet<StepExecution>();
+	private volatile Collection<StepExecution> stepExecutions = new HashSet<StepExecution>();
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 

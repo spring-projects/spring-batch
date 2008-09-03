@@ -151,7 +151,8 @@ public class JobExecutionTests extends TestCase {
 	
 	public void testSerialization() {
 		byte[] serialized = SerializationUtils.serialize(execution);
-		
-		assertEquals(execution, SerializationUtils.deserialize(serialized));
+		JobExecution deserialize = (JobExecution) SerializationUtils.deserialize(serialized);
+		assertEquals(execution, deserialize);
+		assertNotNull(deserialize.createStepExecution("foo"));
 	}
 }
