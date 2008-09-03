@@ -1,18 +1,18 @@
 package org.springframework.batch.item.database;
 
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.batch.item.sample.Foo;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
-import java.util.Collections;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 
-@SuppressWarnings("unchecked")
+import org.junit.runner.RunWith;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
+import org.springframework.batch.item.sample.Foo;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/item/database/JdbcPagingItemReaderParameterTests-context.xml")
 public class JdbcPagingItemReaderClassicParameterTests extends AbstractPagingItemReaderParameterTests {

@@ -11,7 +11,7 @@ import org.junit.internal.runners.JUnit4ClassRunner;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "deprecation"})
 @RunWith(JUnit4ClassRunner.class)
 public class IbatisItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 

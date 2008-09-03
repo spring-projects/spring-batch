@@ -17,12 +17,12 @@ package org.springframework.batch.item.database;
 
 import java.util.Map;
 
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyCollector;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.junit.runner.RunWith;
 
 /**
  * @author Lucas Ward
@@ -30,6 +30,7 @@ import org.junit.runner.RunWith;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "data-source-context.xml")
+@SuppressWarnings("deprecation")
 public class MultipleColumnJdbcDrivingQueryItemReaderIntegrationTests extends
 		AbstractJdbcItemReaderIntegrationTests {
 

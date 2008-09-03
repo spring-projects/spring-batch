@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "data-source-context.xml")
+@SuppressWarnings("deprecation")
 public class SingleColumnJdbcDrivingQueryItemReaderIntegrationTests extends AbstractJdbcItemReaderIntegrationTests {
 
 	protected ItemReader<Long> source;

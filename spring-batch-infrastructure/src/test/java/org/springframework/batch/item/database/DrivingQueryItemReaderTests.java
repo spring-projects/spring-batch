@@ -12,6 +12,7 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+@SuppressWarnings("deprecation")
 public class DrivingQueryItemReaderTests extends TestCase {
 
 	DrivingQueryItemReader<Foo> itemReader;

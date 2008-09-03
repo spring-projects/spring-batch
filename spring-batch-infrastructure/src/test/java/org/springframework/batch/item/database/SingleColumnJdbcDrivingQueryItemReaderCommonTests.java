@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.junit.internal.runners.JUnit4ClassRunner;
 
 @RunWith(JUnit4ClassRunner.class)
+@SuppressWarnings("deprecation")
 public class SingleColumnJdbcDrivingQueryItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {

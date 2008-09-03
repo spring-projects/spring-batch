@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 
-@SuppressWarnings("unchecked")
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
 public class JpaPagingItemReaderParameterTests extends AbstractPagingItemReaderParameterTests {

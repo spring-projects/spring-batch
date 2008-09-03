@@ -9,6 +9,7 @@ import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
+@SuppressWarnings("deprecation")
 class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, InitializingBean {
 
 	DrivingQueryItemReader<?> itemReader;

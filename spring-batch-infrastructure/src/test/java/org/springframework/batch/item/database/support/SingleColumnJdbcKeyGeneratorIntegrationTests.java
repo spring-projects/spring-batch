@@ -24,6 +24,7 @@ import javax.sql.DataSource;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/item/database/data-source-context.xml")
+@SuppressWarnings("deprecation")
 public class SingleColumnJdbcKeyGeneratorIntegrationTests {
 
 	SingleColumnJdbcKeyCollector<Long> keyStrategy;

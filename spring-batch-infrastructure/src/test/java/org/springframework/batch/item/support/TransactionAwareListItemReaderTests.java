@@ -34,7 +34,6 @@ public class TransactionAwareListItemReaderTests extends TestCase {
 
 	private ListItemReader<String> reader;
 
-	@SuppressWarnings("unchecked")
 	protected void setUp() throws Exception {
 		super.setUp();
 		reader = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(Arrays.asList("a", "b", "c")));
