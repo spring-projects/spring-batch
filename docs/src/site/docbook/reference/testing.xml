@@ -30,7 +30,7 @@
     reader = new BufferedReader(new FileReader(fileLocator.getFile()));
     String line;
     while ((line = reader.readLine()) != null) {
-      assertEquals (LINE_LENGTH, line.length());
+      assertEquals(LINE_LENGTH, line.length());
     }
   }
 
@@ -87,7 +87,7 @@
     <para>Because most unit testing of complete batch jobs will take place in
     the development environment (i.e. eclipse) it's important to be able to
     launch these tests in the same way you would launch any unit test. In the
-    following examples JUnit 3.8 will be used, but any testing framework could
+    following examples JUnit 4 will be used, but any testing framework could
     be substituted. The Spring Batch samples contain many 'sample jobs' that
     are unit tested using this technique. The most important step is being
     able to launch the job within a unit test. This requires the use of the
@@ -98,42 +98,36 @@
     following abstract class from Spring Batch Samples illustrates
     this:</para>
 
-    <programlisting>  public abstract class AbstractBatchLauncherTests extends
-                        AbstractDependencyInjectionSpringContextTests {
+    <programlisting>  public abstract class AbstractBatchLauncherTests implements ApplicationContextAware {
 
     JobLauncher launcher;
     private Job job;
     private JobParameters jobParameters = new JobParameters();
 
-    public AbstractBatchLauncherTests() {
-      setDependencyCheck(false);
-    }
-
-    /*
-    * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
-    */ 
-    protected String[] getConfigLocations() {
-      return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), 
-                            ClassUtils.getShortName(getClass()) + "-context.xml") };
-    }
-
+    @Test
     public void testLaunchJob() throws Exception {
       launcher.run(job, jobParameters);
     }
 
+    @Autowired
     public void setLauncher(JobLauncher bootstrap) {
       this.launcher = bootstrap;
     }
 
+    @Autowired
     public void setJob(Job job) {
       this.job = job;
     }
-}</programlisting>
+}
+</programlisting>
 
-    <para>The Spring Test class
-    <classname>AbstractDependencyInjectionSpringContextTests</classname> is
-    extended to allow for context loading, autowiring, etc. Only two classes
-    are needed: The Job to be run, and the JobLauncher to run it. Empty
+	<note>
+		<para>Few additional convenience properties are left out from the real class definition for clarity.</para>
+	</note>
+
+    <para>Only two classes
+    are needed: The Job to be run, and the JobLauncher to run it. These properties
+    are declared to be autowired from the job's application context . Empty
     <classname>JobParameters</classname> are used in the example above.
     However, if the job requires specific parameters they could be coded in
     subclasses with an abstract method, or using a factory bean in the
@@ -147,8 +141,10 @@
     chapter, this class is extended further to allow for separate validation
     before and after the job is run:</para>
 
-    <programlisting>  public abstract class AbstractValidatingBatchLauncherTests extends AbstractBatchLauncherTests {
+    <programlisting>  
+  public abstract class AbstractValidatingBatchLauncherTests extends AbstractBatchLauncherTests {
 
+    @Test
     public void testLaunchJob() throws Exception {
       validatePreConditions();
       super.testLaunchJob();
@@ -175,5 +171,18 @@
     noted that it's not required), and then after the job completes
     successfully, <methodname>validatePostConidtions</methodname> is
     called.</para>
+    
+    <para>Finally to create an executable test the abstract superclass needs to be subclassed.
+    Spring-specific annotations ensure the appropriate application context is loaded and 
+    required properties are injected before executing the test. In this case the XML file name
+    is derived from the class name, so <filename>FixedLengthImportJobFunctionalTests-context.xml</filename> 
+    (see the "Testing" chapter of Spring reference documentation for more details)</para>
+    
+<programlisting>
+	@RunWith(SpringJUnit4ClassRunner.class)
+	@ContextConfiguration()
+	public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatchLauncherTests {...}
+</programlisting>
+	<para></para>
   </section>
 </chapter>
