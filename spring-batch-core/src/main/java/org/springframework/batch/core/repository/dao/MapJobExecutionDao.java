@@ -1,6 +1,8 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,20 @@ public class MapJobExecutionDao implements JobExecutionDao {
 				executions.add(exec);
 			}
 		}
+		Collections.sort(executions, new Comparator<JobExecution>() {
+
+			public int compare(JobExecution e1, JobExecution e2) {
+				long result = (e1.getId() - e2.getId());
+				if (result > 0) {
+					return 1;
+				} else if (result < 0) {
+					return -1;
+				} else {
+					return 0;
+				}
+			}
+			
+		});
 		return executions;
 	}
 

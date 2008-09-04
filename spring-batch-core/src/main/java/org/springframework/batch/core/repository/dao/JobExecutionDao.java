@@ -35,15 +35,14 @@ public interface JobExecutionDao {
 	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Return all {@link JobExecution} for given {@link JobInstance}.
-	 * 
-	 * @param jobInstance
-	 * @return list of jobExecutions.
+	 * Return all {@link JobExecution} for given {@link JobInstance}, sorted
+	 * backwards by creation order (so the first element is the most recent).
 	 */
 	List<JobExecution> findJobExecutions(JobInstance jobInstance);
 
 	/**
-	 * Find the last {@link JobExecution} to have been created for a given {@link JobInstance}.
+	 * Find the last {@link JobExecution} to have been created for a given
+	 * {@link JobInstance}.
 	 * @param jobInstance the {@link JobInstance}
 	 * @return the last {@link JobExecution} to execute for this instance
 	 */
@@ -59,10 +58,11 @@ public interface JobExecutionDao {
 	 * @return the {@link JobExecution} for given identifier.
 	 */
 	JobExecution getJobExecution(Long executionId);
-	
+
 	/**
-	 * Because it may be possible that the status of a JobExecution is updated while running,
-	 * the following method while synchronize only the status field.
+	 * Because it may be possible that the status of a JobExecution is updated
+	 * while running, the following method while synchronize only the status
+	 * field.
 	 * 
 	 * @param jobExecution to be updated.
 	 */

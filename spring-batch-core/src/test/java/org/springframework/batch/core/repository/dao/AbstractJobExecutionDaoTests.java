@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,12 +53,38 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 		execution.setStartTime(new Date(System.currentTimeMillis()));
 		execution.setLastUpdated(new Date(System.currentTimeMillis()));
+		execution.setExitStatus(ExitStatus.UNKNOWN);
+		execution.setEndTime(new Date(System.currentTimeMillis()));
 		dao.saveJobExecution(execution);
 
 		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
 		assertEquals(1, executions.size());
 		assertEquals(execution, executions.get(0));
 		assertExecutionsAreEqual(execution, executions.get(0));
+	}
+	
+	/**
+	 * Executions should be returned in the same order they were saved.
+	 */
+	@Transactional
+	@Test
+	public void testFindExecutionsOrdering() {
+		
+		List<JobExecution> execs = new ArrayList<JobExecution>();
+		
+		for (int i = 0; i < 10; i++) {
+			JobExecution exec = new JobExecution(jobInstance);
+			exec.setCreateTime(new Date(i));
+			execs.add(exec);
+			dao.saveJobExecution(exec);
+		}
+		
+		List<JobExecution> retrieved = dao.findJobExecutions(jobInstance);
+		
+		for (int i = 0; i < 10; i++) {
+			assertExecutionsAreEqual(execs.get(i), retrieved.get(i));
+		}
+		
 	}
 
 	/**
