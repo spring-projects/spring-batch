@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +65,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	}
 	
 	/**
-	 * Executions should be returned in the same order they were saved.
+	 * Executions should be returned in the reverse order they were saved.
 	 */
 	@Transactional
 	@Test
@@ -80,6 +81,8 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		}
 		
 		List<JobExecution> retrieved = dao.findJobExecutions(jobInstance);
+		Collections.reverse(retrieved);
+		
 		
 		for (int i = 0; i < 10; i++) {
 			assertExecutionsAreEqual(execs.get(i), retrieved.get(i));

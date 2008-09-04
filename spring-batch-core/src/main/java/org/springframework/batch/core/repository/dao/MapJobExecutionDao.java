@@ -46,9 +46,9 @@ public class MapJobExecutionDao implements JobExecutionDao {
 			public int compare(JobExecution e1, JobExecution e2) {
 				long result = (e1.getId() - e2.getId());
 				if (result > 0) {
-					return 1;
-				} else if (result < 0) {
 					return -1;
+				} else if (result < 0) {
+					return 1;
 				} else {
 					return 0;
 				}
