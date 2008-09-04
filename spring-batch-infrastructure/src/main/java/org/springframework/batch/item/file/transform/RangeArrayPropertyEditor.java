@@ -110,7 +110,7 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		for (int i = 0; i < c.length - 1; i++) {
 			if (!c[i].hasMaxValue()) {
 				//set max value to (min value - 1) of the next range
-				c[i] = new Range(c[i].getMin(),c[i+1].getMin() - 1);
+				c[i].setMax(c[i+1].getMin() - 1);
 			}
 		}
 		

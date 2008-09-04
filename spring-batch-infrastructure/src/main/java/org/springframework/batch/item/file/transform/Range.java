@@ -14,11 +14,13 @@ public class Range {
 
 	public final static int UPPER_BORDER_NOT_DEFINED = Integer.MAX_VALUE;
 	
-	final private int min;	
-	final private int max;
+	private int min;	
+	private int max;
 	
 	public Range(int min) {
-		this(min,UPPER_BORDER_NOT_DEFINED);		
+		checkMinMaxValues(min, UPPER_BORDER_NOT_DEFINED);
+		this.min = min;
+		this.max = UPPER_BORDER_NOT_DEFINED;		
 	}
 	
 	public Range(int min, int max) {
@@ -35,6 +37,16 @@ public class Range {
 		return min;
 	}
 
+	public void setMax(int max) {
+		checkMinMaxValues(this.min, max);
+		this.max = max;
+	}
+
+	public void setMin(int min) {
+		checkMinMaxValues(min, this.max);
+		this.min = min;
+	}
+	
 	public boolean hasMaxValue() {
 		return max != UPPER_BORDER_NOT_DEFINED;
 	}
