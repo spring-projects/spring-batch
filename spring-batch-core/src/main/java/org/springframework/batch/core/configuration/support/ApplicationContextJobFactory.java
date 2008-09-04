@@ -36,20 +36,20 @@ public class ApplicationContextJobFactory implements JobFactory {
 	final private String jobName;
 
 	final private ApplicationContextFactory applicationContextFactory;
-	
+
 	/**
-	 * @param jobName the id of the {@link Job} in the application context to
-	 * be created
+	 * @param jobName the id of the {@link Job} in the application context to be
+	 * created
 	 */
 	public ApplicationContextJobFactory(ApplicationContextFactory applicationContextFactory, String jobName) {
 		super();
 		this.jobName = jobName;
 		this.applicationContextFactory = applicationContextFactory;
 	}
-	
+
 	/**
-	 * Create a {@link ClassPathXmlApplicationContext} from the path provided
-	 * and pull out a bean with the name given during initialization.
+	 * Create an {@link ApplicationContext} from the factory provided and pull
+	 * out a bean with the name given during initialization.
 	 * 
 	 * @see org.springframework.batch.core.configuration.JobFactory#createJob()
 	 */
