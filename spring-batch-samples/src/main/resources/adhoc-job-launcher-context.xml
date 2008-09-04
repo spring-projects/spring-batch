@@ -30,6 +30,7 @@
 			</bean>
 		</property>
 	</bean>
+	 
 	<bean id="notificationPublisher" class="org.springframework.batch.sample.jmx.JobExecutionNotificationPublisher" />
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
 	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">

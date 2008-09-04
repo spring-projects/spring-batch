@@ -13,17 +13,32 @@
 		class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
+	
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:databaseType="${environment}" p:dataSource-ref="dataSource"
 		p:transactionManager-ref="transactionManager" />
+	
 	<bean id="mapJobRepository"
 		class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean"
 		lazy-init="true" autowire-candidate="false" />
+		
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator"
+	p:jobLauncher-ref="jobLauncher" p:jobExplorer-ref="jobExplorer" p:jobRepository-ref="jobRepository" 
+	p:jobRegistry-ref="jobRegistry" />
+		
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" 
+		p:databaseType="${environment}" p:dataSource-ref="dataSource" />
+		
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+	
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
+	
 	<bean id="logAdvice" class="org.springframework.batch.sample.common.LogAdvice" />
+	
 	<bean id="eventAdvice"
 		class="org.springframework.batch.sample.jmx.StepExecutionApplicationEventAdvice" />
+	
 </beans>

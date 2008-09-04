@@ -25,6 +25,8 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -41,6 +43,13 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration()
 public class DatabaseShutdownFunctionalTests extends AbstractBatchLauncherTests {
 	
+	private JobOperator jobOperator;
+	
+	@Autowired
+	public void setJobOperator(JobOperator jobOperator) {
+		this.jobOperator = jobOperator;
+	}
+	
 	@Transactional @Test
 	public void testLaunchJob() throws Exception {
 
@@ -53,10 +62,7 @@ public class DatabaseShutdownFunctionalTests extends AbstractBatchLauncherTests 
 		assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
 		assertTrue(jobExecution.isRunning());
 
-		//jobExecution.stop();
-		JdbcTemplate jdbcTemplate = (JdbcTemplate)applicationContext.getBean("jdbcTemplate");
-		jdbcTemplate.update("UPDATE BATCH_JOB_EXECUTION set STATUS = ?", new Object[]{BatchStatus.STOPPING.toString()});
-		
+		jobOperator.stop(jobExecution.getId());
 		
 		int count = 0;
 		while(jobExecution.isRunning() && count <= 10){
