@@ -21,7 +21,8 @@ import java.util.List;
 
 /**
  * Tokenizer used to process data obtained from files with fixed-length format.
- * Columns are specified by array of Range objects ({@link #setColumns(Range[])}).
+ * Columns are specified by array of Range objects ({@link #setColumns(Range[])}
+ * ).
  * 
  * @author tomas.slanina
  * @author peter.zozom
@@ -31,45 +32,70 @@ import java.util.List;
 public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 	private Range[] ranges;
-	private int maxRange;
+
+	private int maxRange = 0;
+
+	boolean open = false;
+
+	private boolean strict = true;
+
+	/**
+	 * Public setter for the strict flag. If true (the default) then lines must
+	 * be precisely the length specified by the columns. If false then shorter
+	 * lines will be tolerated and padded with empty columns, and longer strings
+	 * will simply be truncated.
+	 * 
+	 * @see #setColumns(Range[])
+	 * 
+	 * @param strict the strict to set
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
 
 	/**
 	 * Set the column ranges. Used in conjunction with the
 	 * {@link RangeArrayPropertyEditor} this property can be set in the form of
 	 * a String describing the range boundaries, e.g. "1,4,7" or "1-3,4-6,7" or
-	 * "1-2,4-5,7-10".
+	 * "1-2,4-5,7-10". If the last range is open then the rest of the line is
+	 * read into that column (irrespective of the strict flag setting).
+	 * 
+	 * @see #setStrict(boolean)
 	 * 
 	 * @param ranges the column ranges expected in the input
 	 */
 	public void setColumns(Range[] ranges) {
 		this.ranges = ranges;
-		
 		calculateMaxRange(ranges);
 	}
-	
+
 	/*
-	 * Calculate the highest value within an array of ranges.  The ranges aren't
-	 * necessarily in order.  For example: "5-10, 1-4,11-15".  Furthermore, there
+	 * Calculate the highest value within an array of ranges. The ranges aren't
+	 * necessarily in order. For example: "5-10, 1-4,11-15". Furthermore, there
 	 * isn't always a min and max, such as: "1,4-20, 22"
 	 */
-	private void calculateMaxRange(Range[] ranges){
-		if(ranges == null || ranges.length == 0){
+	private void calculateMaxRange(Range[] ranges) {
+		if (ranges == null || ranges.length == 0) {
 			maxRange = 0;
 			return;
 		}
-		
+
+		open = false;
 		maxRange = ranges[0].getMin();
-		
-		for(int i = 0; i < ranges.length; i++){
+
+		for (int i = 0; i < ranges.length; i++) {
 			int upperBound;
-			if(ranges[i].hasMaxValue()){
+			if (ranges[i].hasMaxValue()) {
 				upperBound = ranges[i].getMax();
 			}
-			else{
+			else {
 				upperBound = ranges[i].getMin();
+				if (upperBound > maxRange) {
+					open = true;
+				}
 			}
-			
-			if(upperBound > maxRange){
+
+			if (upperBound > maxRange) {
 				maxRange = upperBound;
 			}
 		}
@@ -79,12 +105,11 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * Yields the tokens resulting from the splitting of the supplied
 	 * <code>line</code>.
 	 * 
-	 * @param line
-	 *            the line to be tokenised (can be <code>null</code>)
+	 * @param line the line to be tokenised (can be <code>null</code>)
 	 * 
 	 * @return the resulting tokens (empty if the line is null)
-	 * @throws IncorrectLineLengthException if line length is greater than
-	 * or less than the max range set.
+	 * @throws IncorrectLineLengthException if line length is greater than or
+	 * less than the max range set.
 	 */
 	protected List<String> doTokenize(String line) {
 		List<String> tokens = new ArrayList<String>(ranges.length);
@@ -92,10 +117,13 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 		String token;
 
 		lineLength = line.length();
-		
-		if(lineLength > maxRange || lineLength < maxRange){
-			//line is longer than max range, throw exception
-			throw new IncorrectLineLengthException(maxRange, lineLength);
+
+		if (lineLength < maxRange && strict) {
+			throw new IncorrectLineLengthException("Line is shorter than max range " + maxRange, maxRange, lineLength);
+		}
+
+		if (!open && lineLength > maxRange && strict) {
+			throw new IncorrectLineLengthException("Line is longer than max range " + maxRange, maxRange, lineLength);
 		}
 
 		for (int i = 0; i < ranges.length; i++) {
@@ -105,9 +133,11 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 
 			if (lineLength >= endPos) {
 				token = line.substring(startPos, endPos);
-			} else if (lineLength >= startPos) {
+			}
+			else if (lineLength >= startPos) {
 				token = line.substring(startPos);
-			} else {
+			}
+			else {
 				token = "";
 			}
 
