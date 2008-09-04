@@ -66,6 +66,21 @@ public class FixedLengthTokenizerTests extends TestCase {
 		assertEquals("", tokens.readString(1));
 	}
 
+	public void testTokenizeSmallerStringThanRangesNotStrict() {
+		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
+		tokenizer.setStrict(false);
+		FieldSet tokens = tokenizer.tokenize("12345");
+		assertEquals("12345", tokens.readString(0));
+		assertEquals("", tokens.readString(1));
+	}
+
+	public void testTokenizeSmallerStringThanRangesWithWhitespaceOpenEnded() {
+		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6) });
+		FieldSet tokens = tokenizer.tokenize("12345     ");
+		assertEquals("12345", tokens.readString(0));
+		assertEquals("", tokens.readString(1));
+	}
+	
 	public void testTokenizeNullString() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10),
 				new Range(11, 15) });
@@ -111,6 +126,25 @@ public class FixedLengthTokenizerTests extends TestCase {
 			assertEquals(30, ex.getExpectedLength());
 			assertEquals(35, ex.getActualLength());
 		}
+	}
+
+	public void testLongerLinesOpenRange() throws Exception {
+		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26) });
+		line = "H1        12345678       1234567890";
+		FieldSet tokens = tokenizer.tokenize(line);
+		assertEquals(line.substring(0, 10).trim(), tokens.readString(0));
+		assertEquals(line.substring(10, 25).trim(), tokens.readString(1));
+		assertEquals(line.substring(25).trim(), tokens.readString(2));
+	}
+
+	public void testLongerLinesNotStrict() throws Exception {
+		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26,30) });
+		line = "H1        12345678       1234567890";
+		tokenizer.setStrict(false);
+		FieldSet tokens = tokenizer.tokenize(line);
+		assertEquals(line.substring(0, 10).trim(), tokens.readString(0));
+		assertEquals(line.substring(10, 25).trim(), tokens.readString(1));
+		assertEquals(line.substring(25, 30).trim(), tokens.readString(2));
 	}
 
 	public void testNonAdjacentRangesUnsorted() throws Exception {
