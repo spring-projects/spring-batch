@@ -1,6 +1,9 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.io.Serializable;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,6 +16,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatementCallback;
@@ -175,7 +179,7 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 					ps.setString(2, null);
 					ps.setDouble(3, 0.0);
 					ps.setLong(4, 0);
-					lobCreator.setBlobAsBytes(ps, 5, SerializationUtils.serialize((Serializable) value));
+					setBlob(lobCreator, ps, 5, value);
 				}
 			}
 		};
@@ -229,11 +233,22 @@ class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 					ps.setString(5, null);
 					ps.setDouble(6, 0.0);
 					ps.setLong(7, 0);
-					lobCreator.setBlobAsBytes(ps, 8, SerializationUtils.serialize((Serializable) value));
+					setBlob(lobCreator, ps, 8, value);
 				}
 			}
 		};
 		getJdbcTemplate().execute(getQuery(INSERT_STEP_EXECUTION_CONTEXT), callback);
+	}
+
+	/**
+	 * Code used to set BLOB values.  Uses a binary stream since that seems to be the most
+	 * compatibile option across database platforms.
+	 *
+	 * @throws SQLException
+	 */
+	private void setBlob(LobCreator lobCreator, PreparedStatement ps, int index, Object value) throws SQLException {
+		byte[] b = SerializationUtils.serialize((Serializable) value);
+		lobCreator.setBlobAsBinaryStream( ps, index, new ByteArrayInputStream(b), b.length);
 	}
 
 	public void setLobHandler(LobHandler lobHandler) {
