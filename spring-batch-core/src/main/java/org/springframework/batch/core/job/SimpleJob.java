@@ -83,7 +83,7 @@ public class SimpleJob extends AbstractJob {
 					updateStatus(execution, BatchStatus.STARTED);
 					currentStepExecution = execution.createStepExecution(step.getName());
 
-					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step);
+					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step.getName());
 
 					boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
 							BatchStatus.COMPLETED)) ? true : false;
@@ -155,7 +155,7 @@ public class SimpleJob extends AbstractJob {
 
 		BatchStatus stepStatus;
 		// if the last execution is null, the step has never been executed.
-		StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step);
+		StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step.getName());
 		if (lastStepExecution == null) {
 			stepStatus = BatchStatus.STARTING;
 		}
@@ -175,7 +175,7 @@ public class SimpleJob extends AbstractJob {
 			return false;
 		}
 
-		if (getJobRepository().getStepExecutionCount(jobInstance, step) < step.getStartLimit()) {
+		if (getJobRepository().getStepExecutionCount(jobInstance, step.getName()) < step.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;
 		}

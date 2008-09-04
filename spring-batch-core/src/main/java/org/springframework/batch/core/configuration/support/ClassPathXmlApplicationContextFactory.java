@@ -12,16 +12,16 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 
 	private ConfigurableApplicationContext parent;
 
-	private Resource[] path;
+	private Resource path;
 
 	/**
 	 * Setter for the path to the xml to load to create an
-	 * {@link ApplicationContext}. Can include wild cards as per the usual
-	 * Spring resource resolution.
+	 * {@link ApplicationContext}. Use imports to centralise the configuration in
+	 * one file.
 	 * 
 	 * @param path the resource path to the xml to load for the child context.
 	 */
-	public void setPath(Resource[] path) {
+	public void setPath(Resource path) {
 		this.path = path;
 	}
 
@@ -41,7 +41,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 	 * @see ApplicationContextFactory#createApplicationContext()
 	 */
 	public ConfigurableApplicationContext createApplicationContext() {
-		if (path==null) {
+		if (path == null) {
 			return parent;
 		}
 		return new ResourceXmlApplicationContext(parent);
@@ -49,7 +49,7 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 
 	/**
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	private final class ResourceXmlApplicationContext extends AbstractXmlApplicationContext {
 		/**
@@ -61,9 +61,8 @@ public class ClassPathXmlApplicationContextFactory implements ApplicationContext
 		}
 
 		protected Resource[] getConfigResources() {
-			return path;
+			return new Resource[] {path};
 		}
 	}
-
 
 }

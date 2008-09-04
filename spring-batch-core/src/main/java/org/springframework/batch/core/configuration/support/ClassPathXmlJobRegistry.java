@@ -48,7 +48,7 @@ public class ClassPathXmlJobRegistry implements ListableJobRegistry, Application
 		jobRegistry = new MapJobRegistry();
 		for(Resource resource:jobPaths){
 			ClassPathXmlApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
-			applicationContextFactory.setPath(new Resource[]{resource});
+			applicationContextFactory.setPath(resource);
 			applicationContextFactory.setApplicationContext(parent);
 			ApplicationContext context = applicationContextFactory.createApplicationContext();
 			String[] names = context.getBeanNamesForType(Job.class);

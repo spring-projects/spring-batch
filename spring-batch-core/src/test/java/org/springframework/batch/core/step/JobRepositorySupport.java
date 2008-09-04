@@ -19,7 +19,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 
@@ -48,11 +47,11 @@ public class JobRepositorySupport implements JobRepository {
 	public void update(JobInstance job) {
 	}
 
-	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
 	}
 
-	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
+	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		return 0;
 	}
 

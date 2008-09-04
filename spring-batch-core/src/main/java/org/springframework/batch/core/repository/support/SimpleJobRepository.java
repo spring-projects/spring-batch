@@ -25,7 +25,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -270,11 +269,11 @@ public class SimpleJobRepository implements JobRepository {
 	/**
 	 * @return the last execution of the step within given job instance
 	 */
-	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
 		for (JobExecution jobExecution : jobExecutions) {
-			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, step.getName());
+			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, stepName);
 			if (stepExecution != null) {
 				stepExecutions.add(stepExecution);
 			}
@@ -298,11 +297,11 @@ public class SimpleJobRepository implements JobRepository {
 	/**
 	 * @return number of executions of the step within given job instance
 	 */
-	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
+	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		int count = 0;
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		for (JobExecution jobExecution : jobExecutions) {
-			if (stepExecutionDao.getStepExecution(jobExecution, step.getName()) != null) {
+			if (stepExecutionDao.getStepExecution(jobExecution, stepName) != null) {
 				count++;
 			}
 		}

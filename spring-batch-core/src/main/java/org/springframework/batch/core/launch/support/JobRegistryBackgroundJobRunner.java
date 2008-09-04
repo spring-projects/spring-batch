@@ -122,7 +122,7 @@ public class JobRegistryBackgroundJobRunner {
 				for (int k = 0; k < names.length; k++) {
 					ClassPathXmlApplicationContextFactory factory = new ClassPathXmlApplicationContextFactory();
 					factory.setApplicationContext(parentContext);
-					factory.setPath(new Resource[] { path });
+					factory.setPath(path);
 					logger.info("Registering Job definition: " + names[k]);
 					registry.register(new ApplicationContextJobFactory(factory, names[k]));
 				}

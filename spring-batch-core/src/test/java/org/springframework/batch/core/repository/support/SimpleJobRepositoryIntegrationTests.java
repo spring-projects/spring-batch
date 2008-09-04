@@ -123,8 +123,8 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobRepository.update(firstJobExec);
 		jobRepository.add(firstStepExec);
 
-		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step));
-		assertEquals(firstStepExec, jobRepository.getLastStepExecution(firstJobExec.getJobInstance(), step));
+		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step.getName()));
+		assertEquals(firstStepExec, jobRepository.getLastStepExecution(firstJobExec.getJobInstance(), step.getName()));
 
 		// first execution failed
 		firstJobExec.setStartTime(new Date(4));
@@ -142,8 +142,8 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobRepository.update(secondJobExec);
 		jobRepository.add(secondStepExec);
 
-		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step));
-		assertEquals(secondStepExec, jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step));
+		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step.getName()));
+		assertEquals(secondStepExec, jobRepository.getLastStepExecution(secondJobExec.getJobInstance(), step.getName()));
 	}
 
 	/*
@@ -166,7 +166,7 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobRepository.add(stepExec);
 		jobRepository.updateExecutionContext(stepExec);
 
-		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step);
+		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step.getName());
 		assertEquals(stepExec, retrievedStepExec);
 		assertEquals(ctx, retrievedStepExec.getExecutionContext());
 		

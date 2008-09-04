@@ -141,7 +141,7 @@ public class ChunkOrientedStepIntegrationTests {
 		catch (RuntimeException e) {
 
 			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
-			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step);
+			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
 			assertEquals(lastStepExecution, stepExecution);
 			assertFalse(lastStepExecution == stepExecution);
 

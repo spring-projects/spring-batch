@@ -32,16 +32,19 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of the {@link JobLauncher} interface. The Spring Core {@link TaskExecutor}
- * interface is used to launch a {@link Job}. This means that the type of executor set is very
- * important. If a {@link SyncTaskExecutor} is used, then the job will be processed <strong>within
- * the same thread that called the launcher.</strong> Care should be taken to ensure any users of
- * this class understand fully whether or not the implementation of TaskExecutor used will start
- * tasks synchronously or asynchronously. The default setting uses a synchronous task executor.
+ * Simple implementation of the {@link JobLauncher} interface. The Spring Core
+ * {@link TaskExecutor} interface is used to launch a {@link Job}. This means
+ * that the type of executor set is very important. If a
+ * {@link SyncTaskExecutor} is used, then the job will be processed
+ * <strong>within the same thread that called the launcher.</strong> Care should
+ * be taken to ensure any users of this class understand fully whether or not
+ * the implementation of TaskExecutor used will start tasks synchronously or
+ * asynchronously. The default setting uses a synchronous task executor.
  * 
- * There is only one required dependency of this Launcher, a {@link JobRepository}. The
- * JobRepository is used to obtain a valid JobExecution. The Repository must be used because the
- * provided {@link Job} could be a restart of an existing {@link JobInstance}, and only the
+ * There is only one required dependency of this Launcher, a
+ * {@link JobRepository}. The JobRepository is used to obtain a valid
+ * JobExecution. The Repository must be used because the provided {@link Job}
+ * could be a restart of an existing {@link JobInstance}, and only the
  * Repository can reliably recreate it.
  * 
  * @author Lucas Ward
@@ -58,20 +61,22 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	private TaskExecutor taskExecutor;
 
 	/**
-	 * Run the provided job with the given {@link JobParameters}. The {@link JobParameters} will be
-	 * used to determine if this is an execution of an existing job instance, or if a new one should
-	 * be created.
+	 * Run the provided job with the given {@link JobParameters}. The
+	 * {@link JobParameters} will be used to determine if this is an execution
+	 * of an existing job instance, or if a new one should be created.
 	 * 
 	 * @param job the job to be run.
-	 * @param jobParameters the {@link JobParameters} for this particular execution.
-	 * @return JobExecutionAlreadyRunningException if the JobInstance already exists and has an
-	 *         execution already running.
-	 * @throws JobRestartException if the execution would be a re-start, but a re-start is either
-	 *             not allowed or not needed.
-	 * @throws JobInstanceAlreadyCompleteException
+	 * @param jobParameters the {@link JobParameters} for this particular
+	 * execution.
+	 * @return JobExecutionAlreadyRunningException if the JobInstance already
+	 * exists and has an execution already running.
+	 * @throws JobRestartException if the execution would be a re-start, but a
+	 * re-start is either not allowed or not needed.
+	 * @throws JobInstanceAlreadyCompleteException if this instance has already
+	 * completed successfully
 	 */
 	public JobExecution run(final Job job, final JobParameters jobParameters)
-	        throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
@@ -85,8 +90,9 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
 					job.execute(jobExecution);
 					logger.info("Job: [" + job + "] completed successfully with the following parameters: ["
-					        + jobParameters + "]");
-				} catch (Throwable t) {
+							+ jobParameters + "]");
+				}
+				catch (Throwable t) {
 					logger.info("Job: [" + job + "] failed with the following parameters: [" + jobParameters + "]", t);
 					rethrow(t);
 				}
@@ -122,7 +128,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 	}
 
 	/**
-	 * Ensure the required dependencies of a {@link JobRepository} have been set.
+	 * Ensure the required dependencies of a {@link JobRepository} have been
+	 * set.
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.state(jobRepository != null, "A JobRepository has not been set.");

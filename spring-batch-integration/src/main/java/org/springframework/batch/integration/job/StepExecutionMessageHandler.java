@@ -72,7 +72,7 @@ public class StepExecutionMessageHandler {
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		try {
 
-			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
+			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
 
 			// Even if it completed successfully we want to pass on the output
 			// attributes, so set up the execution context here if it is
@@ -176,7 +176,7 @@ public class StepExecutionMessageHandler {
 			return false;
 		}
 
-		if (jobRepository.getStepExecutionCount(lastStepExecution.getJobExecution().getJobInstance(), step) < step
+		if (jobRepository.getStepExecutionCount(lastStepExecution.getJobExecution().getJobInstance(), step.getName()) < step
 				.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;

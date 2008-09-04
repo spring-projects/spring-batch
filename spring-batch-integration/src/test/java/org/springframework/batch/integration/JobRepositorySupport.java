@@ -19,7 +19,6 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
@@ -43,14 +42,14 @@ public class JobRepositorySupport implements JobRepository {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.JobRepository#getLastStepExecution(org.springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
 	 */
-	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
+	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.JobRepository#getStepExecutionCount(org.springframework.batch.core.JobInstance, org.springframework.batch.core.Step)
 	 */
-	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
+	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
 		return 0;
 	}
 
