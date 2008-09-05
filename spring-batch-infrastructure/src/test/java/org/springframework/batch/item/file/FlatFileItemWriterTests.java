@@ -203,11 +203,13 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testRestart() throws Exception {
 
+		writer.setFooterLines(new String[] { "footer" });
+
 		writer.open(executionContext);
 		// write some lines
 		writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
 		// write more lines
-		writer.write(Arrays.asList(new String[] {"testLine4", "testLine5"}));
+		writer.write(Arrays.asList(new String[] { "testLine4", "testLine5" }));
 		// get restart data
 		writer.update(executionContext);
 		// close template
@@ -216,7 +218,7 @@ public class FlatFileItemWriterTests {
 		// init with correct data
 		writer.open(executionContext);
 		// write more lines
-		writer.write(Arrays.asList(new String[] {"testLine6","testLine7","testLine8"}));
+		writer.write(Arrays.asList(new String[] { "testLine6", "testLine7", "testLine8" }));
 		// get statistics
 		writer.update(executionContext);
 		// close template
@@ -226,6 +228,8 @@ public class FlatFileItemWriterTests {
 		for (int i = 1; i <= 8; i++) {
 			assertEquals("testLine" + i, readLine());
 		}
+		
+		assertEquals("footer", readLine());
 
 		// 3 lines were written to the file after restart
 		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
@@ -301,6 +305,17 @@ public class FlatFileItemWriterTests {
 		String lineFromFile = readLine();
 
 		assertEquals(TEST_STRING, lineFromFile);
+	}
+
+	@Test
+	public void testWriteFooter() throws Exception {
+		writer.setFooterLines(new String[] { "a", "b" });
+		writer.open(executionContext);
+		writer.write(Collections.singletonList(TEST_STRING));
+		writer.close(executionContext);
+		assertEquals(TEST_STRING, readLine());
+		assertEquals("a", readLine());
+		assertEquals("b", readLine());
 	}
 
 	@Test

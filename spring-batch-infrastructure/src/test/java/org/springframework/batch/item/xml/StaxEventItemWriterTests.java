@@ -95,8 +95,9 @@ public class StaxEventItemWriterTests {
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = outputFileContent();
-
+		System.out.println(outputFile);
 		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
+		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
 	}
 
 	/**
@@ -106,7 +107,12 @@ public class StaxEventItemWriterTests {
 	public void testWriteWithHeader() throws Exception {
 		final Object header1 = new Object();
 		final Object header2 = new Object();
-		writer.setHeaderItems(new ArrayList<Object>() {{add(header1); add(header2); }});
+		writer.setHeaderItems(new ArrayList<Object>() {
+			{
+				add(header1);
+				add(header2);
+			}
+		});
 		writer.open(executionContext);
 		writer.write(items);
 		String content = outputFileContent();

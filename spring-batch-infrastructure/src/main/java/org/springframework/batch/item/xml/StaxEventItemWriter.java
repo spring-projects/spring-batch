@@ -110,7 +110,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	private boolean saveState = true;
 
-	private List<?> headers = new ArrayList<Object>();
+	private List<?> headerItems = new ArrayList<Object>();
+
+	private List<?> footerItems = new ArrayList<Object>();
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -218,14 +220,25 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
-	 * Setter for the headers. This list will be marshalled and output before
-	 * any calls to {@link #write(List)}. Header item type is not restricted,
-	 * but note the {@link #setMarshaller(Marshaller)} needs to support
-	 * the type.
-	 * @param headers
+	 * Setter for the headerItems. This list will be marshalled and output
+	 * before any calls to {@link #write(List)}. Header item type is not
+	 * restricted, but note the {@link #setMarshaller(Marshaller)} needs to
+	 * support the type.
+	 * @param headerItems
 	 */
-	public void setHeaderItems(List<?> headers) {
-		this.headers = headers;
+	public void setHeaderItems(List<?> headerItems) {
+		this.headerItems = headerItems;
+	}
+
+	/**
+	 * Setter for the footerItems. This list will be marshalled and output
+	 * immediately before the writer is closed. Footer item type is not
+	 * restricted, but note the {@link #setMarshaller(Marshaller)} needs to
+	 * support the type.
+	 * @param footerItems
+	 */
+	public void setFooterItems(List<?> footerItems) {
+		this.footerItems = footerItems;
 	}
 
 	public void setSaveState(boolean saveState) {
@@ -262,10 +275,10 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		if (startAtPosition == 0) {
 			try {
-				doWrite(headers);
+				doWrite(headerItems);
 			}
 			catch (IOException e) {
-				throw new ItemStreamException("Failed to write headers", e);
+				throw new ItemStreamException("Failed to write headerItems", e);
 			}
 		}
 
@@ -383,16 +396,33 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		}
 
 		try {
+			doWrite(footerItems);
 			delegateEventWriter.flush();
 			endDocument(delegateEventWriter);
-			eventWriter.close();
-			channel.close();
 		}
-		catch (XMLStreamException xse) {
-			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", xse);
+		catch (IOException e) {
+			throw new ItemStreamException("Failed to write footer items", e);
 		}
-		catch (IOException ioe) {
-			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
+		catch (XMLStreamException e) {
+			throw new ItemStreamException("Failed to write end document tag", e);
+		}
+		finally {
+
+			try {
+				eventWriter.close();
+			}
+			catch (XMLStreamException xse) {
+				log.error("Unable to close file resource: [" + resource + "] " + xse);
+			}
+			finally {
+				try {
+					channel.close();
+				}
+				catch (IOException ioe) {
+					log.error("Unable to close file resource: [" + resource + "] " + ioe);
+				}
+
+			}
 		}
 	}
 

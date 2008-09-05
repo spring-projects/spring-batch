@@ -80,6 +80,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private List<String> headerLines = new ArrayList<String>();
 
+	private List<String> footerLines = new ArrayList<String>();
+
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
 
 	public FlatFileItemWriter() {
@@ -161,6 +163,16 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	/**
+	 * Public setter for footer lines. These will be output at the end of the
+	 * file when the writer is closed.
+	 * 
+	 * @param footerLines the footer lines to set
+	 */
+	public void setFooterLines(String[] footerLines) {
+		this.footerLines = Arrays.asList(footerLines);
+	}
+
+	/**
 	 * Writes out a string followed by a "new line", where the format of the new
 	 * line separator is determined by the underlying operating system. If the
 	 * input is not a String and a converter is available the converter will be
@@ -190,7 +202,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				throw new FlushFailedException("Could not write data.  The file may be corrupt.", e);
 			}
 		}
-
 	}
 
 	/**
@@ -198,8 +209,18 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 */
 	public void close(ExecutionContext executionContext) {
 		if (state != null) {
-			getOutputState().close();
-			state = null;
+			try {
+				for (String line : footerLines) {
+					state.write(line + lineSeparator);
+				}
+			}
+			catch (IOException e) {
+				throw new ItemStreamException("Failed to writer footer before closing", e);
+			}
+			finally {
+				getOutputState().close();
+				state = null;
+			}
 		}
 	}
 
@@ -352,6 +373,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		 * Close the open resource and reset counters.
 		 */
 		public void close() {
+
 			initialized = false;
 			restarted = false;
 			try {
