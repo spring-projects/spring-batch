@@ -82,6 +82,13 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	/**
+	 * @see JobRepository#isJobInstanceExists(String, JobParameters)
+	 */
+	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
+		return jobInstanceDao.getJobInstance(jobName, jobParameters)!=null;
+	}
+	
+	/**
 	 * <p>
 	 * Create a {@link JobExecution} based on the passed in {@link Job} and
 	 * {@link JobParameters}. However, unique identification of a job can only

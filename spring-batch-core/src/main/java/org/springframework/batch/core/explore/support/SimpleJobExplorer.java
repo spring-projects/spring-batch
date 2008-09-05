@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -109,13 +108,6 @@ public class SimpleJobExplorer implements JobExplorer {
 		return jobInstanceDao.getLastJobInstances(jobName, count);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.explore.JobExplorer#isJobInstanceExists(java.lang.String, org.springframework.batch.core.JobParameters)
-	 */
-	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
-		return jobInstanceDao.getJobInstance(jobName, jobParameters)!=null;
-	}
-	
 	/*
 	 * Find all dependencies for a JobExecution, including JobInstance (which requires JobParameters)
 	 * plus StepExecutions

@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
 
 /**
  * @author Dave Syer
@@ -34,13 +33,6 @@ public interface JobExplorer {
 	 * @return the latest {@link JobInstance} values up to a maximum of count values
 	 */
 	List<JobInstance> getLastJobInstances(String jobName, int count);
-
-	/**
-	 * @param jobName the name of the job
-	 * @param jobParameters the parameters to match
-	 * @return true if a {@link JobInstance} already exists for this job name and job parameters
-	 */
-	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
 
 	/**
 	 * @param executionId

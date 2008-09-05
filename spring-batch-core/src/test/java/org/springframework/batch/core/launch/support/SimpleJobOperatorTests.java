@@ -165,20 +165,20 @@ public class SimpleJobOperatorTests {
 	@Test
 	public void testStartNewInstanceSunnyDay() throws Exception {
 		jobParameters = new JobParameters();
-		jobExplorer.isJobInstanceExists("foo", jobParameters);
+		jobRepository.isJobInstanceExists("foo", jobParameters);
 		EasyMock.expectLastCall().andReturn(false);
-		EasyMock.replay(jobExplorer);
+		EasyMock.replay(jobRepository);
 		Long value = jobOperator.start("foo", "a=b");
 		assertEquals(999, value.longValue());
-		EasyMock.verify(jobExplorer);
+		EasyMock.verify(jobRepository);
 	}
 
 	@Test
 	public void testStartNewInstanceAlreadyExists() throws Exception {
 		jobParameters = new JobParameters();
-		jobExplorer.isJobInstanceExists("foo", jobParameters);
+		jobRepository.isJobInstanceExists("foo", jobParameters);
 		EasyMock.expectLastCall().andReturn(true);
-		EasyMock.replay(jobExplorer);
+		EasyMock.replay(jobRepository);
 		try {
 			jobOperator.start("foo", "a=b");
 			fail("Expected JobInstanceAlreadyExistsException");
@@ -186,7 +186,7 @@ public class SimpleJobOperatorTests {
 		catch (JobInstanceAlreadyExistsException e) {
 			// expected
 		}
-		EasyMock.verify(jobExplorer);
+		EasyMock.verify(jobRepository);
 	}
 
 	@Test

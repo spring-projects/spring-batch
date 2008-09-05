@@ -283,7 +283,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		JobParameters jobParameters = jobParametersConverter.getJobParameters(PropertiesConverter
 				.stringToProperties(parameters));
 
-		if (jobExplorer.isJobInstanceExists(jobName, jobParameters)) {
+		if (jobRepository.isJobInstanceExists(jobName, jobParameters)) {
 			throw new JobInstanceAlreadyExistsException(String.format(
 					"Cannot start a job instance that already exists with name=%s and parameters=%s", jobName,
 					parameters));

@@ -33,9 +33,19 @@ import org.springframework.batch.item.ExecutionContext;
  * </p>
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  * 
  */
 public interface JobRepository {
+
+	/**
+	 * Check if an instance of this job already exists with the parameters provided.
+	 * 
+	 * @param jobName the name of the job
+	 * @param jobParameters the parameters to match
+	 * @return true if a {@link JobInstance} already exists for this job name and job parameters
+	 */
+	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
 
 	/**
 	 * Find or create a {@link JobExecution} for a given {@link Job} and

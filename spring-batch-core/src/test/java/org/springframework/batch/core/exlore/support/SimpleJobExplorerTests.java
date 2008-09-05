@@ -110,22 +110,4 @@ public class SimpleJobExplorerTests extends TestCase {
 		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
-	@Test
-	public void testIsJobInstanceFalse() throws Exception {
-		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		EasyMock.expectLastCall().andReturn(null);
-		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
-		assertFalse(jobExplorer.isJobInstanceExists("foo", new JobParameters()));
-		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
-	}
-
-	@Test
-	public void testIsJobInstanceTrue() throws Exception {
-		jobInstanceDao.getJobInstance("foo", new JobParameters());
-		EasyMock.expectLastCall().andReturn(jobInstance);
-		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
-		assertTrue(jobExplorer.isJobInstanceExists("foo", new JobParameters()));
-		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
-	}
-
 }

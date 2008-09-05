@@ -22,6 +22,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -66,7 +67,7 @@ public class SimpleJobRepositoryTests {
 	
 	ExecutionContextDao ecDao;
 
-	JobInstance databaseJob;
+	JobInstance jobInstance;
 
 	String databaseStep1;
 
@@ -102,7 +103,7 @@ public class SimpleJobRepositoryTests {
 
 		job.setSteps(stepConfigurations);
 
-		databaseJob = new JobInstance(new Long(1), jobParameters, job.getName());
+		jobInstance = new JobInstance(new Long(1), jobParameters, job.getName());
 
 		databaseStep1 = "dbStep1";
 		databaseStep2 = "dbStep2";
@@ -196,6 +197,24 @@ public class SimpleJobRepositoryTests {
 		
 		jobRepository.update(stepExecution);
 		assertTrue(stepExecution.isTerminateOnly());
+	}
+
+	@Test
+	public void testIsJobInstanceFalse() throws Exception {
+		jobInstanceDao.getJobInstance("foo", new JobParameters());
+		EasyMock.expectLastCall().andReturn(null);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		assertFalse(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+	}
+
+	@Test
+	public void testIsJobInstanceTrue() throws Exception {
+		jobInstanceDao.getJobInstance("foo", new JobParameters());
+		EasyMock.expectLastCall().andReturn(jobInstance);
+		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
+		assertTrue(jobRepository.isJobInstanceExists("foo", new JobParameters()));
+		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
 }
