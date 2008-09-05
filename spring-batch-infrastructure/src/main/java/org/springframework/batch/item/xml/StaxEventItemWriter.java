@@ -40,7 +40,7 @@ import org.springframework.xml.transform.StaxResult;
 
 /**
  * An implementation of {@link ItemWriter} which uses StAX and
- * {@link EventWriterSerializer} for serializing object to XML.
+ * {@link Marshaller} for serializing object to XML.
  * 
  * This item writer also provides restart, statistics and transaction features
  * by implementing corresponding interfaces.
