@@ -40,6 +40,7 @@
 				<property name="databaseType" value="${environment}" />
 			</bean>
 		</property>
+		<property name="jobRepository" ref="jobRepository" />
 		<property name="jobRegistry" ref="jobRegistry" />
 		<property name="jobLauncher">
 			<bean parent="jobLauncher">
