@@ -54,9 +54,8 @@ public interface JobRepository {
 	 * returned in a new {@link JobInstance}, associated with the
 	 * {@link JobExecution}. If no previous instance is found, the execution
 	 * will be associated with a new {@link JobInstance}
-	 * 
+	 * @param jobName TODO
 	 * @param jobParameters the runtime parameters for the job
-	 * @param job the job the execution should be associated with.
 	 * 
 	 * @return a valid job {@link JobExecution} for the arguments provided
 	 * @throws JobExecutionAlreadyRunningException if there is a
@@ -69,7 +68,7 @@ public interface JobRepository {
 	 * found and was already completed successfully.
 	 * 
 	 */
-	JobExecution createJobExecution(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+	JobExecution createJobExecution(String jobName, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 			JobRestartException, JobInstanceAlreadyCompleteException;
 
 	/**

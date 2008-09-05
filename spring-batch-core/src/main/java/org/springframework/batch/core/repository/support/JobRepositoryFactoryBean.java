@@ -83,7 +83,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	 * 
 	 * @param isolationLevelForCreate the isolation level name to set
 	 * 
-	 * @see SimpleJobRepository#createJobExecution(org.springframework.batch.core.Job,
+	 * @see SimpleJobRepository#createJobExecution(String,
 	 * org.springframework.batch.core.JobParameters)
 	 */
 	public void setIsolationLevelForCreate(String isolationLevelForCreate) {

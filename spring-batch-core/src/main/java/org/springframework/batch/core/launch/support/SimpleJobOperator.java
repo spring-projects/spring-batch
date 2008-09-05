@@ -85,7 +85,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jobLauncher, "JobLauncher must be provided");
 		Assert.notNull(jobRegistry, "JobLocator must be provided");
-		Assert.notNull(jobExplorer, "BatchMetaDataExplorer must be provided");
+		Assert.notNull(jobExplorer, "JobExplorer must be provided");
+		Assert.notNull(jobRepository, "JobRepository must be provided");
 	}
 
 	/**

@@ -176,7 +176,7 @@ public class FileToMessagesJobFactoryBeanTests {
 
 		Job job = (Job) factory.getObject();
 		JobParameters jobParameters = new JobParametersBuilder().addString(FILE_INPUT_PATH, "classpath:/log4j.properties").toJobParameters();
-		JobExecution jobExecution = jobRepository.createJobExecution(job, jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
 		job.execute(jobExecution);
 		assertNotNull(jobExecution);

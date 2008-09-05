@@ -123,7 +123,7 @@ public class SimpleJobTests extends TestCase {
 		job.setName("testJob");
 		job.setSteps(steps);
 
-		jobExecution = jobRepository.createJobExecution(job, jobParameters);
+		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobInstance = jobExecution.getJobInstance();
 
 		stepExecution1 = new StepExecution(step1.getName(), jobExecution);
@@ -403,7 +403,7 @@ public class SimpleJobTests extends TestCase {
 
 		assertFalse(jobExecution.getExecutionContext().isEmpty());
 
-		jobExecution = jobRepository.createJobExecution(job, jobParameters);
+		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
 		try {
 			job.execute(jobExecution);

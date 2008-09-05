@@ -124,7 +124,7 @@ public class ChunkOrientedStepIntegrationTests {
 					}
 				}, chunkOperations));
 
-		JobExecution jobExecution = jobRepository.createJobExecution(job, new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		stepExecution.setExecutionContext(new ExecutionContext() {

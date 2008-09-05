@@ -321,7 +321,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 			JobInstanceAlreadyCompleteException {
 		SimpleJob job = new SimpleJob();
 		job.setName("job");
-		JobExecution jobExecution = jobRepository.createJobExecution(job,
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(),
 				new JobParametersBuilder().addLong("job.counter", jobCounter++)
 						.toJobParameters());
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());

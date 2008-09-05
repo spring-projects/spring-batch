@@ -25,45 +25,46 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Functional test for graceful shutdown.  A batch container is started in a new thread,
- * then it's stopped using {@link JobExecution#stop()}.  
+ * Functional test for graceful shutdown. A batch container is started in a new
+ * thread, then it's stopped using {@link JobExecution#stop()}.
  * 
  * @author Lucas Ward
- *
+ * 
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
 public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests {
 
-	@Transactional @Test
+	@Test
 	public void testLaunchJob() throws Exception {
 
-		final JobParameters jobParameters = new JobParameters();
-		
+		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
+				.toJobParameters();
+
 		JobExecution jobExecution = getLauncher().run(getJob(), jobParameters);
-		
+
 		Thread.sleep(1000);
 
 		assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
 		assertTrue(jobExecution.isRunning());
 
 		jobExecution.stop();
-		
+
 		int count = 0;
-		while(jobExecution.isRunning() && count <= 10){
-			logger.info("Checking for end time in JobExecution: count="+count);
+		while (jobExecution.isRunning() && count <= 10) {
+			logger.info("Checking for end time in JobExecution: count=" + count);
 			Thread.sleep(100);
 			count++;
 		}
-		
+
 		assertFalse("Timed out waiting for job to end.", jobExecution.isRunning());
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 
 	}
-	
+
 }

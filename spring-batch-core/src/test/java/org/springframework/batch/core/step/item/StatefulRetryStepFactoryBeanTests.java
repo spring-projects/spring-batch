@@ -116,7 +116,7 @@ public class StatefulRetryStepFactoryBeanTests {
 		job.setRestartable(true);
 		JobParameters jobParameters = new JobParametersBuilder().addString("statefulTest", "make_this_unique")
 				.toJobParameters();
-		jobExecution = repository.createJobExecution(job, jobParameters);
+		jobExecution = repository.createJobExecution(job.getName(), jobParameters);
 		jobExecution.setEndTime(new Date());
 
 	}

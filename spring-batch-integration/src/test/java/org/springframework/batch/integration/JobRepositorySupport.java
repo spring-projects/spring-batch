@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.integration;
 
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -34,7 +33,7 @@ public class JobRepositorySupport implements JobRepository {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.repository.JobRepository#createJobExecution(org.springframework.batch.core.Job, org.springframework.batch.core.JobParameters)
 	 */
-	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
+	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 		return new JobExecution(new JobInstance(0L, jobParameters, job.getName()));
 	}

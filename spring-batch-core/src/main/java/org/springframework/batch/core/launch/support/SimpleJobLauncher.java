@@ -81,7 +81,17 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
-		final JobExecution jobExecution = jobRepository.createJobExecution(job, jobParameters);
+		boolean exists = jobRepository.isJobInstanceExists(job.getName(), jobParameters);
+		if (exists && !job.isRestartable()) {
+			throw new JobRestartException("JobInstance already exists and is not restartable");
+		}
+		/**
+		 * There is a very small probability that a non-restartable job can be
+		 * restarted, but only if another process or thread manages to launch
+		 * <i>and</i> fail a job execution for this instance between the last assertion
+		 * and the next method returning successfully.
+		 */
+		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
 		taskExecutor.execute(new Runnable() {
 

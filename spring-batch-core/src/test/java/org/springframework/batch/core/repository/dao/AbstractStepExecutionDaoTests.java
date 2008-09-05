@@ -32,7 +32,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -71,9 +70,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Before
 	public void onSetUp() throws Exception {
 		repository = getJobRepository();
-		
-		
-		jobExecution = repository.createJobExecution(new JobSupport("testJob"), new JobParameters());
+		jobExecution = repository.createJobExecution("job", new JobParameters());
 		jobInstance = jobExecution.getJobInstance();
 		step = new StepSupport("foo");
 		stepExecution = new StepExecution(step.getName(), jobExecution);

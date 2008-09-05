@@ -18,7 +18,6 @@ package org.springframework.batch.core.repository.support;
 import static junit.framework.Assert.*;
 import static org.easymock.EasyMock.*;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.dao.DataAccessException;
@@ -161,7 +160,7 @@ public class JobRepositoryFactoryBeanTests {
 		expect(transactionManager.getTransaction(transactionDefinition)).andReturn(null);
 		replay(transactionManager);
 		try {
-			repository.createJobExecution(new JobSupport("job"), new JobParameters());
+			repository.createJobExecution("foo", new JobParameters());
 			// we expect an exception from the txControl because we provided the
 			// wrong meta data
 			fail("Expected IllegalArgumentException");
@@ -188,7 +187,7 @@ public class JobRepositoryFactoryBeanTests {
 		replay(dataSource);
 		replay(transactionManager);
 		try {
-			repository.createJobExecution(new JobSupport("job"), new JobParameters());
+			repository.createJobExecution("foo", new JobParameters());
 			// we expect an exception but not from the txControl because we
 			// provided the correct meta data
 			fail("Expected IllegalArgumentException");
@@ -215,7 +214,7 @@ public class JobRepositoryFactoryBeanTests {
 		replay(dataSource);
 		replay(transactionManager);
 		try {
-			repository.createJobExecution(new JobSupport("job"), new JobParameters());
+			repository.createJobExecution("foo", new JobParameters());
 			// we expect an exception but not from the txControl because we
 			// provided the correct meta data
 			fail("Expected IllegalArgumentException");

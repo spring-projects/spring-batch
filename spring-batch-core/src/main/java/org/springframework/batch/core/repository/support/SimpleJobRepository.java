@@ -143,13 +143,13 @@ public class SimpleJobRepository implements JobRepository {
 	 * support the higher isolation levels).
 	 * </p>
 	 * 
-	 * @see JobRepository#createJobExecution(Job, JobParameters)
+	 * @see JobRepository#createJobExecution(String, JobParameters)
 	 * 
 	 */
-	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
+	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
-		Assert.notNull(job, "Job must not be null.");
+		Assert.notNull(jobName, "Job name must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		/*
@@ -161,14 +161,11 @@ public class SimpleJobRepository implements JobRepository {
 		 * has finished.
 		 */
 
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(job.getName(), jobParameters);
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
 		ExecutionContext executionContext;
 
 		// existing job instance found
 		if (jobInstance != null) {
-			if (!job.isRestartable()) {
-				throw new JobRestartException("JobInstance already exists and is not restartable");
-			}
 
 			List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 
@@ -188,7 +185,7 @@ public class SimpleJobRepository implements JobRepository {
 		}
 		else {
 			// no job found, create one
-			jobInstance = jobInstanceDao.createJobInstance(job.getName(), jobParameters);
+			jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
 			executionContext = new ExecutionContext();
 		}
 

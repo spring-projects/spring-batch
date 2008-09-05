@@ -192,7 +192,7 @@ public class TasketStepTests {
 				new MapStepExecutionDao(), new MapExecutionContextDao());
 		step.setJobRepository(repository);
 
-		JobExecution jobExecution = repository.createJobExecution(job, jobInstance.getJobParameters());
+		JobExecution jobExecution = repository.createJobExecution(job.getName(), jobInstance.getJobParameters());
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		step.execute(stepExecution);

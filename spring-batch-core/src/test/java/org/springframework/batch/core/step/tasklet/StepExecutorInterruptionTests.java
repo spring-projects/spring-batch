@@ -58,11 +58,11 @@ public class StepExecutorInterruptionTests extends TestCase {
 		JobRepository jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 				new MapStepExecutionDao(), new MapExecutionContextDao());
 
-		JobSupport jobConfiguration = new JobSupport();
+		JobSupport job = new JobSupport();
 		step = new TaskletStep("interruptedStep");
-		jobConfiguration.addStep(step);
-		jobConfiguration.setBeanName("testJob");
-		jobExecution = jobRepository.createJobExecution(jobConfiguration, new JobParameters());
+		job.addStep(step);
+		job.setBeanName("testJob");
+		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		step.setJobRepository(jobRepository);
 		step.setTransactionManager(new ResourcelessTransactionManager());
 		itemWriter = new ItemWriter<Object>() {

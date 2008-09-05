@@ -33,7 +33,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.JobRepositorySupport;
-import org.springframework.batch.integration.JobSupport;
 import org.springframework.batch.integration.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Required;
@@ -81,7 +80,7 @@ public class StepExecutionMessageHandlerTests {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobRepository.createJobExecution(
-				new JobSupport("job"), new JobParameters())));
+				job.getName(), new JobParameters())));
 		assertEquals(1, message.getJobExecution().getStepExecutions().size());
 		assertEquals(BatchStatus.COMPLETED, message.getStatus());
 	}
@@ -91,7 +90,7 @@ public class StepExecutionMessageHandlerTests {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
 		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution(
-				new JobSupport("job"), new JobParameters()));
+				job.getName(), new JobParameters()));
 		jobExecutionRequest.getJobExecution().getExecutionContext().putString("foo", "bar");
 		JobExecutionRequest message = handler.handle(jobExecutionRequest);
 		assertEquals(1, message.getJobExecution().getStepExecutions().size());
@@ -104,7 +103,7 @@ public class StepExecutionMessageHandlerTests {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
 		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution(
-				new JobSupport("job"), new JobParameters()));
+				job.getName(), new JobParameters()));
 		jobExecutionRequest.getJobExecution().getExecutionContext().putString("foo", "bar");
 		// The step has to add the output attribute to the context
 		handler.setStep(new StepSupport("step") {
@@ -123,7 +122,7 @@ public class StepExecutionMessageHandlerTests {
 	public void testHandleFailedJob() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		jobExecution.setStatus(BatchStatus.FAILED);
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertEquals(0, message.getJobExecution().getStepExecutions().size());
@@ -158,7 +157,7 @@ public class StepExecutionMessageHandlerTests {
 			}
 		};
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -182,7 +181,7 @@ public class StepExecutionMessageHandlerTests {
 			}
 		};
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -208,7 +207,7 @@ public class StepExecutionMessageHandlerTests {
 			}
 		};
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());

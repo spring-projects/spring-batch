@@ -1,9 +1,13 @@
 package org.springframework.batch.core.repository.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -12,15 +16,12 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import org.junit.runner.RunWith;
-import org.junit.Test;
 
 /**
  * Repository tests using JDBC DAOs (rather than mocks).
@@ -55,7 +56,7 @@ public class SimpleJobRepositoryIntegrationTests {
 		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1).addDate("dateKey", new Date(1L));
 		JobParameters jobParams = builder.toJobParameters();
 
-		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParams);
+		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParams);
 		firstExecution.setStartTime(new Date());
 		assertNotNull(firstExecution.getLastUpdated());
 
@@ -64,7 +65,7 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobRepository.update(firstExecution);
 		firstExecution.setEndTime(new Date());
 		jobRepository.update(firstExecution);
-		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParams);
+		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParams);
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
 		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
@@ -78,34 +79,14 @@ public class SimpleJobRepositoryIntegrationTests {
 	public void testCreateAndFindWithNoStartDate() throws Exception {
 		job.setRestartable(true);
 
-		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
+		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 		firstExecution.setStartTime(new Date(0));
 		firstExecution.setEndTime(new Date(1));
 		jobRepository.update(firstExecution);
-		JobExecution secondExecution = jobRepository.createJobExecution(job, jobParameters);
+		JobExecution secondExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
 		assertEquals(firstExecution.getJobInstance(), secondExecution.getJobInstance());
 		assertEquals(job.getName(), secondExecution.getJobInstance().getJobName());
-	}
-
-	/*
-	 * Non-restartable JobInstance can be run only once - attempt to run
-	 * existing non-restartable JobInstance causes error.
-	 */
-	@Transactional @Test
-	public void testRunNonRestartableJobInstanceTwice() throws Exception {
-		job.setRestartable(false);
-
-		JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
-		jobRepository.update(firstExecution);
-
-		try {
-			jobRepository.createJobExecution(job, jobParameters);
-			fail();
-		}
-		catch (JobRestartException e) {
-			// expected
-		}
 	}
 
 	/*
@@ -118,7 +99,7 @@ public class SimpleJobRepositoryIntegrationTests {
 		StepSupport step = new StepSupport("restartedStep");
 
 		// first execution
-		JobExecution firstJobExec = jobRepository.createJobExecution(job, jobParameters);
+		JobExecution firstJobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
 		StepExecution firstStepExec = new StepExecution(step.getName(), firstJobExec);
 		jobRepository.update(firstJobExec);
 		jobRepository.add(firstStepExec);
@@ -137,7 +118,7 @@ public class SimpleJobRepositoryIntegrationTests {
 		jobRepository.update(firstJobExec);
 
 		// second execution
-		JobExecution secondJobExec = jobRepository.createJobExecution(job, jobParameters);
+		JobExecution secondJobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
 		StepExecution secondStepExec = new StepExecution(step.getName(), secondJobExec);
 		jobRepository.update(secondJobExec);
 		jobRepository.add(secondStepExec);
@@ -156,7 +137,7 @@ public class SimpleJobRepositoryIntegrationTests {
 				putLong("crashedPosition", 7);
 			}
 		};
-		JobExecution jobExec = jobRepository.createJobExecution(job, jobParameters);
+		JobExecution jobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
 		jobExec.setStartTime(new Date(0));
 		jobExec.setExecutionContext(ctx);
 		Step step = new StepSupport("step1");
@@ -182,10 +163,10 @@ public class SimpleJobRepositoryIntegrationTests {
 	@Transactional @Test
 	public void testOnlyOneJobExecutionAllowedRunning() throws Exception {
 		job.setRestartable(true);
-		jobRepository.createJobExecution(job, jobParameters);
+		jobRepository.createJobExecution(job.getName(), jobParameters);
 		
 		try {
-			jobRepository.createJobExecution(job, jobParameters);
+			jobRepository.createJobExecution(job.getName(), jobParameters);
 			fail();
 		}
 		catch (JobExecutionAlreadyRunningException e) {

@@ -55,7 +55,7 @@ public class JdbcJobRepositoryTests {
 
 	private JobRepository repository;
 
-	private JobSupport jobConfiguration;
+	private JobSupport job;
 
 	private Set<Long> jobExecutionIds = new HashSet<Long>();
 
@@ -87,8 +87,8 @@ public class JdbcJobRepositoryTests {
 
 	@Before
 	public void onSetUpInTransaction() throws Exception {
-		jobConfiguration = new JobSupport("test-job");
-		jobConfiguration.setRestartable(true);
+		job = new JobSupport("test-job");
+		job.setRestartable(true);
 		simpleJdbcTemplate.update("DELETE FROM BATCH_EXECUTION_CONTEXT");
 		simpleJdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
 		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
@@ -112,9 +112,9 @@ public class JdbcJobRepositoryTests {
 
 	@Transactional @Test
 	public void testFindOrCreateJob() throws Exception {
-		jobConfiguration.setName("foo");
+		job.setName("foo");
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
-		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobParameters());
+		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(before + 1, after);
 		assertNotNull(execution.getId());
@@ -123,7 +123,7 @@ public class JdbcJobRepositoryTests {
 	@Transactional @Test
 	public void testFindOrCreateJobConcurrently() throws Exception {
 
-		jobConfiguration.setName("bar");
+		job.setName("bar");
 
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(0, before);
@@ -153,9 +153,9 @@ public class JdbcJobRepositoryTests {
 	@Transactional @Test
 	public void testFindOrCreateJobConcurrentlyWhenJobAlreadyExists() throws Exception {
 
-		jobConfiguration.setName("spam");
+		job.setName("spam");
 
-		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobParameters());
+		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		cacheJobIds(execution);
 		execution.setEndTime(new Timestamp(System.currentTimeMillis()));
 		repository.update(execution);
@@ -196,7 +196,7 @@ public class JdbcJobRepositoryTests {
 					new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 						public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
 							try {
-								JobExecution execution = repository.createJobExecution(jobConfiguration, new JobParameters());
+								JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 								cacheJobIds(execution);
 								list.add(execution);
 								Thread.sleep(1000);
@@ -216,7 +216,7 @@ public class JdbcJobRepositoryTests {
 		}).start();
 
 		Thread.sleep(400);
-		JobExecution execution = repository.createJobExecution(jobConfiguration, new JobParameters());
+		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		cacheJobIds(execution);
 
 		int count = 0;
