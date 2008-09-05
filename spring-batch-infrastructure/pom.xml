@@ -137,10 +137,12 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-annotations</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<!-- Needed by Hibernate if JTA is excluded -->
