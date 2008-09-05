@@ -102,6 +102,33 @@ public class StepExecutionResourceProxyTests extends TestCase {
 		resource.beforeStep(jobExecution.createStepExecution(step.getName()));
 		doTestPathName("spam-foo", "foo" + pathsep + "data" + pathsep);
 	}
+	
+//	public void testNonExistentJobParameter() throws Exception{
+//		
+//		resource.setFilePattern("foo/data/%JOB_NAME%/%non.key%-foo");
+//		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
+//				.toJobParameters(), "testJob");
+//		JobExecution jobExecution = new JobExecution(jobInstance);
+//		Step step = new StepSupport("bar");
+//		try{
+//			resource.beforeStep(jobExecution.createStepExecution(step.getName()));
+//			fail();
+//		}
+//		catch(Exception ex){
+//			//expected, if there isn't a JobParameter for that key, it should throw an exception
+//		}
+//	}
+	
+	public void testLongJobParameter() throws Exception {
+		
+		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key(long)%-foo");
+		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addLong("job.key", 123L)
+				.toJobParameters(), "testJob");
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		Step step = new StepSupport("bar");
+		resource.beforeStep(jobExecution.createStepExecution(step.getName()));
+		doTestPathName("123-foo", "foo" + pathsep + "data" + pathsep);
+	}
 
 	public void testResoureLoaderAware() throws Exception {
 		resource = new StepExecutionResourceProxy();

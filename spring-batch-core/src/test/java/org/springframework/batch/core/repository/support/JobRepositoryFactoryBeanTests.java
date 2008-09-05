@@ -17,6 +17,7 @@ package org.springframework.batch.core.repository.support;
 
 import static junit.framework.Assert.*;
 import static org.easymock.EasyMock.*;
+
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
@@ -29,6 +30,7 @@ import org.junit.Test;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 
 /**
  * @author Lucas Ward
@@ -63,19 +65,24 @@ public class JobRepositoryFactoryBeanTests {
 	@Test
 	public void testNoDatabaseType() throws Exception {
 
-		try {
-			expect(incrementerFactory.isSupportedIncrementerType(null)).andReturn(false);
-			expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
-			replay(incrementerFactory);
-			factory.afterPropertiesSet();
-			fail();
-		}
-		catch (IllegalArgumentException ex) {
-			// expected
-			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.indexOf("unsupported database type") >= 0);
-		}
+		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
+		Connection con = createMock(Connection.class);
+		expect(dataSource.getConnection()).andReturn(con);
+		expect(con.getMetaData()).andReturn(dmd);
+		expect(dmd.getDatabaseProductName()).andReturn("Oracle");
+		
+		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
+		expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		replay(dataSource,con,dmd, incrementerFactory);
+		
+		factory.afterPropertiesSet();
+		factory.getObject();
 
+		verify(incrementerFactory);
+		
 	}
 
 	@Test

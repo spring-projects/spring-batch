@@ -18,6 +18,8 @@ package org.springframework.batch.core.repository.support;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
@@ -33,6 +35,7 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
+import org.springframework.batch.support.DatabaseType;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,6 +56,8 @@ import org.springframework.util.StringUtils;
  * @author Lucas Ward
  */
 public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
+	
+	protected static final Log logger = LogFactory.getLog(JobRepositoryFactoryBean.class);
 	
 	/**
 	 * Default value for isolation level in create* method.
@@ -135,6 +140,11 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
+		}
+		
+		if(databaseType == null){
+			logger.info("No database type set, using meta data");
+			databaseType = DatabaseType.fromMetaData(dataSource).name();
 		}
 
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
