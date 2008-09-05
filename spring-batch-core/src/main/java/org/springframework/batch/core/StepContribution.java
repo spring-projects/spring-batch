@@ -69,8 +69,8 @@ public class StepContribution {
 	/**
 	 * Increment the counter for the number of items written.
 	 */
-	public void incrementWriteCount() {
-		writeCount++;
+	public void incrementWriteCount(int count) {
+		writeCount += count;
 	}
 
 	/**

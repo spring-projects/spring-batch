@@ -68,6 +68,9 @@ public class ChunkOrientedTaskletTests {
 		handler.execute(contribution, context);
 		assertEquals(2, itemReader.count);
 		assertEquals("12", itemWriter.values);
+		assertEquals(2, contribution.getReadCount());
+		assertEquals(2, contribution.getWriteCount());
+		assertEquals(0, contribution.getFilterCount());
 	}
 
 	@Test

@@ -253,7 +253,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 		try {
 			listener.beforeWrite(items);
 			itemWriter.write(items);
-			contribution.incrementWriteCount();
+			contribution.incrementWriteCount(items.size());
 			listener.afterWrite(items);
 		}
 		catch (Exception e) {

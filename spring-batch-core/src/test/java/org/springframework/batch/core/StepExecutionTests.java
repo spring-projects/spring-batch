@@ -124,13 +124,13 @@ public class StepExecutionTests extends TestCase {
 		contribution.incrementReadSkipCount();
 		contribution.incrementWriteSkipCount();
 		contribution.incrementReadCount();
-		contribution.incrementWriteCount();
+		contribution.incrementWriteCount(7);
 		contribution.incrementFilterCount(1);
 		execution.apply(contribution);
 		assertEquals(1, execution.getReadSkipCount());
 		assertEquals(1, execution.getWriteSkipCount());
 		assertEquals(1, execution.getReadCount());
-		assertEquals(1, execution.getWriteCount());
+		assertEquals(7, execution.getWriteCount());
 		assertEquals(1, execution.getFilterCount());
 	}
 
