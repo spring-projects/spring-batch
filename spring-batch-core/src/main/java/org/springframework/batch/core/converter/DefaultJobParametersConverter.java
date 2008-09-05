@@ -159,10 +159,10 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			String key = (String) entry.getKey();
 			Object value = entry.getValue();
 			if (value instanceof Date) {
-				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
+				result.setProperty(key, dateFormat.format(value));
 			}
 			else if (value instanceof Long) {
-				result.setProperty(key + LONG_TYPE, numberFormat.format(value));
+				result.setProperty(key, numberFormat.format(value));
 			}
 			else {
 				result.setProperty(key, "" + value);

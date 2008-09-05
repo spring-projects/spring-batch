@@ -157,6 +157,17 @@ public class StepExecutionResourceProxyTests extends TestCase {
 			//expected, if there isn't a JobParameter for that key, it should throw an exception
 		}
 	}
+	
+	public void testLongJobParameter() throws Exception {
+		
+		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
+		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addLong("job.key", new Long(123))
+				.toJobParameters(), "testJob");
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		Step step = new StepSupport("bar");
+		resource.beforeStep(jobExecution.createStepExecution(step));
+		doTestPathName("123-foo", "foo" + pathsep + "data" + pathsep);
+	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {
 		String returnedPath = resource.getFile().getAbsolutePath();

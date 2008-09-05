@@ -145,8 +145,8 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		Properties props = factory.getProperties(parameters);
 		assertNotNull(props);
 		assertEquals("myKey", props.getProperty("job.key"));
-		assertEquals("33243243", props.getProperty("vendor.id(long)"));
-		assertEquals("2008/01/23", props.getProperty("schedule.date(date)"));
+		assertEquals("33243243", props.getProperty("vendor.id"));
+		assertEquals("2008/01/23", props.getProperty("schedule.date"));
 	}
 
 	public void testEmptyArgs() {
