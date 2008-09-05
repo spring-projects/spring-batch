@@ -141,6 +141,22 @@ public class StepExecutionResourceProxyTests extends TestCase {
 		resource.setFilePattern("arbitrary pattern");
 		assertEquals(filePattern, resource.toString());
 	}
+	
+	public void testNonExistentJobParameter() throws Exception{
+		
+		resource.setFilePattern("foo/data/%JOB_NAME%/%non.key%-foo");
+		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
+				.toJobParameters(), "testJob");
+		JobExecution jobExecution = new JobExecution(jobInstance);
+		Step step = new StepSupport("bar");
+		try{
+			resource.beforeStep(jobExecution.createStepExecution(step));
+			fail();
+		}
+		catch(Exception ex){
+			//expected, if there isn't a JobParameter for that key, it should throw an exception
+		}
+	}
 
 	private void doTestPathName(String filename, String path) throws Exception, IOException {
 		String returnedPath = resource.getFile().getAbsolutePath();

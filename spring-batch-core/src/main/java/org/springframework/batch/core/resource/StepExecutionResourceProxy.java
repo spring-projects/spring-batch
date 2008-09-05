@@ -284,7 +284,14 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 		String jobName = execution.getJobExecution().getJobInstance().getJobName();
 		Properties properties = jobParametersConverter.getProperties(execution.getJobExecution().getJobInstance()
 				.getJobParameters());
-		delegate = resourceLoader.getResource(createFileName(jobName, stepName, properties));
+		String fileName = createFileName(jobName, stepName, properties);
+		if(fileName.indexOf("%") > -1){
+			//if a % is still left in the fileName after matching, we have to assume that either no job parameter was found,
+			//or an invalid path was used.
+			throw new IllegalStateException("Invalid file pattern provided: [" + this.filePattern + "], tokens still remain after parameter matching: [" +
+					fileName + "]");
+		}
+		delegate = resourceLoader.getResource(fileName);
 	}
 
 	/**
