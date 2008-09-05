@@ -13,7 +13,6 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
-import org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -57,8 +56,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests extends TestCase {
 		resource = new FileSystemResource(outputFile);
 		writer.setResource(resource);
 
-		MarshallingEventWriterSerializer<Trade> mapper = new MarshallingEventWriterSerializer<Trade>(getMarshaller());
-		writer.setSerializer(mapper);
+		writer.setMarshaller(getMarshaller());
 
 		writer.open(new ExecutionContext());
 	}

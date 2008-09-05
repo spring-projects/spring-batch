@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
@@ -202,8 +201,7 @@ public class StaxEventItemWriterTests {
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();
-		MarshallingEventWriterSerializer<Object> serializer = new MarshallingEventWriterSerializer<Object>(marshaller);
-		source.setSerializer(serializer);
+		source.setMarshaller(marshaller);
 
 		source.setEncoding("UTF-8");
 		source.setRootTagName("root");

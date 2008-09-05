@@ -15,8 +15,10 @@ import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.xml.transform.StaxSource;
 
 /**
  * Item reader for reading XML input based on StAX.
@@ -37,7 +39,7 @@ public class StaxEventItemReader<T> extends AbstractItemReaderItemStream<T> impl
 
 	private XMLEventReader eventReader;
 
-	private EventReaderDeserializer<? extends T> eventReaderDeserializer;
+	private Unmarshaller unmarshaller;
 
 	private Resource resource;
 
@@ -54,11 +56,11 @@ public class StaxEventItemReader<T> extends AbstractItemReaderItemStream<T> impl
 	}
 
 	/**
-	 * @param eventReaderDeserializer maps xml fragments corresponding to
+	 * @param unmarshaller maps xml fragments corresponding to
 	 * records to objects
 	 */
-	public void setFragmentDeserializer(EventReaderDeserializer<? extends T> eventReaderDeserializer) {
-		this.eventReaderDeserializer = eventReaderDeserializer;
+	public void setUnmarshaller(Unmarshaller unmarshaller) {
+		this.unmarshaller = unmarshaller;
 	}
 
 	/**
@@ -79,7 +81,7 @@ public class StaxEventItemReader<T> extends AbstractItemReaderItemStream<T> impl
 	 * @throws IllegalStateException if the Resource does not exist.
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(eventReaderDeserializer, "The FragmentDeserializer must not be null.");
+		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
 	}
 
@@ -151,7 +153,11 @@ public class StaxEventItemReader<T> extends AbstractItemReaderItemStream<T> impl
 
 		if (moveCursorToNextFragment(fragmentReader)) {
 			fragmentReader.markStartFragment();
-			item = eventReaderDeserializer.deserializeFragment(fragmentReader);
+			
+			@SuppressWarnings("unchecked")
+			T mappedFragment = (T) unmarshaller.unmarshal(new StaxSource(fragmentReader));
+			
+			item = mappedFragment;
 			fragmentReader.markFragmentProcessed();
 		}
 

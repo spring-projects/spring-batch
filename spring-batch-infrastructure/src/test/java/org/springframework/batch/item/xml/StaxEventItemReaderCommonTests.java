@@ -1,6 +1,9 @@
 package org.springframework.batch.item.xml;
 
 import static org.junit.Assert.*;
+
+import java.io.IOException;
+
 import org.junit.runner.RunWith;
 import org.junit.internal.runners.JUnit4ClassRunner;
 
@@ -8,12 +11,16 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
+import javax.xml.transform.Source;
 
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.XmlMappingException;
+import org.springframework.xml.transform.StaxSource;
 
 @RunWith(JUnit4ClassRunner.class)
 public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTests {
@@ -24,8 +31,10 @@ public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTe
 		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
 		reader.setResource(new ByteArrayResource(FOOS.getBytes()));
 		reader.setFragmentRootElementName("foo");
-		reader.setFragmentDeserializer(new EventReaderDeserializer<Foo>() {
-			public Foo deserializeFragment(XMLEventReader eventReader) {
+		reader.setUnmarshaller(new Unmarshaller() {
+			public Object unmarshal(Source source) throws XmlMappingException, IOException {
+				StaxSource staxSource = (StaxSource) source;
+				XMLEventReader eventReader = staxSource.getXMLEventReader();
 				Attribute attr;
 				try {
 					assertTrue(eventReader.nextEvent().isStartDocument());
@@ -39,6 +48,12 @@ public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTe
 				foo.setValue(Integer.parseInt(attr.getValue()));
 				return foo;
 			}
+
+			@SuppressWarnings("unchecked")
+			public boolean supports(Class clazz) {
+				return true;
+			}
+
 		});
 
 		reader.setSaveState(true);

@@ -11,6 +11,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.Source;
 
 import junit.framework.TestCase;
 
@@ -19,7 +20,10 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.ClassUtils;
+import org.springframework.xml.transform.StaxSource;
 
 /**
  * Tests for {@link StaxEventItemReader}.
@@ -34,7 +38,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	// test xml input
 	private String xml = "<root> <fragment> <misc1/> </fragment> <misc2/> <fragment> testString </fragment> </root>";
 
-	private EventReaderDeserializer<List<XMLEvent>> deserializer = new MockFragmentDeserializer();
+	private Unmarshaller unmarshaller = new MockFragmentUnmarshaller();
 
 	private static final String FRAGMENT_ROOT_ELEMENT = "fragment";
 
@@ -62,7 +66,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		}
 
 		source = createNewInputSouce();
-		source.setFragmentDeserializer(null);
+		source.setUnmarshaller(null);
 		try {
 			source.afterPropertiesSet();
 			fail();
@@ -74,12 +78,12 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	/**
 	 * Regular usage scenario. ItemReader should pass XML fragments to
-	 * deserializer wrapped with StartDocument and EndDocument events.
+	 * unmarshaller wrapped with StartDocument and EndDocument events.
 	 */
 	public void testFragmentWrapping() throws Exception {
 		source.afterPropertiesSet();
 		source.open(executionContext);
-		// see asserts in the mock deserializer
+		// see asserts in the mock unmarshaller
 		assertNotNull(source.read());
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only two fragments
@@ -163,7 +167,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
-		newSource.setFragmentDeserializer(deserializer);
+		newSource.setUnmarshaller(unmarshaller);
 
 		newSource.open(executionContext);
 
@@ -239,27 +243,52 @@ public class StaxEventItemReaderTests extends TestCase {
 		newSource.setResource(resource);
 
 		newSource.setFragmentRootElementName(FRAGMENT_ROOT_ELEMENT);
-		newSource.setFragmentDeserializer(deserializer);
+		newSource.setUnmarshaller(unmarshaller);
 		newSource.setSaveState(true);
 
 		return newSource;
 	}
 
 	/**
-	 * A simple XMLEvent deserializer mock - check for the start and end
+	 * A simple XMLEvent unmarshaller mock - check for the start and end
 	 * document events for the fragment root & end tags + skips the fragment
 	 * contents.
 	 */
-	private static class MockFragmentDeserializer implements EventReaderDeserializer<List<XMLEvent>> {
+	private static class MockFragmentUnmarshaller implements Unmarshaller {
+
+		/**
+		 * Skips the XML fragment contents.
+		 */
+		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader) throws XMLStreamException {
+			XMLEvent eventInsideFragment;
+			List<XMLEvent> events = new ArrayList<XMLEvent>();
+			do {
+				eventInsideFragment = eventReader.peek();
+				if (eventInsideFragment instanceof EndElement
+						&& ((EndElement) eventInsideFragment).getName().getLocalPart().equals(FRAGMENT_ROOT_ELEMENT)) {
+					break;
+				}
+				events.add(eventReader.nextEvent());
+			} while (eventInsideFragment != null);
+
+			return events;
+		}
+
+		@SuppressWarnings("unchecked")
+		public boolean supports(Class clazz) {
+			return true;
+		}
 
 		/**
 		 * A simple mapFragment implementation checking the
 		 * StaxEventReaderItemReader basic read functionality.
 		 * 
-		 * @param eventReader
+		 * @param source
 		 * @return list of the events from fragment body
 		 */
-		public List<XMLEvent> deserializeFragment(XMLEventReader eventReader) {
+		public Object unmarshal(Source source) throws XmlMappingException, IOException {
+			StaxSource staxSource = (StaxSource) source;
+			XMLEventReader eventReader = staxSource.getXMLEventReader();
 			List<XMLEvent> fragmentContent;
 			try {
 				// first event should be StartDocument
@@ -288,24 +317,6 @@ public class StaxEventItemReaderTests extends TestCase {
 				throw new RuntimeException("Error occured in FragmentDeserializer", e);
 			}
 			return fragmentContent;
-		}
-
-		/**
-		 * Skips the XML fragment contents.
-		 */
-		private List<XMLEvent> readRecordsInsideFragment(XMLEventReader eventReader) throws XMLStreamException {
-			XMLEvent eventInsideFragment;
-			List<XMLEvent> events = new ArrayList<XMLEvent>();
-			do {
-				eventInsideFragment = eventReader.peek();
-				if (eventInsideFragment instanceof EndElement
-						&& ((EndElement) eventInsideFragment).getName().getLocalPart().equals(FRAGMENT_ROOT_ELEMENT)) {
-					break;
-				}
-				events.add(eventReader.nextEvent());
-			} while (eventInsideFragment != null);
-
-			return events;
 		}
 
 	}

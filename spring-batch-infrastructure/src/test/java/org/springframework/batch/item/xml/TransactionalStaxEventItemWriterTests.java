@@ -17,7 +17,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -74,7 +73,12 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				writer.write(items);
+				try {
+					writer.write(items);
+				}
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 				return null;
 			}
 		});
@@ -94,7 +98,12 @@ public class TransactionalStaxEventItemWriterTests {
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 				public Object doInTransaction(TransactionStatus status) {
-					writer.write(items);
+					try {
+						writer.write(items);
+					}
+					catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 					throw new RuntimeException("Planned");
 				}
 			});
@@ -107,7 +116,12 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				writer.write(items);
+				try {
+					writer.write(items);
+				}
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 				return null;
 			}
 		});
@@ -127,7 +141,12 @@ public class TransactionalStaxEventItemWriterTests {
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				writer.write(items);
+				try {
+					writer.write(items);
+				}
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 				return null;
 			}
 		});
@@ -137,7 +156,12 @@ public class TransactionalStaxEventItemWriterTests {
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 				public Object doInTransaction(TransactionStatus status) {
-					writer.write(items);
+					try {
+						writer.write(items);
+					}
+					catch (IOException e) {
+						throw new RuntimeException(e);
+					}
 					throw new RuntimeException("Planned");
 				}
 			});
@@ -189,8 +213,7 @@ public class TransactionalStaxEventItemWriterTests {
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();
-		MarshallingEventWriterSerializer<Object> serializer = new MarshallingEventWriterSerializer<Object>(marshaller);
-		source.setSerializer(serializer);
+		source.setMarshaller(marshaller);
 
 		source.setEncoding("UTF-8");
 		source.setRootTagName("root");

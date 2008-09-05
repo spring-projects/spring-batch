@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
@@ -30,9 +31,12 @@ import org.springframework.batch.support.transaction.TransactionAwareBufferedWri
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.oxm.Marshaller;
+import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.xml.transform.StaxResult;
 
 /**
  * An implementation of {@link ItemWriter} which uses StAX and
@@ -70,8 +74,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	// file system resource
 	private Resource resource;
 
-	// xml serializer
-	private EventWriterSerializer<? super T> serializer;
+	// xml marshaller
+	private Marshaller marshaller;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -123,12 +127,12 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
-	 * Set Object to XML serializer.
+	 * Set Object to XML marshaller.
 	 * 
-	 * @param serializer the Object to XML serializer
+	 * @param marshaller the Object to XML marshaller
 	 */
-	public void setSerializer(EventWriterSerializer<? super T> serializer) {
-		this.serializer = serializer;
+	public void setMarshaller(Marshaller marshaller) {
+		this.marshaller = marshaller;
 	}
 
 	/**
@@ -232,7 +236,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(serializer);
+		Assert.notNull(marshaller);
 	}
 
 	/**
@@ -256,7 +260,12 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		open(startAtPosition);
 
 		if (startAtPosition == 0) {
-			write(headers);
+			try {
+				doWrite(headers);
+			}
+			catch (IOException e) {
+				throw new ItemStreamException("Failed to write headers", e);
+			}
 		}
 
 	}
@@ -331,7 +340,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			}
 
 		}
-		
+
 		writer.flush();
 
 	}
@@ -390,13 +399,22 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * Write the value objects and flush them to the file.
 	 * 
 	 * @param items the value object
+	 * @throws IOException
+	 * @throws XmlMappingException
 	 */
-	public void write(List<? extends T> items) {
+	public void write(List<? extends T> items) throws XmlMappingException, IOException {
 
-		currentRecordCount+=items.size();
+		currentRecordCount += items.size();
 
-		for (T item : items) {
-			serializer.serializeObject(eventWriter, item);
+		doWrite(items);
+
+	}
+
+	private void doWrite(List<?> objects) throws XmlMappingException, IOException {
+		for (Object object : objects) {
+			Assert.state(marshaller.supports(object.getClass()),
+					"Marshaller must support the class of the marshalled object");
+			marshaller.marshal(object, new StaxResult(eventWriter));
 		}
 		try {
 			eventWriter.flush();
@@ -404,7 +422,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		catch (XMLStreamException e) {
 			throw new FlushFailedException("Failed to flush the events", e);
 		}
-
 	}
 
 	/**

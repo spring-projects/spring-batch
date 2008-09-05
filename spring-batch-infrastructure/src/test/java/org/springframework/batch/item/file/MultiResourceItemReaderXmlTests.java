@@ -1,24 +1,28 @@
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import java.util.Comparator;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
+import javax.xml.transform.Source;
 
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
-import org.springframework.batch.item.xml.EventReaderDeserializer;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.oxm.Unmarshaller;
+import org.springframework.oxm.XmlMappingException;
+import org.springframework.xml.transform.StaxSource;
 
 @RunWith(JUnit4ClassRunner.class)
 public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderTests {
@@ -29,8 +33,10 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
 
 		reader.setFragmentRootElementName("foo");
-		reader.setFragmentDeserializer(new EventReaderDeserializer<Foo>() {
-			public Foo deserializeFragment(XMLEventReader eventReader) {
+		reader.setUnmarshaller(new Unmarshaller() {
+			public Object unmarshal(Source source) throws XmlMappingException, IOException {
+				StaxSource staxSource = (StaxSource) source;
+				XMLEventReader eventReader = staxSource.getXMLEventReader();
 				Attribute attr;
 				try {
 					assertTrue(eventReader.nextEvent().isStartDocument());
@@ -44,6 +50,12 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 				foo.setValue(Integer.parseInt(attr.getValue()));
 				return foo;
 			}
+
+			@SuppressWarnings("unchecked")
+			public boolean supports(Class clazz) {
+				return true;
+			}
+
 		});
 
 		reader.setSaveState(true);
