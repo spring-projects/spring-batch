@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -103,9 +104,9 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteWithHeader() throws Exception {
-		Object header1 = new Object();
-		Object header2 = new Object();
-		writer.setHeaderItems(new Object[] { header1, header2 });
+		final Object header1 = new Object();
+		final Object header2 = new Object();
+		writer.setHeaderItems(new ArrayList<Object>() {{add(header1); add(header2); }});
 		writer.open(executionContext);
 		writer.write(items);
 		String content = outputFileContent();

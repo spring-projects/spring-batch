@@ -93,7 +93,7 @@ public class TransactionalStaxEventItemWriterTests {
 	@Test
 	public void testWriteWithHeaderAfterRollback() throws Exception {
 		Object header = new Object();
-		writer.setHeaderItems(new Object[] { header });
+		writer.setHeaderItems(Collections.singletonList(header));
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
@@ -137,7 +137,7 @@ public class TransactionalStaxEventItemWriterTests {
 	@Test
 	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
 		Object header = new Object();
-		writer.setHeaderItems(new Object[] { header });
+		writer.setHeaderItems(Collections.singletonList(header));
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {

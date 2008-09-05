@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -111,7 +110,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	private boolean saveState = true;
 
-	private List<? extends T> headers = new ArrayList<T>();
+	private List<?> headers = new ArrayList<Object>();
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -220,11 +219,13 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	/**
 	 * Setter for the headers. This list will be marshalled and output before
-	 * any calls to {@link #write(List)}.
+	 * any calls to {@link #write(List)}. Header item type is not restricted,
+	 * but note the {@link #setMarshaller(Marshaller)} needs to support
+	 * the type.
 	 * @param headers
 	 */
-	public void setHeaderItems(T[] headers) {
-		this.headers = Arrays.asList(headers);
+	public void setHeaderItems(List<?> headers) {
+		this.headers = headers;
 	}
 
 	public void setSaveState(boolean saveState) {
