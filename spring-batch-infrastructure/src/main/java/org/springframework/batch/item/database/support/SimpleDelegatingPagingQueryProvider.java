@@ -1,11 +1,11 @@
 package org.springframework.batch.item.database.support;
 
-import org.springframework.jdbc.support.JdbcUtils;
+import static org.springframework.batch.support.DatabaseType.*;
+
+import org.springframework.batch.support.DatabaseType;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 import javax.sql.DataSource;
-import java.util.List;
-import java.util.Arrays;
 
 /**
  * Generic Paging Query Provider using standard SQL:2003 windowing functions.  These features are supported by
@@ -16,53 +16,41 @@ import java.util.Arrays;
  */
 public class SimpleDelegatingPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 
-	/* List of supported database products */
-	public static final List<String> supportedDatabaseProducts = Arrays.asList(
-			"Apache Derby",
-			"DB2",
-			"HSQL Database Engine",
-			"Microsoft SQL Server",
-			"MySQL",
-			"Oracle",
-			"PostgreSQL",
-			"Sybase"
-		);
-
 	AbstractSqlPagingQueryProvider delegate;
 
 	@Override
 	public void init(DataSource dataSource) throws Exception {
 		super.init(dataSource);
-		String databaseProductName = JdbcUtils.commonDatabaseName(
-				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString());
-		if ("Apache Derby".equals(databaseProductName)) {
+		
+		DatabaseType type = DatabaseType.fromMetaData(dataSource);
+		if (type == DERBY) {
 			delegate = new DerbyPagingQueryProvider();
 		}
-		else if ("DB2".equals(databaseProductName)) {
+		else if (type == DB2) {
 			delegate = new Db2PagingQueryProvider();
 		}
-		else if ("HSQL Database Engine".equals(databaseProductName)) {
+		else if (type == HSQL) {
 			delegate = new HsqlPagingQueryProvider();
 		}
-		else if ("Microsoft SQL Server".equals(databaseProductName)) {
+		else if (type == SQLSERVER) {
 			delegate = new SqlServerPagingQueryProvider();
 		}
-		else if ("MySQL".equals(databaseProductName)) {
+		else if (type == MYSQL) {
 			delegate = new MySqlPagingQueryProvider();
 		}
-		else if ("Oracle".equals(databaseProductName)) {
+		else if (type == ORACLE) {
 			delegate = new OraclePagingQueryProvider();
 		}
-		else if ("PostgreSQL".equals(databaseProductName)) {
+		else if (type == POSTGRES) {
 			delegate = new PostgresPagingQueryProvider();
 		}
-		else if ("Sybase".equals(databaseProductName)) {
+		else if (type == SYBASE) {
 			delegate = new SybasePagingQueryProvider();
 		}
 		else {
-			throw new InvalidDataAccessResourceUsageException(databaseProductName +
+			throw new InvalidDataAccessResourceUsageException(type.name() +
 					" is not a supported database.  The supported databases are " +
-					supportedDatabaseProducts.toString());
+					type.values().toString());
 		}
 		delegate.setSelectClause(this.getSelectClause());
 		delegate.setFromClause(this.getFromClause());

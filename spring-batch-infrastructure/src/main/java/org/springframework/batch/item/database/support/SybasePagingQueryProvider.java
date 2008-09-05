@@ -1,7 +1,7 @@
 package org.springframework.batch.item.database.support;
 
 /**
- * Oracle implementation of a  {@link PagingQueryProvider} using
+ * Sybase implementation of a  {@link PagingQueryProvider} using
  * database specific features.
  *
  * @author Thomas Risberg

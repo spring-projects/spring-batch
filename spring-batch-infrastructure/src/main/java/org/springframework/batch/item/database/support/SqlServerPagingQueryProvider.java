@@ -1,7 +1,7 @@
 package org.springframework.batch.item.database.support;
 
 /**
- * Oracle implementation of a  {@link org.springframework.batch.item.database.support.PagingQueryProvider} using
+ * Sql Server implementation of a  {@link org.springframework.batch.item.database.support.PagingQueryProvider} using
  * database specific features.
  *
  * @author Thomas Risberg

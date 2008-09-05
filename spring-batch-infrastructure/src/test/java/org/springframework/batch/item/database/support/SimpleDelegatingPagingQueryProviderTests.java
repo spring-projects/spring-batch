@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.junit.Assert;
 import org.junit.Before;
 import org.easymock.EasyMock;
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -214,7 +213,7 @@ public class SimpleDelegatingPagingQueryProviderTests {
 		try {
 			pagingQueryProvider.init(ds);
 			fail("Expected an InvalidDataAccessResourceUsageException since the MyDB database is not supported");
-		} catch (InvalidDataAccessResourceUsageException e) {
+		} catch (IllegalArgumentException e) {
 			// expected
 		}
 

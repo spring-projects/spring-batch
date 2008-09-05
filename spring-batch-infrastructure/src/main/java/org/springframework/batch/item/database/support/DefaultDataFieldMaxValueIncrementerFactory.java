@@ -15,8 +15,14 @@
  */
 package org.springframework.batch.item.database.support;
 
+import static org.springframework.batch.support.DatabaseType.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sql.DataSource;
 
+import org.springframework.batch.support.DatabaseType;
 import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
@@ -45,25 +51,9 @@ import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
  * </ul>
  * 
  * @author Lucas Ward
- * 
+ * @see DatabaseType
  */
 public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxValueIncrementerFactory {
-
-	static final String DB_TYPE_DB2 = "db2";
-
-	static final String DB_TYPE_DERBY = "derby";
-
-	static final String DB_TYPE_HSQL = "hsql";
-
-	static final String DB_TYPE_MYSQL = "mysql";
-
-	static final String DB_TYPE_ORACLE = "oracle";
-
-	static final String DB_TYPE_POSTGRES = "postgres";
-
-	static final String DB_TYPE_SQLSERVER = "sqlserver";
-
-	static final String DB_TYPE_SYBASE = "sybase";
 
 	private DataSource dataSource;
 
@@ -86,28 +76,30 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	}
 
 	public DataFieldMaxValueIncrementer getIncrementer(String incrementerType, String incrementerName) {
-		if (DB_TYPE_DB2.equals(incrementerType)) {
+		DatabaseType databaseType = DatabaseType.valueOf(incrementerType.toUpperCase());
+		
+		if (databaseType == DB2) {
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
-		else if (DB_TYPE_DERBY.equals(incrementerType)) {
+		else if (databaseType == DERBY) {
 			return new DerbyMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
-		else if (DB_TYPE_HSQL.equals(incrementerType)) {
+		else if (databaseType == HSQL) {
 			return new HsqlMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
-		else if (DB_TYPE_MYSQL.equals(incrementerType)) {
+		else if (databaseType == MYSQL) {
 			return new MySQLMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
-		else if (DB_TYPE_ORACLE.equals(incrementerType)) {
+		else if (databaseType == ORACLE) {
 			return new OracleSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
-		else if (DB_TYPE_POSTGRES.equals(incrementerType)) {
+		else if (databaseType == POSTGRES) {
 			return new PostgreSQLSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
-		else if (DB_TYPE_SQLSERVER.equals(incrementerType)) {
+		else if (databaseType == SQLSERVER) {
 			return new SqlServerMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
-		else if (DB_TYPE_SYBASE.equals(incrementerType)) {
+		else if (databaseType == SYBASE) {
 			return new SybaseMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
 		throw new IllegalArgumentException("databaseType argument was not on the approved list");
@@ -115,20 +107,23 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	}
 
 	public boolean isSupportedIncrementerType(String incrementerType) {
-		if (!DB_TYPE_DB2.equals(incrementerType) && !DB_TYPE_DERBY.equals(incrementerType)
-				&& !DB_TYPE_HSQL.equals(incrementerType) && !DB_TYPE_MYSQL.equals(incrementerType)
-				&& !DB_TYPE_ORACLE.equals(incrementerType) && !DB_TYPE_POSTGRES.equals(incrementerType)
-				&& !DB_TYPE_SQLSERVER.equals(incrementerType) && !DB_TYPE_SYBASE.equals(incrementerType)) {
-
-			return false;
+		for(DatabaseType type : DatabaseType.values()){
+			if(type.name().equals(incrementerType.toUpperCase())){
+				return true;
+			}
 		}
-		else {
-			return true;
-		}
+		
+		return false;
 	}
 
 	public String[] getSupportedIncrementerTypes() {
-		return new String[] { DB_TYPE_DB2, DB_TYPE_DERBY, DB_TYPE_HSQL, DB_TYPE_MYSQL,
-				DB_TYPE_ORACLE, DB_TYPE_POSTGRES, DB_TYPE_SQLSERVER, DB_TYPE_SYBASE };
+		
+		List<String> types = new ArrayList<String>();
+		
+		for(DatabaseType type : DatabaseType.values()){
+			types.add(type.name());
+		}
+		
+		return (String[])types.toArray();
 	}
 }
