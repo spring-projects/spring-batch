@@ -105,15 +105,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		dao.saveStepExecution(stepExecution);
 
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step.getName());
-		assertEquals(stepExecution, retrieved);
-		assertEquals(BatchStatus.STARTED, retrieved.getStatus());
-		assertEquals(stepExecution.getReadSkipCount(), retrieved.getReadSkipCount());
-		assertEquals(stepExecution.getWriteSkipCount(), retrieved.getWriteSkipCount());
-		assertEquals(stepExecution.getRollbackCount(), retrieved.getRollbackCount());
-		assertEquals(stepExecution.getLastUpdated(), retrieved.getLastUpdated());
-		assertEquals(stepExecution.getReadCount(), retrieved.getReadCount());
-		assertEquals(stepExecution.getFilterCount(), retrieved.getFilterCount());
-		assertEquals(stepExecution.getWriteCount(), retrieved.getWriteCount());
+		
+		assertStepExecutionsAreEqual(stepExecution, retrieved);
 		
 		assertNull(dao.getStepExecution(jobExecution, "not-existing step"));
 	}
@@ -128,7 +121,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		dao.saveStepExecution(stepExecution);
 
 		List<StepExecution> retrieved = dao.getStepExecutions(jobExecution);
-		assertEquals(stepExecution, retrieved.get(0));
+		assertStepExecutionsAreEqual(stepExecution, retrieved.get(0));
 	}
 
 	@Transactional @Test
@@ -216,5 +209,23 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 			// expected
 		}
 
+	}
+	
+	private void assertStepExecutionsAreEqual(StepExecution expected, StepExecution actual) {
+		assertEquals(expected.getId(), actual.getId());
+		assertEquals(expected.getStartTime(), actual.getStartTime());
+		assertEquals(expected.getEndTime(), actual.getEndTime());
+		assertEquals(expected.getSkipCount(), actual.getSkipCount());
+		assertEquals(expected.getCommitCount(), actual.getCommitCount());
+		assertEquals(expected.getReadCount(), actual.getReadCount());
+		assertEquals(expected.getWriteCount(), actual.getWriteCount());
+		assertEquals(expected.getFilterCount(), actual.getFilterCount());
+		assertEquals(expected.getWriteSkipCount(), actual.getWriteSkipCount());
+		assertEquals(expected.getReadSkipCount(), actual.getReadSkipCount());
+		assertEquals(expected.getRollbackCount(), actual.getRollbackCount());
+		assertEquals(expected.getExitStatus(), actual.getExitStatus());
+		assertEquals(expected.getLastUpdated(), actual.getLastUpdated());
+		assertEquals(expected.getExitStatus(), actual.getExitStatus());
+		assertEquals(expected.getJobExecutionId(), actual.getJobExecutionId());
 	}
 }
