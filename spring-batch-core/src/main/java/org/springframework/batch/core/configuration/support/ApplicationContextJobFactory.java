@@ -22,7 +22,6 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * A {@link JobFactory} that creates its own {@link ApplicationContext} from a
