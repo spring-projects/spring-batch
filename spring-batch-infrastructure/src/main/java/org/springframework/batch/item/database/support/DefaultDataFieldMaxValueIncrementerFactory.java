@@ -119,11 +119,11 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	public String[] getSupportedIncrementerTypes() {
 		
 		List<String> types = new ArrayList<String>();
-		
+
 		for(DatabaseType type : DatabaseType.values()){
 			types.add(type.name());
 		}
-		
-		return (String[])types.toArray();
+
+		return types.toArray(new String[types.size()]);
 	}
 }
