@@ -89,7 +89,8 @@ public class JdbcJobRepositoryTests {
 	public void onSetUpInTransaction() throws Exception {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
-		simpleJdbcTemplate.update("DELETE FROM BATCH_EXECUTION_CONTEXT");
+		simpleJdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION_CONTEXT");
+		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT");
 		simpleJdbcTemplate.update("DELETE FROM BATCH_STEP_EXECUTION");
 		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION");
 		simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_PARAMS");

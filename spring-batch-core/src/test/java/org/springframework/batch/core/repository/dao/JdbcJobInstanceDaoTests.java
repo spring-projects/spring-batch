@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	
 	protected JobInstanceDao getJobInstanceDao() {
-		deleteFromTables("BATCH_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
+		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
 				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
 		return (JobInstanceDao) applicationContext.getBean("jobInstanceDao");
 	}

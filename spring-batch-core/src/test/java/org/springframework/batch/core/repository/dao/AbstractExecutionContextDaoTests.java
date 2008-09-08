@@ -11,6 +11,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -18,16 +19,50 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public abstract class AbstractExecutionContextDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
 
-	private ExecutionContextDao dao;
+	private JobInstanceDao jobInstanceDao;
+	
+	private JobExecutionDao jobExecutionDao;
 
-	private JobExecution jobExecution = new JobExecution(new JobInstance(1L, new JobParameters(), "jobName"), 1L);
+	private StepExecutionDao stepExecutionDao;
 
-	private StepExecution stepExecution = new StepExecution("stepName", jobExecution, 1L);
+	private ExecutionContextDao contextDao;
+
+	private JobExecution jobExecution;
+
+	private StepExecution stepExecution;
 
 	@Before
 	public void setUp() {
-		dao = getExecutionContextDao();
+		jobInstanceDao = getJobInstanceDao();
+		jobExecutionDao = getJobExecutionDao();
+		stepExecutionDao = getStepExecutionDao();
+		contextDao = getExecutionContextDao();
+
+		JobInstance ji = jobInstanceDao.createJobInstance("testJob", new JobParameters());
+		jobExecution = new JobExecution(ji);
+		jobExecutionDao.saveJobExecution(jobExecution);
+		stepExecution = new StepExecution("stepName", jobExecution);
+		stepExecutionDao.saveStepExecution(stepExecution);
+
 	}
+
+	/**
+	 * @return Configured {@link ExecutionContextDao} implementation ready for
+	 * use.
+	 */
+	protected abstract JobExecutionDao getJobExecutionDao();
+
+	/**
+	 * @return Configured {@link ExecutionContextDao} implementation ready for
+	 * use.
+	 */
+	protected abstract JobInstanceDao getJobInstanceDao();
+
+	/**
+	 * @return Configured {@link ExecutionContextDao} implementation ready for
+	 * use.
+	 */
+	protected abstract StepExecutionDao getStepExecutionDao();
 
 	/**
 	 * @return Configured {@link ExecutionContextDao} implementation ready for
@@ -41,9 +76,9 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(jobExecution);
+		contextDao.persistExecutionContext(jobExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(jobExecution);
+		ExecutionContext retrieved = contextDao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
 	}
 
@@ -53,9 +88,9 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext();
 		jobExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(jobExecution);
+		contextDao.persistExecutionContext(jobExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(jobExecution);
+		ExecutionContext retrieved = contextDao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
 	}
 
@@ -66,12 +101,12 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		ExecutionContext ctx = new ExecutionContext(Collections
 				.<String, Object> singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(jobExecution);
+		contextDao.persistExecutionContext(jobExecution);
 
 		ctx.putLong("longKey", 7);
-		dao.persistExecutionContext(jobExecution);
+		contextDao.persistExecutionContext(jobExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(jobExecution);
+		ExecutionContext retrieved = contextDao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
 		assertEquals(7, retrieved.getLong("longKey"));
 	}
@@ -82,9 +117,9 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(stepExecution);
+		contextDao.persistExecutionContext(stepExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(stepExecution);
+		ExecutionContext retrieved = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
 	}
 
@@ -94,9 +129,9 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext();
 		stepExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(stepExecution);
+		contextDao.persistExecutionContext(stepExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(stepExecution);
+		ExecutionContext retrieved = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
 	}
 
@@ -106,12 +141,12 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
-		dao.persistExecutionContext(stepExecution);
+		contextDao.persistExecutionContext(stepExecution);
 
 		ctx.putLong("longKey", 7);
-		dao.persistExecutionContext(stepExecution);
+		contextDao.persistExecutionContext(stepExecution);
 
-		ExecutionContext retrieved = dao.getExecutionContext(stepExecution);
+		ExecutionContext retrieved = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
 		assertEquals(7, retrieved.getLong("longKey"));
 	}
@@ -123,8 +158,8 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		ExecutionContext ec = new ExecutionContext();
 		ec.put("intValue", new Integer(343232));
 		stepExecution.setExecutionContext(ec);
-		dao.persistExecutionContext(stepExecution);
-		ExecutionContext restoredEc = dao.getExecutionContext(stepExecution);
+		contextDao.persistExecutionContext(stepExecution);
+		ExecutionContext restoredEc = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ec, restoredEc);
 	}
 

@@ -44,7 +44,7 @@ public class MySqlPagingQueryProviderTests extends AbstractSqlPagingQueryProvide
 
 	@Test @Override
 	public void testGenerateJumpToItemQuery() {
-		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99 1";
+		String sql = "SELECT id AS SORT_KEY FROM foo WHERE bar = 1 ORDER BY id ASC LIMIT 99, 1";
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		Assert.assertEquals("", sql, s);
 	}

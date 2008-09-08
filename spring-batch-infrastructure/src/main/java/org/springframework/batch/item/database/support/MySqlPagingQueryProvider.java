@@ -62,7 +62,7 @@ public class MySqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
 		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
-		sql.append(" LIMIT ").append(offset).append(" 1");
+		sql.append(" LIMIT ").append(offset).append(", 1");
 
 		return sql.toString();
 	}

@@ -22,7 +22,7 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
 	@Override
 	protected JobExecutionDao getJobExecutionDao() {
-		deleteFromTables("BATCH_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION", "BATCH_JOB_PARAMS",
+		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION", "BATCH_JOB_PARAMS",
 				"BATCH_JOB_INSTANCE");
 
 		// job instance needs to exist before job execution can be created

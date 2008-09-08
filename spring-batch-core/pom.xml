@@ -74,6 +74,14 @@
 			<artifactId>cglib-nodep</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jettison</groupId>
+			<artifactId>jettison</artifactId>
+		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
