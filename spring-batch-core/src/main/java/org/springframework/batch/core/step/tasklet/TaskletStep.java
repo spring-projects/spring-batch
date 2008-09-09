@@ -206,9 +206,9 @@ public class TaskletStep extends AbstractStep {
 	 * Process the step and update its context so that progress can be monitored
 	 * by the caller. The step is broken down into chunks, each one executing in
 	 * a transaction. The step and its execution and execution context are all
-	 * given an up to date {@link BatchStatus}, and the {@link JobRepository}
-	 * is used to store the result. Various reporting information are also added
-	 * to the current context (the {@link RepeatContext} governing the step
+	 * given an up to date {@link BatchStatus}, and the {@link JobRepository} is
+	 * used to store the result. Various reporting information are also added to
+	 * the current context (the {@link RepeatContext} governing the step
 	 * execution, which would normally be available to the caller somehow
 	 * through the step's {@link ExecutionContext}.<br/>
 	 * 
@@ -255,10 +255,16 @@ public class TaskletStep extends AbstractStep {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
+						else {
+							logger.error("Ecountered error that should not cause rollback: ", e);
+						}
 					}
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
+						}
+						else {
+							logger.error("Ecountered error that should not cause rollback: ", e);
 						}
 					}
 					finally {
@@ -289,19 +295,7 @@ public class TaskletStep extends AbstractStep {
 						Thread.currentThread().interrupt();
 					}
 
-					try {
-						stream.update(stepExecution.getExecutionContext());
-					}
-					catch (Error e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-					}
-					catch (Exception e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-					}
+					stream.update(stepExecution.getExecutionContext());
 
 					try {
 						getJobRepository().updateExecutionContext(stepExecution);
@@ -380,8 +374,8 @@ public class TaskletStep extends AbstractStep {
 		}
 		catch (Exception e) {
 			/*
-			 * If we already failed to commit, it doesn't help to do this again -
-			 * it's better to allow the CommitFailedException to propagate
+			 * If we already failed to commit, it doesn't help to do this again
+			 * - it's better to allow the CommitFailedException to propagate
 			 */
 			if (!fatalException.hasException()) {
 				fatalException.setException(e);
