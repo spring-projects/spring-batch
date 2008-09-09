@@ -64,7 +64,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
-public class TasketStepTests {
+public class TaskletStepTests {
 
 	List<String> processed = new ArrayList<String>();
 
