@@ -481,6 +481,9 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 							if (rollbackClassifier.classify(e)) {
 								throw e;
 							}
+							else {
+								logger.error("Exception encountered that does not classify for rollback: ", e);
+							}
 						}
 					}
 

@@ -323,6 +323,9 @@ public class SkipLimitStepFactoryBeanTests {
 		// skipped 2,3,4,5
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
 		assertEquals(expectedOutput, writer.written);
+		
+		// reader exceptions should not cause rollback, 1 writer exception causes 2 rollbacks
+		assertEquals(2, stepExecution.getRollbackCount());
 
 	}
 
