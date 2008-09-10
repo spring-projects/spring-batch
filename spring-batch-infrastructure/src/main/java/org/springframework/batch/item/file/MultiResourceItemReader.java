@@ -3,6 +3,8 @@ package org.springframework.batch.item.file;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -29,6 +31,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  */
 public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
+	
+	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
@@ -39,6 +43,9 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	private MultiResourceIndex index = new MultiResourceIndex();
 
 	private boolean saveState = true;
+	
+	// signals there are no resources to read -> just return null on first read
+	private boolean emptyInput;
 
 	private Comparator<Resource> comparator = new Comparator<Resource>() {
 
@@ -60,6 +67,10 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 */
 	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 
+		if (emptyInput) {
+			return null;
+		}
+		
 		T item;
 		item = readNextItem();
 		index.incrementItemCount();
@@ -101,6 +112,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
 		index = new MultiResourceIndex();
 		delegate.close(new ExecutionContext());
+		emptyInput = false;
 	}
 
 	/**
@@ -109,7 +121,14 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
-		Assert.notEmpty(resources, "There must be at least one input resource");
+		Assert.notNull(resources, "Resources must be set");
+		
+		emptyInput = false;
+		if (resources.length == 0) {
+			logger.info("No resources to read");
+			emptyInput = true;
+			return;
+		}
 
 		Arrays.sort(resources, comparator);
 

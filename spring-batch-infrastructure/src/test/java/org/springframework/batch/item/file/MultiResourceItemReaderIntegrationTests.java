@@ -200,6 +200,15 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertSame(r2, resources[2]);
 	}
 
+	/**
+	 * Empty resource list is OK.
+	 */
+	public void testNoResourcesFound() throws Exception {
+		tested.setResources(new Resource[] {});
+		tested.open(ctx);
+		
+		assertNull(tested.read());
+	}
 	private String readItem() throws Exception {
 		Object result = tested.read();
 		return result == null ? null : ((FieldSet) result).readString(0);
