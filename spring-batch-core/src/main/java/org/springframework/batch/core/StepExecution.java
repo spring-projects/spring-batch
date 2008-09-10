@@ -50,6 +50,8 @@ public class StepExecution extends Entity {
 	private volatile int rollbackCount = 0;
 
 	private volatile int readSkipCount = 0;
+	
+	private volatile int processSkipCount = 0;
 
 	private volatile int writeSkipCount = 0;
 
@@ -316,6 +318,7 @@ public class StepExecution extends Entity {
 	public synchronized void apply(StepContribution contribution) {
 		readSkipCount += contribution.getReadSkipCount();
 		writeSkipCount += contribution.getWriteSkipCount();
+		processSkipCount += contribution.getProcessSkipCount();
 		filterCount += contribution.getFilterCount();
 		readCount += contribution.getReadCount();
 		writeCount += contribution.getWriteCount();
@@ -347,7 +350,7 @@ public class StepExecution extends Entity {
 	 * @return the total number of items skipped.
 	 */
 	public int getSkipCount() {
-		return readSkipCount + writeSkipCount;
+		return readSkipCount + processSkipCount + writeSkipCount;
 	}
 
 	/**
@@ -400,6 +403,22 @@ public class StepExecution extends Entity {
 	 */
 	public void setWriteSkipCount(int writeSkipCount) {
 		this.writeSkipCount = writeSkipCount;
+	}
+	
+	/**
+	 * @return the number of records skipped during processing
+	 */
+	public int getProcessSkipCount() {
+		return processSkipCount;
+	}
+
+	/**
+	 * Set the number of records skipped during processing.
+	 * 
+	 * @param processSkipCount
+	 */
+	public void setProcessSkipCount(int processSkipCount) {
+		this.processSkipCount = processSkipCount;
 	}
 
 	/**

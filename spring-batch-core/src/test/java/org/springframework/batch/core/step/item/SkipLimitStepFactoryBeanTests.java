@@ -26,6 +26,7 @@ import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.NoWorkFoundException;
@@ -104,7 +105,7 @@ public class SkipLimitStepFactoryBeanTests {
 	}
 
 	/**
-	 * Check skippable write exception does not cause rollback when included on
+	 * Check rollback write exception does not cause rollback when included on
 	 * transaction attributes as "no rollback for".
 	 */
 	@Test
@@ -132,7 +133,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 	/**
 	 * Fatal exception should cause immediate termination regardless of other
-	 * skip settings (note the fatal exception is also classified as skippable).
+	 * skip settings (note the fatal exception is also classified as rollback).
 	 */
 	@Test
 	public void testFatalException() throws Exception {
@@ -323,8 +324,9 @@ public class SkipLimitStepFactoryBeanTests {
 		// skipped 2,3,4,5
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6"));
 		assertEquals(expectedOutput, writer.written);
-		
-		// reader exceptions should not cause rollback, 1 writer exception causes 2 rollbacks
+
+		// reader exceptions should not cause rollback, 1 writer exception
+		// causes 2 rollbacks
 		assertEquals(2, stepExecution.getRollbackCount());
 
 	}
@@ -426,6 +428,77 @@ public class SkipLimitStepFactoryBeanTests {
 	}
 
 	// TODO: test with transactional reader (e.g. list with tx proxy)
+
+	/**
+	 * Scenario: Exception in processor that shouldn't cause rollback
+	 */
+	@Test
+	public void testProcessorRollback() throws Exception {
+		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("1,3")));
+		factory.setItemProcessor(processor);
+
+		@SuppressWarnings("unchecked")
+		final Collection<String> NO_FAILURES = Collections.EMPTY_LIST;
+		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
+		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
+
+		Step step = (Step) factory.getObject();
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		processor.rollback = false;
+		step.execute(stepExecution);
+		assertEquals(2, stepExecution.getSkipCount());
+		assertEquals(0, stepExecution.getRollbackCount());
+
+	}
+
+	/**
+	 * Scenario: Exception in processor that should cause rollback
+	 */
+	@Test
+	public void testProcessorNoRollback() throws Exception {
+		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("1,3")));
+		factory.setItemProcessor(processor);
+
+		@SuppressWarnings("unchecked")
+		final Collection<String> NO_FAILURES = Collections.EMPTY_LIST;
+		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
+		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
+
+		Step step = (Step) factory.getObject();
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		processor.rollback = true;
+		step.execute(stepExecution);
+		assertEquals(2, stepExecution.getSkipCount());
+		assertEquals(2, stepExecution.getRollbackCount());
+	}
+
+	private static class SkipProcessorStub implements ItemProcessor<String, String> {
+
+		private final Collection<String> failures;
+
+		private boolean rollback = false;
+
+		public SkipProcessorStub(Collection<String> failures) {
+			this.failures = failures;
+		}
+
+		public String process(String item) throws Exception {
+			if (failures.contains(item)) {
+				if (rollback) {
+					throw new SkippableRuntimeException("should cause rollback");
+				}
+				else {
+					throw new SkippableException("shouldn't cause rollback");
+				}
+			}
+			return item;
+		}
+
+	}
 
 	/**
 	 * Simple item reader that supports skip functionality.
