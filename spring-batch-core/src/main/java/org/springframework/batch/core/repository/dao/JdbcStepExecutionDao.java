@@ -41,8 +41,8 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	private static final Log logger = LogFactory.getLog(JdbcStepExecutionDao.class);
 
 	private static final String SAVE_STEP_EXECUTION = "INSERT into %PREFIX%STEP_EXECUTION(STEP_EXECUTION_ID, VERSION, STEP_NAME, JOB_EXECUTION_ID, START_TIME, "
-			+ "END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED) "
-			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, COMMIT_COUNT, READ_COUNT, FILTER_COUNT, WRITE_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED) "
+			+ "values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, CONTINUABLE = ? , EXIT_CODE = ?, "
@@ -50,7 +50,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			+ " where STEP_EXECUTION_ID = ? and VERSION = ?";
 
 	private static final String GET_RAW_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " READ_COUNT, FILTER_COUNT, WRITE_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID = ?";
+			+ " READ_COUNT, FILTER_COUNT, WRITE_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID = ?";
 
 	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " order by STEP_EXECUTION_ID";
 
@@ -108,14 +108,14 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 				stepExecution.getReadCount(), stepExecution.getFilterCount(), stepExecution.getWriteCount(),
 				stepExecution.getExitStatus().isContinuable() ? "Y" : "N", stepExecution.getExitStatus().getExitCode(),
 				exitDescription, stepExecution.getReadSkipCount(), stepExecution.getWriteSkipCount(),
-				stepExecution.getRollbackCount(), stepExecution.getLastUpdated() };
+				stepExecution.getProcessSkipCount(), stepExecution.getRollbackCount(), stepExecution.getLastUpdated() };
 		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(SAVE_STEP_EXECUTION),
 				parameters,
 				new int[] { Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP,
 						Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER,
 						Types.CHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER, Types.INTEGER,
-						Types.TIMESTAMP });
+						Types.INTEGER, Types.TIMESTAMP });
 	}
 
 	/**
@@ -238,11 +238,13 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setReadCount(rs.getInt(7));
 			stepExecution.setFilterCount(rs.getInt(8));
 			stepExecution.setWriteCount(rs.getInt(9));
-			stepExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(10)), rs.getString(11), rs.getString(12)));
+			stepExecution
+					.setExitStatus(new ExitStatus("Y".equals(rs.getString(10)), rs.getString(11), rs.getString(12)));
 			stepExecution.setReadSkipCount(rs.getInt(13));
 			stepExecution.setWriteSkipCount(rs.getInt(14));
-			stepExecution.setRollbackCount(rs.getInt(15));
-			stepExecution.setLastUpdated(rs.getTimestamp(16));
+			stepExecution.setProcessSkipCount(rs.getInt(15));
+			stepExecution.setRollbackCount(rs.getInt(16));
+			stepExecution.setLastUpdated(rs.getTimestamp(17));
 			return stepExecution;
 		}
 

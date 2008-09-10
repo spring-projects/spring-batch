@@ -90,10 +90,10 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	@Transactional @Test
 	public void testSaveAndFindExecution() {
 		
-		
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);
 		stepExecution.setWriteSkipCount(5);
+		stepExecution.setProcessSkipCount(11);
 		stepExecution.setRollbackCount(3);
 		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		stepExecution.setReadCount(17);
@@ -219,6 +219,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		assertEquals(expected.getFilterCount(), actual.getFilterCount());
 		assertEquals(expected.getWriteSkipCount(), actual.getWriteSkipCount());
 		assertEquals(expected.getReadSkipCount(), actual.getReadSkipCount());
+		assertEquals(expected.getProcessSkipCount(), actual.getProcessSkipCount());
 		assertEquals(expected.getRollbackCount(), actual.getRollbackCount());
 		assertEquals(expected.getExitStatus(), actual.getExitStatus());
 		assertEquals(expected.getLastUpdated(), actual.getLastUpdated());
