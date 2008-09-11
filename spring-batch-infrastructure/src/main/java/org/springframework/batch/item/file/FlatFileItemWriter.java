@@ -247,8 +247,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		if (outputState.lastMarkedByteOffsetPosition == 0) {
 			if (headerCallback != null) {
 				try {
-					headerCallback.write(state.outputBufferedWriter);
-					state.write("\n");
+					headerCallback.write(outputState.outputBufferedWriter);
+					outputState.write("\n");
 				}
 				catch (IOException e) {
 					throw new FlushFailedException("Could not write headers.  The file may be corrupt.", e);
@@ -422,6 +422,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 			outputBufferedWriter = getBufferedWriter(fileChannel, encoding);
 
+			Assert.state(outputBufferedWriter != null);
 			// in case of restarting reset position to last committed point
 			if (restarted) {
 				checkFileSize();

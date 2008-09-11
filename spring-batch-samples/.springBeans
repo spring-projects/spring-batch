@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.1.0.v200806081427]]></pluginVersion>
+	<pluginVersion><![CDATA[2.0.6.v200806241357]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -41,6 +41,7 @@
 		<config>src/main/resources/staging-test-context.xml</config>
 		<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 		<config>src/main/resources/jobs/taskletJob.xml</config>
+		<config>src/main/resources/jobs/headerFooterSample.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -216,17 +217,6 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[jmxLauncher]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/adhoc-job-launcher-context.xml</config>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[skipSample]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
@@ -343,6 +333,28 @@
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 				<config>src/main/resources/jobs/taskletJob.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[jmxLauncher]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/adhoc-job-launcher-context.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[headerFooter]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/headerFooterSample.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
