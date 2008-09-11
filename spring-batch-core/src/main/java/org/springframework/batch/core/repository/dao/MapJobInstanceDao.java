@@ -16,7 +16,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	private static Collection jobInstances = TransactionAwareProxyFactory.createTransactionalList();
 
-	private long currentId = 0;
+	private static long currentId = 0;
 
 	public static void clear() {
 		jobInstances.clear();
