@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
@@ -92,8 +93,21 @@ public class TransactionalStaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteWithHeaderAfterRollback() throws Exception {
-		Object header = new Object();
-		writer.setHeaderItems(Collections.singletonList(header));
+		writer.setHeaderCallback(new StaxWriterCallback(){
+
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "header"));
+					writer.add(factory.createEndElement("", "", "header"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+				
+			}
+			
+		});
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
@@ -127,7 +141,7 @@ public class TransactionalStaxEventItemWriterTests {
 		});
 		writer.close(executionContext);
 		String content = outputFileContent();
-		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<!--" + header + "-->")));
+		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<header></header>")));
 		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, TEST_STRING));
 	}
 
@@ -136,8 +150,21 @@ public class TransactionalStaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
-		Object header = new Object();
-		writer.setHeaderItems(Collections.singletonList(header));
+		writer.setHeaderCallback(new StaxWriterCallback(){
+
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "header"));
+					writer.add(factory.createEndElement("", "", "header"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+				
+			}
+			
+		});
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
@@ -172,7 +199,7 @@ public class TransactionalStaxEventItemWriterTests {
 		}
 		writer.close(executionContext);
 		String content = outputFileContent();
-		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<!--" + header + "-->")));
+		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<header></header>")));
 		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, TEST_STRING));
 	}
 

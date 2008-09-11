@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -110,9 +109,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	private boolean saveState = true;
 
-	private List<?> headerItems = new ArrayList<Object>();
+	private StaxWriterCallback headerCallback;
 
-	private List<?> footerItems = new ArrayList<Object>();
+	private StaxWriterCallback footerCallback;
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -134,6 +133,21 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 */
 	public void setMarshaller(Marshaller marshaller) {
 		this.marshaller = marshaller;
+	}
+
+	/**
+	 * headerCallback is called before writing any items.
+	 */
+	public void setHeaderCallback(StaxWriterCallback headerCallback) {
+		this.headerCallback = headerCallback;
+	}
+
+	/**
+	 * footerCallback is called after writing all items but before closing the
+	 * file
+	 */
+	public void setFooterCallback(StaxWriterCallback footerCallback) {
+		this.footerCallback = footerCallback;
 	}
 
 	/**
@@ -219,28 +233,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		this.overwriteOutput = overwriteOutput;
 	}
 
-	/**
-	 * Setter for the headerItems. This list will be marshalled and output
-	 * before any calls to {@link #write(List)}. Header item type is not
-	 * restricted, but note the {@link #setMarshaller(Marshaller)} needs to
-	 * support the type.
-	 * @param headerItems
-	 */
-	public void setHeaderItems(List<?> headerItems) {
-		this.headerItems = headerItems;
-	}
-
-	/**
-	 * Setter for the footerItems. This list will be marshalled and output
-	 * immediately before the writer is closed. Footer item type is not
-	 * restricted, but note the {@link #setMarshaller(Marshaller)} needs to
-	 * support the type.
-	 * @param footerItems
-	 */
-	public void setFooterItems(List<?> footerItems) {
-		this.footerItems = footerItems;
-	}
-
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
@@ -275,7 +267,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		if (startAtPosition == 0) {
 			try {
-				doWrite(headerItems);
+				if (headerCallback != null) {
+					headerCallback.write(delegateEventWriter);
+				}
 			}
 			catch (IOException e) {
 				throw new ItemStreamException("Failed to write headerItems", e);
@@ -396,7 +390,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		}
 
 		try {
-			doWrite(footerItems);
+			if (footerCallback != null) {
+				footerCallback.write(delegateEventWriter);
+			}
 			delegateEventWriter.flush();
 			endDocument(delegateEventWriter);
 		}

@@ -10,11 +10,11 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
@@ -95,7 +95,6 @@ public class StaxEventItemWriterTests {
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = outputFileContent();
-		System.out.println(outputFile);
 		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
 		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
 	}
@@ -105,19 +104,26 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testWriteWithHeader() throws Exception {
-		final Object header1 = new Object();
-		final Object header2 = new Object();
-		writer.setHeaderItems(new ArrayList<Object>() {
-			{
-				add(header1);
-				add(header2);
+		
+		writer.setHeaderCallback(new StaxWriterCallback(){
+
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "header"));
+					writer.add(factory.createEndElement("", "", "header"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+				
 			}
+			
 		});
 		writer.open(executionContext);
 		writer.write(items);
 		String content = outputFileContent();
-		assertTrue("Wrong content: " + content, content.contains(("<!--" + header1 + "-->")));
-		assertTrue("Wrong content: " + content, content.contains(("<!--" + header2 + "-->")));
+		assertTrue("Wrong content: " + content, content.contains(("<header></header>")));
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
 
@@ -144,12 +150,45 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testOpenAndClose() throws Exception {
+		writer.setHeaderCallback(new StaxWriterCallback(){
+
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "header"));
+					writer.add(factory.createEndElement("", "", "header"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+				
+			}
+			
+		});
+		writer.setFooterCallback(new StaxWriterCallback() {
+
+			public void write(XMLEventWriter writer) throws IOException {
+				XMLEventFactory factory = XMLEventFactory.newInstance();
+				try {
+					writer.add(factory.createStartElement("", "", "footer"));
+					writer.add(factory.createEndElement("", "", "footer"));
+				}
+				catch (XMLStreamException e) {
+					throw new RuntimeException(e);
+				}
+				
+			}
+			
+		});
 		writer.setRootTagName("testroot");
 		writer.setRootElementAttributes(Collections.<String, String> singletonMap("attribute", "value"));
 		writer.open(executionContext);
 		writer.close(null);
 		String content = outputFileContent();
+		
 		assertTrue(content.contains("<testroot attribute=\"value\">"));
+		assertTrue(content.contains("<header></header>"));
+		assertTrue(content.contains("<footer></footer>"));
 		assertTrue(content.endsWith("</testroot>"));
 	}
 
