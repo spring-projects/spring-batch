@@ -23,8 +23,6 @@ import java.io.Writer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -78,9 +76,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private String encoding = OutputState.DEFAULT_CHARSET;
 
-	private List<String> headerLines = new ArrayList<String>();
+	private FileWriterCallback headerCallback;
 
-	private List<String> footerLines = new ArrayList<String>();
+	private FileWriterCallback footerCallback;
 
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
 
@@ -152,24 +150,19 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	/**
-	 * Public setter for the header lines. These will be output at the head of
-	 * the file before any calls to {@link #write(List)} (and not on restart
-	 * unless the restart is after a failure before the first flush).
-	 * 
-	 * @param headerLines the header lines to set
+	 * headerCallback will be called before writing the first item to file.
+	 * Newline will be automatically appended after the header is written.
 	 */
-	public void setHeaderLines(String[] headerLines) {
-		this.headerLines = Arrays.asList(headerLines);
+	public void setHeaderCallback(FileWriterCallback headerCallback) {
+		this.headerCallback = headerCallback;
 	}
 
 	/**
-	 * Public setter for footer lines. These will be output at the end of the
-	 * file when the writer is closed.
-	 * 
-	 * @param footerLines the footer lines to set
+	 * footerCallback will be called after writing the last item to file, but
+	 * before the file is closed.
 	 */
-	public void setFooterLines(String[] footerLines) {
-		this.footerLines = Arrays.asList(footerLines);
+	public void setFooterCallback(FileWriterCallback footerCallback) {
+		this.footerCallback = footerCallback;
 	}
 
 	/**
@@ -210,8 +203,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	public void close(ExecutionContext executionContext) {
 		if (state != null) {
 			try {
-				for (String line : footerLines) {
-					state.write(line + lineSeparator);
+				if (footerCallback != null) {
+					footerCallback.write(state.outputBufferedWriter);
+					state.outputBufferedWriter.flush();
 				}
 			}
 			catch (IOException e) {
@@ -251,13 +245,14 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			throw new ItemStreamException("Failed to initialize writer", ioe);
 		}
 		if (outputState.lastMarkedByteOffsetPosition == 0) {
-			try {
-				for (String line : headerLines) {
-					outputState.write(line + lineSeparator);
+			if (headerCallback != null) {
+				try {
+					headerCallback.write(state.outputBufferedWriter);
+					state.write("\n");
 				}
-			}
-			catch (IOException e) {
-				throw new FlushFailedException("Could not write headers.  The file may be corrupt.", e);
+				catch (IOException e) {
+					throw new FlushFailedException("Could not write headers.  The file may be corrupt.", e);
+				}
 			}
 		}
 	}

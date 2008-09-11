@@ -25,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -203,7 +204,13 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testRestart() throws Exception {
 
-		writer.setFooterLines(new String[] { "footer" });
+		writer.setFooterCallback(new FileWriterCallback() {
+
+			public void write(Writer writer) throws IOException {
+				writer.write("footer");
+			}
+			
+		});
 
 		writer.open(executionContext);
 		// write some lines
@@ -309,7 +316,13 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteFooter() throws Exception {
-		writer.setFooterLines(new String[] { "a", "b" });
+		writer.setFooterCallback(new FileWriterCallback() {
+
+			public void write(Writer writer) throws IOException {
+				writer.write("a\nb");
+			}
+			
+		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close(executionContext);
@@ -320,7 +333,13 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteHeader() throws Exception {
-		writer.setHeaderLines(new String[] { "a", "b" });
+		writer.setHeaderCallback(new FileWriterCallback() {
+
+			public void write(Writer writer) throws IOException {
+				writer.write("a\nb");
+			}
+			
+		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close(null);
@@ -334,7 +353,13 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
-		writer.setHeaderLines(new String[] { "a", "b" });
+		writer.setHeaderCallback(new FileWriterCallback() {
+
+			public void write(Writer writer) throws IOException {
+				writer.write("a\nb");
+			}
+			
+		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.close(executionContext);
@@ -353,7 +378,13 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
-		writer.setHeaderLines(new String[] { "a", "b" });
+		writer.setHeaderCallback(new FileWriterCallback() {
+
+			public void write(Writer writer) throws IOException {
+				writer.write("a\nb");
+			}
+			
+		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.update(executionContext);
