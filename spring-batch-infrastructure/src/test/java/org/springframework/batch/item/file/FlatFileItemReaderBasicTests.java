@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
+import static org.easymock.EasyMock.*;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
@@ -228,15 +229,21 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 
 	/**
 	 * Header line is skipped and used to setup fieldSet column names.
+	 * It is also passed to header callback.
 	 */
 	public void testColumnNamesInHeader() throws Exception {
 		final String INPUT = "name1|name2\nvalue1|value2\nvalue3|value4";
+		
+		LineCallbackHandler headerCallback = createStrictMock(LineCallbackHandler.class);
+		headerCallback.handleLine("name1|name2");
+		replay(headerCallback);
 
 		itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setResource(getInputResource(INPUT));
 		itemReader.setLineTokenizer(new DelimitedLineTokenizer('|'));
 		itemReader.setFieldSetMapper(fieldSetMapper);
 		itemReader.setFirstLineIsHeader(true);
+		itemReader.setHeaderCallback(headerCallback);
 		itemReader.afterPropertiesSet();
 		itemReader.open(executionContext);
 
@@ -247,6 +254,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		fs = itemReader.read();
 		assertEquals("value3", fs.readString("name1"));
 		assertEquals("value4", fs.readString("name2"));
+		
+		verify(headerCallback);
 	}
 
 	/**

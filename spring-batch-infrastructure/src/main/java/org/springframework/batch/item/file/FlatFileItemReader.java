@@ -90,8 +90,17 @@ public class FlatFileItemReader<T> extends AbstractItemReaderItemStream<T> imple
 
 	private BufferedReader reader;
 
+	private LineCallbackHandler headerCallback;
+
 	public FlatFileItemReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
+	}
+
+	/**
+	 * headerCallback will be passed the header line before any items are read.
+	 */
+	public void setHeaderCallback(LineCallbackHandler headerCallback) {
+		this.headerCallback = headerCallback;
 	}
 
 	/**
@@ -226,6 +235,9 @@ public class FlatFileItemReader<T> extends AbstractItemReaderItemStream<T> imple
 			if (tokenizer instanceof AbstractLineTokenizer && !((AbstractLineTokenizer) tokenizer).hasNames()) {
 				String[] names = tokenizer.tokenize(firstLine).getValues();
 				((AbstractLineTokenizer) tokenizer).setNames(names);
+			}
+			if (headerCallback != null) {
+				headerCallback.handleLine(firstLine);
 			}
 		}
 
