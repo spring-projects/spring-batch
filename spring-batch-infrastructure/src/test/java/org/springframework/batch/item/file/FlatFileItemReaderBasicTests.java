@@ -308,12 +308,10 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		// afterPropertiesSet should only throw an exception if the Resource is null
 		testReader.afterPropertiesSet();
 
-		try {
-			testReader.open(executionContext);
-			fail();
-		} catch (ItemStreamException ex) {
-			// expected
-		}
+		
+		testReader.open(executionContext);
+		assertNull(testReader.read());
+		
 
 	}
 

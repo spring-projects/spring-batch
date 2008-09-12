@@ -240,12 +240,9 @@ public class StaxEventItemReaderTests extends TestCase {
 		source.setResource(new NonExistentResource());
 		source.afterPropertiesSet();
 
-		try {
-			source.open(executionContext);
-			fail();
-		} catch (ItemStreamException ex) {
-			// expected
-		}
+		source.open(executionContext);
+		assertNull(source.read());
+			
 	}
 
 	public void testRuntimeFileCreation() throws Exception {

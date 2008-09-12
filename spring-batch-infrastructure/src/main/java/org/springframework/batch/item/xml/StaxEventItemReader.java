@@ -8,6 +8,8 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
 import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
@@ -32,6 +34,8 @@ import org.springframework.util.ClassUtils;
  */
 public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream implements
 		ResourceAwareItemReaderItemStream, InitializingBean {
+	
+	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
 
 	private FragmentEventReader fragmentReader;
 
@@ -44,6 +48,8 @@ public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream im
 	private InputStream inputStream;
 
 	private String fragmentRootElementName;
+
+	private boolean noInput;
 
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
@@ -135,7 +141,13 @@ public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream im
 
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "The Resource must not be null.");
-		Assert.state(resource.exists(), "Input resource does not exist: [" + resource + "]");
+		
+		noInput = false;
+		if (!resource.exists()) {
+			noInput = true;
+			logger.warn("Input resource does not exist");
+			return;
+		}
 
 		inputStream = resource.getInputStream();
 		eventReader = XMLInputFactory.newInstance().createXMLEventReader(inputStream);
@@ -147,6 +159,10 @@ public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream im
 	 * Move to next fragment and map it to item.
 	 */
 	protected Object doRead() throws Exception {
+		if (noInput) {
+			return null;
+		}
+		
 		Object item = null;
 
 		if (moveCursorToNextFragment(fragmentReader)) {

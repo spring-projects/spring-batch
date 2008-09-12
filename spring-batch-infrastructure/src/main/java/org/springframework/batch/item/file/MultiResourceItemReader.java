@@ -71,7 +71,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 
 	};
 
-	private boolean emptyInput;
+	private boolean noInput;
 
 	public MultiResourceItemReader() {
 		setName(ClassUtils.getShortName(MultiResourceItemReader.class));
@@ -82,7 +82,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 */
 	public Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 
-		if (emptyInput) {
+		if (noInput) {
 			return null;
 		}
 		
@@ -194,7 +194,7 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 	 * and reset instance variable values.
 	 */
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
-		emptyInput = false;
+		noInput = false;
 		shouldReadBuffer = false;
 		itemBufferIterator = null;
 		index = new MultiResourceIndex();
@@ -211,10 +211,10 @@ public class MultiResourceItemReader extends ExecutionContextUserSupport impleme
 		Assert.notNull(resources, "There must be at least one input resource");
 		Assert.notNull(delegate, "Delegate must not be null");
 		
-		emptyInput = false;
+		noInput = false;
 		if (resources.length == 0) {
-			logger.info("No resources to read");
-			emptyInput = true;
+			logger.warn("No resources to read");
+			noInput = true;
 			return;
 		}
 		

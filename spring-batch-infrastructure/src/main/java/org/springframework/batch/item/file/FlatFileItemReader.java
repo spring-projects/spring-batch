@@ -91,6 +91,8 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 	 */
 	private LineReader reader;
 
+	private boolean noInput = false;
+
 	public FlatFileItemReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
@@ -223,7 +225,13 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "Input Resource must not be null");
-		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
+		
+		noInput = false;
+		if (!resource.exists()) {
+			noInput  = true;
+			log.warn("Input resource does not exist");
+			return;
+		}
 
 		log.debug("Opening flat file for reading: " + resource);
 
@@ -263,6 +271,9 @@ public class FlatFileItemReader extends AbstractBufferedItemReaderItemStream imp
 	 * @see org.springframework.batch.item.ItemReader#read()
 	 */
 	protected Object doRead() throws Exception {
+		if (noInput) {
+			return null;
+		}
 		String line = readLine();
 
 		if (line != null) {
