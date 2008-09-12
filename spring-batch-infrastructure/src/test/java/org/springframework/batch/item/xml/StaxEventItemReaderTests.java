@@ -13,8 +13,10 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Source;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.AbstractResource;
@@ -30,7 +32,7 @@ import org.springframework.xml.transform.StaxSource;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReaderTests extends TestCase {
+public class StaxEventItemReaderTests {
 
 	// object under test
 	private StaxEventItemReader<List<XMLEvent>> source;
@@ -44,15 +46,18 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	private ExecutionContext executionContext;
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		this.executionContext = new ExecutionContext();
 		source = createNewInputSouce();
 	}
 
+	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		source.afterPropertiesSet();
 	}
 
+	@Test
 	public void testAfterPropertesSetException() throws Exception {
 
 		source = createNewInputSouce();
@@ -80,6 +85,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * Regular usage scenario. ItemReader should pass XML fragments to
 	 * unmarshaller wrapped with StartDocument and EndDocument events.
 	 */
+	@Test
 	public void testFragmentWrapping() throws Exception {
 		source.afterPropertiesSet();
 		source.open(executionContext);
@@ -94,6 +100,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	/**
 	 * Cursor is moved before beginning of next fragment.
 	 */
+	@Test
 	public void testMoveCursorToNextFragment() throws XMLStreamException, FactoryConfigurationError, IOException {
 		Resource resource = new ByteArrayResource(xml.getBytes());
 		XMLEventReader reader = XMLInputFactory.newInstance().createXMLEventReader(resource.getInputStream());
@@ -110,6 +117,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	/**
 	 * Save restart data and restore from it.
 	 */
+	@Test
 	public void testRestart() throws Exception {
 
 		source.open(executionContext);
@@ -126,6 +134,7 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	}
 
+	@Test
 	public void testRestoreWorksFromClosedStream() throws Exception {
 		source.close(executionContext);
 		source.update(executionContext);
@@ -135,6 +144,7 @@ public class StaxEventItemReaderTests extends TestCase {
 	 * Statistics return the current record count. Calling read after end of
 	 * input does not increase the counter.
 	 */
+	@Test
 	public void testExecutionContext() throws Exception {
 		final int NUMBER_OF_RECORDS = 2;
 		source.open(executionContext);
@@ -156,11 +166,13 @@ public class StaxEventItemReaderTests extends TestCase {
 		return executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count");
 	}
 
+	@Test
 	public void testCloseWithoutOpen() throws Exception {
 		source.close(null);
 		// No error!
 	}
 
+	@Test
 	public void testClose() throws Exception {
 		MockStaxEventItemReader newSource = new MockStaxEventItemReader();
 		Resource resource = new ByteArrayResource(xml.getBytes());
@@ -187,6 +199,7 @@ public class StaxEventItemReaderTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testOpenBadIOInput() {
 
 		source.setResource(new AbstractResource() {
@@ -212,20 +225,19 @@ public class StaxEventItemReaderTests extends TestCase {
 
 	}
 
+	@Test
 	public void testNonExistentResource() throws Exception {
 
 		source.setResource(new NonExistentResource());
 		source.afterPropertiesSet();
 
-		try {
-			source.open(executionContext);
-			fail();
-		}
-		catch (ItemStreamException ex) {
-			// expected
-		}
+		
+		source.open(executionContext);
+		assertNull(source.read());
+		
 	}
 
+	@Test
 	public void testRuntimeFileCreation() throws Exception {
 
 		source.setResource(new NonExistentResource());

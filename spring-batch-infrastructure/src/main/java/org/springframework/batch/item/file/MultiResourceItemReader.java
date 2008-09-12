@@ -45,7 +45,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	private boolean saveState = true;
 	
 	// signals there are no resources to read -> just return null on first read
-	private boolean emptyInput;
+	private boolean noInput;
 
 	private Comparator<Resource> comparator = new Comparator<Resource>() {
 
@@ -67,7 +67,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 */
 	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 
-		if (emptyInput) {
+		if (noInput) {
 			return null;
 		}
 		
@@ -112,7 +112,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
 		index = new MultiResourceIndex();
 		delegate.close(new ExecutionContext());
-		emptyInput = false;
+		noInput = false;
 	}
 
 	/**
@@ -123,10 +123,10 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		Assert.notNull(resources, "Resources must be set");
 		
-		emptyInput = false;
+		noInput = false;
 		if (resources.length == 0) {
-			logger.info("No resources to read");
-			emptyInput = true;
+			logger.warn("No resources to read");
+			noInput = true;
 			return;
 		}
 

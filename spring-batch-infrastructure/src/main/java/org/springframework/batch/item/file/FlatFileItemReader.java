@@ -92,6 +92,8 @@ public class FlatFileItemReader<T> extends AbstractItemReaderItemStream<T> imple
 
 	private LineCallbackHandler headerCallback;
 
+	private boolean noInput;
+
 	public FlatFileItemReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
@@ -213,8 +215,13 @@ public class FlatFileItemReader<T> extends AbstractItemReaderItemStream<T> imple
 	 */
 	protected void doOpen() throws Exception {
 		Assert.notNull(resource, "Input resource must not be null");
-		Assert.state(resource.exists(), "Resource must exist: [" + resource + "]");
 
+		noInput = false;
+		if (!resource.exists()) {
+			noInput = true;
+			log.warn("Input resource does not exist");
+			return;
+		}
 		try {
 			reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
 		}
@@ -249,6 +256,9 @@ public class FlatFileItemReader<T> extends AbstractItemReaderItemStream<T> imple
 	 * {@link #setFieldSetMapper(FieldSetMapper)}.
 	 */
 	protected T doRead() throws Exception {
+		if (noInput) {
+			return null;
+		}
 		String record = readRecord();
 
 		if (record != null) {

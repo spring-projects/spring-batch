@@ -16,12 +16,20 @@
 
 package org.springframework.batch.item.file;
 
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-import static org.easymock.EasyMock.*;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ReaderNotOpenException;
@@ -42,7 +50,7 @@ import org.springframework.core.io.Resource;
  * @see FlatFileItemReaderAdvancedTests
  * @author Dave Syer
  */
-public class FlatFileItemReaderBasicTests extends TestCase {
+public class FlatFileItemReaderBasicTests {
 
 	// object under test
 	private FlatFileItemReader<FieldSet> itemReader = new FlatFileItemReader<FieldSet>();
@@ -65,7 +73,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	/**
 	 * Create inputFile, inject mock/stub dependencies for tested object, initialize the tested object
 	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 
 		itemReader.setResource(getInputResource(TEST_STRING));
 		itemReader.setLineTokenizer(tokenizer);
@@ -78,7 +87,8 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	/**
 	 * Release resources.
 	 */
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		itemReader.close(null);
 	}
 
@@ -89,6 +99,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
+	@Test
 	public void testRead() throws Exception {
 		itemReader.open(executionContext);
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
@@ -97,6 +108,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
+	@Test
 	public void testReadExhausted() throws Exception {
 		itemReader.open(executionContext);
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
@@ -106,6 +118,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	/**
 	 * Regular usage of <code>read</code> method
 	 */
+	@Test
 	public void testReadWithTokenizerError() throws Exception {
 		itemReader.setLineTokenizer(new LineTokenizer() {
 			public FieldSet tokenize(String line) {
@@ -122,6 +135,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testReadWithMapperError() throws Exception {
 		itemReader.setFieldSetMapper(new FieldSetMapper<FieldSet>() {
 			public FieldSet mapLine(FieldSet fs) {
@@ -139,6 +153,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testReadBeforeOpen() throws Exception {
 		itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setResource(getInputResource(TEST_STRING));
@@ -151,6 +166,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testCloseBeforeOpen() throws Exception {
 		itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setResource(getInputResource(TEST_STRING));
@@ -161,6 +177,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		assertEquals("[FlatFileInputTemplate-TestData]", itemReader.read().toString());
 	}
 
+	@Test
 	public void testInitializationWithNullResource() throws Exception {
 		itemReader = new FlatFileItemReader<FieldSet>();
 		try {
@@ -171,11 +188,13 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testOpenTwiceHasNoEffect() throws Exception {
 		itemReader.open(executionContext);
 		testRead();
 	}
 
+	@Test
 	public void testSetValidEncoding() throws Exception {
 		itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setEncoding("UTF-8");
@@ -185,6 +204,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		testRead();
 	}
 
+	@Test
 	public void testSetNullEncoding() throws Exception {
 		itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setEncoding(null);
@@ -197,6 +217,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testSetInvalidEncoding() throws Exception {
 		itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setEncoding("foo");
@@ -211,16 +232,19 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testEncoding() throws Exception {
 		itemReader.setEncoding("UTF-8");
 		testRead();
 	}
 
+	@Test
 	public void testRecordSeparator() throws Exception {
 		itemReader.setRecordSeparatorPolicy(new DefaultRecordSeparatorPolicy());
 		testRead();
 	}
 
+	@Test
 	public void testComments() throws Exception {
 		itemReader.setResource(getInputResource("% Comment\n" + TEST_STRING));
 		itemReader.setComments(new String[] { "%" });
@@ -231,6 +255,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	 * Header line is skipped and used to setup fieldSet column names.
 	 * It is also passed to header callback.
 	 */
+	@Test
 	public void testColumnNamesInHeader() throws Exception {
 		final String INPUT = "name1|name2\nvalue1|value2\nvalue3|value4";
 		
@@ -261,6 +286,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 	/**
 	 * Header line is skipped and used to setup fieldSet column names.
 	 */
+	@Test
 	public void testLinesToSkip() throws Exception {
 		final String INPUT = "foo bar spam\none two\nthree four";
 
@@ -281,6 +307,7 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		assertEquals("four", fs.readString(1));
 	}
 
+	@Test
 	public void testNonExistantResource() throws Exception {
 
 		Resource resource = new NonExistentResource();
@@ -294,15 +321,12 @@ public class FlatFileItemReaderBasicTests extends TestCase {
 		// afterPropertiesSet should only throw an exception if the Resource is null
 		testReader.afterPropertiesSet();
 
-		try {
-			testReader.open(executionContext);
-			fail();
-		} catch (ItemStreamException ex) {
-			// expected
-		}
+		testReader.open(executionContext);
+		assertNull(testReader.read());
 
 	}
 
+	@Test
 	public void testRuntimeFileCreation() throws Exception {
 
 		Resource resource = new NonExistentResource();
