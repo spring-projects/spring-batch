@@ -1,9 +1,7 @@
 package org.springframework.batch.core.repository.dao;
 
-import java.io.Serializable;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.IOException;
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +14,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatementCallback;
