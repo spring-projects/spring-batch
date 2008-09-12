@@ -16,12 +16,12 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.MessageDeliveryException;
 import org.springframework.integration.message.MessageHeaders;
-import org.springframework.integration.message.MessageTarget;
+import org.springframework.integration.message.MessagingException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,7 +32,7 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
-	private MessageTarget requestChannel;
+	private MessageChannel requestChannel;
 
 	@Autowired
 	@Qualifier("response")
@@ -54,9 +54,9 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 		try {
 			requestChannel.send(trigger);
 		}
-		catch (MessageDeliveryException e) {
+		catch (MessagingException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("reply target"));
+			assertTrue("Wrong message: " + message, message.contains("reply channel"));
 		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
@@ -79,7 +79,7 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 
 		assertNotNull("No response received", executionMessage);
 		JobExecution execution = executionMessage.getPayload();
-		assertNotNull("JobExectuion not returned", execution);
+		assertNotNull("JobExecution not returned", execution);
 	}
 
 }

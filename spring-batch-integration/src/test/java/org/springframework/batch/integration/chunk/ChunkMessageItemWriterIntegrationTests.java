@@ -32,6 +32,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
@@ -47,7 +48,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
-	private PollableChannel requests;
+	private MessageChannel requests;
 
 	@Autowired
 	@Qualifier("replies")
@@ -59,7 +60,6 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	private static long jobCounter;
 
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() {
 
@@ -71,18 +71,13 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setItemWriter(writer);
 		factory.setCommitInterval(4);
 
-		writer.setSource(replies);
-		writer.setTarget(requests);
+		writer.setInputChannel(replies);
+		writer.setOutputChannel(requests);
 
 		TestItemWriter.count = 0;
 		
 		// Drain queues
-		Message<?> message = requests.receive(10);
-		while (message!=null) {
-			System.err.println(message);
-			message = requests.receive(10);
-		}
-		message = replies.receive(10);
+		Message<?> message = replies.receive(10);
 		while (message!=null) {
 			System.err.println(message);
 			message = replies.receive(10);
@@ -92,7 +87,6 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	@After
 	public void tearDown() {
-		while(requests.receive(10L)!=null) {}
 		while(replies.receive(10L)!=null) {}
 	}
 
@@ -126,7 +120,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		waitForResults(6, 10);
 
 		assertEquals(6, TestItemWriter.count);
-		assertEquals(6, stepExecution.getItemCount());
+		assertEquals(6, stepExecution.getReadCount());
 
 	}
 
@@ -153,7 +147,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		waitForResults(8, 10);
 
 		assertEquals(8, TestItemWriter.count);
-		assertEquals(6, stepExecution.getItemCount());
+		assertEquals(6, stepExecution.getReadCount());
 
 	}
 
@@ -185,7 +179,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		waitForResults(1, 10);
 
 		assertEquals(1, TestItemWriter.count);
-		assertEquals(0, stepExecution.getItemCount());
+		assertEquals(0, stepExecution.getReadCount());
 
 	}
 
@@ -260,7 +254,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		}
 
 		assertEquals(0, TestItemWriter.count);
-		assertEquals(0, stepExecution.getItemCount());
+		assertEquals(0, stepExecution.getReadCount());
 
 	}
 

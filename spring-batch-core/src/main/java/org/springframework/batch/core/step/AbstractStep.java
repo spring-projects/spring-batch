@@ -353,10 +353,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			exitStatus = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB);
 		}
 		else {
-			String message = "";
 			StringWriter writer = new StringWriter();
 			ex.printStackTrace(new PrintWriter(writer));
-			message = writer.toString();
+			String message = writer.toString();
 			exitStatus = ExitStatus.FAILED.addExitDescription(message);
 		}
 

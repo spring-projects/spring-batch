@@ -35,7 +35,7 @@ public class JobRepositorySupport implements JobRepository {
 	 */
 	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
-		return new JobExecution(new JobInstance(0L, jobParameters, job.getName()));
+		return new JobExecution(new JobInstance(0L, jobParameters, jobName));
 	}
 
 	/* (non-Javadoc)
@@ -74,6 +74,10 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	public void update(StepExecution stepExecution) {
+	}
+
+	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
+		return false;
 	}
 
 }

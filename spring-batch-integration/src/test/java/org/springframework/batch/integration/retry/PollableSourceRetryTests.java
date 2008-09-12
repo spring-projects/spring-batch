@@ -17,6 +17,9 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.interceptor.MethodArgumentsKeyGenerator;
 import org.springframework.batch.retry.interceptor.MethodInvocationRecoverer;
 import org.springframework.batch.retry.interceptor.StatefulRetryOperationsInterceptor;
@@ -24,11 +27,11 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.context.Lifecycle;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.dispatcher.PollingDispatcher;
+import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.endpoint.SourcePoller;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.MessageExchangeTemplate;
-import org.springframework.integration.message.MessageTarget;
+import org.springframework.integration.message.MessageConsumer;
 import org.springframework.integration.message.PollableSource;
 import org.springframework.integration.scheduling.PollingSchedule;
 import org.springframework.integration.scheduling.SchedulableTask;
@@ -36,6 +39,8 @@ import org.springframework.integration.scheduling.TaskScheduler;
 import org.springframework.integration.scheduling.spi.ProviderTaskScheduler;
 import org.springframework.integration.scheduling.spi.SimpleScheduleServiceProvider;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.MatchAlwaysTransactionAttributeSource;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.StringUtils;
 
 public class PollableSourceRetryTests {
@@ -70,16 +75,16 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		MessageTarget handler = new MessageTarget() {
-			public boolean send(Message<?> message) {
+		MessageConsumer handler = new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
-				return processed.add((String) payload);
+				processed.add((String) payload);
 			}
 		};
 		PollableSource<Object> source = getPollableSource(list);
-		MessageTarget target = getChannel(handler);
-		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 1);
+		MessageChannel target = getChannel(handler);
+		SourcePoller trigger = getSourcePoller(source, target, transactionManager, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 40);
@@ -98,8 +103,8 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		MessageTarget handler = new MessageTarget() {
-			public boolean send(Message<?> message) {
+		MessageConsumer handler = new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
 				processed.add((String) payload);
@@ -107,8 +112,8 @@ public class PollableSourceRetryTests {
 			}
 		};
 		PollableSource<Object> source = getPollableSource(list);
-		MessageTarget target = getChannel(handler);
-		PollingDispatcher trigger = getPollingDispatcher(source, target, null, 1);
+		MessageChannel target = getChannel(handler);
+		SourcePoller trigger = getSourcePoller(source, target, null, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 20);
@@ -129,8 +134,8 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		MessageTarget handler = new MessageTarget() {
-			public boolean send(Message<?> message) {
+		MessageConsumer handler = new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
 				processed.add((String) payload);
@@ -138,8 +143,8 @@ public class PollableSourceRetryTests {
 			}
 		};
 		PollableSource<Object> source = getPollableSource(list);
-		MessageTarget target = getChannel(handler);
-		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 1);
+		MessageChannel target = getChannel(handler);
+		SourcePoller trigger = getSourcePoller(source, target, transactionManager, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 2, 40);
@@ -162,21 +167,20 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		MessageTarget handler = new MessageTarget() {
-			public boolean send(Message<?> message) {
+		MessageConsumer handler = new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
-				boolean result = processed.add((String) payload);
+				processed.add((String) payload);
 				if ("fail".equals(payload)) {
 					throw new RuntimeException("Planned failure: " + payload);
 				}
-				return result;
 			}
 		};
 
 		PollableSource<Object> source = getPollableSource(list);
-		MessageTarget target = getChannel(handler);
-		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 1);
+		MessageChannel target = getChannel(handler);
+		SourcePoller trigger = getSourcePoller(source, target, transactionManager, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 5, 50);
@@ -202,22 +206,24 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		MessageTarget handler = new MessageTarget() {
-			public boolean send(Message<?> message) {
+		MessageConsumer handler = new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
-				boolean result = processed.add((String) payload);
+				processed.add((String) payload);
 				if ("fail".equals(payload)) {
 					throw new RuntimeException("Planned failure: " + payload);
 				}
-				return result;
 			}
 		};
 
 		PollableSource<Object> source = getPollableSource(list);
-		MessageTarget target = getChannel(handler);
-		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 3);
-		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
+		MessageChannel target = getChannel(handler);
+		SourcePoller trigger = getSourcePoller(source, target, null, 1);
+		SchedulableTask task = (SchedulableTask) getProxy(trigger, SchedulableTask.class, new Advice[] {
+				new TransactionInterceptor(transactionManager, new MatchAlwaysTransactionAttributeSource()),
+				getRepeatOperationsInterceptor(3) }, "run");
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(task);
 
 		waitForResults(scheduler, 6, 100);
 
@@ -242,29 +248,29 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		MessageTarget handler = new MessageTarget() {
-			public boolean send(Message<?> message) {
+		MessageConsumer handler = new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				if (message == null) {
-					return false;
+					return;
 				}
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
-				boolean result = processed.add((String) payload);
+				processed.add((String) payload);
 				// INT-184 this won't work if it is a "real" handler that throws
 				// MessageHandlingException
 				if ("fail".equals(payload)) {
 					throw new RuntimeException("Planned failure: " + payload);
 				}
-				return result;
 			}
 		};
 
 		PollableSource<Object> source = getPollableSource(list);
-		MessageTarget target = getChannel(handler);
+		MessageChannel target = getChannel(handler);
 		// this was the old dispatch advice chain
-		target = (MessageTarget) getProxy(target, MessageTarget.class,
+		target = (MessageChannel) getProxy(target, MessageChannel.class,
 				new Advice[] { getRetryOperationsInterceptor(methodArgumentsKeyGenerator) }, "send");
-		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 1);
+		SourcePoller trigger = getSourcePoller(source, target, transactionManager, 1);
+
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
 
 		waitForResults(scheduler, 4, 40);
@@ -290,34 +296,37 @@ public class PollableSourceRetryTests {
 		list.addAll(Arrays.asList(StringUtils.commaDelimitedListToStringArray("a,fail,c,d,e,f,g,h,j,k")));
 		int beforeCount = list.size();
 
-		MessageTarget handler = new MessageTarget() {
-			public boolean send(Message<?> message) {
+		MessageConsumer handler = new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				Object payload = message.getPayload();
 				logger.debug("Handling: " + payload);
-				boolean result = processed.add((String) payload);
+				processed.add((String) payload);
 				if ("fail".equals(payload)) {
 					throw new RuntimeException("Planned failure: " + payload);
 				}
-				return result;
 			}
 		};
 
 		PollableSource<Object> source = getPollableSource(list);
-		MessageTarget target = getChannel(handler);
+		MessageChannel target = getChannel(handler);
+
 		// this was the old dispatch advice chain
-		target = (MessageTarget) getProxy(target, MessageTarget.class,
+		target = (MessageChannel) getProxy(target, MessageChannel.class,
 				new Advice[] { getRetryOperationsInterceptor(methodArgumentsKeyGenerator) }, "send");
-		PollingDispatcher trigger = getPollingDispatcher(source, target, transactionManager, 3);
-		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
+		SourcePoller trigger = getSourcePoller(source, target, null, 1);
+		SchedulableTask task = (SchedulableTask) getProxy(trigger, SchedulableTask.class, new Advice[] {
+			new TransactionInterceptor(transactionManager, new MatchAlwaysTransactionAttributeSource()),
+			getRepeatOperationsInterceptor(3) }, "run");
+		TaskScheduler scheduler = getSchedulerWithErrorHandler(task);
 
 		waitForResults(scheduler, 6, 100);
 		System.err.println(processed);
 		System.err.println(list);
 
-		assertEquals(6, processed.size());
 		assertFalse("No messages got to processor", processed.isEmpty());
-		// One roll back and then start again with a,b,d,e
-		assertEquals(beforeCount - 5, list.size());
+		assertEquals(7, processed.size());
+		// 6 items were removed from the list
+		assertEquals(beforeCount - 6, list.size());
 		assertEquals("a", processed.get(0));
 		assertEquals("fail", processed.get(1));
 		// retry makes it fail once then recover...
@@ -327,26 +336,18 @@ public class PollableSourceRetryTests {
 
 	}
 
-	private PollingDispatcher getPollingDispatcher(PollableSource<Object> source, MessageTarget target,
-			PlatformTransactionManager transactionManager, int commitInterval) {
-		MessageExchangeTemplate template = getExchangeTemplate(transactionManager);
-		PollingDispatcher dispatcher = new PollingDispatcher(source, new PollingSchedule(100), null, template);
-		dispatcher.setMaxMessagesPerPoll(commitInterval);
-		dispatcher.subscribe(target);
-		return dispatcher;
+	private SourcePoller getSourcePoller(PollableSource<Object> source, MessageChannel channel,
+			PlatformTransactionManager transactionManager, int maxMessagesPerPoll) {
+		SourcePoller poller = new SourcePoller(source, channel, new PollingSchedule(100));
+		poller.setTransactionManager(transactionManager);
+		poller.setMaxMessagesPerPoll(maxMessagesPerPoll);
+		return poller;
 	}
 
-	private MessageExchangeTemplate getExchangeTemplate(PlatformTransactionManager transactionManager) {
-		MessageExchangeTemplate template = new MessageExchangeTemplate();
-		template.setTransactionManager(transactionManager);
-		template.afterPropertiesSet();
-		return template;
-	}
-
-	private DirectChannel getChannel(MessageTarget target) {
+	private DirectChannel getChannel(MessageConsumer handler) {
 		DirectChannel channel = new DirectChannel();
 		channel.setBeanName("input");
-		channel.subscribe(target);
+		channel.subscribe(handler);
 		return channel;
 	}
 
@@ -398,7 +399,8 @@ public class PollableSourceRetryTests {
 	 * @param methodArgumentsKeyGenerator
 	 * @return
 	 */
-	private StatefulRetryOperationsInterceptor getRetryOperationsInterceptor(MethodArgumentsKeyGenerator methodArgumentsKeyGenerator) {
+	private StatefulRetryOperationsInterceptor getRetryOperationsInterceptor(
+			MethodArgumentsKeyGenerator methodArgumentsKeyGenerator) {
 		StatefulRetryOperationsInterceptor advice = new StatefulRetryOperationsInterceptor();
 		advice.setRecoverer(new MethodInvocationRecoverer<Boolean>() {
 			@SuppressWarnings("unchecked")
@@ -416,21 +418,18 @@ public class PollableSourceRetryTests {
 		return advice;
 	}
 
+	private RepeatOperationsInterceptor getRepeatOperationsInterceptor(int commitInterval) {
+		RepeatOperationsInterceptor advice = new RepeatOperationsInterceptor();
+		RepeatTemplate repeatTemplate = new RepeatTemplate();
+		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
+		advice.setRepeatOperations(repeatTemplate);
+		return advice;
+	}
 
 	/**
 	 * @param commitInterval
 	 * @return
 	 */
-	// private RepeatOperationsInterceptor getRepeatOperationsInterceptor(int
-	// commitInterval) {
-	// RepeatOperationsInterceptor advice = new RepeatOperationsInterceptor();
-	// RepeatTemplate repeatTemplate = new RepeatTemplate();
-	// repeatTemplate.setCompletionPolicy(new
-	// SimpleCompletionPolicy(commitInterval));
-	// advice.setRepeatOperations(repeatTemplate);
-	// return advice;
-	// }
-
 	private Object getProxy(Object target, Class<?> intf, Advice[] advices, String methodName) {
 		ProxyFactory factory = new ProxyFactory(target);
 		for (int i = 0; i < advices.length; i++) {

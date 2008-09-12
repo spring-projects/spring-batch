@@ -40,7 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration()
 @RunWith(SpringJUnit4ClassRunner.class)
-@MessageEndpoint(input = "resources", output = "requests")
+@MessageEndpoint
 public class ResourceSplitterIntegrationTests {
 
 	@Autowired
@@ -57,7 +57,7 @@ public class ResourceSplitterIntegrationTests {
 	 * The incoming message is a Resource pattern, and it is converted to the
 	 * correct payload type with Spring's default strategy
 	 */
-	@Splitter
+	@Splitter(inputChannel = "resources", outputChannel = "requests")
 	public Resource[] handle(Resource[] message) {
 		List<Resource> list = Arrays.asList(message);
 		System.err.println(list);

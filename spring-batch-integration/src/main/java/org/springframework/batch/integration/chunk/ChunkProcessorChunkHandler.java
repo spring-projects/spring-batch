@@ -4,9 +4,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.integration.annotation.Handler;
+import org.springframework.integration.annotation.MessageEndpoint;
+import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.util.Assert;
 
+@MessageEndpoint
 public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(ChunkProcessorChunkHandler.class);
@@ -32,7 +34,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 	 * (non-Javadoc)
 	 * @see org.springframework.integration.batch.slave.ChunkHandler#handleChunk(java.util.Collection)
 	 */
-	@Handler
+	@ServiceActivator
 	public ChunkResponse handleChunk(ChunkRequest<S> chunkRequest) {
 
 		logger.debug("Handling chunk: " + chunkRequest);

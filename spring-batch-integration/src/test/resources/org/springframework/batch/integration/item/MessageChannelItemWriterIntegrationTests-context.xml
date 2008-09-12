@@ -12,7 +12,9 @@
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 	<integration:message-bus/>
-	<integration:channel id="requests" />
+	<integration:channel id="requests">
+		<integration:queue capacity="UNBOUNDED"/>
+	</integration:channel>
 	<bean id="itemWriter" class="org.springframework.batch.integration.item.MessageChannelItemWriter">
 		<property name="channel" ref="requests"/>
 	</bean>

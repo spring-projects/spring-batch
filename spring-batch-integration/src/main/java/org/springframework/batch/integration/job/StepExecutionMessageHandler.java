@@ -25,7 +25,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.integration.annotation.Handler;
+import org.springframework.integration.annotation.ServiceActivator;
 
 /**
  * @author Dave Syer
@@ -58,7 +58,7 @@ public class StepExecutionMessageHandler {
 		this.jobRepository = jobRepository;
 	}
 
-	@Handler
+	@ServiceActivator
 	public JobExecutionRequest handle(JobExecutionRequest request) {
 
 		// Hand off immediately if the job has already failed

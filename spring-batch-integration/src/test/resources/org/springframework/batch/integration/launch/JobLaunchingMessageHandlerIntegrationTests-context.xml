@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:integration="http://www.springframework.org/schema/integration"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
 	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
@@ -11,34 +9,25 @@
 		http://www.springframework.org/schema/integration
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-
 	<import resource="classpath:simple-job-launcher-context.xml" />
-
-	<integration:message-bus/>
+	<integration:message-bus />
 	<integration:annotation-driven />
 	<integration:channel id="requests" />
-	<integration:channel id="jobs" />
 	<integration:channel id="response">
-		<integration:queue capacity="UNBOUNDED"/>
+		<integration:queue capacity="UNBOUNDED" />
 	</integration:channel>
 
-	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler"/>
-	<integration:service-activator input-channel="none" output-channel="jobs" ref="jobRequestConverter" />
-
-	<bean id="jobRequestConverter" class="org.springframework.batch.integration.launch.JobRequestConverter" />
+	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" method="launch" />
 
 	<bean id="jobLaunchingHandler" class="org.springframework.batch.integration.launch.JobLaunchingMessageHandler">
 		<constructor-arg ref="jobLauncher" />
 	</bean>
-
 	<bean id="testJob" parent="simpleJob">
 		<property name="steps" ref="step" />
 	</bean>
-
 	<bean id="step" parent="taskletStep">
 		<property name="tasklet">
 			<bean class="org.springframework.batch.integration.job.TestTasklet" />
 		</property>
 	</bean>
-
 </beans>

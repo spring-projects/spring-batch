@@ -19,7 +19,7 @@ import java.util.Properties;
 
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.integration.JobSupport;
-import org.springframework.integration.annotation.Handler;
+import org.springframework.integration.annotation.ServiceActivator;
 
 /**
  * @author Dave Syer
@@ -27,7 +27,7 @@ import org.springframework.integration.annotation.Handler;
  */
 public class JobRequestConverter {
 
-	@Handler
+	@ServiceActivator
 	public JobLaunchRequest convert(String jobName) {
 		// TODO: get these from message header
 		Properties properties = new Properties();

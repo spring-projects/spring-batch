@@ -12,10 +12,10 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.integration.message.BlockingSource;
+import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.Assert;
 
 public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>, ItemStream {
@@ -28,9 +28,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
 
-	private MessageTarget target;
+	private MessageChannel target;
 
-	private BlockingSource<ChunkResponse> source;
+	private PollableChannel source;
 
 	// TODO: abstract the state or make a factory for this writer?
 	private LocalState localState = new LocalState();
@@ -46,11 +46,13 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		this.throttleLimit = throttleLimit;
 	}
 
-	public void setSource(BlockingSource<ChunkResponse> source) {
+	// TODO: refactor to ChannelAdapter?
+	public void setInputChannel(PollableChannel source) {
 		this.source = source;
 	}
 
-	public void setTarget(MessageTarget target) {
+	// TODO: re-evaluate the refactor to MessageChannel
+	public void setOutputChannel(MessageChannel target) {
 		this.target = target;
 	}
 
@@ -145,7 +147,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * otherwise return null.
 	 */
 	private void getNextResult(long timeout) {
-		Message<ChunkResponse> message = source.receive(timeout);
+		@SuppressWarnings("unchecked")
+		Message<ChunkResponse> message = (Message<ChunkResponse>) source.receive(timeout);
 		if (message != null) {
 			ChunkResponse payload = message.getPayload();
 			Long jobInstanceId = payload.getJobId();
@@ -174,7 +177,6 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		}
 
 		public int getSkipCount() {
-			// TODO Auto-generated method stub
 			return stepExecution.getSkipCount();
 		}
 

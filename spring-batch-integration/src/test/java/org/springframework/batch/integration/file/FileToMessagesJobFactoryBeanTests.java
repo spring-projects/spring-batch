@@ -20,8 +20,9 @@ import static org.junit.Assert.assertNotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -40,8 +41,8 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.MessageChannel;
-import org.springframework.integration.channel.ThreadLocalChannel;
 import org.springframework.integration.message.Message;
+import org.springframework.integration.message.MessageConsumer;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 
@@ -53,7 +54,8 @@ public class FileToMessagesJobFactoryBeanTests {
 
 	private static final String FILE_INPUT_PATH = ResourcePayloadAsJobParameterStrategy.FILE_INPUT_PATH;
 	private FileToMessagesJobFactoryBean<FieldSet> factory = new FileToMessagesJobFactoryBean<FieldSet>();
-	private ThreadLocalChannel receiver = new ThreadLocalChannel();
+	private DirectChannel channel = new DirectChannel();
+	private List<FieldSet> receiver = new ArrayList<FieldSet>();
 	private JobRepositorySupport jobRepository;
 
 	@Before
@@ -64,16 +66,15 @@ public class FileToMessagesJobFactoryBeanTests {
 		FlatFileItemReader<FieldSet> itemReader = new FlatFileItemReader<FieldSet>();
 		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
 		factory.setItemReader(itemReader);
-		DirectChannel channel = new DirectChannel();
 		factory.setChannel(channel);
-		channel.subscribe(this.receiver);
+		channel.subscribe(new MessageConsumer() {
+			public void onMessage(Message<?> message) {
+				// TODO: Ask Mark: unsafe cast...
+				receiver.add((FieldSet) message.getPayload());
+			}
+		});
 	}
 	
-	@After
-	public void tearDown() {
-		while(receiver.receive(10L)!=null) {}
-	}
-
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.integration.file.FileToMessagesJobFactoryBean#setBeanName(java.lang.String)}.
@@ -170,7 +171,6 @@ public class FileToMessagesJobFactoryBeanTests {
 		assertEquals(true, factory.isSingleton());
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testVanillaJobExecution() throws Exception {
 
@@ -183,17 +183,12 @@ public class FileToMessagesJobFactoryBeanTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		FieldSet payload;
-		Message<FieldSet> message;
 
 		// first line from properties file
-		message = (Message<FieldSet>) receiver.receive(100L);
-		assertNotNull(message);
-		payload = message.getPayload();
+		payload = receiver.get(0);
 		assertNotNull(payload);
 		// second line from properties file
-		message = (Message<FieldSet>) receiver.receive(100L);
-		assertNotNull(message);
-		payload = message.getPayload();
+		payload = receiver.get(1);
 		assertNotNull(payload);
 	}
 

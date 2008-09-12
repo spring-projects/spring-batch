@@ -24,6 +24,8 @@ package org.springframework.batch.repeat.support;
  * 
  * @author Dave Syer
  * @author Ben Hale
+ * 
+ * TODO: BlockingQueue with a CompletionService?
  */
 interface ResultQueue extends RepeatInternalState {
 

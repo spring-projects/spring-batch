@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:integration="http://www.springframework.org/schema/integration"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
@@ -14,35 +10,31 @@
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 	<import resource="classpath:/simple-job-launcher-context.xml" />
-	<integration:annotation-driven/>
-	<integration:message-bus/>
+	<integration:annotation-driven />
+	<integration:message-bus />
 	<integration:channel id="requests" />
 	<integration:channel id="replies">
-		<integration:queue capacity="UNBOUNDED"/>
+		<integration:queue capacity="UNBOUNDED" />
 	</integration:channel>
 	<bean id="job" parent="simpleJob">
 		<property name="steps">
-			<bean id="stepController"
-				class="org.springframework.batch.integration.job.MessageOrientedStep">
-				<property name="target" ref="requests" />
-				<property name="source" ref="replies" />
+			<bean id="stepController" class="org.springframework.batch.integration.job.MessageOrientedStep">
+				<property name="outputChannel" ref="requests" />
+				<property name="inputChannel" ref="replies" />
 				<property name="jobRepository" ref="jobRepository" />
 			</bean>
 		</property>
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
-	<bean id="step"
-		class="org.springframework.batch.integration.job.StepExecutionMessageHandler">
+	<bean id="step" class="org.springframework.batch.integration.job.StepExecutionMessageHandler">
 		<property name="step">
 			<bean parent="taskletStep">
 				<property name="tasklet">
-					<bean
-						class="org.springframework.batch.integration.job.TestTasklet" />
+					<bean class="org.springframework.batch.integration.job.TestTasklet" />
 				</property>
 			</bean>
 		</property>
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
-	<integration:service-activator ref="step" method="handle" input-channel="requests"
-		 output-channel="replies" />
+	<integration:service-activator ref="step" input-channel="requests" output-channel="replies" />
 </beans>

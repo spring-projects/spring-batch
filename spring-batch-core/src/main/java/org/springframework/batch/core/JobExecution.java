@@ -146,7 +146,7 @@ public class JobExecution extends Entity {
 
 	/**
 	 * Register a step execution with the current job execution.
-	 * @param stepName TODO
+	 * @param stepName the name of the step the new execution is associated with
 	 */
 	public StepExecution createStepExecution(String stepName) {
 		StepExecution stepExecution = new StepExecution(stepName, this);

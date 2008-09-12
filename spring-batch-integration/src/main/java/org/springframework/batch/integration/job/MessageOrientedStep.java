@@ -23,10 +23,10 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.integration.message.BlockingSource;
+import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
-import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.Assert;
 
 /**
@@ -40,9 +40,9 @@ public class MessageOrientedStep extends AbstractStep {
 	 */
 	public static final String WAITING = MessageOrientedStep.class.getName() + ".WAITING";
 
-	private MessageTarget target;
+	private MessageChannel outputChannel;
 
-	private BlockingSource<JobExecutionRequest> source;
+	private PollableChannel source;
 
 	private static int MINUTE = 1000 * 60;
 
@@ -77,11 +77,11 @@ public class MessageOrientedStep extends AbstractStep {
 
 	/**
 	 * Public setter for the target.
-	 * @param target the target to set
+	 * @param outputChannel the target to set
 	 */
 	@Required
-	public void setTarget(MessageTarget target) {
-		this.target = target;
+	public void setOutputChannel(MessageChannel outputChannel) {
+		this.outputChannel = outputChannel;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class MessageOrientedStep extends AbstractStep {
 	 * @param source the source to set
 	 */
 	@Required
-	public void setSource(BlockingSource<JobExecutionRequest> source) {
+	public void setInputChannel(PollableChannel source) {
 		this.source = source;
 	}
 
@@ -113,7 +113,7 @@ public class MessageOrientedStep extends AbstractStep {
 			executionContext.putString(WAITING, "true");
 			// TODO: need these two lines to be atomic
 			getJobRepository().update(stepExecution);
-			target.send(new GenericMessage<JobExecutionRequest>(request));
+			outputChannel.send(new GenericMessage<JobExecutionRequest>(request));
 			waitForReply(request.getJobId());
 		}
 
@@ -132,7 +132,8 @@ public class MessageOrientedStep extends AbstractStep {
 		while (count++ < maxCount) {
 
 			// TODO: timeout?
-			Message<JobExecutionRequest> message = source.receive(timeout);
+			@SuppressWarnings("unchecked")
+			Message<JobExecutionRequest> message = (Message<JobExecutionRequest>) source.receive(timeout);
 
 			if (message != null) {
 
