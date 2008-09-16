@@ -392,7 +392,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 				RetryCallback<S> retryCallback = new RetryCallback<S>() {
 
 					public S doWithRetry(RetryContext context) throws Exception {
-						S output = doProcess(wrapper);
+						S output = doProcess(wrapper.getItem());
 						return output;
 					}
 

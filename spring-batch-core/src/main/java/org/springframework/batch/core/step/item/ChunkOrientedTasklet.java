@@ -203,9 +203,9 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	 */
 	protected void process(StepContribution contribution, Chunk<ItemWrapper<T>> inputs, Chunk<S> outputs) throws Exception {
 		int filtered = 0;
-		for (ItemWrapper<T> item : inputs) {
+		for (ItemWrapper<T> wrapper : inputs) {
 			
-			S output = doProcess(item);
+			S output = doProcess(wrapper.getItem());
 			if (output != null) {
 				outputs.add(output);
 			} else {
@@ -217,12 +217,11 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	}
 
 	/**
-	 * @param wrapper the input item
+	 * @param item the input item
 	 * @return the result of the processing
 	 * @throws Exception
 	 */
-	protected S doProcess(ItemWrapper<T> wrapper) throws Exception {
-		T item = wrapper.getItem();
+	protected S doProcess(T item) throws Exception {
 		try {
 			listener.beforeProcess(item);
 			S result = itemProcessor.process(item);
