@@ -15,13 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.util.List;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -44,23 +38,13 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class ChunkOrientedTasklet<T, S> implements Tasklet {
+public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,S> {
 
 	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
 	private static final String OUTPUT_BUFFER_KEY = "OUTPUT_BUFFER_KEY";
 
-	protected final Log logger = LogFactory.getLog(getClass());
-
-	private final ItemReader<? extends T> itemReader;
-
-	private final ItemProcessor<? super T, ? extends S> itemProcessor;
-
-	private final ItemWriter<? super S> itemWriter;
-
 	private final RepeatOperations repeatOperations;
-
-	final private MulticasterBatchListener<T,S> listener = new MulticasterBatchListener<T,S>();
 
 	/**
 	 * @param itemReader
@@ -71,41 +55,8 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	public ChunkOrientedTasklet(ItemReader<? extends T> itemReader,
 			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 			RepeatOperations repeatOperations) {
-		super();
-		this.itemReader = itemReader;
-		this.itemProcessor = itemProcessor;
-		this.itemWriter = itemWriter;
+		super(itemReader, itemProcessor, itemWriter);
 		this.repeatOperations = repeatOperations;
-	}
-
-	/**
-	 * Register some {@link StepListener}s with the handler. Each will get
-	 * the callbacks in the order specified at the correct stage.
-	 * 
-	 * @param listeners
-	 */
-	public void setListeners(StepListener[] listeners) {
-		for (StepListener listener : listeners) {
-			registerListener(listener);
-		}
-	}
-
-	/**
-	 * Register a listener for callbacks at the appropriate stages in a 
-	 * process.
-	 * 
-	 * @param listener a {@link StepListener}
-	 */
-	public void registerListener(StepListener listener) {
-		this.listener.register(listener);
-	}
-
-	/**
-	 * Public getter for the listener.
-	 * @return the listener
-	 */
-	protected MulticasterBatchListener<T,S> getListener() {
-		return listener;
 	}
 
 	/**
@@ -178,23 +129,6 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	}
 
 	/**
-	 * @return item
-	 * @throws Exception
-	 */
-	protected final T doRead() throws Exception {
-		try {
-			listener.beforeRead();
-			T item = itemReader.read();
-			listener.afterRead(item);
-			return item;
-		}
-		catch (Exception e) {
-			listener.onReadError(e);
-			throw e;
-		}
-	}
-
-	/**
 	 * 
 	 * @param inputs the items to process
 	 * @param outputs the items to write
@@ -216,48 +150,14 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	}
 
 	/**
-	 * @param item the input item
-	 * @return the result of the processing
-	 * @throws Exception
-	 */
-	protected S doProcess(T item) throws Exception {
-		try {
-			listener.beforeProcess(item);
-			S result = itemProcessor.process(item);
-			listener.afterProcess(item, result);
-			return result;
-		}
-		catch (Exception e) {
-			listener.onProcessError(item, e);
-			throw e;
-		}
-	}
-
-	/**
 	 * 
 	 * @param chunk the items to write
 	 * @param contribution current context
 	 */
 	protected void write(Chunk<S> chunk, StepContribution contribution) throws Exception {
-		doWrite(chunk.getItems(), contribution);
+		doWrite(chunk.getItems());
+		contribution.incrementWriteCount(chunk.size());
 		chunk.clear();
-	}
-
-	/**
-	 * @param items
-	 * @throws Exception
-	 */
-	protected final void doWrite(List<S> items, StepContribution contribution) throws Exception {
-		try {
-			listener.beforeWrite(items);
-			itemWriter.write(items);
-			contribution.incrementWriteCount(items.size());
-			listener.afterWrite(items);
-		}
-		catch (Exception e) {
-			listener.onWriteError(e, items);
-			throw e;
-		}
 	}
 
 	/**

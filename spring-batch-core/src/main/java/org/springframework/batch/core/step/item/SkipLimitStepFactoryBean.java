@@ -347,7 +347,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 							// increment skip count and try again
 							try {
 								skipCount++;
-								getListener().onSkipInRead(e);
+								listener.onSkipInRead(e);
 							}
 							catch (RuntimeException ex) {
 								contribution.incrementReadSkipCount(skipCount);
@@ -427,7 +427,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			for (ItemWrapper<ItemWrapper<T>> skip : inputs.getSkips()) {
 				Exception exception = skip.getException();
 				try {
-					getListener().onSkipInProcess(skip.getItem().getItem(), exception);
+					listener.onSkipInProcess(skip.getItem().getItem(), exception);
 				}
 				catch (RuntimeException e) {
 					throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
@@ -453,7 +453,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 			RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 				public Object doWithRetry(RetryContext context) throws Exception {
-					doWrite(chunk.getItems(), contribution);
+					doWrite(chunk.getItems());
+					contribution.incrementWriteCount(chunk.size());
 					return null;
 				}
 			};
@@ -473,7 +474,8 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					for (Chunk<S>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
 						S item = iterator.next();
 						try {
-							doWrite(Collections.singletonList(item), contribution);
+							doWrite(Collections.singletonList(item));
+							contribution.incrementWriteCount(1);
 						}
 						catch (Exception e) {
 							checkSkipPolicy(contribution, iterator, e);
@@ -507,7 +509,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			for (ItemWrapper<S> skip : chunk.getSkips()) {
 				Exception exception = skip.getException();
 				try {
-					getListener().onSkipInWrite(skip.getItem(), exception);
+					listener.onSkipInWrite(skip.getItem(), exception);
 				}
 				catch (RuntimeException e) {
 					throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
