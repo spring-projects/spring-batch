@@ -18,6 +18,7 @@ package org.springframework.batch.item.database.support;
 import javax.sql.DataSource;
 
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import java.util.List;
@@ -56,14 +57,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param selectClause SELECT clause part of SQL query string
 	 */
 	public void setSelectClause(String selectClause) {
-		String keyWord = "select ";
-		String temp = selectClause.trim();
-		if (temp.toLowerCase().startsWith(keyWord) && temp.length() > keyWord.length()) {
-			this.selectClause = temp.substring(keyWord.length());
-		}
-		else {
-			this.selectClause = temp;
-		}
+		this.selectClause = removeKeyWord("select", selectClause);
 	}
 
 	/**
@@ -78,14 +72,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param fromClause FROM clause part of SQL query string
 	 */
 	public void setFromClause(String fromClause) {
-		String keyWord = "from ";
-		String temp = fromClause.trim();
-		if (temp.toLowerCase().startsWith(keyWord) && temp.length() > keyWord.length()) {
-			this.fromClause = temp.substring(keyWord.length());
-		}
-		else {
-			this.fromClause = temp;
-		}
+		this.fromClause = removeKeyWord("from", fromClause);
 	}
 
 	/**
@@ -100,13 +87,11 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	 * @param whereClause WHERE clause part of SQL query string
 	 */
 	public void setWhereClause(String whereClause) {
-		String keyWord = "where ";
-		String temp = whereClause.trim();
-		if (temp.toLowerCase().startsWith(keyWord) && temp.length() > keyWord.length()) {
-			this.whereClause = temp.substring(keyWord.length());
+		if (StringUtils.hasText(whereClause)) {
+			this.whereClause = removeKeyWord("where", whereClause);
 		}
 		else {
-			this.whereClause = temp;
+			this.whereClause = null;			
 		}
 	}
 
@@ -181,5 +166,16 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	public abstract String generateRemainingPagesQuery(int pageSize);
 
 	public abstract String generateJumpToItemQuery(int itemIndex, int pageSize);
+
+	private String removeKeyWord(String keyWord,  String clause) {
+		String temp = clause.trim();
+		String keyWordString = keyWord + " ";
+		if (temp.toLowerCase().startsWith(keyWordString) && temp.length() > keyWordString.length()) {
+			return temp.substring(keyWordString.length());
+		}
+		else {
+			return temp;
+		}
+	}
 
 }

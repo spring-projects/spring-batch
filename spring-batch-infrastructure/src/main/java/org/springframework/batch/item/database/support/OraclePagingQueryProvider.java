@@ -1,7 +1,22 @@
+/*
+ * Copyright 2006-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.springframework.batch.item.database.support;
 
 /**
- * Oracle implementation of a  {@link org.springframework.batch.item.database.support.PagingQueryProvider} using
+ * Oracle implementation of a {@link org.springframework.batch.item.database.support.PagingQueryProvider} using
  * database specific features.
  *
  * @author Thomas Risberg
@@ -11,34 +26,17 @@ public class OraclePagingQueryProvider extends SqlWindowingPagingQueryProvider {
 
 	@Override
 	public String generateFirstPageQuery(int pageSize) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(getSelectClause());
-		sql.append(" FROM ").append(getFromClause());
-		sql.append(" WHERE ");
-		if (getWhereClause() != null) {
-			sql.append(getWhereClause());
-			sql.append(" AND ");
-		}
-		sql.append("ROWNUM <= ").append(pageSize);
-		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
+		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, false, buildRowNumClause(pageSize));
 
-		return sql.toString();
 	}
 
 	@Override
 	public String generateRemainingPagesQuery(int pageSize) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(getSelectClause());
-		sql.append(" FROM ").append(getFromClause());
-		sql.append(" WHERE ");
-		if (getWhereClause() != null) {
-			sql.append(getWhereClause());
-			sql.append(" AND ");
-		}
-		sql.append(getSortKey()).append(" > ").append(getSortKeyPlaceHolder());
-		sql.append(" AND ROWNUM <= ").append(pageSize);
-		sql.append(" ORDER BY ").append(getSortKey()).append(" ASC");
-
-		return sql.toString();
+		return SqlPagingQueryUtils.generateRowNumSqlQuery(this, true, buildRowNumClause(pageSize));
 	}
+
+	private String buildRowNumClause(int pageSize) {
+		return new StringBuilder().append("ROWNUM <= ").append(pageSize).toString();
+	}
+
 }
