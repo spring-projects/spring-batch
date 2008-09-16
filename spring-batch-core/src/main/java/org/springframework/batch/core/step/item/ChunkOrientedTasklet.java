@@ -144,6 +144,8 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 				return result;
 			}
 
+			contribution.incrementReadCount(inputs.size());
+			
 			storeInputs(attributes, inputs);
 
 		}
@@ -202,8 +204,6 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 	protected void process(StepContribution contribution, Chunk<ItemWrapper<T>> inputs, Chunk<S> outputs) throws Exception {
 		int filtered = 0;
 		for (ItemWrapper<T> item : inputs) {
-			
-			contribution.incrementReadCount();
 			
 			S output = doProcess(item);
 			if (output != null) {
