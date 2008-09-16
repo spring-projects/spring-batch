@@ -16,7 +16,9 @@
 
 package org.springframework.batch.core.job;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,7 +34,6 @@ import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
@@ -217,13 +218,9 @@ public class SimpleJobTests extends TestCase {
 		step2.setStartLimit(5);
 		final JobInterruptedException exception = new JobInterruptedException("Interrupt!");
 		step1.setProcessException(exception);
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (UnexpectedJobExecutionException e) {
-			assertEquals(exception, e.getCause());
-		}
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.STOPPED, ExitStatus.FAILED);
 	}
@@ -233,13 +230,10 @@ public class SimpleJobTests extends TestCase {
 		step2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step1.setProcessException(exception);
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertEquals(exception, e);
-		}
+			
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
@@ -253,15 +247,10 @@ public class SimpleJobTests extends TestCase {
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step1.setProcessException(exception);
 
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertEquals(exception, e);
-		}
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(1, list.size());
-		assertSame(exception, list.get(0));
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
@@ -270,13 +259,10 @@ public class SimpleJobTests extends TestCase {
 		step2.setStartLimit(5);
 		final Error exception = new Error("Foo!");
 		step1.setProcessException(exception);
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (Error e) {
-			assertEquals(exception, e);
-		}
+
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
@@ -285,15 +271,12 @@ public class SimpleJobTests extends TestCase {
 		// Start policy will return false, keeping the step from being started.
 		step1.setStartLimit(0);
 
-		try {
-			job.execute(jobExecution);
-			fail("Expected BatchCriticalException");
-		}
-		catch (StartLimitExceededException ex) {
-			// expected
-			assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
+		job.execute(jobExecution);
+			
+		assertEquals(1, jobExecution.getFailureExceptions().size());
+		Throwable ex = jobExecution.getFailureExceptions().get(0);
+		assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
 					.indexOf("start limit exceeded") >= 0);
-		}
 	}
 
 	public void testNoSteps() throws Exception {
@@ -320,13 +303,10 @@ public class SimpleJobTests extends TestCase {
 
 	public void testNotExecutedIfAlreadyStopped() throws Exception {
 		jobExecution.stop();
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (UnexpectedJobExecutionException e) {
-			assertTrue(e.getCause() instanceof JobInterruptedException);
-		}
+		job.execute(jobExecution);
+		
+		assertEquals(1, jobExecution.getFailureExceptions().size());
+		assertTrue(jobExecution.getFailureExceptions().get(0) instanceof JobInterruptedException);
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
@@ -338,24 +318,15 @@ public class SimpleJobTests extends TestCase {
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step2.setProcessException(exception);
 
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertSame(exception, e);
-		}
+		job.execute(jobExecution);
+		Throwable e = jobExecution.getAllFailureExceptions().get(0);
+		assertSame(exception, e);
 
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertSame(exception, e);
-		}
+		job.execute(jobExecution);
+		e = jobExecution.getAllFailureExceptions().get(0);
+		assertSame(exception, e);
 		assertTrue(step1.passedInStepContext.isEmpty());
 		assertFalse(step2.passedInStepContext.isEmpty());
-
 	}
 
 	public void testInterruptWithListener() throws Exception {
@@ -368,13 +339,8 @@ public class SimpleJobTests extends TestCase {
 
 		job.setJobExecutionListeners(new JobExecutionListener[] { listener });
 
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (UnexpectedJobExecutionException e) {
-			// expected
-		}
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 
 		verify(listener);
 	}
@@ -390,13 +356,10 @@ public class SimpleJobTests extends TestCase {
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step2.setProcessException(exception);
 
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertSame(exception, e);
-		}
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		Throwable e = jobExecution.getAllFailureExceptions().get(0);
+		assertSame(exception, e);
 
 		assertTrue(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
@@ -405,13 +368,10 @@ public class SimpleJobTests extends TestCase {
 
 		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
 
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertSame(exception, e);
-		}
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		e = jobExecution.getAllFailureExceptions().get(0);
+		assertSame(exception, e);
 		assertFalse(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
 	}
@@ -428,16 +388,11 @@ public class SimpleJobTests extends TestCase {
 		};
 
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
-
-		try {
-			job.execute(jobExecution);
-			fail();
-		}
-		catch (UnexpectedJobExecutionException expected) {
-			assertTrue(expected.getCause() instanceof JobInterruptedException);
-			assertEquals("JobExecution interrupted.", expected.getCause().getMessage());
-		}
-
+		job.execute(jobExecution);
+		Throwable expected = jobExecution.getAllFailureExceptions().get(0);	
+		assertTrue(expected instanceof JobInterruptedException);
+			assertEquals("JobExecution interrupted.", expected.getMessage());
+		
 		assertNull("Second step was not executed", step2.passedInStepContext);
 	}
 
@@ -509,17 +464,20 @@ public class SimpleJobTests extends TestCase {
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				stepExecution.setStatus(BatchStatus.FAILED);
-				throw (RuntimeException) exception;
+				stepExecution.addFailureException(exception);
+				return;
 			}
 			if (exception instanceof Error) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				stepExecution.setStatus(BatchStatus.FAILED);
-				throw (Error) exception;
+				stepExecution.addFailureException(exception);
+				return;
 			}
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.FAILED);
-				throw (JobInterruptedException) exception;
+				stepExecution.setStatus(BatchStatus.STOPPED);
+				stepExecution.addFailureException(exception);
+				return;
 			}
 			if (runnable != null) {
 				runnable.run();

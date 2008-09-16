@@ -3,7 +3,6 @@ package org.springframework.batch.core.step.item;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -24,8 +24,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
-import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -148,13 +146,8 @@ public class SkipLimitStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail();
-		}
-		catch (FatalRuntimeException expected) {
-			assertTrue(expected.getMessage().equals("Ouch!"));
-		}
+		step.execute(stepExecution);
+		assertTrue(stepExecution.getFailureExceptions().get(0).getMessage().equals("Ouch!"));
 	}
 
 	/**
@@ -169,12 +162,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected SkipLimitExceededException.");
-		}
-		catch (SkipLimitExceededException e) {
-		}
+		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
 
@@ -205,13 +193,9 @@ public class SkipLimitStepFactoryBeanTests {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected SkipLimitExceededException.");
-		}
-		catch (SkipLimitExceededException e) {
-		}
-
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		
 		assertEquals(3, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
@@ -249,13 +233,9 @@ public class SkipLimitStepFactoryBeanTests {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected SkipListenerFailedException.");
-		}
-		catch (SkipListenerFailedException e) {
-			assertEquals("oops", e.getCause().getMessage());
-		}
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(1, stepExecution.getReadSkipCount());
@@ -286,14 +266,9 @@ public class SkipLimitStepFactoryBeanTests {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected SkipListenerFailedException.");
-		}
-		catch (SkipListenerFailedException e) {
-			assertEquals("oops", e.getCause().getMessage());
-		}
-
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 		assertEquals(3, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
@@ -406,13 +381,8 @@ public class SkipLimitStepFactoryBeanTests {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected SkipLimitExceededException.");
-		}
-		catch (SkipLimitExceededException e) {
-		}
-
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("bad skip count", 3, stepExecution.getSkipCount());
 		assertEquals("bad read skip count", 2, stepExecution.getReadSkipCount());
 		assertEquals("bad write skip count", 1, stepExecution.getWriteSkipCount());

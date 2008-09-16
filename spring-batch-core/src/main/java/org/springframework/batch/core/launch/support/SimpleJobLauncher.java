@@ -99,8 +99,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 				try {
 					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
 					job.execute(jobExecution);
-					logger.info("Job: [" + job + "] completed successfully with the following parameters: ["
-							+ jobParameters + "]");
+					logger.info("Job: [" + job + "] completed with the following parameters: ["
+							+ jobParameters + "] and the following status: [" + jobExecution.getStatus() + "]");
 				}
 				catch (Throwable t) {
 					logger.info("Job: [" + job + "] failed with the following parameters: [" + jobParameters + "]", t);

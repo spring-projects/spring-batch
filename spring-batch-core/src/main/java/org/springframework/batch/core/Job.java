@@ -32,12 +32,13 @@ public interface Job {
 
 	/**
 	 * Run the {@link JobExecution} and update the meta information like status
-	 * and statistics as necessary.
+	 * and statistics as necessary.  This method should not throw any exceptions
+	 * for failed execution.  Clients should be careful to inspect the {@link JobExecution}
+	 * status to determine success or failure.
 	 * 
 	 * @param execution a {@link JobExecution}
-	 * @throws JobExecutionException
 	 */
-	void execute(JobExecution execution) throws JobExecutionException;
+	void execute(JobExecution execution);
 
 	/**
 	 * @return in incrementer to be used for creating new parameters

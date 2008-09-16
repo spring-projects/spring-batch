@@ -188,12 +188,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 		try {
 			getCompositeListener().beforeStep(stepExecution);
-			try {
-				open(stepExecution.getExecutionContext());
-			}
-			catch (Exception e) {
-				throw new UnexpectedJobExecutionException("Failed to initialize the step", e);
-			}
+			open(stepExecution.getExecutionContext());
+
 			exitStatus = doExecute(stepExecution);
 
 			// Check if someone is trying to stop us
@@ -220,6 +216,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			logger.error("Encountered an error executing the step: " + e.getClass() + ": " + e.getMessage());
 			stepExecution.setStatus(determineBatchStatus(e));
 			exitStatus = getDefaultExitStatusForFailure(e);
+			stepExecution.addFailureException(e);
 
 			try {
 				exitStatus = exitStatus.and(getCompositeListener().onErrorInStep(stepExecution, e));
@@ -227,8 +224,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 			catch (Exception ex) {
 				logger.error("Encountered an error on listener error callback.", ex);
+				stepExecution.addFailureException(ex);
 			}
-			rethrow(e);
 		}
 		finally {
 
@@ -252,33 +249,16 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 			catch (Exception e) {
 				logger.error("Exception while closing step execution resources", e);
-				throw new UnexpectedJobExecutionException("Exception while closing step resources", e);
+				stepExecution.addFailureException(e);
 			}
 
 			if (commitException != null) {
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
 				logger.error("Encountered an error saving batch meta data."
 						+ "This job is now in an unknown state and should not be restarted.", commitException);
-				throw new UnexpectedJobExecutionException("Encountered an error saving batch meta data.",
-						commitException);
+				stepExecution.addFailureException(commitException);
 			}
 		}
-	}
-
-	private static void rethrow(Throwable e) throws JobInterruptedException {
-		if (e instanceof Error) {
-			throw (Error) e;
-		}
-		if (e instanceof JobInterruptedException) {
-			throw (JobInterruptedException) e;
-		}
-		else if (e.getCause() instanceof JobInterruptedException) {
-			throw (JobInterruptedException) e.getCause();
-		}
-		else if (e instanceof RuntimeException) {
-			throw (RuntimeException) e;
-		}
-		throw new UnexpectedJobExecutionException("Unexpected checked exception in step execution", e);
 	}
 
 	/**

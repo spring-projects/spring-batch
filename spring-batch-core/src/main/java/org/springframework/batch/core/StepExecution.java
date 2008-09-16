@@ -16,7 +16,9 @@
 
 package org.springframework.batch.core;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -68,6 +70,8 @@ public class StepExecution extends Entity {
 	private volatile boolean terminateOnly;
 
 	private volatile int filterCount;
+	
+	private volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
 	 * Constructor with mandatory properties.
@@ -435,6 +439,18 @@ public class StepExecution extends Entity {
 	 */
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+	
+	public List<Throwable> getFailureExceptions() {
+		return failureExceptions;
+	}
+	
+	public void setFailureExceptions(List<Throwable> failureExceptions) {
+		this.failureExceptions = failureExceptions;
+	}
+	
+	public void addFailureException(Throwable throwable){
+		this.failureExceptions.add(throwable);
 	}
 
 	/*

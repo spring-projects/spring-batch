@@ -90,10 +90,9 @@ public class ApplicationContextJobFactory implements JobFactory {
 
 		/**
 		 * @param execution
-		 * @throws JobExecutionException
 		 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
 		 */
-		public void execute(JobExecution execution) throws JobExecutionException {
+		public void execute(JobExecution execution) {
 			try {
 				delegate.execute(execution);
 			}

@@ -37,10 +37,12 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 public interface JobLauncher {
 
 	/**
-	 * Start a job execution for the given {@link Job} and {@link JobParameters}.
+	 * Start a job execution for the given {@link Job} and {@link JobParameters}.  If
+	 * a JobExecution was able to be created successfully, it will always be returned
+	 * by this method, regardless of whether or not the execution was successful.
 	 * 
-	 * @return the exit code from the job if it returns synchronously. If the
-	 * implementation is asynchronous, the status might well be unknown.
+	 * @return the {@link JobExecution} if it returns synchronously. If the
+	 * implementation is asynchronous, the status might well be unknown.  
 	 * 
 	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified
 	 * by the properties already has an execution running.

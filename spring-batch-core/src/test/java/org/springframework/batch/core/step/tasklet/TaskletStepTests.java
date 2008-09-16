@@ -36,7 +36,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
@@ -172,16 +171,8 @@ public class TaskletStepTests {
 		step.setJobRepository(repository);
 		step.afterPropertiesSet();
 
-		try {
-			step.execute(stepExecution);
-			fail();
-		}
-		catch (Exception e) {
-			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
-			assertEquals("Fatal error detected during update of step execution", e.getMessage());
-			assertEquals("stub exception", e.getCause().getMessage());
-		}
-		
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 	}
 
 	@Test
@@ -328,14 +319,11 @@ public class TaskletStepTests {
 				counter++;
 			}
 		});
-		try {
-			step.execute(stepExecution);
-			fail();
-		}
-		catch (RuntimeException e) {
-			assertEquals("Fatal error detected during save of step execution context", e.getMessage());
-			assertEquals("foo", e.getCause().getMessage());
-		}
+		
+		step.execute(stepExecution);
+		Throwable e = stepExecution.getFailureExceptions().get(0);	
+		assertEquals("Fatal error detected during save of step execution context", e.getMessage());
+		assertEquals("foo", e.getCause().getMessage());
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 	}
 
@@ -497,13 +485,8 @@ public class TaskletStepTests {
 		}, itemWriter));
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		try {
-			step.execute(stepExecution);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("FOO", e.getMessage());
-		}
+		step.execute(stepExecution);
+		assertEquals("FOO", stepExecution.getFailureExceptions().get(0).getMessage());
 		assertEquals(1, list.size());
 	}
 
@@ -533,7 +516,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStatusForInterruptedException() {
+	public void testStatusForInterruptedException() throws Exception{
 
 		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
 
@@ -560,16 +543,11 @@ public class TaskletStepTests {
 
 		stepExecution.setExecutionContext(foobarEc);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected JobInterruptedException");
-		}
-		catch (JobInterruptedException ex) {
-			assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
-			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg,
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+		String msg = stepExecution.getExitStatus().getExitDescription();
+		assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg,
 					"JobInterruptedException"));
-		}
 	}
 
 	@Test
@@ -589,15 +567,10 @@ public class TaskletStepTests {
 		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException ex) {
-			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-			// The original rollback was caused by this one:
-			assertEquals("Foo", ex.getMessage());
-		}
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// The original rollback was caused by this one:
+		assertEquals("Foo", stepExecution.getFailureExceptions().get(0).getMessage());
 	}
 
 	@Test
@@ -617,15 +590,10 @@ public class TaskletStepTests {
 		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected Error");
-		}
-		catch (Error ex) {
-			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-			// The original rollback was caused by this one:
-			assertEquals("Foo", ex.getMessage());
-		}
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		// The original rollback was caused by this one:
+		assertEquals("Foo", stepExecution.getFailureExceptions().get(0).getMessage());
 	}
 
 	@Test
@@ -651,17 +619,12 @@ public class TaskletStepTests {
 		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected UnexpectedJobExecutionException");
-		}
-		catch (RuntimeException ex) {
-			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
-			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue("Message does not contain ResetFailedException: " + msg, contains(msg, "ResetFailedException"));
-			// The original rollback was caused by this one:
-			assertEquals("Bar", ex.getCause().getMessage());
-		}
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+		String msg = stepExecution.getExitStatus().getExitDescription();
+		assertTrue("Message does not contain ResetFailedException: " + msg, contains(msg, "ResetFailedException"));
+		// The original rollback was caused by this one:
+		assertEquals("Bar", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 	}
 
 	@Test
@@ -680,19 +643,15 @@ public class TaskletStepTests {
 		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected BatchCriticalException");
-		}
-		catch (RuntimeException ex) {
-			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
-			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue(msg.contains("Fatal error detected during commit"));
-			msg = ex.getMessage();
-			assertTrue(msg.contains("Fatal error detected during commit"));
-			// The original rollback was caused by this one:
-			assertEquals("Bar", ex.getCause().getMessage());
-		}
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+		String msg = stepExecution.getExitStatus().getExitDescription();
+		assertTrue(msg.contains("Fatal error detected during commit"));
+		Throwable ex = stepExecution.getFailureExceptions().get(0);
+		msg = ex.getMessage();
+		assertTrue(msg.contains("Fatal error detected during commit"));
+		// The original rollback was caused by this one:
+		assertEquals("Bar", ex.getCause().getMessage());
 	}
 
 	@Test
@@ -708,20 +667,15 @@ public class TaskletStepTests {
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException ex) {
-			// The job actually completed, but the streams couldn't be closed.
-			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertEquals("", msg);
-			msg = ex.getMessage();
-			assertTrue("Message does not contain 'closing step': " + msg, contains(msg, "closing step"));
-			// The original rollback was caused by this one:
-			assertEquals("Bar", ex.getCause().getMessage());
-		}
+		step.execute(stepExecution);
+		// The job actually completed, but the streams couldn't be closed.
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		String msg = stepExecution.getExitStatus().getExitDescription();
+		assertEquals("", msg);
+		Throwable ex = stepExecution.getFailureExceptions().get(0);
+		msg = ex.getMessage();
+		// The original rollback was caused by this one:
+		assertEquals("Bar", ex.getMessage());
 	}
 
 	@Test
@@ -743,20 +697,15 @@ public class TaskletStepTests {
 		stepExecution.setExecutionContext(foobarEc);
 		// step.setLastExecution(stepExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected InfrastructureException");
-		}
-		catch (UnexpectedJobExecutionException ex) {
+		step.execute(stepExecution);
 			// The job actually completed, but the streams couldn't be closed.
-			assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertEquals("", msg);
-			msg = ex.getMessage();
-			assertTrue("Message does not contain 'closing': " + msg, contains(msg, "closing"));
-			// The original rollback was caused by this one:
-			assertEquals("Bar", ex.getCause().getMessage());
-		}
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		String msg = stepExecution.getExitStatus().getExitDescription();
+		assertEquals("", msg);
+		Throwable ex = stepExecution.getFailureExceptions().get(0);
+		msg = ex.getMessage();
+		// The original rollback was caused by this one:
+		assertEquals("Bar", ex.getMessage());
 	}
 
 	/**
@@ -777,16 +726,12 @@ public class TaskletStepTests {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected InfrastructureException");
-		}
-		catch (RuntimeException expected) {
-			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-			assertEquals("CRASH!", expected.getMessage());
-			assertFalse(stepExecution.getExecutionContext().isEmpty());
-			assertTrue(stepExecution.getExecutionContext().getString("spam").equals("bucket"));
-		}
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		Throwable expected = stepExecution.getFailureExceptions().get(0);
+		assertEquals("CRASH!", expected.getMessage());
+		assertFalse(stepExecution.getExecutionContext().isEmpty());
+		assertTrue(stepExecution.getExecutionContext().getString("spam").equals("bucket"));
 	}
 
 	@Test
@@ -820,14 +765,10 @@ public class TaskletStepTests {
 		};
 		step.setStepExecutionListeners(new StepExecutionListener[] { listener });
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
-		try {
-			step.execute(stepExecution);
-			fail();
-		}
-		catch (RuntimeException expected) {
-			assertEquals("exception thrown in afterStep to signal failure", expected.getMessage());
-		}
 
+		step.execute(stepExecution);
+		Throwable expected = stepExecution.getFailureExceptions().get(0);
+		assertEquals("exception thrown in afterStep to signal failure", expected.getMessage());
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 
 	}

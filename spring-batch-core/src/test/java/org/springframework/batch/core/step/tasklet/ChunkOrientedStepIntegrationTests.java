@@ -18,7 +18,6 @@ package org.springframework.batch.core.step.tasklet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +38,6 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -134,27 +132,20 @@ public class ChunkOrientedStepIntegrationTests {
 		});
 		// step.setLastExecution(stepExecution);
 
-		try {
-			step.execute(stepExecution);
-			fail("Expected BatchCriticalException");
-		}
-		catch (RuntimeException e) {
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
+		assertEquals(lastStepExecution, stepExecution);
+		assertFalse(lastStepExecution == stepExecution);
 
-			assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
-			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());
-			assertEquals(lastStepExecution, stepExecution);
-			assertFalse(lastStepExecution == stepExecution);
+		// If the StepExecution is not saved after the failure it will be
+		// STARTED instead of UNKNOWN
+		assertEquals(BatchStatus.UNKNOWN, lastStepExecution.getStatus());
+		String msg = stepExecution.getExitStatus().getExitDescription();
+		assertTrue(msg.contains("Fatal error detected during commit"));
+		// The original rollback was caused by this one:
+		assertEquals("Simulate commit failure", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 
-			// If the StepExecution is not saved after the failure it will be
-			// STARTED instead of UNKNOWN
-			assertEquals(BatchStatus.UNKNOWN, lastStepExecution.getStatus());
-
-			String msg = stepExecution.getExitStatus().getExitDescription();
-			assertTrue(msg.contains("Fatal error detected during commit"));
-			// The original rollback was caused by this one:
-			assertEquals("Simulate commit failure", e.getCause().getMessage());
-
-		}
 	}
 
 }

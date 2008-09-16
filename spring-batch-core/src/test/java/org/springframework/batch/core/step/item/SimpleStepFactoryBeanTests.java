@@ -151,14 +151,9 @@ public class SimpleStepFactoryBeanTests {
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
-		try {
-			job.execute(jobExecution);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-			assertEquals("Error!", e.getMessage());
-		}
+		
+		job.execute(jobExecution);
+		assertEquals("Error!", jobExecution.getAllFailureExceptions().get(0).getMessage());
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(0, written.size());
@@ -180,14 +175,9 @@ public class SimpleStepFactoryBeanTests {
 		job.setSteps(Collections.singletonList((Step) step));
 
 		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
-		try {
-			job.execute(jobExecution);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			assertEquals("Foo", e.getMessage());
-			// expected
-		}
+
+		job.execute(jobExecution);
+		assertEquals("Foo", jobExecution.getAllFailureExceptions().get(0).getMessage());
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
 

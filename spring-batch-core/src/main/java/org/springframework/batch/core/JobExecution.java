@@ -16,9 +16,11 @@
 
 package org.springframework.batch.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -48,6 +50,8 @@ public class JobExecution extends Entity {
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
+	
+	private volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
@@ -234,12 +238,63 @@ public class JobExecution extends Entity {
 		stepExecutions.add(stepExecution);
 	}
 
+	/**
+	 * Get the date representing the last time this JobExecution was updated in the
+	 * JobRepository.
+	 * 
+	 * @return Date representing the last time this JobExecution was updated.
+	 */
 	public Date getLastUpdated() {
 		return lastUpdated;
 	}
 
+	/**
+	 * Set the last time this JobExecution was updated.
+	 * 
+	 * @param lastUpdated
+	 */
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
 	
+	public List<Throwable> getFailureExceptions() {
+		return failureExceptions;
+	}
+	
+	/**
+	 * Set the list of failure causing exceptions for this JobExecution.  It
+	 * should be noted that the exceptions should only be for the job execution
+	 * not step executions. 
+	 * 
+	 * @param failureExceptions
+	 */
+	public void setFailureExceptions(List<Throwable> failureExceptions) {
+		this.failureExceptions = failureExceptions;
+	}
+	
+	/**
+	 * Add the provided throwable to the failure exception list. 
+	 * 
+	 * @param t
+	 */
+	public void addFailureException(Throwable t){
+		this.failureExceptions.add(t);
+	}
+	
+	/**
+	 * Return all failure causing exceptions for this JobExecution, including
+	 * step executions.
+	 * 
+	 * @return List<Throwable> containing all exceptions causing failure for this
+	 * JobExecution.
+	 */
+	public List<Throwable> getAllFailureExceptions(){
+		
+		List<Throwable> allExceptions = new ArrayList<Throwable>(failureExceptions);
+		for(StepExecution stepExecution: stepExecutions){
+			allExceptions.addAll(stepExecution.getFailureExceptions());
+		}
+		
+		return allExceptions;
+	}
 }

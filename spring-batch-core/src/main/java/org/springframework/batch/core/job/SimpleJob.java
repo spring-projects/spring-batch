@@ -28,7 +28,6 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 
@@ -50,7 +49,7 @@ public class SimpleJob extends AbstractJob {
 	 * @throws StartLimitExceededException if start limit of one of the steps
 	 * was exceeded
 	 */
-	public void execute(JobExecution execution) throws JobExecutionException {
+	public void execute(JobExecution execution){
 
 		JobInstance jobInstance = execution.getJobInstance();
 
@@ -97,6 +96,10 @@ public class SimpleJob extends AbstractJob {
 
 					step.execute(currentStepExecution);
 
+					if(currentStepExecution.getStatus() == BatchStatus.FAILED ||
+							currentStepExecution.getStatus() == BatchStatus.STOPPED	){
+						break;
+					}
 				}
 			}
 
@@ -105,20 +108,30 @@ public class SimpleJob extends AbstractJob {
 				throw new JobInterruptedException("JobExecution interrupted.");
 			}
 
-			updateStatus(execution, BatchStatus.COMPLETED);
+			updateStatus(execution, currentStepExecution.getStatus());
 
-			getCompositeListener().afterJob(execution);
+			//This is temporary, given the changes to how exceptions are handled, there really should only be an afterJob method
+			//but it's being left as is until the listener contract can be discussed.
+			if(execution.getStatus() == BatchStatus.COMPLETED){
+				getCompositeListener().afterJob(execution);
+			}
+			else if(execution.getStatus() == BatchStatus.FAILED){
+				getCompositeListener().onError(execution, currentStepExecution.getFailureExceptions().get(0));
+			}
+			else if(execution.getStatus() == BatchStatus.STOPPED){
+				getCompositeListener().onInterrupt(execution);
+			}
 
 		}
 		catch (JobInterruptedException e) {
 			execution.setStatus(BatchStatus.STOPPED);
+			execution.addFailureException(e);
 			getCompositeListener().onInterrupt(execution);
-			rethrow(e);
 		}
 		catch (Throwable t) {
 			execution.setStatus(BatchStatus.FAILED);
+			execution.addFailureException(t);
 			getCompositeListener().onError(execution, t);
-			rethrow(t);
 		}
 		finally {
 			ExitStatus status = ExitStatus.FAILED;
@@ -183,21 +196,6 @@ public class SimpleJob extends AbstractJob {
 			// start max has been exceeded, throw an exception.
 			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
 					+ "StartMax: " + step.getStartLimit());
-		}
-	}
-
-	/**
-	 * @param t
-	 */
-	private static void rethrow(Throwable t) throws RuntimeException {
-		if (t instanceof RuntimeException) {
-			throw (RuntimeException) t;
-		}
-		else if (t instanceof Error) {
-			throw (Error) t;
-		}
-		else {
-			throw new UnexpectedJobExecutionException("Unexpected checked exception in job execution", t);
 		}
 	}
 }

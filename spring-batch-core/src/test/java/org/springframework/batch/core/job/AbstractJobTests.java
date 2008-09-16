@@ -20,7 +20,6 @@ import java.util.Collections;
 import junit.framework.TestCase;
 
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.StepSupport;
 
@@ -31,7 +30,7 @@ import org.springframework.batch.core.step.StepSupport;
 public class AbstractJobTests extends TestCase {
 
 	AbstractJob job = new AbstractJob("job") {
-		public void execute(JobExecution execution) throws JobExecutionException {
+		public void execute(JobExecution execution) {
 			throw new UnsupportedOperationException();
 		}
 	};
@@ -41,7 +40,7 @@ public class AbstractJobTests extends TestCase {
 	 */
 	public void testGetName() {
 		job = new AbstractJob(){
-			public void execute(JobExecution execution) throws JobExecutionException {
+			public void execute(JobExecution execution) {
 				// No-op
 			}
 		};
@@ -61,7 +60,7 @@ public class AbstractJobTests extends TestCase {
 	 */
 	public void testSetBeanNameWithNullName() {
 		job = new AbstractJob(null) {
-			public void execute(JobExecution execution) throws JobExecutionException {
+			public void execute(JobExecution execution) {
 				// NO-OP
 			}
 		};
@@ -103,7 +102,7 @@ public class AbstractJobTests extends TestCase {
 	
 	public void testAfterPropertiesSet() throws Exception {
 		AbstractJob job = new AbstractJob() {
-			public void execute(JobExecution execution) throws JobExecutionException {
+			public void execute(JobExecution execution) {
 			}
 		};
 		job.setJobRepository(null);

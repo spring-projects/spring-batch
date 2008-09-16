@@ -15,21 +15,24 @@
  */
 package org.springframework.batch.core;
 
-import java.util.Date;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Test;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer
  * 
  */
-public class JobExecutionTests extends TestCase {
+public class JobExecutionTests {
 
 	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "foo"), new Long(12));
 
+	@Test
 	public void testJobExecution() {
 		assertNull(new JobExecution(new JobInstance(null,null,"foo")).getId());
 	}
@@ -38,6 +41,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
+	@Test
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
 		execution.setEndTime(new Date(100L));
@@ -48,6 +52,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
+	@Test
 	public void testIsRunning() {
 		assertTrue(execution.isRunning());
 		execution.setEndTime(new Date(100L));
@@ -58,6 +63,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
+	@Test
 	public void testIsRunningWithStoppedExecution() {
 		assertTrue(execution.isRunning());
 		execution.stop();
@@ -69,6 +75,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getStartTime()}.
 	 */
+	@Test
 	public void testGetStartTime() {
 		execution.setStartTime(new Date(0L));
 		assertEquals(0L, execution.getStartTime().getTime());
@@ -78,6 +85,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
 	 */
+	@Test
 	public void testGetStatus() {
 		assertEquals(BatchStatus.STARTING, execution.getStatus());
 		execution.setStatus(BatchStatus.COMPLETED);
@@ -88,6 +96,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
+	@Test
 	public void testGetJobId() {
 		assertEquals(11, execution.getJobId().longValue());
 		execution = new JobExecution(new JobInstance(new Long(23), new JobParameters(), "testJob"), null);
@@ -98,6 +107,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
+	@Test
 	public void testGetJobIdForNullJob() {
 		execution = new JobExecution(null, null);
 		assertEquals(null, execution.getJobId());
@@ -107,6 +117,7 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
+	@Test
 	public void testGetJob() {
 		assertNotNull(execution.getJobInstance());
 	}
@@ -115,22 +126,26 @@ public class JobExecutionTests extends TestCase {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getExitStatus()}.
 	 */
+	@Test
 	public void testGetExitCode() {
 		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
 		execution.setExitStatus(new ExitStatus(true, "23"));
 		assertEquals("23", execution.getExitStatus().getExitCode());
 	}
 
+	@Test
 	public void testContextContainsInfo() throws Exception {
 		assertEquals("foo", execution.getJobInstance().getJobName());
 	}
 
+	@Test
 	public void testAddAndRemoveStepExecution() throws Exception {
 		assertEquals(0, execution.getStepExecutions().size());
 		execution.createStepExecution("step");
 		assertEquals(1, execution.getStepExecutions().size());
 	}
 	
+	@Test
 	public void testStop() throws Exception {
 		StepExecution stepExecution = execution.createStepExecution("step");
 		assertFalse(stepExecution.isTerminateOnly());
@@ -138,21 +153,42 @@ public class JobExecutionTests extends TestCase {
 		assertTrue(stepExecution.isTerminateOnly());
 	}
 
+	@Test
 	public void testToString() throws Exception {
 		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
 		assertTrue("JobExecution string does not contain name: " + execution, execution.toString().indexOf("foo") >= 0);
 	}
 
+	@Test
 	public void testToStringWithNullJob() throws Exception {
 		execution = new JobExecution(new JobInstance(null,null,"foo"));
 		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
 		assertTrue("JobExecution string does not contain job: " + execution, execution.toString().indexOf("job=") >= 0);
 	}
 	
+	@Test
 	public void testSerialization() {
 		byte[] serialized = SerializationUtils.serialize(execution);
 		JobExecution deserialize = (JobExecution) SerializationUtils.deserialize(serialized);
 		assertEquals(execution, deserialize);
 		assertNotNull(deserialize.createStepExecution("foo"));
+	}
+	
+	public void testFailureExceptions(){
+		
+		RuntimeException exception = new RuntimeException();
+		assertEquals(0, execution.getFailureExceptions().size());
+		execution.addFailureException(exception);
+		assertEquals(1, execution.getFailureExceptions().size());
+		assertEquals(exception, execution.getFailureExceptions().get(0));
+		StepExecution stepExecution1 = execution.createStepExecution("execution1");
+		RuntimeException stepException1 = new RuntimeException();
+		stepExecution1.addFailureException(stepException1);
+		execution.createStepExecution("execution2");
+		List<Throwable> allExceptions = execution.getAllFailureExceptions();
+		assertEquals(2, allExceptions.size());
+		assertEquals(1, execution.getFailureExceptions().size());
+		assertTrue(allExceptions.contains(exception));
+		assertTrue(allExceptions.contains(stepException1));
 	}
 }

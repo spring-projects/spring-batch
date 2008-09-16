@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -361,14 +362,9 @@ public class StatefulRetryStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		try {
-			step.execute(stepExecution);
-			fail("Expected SkipLimitExceededException");
-		}
-		catch (SkipLimitExceededException e) {
-			// expected
-		}
-
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());	
+			
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
 
@@ -418,15 +414,9 @@ public class StatefulRetryStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		try {
-			step.execute(stepExecution);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("Write error - planned but not skippable."));
-		}
+		step.execute(stepExecution);
+		String message = stepExecution.getFailureExceptions().get(0).getMessage();
+		assertTrue("Wrong message: " + message, message.contains("Write error - planned but not skippable."));
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
@@ -466,14 +456,9 @@ public class StatefulRetryStepFactoryBeanTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		try {
-			step.execute(stepExecution);
-			fail("Expected SkipLimitExceededException");
-		}
-		catch (SkipLimitExceededException e) {
-			// expected
-		}
-
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
 
@@ -519,14 +504,9 @@ public class StatefulRetryStepFactoryBeanTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		try {
-			step.execute(stepExecution);
-			fail("Expected RetryCacheCapacityExceededException");
-		}
-		catch (RetryCacheCapacityExceededException e) {
-			// expected
-		}
-
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		
 		// We added a bogus cache so no items are actually skipped
 		// because they aren't recognised as eligible
 		assertEquals(0, stepExecution.getSkipCount());

@@ -169,15 +169,10 @@ public class StepExecutorInterruptionTests extends TestCase {
 			}
 		});
 		
-		try {
-			step.execute(stepExecution);
-			fail("Expected planned RuntimeException");
-		} catch (RuntimeException e) {
-			assertEquals("Planned!", e.getMessage());
-		}
-
+		step.execute(stepExecution);
+		
+		assertEquals("Planned!", stepExecution.getFailureExceptions().get(0).getMessage());
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-
 	}
 
 	/**
