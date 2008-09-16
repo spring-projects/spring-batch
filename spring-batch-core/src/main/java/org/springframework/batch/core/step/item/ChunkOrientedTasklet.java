@@ -71,7 +71,7 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
 		// TODO: check flags to see if these need to be saved or not (e.g. JMS not)
-		final Chunk<ItemWrapper<T>> inputs = getInputBuffer(attributes);
+		final Chunk<T> inputs = getInputBuffer(attributes);
 		final Chunk<S> outputs = getOutputBuffer(attributes);
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
@@ -80,9 +80,9 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 
 			result = repeatOperations.iterate(new RepeatCallback() {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-					ItemWrapper<T> item = read(contribution);
-					contribution.incrementReadSkipCount(item.getSkipCount());
-					if (item.getItem() == null) {
+					T item = read(contribution);
+					
+					if (item == null) {
 						return ExitStatus.FINISHED;
 					}
 					inputs.add(item);
@@ -124,8 +124,8 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	 * @param contribution current context
 	 * @return next item for writing
 	 */
-	protected ItemWrapper<T> read(StepContribution contribution) throws Exception {
-		return new ItemWrapper<T>(doRead());
+	protected T read(StepContribution contribution) throws Exception {
+		return doRead();
 	}
 
 	/**
@@ -134,11 +134,11 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	 * @param outputs the items to write
 	 * @param contribution current context
 	 */
-	protected void process(StepContribution contribution, Chunk<ItemWrapper<T>> inputs, Chunk<S> outputs) throws Exception {
+	protected void process(StepContribution contribution, Chunk<T> inputs, Chunk<S> outputs) throws Exception {
 		int filtered = 0;
-		for (ItemWrapper<T> wrapper : inputs) {
+		for (T item : inputs) {
 			
-			S output = doProcess(wrapper.getItem());
+			S output = doProcess(item);
 			if (output != null) {
 				outputs.add(output);
 			} else {
@@ -171,7 +171,7 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	 * @param attributes
 	 * @param inputs
 	 */
-	private void storeInputs(AttributeAccessor attributes, Chunk<ItemWrapper<T>> inputs) {
+	private void storeInputs(AttributeAccessor attributes, Chunk<T> inputs) {
 		store(attributes, INPUT_BUFFER_KEY, inputs);
 	}
 
@@ -205,7 +205,7 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 		}
 	}
 
-	private Chunk<ItemWrapper<T>> getInputBuffer(AttributeAccessor attributes) {
+	private Chunk<T> getInputBuffer(AttributeAccessor attributes) {
 		return getBuffer(attributes, INPUT_BUFFER_KEY);
 	}
 

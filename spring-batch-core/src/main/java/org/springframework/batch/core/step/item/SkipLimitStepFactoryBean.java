@@ -333,24 +333,21 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * @return next item for processing
 		 */
 		@Override
-		protected ItemWrapper<T> read(StepContribution contribution) throws Exception {
-
-			int skipCount = 0;
+		protected T read(StepContribution contribution) throws Exception {
 
 			while (true) {
 				try {
-					return new ItemWrapper<T>(doRead(), skipCount);
+					return doRead();
 				}
 				catch (Exception e) {
 					try {
-						if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount() + skipCount)) {
+						if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 							// increment skip count and try again
+							contribution.incrementReadSkipCount();
 							try {
-								skipCount++;
 								listener.onSkipInRead(e);
 							}
 							catch (RuntimeException ex) {
-								contribution.incrementReadSkipCount(skipCount);
 								throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 							}
 							logger.debug("Skipping failed input", e);
@@ -364,7 +361,6 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 					catch (SkipLimitExceededException ex) {
 						// we are headed for a abnormal ending so bake in the
 						// skip count
-						contribution.incrementReadSkipCount(skipCount);
 						throw ex;
 					}
 				}
@@ -380,19 +376,19 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		 * org.springframework.batch.core.step.item.Chunk)
 		 */
 		@Override
-		protected void process(final StepContribution contribution, final Chunk<ItemWrapper<T>> inputs, final Chunk<S> outputs)
+		protected void process(final StepContribution contribution, final Chunk<T> inputs, final Chunk<S> outputs)
 				throws Exception {
 
 			int filtered = 0;
 
-			for (final Chunk<ItemWrapper<T>>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
+			for (final Chunk<T>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 
-				final ItemWrapper<T> wrapper = iterator.next();
+				final T item = iterator.next();
 
 				RetryCallback<S> retryCallback = new RetryCallback<S>() {
 
 					public S doWithRetry(RetryContext context) throws Exception {
-						S output = doProcess(wrapper.getItem());
+						S output = doProcess(item);
 						return output;
 					}
 
@@ -414,7 +410,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 				};
 
-				S output = retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(wrapper, rollbackClassifier));
+				S output = retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(item, rollbackClassifier));
 				if (output != null) {
 					outputs.add(output);
 				}
@@ -424,10 +420,10 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 			}
 
-			for (ItemWrapper<ItemWrapper<T>> skip : inputs.getSkips()) {
+			for (ItemWrapper<T> skip : inputs.getSkips()) {
 				Exception exception = skip.getException();
 				try {
-					listener.onSkipInProcess(skip.getItem().getItem(), exception);
+					listener.onSkipInProcess(skip.getItem(), exception);
 				}
 				catch (RuntimeException e) {
 					throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
