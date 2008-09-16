@@ -135,6 +135,7 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 						return ExitStatus.FINISHED;
 					}
 					inputs.add(item);
+					contribution.incrementReadCount();
 					return ExitStatus.CONTINUABLE;
 				}
 			});
@@ -143,8 +144,6 @@ public class ChunkOrientedTasklet<T, S> implements Tasklet {
 			if (inputs.isEmpty()) {
 				return result;
 			}
-
-			contribution.incrementReadCount(inputs.size());
 			
 			storeInputs(attributes, inputs);
 

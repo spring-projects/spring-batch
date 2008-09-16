@@ -60,13 +60,6 @@ public class StepContribution {
 	}
 
 	/**
-	 * Increment the counter for the number of items read.
-	 */
-	public void incrementReadCount(int count) {
-		readCount += count;
-	}
-
-	/**
 	 * Increment the counter for the number of items written.
 	 */
 	public void incrementWriteCount(int count) {
