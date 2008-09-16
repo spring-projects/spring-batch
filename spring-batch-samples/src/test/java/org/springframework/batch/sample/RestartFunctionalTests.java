@@ -24,6 +24,8 @@ import javax.sql.DataSource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
@@ -69,21 +71,19 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
-		try {
-			runJobForRestartTest();
-			fail("First run of the job is expected to fail.");
-		}
-		catch (UnexpectedJobExecutionException expected) {
-			// expected
-			assertTrue("Not planned exception: " + expected.getMessage(), expected.getMessage().toLowerCase().indexOf(
+		JobExecution jobExecution = runJobForRestartTest();
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		
+		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
+		assertTrue("Not planned exception: " + expected.getMessage(), expected.getMessage().toLowerCase().indexOf(
 					"planned") >= 0);
-		}
 
 		int medium = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
-		runJobForRestartTest();
+		jobExecution = runJobForRestartTest();
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
@@ -91,10 +91,10 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	}
 
 	// load the application context and launch the job
-	private void runJobForRestartTest() throws Exception {
+	private JobExecution runJobForRestartTest() throws Exception {
 		// The second time we run the job it needs to be a new instance so we
 		// need to make the parameters unique...
-		getLauncher().run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
+		return getLauncher().run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
 				.stringToProperties("force.new.job.parameters=true")));
 	}
 
