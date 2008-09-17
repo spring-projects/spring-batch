@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  * 
  * @author Dave Syer
  */
-public class SimpleChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T, T> {
+public class SimpleChunkOrientedTasklet<T> extends org.springframework.batch.core.step.item.SimpleChunkOrientedTasklet<T, T> {
 
 	/**
 	 * 

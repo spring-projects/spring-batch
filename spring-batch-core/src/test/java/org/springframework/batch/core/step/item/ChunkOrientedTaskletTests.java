@@ -61,7 +61,7 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testHandle() throws Exception {
-		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
+		SimpleChunkOrientedTasklet<String, String> handler = new SimpleChunkOrientedTasklet<String, String>(itemReader,
 				new PassthroughItemProcessor<String>(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
@@ -75,7 +75,7 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testHandleWithItemProcessorFailure() throws Exception {
-		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
+		SimpleChunkOrientedTasklet<String, String> handler = new SimpleChunkOrientedTasklet<String, String>(itemReader,
 				new StubItemProcessor(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
@@ -95,7 +95,7 @@ public class ChunkOrientedTaskletTests {
 
 	@Test
 	public void testHandleCompositeItem() throws Exception {
-		ChunkOrientedTasklet<String, String> handler = new ChunkOrientedTasklet<String, String>(itemReader,
+		SimpleChunkOrientedTasklet<String, String> handler = new SimpleChunkOrientedTasklet<String, String>(itemReader,
 				new AggregateItemProcessor(), itemWriter, repeatTemplate);
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));

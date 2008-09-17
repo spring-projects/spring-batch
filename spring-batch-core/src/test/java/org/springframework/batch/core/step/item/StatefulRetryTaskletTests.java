@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.step.item.SkipLimitStepFactoryBean.StatefulRetryTasklet;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.tasklet.BasicAttributeAccessor;
@@ -62,7 +61,7 @@ public class StatefulRetryTaskletTests {
 
 	private List<Integer> processed = new ArrayList<Integer>();
 
-	private StatefulRetryTasklet<Integer, String> handler;
+	private ChunkOrientedTasklet<Integer, String> handler;
 
 	private RepeatTemplate chunkOperations = new RepeatTemplate();
 
@@ -110,7 +109,7 @@ public class StatefulRetryTaskletTests {
 
 	@Test
 	public void testBasicHandle() throws Exception {
-		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, itemWriter, chunkOperations,
+		handler = new ChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, itemWriter, chunkOperations,
 				retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		handler.execute(contribution, new BasicAttributeAccessor());
@@ -119,7 +118,7 @@ public class StatefulRetryTaskletTests {
 
 	@Test
 	public void testSkipOnRead() throws Exception {
-		handler = new StatefulRetryTasklet<Integer, String>(new ItemReader<Integer>() {
+		handler = new ChunkOrientedTasklet<Integer, String>(new ItemReader<Integer>() {
 			public Integer read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 				throw new RuntimeException("Barf!");
 			}
@@ -141,7 +140,7 @@ public class StatefulRetryTaskletTests {
 
 	@Test
 	public void testSkipSingleItemOnWrite() throws Exception {
-		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
+		handler = new ChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
 			public void write(List<? extends String> items) throws Exception {
 				written.addAll(items);
 				throw new RuntimeException("Barf!");
@@ -166,7 +165,7 @@ public class StatefulRetryTaskletTests {
 
 	@Test
 	public void testSkipMultipleItemsOnWrite() throws Exception {
-		handler = new StatefulRetryTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
+		handler = new ChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
 			public void write(List<? extends String> items) throws Exception {
 				logger.debug("Writing items: " + items);
 				written.addAll(items);
@@ -218,7 +217,7 @@ public class StatefulRetryTaskletTests {
 
 	@Test
 	public void testSkipSingleItemOnProcess() throws Exception {
-		handler = new StatefulRetryTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
+		handler = new ChunkOrientedTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
 			public String process(Integer item) throws Exception {
 				logger.debug("Processing item: " + item);
 				processed.add(item);
@@ -258,7 +257,7 @@ public class StatefulRetryTaskletTests {
 
 	@Test
 	public void testSkipOverLimitOnProcess() throws Exception {
-		handler = new StatefulRetryTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
+		handler = new ChunkOrientedTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
 			public String process(Integer item) throws Exception {
 				logger.debug("Processing item: " + item);
 				processed.add(item);
