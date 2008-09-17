@@ -43,6 +43,7 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -61,6 +62,7 @@ import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
 public class ItemOrientedStepTests extends TestCase {
@@ -813,6 +815,7 @@ public class ItemOrientedStepTests extends TestCase {
 		assertTrue(3 <= jobRepository.updateCount);
 	}
 	
+	
 	/**
 	 * Failure to update StepExecution after chunk commit is fatal.
 	 */
@@ -836,6 +839,101 @@ public class ItemOrientedStepTests extends TestCase {
 			assertEquals("stub exception", e.getCause().getMessage());
 		}
 		
+	}
+	
+	public void testNoRollbackOnHandlerException() throws Exception{
+		
+		final RuntimeException exception = new RuntimeException();
+		ItemReader itemReader = new AbstractItemReader() {
+			public Object read() throws Exception {
+				// Trigger a rollback
+				throw exception;
+			}
+		};
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
+		itemOrientedStep.setTransactionAttribute(new NeverRollbackTransactionAttribute());
+		
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
+
+		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		// step.setLastExecution(stepExecution);
+
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException ex) {
+			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+			// The original rollback was caused by this one:
+			assertSame(exception, ex);
+		}
+	}
+	
+	public void testNoRollbackOnFlushException() throws Exception{
+		
+		final RuntimeException exception = new RuntimeException();
+		ItemWriter itemWriter = new AbstractItemWriter() {
+			public void flush() throws FlushFailedException {
+				throw exception;
+			}
+
+			public void write(Object item) throws Exception {	}
+		};
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(new MockRestartableItemReader(), itemWriter));
+		itemOrientedStep.setTransactionAttribute(new NeverRollbackTransactionAttribute());
+		
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
+
+		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		// step.setLastExecution(stepExecution);
+
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException ex) {
+			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+			// The original rollback was caused by this one:
+			assertSame(exception, ex);
+		}
+	}
+	
+	public void testNoRollbackOnUpdateException() throws Exception{
+		
+		final RuntimeException exception = new RuntimeException();
+
+		itemOrientedStep.setStreams(new ItemStream[]{new ItemStreamSupport(){
+			int updateCount = 0;
+			
+			public void update(ExecutionContext executionContext) {
+				if(updateCount > 0){
+					throw exception;
+				}
+				
+				updateCount++;
+			}
+		}});
+		
+		itemOrientedStep.setItemHandler(new SimpleItemHandler(new MockRestartableItemReader(), itemWriter));
+		itemOrientedStep.setTransactionAttribute(new NeverRollbackTransactionAttribute());
+		
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
+
+		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
+		// step.setLastExecution(stepExecution);
+
+		try {
+			itemOrientedStep.execute(stepExecution);
+			fail("Expected RuntimeException");
+		}
+		catch (RuntimeException ex) {
+			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+			// The original rollback was caused by this one:
+			assertSame(exception, ex);
+		}
 	}
 	
 	private static class JobRepositoryFailedUpdateStub extends JobRepositorySupport {
@@ -913,6 +1011,40 @@ public class ItemOrientedStepTests extends TestCase {
 			return null;
 		}
 
+	}
+	
+	private static class NeverRollbackTransactionAttribute implements TransactionAttribute{
+
+		public boolean rollbackOn(Throwable ex) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		public int getIsolationLevel() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		public String getName() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public int getPropagationBehavior() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		public int getTimeout() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		public boolean isReadOnly() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
 	}
 
 }

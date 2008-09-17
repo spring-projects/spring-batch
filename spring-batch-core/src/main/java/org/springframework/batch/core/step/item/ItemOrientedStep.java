@@ -244,9 +244,12 @@ public class ItemOrientedStep extends AbstractStep {
 				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
 
 				boolean locked = false;
+				//Throwable that contains any exceptions that are caught but are propagated up because
+				//they shouldn't cause a rollback.
+				Throwable nonRollbackException = null;
 
 				try {
-
+					
 					try {
 						exitStatus = processChunk(stepExecution, contribution);
 					}
@@ -254,11 +257,13 @@ public class ItemOrientedStep extends AbstractStep {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
+						nonRollbackException = e;
 					}
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
+						nonRollbackException = e;
 					}
 
 					contribution.incrementCommitCount();
@@ -288,11 +293,13 @@ public class ItemOrientedStep extends AbstractStep {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
+						nonRollbackException = e;
 					}
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
+						nonRollbackException = e;
 					}
 
 					try {
@@ -302,11 +309,13 @@ public class ItemOrientedStep extends AbstractStep {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
+						nonRollbackException = e;
 					}
 					catch (Exception e) {
 						if (transactionAttribute.rollbackOn(e)) {
 							throw e;
 						}
+						nonRollbackException = e;
 					}
 
 					try {
@@ -337,7 +346,7 @@ public class ItemOrientedStep extends AbstractStep {
 						stepExecution.setStatus(BatchStatus.UNKNOWN);
 						throw new FatalException("Fatal error detected during update of step execution", e);
 					}
-
+					
 				}
 				catch (Error e) {
 					processRollback(stepExecution, contribution, fatalException, transaction);
@@ -353,6 +362,18 @@ public class ItemOrientedStep extends AbstractStep {
 							synchronizer.release(stepExecution);
 						}
 						locked = false;
+						
+						//Even if the TransactionAttributes dictate that an exception shouldn't cause a rollback,
+						//we still need to throw the exception so the ExceptionHandler can make a determination about
+						//whether the exception should cause job failure.
+						if(nonRollbackException != null){
+							if(nonRollbackException instanceof Error){
+								throw (Error)nonRollbackException;
+							}
+							else{
+								throw (Exception)nonRollbackException;
+							}
+						}
 				}
 
 				// Check for interruption after transaction as well, so that
