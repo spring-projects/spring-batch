@@ -39,26 +39,25 @@ import org.springframework.batch.support.Classifier;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * If there is an exception on input it is skipped if allowed. If there is
- * an exception on output, it will be re-thrown in any case, and the
- * behaviour when the item is next encountered depends on the retryable and
- * skippable exception configuration. If the exception is retryable the
- * write will be attempted again up to the retry limit. When retry attempts
- * are exhausted the skip listener is invoked and the skip count
- * incremented. A retryable exception is thus also effectively also
- * implicitly skippable.
+ * If there is an exception on input it is skipped if allowed. If there is an
+ * exception on output, it will be re-thrown in any case, and the behaviour when
+ * the item is next encountered depends on the retryable and skippable exception
+ * configuration. If the exception is retryable the write will be attempted
+ * again up to the retry limit. When retry attempts are exhausted the skip
+ * listener is invoked and the skip count incremented. A retryable exception is
+ * thus also effectively also implicitly skippable.
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOrientedTasklet<T,S> {
+public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOrientedTasklet<T, S> {
 
 	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
 	private static final String OUTPUT_BUFFER_KEY = "OUTPUT_BUFFER_KEY";
 
 	private final RepeatOperations repeatOperations;
-	
+
 	final private RetryOperations retryOperations;
 
 	final private ItemSkipPolicy readSkipPolicy;
@@ -69,7 +68,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 	final private Classifier<Throwable, Boolean> rollbackClassifier;
 
-	
 	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends T> itemReader,
 			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
@@ -95,7 +93,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	 */
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
-		// TODO: check flags to see if these need to be saved or not (e.g. JMS not)
+		// TODO: check flags to see if these need to be saved or not (e.g. JMS
+		// not)
 		final Chunk<T> inputs = getInputBuffer(attributes);
 		final Chunk<S> outputs = getOutputBuffer(attributes);
 
@@ -106,7 +105,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 			result = repeatOperations.iterate(new RepeatCallback() {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 					T item = read(contribution);
-					
+
 					if (item == null) {
 						return ExitStatus.FINISHED;
 					}
@@ -115,16 +114,16 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 					return ExitStatus.CONTINUABLE;
 				}
 			});
-			
+
 			// If there is no input we don't have to do anything more
 			if (inputs.isEmpty()) {
 				return result;
 			}
-			
+
 			storeInputs(attributes, inputs);
 
 		}
-		
+
 		if (!inputs.isEmpty()) {
 			process(contribution, inputs, outputs);
 		}
@@ -149,8 +148,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	 * Tries to read the item from the reader, in case of exception skip the
 	 * item if the skip policy allows, otherwise re-throw.
 	 * 
-	 * @param contribution current StepContribution holding skipped items
-	 * count
+	 * @param contribution current StepContribution holding skipped items count
 	 * @return next item for processing
 	 */
 	protected T read(StepContribution contribution) throws Exception {
@@ -173,14 +171,12 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 						logger.debug("Skipping failed input", e);
 					}
 					else {
-						// re-throw only when the skip policy runs out of
-						// patience
+						// skip doesn't apply -> rethrow
 						throw e;
 					}
 				}
 				catch (SkipLimitExceededException ex) {
-					// we are headed for a abnormal ending so bake in the
-					// skip count
+					// re-throw when the skip policy runs out of patience
 					throw ex;
 				}
 			}
@@ -235,7 +231,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 			};
 
-			S output = retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(item, rollbackClassifier));
+			S output = retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(item,
+					rollbackClassifier));
 			if (output != null) {
 				outputs.add(output);
 			}
@@ -264,10 +261,10 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	/**
 	 * Execute the business logic, delegating to the writer.<br/>
 	 * 
-	 * Process the items with the {@link ItemWriter} in a stateful retry.
-	 * Any {@link SkipListener} provided is called when retry attempts are
-	 * exhausted. The listener callback (on write failure) will happen in
-	 * the next transaction automatically.<br/>
+	 * Process the items with the {@link ItemWriter} in a stateful retry. Any
+	 * {@link SkipListener} provided is called when retry attempts are
+	 * exhausted. The listener callback (on write failure) will happen in the
+	 * next transaction automatically.<br/>
 	 */
 	protected void write(final Chunk<S> chunk, final StepContribution contribution) throws Exception {
 
@@ -324,7 +321,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 			}
 		};
 
-		retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(chunk,rollbackClassifier));
+		retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(chunk, rollbackClassifier));
 
 		for (ItemWrapper<S> skip : chunk.getSkips()) {
 			Exception exception = skip.getException();
@@ -339,7 +336,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 		chunk.clear();
 
 	}
-
 
 	/**
 	 * @param attributes
