@@ -35,18 +35,6 @@ public class ItemWrapperTests {
 		ItemWrapper<String> wrapper = new ItemWrapper<String>("foo");
 		assertEquals("foo", wrapper.getItem());
 		assertEquals(null, wrapper.getException());
-		assertEquals(0, wrapper.getSkipCount());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.step.item.ItemWrapper#ItemWrapper(java.lang.Object, int)}.
-	 */
-	@Test
-	public void testItemWrapperTInt() {
-		ItemWrapper<String> wrapper = new ItemWrapper<String>("foo",2);
-		assertEquals("foo", wrapper.getItem());
-		assertEquals(null, wrapper.getException());
-		assertEquals(2, wrapper.getSkipCount());
 	}
 
 	/**
@@ -57,18 +45,6 @@ public class ItemWrapperTests {
 		ItemWrapper<String> wrapper = new ItemWrapper<String>("foo",exception);
 		assertEquals("foo", wrapper.getItem());
 		assertEquals(exception, wrapper.getException());
-		assertEquals(0, wrapper.getSkipCount());
-	}
-
-	/**
-	 * Test method for {@link org.springframework.batch.core.step.item.ItemWrapper#ItemWrapper(java.lang.Object, java.lang.Exception, int)}.
-	 */
-	@Test
-	public void testItemWrapperTExceptionInt() {
-		ItemWrapper<String> wrapper = new ItemWrapper<String>("foo", exception, 2);
-		assertEquals("foo", wrapper.getItem());
-		assertEquals(exception , wrapper.getException());
-		assertEquals(2, wrapper.getSkipCount());
 	}
 
 	/**

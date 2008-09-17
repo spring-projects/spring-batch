@@ -12,39 +12,17 @@ public class ItemWrapper<T> {
 
 	final private T item;
 
-	final private int skipCount;
-
 	/**
 	 * @param item
 	 */
 	public ItemWrapper(T item) {
-		this(item, null, 0);
+		this(item, null);
 	}
 
-	/**
-	 * @param item
-	 * @param skipCount
-	 */
-	public ItemWrapper(T item, int skipCount) {
-		this(item, null, skipCount);
-	}
 
 	public ItemWrapper(T item, Exception e) {
-		this(item, e, 0);
-	}
-
-	public ItemWrapper(T item, Exception e, int skipCount) {
 		this.item = item;
 		this.exception = e;
-		this.skipCount = skipCount;
-	}
-
-	/**
-	 * Public getter for the skipCount.
-	 * @return the skipCount
-	 */
-	public int getSkipCount() {
-		return skipCount;
 	}
 
 	/**
@@ -65,7 +43,7 @@ public class ItemWrapper<T> {
 
 	@Override
 	public String toString() {
-		return String.format("[exception=%s, item=%s, skips=%d]", exception, item, skipCount);
+		return String.format("[exception=%s, item=%s]", exception, item);
 	}
 
 }
