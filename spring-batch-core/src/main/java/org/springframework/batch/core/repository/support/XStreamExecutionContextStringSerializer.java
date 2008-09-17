@@ -20,12 +20,13 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 
 	private XStream xstream;
 
-	public String serialize(Map context) {
+	public String serialize(Map<String, Object> context) {
 		return xstream.toXML(context);
 	}
 
-	public Map deserialize(String context) {
-		return (Map) xstream.fromXML(context);
+	@SuppressWarnings("unchecked")
+	public Map<String, Object> deserialize(String context) {
+		return (Map<String, Object>) xstream.fromXML(context);
 	}
 
 	public void setReflectionProvider(ReflectionProvider reflectionProvider) {
