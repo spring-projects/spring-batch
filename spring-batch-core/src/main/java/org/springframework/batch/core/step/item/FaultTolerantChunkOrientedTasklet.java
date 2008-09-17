@@ -95,8 +95,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 		// TODO: check flags to see if these need to be saved or not (e.g. JMS
 		// not)
-		final Chunk<T> inputs = getInputBuffer(attributes);
-		final Chunk<S> outputs = getOutputBuffer(attributes);
+		final Chunk<T> inputs = getBuffer(attributes, INPUT_BUFFER_KEY);
+		final Chunk<S> outputs = getBuffer(attributes, OUTPUT_BUFFER_KEY);
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
@@ -120,7 +120,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 				return result;
 			}
 
-			storeInputs(attributes, inputs);
+			// store inputs
+			attributes.setAttribute(INPUT_BUFFER_KEY, inputs);
 
 		}
 
@@ -128,7 +129,13 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 			process(contribution, inputs, outputs);
 		}
 
-		storeOutputsAndClearInputs(attributes, outputs, contribution);
+		/* Savepoint at end of processing and before writing. The processed items
+		 * ready for output are stored so that if writing fails they can be picked
+		 * up again in the next try. The inputs are finished with so we can clear
+		 * their attribute.
+		 */
+		attributes.setAttribute(OUTPUT_BUFFER_KEY, outputs);
+		attributes.removeAttribute(INPUT_BUFFER_KEY);
 
 		// TODO: use ItemWriter interface properly
 		// TODO: make sure exceptions get handled by the appropriate handler
@@ -137,7 +144,9 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 		// On successful completion clear the attributes to signal that there is
 		// no more processing
 		if (outputs.isEmpty()) {
-			clearAll(attributes);
+			for (String key : attributes.attributeNames()) {
+				attributes.removeAttribute(key);
+			}
 		}
 
 		return result;
@@ -335,59 +344,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 		chunk.clear();
 
-	}
-
-	/**
-	 * @param attributes
-	 */
-	private static void clearInputs(AttributeAccessor attributes) {
-		attributes.removeAttribute(INPUT_BUFFER_KEY);
-	}
-
-	/**
-	 * @param attributes
-	 * @param inputs
-	 */
-	private void storeInputs(AttributeAccessor attributes, Chunk<T> inputs) {
-		store(attributes, INPUT_BUFFER_KEY, inputs);
-	}
-
-	/**
-	 * Savepoint at end of processing and before writing. The processed items
-	 * ready for output are stored so that if writing fails they can be picked
-	 * up again in the next try. The inputs are finished with so we can clear
-	 * their attribute.
-	 * 
-	 * @param attributes
-	 * @param outputs
-	 */
-	private void storeOutputsAndClearInputs(AttributeAccessor attributes, Chunk<S> outputs,
-			StepContribution contribution) {
-		store(attributes, OUTPUT_BUFFER_KEY, outputs);
-		clearInputs(attributes);
-	}
-
-	/**
-	 * @param attributes
-	 * @param inputBufferKey
-	 * @param outputs
-	 */
-	private static <W> void store(AttributeAccessor attributes, String key, W value) {
-		attributes.setAttribute(key, value);
-	}
-
-	private static void clearAll(AttributeAccessor attributes) {
-		for (String key : attributes.attributeNames()) {
-			attributes.removeAttribute(key);
-		}
-	}
-
-	private Chunk<T> getInputBuffer(AttributeAccessor attributes) {
-		return getBuffer(attributes, INPUT_BUFFER_KEY);
-	}
-
-	private Chunk<S> getOutputBuffer(AttributeAccessor attributes) {
-		return getBuffer(attributes, OUTPUT_BUFFER_KEY);
 	}
 
 	/**
