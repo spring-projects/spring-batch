@@ -163,7 +163,7 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	/**
 	 * @param attributes
 	 */
-	private void clearInputs(AttributeAccessor attributes) {
+	private static void clearInputs(AttributeAccessor attributes) {
 		attributes.removeAttribute(INPUT_BUFFER_KEY);
 	}
 
@@ -195,11 +195,11 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	 * @param inputBufferKey
 	 * @param outputs
 	 */
-	private <W> void store(AttributeAccessor attributes, String key, W value) {
+	private static <W> void store(AttributeAccessor attributes, String key, W value) {
 		attributes.setAttribute(key, value);
 	}
 
-	private void clearAll(AttributeAccessor attributes) {
+	private static void clearAll(AttributeAccessor attributes) {
 		for (String key : attributes.attributeNames()) {
 			attributes.removeAttribute(key);
 		}
@@ -218,7 +218,7 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	 * @param inputBufferKey
 	 * @return
 	 */
-	private <W> Chunk<W> getBuffer(AttributeAccessor attributes, String key) {
+	private static <W> Chunk<W> getBuffer(AttributeAccessor attributes, String key) {
 		if (!attributes.hasAttribute(key)) {
 			return new Chunk<W>();
 		}
