@@ -21,7 +21,7 @@ import org.springframework.batch.item.ItemWriter;
  * @param <I> input item type
  * @param <O> output item type
  */
-public abstract class AbstractItemProcessingTasklet<I, O> implements Tasklet {
+public abstract class AbstractItemOrientedTasklet<I, O> implements Tasklet {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -33,7 +33,7 @@ public abstract class AbstractItemProcessingTasklet<I, O> implements Tasklet {
 
 	protected final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<I, O>();
 
-	public AbstractItemProcessingTasklet(ItemReader<? extends I> itemReader,
+	public AbstractItemOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
 		this.itemReader = itemReader;
 		this.itemProcessor = itemProcessor;

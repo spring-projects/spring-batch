@@ -51,7 +51,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,S> {
+public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOrientedTasklet<T,S> {
 
 	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
@@ -70,7 +70,7 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	final private Classifier<Throwable, Boolean> rollbackClassifier;
 
 	
-	public ChunkOrientedTasklet(ItemReader<? extends T> itemReader,
+	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends T> itemReader,
 			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
 			Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
@@ -197,7 +197,7 @@ public class ChunkOrientedTasklet<T, S> extends AbstractItemProcessingTasklet<T,
 	/**
 	 * Incorporate retry into the item processor stage.
 	 * 
-	 * @see org.springframework.batch.core.step.item.ChunkOrientedTasklet#process(org.springframework.batch.core.StepContribution,
+	 * @see org.springframework.batch.core.step.item.FaultTolerantChunkOrientedTasklet#process(org.springframework.batch.core.StepContribution,
 	 * org.springframework.batch.core.step.item.Chunk,
 	 * org.springframework.batch.core.step.item.Chunk)
 	 */

@@ -248,7 +248,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-			ChunkOrientedTasklet<T, S> tasklet = new ChunkOrientedTasklet<T, S>(getItemReader(), getItemProcessor(),
+			FaultTolerantChunkOrientedTasklet<T, S> tasklet = new FaultTolerantChunkOrientedTasklet<T, S>(getItemReader(), getItemProcessor(),
 					getItemWriter(), getChunkOperations(), retryTemplate, rollbackClassifier, readSkipPolicy,
 					writeSkipPolicy, writeSkipPolicy);
 			tasklet.setListeners(getListeners());

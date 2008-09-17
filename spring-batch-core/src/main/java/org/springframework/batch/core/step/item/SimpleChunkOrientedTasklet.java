@@ -22,7 +22,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class SimpleChunkOrientedTasklet<I, O> extends AbstractItemProcessingTasklet<I, O> {
+public class SimpleChunkOrientedTasklet<I, O> extends AbstractItemOrientedTasklet<I, O> {
 
 	private RepeatOperations repeatOperations;
 
