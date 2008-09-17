@@ -18,7 +18,6 @@ package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import javax.sql.DataSource;
 
@@ -26,7 +25,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,10 +90,8 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// load the application context and launch the job
 	private JobExecution runJobForRestartTest() throws Exception {
-		// The second time we run the job it needs to be a new instance so we
-		// need to make the parameters unique...
 		return getLauncher().run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
-				.stringToProperties("force.new.job.parameters=true")));
+				.stringToProperties("parameter=true")));
 	}
 
 }
