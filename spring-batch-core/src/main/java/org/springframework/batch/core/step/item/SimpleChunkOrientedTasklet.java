@@ -15,9 +15,9 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.core.AttributeAccessor;
 
 /**
- * Simplest possible implementation of {@link Tasklet} with no skipping or
- * recovering. Just delegates all calls to the provided {@link ItemReader} and
- * {@link ItemWriter}.
+ * Simplest possible implementation of chunk-oriented {@link Tasklet} with no
+ * skipping or recovering. Just delegates all calls to the provided
+ * {@link ItemReader}, {@link ItemProcessor} and {@link ItemWriter}.
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -67,9 +67,7 @@ public class SimpleChunkOrientedTasklet<I, O> extends AbstractItemOrientedTaskle
 			}
 		}
 		contribution.incrementFilterCount(inputs.size() - outputs.size());
-		
-		// TODO: use ItemWriter interface properly
-		// TODO: make sure exceptions get handled by the appropriate handler
+
 		doWrite(outputs);
 		contribution.incrementWriteCount(outputs.size());
 
