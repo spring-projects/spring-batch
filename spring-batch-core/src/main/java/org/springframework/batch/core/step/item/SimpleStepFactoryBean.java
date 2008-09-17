@@ -457,7 +457,7 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 
 		step.setStepOperations(stepOperations);
 
-		ChunkOrientedTasklet<T,S> tasklet = new ChunkOrientedTasklet<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations);
+		SimpleChunkOrientedTasklet<T,S> tasklet = new SimpleChunkOrientedTasklet<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations);
 		tasklet.setListeners(getListeners());
 		step.setTasklet(tasklet);
 
