@@ -110,7 +110,7 @@ public class ChunkOrientedStepIntegrationTests {
 	@Test
 	public void testStatusForCommitFailedException() throws Exception {
 
-		step.setTasklet(new SimpleChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
+		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[] { "a", "b", "c" }),
 				new ItemWriter<String>() {
 					public void write(List<? extends String> data) throws Exception {
 						TransactionSynchronizationManager

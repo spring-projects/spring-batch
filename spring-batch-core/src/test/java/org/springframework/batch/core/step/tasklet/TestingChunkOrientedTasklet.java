@@ -16,7 +16,7 @@
 package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.step.item.FaultTolerantChunkOrientedTasklet;
-import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.core.step.item.SimpleChunkOrientedTasklet;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
@@ -31,7 +31,7 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  * 
  * @author Dave Syer
  */
-public class SimpleChunkOrientedTasklet<T> extends org.springframework.batch.core.step.item.SimpleChunkOrientedTasklet<T, T> {
+public class TestingChunkOrientedTasklet<T> extends SimpleChunkOrientedTasklet<T, T> {
 
 	/**
 	 * 
@@ -47,7 +47,7 @@ public class SimpleChunkOrientedTasklet<T> extends org.springframework.batch.cor
 	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
 	 * instance of {@link FaultTolerantChunkOrientedTasklet}.
 	 */
-	public SimpleChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
+	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
 		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter, repeatTemplate);
 	}
 
@@ -55,7 +55,7 @@ public class SimpleChunkOrientedTasklet<T> extends org.springframework.batch.cor
 	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
 	 * instance of {@link FaultTolerantChunkOrientedTasklet}.
 	 */
-	public SimpleChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter, RepeatOperations repeatOperations) {
+	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter, RepeatOperations repeatOperations) {
 		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter, repeatOperations);
 	}
 

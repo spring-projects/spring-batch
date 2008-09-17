@@ -44,7 +44,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * 
  */
-public class ChunkOrientedTaskletTests {
+public class SimpleChunkOrientedTaskletTests {
 
 	private StubItemReader itemReader = new StubItemReader();
 
