@@ -5,9 +5,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -165,13 +165,10 @@ public class AbstractStepTests extends TestCase {
 		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
-		try {
-			tested.execute(execution);
-			fail();
-		}
-		catch (RuntimeException expected) {
-			assertEquals("crash!", expected.getMessage());
-		}
+		tested.execute(execution);
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		Throwable expected = execution.getFailureExceptions().get(0);
+		assertEquals("crash!", expected.getMessage());
 
 		int i = 0;
 		assertEquals("listener1#beforeStep", events.get(i++));
@@ -202,13 +199,10 @@ public class AbstractStepTests extends TestCase {
 		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
-		try {
-			tested.execute(execution);
-			fail();
-		}
-		catch (JobInterruptedException expected) {
-			assertEquals("JobExecution interrupted.", expected.getMessage());
-		}
+		tested.execute(execution);
+		assertEquals(BatchStatus.STOPPED, execution.getStatus());
+		Throwable expected = execution.getFailureExceptions().get(0);
+		assertEquals("JobExecution interrupted.", expected.getMessage());
 
 		int i = 0;
 		assertEquals("listener1#beforeStep", events.get(i++));
@@ -243,13 +237,10 @@ public class AbstractStepTests extends TestCase {
 		};
 		tested.setJobRepository(repository);
 
-		try {
-			tested.execute(execution);
-			fail();
-		}
-		catch (RuntimeException expected) {
-			assertEquals("Bad context!", expected.getCause().getMessage());
-		}
+		tested.execute(execution);
+		assertEquals(BatchStatus.UNKNOWN, execution.getStatus());
+		Throwable expected = execution.getFailureExceptions().get(0);
+		assertEquals("Bad context!", expected.getMessage());
 
 		int i = 0;
 		assertEquals("open", events.get(i++));
