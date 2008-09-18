@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.item.database.support;
 
 import javax.sql.DataSource;
@@ -62,7 +63,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 *
-	 * @return the
+	 * @return SQL SELECT clause part of SQL query string
 	 */
 	protected String getSelectClause() {
 		return selectClause;
@@ -77,7 +78,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 *
-	 * @return SQL "from" clause
+	 * @return SQL FROM clause part of SQL query string
 	 */
 	protected String getFromClause() {
 		return fromClause;
@@ -97,7 +98,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	/**
 	 *
-	 * @return WHERE clause part of SQL query string
+	 * @return SQL WHERE clause part of SQL query string
 	 */
 	protected String getWhereClause() {
 		return whereClause;
@@ -128,9 +129,10 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 *
-	 * @return place holder for sortKey. Will vary depending on whethernamed parameters or traditional placeholders
+	 * The sort key placegholder will vary depending on whether named parameters or traditional placeholders
 	 * are used in query strings.
+	 *
+	 * @return place holder for sortKey.
 	 */
 	protected String getSortKeyPlaceHolder() {
 		return usingNamedParameters ? ":_sortKey" : "?";
@@ -161,10 +163,32 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		}
 	}
 
+	/**
+	 * Method generating the query string to be used for retrieving the first page.
+	 * This method must be implemented in sub classes.
+	 *
+	 * @param pageSize number of rows to read per page
+	 * @return query string
+	 */
 	public abstract String generateFirstPageQuery(int pageSize);
 
+	/**
+	 * Method generating the query string to be used for retrieving the pages following the first page.
+	 * This method must be implemented in sub classes.
+	 *
+	 * @param pageSize number of rows to read per page
+	 * @return query string
+	 */
 	public abstract String generateRemainingPagesQuery(int pageSize);
 
+	/**
+	 * Method generating the query string to be used for jumping to a specific item position.  
+	 * This method must be implemented in sub classes.
+	 *
+	 * @param itemIndex the index of the item to jump to
+	 * @param pageSize number of rows to read per page
+	 * @return query string
+	 */
 	public abstract String generateJumpToItemQuery(int itemIndex, int pageSize);
 
 	private String removeKeyWord(String keyWord,  String clause) {

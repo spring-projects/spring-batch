@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.item.database.support;
 
 /**
@@ -23,6 +24,14 @@ package org.springframework.batch.item.database.support;
  */
 public class SqlPagingQueryUtils {
 
+	/**
+	 * Generate SQL query string using a LIMIT clause
+	 *
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation specifics
+	 * @param remainingPageQuery is this query for the ramining pages (true) as opposed to the first page (false)
+	 * @param limitClause the implementation specific limit clause to be used 
+	 * @return the generated query
+	 */
 	public static String generateLimitSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery, String limitClause) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(provider.getSelectClause());
@@ -34,6 +43,14 @@ public class SqlPagingQueryUtils {
 		return sql.toString();
 	}
 
+	/**
+	 * Generate SQL query string using a TOP clause
+	 *
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation specifics
+	 * @param remainingPageQuery is this query for the ramining pages (true) as opposed to the first page (false)
+	 * @param topClause the implementation specific top clause to be used
+	 * @return the generated query
+	 */
 	public static String generateTopSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery, String topClause) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSelectClause());
@@ -44,6 +61,14 @@ public class SqlPagingQueryUtils {
 		return sql.toString();
 	}
 
+	/**
+	 * Generate SQL query string using a ROW_NUM condition
+	 *
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation specifics
+	 * @param remainingPageQuery is this query for the ramining pages (true) as opposed to the first page (false)
+	 * @param rowNumClause the implementation specific row num clause to be used
+	 * @return the generated query
+	 */
 	public static String generateRowNumSqlQuery(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery, String rowNumClause) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ").append(provider.getSelectClause());
@@ -54,6 +79,41 @@ public class SqlPagingQueryUtils {
 
 		return sql.toString();
 
+	}
+
+	/**
+	 * Generate SQL query string using a LIMIT clause
+	 *
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation specifics
+	 * @param limitClause the implementation specific top clause to be used
+	 * @return the generated query
+	 */
+	public static String generateLimitJumpToQuery(AbstractSqlPagingQueryProvider provider, String limitClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT ").append(provider.getSortKey()).append(" AS SORT_KEY");
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		sql.append(" ORDER BY ").append(provider.getSortKey()).append(" ASC ");
+		sql.append( limitClause);
+
+		return sql.toString();
+	}
+
+	/**
+	 * Generate SQL query string using a TOP clause
+	 *
+	 * @param provider {@link AbstractSqlPagingQueryProvider} providing the implementation specifics
+	 * @param topClause the implementation specific top clause to be used
+	 * @return the generated query
+	 */
+	public static String generateTopJumpToQuery(AbstractSqlPagingQueryProvider provider, String topClause) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSortKey()).append(" AS SORT_KEY");
+		sql.append(" FROM ").append(provider.getFromClause());
+		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
+		sql.append(" ORDER BY ").append(provider.getSortKey()).append(" ASC");
+
+		return sql.toString();
 	}
 
 	private static void buildWhereClause(AbstractSqlPagingQueryProvider provider, boolean remainingPageQuery, StringBuilder sql) {
@@ -68,27 +128,6 @@ public class SqlPagingQueryUtils {
 		else {
 			sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
 		}
-	}
-
-	public static String generateTopJumpToQuery(AbstractSqlPagingQueryProvider provider, String topClause) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(topClause).append(" ").append(provider.getSortKey()).append(" AS SORT_KEY");
-		sql.append(" FROM ").append(provider.getFromClause());
-		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
-		sql.append(" ORDER BY ").append(provider.getSortKey()).append(" ASC");
-
-		return sql.toString();
-	}
-
-	public static String generateLimitJumpToQuery(AbstractSqlPagingQueryProvider provider, String limitClause) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT ").append(provider.getSortKey()).append(" AS SORT_KEY");
-		sql.append(" FROM ").append(provider.getFromClause());
-		sql.append(provider.getWhereClause() == null ? "" : " WHERE " + provider.getWhereClause());
-		sql.append(" ORDER BY ").append(provider.getSortKey()).append(" ASC ");
-		sql.append( limitClause);
-
-		return sql.toString();
 	}
 
 }
