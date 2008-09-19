@@ -841,35 +841,6 @@ public class ItemOrientedStepTests extends TestCase {
 		
 	}
 	
-	public void testNoRollbackOnHandlerException() throws Exception{
-		
-		final RuntimeException exception = new RuntimeException();
-		ItemReader itemReader = new AbstractItemReader() {
-			public Object read() throws Exception {
-				// Trigger a rollback
-				throw exception;
-			}
-		};
-		itemOrientedStep.setItemHandler(new SimpleItemHandler(itemReader, itemWriter));
-		itemOrientedStep.setTransactionAttribute(new NeverRollbackTransactionAttribute());
-		
-		JobExecution jobExecutionContext = new JobExecution(jobInstance);
-		StepExecution stepExecution = new StepExecution(itemOrientedStep.getName(), jobExecutionContext);
-
-		stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
-		// step.setLastExecution(stepExecution);
-
-		try {
-			itemOrientedStep.execute(stepExecution);
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException ex) {
-			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-			// The original rollback was caused by this one:
-			assertSame(exception, ex);
-		}
-	}
-	
 	public void testNoRollbackOnFlushException() throws Exception{
 		
 		final RuntimeException exception = new RuntimeException();

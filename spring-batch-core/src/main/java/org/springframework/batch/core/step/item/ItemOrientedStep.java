@@ -286,37 +286,9 @@ public class ItemOrientedStep extends AbstractStep {
 
 					// Attempt to flush before the step execution and stream
 					// state are updated
-					try {
-						itemHandler.flush();
-					}
-					catch (Error e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						nonRollbackException = e;
-					}
-					catch (Exception e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						nonRollbackException = e;
-					}
+					itemHandler.flush();
 
-					try {
-						stream.update(stepExecution.getExecutionContext());
-					}
-					catch (Error e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						nonRollbackException = e;
-					}
-					catch (Exception e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						nonRollbackException = e;
-					}
+					stream.update(stepExecution.getExecutionContext());
 
 					try {
 						getJobRepository().saveOrUpdateExecutionContext(stepExecution);
@@ -408,7 +380,22 @@ public class ItemOrientedStep extends AbstractStep {
 				}
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(execution);
-				ExitStatus exitStatus = itemHandler.handle(contribution);
+				ExitStatus exitStatus = ExitStatus.FINISHED;
+				
+				try{
+					exitStatus = itemHandler.handle(contribution);
+				}
+				catch (Error e) {
+					if (transactionAttribute.rollbackOn(e)) {
+						throw e;
+					}
+				}
+				catch (Exception e) {
+					if (transactionAttribute.rollbackOn(e)) {
+						throw e;
+					}
+				}
+				
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(execution);
 				return exitStatus;
