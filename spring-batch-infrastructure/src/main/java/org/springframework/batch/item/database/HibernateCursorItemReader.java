@@ -25,7 +25,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.support.AbstractItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -53,7 +53,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractItemReaderItemStream<T> implements ItemStream,
+public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
 		InitializingBean {
 
 	private SessionFactory sessionFactory;

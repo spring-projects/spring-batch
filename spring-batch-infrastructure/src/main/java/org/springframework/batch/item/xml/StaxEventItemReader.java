@@ -11,7 +11,7 @@ import javax.xml.stream.events.StartElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
-import org.springframework.batch.item.support.AbstractItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,7 +34,7 @@ import org.springframework.xml.transform.StaxSource;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader<T> extends AbstractItemReaderItemStream<T> implements
+public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);

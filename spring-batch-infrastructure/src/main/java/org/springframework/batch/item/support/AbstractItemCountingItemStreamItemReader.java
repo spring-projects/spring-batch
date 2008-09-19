@@ -19,7 +19,7 @@ import org.springframework.util.Assert;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractItemReaderItemStream<T> implements ItemReader<T>, ItemStream {
+public abstract class AbstractItemCountingItemStreamItemReader<T> implements ItemReader<T>, ItemStream {
 
 	private static final String READ_COUNT = "read.count";
 

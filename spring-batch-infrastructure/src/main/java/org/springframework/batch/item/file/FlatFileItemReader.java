@@ -33,7 +33,7 @@ import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.transform.AbstractLineTokenizer;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.LineTokenizer;
-import org.springframework.batch.item.support.AbstractItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
@@ -62,7 +62,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemReader<T> extends AbstractItemReaderItemStream<T> implements
+public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static Log log = LogFactory.getLog(FlatFileItemReader.class);

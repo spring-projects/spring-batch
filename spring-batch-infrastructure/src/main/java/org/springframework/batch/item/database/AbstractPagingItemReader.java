@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.item.support.AbstractItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.Assert;
@@ -35,7 +35,7 @@ import java.util.List;
  * @author Thomas Risberg
  * @since 2.0
  */
-public abstract class AbstractPagingItemReader<T> extends AbstractItemReaderItemStream<T> implements InitializingBean {
+public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 

@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.support.AbstractItemReaderItemStream;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
@@ -97,7 +97,7 @@ import org.springframework.util.ClassUtils;
  * @author Peter Zozom
  * @author Robert Kasanicky
  */
-public class JdbcCursorItemReader<T> extends AbstractItemReaderItemStream<T> implements InitializingBean {
+public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
