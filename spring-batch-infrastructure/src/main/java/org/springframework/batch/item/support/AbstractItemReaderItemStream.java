@@ -11,10 +11,9 @@ import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.util.Assert;
 
 /**
- * Abstract superclass for {@link ItemReader}s which use item buffering to
- * support reset/rollback. Supports restart by storing item count in the
- * {@link ExecutionContext} (therefore requires item ordering to be preserved
- * between runs).
+ * Abstract superclass for {@link ItemReader}s that supports restart by storing
+ * item count in the {@link ExecutionContext} (therefore requires item ordering
+ * to be preserved between runs).
  * 
  * Subclasses are inherently *not* thread-safe.
  * 
@@ -36,7 +35,7 @@ public abstract class AbstractItemReaderItemStream<T> implements ItemReader<T>, 
 	 * @throws Exception
 	 */
 	protected abstract T doRead() throws Exception;
-	
+
 	/**
 	 * Open resources necessary to start reading input.
 	 */
