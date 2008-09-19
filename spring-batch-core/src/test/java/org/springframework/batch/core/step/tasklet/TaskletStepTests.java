@@ -34,6 +34,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
@@ -58,6 +59,7 @@ import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.core.AttributeAccessor;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
@@ -771,6 +773,26 @@ public class TaskletStepTests {
 		assertEquals("exception thrown in afterStep to signal failure", expected.getMessage());
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 
+	}
+	
+	@Test
+	 public void testModifyingExecutionContextMidProcessCausesException() throws Exception{
+		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
+		final ExecutionContext ec = stepExecution.getExecutionContext();
+		step.setTasklet(new Tasklet(){
+
+			public ExitStatus execute(StepContribution contribution,
+					AttributeAccessor attributes) throws Exception {
+
+				ec.putString("test", "test");
+				return ExitStatus.FINISHED;
+			}
+		});
+		
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(1, stepExecution.getFailureExceptions().size());
+		assertTrue(stepExecution.getFailureExceptions().get(0) instanceof IllegalStateException);
 	}
 
 	private boolean contains(String str, String searchStr) {
