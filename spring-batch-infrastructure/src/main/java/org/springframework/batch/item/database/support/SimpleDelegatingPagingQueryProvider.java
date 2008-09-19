@@ -65,7 +65,7 @@ public class SimpleDelegatingPagingQueryProvider extends AbstractSqlPagingQueryP
 		else {
 			throw new InvalidDataAccessResourceUsageException(type.name() +
 					" is not a supported database.  The supported databases are " +
-					type.values().toString());
+					DatabaseType.values().toString());
 		}
 		delegate.setSelectClause(this.getSelectClause());
 		delegate.setFromClause(this.getFromClause());
