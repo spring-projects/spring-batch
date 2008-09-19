@@ -75,7 +75,10 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	}
 
 	/**
-	 * Read-process-write a list of items.
+	 * Read-process-write a list of items. Uses fault-tolerant
+	 * {@link #read(StepContribution)},
+	 * {@link #process(StepContribution, List, List)} and
+	 * {@link #write(List, StepContribution)} implementations.
 	 */
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		ExitStatus result = ExitStatus.CONTINUABLE;
@@ -95,6 +98,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 			}
 		});
 
+		// filter inputs marked for skipping
 		inputs.removeAll(skippedInputs);
 
 		// If there is no input we don't have to do anything more
@@ -105,6 +109,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		List<O> outputs = new ArrayList<O>();
 		process(contribution, inputs, outputs);
 
+		// filter outputs marked for skipping
 		outputs.removeAll(skippedOutputs);
 
 		write(outputs, contribution);
@@ -146,11 +151,10 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	}
 
 	/**
-	 * Incorporate retry into the item processor stage.
-	 * 
-	 * @see org.springframework.batch.core.step.item.FaultTolerantChunkOrientedTasklet#process(org.springframework.batch.core.StepContribution,
-	 * org.springframework.batch.core.step.item.Chunk,
-	 * org.springframework.batch.core.step.item.Chunk)
+	 * Incorporate retry and skip into the item processor stage. Any
+	 * {@link SkipListener} provided is called when retry attempts are
+	 * exhausted. Adds failed items into skipped inputs list so that they can be
+	 * filtered if they are encountered again (after rollback).
 	 */
 	protected void process(final StepContribution contribution, final List<I> inputs, final List<O> outputs)
 			throws Exception {
@@ -208,12 +212,12 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	}
 
 	/**
-	 * Execute the business logic, delegating to the writer.<br/>
+	 * Write the items in a stateful retry. Any {@link SkipListener} provided is
+	 * called when retry attempts are exhausted. The listener callback (on write
+	 * failure) will happen in the next transaction automatically.
 	 * 
-	 * Process the items with the {@link ItemWriter} in a stateful retry. Any
-	 * {@link SkipListener} provided is called when retry attempts are
-	 * exhausted. The listener callback (on write failure) will happen in the
-	 * next transaction automatically.<br/>
+	 * Adds failed items into skipped outputs list so that they can be filtered
+	 * if they are encountered again (after rollback).
 	 */
 	protected void write(final List<O> outputs, final StepContribution contribution) throws Exception {
 
