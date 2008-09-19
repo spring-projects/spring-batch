@@ -3,6 +3,7 @@ package org.springframework.batch.core.repository.dao;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
@@ -11,7 +12,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 /**

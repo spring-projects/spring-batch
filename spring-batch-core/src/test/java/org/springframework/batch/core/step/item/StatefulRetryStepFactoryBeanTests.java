@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,13 +42,11 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
-import org.springframework.batch.retry.policy.RetryCacheCapacityExceededException;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
