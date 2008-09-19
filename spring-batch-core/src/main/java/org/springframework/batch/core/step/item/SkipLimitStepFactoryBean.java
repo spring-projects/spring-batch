@@ -70,6 +70,12 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 
 	private RetryContextCache retryContextCache;
 
+	private boolean isReaderTransactional = false;
+
+	public void setIsReaderTransactional(boolean isReaderTransactional) {
+		this.isReaderTransactional = isReaderTransactional;
+	}
+
 	/**
 	 * Setter for the retry policy. If this is specified the other retry
 	 * properties are ignored (retryLimit, backOffPolicy,
@@ -248,12 +254,23 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-			FaultTolerantChunkOrientedTasklet<T, S> tasklet = new FaultTolerantChunkOrientedTasklet<T, S>(getItemReader(), getItemProcessor(),
-					getItemWriter(), getChunkOperations(), retryTemplate, rollbackClassifier, readSkipPolicy,
-					writeSkipPolicy, writeSkipPolicy);
-			tasklet.setListeners(getListeners());
 
-			step.setTasklet(tasklet);
+			if (isReaderTransactional) {
+				NonbufferingFaultTolerantChunkOrientedTasklet<T, S> tasklet = new NonbufferingFaultTolerantChunkOrientedTasklet<T, S>(
+						getItemReader(), getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate,
+						rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+				tasklet.setListeners(getListeners());
+
+				step.setTasklet(tasklet);
+			}
+			else {
+				FaultTolerantChunkOrientedTasklet<T, S> tasklet = new FaultTolerantChunkOrientedTasklet<T, S>(
+						getItemReader(), getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate,
+						rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+				tasklet.setListeners(getListeners());
+
+				step.setTasklet(tasklet);
+			}
 
 		}
 
