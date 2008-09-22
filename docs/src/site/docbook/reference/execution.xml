@@ -1152,7 +1152,7 @@
     &lt;property name="retryableExceptionClasses" value="org.springframework.dao.DeadlockLoserDataAccessException" /&gt;</emphasis>
   &lt;/bean&gt;</programlisting>
 
-        <para>The <classname>StatefulRetryStepFactoryBean</classname> requires
+        <para>The <classname>SkipLimitStepFactoryBean</classname> requires
         a limit for the number of times an individual item can be retried, and
         a list of Exceptions that are 'retryable'.</para>
       </section>
