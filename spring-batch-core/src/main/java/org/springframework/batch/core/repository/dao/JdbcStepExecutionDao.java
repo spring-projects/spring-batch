@@ -58,8 +58,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
 
-	private static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
-
 	private int exitMessageLength = DEFAULT_EXIT_MESSAGE_LENGTH;
 
 	private LobHandler lobHandler = new DefaultLobHandler();

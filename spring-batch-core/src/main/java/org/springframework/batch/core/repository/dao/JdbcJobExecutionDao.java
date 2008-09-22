@@ -36,8 +36,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final Log logger = LogFactory.getLog(JdbcJobExecutionDao.class);
 
-	private static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
-
 	private static final String GET_JOB_EXECUTION_COUNT = "SELECT count(JOB_EXECUTION_ID) from %PREFIX%JOB_EXECUTION "
 			+ "where JOB_INSTANCE_ID = ?";
 

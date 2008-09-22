@@ -17,6 +17,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	 * Default value for the table prefix property.
 	 */
 	public static final String DEFAULT_TABLE_PREFIX = "BATCH_";
+	
+	public static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
 
