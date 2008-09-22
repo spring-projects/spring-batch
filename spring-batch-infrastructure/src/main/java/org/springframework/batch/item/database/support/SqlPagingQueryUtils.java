@@ -74,7 +74,7 @@ public class SqlPagingQueryUtils {
 		sql.append("SELECT ").append(provider.getSelectClause());
 		sql.append(" FROM ").append(provider.getFromClause());
 		buildWhereClause(provider, remainingPageQuery, sql);
-		sql.append(provider.getWhereClause() != null ? " AND " : " WHERE ").append(rowNumClause);
+		sql.append(provider.getWhereClause() != null || remainingPageQuery ? " AND " : " WHERE ").append(rowNumClause);
 		sql.append(" ORDER BY ").append(provider.getSortKey()).append(" ASC");
 
 		return sql.toString();
