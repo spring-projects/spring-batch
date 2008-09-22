@@ -10,16 +10,11 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @SuppressWarnings("deprecation")
 public class DrivingQueryItemReaderTests extends TestCase {
 
 	DrivingQueryItemReader<Foo> itemReader;
-
-	static {
-		TransactionSynchronizationManager.initSynchronization();
-	}
 
 	protected void setUp() throws Exception {
 		super.setUp();
