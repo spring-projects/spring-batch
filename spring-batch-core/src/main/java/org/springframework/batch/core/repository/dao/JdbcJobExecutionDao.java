@@ -37,8 +37,6 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	private static final Log logger = LogFactory.getLog(JdbcJobExecutionDao.class);
 
-	private static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
-
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
 			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 

@@ -79,6 +79,19 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	private DataFieldMaxValueIncrementerFactory incrementerFactory;
 	
 	private PlatformTransactionManager transactionManager;
+	
+	private int exitMessageLength = AbstractJdbcBatchMetadataDao.DEFAULT_EXIT_MESSAGE_LENGTH;
+	
+	/**
+	 * Public setter for the exit message length in database. Do not set this if
+	 * you haven't modified the schema. Note this value will be used for both
+	 * {@link JdbcJobExecutionDao} and {@link JdbcStepExecutionDao}.
+	 * 
+	 * @param exitMessageLength the exitMessageLength to set
+	 */
+	public void setExitMessageLength(int exitMessageLength) {
+		this.exitMessageLength = exitMessageLength;
+	}
 
 	/**
 	 * Public setter for the isolation level to be used for the transaction when
@@ -191,6 +204,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
+		dao.setExitMessageLength(exitMessageLength);
 		dao.afterPropertiesSet();
 		return dao;
 	}
@@ -202,6 +216,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
+		dao.setExitMessageLength(exitMessageLength);
 		dao.afterPropertiesSet();
 		return dao;
 	}
