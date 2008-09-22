@@ -324,6 +324,8 @@ public class RepeatTemplate implements RepeatOperations {
 	 * 
 	 * @param context the current {@link RepeatContext}
 	 * @return a {@link RepeatInternalState} instance.
+	 * 
+	 * @see RepeatTemplate#waitForResults(RepeatInternalState)
 	 */
 	protected RepeatInternalState createInternalState(RepeatContext context) {
 		return new RepeatInternalStateSupport();
@@ -331,7 +333,10 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Get the next completed result, possibly executing several callbacks until
-	 * one finally finishes.
+	 * one finally finishes. Normally a subclass would have to override both
+	 * this method and {@link #createInternalState(RepeatContext)} because the
+	 * implementation of this method would rely on the details of the internal
+	 * state.
 	 * 
 	 * @param context current BatchContext.
 	 * @param callback the callback to execute.
@@ -339,6 +344,7 @@ public class RepeatTemplate implements RepeatOperations {
 	 * @return a finished result.
 	 * 
 	 * @see #isComplete(RepeatContext)
+	 * @see #createInternalState(RepeatContext)
 	 */
 	protected ExitStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {

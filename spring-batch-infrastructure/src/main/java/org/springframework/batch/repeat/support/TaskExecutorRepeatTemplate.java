@@ -19,6 +19,7 @@ package org.springframework.batch.repeat.support;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -82,7 +83,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		ExecutingRunnable runnable = null;
 
-		ResultQueue queue = (ResultQueue) state;
+		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
 
 		do {
 
@@ -137,7 +138,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 */
 	protected boolean waitForResults(RepeatInternalState state) {
 
-		ResultQueue queue = (ResultQueue) state;
+		ResultQueue<ResultHolder> queue = ((ResultQueueInternalState) state).getResultQueue();
 
 		boolean result = true;
 
@@ -147,7 +148,14 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			 * Careful that no runnables that are not going to finish ever get
 			 * onto the queue, else this may block forever.
 			 */
-			ResultHolder future = (ResultHolder) queue.take();
+			ResultHolder future;
+			try {
+				future = (ResultHolder) queue.take();
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new RepeatException("InterruptedException while waiting for result.");
+			}
 
 			if (future.getError() != null) {
 				state.getThrowables().add(future.getError());
@@ -167,7 +175,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	protected RepeatInternalState createInternalState(RepeatContext context) {
 		// Queue of pending results:
-		return new ResultQueueFactory().getResultQueue(throttleLimit);
+		return new ResultQueueInternalState(throttleLimit);
 	}
 
 	/**
@@ -181,13 +189,13 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		private RepeatContext context;
 
-		private ResultQueue queue;
+		private ResultQueue<ResultHolder> queue;
 
 		private ExitStatus result;
 
 		private Throwable error;
 
-		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue queue) {
+		public ExecutingRunnable(RepeatCallback callback, RepeatContext context, ResultQueue<ResultHolder> queue) {
 
 			super();
 
@@ -201,7 +209,13 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * Tell the queue to expect a result.
 		 */
 		public void expect() {
-			queue.expect();
+			try {
+				queue.expect();
+			}
+			catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				throw new RepeatException("InterruptedException waiting for to acquire lock on input.");
+			}
 		}
 
 		/**
@@ -243,6 +257,30 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 */
 		public RepeatContext getContext() {
 			return this.context;
+		}
+
+	}
+
+	/**
+	 * @author Dave Syer
+	 *
+	 */
+	private static class ResultQueueInternalState extends RepeatInternalStateSupport {
+
+		private final ResultQueue<ResultHolder> results;
+		
+		/**
+		 * @param throttleLimit the throttle limit for the result queue
+		 */
+		public ResultQueueInternalState(int throttleLimit) {
+			super();
+			this.results = new ThrottleLimitResultQueue<ResultHolder>(throttleLimit);
+		}
+		/* (non-Javadoc)
+		 * @see org.springframework.batch.repeat.support.RepeatInternalState#getResultQueue()
+		 */
+		public ResultQueue<ResultHolder> getResultQueue() {
+			return results;
 		}
 
 	}

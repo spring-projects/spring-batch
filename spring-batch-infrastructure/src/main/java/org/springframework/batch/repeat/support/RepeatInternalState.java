@@ -18,8 +18,20 @@ package org.springframework.batch.repeat.support;
 
 import java.util.Collection;
 
+/**
+ * Internal interface for extensions of {@link RepeatTemplate}.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public interface RepeatInternalState {
 
+	/**
+	 * Returns a mutable collection of exceptions that have occurred in the
+	 * current repeat context. Clients are expected to mutate this collection.
+	 * 
+	 * @return the collection of exceptions being accumulated
+	 */
 	Collection<Throwable> getThrowables();
 
 }
