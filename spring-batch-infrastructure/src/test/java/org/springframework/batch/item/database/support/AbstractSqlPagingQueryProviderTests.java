@@ -30,7 +30,7 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	@Before
 	public void setUp() {
 		if (pagingQueryProvider == null) {
-			throw new IllegalArgumentException("pagingQuery{rovider can't be null");
+			throw new IllegalArgumentException("pagingQueryProvider can't be null");
 		}
 		pagingQueryProvider.setSelectClause("id, name, age");
 		pagingQueryProvider.setFromClause("foo");
