@@ -2,7 +2,6 @@ package org.springframework.batch.integration;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParametersIncrementer;
 
 public class JobSupport implements Job {
@@ -13,7 +12,7 @@ public class JobSupport implements Job {
 		this.name = name;
 	}
 
-	public void execute(JobExecution execution) throws JobExecutionException {
+	public void execute(JobExecution execution) {
 	}
 
 	public String getName() {
