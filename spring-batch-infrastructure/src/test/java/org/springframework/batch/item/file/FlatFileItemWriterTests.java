@@ -16,10 +16,7 @@
 
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,8 +24,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -209,7 +208,7 @@ public class FlatFileItemWriterTests {
 			public void write(Writer writer) throws IOException {
 				writer.write("footer");
 			}
-			
+
 		});
 
 		writer.open(executionContext);
@@ -235,7 +234,7 @@ public class FlatFileItemWriterTests {
 		for (int i = 1; i <= 8; i++) {
 			assertEquals("testLine" + i, readLine());
 		}
-		
+
 		assertEquals("footer", readLine());
 
 		// 3 lines were written to the file after restart
@@ -321,7 +320,7 @@ public class FlatFileItemWriterTests {
 			public void write(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
-			
+
 		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
@@ -338,7 +337,7 @@ public class FlatFileItemWriterTests {
 			public void write(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
-			
+
 		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
@@ -358,7 +357,7 @@ public class FlatFileItemWriterTests {
 			public void write(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
-			
+
 		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
@@ -383,7 +382,7 @@ public class FlatFileItemWriterTests {
 			public void write(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
-			
+
 		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
@@ -410,4 +409,39 @@ public class FlatFileItemWriterTests {
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
+	@Test
+	/**
+	 * Nothing gets written to file if line aggregation fails.
+	 */
+	public void testLineAggregatorFailure() throws Exception {
+
+		writer.setLineAggregator(new LineAggregator<String>() {
+
+			public String aggregate(String item) {
+				if (item.equals("2")) {
+					throw new RuntimeException("aggregation failed on " + item);
+				}
+				return item;
+			}
+		});
+		List<String> items = new ArrayList<String>() {
+			{
+				add("1");
+				add("2");
+				add("3");
+			}
+		};
+
+		writer.open(executionContext);
+		try {
+			writer.write(items);
+			fail();
+		}
+		catch (RuntimeException expected) {
+			assertEquals("aggregation failed on 2", expected.getMessage());
+		}
+		
+		// nothing was written to output
+		assertNull(readLine());
+	}
 }

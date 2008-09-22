@@ -186,15 +186,19 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 		OutputState state = getOutputState();
 
+		StringBuilder lines = new StringBuilder();
+		int lineCount = 0;
 		for (T item : items) {
-			String line = lineAggregator.aggregate(item) + lineSeparator;
-			try {
-				state.write(line);
-			}
-			catch (IOException e) {
-				throw new FlushFailedException("Could not write data.  The file may be corrupt.", e);
-			}
+			lines.append(lineAggregator.aggregate(item) + lineSeparator);
+			lineCount++;
 		}
+		try {
+			state.write(lines.toString());
+		}
+		catch (IOException e) {
+			throw new FlushFailedException("Could not write data.  The file may be corrupt.", e);
+		}
+		state.linesWritten += lineCount;
 	}
 
 	/**
@@ -394,7 +398,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 			outputBufferedWriter.write(line);
 			outputBufferedWriter.flush();
-			linesWritten++;
 		}
 
 		/**
