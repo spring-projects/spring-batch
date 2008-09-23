@@ -19,7 +19,10 @@ package org.springframework.batch.core.repository.support;
 import java.util.Map;
 
 /**
- * @author trisberg
+ * Interface defining serialization support for execution context Map in the form of a String.
+ *  
+ * @author Thomas Risberg
+ * @since 2.0
  */
 public interface ExecutionContextStringSerializer {
 

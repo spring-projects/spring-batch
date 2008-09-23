@@ -26,7 +26,10 @@ import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * @author trisberg
+ * Implementation that uses XStream and Jettison to provide serialization.
+ * 
+ * @author Thomas Risberg
+ * @since 2.0
  */
 public class XStreamExecutionContextStringSerializer implements ExecutionContextStringSerializer, InitializingBean {
 
