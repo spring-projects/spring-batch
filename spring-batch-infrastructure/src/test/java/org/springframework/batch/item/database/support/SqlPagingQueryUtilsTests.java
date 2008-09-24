@@ -16,11 +16,8 @@
 
 package org.springframework.batch.item.database.support;
 
-import org.junit.Test;
 import org.junit.Assert;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.junit.Test;
 
 /**
  * @author Thomas Risberg
