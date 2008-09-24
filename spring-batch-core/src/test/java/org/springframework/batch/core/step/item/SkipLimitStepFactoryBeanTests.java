@@ -10,9 +10,11 @@ import junit.framework.TestCase;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
@@ -26,6 +28,7 @@ import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -91,9 +94,35 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
 		assertEquals(expectedOutput, writer.written);
-		
+
 		assertEquals(4, stepExecution.getItemCount().intValue());
 
+	}
+
+	/**
+	 * Non-skippable (and non-fatal) exception causes failure immediately.
+	 * @throws Exception
+	 */
+	public void testNonSkippableExceptionOnRead() throws Exception {
+
+		// nothing is skippable
+		factory.setSkippableExceptionClasses(new Class[] {});
+
+		// no exceptions on write
+		factory.setItemWriter(new ItemWriterAdapter());
+
+		Step step = (Step) factory.getObject();
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		try {
+			step.execute(stepExecution);
+			fail();
+		}
+		catch (SkipLimitExceededException e) {
+			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+			assertEquals(1, stepExecution.getItemCount().intValue());
+		}
+		
 	}
 
 	/**
@@ -117,7 +146,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		// no rollbacks
 		assertEquals(0, stepExecution.getRollbackCount().intValue());
-		
+
 		assertEquals(4, stepExecution.getItemCount().intValue());
 
 	}
@@ -207,8 +236,10 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertFalse(reader.processed.contains("2"));
 		assertTrue(reader.processed.contains("4"));
 
-		// failure on "5" tripped the skip limit but "4" failed on write and was skipped and 
-		// RepeatSynchronizationManager.setCompleteOnly() was called in the retry policy to
+		// failure on "5" tripped the skip limit but "4" failed on write and was
+		// skipped and
+		// RepeatSynchronizationManager.setCompleteOnly() was called in the
+		// retry policy to
 		// aggressively commit after a recovery ("1" was written at that point)
 		List expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
 		assertEquals(expectedOutput, writer.written);
@@ -378,7 +409,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		public void clear() throws ClearFailedException {
 			for (int i = flushIndex + 1; i < written.size(); i++) {
-				written.remove(written.size()-1);
+				written.remove(written.size() - 1);
 			}
 		}
 

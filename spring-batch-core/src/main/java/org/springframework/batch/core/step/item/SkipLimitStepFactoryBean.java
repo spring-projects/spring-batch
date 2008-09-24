@@ -385,9 +385,8 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 							onSkipInRead(e);
 							logger.debug("Skipping failed input", e);
 						} else {
-							// re-throw only when the skip policy runs out of
-							// patience
-							throw e;
+							// re-throw the same way as exceeding skip limit (fatal)
+							throw new SkipLimitExceededException(0, e);
 						}
 					} catch (SkipLimitExceededException ex) {
 						// we are headed for a abnormal ending so bake in the

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -41,6 +43,8 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 
 	final private BinaryExceptionClassifier fatalExceptionClassifier;
 
+	private static final Log logger = LogFactory.getLog(SimpleRetryExceptionHandler.class);
+
 	/**
 	 * @param retryPolicy
 	 * @param exceptionHandler
@@ -63,6 +67,9 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 		// retry is exhausted
 		if (!fatalExceptionClassifier.isDefault(throwable) || context.hasAttribute(EXHAUSTED)) {
 			exceptionHandler.handleException(context, throwable);
+		}
+		else {
+			logger .debug("handled non-fatal exception", throwable);
 		}
 	}
 
