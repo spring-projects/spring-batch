@@ -139,13 +139,19 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		try {
 		step.execute(stepExecution);
+		fail();
+		}
+		catch (SkipLimitExceededException expected) {
+			assertEquals(0, stepExecution.getSkipCount());
 
-		assertEquals(0, stepExecution.getSkipCount());
+			// b is processed twice, plus a, plus c, plus the null at end
+			assertEquals(2, count);
+			assertEquals(1, stepExecution.getItemCount().intValue());
+		}
 
-		// b is processed twice, plus a, plus c, plus the null at end
-		assertEquals(5, count);
-		assertEquals(3, stepExecution.getItemCount().intValue());
+		
 	}
 
 	public void testSkipAndRetry() throws Exception {
