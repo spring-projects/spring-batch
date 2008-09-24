@@ -79,17 +79,24 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 			this.chunkListener.register((ChunkListener) listener);
 		}
 		if (listener instanceof ItemReadListener) {
-			// TODO: make this type safe somehow?
-			this.itemReadListener.register((ItemReadListener) listener);
+			@SuppressWarnings("unchecked")
+			ItemReadListener<T> itemReadListener = (ItemReadListener) listener;
+			this.itemReadListener.register(itemReadListener);
 		}
 		if (listener instanceof ItemProcessListener) {
-			this.itemProcessListener.register((ItemProcessListener) listener);
+			@SuppressWarnings("unchecked")
+			ItemProcessListener<T,S> itemProcessListener = (ItemProcessListener) listener;
+			this.itemProcessListener.register(itemProcessListener);
 		}
 		if (listener instanceof ItemWriteListener) {
-			this.itemWriteListener.register((ItemWriteListener) listener);
+			@SuppressWarnings("unchecked")
+			ItemWriteListener<S> itemWriteListener = (ItemWriteListener) listener;
+			this.itemWriteListener.register(itemWriteListener);
 		}
 		if (listener instanceof SkipListener) {
-			this.skipListener.register((SkipListener) listener);
+			@SuppressWarnings("unchecked")
+			SkipListener<T,S> skipListener = (SkipListener) listener;
+			this.skipListener.register(skipListener);
 		}
 	}
 
