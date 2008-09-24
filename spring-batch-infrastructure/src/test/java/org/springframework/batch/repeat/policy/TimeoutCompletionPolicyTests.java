@@ -16,12 +16,15 @@
 
 package org.springframework.batch.repeat.policy;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
+import org.junit.Test;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
-public class TimeoutCompletionPolicyTests extends TestCase {
+public class TimeoutCompletionPolicyTests {
 
+	@Test
 	public void testSimpleTimeout() throws Exception {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy(20L);
 		RepeatContext context = policy.start(null);
@@ -30,12 +33,21 @@ public class TimeoutCompletionPolicyTests extends TestCase {
 		assertTrue(policy.isComplete(context));
 	}
 
+	@Test
 	public void testSuccessfulResult() throws Exception {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
 		RepeatContext context = policy.start(null);
 		assertFalse(policy.isComplete(context, null));
 	}
+	
+	@Test
+	public void testNonContinuableResult() throws Exception {
+		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
+		ExitStatus result = new ExitStatus(false, "non-continuable exit status");
+		assertTrue(policy.isComplete(policy.start(null), result));
+	}
 
+	@Test
 	public void testUpdate() throws Exception {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy(20L);
 		RepeatContext context = policy.start(null);
