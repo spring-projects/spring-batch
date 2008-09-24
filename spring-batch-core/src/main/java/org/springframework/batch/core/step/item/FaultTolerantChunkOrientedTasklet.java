@@ -129,10 +129,11 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 			process(contribution, inputs, outputs);
 		}
 
-		/* Savepoint at end of processing and before writing. The processed items
-		 * ready for output are stored so that if writing fails they can be picked
-		 * up again in the next try. The inputs are finished with so we can clear
-		 * their attribute.
+		/*
+		 * Savepoint at end of processing and before writing. The processed
+		 * items ready for output are stored so that if writing fails they can
+		 * be picked up again in the next try. The inputs are finished with so
+		 * we can clear their attribute.
 		 */
 		attributes.setAttribute(OUTPUT_BUFFER_KEY, outputs);
 		attributes.removeAttribute(INPUT_BUFFER_KEY);
@@ -167,27 +168,23 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 				return doRead();
 			}
 			catch (Exception e) {
-				try {
-					if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
-						// increment skip count and try again
-						contribution.incrementReadSkipCount();
-						try {
-							listener.onSkipInRead(e);
-						}
-						catch (RuntimeException ex) {
-							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-						}
-						logger.debug("Skipping failed input", e);
+
+				if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+					// increment skip count and try again
+					contribution.incrementReadSkipCount();
+					try {
+						listener.onSkipInRead(e);
 					}
-					else {
-						// skip doesn't apply -> rethrow
-						throw e;
+					catch (RuntimeException ex) {
+						throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 					}
+					logger.debug("Skipping failed input", e);
 				}
-				catch (SkipLimitExceededException ex) {
-					// re-throw when the skip policy runs out of patience
-					throw ex;
+				else {
+					// skip doesn't apply -> rethrow as if skip limit of zero was exceeded
+					throw new SkipLimitExceededException(0, e);
 				}
+
 			}
 		}
 

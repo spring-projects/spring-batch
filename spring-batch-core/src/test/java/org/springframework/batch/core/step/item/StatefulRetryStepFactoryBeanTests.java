@@ -159,13 +159,13 @@ public class StatefulRetryStepFactoryBeanTests {
 
 		assertEquals(0, stepExecution.getSkipCount());
 
-		// [a, b, c, null]
-		assertEquals(4, provided.size());
-		// [a, c]
-		assertEquals(2, processed.size());
+		// [a, b with error]
+		assertEquals(2, provided.size());
+		// [a]
+		assertEquals(1, processed.size());
 		// []
 		assertEquals(0, recovered.size());
-		assertEquals(2, stepExecution.getReadCount());
+		assertEquals(1, stepExecution.getReadCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
 	}
 

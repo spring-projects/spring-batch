@@ -73,6 +73,58 @@ public class SkipLimitStepFactoryBeanTests {
 	}
 
 	/**
+	 * Non-skippable (and non-fatal) exception causes failure immediately.
+	 * @throws Exception
+	 */
+	@Test
+	public void testNonSkippableExceptionOnRead() throws Exception {
+		
+		// nothing is skippable
+		Collection<Class<? extends Throwable>> empty = Collections.emptySet();
+		factory.setSkippableExceptionClasses(empty);
+		
+		// no exceptions on write
+		factory.setItemWriter(new ItemWriter<String>() {
+			public void write(List<? extends String> items) throws Exception {
+				logger.debug(items);
+			}
+		});
+
+		Step step = (Step) factory.getObject();
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		//assertEquals("Ouch!", stepExecution.getFailureExceptions().get(0).getMessage());
+	}
+	
+	@Test
+	public void testNonSkippableException() throws Exception {
+		// nothing is skippable
+		Collection<Class<? extends Throwable>> empty = Collections.emptySet();
+		factory.setSkippableExceptionClasses(empty);
+		factory.setCommitInterval(1);
+		
+		// no failures on read
+		reader = new SkipReaderStub(new String[] { "1", "2", "3", "4", "5" }, new ArrayList<String>());
+		factory.setItemReader(reader);
+		factory.setItemWriter(new ItemWriter<String>() {
+
+			public void write(List<? extends String> items) throws Exception {
+				throw new RuntimeException("non-skippable exception");
+			}
+			
+		});
+
+		Step step = (Step) factory.getObject();
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(1, reader.processed.size());
+	}
+
+	/**
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
@@ -99,6 +151,7 @@ public class SkipLimitStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.written);
 
 		assertEquals(4, stepExecution.getReadCount());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 	}
 
@@ -195,7 +248,7 @@ public class SkipLimitStepFactoryBeanTests {
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		
+
 		assertEquals(3, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());

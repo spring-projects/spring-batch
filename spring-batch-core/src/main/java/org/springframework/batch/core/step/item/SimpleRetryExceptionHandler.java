@@ -17,6 +17,8 @@ package org.springframework.batch.core.step.item;
 
 import java.util.Collection;
 
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -40,6 +42,8 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * Attribute key, whose existence signals an exhausted retry.
 	 */
 	private static final String EXHAUSTED = SimpleRetryExceptionHandler.class.getName() + ".RETRY_EXHAUSTED";
+	
+	private static final Log logger = LogFactory.getLog(SimpleRetryExceptionHandler.class);
 
 	final private RetryPolicy retryPolicy;
 
@@ -76,6 +80,9 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 		// retry is exhausted
 		if (fatalExceptionClassifier.classify(throwable) || context.hasAttribute(EXHAUSTED)) {
 			exceptionHandler.handleException(context, throwable);
+		}
+		else {
+			logger.debug("handled non-fatal exception", throwable);
 		}
 	}
 
