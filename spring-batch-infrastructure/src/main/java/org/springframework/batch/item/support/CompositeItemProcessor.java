@@ -19,27 +19,27 @@ import org.springframework.util.Assert;
 @SuppressWarnings("unchecked")
 public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, InitializingBean {
 
-	private List<ItemProcessor> itemTransformers;
+	private List<ItemProcessor> itemProcessors;
 
 	public O process(I item) throws Exception {
 		Object result = item;
 	
-		for(ItemProcessor transformer: itemTransformers){
+		for(ItemProcessor transformer: itemProcessors){
 			result = transformer.process(result);
 		}
 		return (O) result;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notEmpty(itemTransformers);
+		Assert.notEmpty(itemProcessors);
 	}
 
 	/**
-	 * @param itemTransformers will be chained to produce a composite
+	 * @param itemProcessors will be chained to produce a composite
 	 * transformation.
 	 */
-	public void setItemTransformers(List<ItemProcessor> itemTransformers) {
-		this.itemTransformers = itemTransformers;
+	public void setItemProcessors(List<ItemProcessor> itemProcessors) {
+		this.itemProcessors = itemProcessors;
 	}
 
 }

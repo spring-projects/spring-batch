@@ -16,13 +16,10 @@
 				<bean id="step1" parent="simpleStep">
 					<property name="transactionAttribute" value="PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED"/>
 					<property name="streams" ref="fileItemReader" />
-					<property name="itemReader">
-						<bean
-							class="org.springframework.batch.item.validator.ValidatingItemReader">
-							<property name="itemReader"
-								ref="fileItemReader" />
-							<property name="validator"
-								ref="tradeValidator" />
+					<property name="itemReader" ref="fileItemReader" />
+					<property name="itemProcessor">
+						<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+							<constructor-arg ref="tradeValidator" />
 						</bean>
 					</property>
 					<property name="itemWriter">

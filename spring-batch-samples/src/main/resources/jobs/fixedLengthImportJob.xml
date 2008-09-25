@@ -10,11 +10,10 @@
 	<bean id="fixedLengthImportJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep" p:commitInterval="3">
-				<property name="streams" ref="fileItemReader" />
-				<property name="itemReader">
-					<bean class="org.springframework.batch.item.validator.ValidatingItemReader">
-						<property name="itemReader" ref="fileItemReader" />
-						<property name="validator" ref="fixedValidator" />
+				<property name="itemReader" ref="fileItemReader" />
+				<property name="itemProcessor">
+					<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+						<constructor-arg ref="fixedValidator" />
 					</bean>
 				</property>
 				<property name="itemWriter">

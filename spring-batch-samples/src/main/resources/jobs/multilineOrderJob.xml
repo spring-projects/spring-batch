@@ -20,25 +20,29 @@
 					</list>
 				</property>
 				<property name="itemReader">
-					<bean class="org.springframework.batch.item.validator.ValidatingItemReader">
-						<property name="itemReader">
-							<bean class="org.springframework.batch.sample.domain.order.internal.OrderItemReader">
-								<property name="fieldSetReader" ref="fileItemReader" />
-								<property name="headerMapper" ref="headerFieldSetMapper" />
-								<property name="customerMapper" ref="customerFieldSetMapper" />
-								<property name="addressMapper" ref="addressFieldSetMapper" />
-								<property name="billingMapper" ref="billingFieldSetMapper" />
-								<property name="itemMapper" ref="orderItemFieldSetMapper" />
-								<property name="shippingMapper" ref="shippingFieldSetMapper" />
-							</bean>
-						</property>
-						<property name="validator" ref="validator" />
+					<bean class="org.springframework.batch.sample.domain.order.internal.OrderItemReader">
+						<property name="fieldSetReader" ref="fileItemReader" />
+						<property name="headerMapper" ref="headerFieldSetMapper" />
+						<property name="customerMapper" ref="customerFieldSetMapper" />
+						<property name="addressMapper" ref="addressFieldSetMapper" />
+						<property name="billingMapper" ref="billingFieldSetMapper" />
+						<property name="itemMapper" ref="orderItemFieldSetMapper" />
+						<property name="shippingMapper" ref="shippingFieldSetMapper" />
 					</bean>
 				</property>
 				<property name="itemWriter" ref="fileItemWriter" />
 				<property name="itemProcessor">
-					<bean class="org.springframework.batch.sample.domain.order.internal.OrderProcessor">
-						<property name="aggregators" ref="outputAggregators" />
+					<bean class="org.springframework.batch.item.support.CompositeItemProcessor">
+						<property name="itemProcessors">
+							<list>
+								<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+									<constructor-arg ref="validator" />
+								</bean>
+								<bean class="org.springframework.batch.sample.domain.order.internal.OrderProcessor">
+									<property name="aggregators" ref="outputAggregators" />
+								</bean>
+							</list>
+						</property>
 					</bean>
 				</property>
 			</bean>
@@ -134,7 +138,8 @@
 			</bean>
 		</property>
 	</bean>
-	<!-- "{" <key> : <rule> : <message> : [ <error_code> [ : <error_parameters> ] ] "}" -->
+	<!-- "{" <key> : <rule> : <message> : [ <error_code> [ : <error_parameters> ] ] "}"
+-->
 
 	<bean id="fileInputLocator" class="org.springframework.core.io.ClassPathResource">
 		<constructor-arg type="java.lang.String"

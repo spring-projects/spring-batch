@@ -32,7 +32,7 @@ public class CompositeItemProcessorTests {
 		transformer1 = createMock(ItemProcessor.class);
 		transformer2 = createMock(ItemProcessor.class);
 		
-		composite.setItemTransformers(new ArrayList<ItemProcessor>() {{ 
+		composite.setItemProcessors(new ArrayList<ItemProcessor>() {{ 
 			add(transformer1); add(transformer2); 
 		}});
 		
@@ -71,7 +71,7 @@ public class CompositeItemProcessorTests {
 	public void testAfterPropertiesSet() throws Exception {
 		
 		// value not set
-		composite.setItemTransformers(null);
+		composite.setItemProcessors(null);
 		try {
 			composite.afterPropertiesSet();
 			fail();
@@ -81,7 +81,7 @@ public class CompositeItemProcessorTests {
 		}
 		
 		// empty list
-		composite.setItemTransformers(new ArrayList<ItemProcessor>());
+		composite.setItemProcessors(new ArrayList<ItemProcessor>());
 		try {
 			composite.afterPropertiesSet();
 			fail();
