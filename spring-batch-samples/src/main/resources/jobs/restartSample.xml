@@ -34,7 +34,7 @@
 
 	<bean id="itemReader"
 		class="org.springframework.batch.sample.support.ExceptionThrowingItemReaderProxy">
-		<property name="itemReader" ref="fileItemReader" />
+		<property name="delegate" ref="fileItemReader" />
 	</bean>
 
 	<bean id="fileItemReader"
