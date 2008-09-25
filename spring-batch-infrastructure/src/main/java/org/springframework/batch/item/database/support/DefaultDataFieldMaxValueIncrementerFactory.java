@@ -27,6 +27,7 @@ import org.springframework.jdbc.support.incrementer.*;
  * 
  * <ul>
  * <li>db2</li>
+ * <li>db2zos</li>
  * <li>derby</li>
  * <li>hsql</li>
  * <li>mysql</li>
