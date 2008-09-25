@@ -6,7 +6,6 @@ import static org.junit.Assert.assertFalse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
 
 import org.aopalliance.aop.Advice;
 import org.apache.commons.logging.Log;
@@ -26,6 +25,7 @@ import org.springframework.batch.retry.interceptor.StatefulRetryOperationsInterc
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.context.Lifecycle;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.endpoint.SourcePoller;
@@ -33,11 +33,9 @@ import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageConsumer;
 import org.springframework.integration.message.PollableSource;
-import org.springframework.integration.scheduling.PollingSchedule;
-import org.springframework.integration.scheduling.SchedulableTask;
+import org.springframework.integration.scheduling.IntervalTrigger;
+import org.springframework.integration.scheduling.SimpleTaskScheduler;
 import org.springframework.integration.scheduling.TaskScheduler;
-import org.springframework.integration.scheduling.spi.ProviderTaskScheduler;
-import org.springframework.integration.scheduling.spi.SimpleScheduleServiceProvider;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.MatchAlwaysTransactionAttributeSource;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
@@ -220,7 +218,7 @@ public class PollableSourceRetryTests {
 		PollableSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 		SourcePoller trigger = getSourcePoller(source, target, null, 1);
-		SchedulableTask task = (SchedulableTask) getProxy(trigger, SchedulableTask.class, new Advice[] {
+		SourcePoller task = (SourcePoller) getProxy(trigger, SourcePoller.class, new Advice[] {
 				new TransactionInterceptor(transactionManager, new MatchAlwaysTransactionAttributeSource()),
 				getRepeatOperationsInterceptor(3) }, "run");
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(task);
@@ -314,7 +312,7 @@ public class PollableSourceRetryTests {
 		target = (MessageChannel) getProxy(target, MessageChannel.class,
 				new Advice[] { getRetryOperationsInterceptor(methodArgumentsKeyGenerator) }, "send");
 		SourcePoller trigger = getSourcePoller(source, target, null, 1);
-		SchedulableTask task = (SchedulableTask) getProxy(trigger, SchedulableTask.class, new Advice[] {
+		SourcePoller task = (SourcePoller) getProxy(trigger, SourcePoller.class, new Advice[] {
 			new TransactionInterceptor(transactionManager, new MatchAlwaysTransactionAttributeSource()),
 			getRepeatOperationsInterceptor(3) }, "run");
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(task);
@@ -338,7 +336,7 @@ public class PollableSourceRetryTests {
 
 	private SourcePoller getSourcePoller(PollableSource<Object> source, MessageChannel channel,
 			PlatformTransactionManager transactionManager, int maxMessagesPerPoll) {
-		SourcePoller poller = new SourcePoller(source, channel, new PollingSchedule(100));
+		SourcePoller poller = new SourcePoller(source, channel, new IntervalTrigger(100));
 		poller.setTransactionManager(transactionManager);
 		poller.setMaxMessagesPerPoll(maxMessagesPerPoll);
 		return poller;
@@ -387,11 +385,11 @@ public class PollableSourceRetryTests {
 		return source;
 	}
 
-	private TaskScheduler getSchedulerWithErrorHandler(SchedulableTask task) {
-		SimpleScheduleServiceProvider provider = new SimpleScheduleServiceProvider(Executors
-				.newSingleThreadScheduledExecutor());
-		TaskScheduler scheduler = new ProviderTaskScheduler(provider);
-		scheduler.schedule(task);
+	private TaskScheduler getSchedulerWithErrorHandler(SourcePoller task) {
+		SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor();
+		executor.setConcurrencyLimit(1);
+		TaskScheduler scheduler = new SimpleTaskScheduler(executor);
+		scheduler.schedule(task, task.getTrigger());
 		return scheduler;
 	}
 
