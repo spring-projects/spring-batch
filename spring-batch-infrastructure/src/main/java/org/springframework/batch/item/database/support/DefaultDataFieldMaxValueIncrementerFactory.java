@@ -17,15 +17,7 @@ package org.springframework.batch.item.database.support;
 
 import javax.sql.DataSource;
 
-import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.*;
 
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory}
@@ -50,6 +42,8 @@ import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
 public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxValueIncrementerFactory {
 
 	static final String DB_TYPE_DB2 = "db2";
+
+    static final String DB_TYPE_DB2ZOS = "db2zos";
 
 	static final String DB_TYPE_DERBY = "derby";
 
@@ -89,6 +83,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		if (DB_TYPE_DB2.equals(incrementerType)) {
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
+		else if (DB_TYPE_DB2ZOS.equals(incrementerType)) {
+			return new DB2MainframeSequenceMaxValueIncrementer(dataSource, incrementerName);
+		}
 		else if (DB_TYPE_DERBY.equals(incrementerType)) {
 			return new DerbyMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);
 		}
@@ -115,11 +112,15 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	}
 
 	public boolean isSupportedIncrementerType(String incrementerType) {
-		if (!DB_TYPE_DB2.equals(incrementerType) && !DB_TYPE_DERBY.equals(incrementerType)
-				&& !DB_TYPE_HSQL.equals(incrementerType) && !DB_TYPE_MYSQL.equals(incrementerType)
-				&& !DB_TYPE_ORACLE.equals(incrementerType) && !DB_TYPE_POSTGRES.equals(incrementerType)
-				&& !DB_TYPE_SQLSERVER.equals(incrementerType) && !DB_TYPE_SYBASE.equals(incrementerType)) {
-
+		if (!DB_TYPE_DB2.equals(incrementerType)
+                && !DB_TYPE_DB2ZOS.equals(incrementerType)
+                && !DB_TYPE_DERBY.equals(incrementerType)
+				&& !DB_TYPE_HSQL.equals(incrementerType)
+                && !DB_TYPE_MYSQL.equals(incrementerType)
+				&& !DB_TYPE_ORACLE.equals(incrementerType)
+                && !DB_TYPE_POSTGRES.equals(incrementerType)
+				&& !DB_TYPE_SQLSERVER.equals(incrementerType)
+                && !DB_TYPE_SYBASE.equals(incrementerType)) {
 			return false;
 		}
 		else {
@@ -128,7 +129,7 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	}
 
 	public String[] getSupportedIncrementerTypes() {
-		return new String[] { DB_TYPE_DB2, DB_TYPE_DERBY, DB_TYPE_HSQL, DB_TYPE_MYSQL,
+		return new String[] { DB_TYPE_DB2, DB_TYPE_DB2ZOS, DB_TYPE_DERBY, DB_TYPE_HSQL, DB_TYPE_MYSQL,
 				DB_TYPE_ORACLE, DB_TYPE_POSTGRES, DB_TYPE_SQLSERVER, DB_TYPE_SYBASE };
 	}
 }
