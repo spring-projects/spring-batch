@@ -24,7 +24,8 @@ public enum DatabaseType {
 
 	DERBY("Apache Derby"), 
 	DB2("DB2"), 
-	HSQL("HSQL Database Engine"), 
+	DB2ZOS("DB2ZOS"), 
+	HSQL("HSQL Database Engine"),
 	SQLSERVER("Microsoft SQL Server"),
 	MYSQL("MySQL"),
 	ORACLE("Oracle"),
@@ -76,9 +77,21 @@ public enum DatabaseType {
 	 * @throws MetaDataAccessException
 	 */
 	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException{
-		String databaseProductName = JdbcUtils.commonDatabaseName(
-				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString());
-		
+		String databaseProductName =
+				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString();
+		if ("DB2".equals(databaseProductName)) {
+			String databaseProductVersion =
+					JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductVersion").toString();
+			if (!databaseProductVersion.startsWith("SQL")) {
+				databaseProductName = "DB2ZOS";
+			}
+			else {
+				databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
+			}
+		}
+		else {
+			databaseProductName = JdbcUtils.commonDatabaseName(databaseProductName);
+		}
 		return fromProductName(databaseProductName);
 	}
 }

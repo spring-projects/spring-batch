@@ -457,7 +457,7 @@
   &lt;/bean&gt;</programlisting>
 
         <para>The databaseType property indicates the type of incrementer that
-        must be used. Options include: "db2", "derby", "hsql", "mysql",
+        must be used. Options include: "db2", "db2zos", "derby", "hsql", "mysql",
         "oracle", and "postgres".</para>
       </section>
 

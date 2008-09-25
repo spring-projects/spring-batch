@@ -32,6 +32,7 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.DB2MainframeSequenceMaxValueIncrementer;
 
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory}
@@ -41,6 +42,7 @@ import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
  * 
  * <ul>
  * <li>db2</li>
+ * <li>db2zos</li>
  * <li>derby</li>
  * <li>hsql</li>
  * <li>mysql</li>
@@ -80,6 +82,9 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 		
 		if (databaseType == DB2) {
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
+		}
+		else if (databaseType == DB2ZOS) {
+			return new DB2MainframeSequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
 		else if (databaseType == DERBY) {
 			return new DerbyMaxValueIncrementer(dataSource, incrementerName, incrementerColumnName);

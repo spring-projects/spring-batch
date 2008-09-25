@@ -67,7 +67,30 @@ public class SimpleDelegatingPagingQueryProviderTests {
 		AbstractSqlPagingQueryProvider queryProviderToBeUsed = new Db2PagingQueryProvider();
 		initializeQueryProvider(queryProviderToBeUsed);
 
+		EasyMock.expect(dmd.getDatabaseProductName()).andReturn("DB2/Linux");
+		EasyMock.replay(dmd);
+		EasyMock.replay(con);
+		EasyMock.replay(ds);
+
+		pagingQueryProvider.init(ds);
+		String sql = queryProviderToBeUsed.generateFirstPageQuery(pageSize);
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize);
+		Assert.assertEquals("", sql, s);
+
+		EasyMock.verify(ds);
+		EasyMock.verify(con);
+		EasyMock.verify(dmd);
+	}
+
+	@Test
+	public void testDb2ZOS() throws Exception {
+		AbstractSqlPagingQueryProvider queryProviderToBeUsed = new Db2PagingQueryProvider();
+		initializeQueryProvider(queryProviderToBeUsed);
+
 		EasyMock.expect(dmd.getDatabaseProductName()).andReturn("DB2");
+		expect(con.getMetaData()).andReturn(dmd);
+		expect(ds.getConnection()).andReturn(con);
+		EasyMock.expect(dmd.getDatabaseProductVersion()).andReturn("DSN08015");
 		EasyMock.replay(dmd);
 		EasyMock.replay(con);
 		EasyMock.replay(ds);

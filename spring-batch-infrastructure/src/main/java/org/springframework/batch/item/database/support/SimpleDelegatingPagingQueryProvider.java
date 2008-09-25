@@ -41,7 +41,7 @@ public class SimpleDelegatingPagingQueryProvider extends AbstractSqlPagingQueryP
 		if (type == DERBY) {
 			delegate = new DerbyPagingQueryProvider();
 		}
-		else if (type == DB2) {
+		else if (type == DB2 || type == DB2ZOS) {
 			delegate = new Db2PagingQueryProvider();
 		}
 		else if (type == HSQL) {

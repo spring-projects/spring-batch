@@ -28,6 +28,7 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.DB2MainframeSequenceMaxValueIncrementer;
 
 /**
  * @author Lucas Ward
@@ -49,6 +50,7 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 	
 	public void testSupportedDatabaseType(){
 		assertTrue(factory.isSupportedIncrementerType("db2"));
+		assertTrue(factory.isSupportedIncrementerType("db2zos"));
 		assertTrue(factory.isSupportedIncrementerType("mysql"));
 		assertTrue(factory.isSupportedIncrementerType("derby"));
 		assertTrue(factory.isSupportedIncrementerType("oracle"));
@@ -86,6 +88,10 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 		assertTrue(factory.getIncrementer("db2", "NAME") instanceof DB2SequenceMaxValueIncrementer);
 	}
 	
+	public void testDb2zos(){
+		assertTrue(factory.getIncrementer("db2zos", "NAME") instanceof DB2MainframeSequenceMaxValueIncrementer);
+	}
+
 	public void testMysql(){
 		assertTrue(factory.getIncrementer("mysql", "NAME") instanceof MySQLMaxValueIncrementer);
 	}
