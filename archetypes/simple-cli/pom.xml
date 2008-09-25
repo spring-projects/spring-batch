@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>simple-cli-archetype</artifactId>
@@ -7,7 +7,6 @@
 	<packaging>jar</packaging>
 	<name>Commandline</name>
 	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
-
 	<description>
 		<![CDATA[
       This project is a minimal command line batch sample from
@@ -15,13 +14,11 @@
       see the job run.
     ]]>
 	</description>
-
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.5</spring.framework.version>
-		<bundle.symbolic.name>${pom.groupId}.sample.archetype.cli</bundle.symbolic.name>
+		<bundlor.version>1.0.0.BUILD-SNAPSHOT</bundlor.version>
 	</properties>
-
 	<profiles>
 		<profile>
 			<id>strict</id>
@@ -29,8 +26,34 @@
 				<maven.test.failure.ignore>false</maven.test.failure.ignore>
 			</properties>
 		</profile>
+		<profile>
+			<id>manifest</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.springsource.bundlor</groupId>
+						<artifactId>com.springsource.bundlor.maven</artifactId>
+						<version>${bundlor.version}</version>
+						<executions>
+							<execution>
+								<id>bundlor-manifest</id>
+								<phase>package</phase>
+								<goals>
+									<goal>manifest</goal>
+								</goals>
+								<configuration>
+									<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
-
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -76,7 +99,6 @@
 			<version>1.5.3</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<extensions>
 			<extension>
@@ -95,30 +117,19 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<extensions>true</extensions>
-				<configuration>
-					<manifestLocation>target/generated-resources/META-INF</manifestLocation>
-					<instructions>
-						<Bundle-SymbolicName>${bundle.symbolic.name}</Bundle-SymbolicName>
-						<Export-Package>!example,!test.*</Export-Package>
-						<Import-Package><![CDATA[
- org.apache.commons.logging.*;version="[1.1.0, 2.0.0)",
- org.springframework.batch.*;version="[2.0.0,3.0.0)",
- org.springframework.*;version="[2.5.5, 3.0.0)"
- 						]]></Import-Package>
-					</instructions>
-				</configuration>
+				<groupId>com.springsource.bundlor</groupId>
+				<artifactId>com.springsource.bundlor.maven</artifactId>
+				<version>${bundlor.version}</version>
+				<executions>
+					<execution>
+						<id>bundlor-transform</id>
+						<!-- This isn't necessary, but Q4E barfs without it. -->
+						<phase>package</phase>
+						<goals>
+							<goal>transform</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -149,14 +160,18 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<pluginRepositories>
 		<pluginRepository>
 			<id>Codehaus</id>
 			<url>http://repository.codehaus.org/</url>
 		</pluginRepository>
+		<pluginRepository>
+			<id>com.springsource.repository.bundles.snapshot</id>
+			<name>SpringSource Enterprise Bundle Repository -
+				SpringSource Bundle Snapshots</name>
+			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+		</pluginRepository>
 	</pluginRepositories>
-
 	<distributionManagement>
 		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
@@ -174,5 +189,4 @@
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
-
 </project>

@@ -36,7 +36,6 @@ $ mvn archetype:create -DgroupId=com.mycompany -DartifactId=batch \
 		</buildCommand>
 	</buildSpec>
 	<natures>
-		<nature>com.springsource.platform.ide.facet.core.bundlenature</nature>
 		<nature>org.springframework.ide.eclipse.core.springnature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.devzuz.q.maven.jdt.core.mavenNature</nature>
