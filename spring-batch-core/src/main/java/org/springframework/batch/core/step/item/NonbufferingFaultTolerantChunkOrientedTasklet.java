@@ -30,12 +30,13 @@ import org.springframework.core.AttributeAccessor;
 /**
  * Fault-tolerant chunk-oriented tasklet implementation which does not buffer
  * items that have been read - the assumption is that item reader is
- * transactional and will re-present the items after transaction rollback.
+ * transactional and will re-present the items after transaction rollback, while
+ * item ordering might not be preserved (JMS).
  * 
  * Note that the implementation relies on {@link Object#equals(Object)}
  * comparisons for recognizing items on retry/skip.
  * 
- * TODO garbage collection of skipped items
+ * TODO how to cleanup skipped items buffers?
  * 
  * @author Robert Kasanicky
  * 
