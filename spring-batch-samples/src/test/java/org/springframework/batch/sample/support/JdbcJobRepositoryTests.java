@@ -114,7 +114,6 @@ public class JdbcJobRepositoryTests {
 
 	@Transactional @Test
 	public void testFindOrCreateJob() throws Exception {
-		System.out.println("**** START ****");
 		job.setName("foo");
 		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());

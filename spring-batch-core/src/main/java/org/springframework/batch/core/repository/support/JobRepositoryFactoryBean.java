@@ -156,8 +156,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		}
 		
 		if(databaseType == null){
-			logger.info("No database type set, using meta data");
 			databaseType = DatabaseType.fromMetaData(dataSource).name();
+			logger.info("No database type set, using meta data indicating: " + databaseType);
 		}
 
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType

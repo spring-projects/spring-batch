@@ -173,6 +173,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derbyclient</artifactId>
+			<version>10.2.1.6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
 			<version>1.2.2</version>
@@ -184,6 +190,21 @@
 			<version>10.2.0.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.2-504.jdbc3</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- db2 driver needs to be installed locally in maven first -->
+		<!--
+		<dependency>
+			<groupId>com.ibm</groupId>
+			<artifactId>db2jcc</artifactId>
+			<version>9.5.0</version>
+			<scope>test</scope>
+		</dependency>
+		-->
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
