@@ -4,15 +4,14 @@ import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
@@ -71,32 +70,33 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	 * 
 	 * @see ItemWriter#write(java.util.List)
 	 */
-	public void write(List<? extends T> items) {
+	public void write(final List<? extends T> items) {
 
-		for (T data : items) {
+		final ListIterator<? extends T> itemIterator = items.listIterator();
+		getJdbcTemplate().batchUpdate("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
+				new BatchPreparedStatementSetter() {
 
-			final long id = incrementer.nextLongValue();
-			final long jobId = stepExecution.getJobExecution().getJobId();
-			final byte[] blob = SerializationUtils.serialize((Serializable) data);
-			getJdbcTemplate().update("INSERT into BATCH_STAGING (ID, JOB_ID, VALUE, PROCESSED) values (?,?,?,?)",
-					new PreparedStatementSetter() {
-						public void setValues(PreparedStatement ps) throws SQLException {
-							ps.setLong(1, id);
-							ps.setLong(2, jobId);
-							lobHandler.getLobCreator().setBlobAsBytes(ps, 3, blob);
-							ps.setString(4, NEW);
-						}
+					public int getBatchSize() {
+						return items.size();
+					}
 
-					});
+					public void setValues(PreparedStatement ps, int i) throws SQLException {
 
-		}
+						long id = incrementer.nextLongValue();
+						long jobId = stepExecution.getJobExecution().getJobId();
 
-	}
+						Assert.state(itemIterator.nextIndex() == i,
+								"Item ordering must be preserved in batch sql update");
 
-	public void clear() throws ClearFailedException {
-	}
+						byte[] blob = SerializationUtils.serialize((Serializable) itemIterator.next());
 
-	public void flush() throws FlushFailedException {
+						ps.setLong(1, id);
+						ps.setLong(2, jobId);
+						lobHandler.getLobCreator().setBlobAsBytes(ps, 3, blob);
+						ps.setString(4, NEW);
+					}
+				});
+
 	}
 
 	/*
