@@ -47,6 +47,10 @@ import org.springframework.core.AttributeAccessor;
  * listener is invoked and the skip count incremented. A retryable exception is
  * thus also effectively also implicitly skippable.
  * 
+ * Known limitation: ItemProcessor is assumed to be non-transactional. In case
+ * of rollback caused by error on write the processing phase will not be
+ * repeated, only the failed write will.
+ * 
  * @author Dave Syer
  * @author Robert Kasanicky
  */
@@ -181,7 +185,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 					logger.debug("Skipping failed input", e);
 				}
 				else {
-					// skip doesn't apply -> rethrow as if skip limit of zero was exceeded
+					// skip doesn't apply -> rethrow as if skip limit of zero
+					// was exceeded
 					throw new SkipLimitExceededException(0, e);
 				}
 
