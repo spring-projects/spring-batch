@@ -241,20 +241,6 @@
 			<artifactId>spring-web</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-		<!-- JMX for Java 1.4 -->
-		<dependency>
-			<groupId>mx4j</groupId>
-			<artifactId>mx4j</artifactId>
-			<version>3.0.2</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>mx4j</groupId>
-			<artifactId>mx4j-remote</artifactId>
-			<version>3.0.2</version>
-			<optional>true</optional>
-		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
