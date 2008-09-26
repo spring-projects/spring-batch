@@ -49,7 +49,7 @@ public class DatabaseShutdownFunctionalTests extends AbstractBatchLauncherTests 
 		this.jobOperator = jobOperator;
 	}
 	
-	@Transactional @Test
+	@Test
 	public void testLaunchJob() throws Exception {
 
 		final JobParameters jobParameters = new JobParameters();

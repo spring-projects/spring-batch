@@ -42,7 +42,7 @@ public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIn
 		this.writer = writer;
 	}
 
-	@Transactional @Test
+	@Test
 	public void testLaunchJob() throws Exception {
 		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();
 		setJobParameters(params);

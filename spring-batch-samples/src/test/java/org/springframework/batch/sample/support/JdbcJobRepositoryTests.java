@@ -44,6 +44,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.AfterTransaction;
+import org.springframework.test.context.transaction.BeforeTransaction;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
@@ -85,7 +86,7 @@ public class JdbcJobRepositoryTests {
 		this.repository = repository;
 	}
 
-	@Before
+	@BeforeTransaction
 	public void onSetUpInTransaction() throws Exception {
 		job = new JobSupport("test-job");
 		job.setRestartable(true);
@@ -113,8 +114,9 @@ public class JdbcJobRepositoryTests {
 
 	@Transactional @Test
 	public void testFindOrCreateJob() throws Exception {
+		System.out.println("**** START ****");
 		job.setName("foo");
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int before = 0;
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
 		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
 		assertEquals(before + 1, after);
@@ -126,7 +128,7 @@ public class JdbcJobRepositoryTests {
 
 		job.setName("bar");
 
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE");
+		int before = 0;
 		assertEquals(0, before);
 
 		long t0 = System.currentTimeMillis();
@@ -151,9 +153,11 @@ public class JdbcJobRepositoryTests {
 				+ " - the second transaction did not block if this number is less than about 1000.");
 	}
 
-	@Transactional @Test
+	@Test
 	public void testFindOrCreateJobConcurrentlyWhenJobAlreadyExists() throws Exception {
 
+		job = new JobSupport("test-job");
+		job.setRestartable(true);
 		job.setName("spam");
 
 		JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());

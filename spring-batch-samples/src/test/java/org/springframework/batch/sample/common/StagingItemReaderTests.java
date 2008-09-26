@@ -1,6 +1,7 @@
 package org.springframework.batch.sample.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
@@ -18,6 +19,8 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -49,7 +52,7 @@ public class StagingItemReaderTests {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	@Before
+	@BeforeTransaction
 	public void onSetUpBeforeTransaction() throws Exception {
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(jobId,
 				new JobParameters(), "testJob")));
@@ -59,7 +62,7 @@ public class StagingItemReaderTests {
 		reader.open(new ExecutionContext());
 	}
 
-	@After
+	@AfterTransaction
 	public void onTearDownAfterTransaction() throws Exception {
 		reader.close(null);
 		simpleJdbcTemplate.update("DELETE FROM BATCH_STAGING");
@@ -85,11 +88,15 @@ public class StagingItemReaderTests {
 
 	@Transactional @Test
 	public void testUpdateProcessIndicatorAfterCommit() throws Exception {
-		testReaderUpdatesProcessIndicator();
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		txTemplate.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus transactionStatus) {
+						try {
+							testReaderUpdatesProcessIndicator();
+						} catch (Exception e) {
+							fail("Unxpected Exception: " + e);
+						}
 						long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
 								jobId);
 						String before =

@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.After;
 import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,12 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		}
 	}
 	
-	@Transactional @Test
+	@After
+	public void tearDown() throws Exception {
+		simpleJdbcTemplate.update("delete from TRADE");
+	}
+
+	@Test
 	public void testLaunchJob() throws Exception{
 		super.testLaunchJob();
 	}
