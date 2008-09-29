@@ -212,7 +212,6 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using parameterMap:" + parameterMap);
 		}
-		System.out.println();
 		return parameterMap;
 	}
 
