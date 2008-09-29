@@ -607,11 +607,11 @@
           </listitem>
 
           <listitem>
-            <para>Price: Price of the item - 4 characters long.</para>
+            <para>Price: Price of the item - 5 characters long.</para>
           </listitem>
 
           <listitem>
-            <para>Customer: Id of the customer ordering the item - 8
+            <para>Customer: Id of the customer ordering the item - 9
             characters long.</para>
           </listitem>
         </orderedlist>
