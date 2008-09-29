@@ -33,46 +33,46 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	}
 	
 	@Test
-	public void testFooter(){
+	public void testFooter() throws Exception{
 		
 		String footerLine = "Ffjkdalsfjdaskl;f";
-		FieldSet fs = compositeTokenizer.tokenize(footerLine);
+		FieldSet fs = compositeTokenizer.process(footerLine);
 		assertEquals(footerFieldSet, fs);
 		assertEquals(footerLine, footerTokenizer.getTokenizedLine());
 	}
 	
 	@Test
-	public void testCustomerAdd(){
+	public void testCustomerAdd() throws Exception{
 		
 		String customerAddLine = "AFDASFDASFDFSA";
-		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
+		FieldSet fs = compositeTokenizer.process(customerAddLine);
 		assertEquals(customerFieldSet, fs);
 		assertEquals(customerAddLine, customerTokenizer.getTokenizedLine());
 	}
 	
 	@Test
-	public void testCustomerDelete(){
+	public void testCustomerDelete() throws Exception{
 		
 		String customerAddLine = "DFDASFDASFDFSA";
-		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
+		FieldSet fs = compositeTokenizer.process(customerAddLine);
 		assertEquals(customerFieldSet, fs);
 		assertEquals(customerAddLine, customerTokenizer.getTokenizedLine());
 	}
 	
 	@Test
-	public void testCustomerUpdate(){
+	public void testCustomerUpdate() throws Exception{
 		
 		String customerAddLine = "UFDASFDASFDFSA";
-		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
+		FieldSet fs = compositeTokenizer.process(customerAddLine);
 		assertEquals(customerFieldSet, fs);
 		assertEquals(customerAddLine, customerTokenizer.getTokenizedLine());
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
-	public void testInvalidLine(){
+	public void testInvalidLine() throws Exception{
 		
 		String invalidLine = "INVALID";
-		compositeTokenizer.tokenize(invalidLine);
+		compositeTokenizer.process(invalidLine);
 	}
 	
 	
@@ -85,7 +85,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 			this.fieldSetToReturn = fieldSetToReturn;
 		}
 		
-		public FieldSet tokenize(String line) {
+		public FieldSet process(String line) {
 			this.tokenizedLine = line;
 			return fieldSetToReturn;
 		}

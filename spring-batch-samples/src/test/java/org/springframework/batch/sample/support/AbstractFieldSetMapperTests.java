@@ -34,10 +34,11 @@ public abstract class AbstractFieldSetMapperTests {
 	/**
 	 * Regular usage scenario.
 	 * Assumes the domain object implements sensible <code>equals(Object other)</code>
+	 * @throws Exception 
 	 */
 	@Test
-	public void testRegularUse() {
-		assertEquals(expectedDomainObject(), fieldSetMapper().mapLine(fieldSet()));
+	public void testRegularUse() throws Exception {
+		assertEquals(expectedDomainObject(), fieldSetMapper().process(fieldSet()));
 	}
 	
 }

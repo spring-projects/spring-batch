@@ -15,7 +15,13 @@ public class ExampleItemReader implements ItemReader<String> {
 	 * Reads next record from input
 	 */
 	public String read() throws Exception {
-		return input[index++];
+		if (index < input.length) {
+			return input[index++];
+		}
+		else {
+			return null;
+		}
+		
 	}
 
 }

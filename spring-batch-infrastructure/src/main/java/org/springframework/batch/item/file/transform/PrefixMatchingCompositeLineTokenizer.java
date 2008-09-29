@@ -31,7 +31,7 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
 		this.tokenizers = new LinkedHashMap<String, LineTokenizer>(tokenizers);
 	}
 
-	public FieldSet tokenize(String line) {
+	public FieldSet process(String line) throws Exception {
 
 		if (line == null) {
 			return new DefaultFieldSet(new String[0]);
@@ -61,7 +61,7 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
 			throw new IllegalStateException("Could not match record to tokenizer for line=[" + line + "]");
 		}
 
-		return tokenizer.tokenize(line);
+		return tokenizer.process(line);
 	}
 
 }

@@ -46,7 +46,7 @@ public class FlatFileItemReaderAdvancedTests extends TestCase {
 
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
-		public FieldSet tokenize(String line) {
+		public FieldSet process(String line) {
 			return new DefaultFieldSet(new String[] { line });
 		}
 	};

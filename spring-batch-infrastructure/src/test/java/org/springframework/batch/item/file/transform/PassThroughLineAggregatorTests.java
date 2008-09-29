@@ -9,13 +9,13 @@ public class PassThroughLineAggregatorTests extends TestCase {
 	
 	private LineAggregator<Object> mapper = new PassThroughLineAggregator<Object>();
 
-	public void testUnmapItemAsFieldSet() {
+	public void testUnmapItemAsFieldSet() throws Exception {
 		Object item = new Object();
-		assertEquals(item.toString(), mapper.aggregate(item));
+		assertEquals(item.toString(), mapper.process(item));
 	}
 
-	public void testUnmapItemAsString() {
-		assertEquals("foo", mapper.aggregate("foo"));
+	public void testUnmapItemAsString() throws Exception {
+		assertEquals("foo", mapper.process("foo"));
 	}
 
 }

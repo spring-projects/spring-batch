@@ -240,7 +240,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			String firstLine = readRecord();
 			// set names in tokenizer if they haven't been set already
 			if (tokenizer instanceof AbstractLineTokenizer && !((AbstractLineTokenizer) tokenizer).hasNames()) {
-				String[] names = tokenizer.tokenize(firstLine).getValues();
+				String[] names = tokenizer.process(firstLine).getValues();
 				((AbstractLineTokenizer) tokenizer).setNames(names);
 			}
 			if (headerCallback != null) {
@@ -263,10 +263,10 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 		if (record != null) {
 			try {
-				FieldSet tokenizedLine = tokenizer.tokenize(record);
-				return fieldSetMapper.mapLine(tokenizedLine);
+				FieldSet tokenizedLine = tokenizer.process(record);
+				return fieldSetMapper.process(tokenizedLine);
 			}
-			catch (RuntimeException ex) {
+			catch (Exception ex) {
 				// add current line count to message and re-throw
 				throw new FlatFileParseException("Parsing error at line: " + lineCount + " in resource="
 						+ resource.getDescription() + ", input=[" + record + "]", ex, record, lineCount);

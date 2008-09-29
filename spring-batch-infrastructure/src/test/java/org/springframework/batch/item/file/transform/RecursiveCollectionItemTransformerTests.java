@@ -34,15 +34,15 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 
 	public void testSetDelegateAndPassInString() throws Exception {
 		aggregator.setDelegate(new LineAggregator<String>() {
-			public String aggregate(String item) {
+			public String process(String item) {
 				return "bar";
 			}
 		});
-		assertEquals("bar", aggregator.aggregate(Collections.singleton("foo")));
+		assertEquals("bar", aggregator.process(Collections.singleton("foo")));
 	}
 
 	public void testTransformList() throws Exception {
-		String result = aggregator.aggregate(Arrays.asList(StringUtils.commaDelimitedListToStringArray("foo,bar")));
+		String result = aggregator.process(Arrays.asList(StringUtils.commaDelimitedListToStringArray("foo,bar")));
 		String[] array = StringUtils.delimitedListToStringArray(result, LINE_SEPARATOR);
 		assertEquals("foo", array[0]);
 		assertEquals("bar", array[1]);

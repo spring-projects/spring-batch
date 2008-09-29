@@ -23,15 +23,15 @@ public class CompositeCustomerUpdateLineTokenizer implements LineTokenizer {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
 	 */
-	public FieldSet tokenize(String line) {
+	public FieldSet process(String line) throws Exception {
 		
 		if(line.charAt(0) == 'F'){
 			//line starts with F, so the footer tokenizer should tokenize it.
-			return footerTokenizer.tokenize(line);
+			return footerTokenizer.process(line);
 		}
 		else if(line.charAt(0) == 'A' || line.charAt(0) == 'U' || line.charAt(0) == 'D'){
 			//line starts with A,U, or D, so it must be a customer operation.
-			return customerTokenizer.tokenize(line);
+			return customerTokenizer.process(line);
 		}
 		else{
 			//If the line doesn't start with any of the characters above, it must obviously be invalid.

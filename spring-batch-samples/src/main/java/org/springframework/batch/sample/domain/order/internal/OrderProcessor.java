@@ -44,23 +44,24 @@ public class OrderProcessor implements ItemProcessor<Order, List<String>> {
 	/**
 	 * Converts information from an Order object to a collection of Strings for
 	 * output.
+	 * @throws Exception 
 	 */
-	public List<String> process(Order order) {
+	public List<String> process(Order order) throws Exception {
 
 		List<String> result = new ArrayList<String>();
 
-		result.add(getAggregator("header").aggregate(OrderFormatterUtils.headerArgs(order)));
-		result.add(getAggregator("customer").aggregate(OrderFormatterUtils.customerArgs(order)));
-		result.add(getAggregator("address").aggregate(OrderFormatterUtils.billingAddressArgs(order)));
-		result.add(getAggregator("billing").aggregate(OrderFormatterUtils.billingInfoArgs(order)));
+		result.add(getAggregator("header").process(OrderFormatterUtils.headerArgs(order)));
+		result.add(getAggregator("customer").process(OrderFormatterUtils.customerArgs(order)));
+		result.add(getAggregator("address").process(OrderFormatterUtils.billingAddressArgs(order)));
+		result.add(getAggregator("billing").process(OrderFormatterUtils.billingInfoArgs(order)));
 
 		List<LineItem> items = order.getLineItems();
 
 		for (LineItem lineItem : items) {
-			result.add(getAggregator("item").aggregate(OrderFormatterUtils.lineItemArgs(lineItem)));
+			result.add(getAggregator("item").process(OrderFormatterUtils.lineItemArgs(lineItem)));
 		}
 
-		result.add(getAggregator("footer").aggregate(OrderFormatterUtils.footerArgs(order)));
+		result.add(getAggregator("footer").process(OrderFormatterUtils.footerArgs(order)));
 
 		return result;
 	}

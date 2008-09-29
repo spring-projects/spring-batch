@@ -189,7 +189,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		StringBuilder lines = new StringBuilder();
 		int lineCount = 0;
 		for (T item : items) {
-			lines.append(lineAggregator.aggregate(item) + lineSeparator);
+			lines.append(lineAggregator.process(item) + lineSeparator);
 			lineCount++;
 		}
 		try {

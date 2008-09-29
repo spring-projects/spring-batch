@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.file.transform;
 
+import org.springframework.batch.item.ItemProcessor;
+
 
 
 /**
@@ -23,12 +25,5 @@ package org.springframework.batch.item.file.transform;
  * 
  * @author Dave Syer
  */
-public interface LineAggregator<T> {
-	/**
-	 * Create a string from the value provided.
-	 * 
-	 * @param item values to be converted
-	 * @return string
-	 */
-	public String aggregate(T item);
+public interface LineAggregator<T> extends ItemProcessor<T, String>{
 }

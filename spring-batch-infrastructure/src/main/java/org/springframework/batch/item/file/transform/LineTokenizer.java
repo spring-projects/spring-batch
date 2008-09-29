@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file.transform;
 
+import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.mapping.FieldSet;
 
 
@@ -26,14 +27,5 @@ import org.springframework.batch.item.file.mapping.FieldSet;
  * @author tomas.slanina
  * 
  */
-public interface LineTokenizer {
-	/**
-	 * Yields the tokens resulting from the splitting of the supplied
-	 * <code>line</code>.
-	 * 
-	 * @param line the line to be tokenized (can be <code>null</code>)
-	 * 
-	 * @return the resulting tokens
-	 */
-	FieldSet tokenize(String line);
+public interface LineTokenizer extends ItemProcessor<String, FieldSet> {
 }

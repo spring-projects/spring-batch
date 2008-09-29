@@ -20,7 +20,7 @@ public class CustomerUpdateFieldSetMapper extends StepExecutionListenerSupport i
 
 	StepExecution stepExecution;
 	
-	public CustomerUpdate mapLine(FieldSet fs) {
+	public CustomerUpdate process(FieldSet fs) {
 		
 		char code = fs.readChar(0);
 		if(code == 'F'){

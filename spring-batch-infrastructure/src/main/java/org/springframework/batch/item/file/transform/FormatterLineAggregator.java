@@ -94,7 +94,7 @@ public class FormatterLineAggregator<T> implements LineAggregator<T> {
 	 * @param item data to be aggregated
 	 * @return aggregated string
 	 */
-	public String aggregate(T item) {
+	public String process(T item) {
 
 		Assert.notNull(item);
 		Assert.notNull(format);

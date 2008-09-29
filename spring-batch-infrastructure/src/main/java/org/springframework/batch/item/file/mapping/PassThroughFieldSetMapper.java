@@ -31,7 +31,7 @@ public class PassThroughFieldSetMapper implements FieldSetMapper<FieldSet> {
 	 * org.springframework.batch.io.file.FieldSetMapper#mapLine(org.springframework
 	 * .batch.io.file.FieldSet)
 	 */
-	public FieldSet mapLine(FieldSet fs) {
+	public FieldSet process(FieldSet fs) {
 		return fs;
 	}
 

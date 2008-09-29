@@ -63,7 +63,7 @@ public class FlatFileItemReaderBasicTests {
 
 	// simple stub instead of a realistic tokenizer
 	private LineTokenizer tokenizer = new LineTokenizer() {
-		public FieldSet tokenize(String line) {
+		public FieldSet process(String line) {
 			return new DefaultFieldSet(new String[] { line });
 		}
 	};
@@ -121,7 +121,7 @@ public class FlatFileItemReaderBasicTests {
 	@Test
 	public void testReadWithTokenizerError() throws Exception {
 		itemReader.setLineTokenizer(new LineTokenizer() {
-			public FieldSet tokenize(String line) {
+			public FieldSet process(String line) {
 				throw new RuntimeException("foo");
 			}
 		});
@@ -138,7 +138,7 @@ public class FlatFileItemReaderBasicTests {
 	@Test
 	public void testReadWithMapperError() throws Exception {
 		itemReader.setFieldSetMapper(new FieldSetMapper<FieldSet>() {
-			public FieldSet mapLine(FieldSet fs) {
+			public FieldSet process(FieldSet fs) {
 				throw new RuntimeException("foo");
 			}
 		});

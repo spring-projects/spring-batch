@@ -21,7 +21,7 @@ public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTes
 		Resource resource = new ByteArrayResource(FOOS.getBytes());
 		tested.setResource(resource);
 		tested.setFieldSetMapper(new FieldSetMapper<Foo>() {
-			public Foo mapLine(FieldSet fs) {
+			public Foo process(FieldSet fs) {
 				Foo foo = new Foo();
 				foo.setValue(fs.readInt(0));
 				return foo;
