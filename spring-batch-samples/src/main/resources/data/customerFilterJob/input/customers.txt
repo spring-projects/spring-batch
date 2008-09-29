@@ -1,0 +1,6 @@
+SCust             Credit
+Acustomer5        00032345
+Ucustomer3        00100500
+Acustomer6        00123456
+Dcustomer1        00000000
+F0000004
