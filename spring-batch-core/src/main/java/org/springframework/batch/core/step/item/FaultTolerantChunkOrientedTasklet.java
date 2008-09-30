@@ -20,7 +20,7 @@ import java.util.Collections;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
+import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -185,9 +185,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 					logger.debug("Skipping failed input", e);
 				}
 				else {
-					// skip doesn't apply -> rethrow as if skip limit of zero
-					// was exceeded
-					throw new SkipLimitExceededException(0, e);
+					throw new NonSkippableReadException("Non-skippable exception during read", e);
 				}
 
 			}

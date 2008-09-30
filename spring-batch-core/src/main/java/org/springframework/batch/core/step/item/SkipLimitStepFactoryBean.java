@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -194,6 +195,7 @@ public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> 
 		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
 
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
+			addFatalExceptionIfMissing(NonSkippableReadException.class);
 			addFatalExceptionIfMissing(SkipListenerFailedException.class);
 			addFatalExceptionIfMissing(RetryException.class);
 
