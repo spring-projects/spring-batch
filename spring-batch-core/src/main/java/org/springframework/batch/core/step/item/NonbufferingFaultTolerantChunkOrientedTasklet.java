@@ -36,8 +36,6 @@ import org.springframework.core.AttributeAccessor;
  * Note that the implementation relies on {@link Object#equals(Object)}
  * comparisons for recognizing items on retry/skip.
  * 
- * TODO how to cleanup skipped items buffers?
- * 
  * @author Robert Kasanicky
  * 
  * @param <I> input item type
@@ -45,11 +43,11 @@ import org.springframework.core.AttributeAccessor;
  */
 public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends AbstractItemOrientedTasklet<I, O> {
 
+	private static final String SKIPPED_INPUTS_KEY = "SKIPPED_INPUTS_KEY";
+
+	private static final String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_KEY";
+
 	private final RepeatOperations repeatOperations;
-
-	private final Set<I> skippedInputs = new HashSet<I>();
-
-	private final Set<O> skippedOutputs = new HashSet<O>();
 
 	private final RetryOperations retryOperations;
 
@@ -76,10 +74,29 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	}
 
 	/**
-	 * Read-process-write a list of items. Uses fault-tolerant
-	 * {@link #read(StepContribution)},
-	 * {@link #process(StepContribution, List, List)} and
-	 * {@link #write(List, StepContribution)} implementations.
+	 * 
+	 * @param <T> buffer type
+	 * @param attributes used to store the state of the tasklet
+	 * @param key the key buffer is stored under in the attributes
+	 * @return newly created or existing buffer stored under the given key
+	 */
+	private static <T> Set<T> getBuffer(AttributeAccessor attributes, String key) {
+		Set<T> buffer;
+		if (!attributes.hasAttribute(key)) {
+			buffer = new HashSet<T>();
+			attributes.setAttribute(key, buffer);
+		}
+		else {
+			@SuppressWarnings("unchecked")
+			Set<T> casted = (Set<T>) attributes.getAttribute(key);
+			buffer = casted;
+		}
+		return buffer;
+	}
+
+	/**
+	 * Read-process-write a list of items. Uses fault-tolerant read, process and
+	 * write implementations.
 	 */
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		ExitStatus result = ExitStatus.CONTINUABLE;
@@ -100,6 +117,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		});
 
 		// filter inputs marked for skipping
+		Set<I> skippedInputs = getBuffer(attributes, SKIPPED_INPUTS_KEY);
 		inputs.removeAll(skippedInputs);
 
 		// If there is no input we don't have to do anything more
@@ -108,12 +126,13 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		}
 
 		List<O> outputs = new ArrayList<O>();
-		process(contribution, inputs, outputs);
+		process(contribution, inputs, outputs, skippedInputs);
 
 		// filter outputs marked for skipping
+		Set<O> skippedOutputs = getBuffer(attributes, SKIPPED_OUTPUTS_KEY);
 		outputs.removeAll(skippedOutputs);
 
-		write(outputs, contribution);
+		write(contribution, outputs, skippedOutputs);
 
 		return result;
 	}
@@ -127,7 +146,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	 * @param contribution current StepContribution holding skipped items count
 	 * @return next item for processing
 	 */
-	protected I read(StepContribution contribution) throws Exception {
+	private I read(StepContribution contribution) throws Exception {
 
 		try {
 			return doRead();
@@ -156,9 +175,11 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	 * {@link SkipListener} provided is called when retry attempts are
 	 * exhausted. Adds failed items into skipped inputs list so that they can be
 	 * filtered if they are encountered again (after rollback).
+	 * 
+	 * @param skippedInputs container for items marked for skipping
 	 */
-	protected void process(final StepContribution contribution, final List<I> inputs, final List<O> outputs)
-			throws Exception {
+	private void process(final StepContribution contribution, final List<I> inputs, final List<O> outputs,
+			final Set<I> skippedInputs) throws Exception {
 
 		int filtered = 0;
 
@@ -219,8 +240,11 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	 * 
 	 * Adds failed items into skipped outputs list so that they can be filtered
 	 * if they are encountered again (after rollback).
+	 * 
+	 * @param skippedOutputs container for items marked for skipping
 	 */
-	protected void write(final List<O> outputs, final StepContribution contribution) throws Exception {
+	private void write(final StepContribution contribution, final List<O> outputs,  final Set<O> skippedOutputs)
+			throws Exception {
 
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {
