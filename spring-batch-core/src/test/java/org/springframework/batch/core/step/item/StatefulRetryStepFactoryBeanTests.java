@@ -37,6 +37,7 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -143,7 +144,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		step.execute(stepExecution);
 		fail();
 		}
-		catch (SkipLimitExceededException expected) {
+		catch (NonSkippableReadException expected) {
 			assertEquals(0, stepExecution.getSkipCount());
 
 			// b is processed twice, plus a, plus c, plus the null at end

@@ -18,6 +18,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
@@ -118,7 +119,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			step.execute(stepExecution);
 			fail();
 		}
-		catch (SkipLimitExceededException e) {
+		catch (NonSkippableReadException e) {
 			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 			assertEquals(1, stepExecution.getItemCount().intValue());
 		}
