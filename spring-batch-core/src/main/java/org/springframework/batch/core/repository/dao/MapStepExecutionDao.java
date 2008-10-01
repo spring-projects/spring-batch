@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.batch.core.repository.dao;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,9 +34,7 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
-
+	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = new HashMap<Long, Map<String, StepExecution>>();
 	private static long currentId = 0;
 
 	public static void clear() {
@@ -50,7 +48,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
-			executions = TransactionAwareProxyFactory.createTransactionalMap();
+			executions = new HashMap<String, StepExecution>();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 		stepExecution.setId(new Long(currentId++));
@@ -70,9 +68,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		synchronized (stepExecution) {
 			if (!persistedExecution.getVersion().equals(stepExecution.getVersion())) {
-				throw new OptimisticLockingFailureException("Attempt to update step execution id="
-						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
-						+ "), where current version is " + persistedExecution.getVersion());
+				throw new OptimisticLockingFailureException("Attempt to update step execution id=" + stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + "), where current version is " + persistedExecution.getVersion());
 			}
 
 			stepExecution.incrementVersion();
@@ -93,11 +89,11 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
 		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
 		Collections.sort(result, new Comparator<Entity>() {
+
 			public int compare(Entity o1, Entity o2) {
-				return Long.signum(o2.getId()-o1.getId());
+				return Long.signum(o2.getId() - o1.getId());
 			}
 		});
 		return result;
 	}
-
 }

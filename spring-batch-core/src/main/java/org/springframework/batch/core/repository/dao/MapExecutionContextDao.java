@@ -1,19 +1,17 @@
 package org.springframework.batch.core.repository.dao;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
 public class MapExecutionContextDao implements ExecutionContextDao {
 
-	private static Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
+	private static Map<Long, ExecutionContext> contextsByStepExecutionId = new HashMap<Long, ExecutionContext>();
 
-	private static Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
-			.createTransactionalMap();
+	private static Map<Long, ExecutionContext> contextsByJobExecutionId = new HashMap<Long, ExecutionContext>();
 	
 	public static void clear() {
 		contextsByJobExecutionId.clear();
