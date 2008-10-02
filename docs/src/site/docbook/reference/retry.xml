@@ -94,8 +94,9 @@ Foo result = template.execute(new RetryCallback<Foo>() {
     public Foo doWithRetry(RetryContext context) {
         // business logic here
     },
-    new RecoveryCallback<Foo>() {
-        // recover logic here
+  new RecoveryCallback<Foo>() {
+    Foo recover(RetryContext context) throws Exception {
+          // recover logic here
     }
 });]]></programlisting>If the business logic does not succeed before the
       template decides to abort, then the client is given the chance to do
@@ -143,42 +144,42 @@ Foo result = template.execute(new RetryCallback<Foo>() {
       <classname>RetryContextCache</classname> with a cluster cache of some
       sort (even in a clustered environment this might be overkill).</para>
 
-<para>Part of the reponsibility of the
-        <classname>RetryOperations</classname> is to recognise the failed
-        operations when they come back in a new execution (and usually wrapped
-        in a new transaction). To facilitate this, Spring Batch provides the
-        <classname>RetryState</classname> abstraction. This works in
-        conjunction with a special <classname>execute</classname> methods in
-        the <classname>RetryOperations</classname>.</para>
+      <para>Part of the reponsibility of the
+      <classname>RetryOperations</classname> is to recognise the failed
+      operations when they come back in a new execution (and usually wrapped
+      in a new transaction). To facilitate this, Spring Batch provides the
+      <classname>RetryState</classname> abstraction. This works in conjunction
+      with a special <classname>execute</classname> methods in the
+      <classname>RetryOperations</classname>.</para>
 
-        <para>The way the failed operations are recognised is by identifying
-        the state across multiple invocations of the retry. To identify the
-        state the user can provide an <classname>RetryState</classname>
-        object, and this is responsible for returning a unique key identifying
-        the item. The identifier is used as a key in the
-        <classname>RetryContextCache</classname>.</para>
+      <para>The way the failed operations are recognised is by identifying the
+      state across multiple invocations of the retry. To identify the state
+      the user can provide an <classname>RetryState</classname> object, and
+      this is responsible for returning a unique key identifying the item. The
+      identifier is used as a key in the
+      <classname>RetryContextCache</classname>.</para>
 
-        <warning>
-          <para>Be very careful with the implementation of
-          <code>Object.equals()</code> and <code>Object.hashCode()</code> in
-          the key returned by <classname>RetryState</classname>. The best
-          advice is to use a business key to identify the items. In the case
-          of a JMS message the message ID can be used.</para>
-        </warning>
+      <warning>
+        <para>Be very careful with the implementation of
+        <code>Object.equals()</code> and <code>Object.hashCode()</code> in the
+        key returned by <classname>RetryState</classname>. The best advice is
+        to use a business key to identify the items. In the case of a JMS
+        message the message ID can be used.</para>
+      </warning>
 
-        <para>When the retry is exhausted there is also the option to handle
-        the failed item in a different way, instead of calling the
-        <classname>RetryCallback</classname> (which is presumed now to be
-        likely to fail). Just like in the stateless case, this option is
-        provided by the <classname>RecoveryCallback</classname>, which can be
-        provided by passing it in to the <classname>execute</classname> method
-        of <classname>RetryOperations</classname>.</para>
+      <para>When the retry is exhausted there is also the option to handle the
+      failed item in a different way, instead of calling the
+      <classname>RetryCallback</classname> (which is presumed now to be likely
+      to fail). Just like in the stateless case, this option is provided by
+      the <classname>RecoveryCallback</classname>, which can be provided by
+      passing it in to the <classname>execute</classname> method of
+      <classname>RetryOperations</classname>.</para>
 
-        <para>The decision to retry or not is actually delegated to a regular
-        retry policy, so the usual concerns about limits and timeouts can be
-        injected through the <classname>RetryPolicy</classname> (see
-        below).</para>
-     </section>
+      <para>The decision to retry or not is actually delegated to a regular
+      retry policy, so the usual concerns about limits and timeouts can be
+      injected through the <classname>RetryPolicy</classname> (see
+      below).</para>
+    </section>
   </section>
 
   <section>
