@@ -32,7 +32,7 @@ import org.springframework.integration.endpoint.SourcePoller;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.integration.message.Message;
 import org.springframework.integration.message.MessageConsumer;
-import org.springframework.integration.message.PollableSource;
+import org.springframework.integration.message.MessageSource;
 import org.springframework.integration.scheduling.IntervalTrigger;
 import org.springframework.integration.scheduling.SimpleTaskScheduler;
 import org.springframework.integration.scheduling.TaskScheduler;
@@ -80,7 +80,7 @@ public class PollableSourceRetryTests {
 				processed.add((String) payload);
 			}
 		};
-		PollableSource<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 		SourcePoller trigger = getSourcePoller(source, target, transactionManager, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
@@ -109,7 +109,7 @@ public class PollableSourceRetryTests {
 				throw new RuntimeException("Planned failure: " + payload);
 			}
 		};
-		PollableSource<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 		SourcePoller trigger = getSourcePoller(source, target, null, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
@@ -140,7 +140,7 @@ public class PollableSourceRetryTests {
 				throw new RuntimeException("Planned failure: " + payload);
 			}
 		};
-		PollableSource<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 		SourcePoller trigger = getSourcePoller(source, target, transactionManager, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
@@ -176,7 +176,7 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		PollableSource<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 		SourcePoller trigger = getSourcePoller(source, target, transactionManager, 1);
 		TaskScheduler scheduler = getSchedulerWithErrorHandler(trigger);
@@ -215,7 +215,7 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		PollableSource<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 		SourcePoller trigger = getSourcePoller(source, target, null, 1);
 		SourcePoller task = (SourcePoller) getProxy(trigger, SourcePoller.class, new Advice[] {
@@ -262,7 +262,7 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		PollableSource<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 		// this was the old dispatch advice chain
 		target = (MessageChannel) getProxy(target, MessageChannel.class,
@@ -305,7 +305,7 @@ public class PollableSourceRetryTests {
 			}
 		};
 
-		PollableSource<Object> source = getPollableSource(list);
+		MessageSource<Object> source = getPollableSource(list);
 		MessageChannel target = getChannel(handler);
 
 		// this was the old dispatch advice chain
@@ -334,7 +334,7 @@ public class PollableSourceRetryTests {
 
 	}
 
-	private SourcePoller getSourcePoller(PollableSource<Object> source, MessageChannel channel,
+	private SourcePoller getSourcePoller(MessageSource<Object> source, MessageChannel channel,
 			PlatformTransactionManager transactionManager, int maxMessagesPerPoll) {
 		SourcePoller poller = new SourcePoller(source, channel, new IntervalTrigger(100));
 		poller.setTransactionManager(transactionManager);
@@ -358,7 +358,7 @@ public class PollableSourceRetryTests {
 		lifecycle.stop();
 	}
 
-	private PollableSource<Object> getPollableSource(List<String> list) {
+	private MessageSource<Object> getPollableSource(List<String> list) {
 		final ItemReader<String> reader = new ListItemReader<String>(list) {
 			public String read() {
 				String item = super.read();
@@ -366,7 +366,7 @@ public class PollableSourceRetryTests {
 				return item;
 			}
 		};
-		PollableSource<Object> source = new PollableSource<Object>() {
+		MessageSource<Object> source = new MessageSource<Object>() {
 			public Message<Object> receive() {
 				try {
 					String payload = reader.read();

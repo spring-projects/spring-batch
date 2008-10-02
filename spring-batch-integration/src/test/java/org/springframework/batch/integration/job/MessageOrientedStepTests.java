@@ -18,7 +18,6 @@ package org.springframework.batch.integration.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -31,6 +30,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.integration.JobRepositorySupport;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.integration.channel.DirectChannel;
@@ -101,17 +101,14 @@ public class MessageOrientedStepTests {
 			public void onMessage(Message<?> message) {
 			}
 		});
-		try {
-			step.setExecutionTimeout(1000);
-			step.setPollingInterval(100);
-			step.execute(jobExecution.createStepExecution(step.getName()));
-			fail("Expected StepExecutionTimeoutException");
-		}
-		catch (StepExecutionTimeoutException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("waiting for steps"));
-		}
+		step.setExecutionTimeout(1000);
+		step.setPollingInterval(100);
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		String message = stepExecution.getExitStatus().getExitDescription();
+		assertTrue("Wrong message: " + message, message.contains("StepExecutionTimeoutException"));
 	}
 
 	@Test
@@ -135,15 +132,12 @@ public class MessageOrientedStepTests {
 				replyChannel.send(message);
 			}
 		});
-		try {
-			step.execute(jobExecution.createStepExecution(step.getName()));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-			String message = e.getMessage();
-			assertEquals("Wrong message: " + message, "Planned failure", message);
-		}
+		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		String message = stepExecution.getExitStatus().getExitDescription();
+		assertTrue("Wrong message: " + message, message.contains("Planned failure"));
 	}
 
 	@Test
