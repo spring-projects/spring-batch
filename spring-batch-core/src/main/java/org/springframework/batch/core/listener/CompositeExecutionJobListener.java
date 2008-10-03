@@ -75,20 +75,6 @@ public class CompositeExecutionJobListener implements JobExecutionListener {
 	/**
 	 * Call the registered listeners in reverse order, respecting and
 	 * prioritising those that implement {@link Ordered}.
-	 * @see org.springframework.batch.core.JobExecutionListener#onError(org.springframework.batch.core.JobExecution,
-	 * java.lang.Throwable)
-	 */
-	public void onError(JobExecution jobExecution, Throwable e) {
-		for (Iterator<JobExecutionListener> iterator = listeners.reverse(); iterator.hasNext();) {
-			JobExecutionListener listener = iterator.next();
-			listener.onError(jobExecution, e);
-		}
-
-	}
-
-	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.JobExecutionListener#onInterrupt(org.springframework.batch.core.JobExecution)
 	 */
 	public void onInterrupt(JobExecution jobExecution) {

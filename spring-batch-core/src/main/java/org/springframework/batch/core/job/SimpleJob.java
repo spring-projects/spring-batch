@@ -112,11 +112,8 @@ public class SimpleJob extends AbstractJob {
 
 			//This is temporary, given the changes to how exceptions are handled, there really should only be an afterJob method
 			//but it's being left as is until the listener contract can be discussed.
-			if(execution.getStatus() == BatchStatus.COMPLETED){
+			if(execution.getStatus() != BatchStatus.STOPPED){
 				getCompositeListener().afterJob(execution);
-			}
-			else if(execution.getStatus() == BatchStatus.FAILED){
-				getCompositeListener().onError(execution, currentStepExecution.getFailureExceptions().get(0));
 			}
 			else if(execution.getStatus() == BatchStatus.STOPPED){
 				getCompositeListener().onInterrupt(execution);
@@ -131,7 +128,7 @@ public class SimpleJob extends AbstractJob {
 		catch (Throwable t) {
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
-			getCompositeListener().onError(execution, t);
+			getCompositeListener().afterJob(execution);
 		}
 		finally {
 			ExitStatus status = ExitStatus.FAILED;

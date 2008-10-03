@@ -37,12 +37,6 @@ public class JobExecutionListenerSupport implements JobExecutionListener {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.JobListener#onError(org.springframework.batch.core.JobExecution, java.lang.Throwable)
-	 */
-	public void onError(JobExecution jobExecution, Throwable e) {
-	}
-
-	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.JobListener#onInterrupt(org.springframework.batch.core.JobExecution)
 	 */
 	public void onInterrupt(JobExecution jobExecution) {

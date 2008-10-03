@@ -34,17 +34,10 @@ public interface JobExecutionListener {
 	void beforeJob(JobExecution jobExecution);
 
 	/**
-	 * Callback after successful completion of a job.
+	 * Callback after completion of a job, both successful and failed.
 	 * @param jobExecution the current {@link JobExecution}
 	 */
 	void afterJob(JobExecution jobExecution);
-	
-	/**
-	 * Callback on job failure owing to the throwable provided.
-	 * @param jobExecution the current {@link JobExecution}
-	 * @param e the exception that caused the job to terminate
-	 */
-	void onError(JobExecution jobExecution, Throwable e);
 
 	/**
 	 * Callback when a job is interrupted or stopped manually.

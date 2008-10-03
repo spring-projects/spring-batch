@@ -240,8 +240,8 @@ public class SimpleJobTests extends TestCase {
 
 	public void testFailedWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
-			public void onError(JobExecution jobExecution, Throwable t) {
-				list.add(t);
+			public void afterJob(JobExecution jobExecution) {
+				list.add("afterJob");
 			}
 		} });
 		final RuntimeException exception = new RuntimeException("Foo!");
