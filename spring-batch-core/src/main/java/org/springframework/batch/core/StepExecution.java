@@ -71,7 +71,7 @@ public class StepExecution extends Entity {
 
 	private volatile int filterCount;
 	
-	private volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
+	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
 	 * Constructor with mandatory properties.
@@ -443,10 +443,6 @@ public class StepExecution extends Entity {
 	
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
-	}
-	
-	public void setFailureExceptions(List<Throwable> failureExceptions) {
-		this.failureExceptions = failureExceptions;
 	}
 	
 	public void addFailureException(Throwable throwable){
