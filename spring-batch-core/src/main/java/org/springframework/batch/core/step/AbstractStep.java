@@ -199,7 +199,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 
 			stepExecution.setStatus(BatchStatus.COMPLETED);
-			exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 
 			try {
 				getJobRepository().update(stepExecution);
@@ -219,7 +218,6 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			stepExecution.addFailureException(e);
 
 			try {
-				exitStatus = exitStatus.and(getCompositeListener().onErrorInStep(stepExecution, e));
 				getJobRepository().updateExecutionContext(stepExecution);
 			}
 			catch (Exception ex) {
@@ -228,7 +226,14 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 		}
 		finally {
-
+			
+			try {
+				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
+			}
+			catch (Exception e){
+				logger.error("Excption in afterStep callback", e);
+			}
+			
 			stepExecution.setExitStatus(exitStatus);
 			stepExecution.setEndTime(new Date());
 

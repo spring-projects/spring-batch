@@ -175,15 +175,15 @@ public class AbstractStepTests extends TestCase {
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener2#onErrorInStep", events.get(i++));
-		assertEquals("listener1#onErrorInStep", events.get(i++));
+		assertEquals("listener2#afterStep", events.get(i++));
+		assertEquals("listener1#afterStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("onErrorInStep"));
+				.containsKey("afterStep"));
 	}
 
 	/**
@@ -209,15 +209,15 @@ public class AbstractStepTests extends TestCase {
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener2#onErrorInStep", events.get(i++));
-		assertEquals("listener1#onErrorInStep", events.get(i++));
+		assertEquals("listener2#afterStep", events.get(i++));
+		assertEquals("listener1#afterStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
 		assertEquals("JOB_INTERRUPTED", execution.getExitStatus().getExitCode());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("onErrorInStep"));
+				.containsKey("afterStep"));
 	}
 
 	/**

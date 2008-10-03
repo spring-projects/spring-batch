@@ -77,19 +77,4 @@ public class CompositeStepExecutionListener implements StepExecutionListener {
 		}
 	}
 
-	/**
-	 * Call the registered listeners in reverse order, respecting and
-	 * prioritising those that implement {@link Ordered}.
-	 * @see org.springframework.batch.core.StepExecutionListener#onErrorInStep(StepExecution,
-	 * java.lang.Throwable)
-	 */
-	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-		ExitStatus status = null;
-		for (Iterator<StepExecutionListener> iterator = list.reverse(); iterator.hasNext();) {
-			StepExecutionListener listener = (StepExecutionListener) iterator.next();
-			ExitStatus close = listener.onErrorInStep(stepExecution, e);
-			status = status != null ? status.and(close) : close;
-		}
-		return status;
-	}
 }

@@ -128,37 +128,6 @@ public class MulticasterBatchListenerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onErrorInStep(org.springframework.batch.core.StepExecution, java.lang.Throwable)}
-	 * .
-	 */
-	@Test
-	public void testOnErrorInStep() {
-		multicast.onErrorInStep(null, new RuntimeException("foo"));
-		assertEquals(1, count);
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#onErrorInStep(org.springframework.batch.core.StepExecution, java.lang.Throwable)}
-	 * .
-	 */
-	@Test
-	public void testOnErrorInStepFails() {
-		error = true;
-		try {
-			multicast.onErrorInStep(null, new RuntimeException("foo"));
-			fail("Expected StepListenerFailedException");
-		}
-		catch (StepListenerFailedException e) {
-			// expected
-			String message = e.getCause().getMessage();
-			assertEquals("Wrong message: " + message, "foo", message);
-		}
-		assertEquals(1, count);
-	}
-
-	/**
-	 * Test method for
 	 * {@link org.springframework.batch.core.listener.MulticasterBatchListener#afterChunk()}
 	 * .
 	 */

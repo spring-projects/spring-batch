@@ -169,20 +169,6 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	}
 
 	/**
-	 * @param t
-	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#onErrorInStep(StepExecution,
-	 * Throwable)
-	 */
-	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable t) {
-		try {
-			return stepListener.onErrorInStep(stepExecution, t);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onErrorInStep.", t, e);
-		}
-	}
-
-	/**
 	 * 
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk()
 	 */
