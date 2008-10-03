@@ -254,7 +254,8 @@ public class TaskletStepTests {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(itemReader, itemWriter));
 		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
-			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
+			@Override
+			public ExitStatus afterStep(StepExecution stepExecution) {
 				return ExitStatus.FAILED.addExitDescription("FOO");
 			}
 		});
@@ -475,8 +476,8 @@ public class TaskletStepTests {
 	@Test
 	public void testDirectlyInjectedListenerOnError() throws Exception {
 		step.registerStepExecutionListener(new StepExecutionListenerSupport() {
-			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
-				list.add(e);
+			public ExitStatus afterStep(StepExecution stepExecution) {
+				list.add("exception");
 				return null;
 			}
 		});
@@ -755,7 +756,7 @@ public class TaskletStepTests {
 
 	/**
 	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)}
-	 * causes step to fail.
+	 * doesn't cause step failure.
 	 * @throws JobInterruptedException
 	 */
 	@Test
@@ -769,9 +770,7 @@ public class TaskletStepTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 
 		step.execute(stepExecution);
-		Throwable expected = stepExecution.getFailureExceptions().get(0);
-		assertEquals("exception thrown in afterStep to signal failure", expected.getMessage());
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 	}
 	
