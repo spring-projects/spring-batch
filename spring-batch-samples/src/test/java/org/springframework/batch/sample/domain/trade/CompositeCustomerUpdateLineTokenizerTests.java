@@ -7,6 +7,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
@@ -30,15 +32,6 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 		compositeTokenizer = new CompositeCustomerUpdateLineTokenizer();
 		compositeTokenizer.setCustomerTokenizer(customerTokenizer);
 		compositeTokenizer.setFooterTokenizer(footerTokenizer);
-	}
-	
-	@Test
-	public void testFooter() throws Exception{
-		
-		String footerLine = "Ffjkdalsfjdaskl;f";
-		FieldSet fs = compositeTokenizer.process(footerLine);
-		assertEquals(footerFieldSet, fs);
-		assertEquals(footerLine, footerTokenizer.getTokenizedLine());
 	}
 	
 	@Test

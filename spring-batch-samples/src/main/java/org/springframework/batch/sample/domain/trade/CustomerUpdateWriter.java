@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * @author Lucas Wward
+ * @author Lucas Ward
  *
  */
 public class CustomerUpdateWriter implements ItemWriter<CustomerUpdate> {
@@ -24,6 +24,8 @@ public class CustomerUpdateWriter implements ItemWriter<CustomerUpdate> {
 				customerDao.updateCustomer(customerUpdate.getCustomerName(), customerUpdate.getCredit());
 			}
 		}
+		
+		//flush and/or clear resources
 	}
 	
 	public void setCustomerDao(CustomerDao customerDao) {

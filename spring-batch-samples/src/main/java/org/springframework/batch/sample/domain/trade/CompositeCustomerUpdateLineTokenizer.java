@@ -3,6 +3,8 @@
  */
 package org.springframework.batch.sample.domain.trade;
 
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 
@@ -15,10 +17,11 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
  * @author Lucas Ward
  * @since 2.0
  */
-public class CompositeCustomerUpdateLineTokenizer implements LineTokenizer {
+public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerSupport implements LineTokenizer {
 
 	private LineTokenizer customerTokenizer;
 	private LineTokenizer footerTokenizer;
+	private StepExecution stepExecution;
 	
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
@@ -27,16 +30,36 @@ public class CompositeCustomerUpdateLineTokenizer implements LineTokenizer {
 		
 		if(line.charAt(0) == 'F'){
 			//line starts with F, so the footer tokenizer should tokenize it.
-			return footerTokenizer.process(line);
+			FieldSet fs = footerTokenizer.process(line);
+			long customerUpdateTotal = stepExecution.getReadCount();
+			long fileUpdateTotal = fs.readLong(1);
+			if(customerUpdateTotal != fileUpdateTotal){
+				throw new IllegalStateException("The total number of customer updates in the file footer does not match the " +
+						"number entered  File footer total: [" + fileUpdateTotal + "] Total encountered during processing: [" +
+						customerUpdateTotal + "]");
+			}
+			else{
+				//return null, because the footer indicates an end of processing.
+				return null;
+			}
 		}
 		else if(line.charAt(0) == 'A' || line.charAt(0) == 'U' || line.charAt(0) == 'D'){
 			//line starts with A,U, or D, so it must be a customer operation.
 			return customerTokenizer.process(line);
 		}
+		else if(line.charAt(0) == 'S'){
+			//header record, ignore
+			return null;
+		}
 		else{
 			//If the line doesn't start with any of the characters above, it must obviously be invalid.
 			throw new IllegalArgumentException("Invalid line encountered for tokenizing: " + line);
 		}
+	}
+	
+	@Override
+	public void beforeStep(StepExecution stepExecution) {
+		this.stepExecution = stepExecution;
 	}
 
 	/**
