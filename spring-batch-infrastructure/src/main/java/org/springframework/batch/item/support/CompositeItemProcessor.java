@@ -25,6 +25,9 @@ public class CompositeItemProcessor<I, O> implements ItemProcessor<I, O>, Initia
 		Object result = item;
 	
 		for(ItemProcessor transformer: itemProcessors){
+			if(result == null){
+				return null;
+			}
 			result = transformer.process(result);
 		}
 		return (O) result;

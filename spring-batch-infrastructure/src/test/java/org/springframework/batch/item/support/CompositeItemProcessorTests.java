@@ -9,6 +9,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemProcessor;
@@ -23,17 +24,17 @@ public class CompositeItemProcessorTests {
 
 	private CompositeItemProcessor<Object, Object> composite = new CompositeItemProcessor<Object, Object>();
 	
-	private ItemProcessor<Object, Object> transformer1;
-	private ItemProcessor<Object, Object> transformer2;
+	private ItemProcessor<Object, Object> processor1;
+	private ItemProcessor<Object, Object> processor2;
 	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws Exception {
-		transformer1 = createMock(ItemProcessor.class);
-		transformer2 = createMock(ItemProcessor.class);
+		processor1 = createMock(ItemProcessor.class);
+		processor2 = createMock(ItemProcessor.class);
 		
 		composite.setItemProcessors(new ArrayList<ItemProcessor>() {{ 
-			add(transformer1); add(transformer2); 
+			add(processor1); add(processor2); 
 		}});
 		
 		composite.afterPropertiesSet();
@@ -49,17 +50,17 @@ public class CompositeItemProcessorTests {
 		Object itemAfterFirstTransfromation = new Object();
 		Object itemAfterSecondTransformation = new Object();
 
-		expect(transformer1.process(item)).andReturn(itemAfterFirstTransfromation);
+		expect(processor1.process(item)).andReturn(itemAfterFirstTransfromation);
 		
-		expect(transformer2.process(itemAfterFirstTransfromation)).andReturn(itemAfterSecondTransformation);
+		expect(processor2.process(itemAfterFirstTransfromation)).andReturn(itemAfterSecondTransformation);
 		
-		replay(transformer1);
-		replay(transformer2);
+		replay(processor1);
+		replay(processor2);
 		
 		assertSame(itemAfterSecondTransformation, composite.process(item));
 
-		verify(transformer1);
-		verify(transformer2);
+		verify(processor1);
+		verify(processor2);
 	}
 	
 	/**
@@ -90,5 +91,15 @@ public class CompositeItemProcessorTests {
 			// expected
 		}
 		
+	}
+	
+	@Test
+	public void testFilteredItemInFirstProcessor() throws Exception{
+		
+		Object item = new Object();
+		expect(processor1.process(item)).andReturn(null);
+		replay(processor1, processor2);
+		Assert.assertEquals(null,composite.process(item));
+		verify(processor1,processor2);
 	}
 }
