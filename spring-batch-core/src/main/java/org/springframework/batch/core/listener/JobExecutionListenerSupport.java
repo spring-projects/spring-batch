@@ -36,10 +36,4 @@ public class JobExecutionListenerSupport implements JobExecutionListener {
 	public void beforeJob(JobExecution jobExecution) {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.JobListener#onInterrupt(org.springframework.batch.core.JobExecution)
-	 */
-	public void onInterrupt(JobExecution jobExecution) {
-	}
-
 }

@@ -19,6 +19,8 @@ package org.springframework.batch.core.job;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -41,6 +43,8 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class SimpleJob extends AbstractJob {
 
+	private static final Log logger = LogFactory.getLog(SimpleJob.class);
+
 	/**
 	 * Run the specified job by looping through the steps and delegating to the
 	 * {@link Step}.
@@ -49,7 +53,7 @@ public class SimpleJob extends AbstractJob {
 	 * @throws StartLimitExceededException if start limit of one of the steps
 	 * was exceeded
 	 */
-	public void execute(JobExecution execution){
+	public void execute(JobExecution execution) {
 
 		JobInstance jobInstance = execution.getJobInstance();
 
@@ -82,7 +86,8 @@ public class SimpleJob extends AbstractJob {
 					updateStatus(execution, BatchStatus.STARTED);
 					currentStepExecution = execution.createStepExecution(step.getName());
 
-					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step.getName());
+					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance,
+							step.getName());
 
 					boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
 							BatchStatus.COMPLETED)) ? true : false;
@@ -96,8 +101,8 @@ public class SimpleJob extends AbstractJob {
 
 					step.execute(currentStepExecution);
 
-					if(currentStepExecution.getStatus() == BatchStatus.FAILED ||
-							currentStepExecution.getStatus() == BatchStatus.STOPPED	){
+					if (currentStepExecution.getStatus() == BatchStatus.FAILED
+							|| currentStepExecution.getStatus() == BatchStatus.STOPPED) {
 						break;
 					}
 				}
@@ -110,25 +115,14 @@ public class SimpleJob extends AbstractJob {
 
 			updateStatus(execution, currentStepExecution.getStatus());
 
-			//This is temporary, given the changes to how exceptions are handled, there really should only be an afterJob method
-			//but it's being left as is until the listener contract can be discussed.
-			if(execution.getStatus() != BatchStatus.STOPPED){
-				getCompositeListener().afterJob(execution);
-			}
-			else if(execution.getStatus() == BatchStatus.STOPPED){
-				getCompositeListener().onInterrupt(execution);
-			}
-
 		}
 		catch (JobInterruptedException e) {
 			execution.setStatus(BatchStatus.STOPPED);
 			execution.addFailureException(e);
-			getCompositeListener().onInterrupt(execution);
 		}
 		catch (Throwable t) {
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
-			getCompositeListener().afterJob(execution);
 		}
 		finally {
 			ExitStatus status = ExitStatus.FAILED;
@@ -148,6 +142,13 @@ public class SimpleJob extends AbstractJob {
 			execution.setEndTime(new Date());
 			execution.setExitStatus(status);
 			getJobRepository().update(execution);
+
+			try {
+				getCompositeListener().afterJob(execution);
+			}
+			catch (Exception e) {
+				logger.error("Exception encountered in afterStep callback", e);
+			}
 		}
 
 	}

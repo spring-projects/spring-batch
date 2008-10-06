@@ -334,7 +334,7 @@ public class SimpleJobTests extends TestCase {
 
 		JobExecutionListener listener = createMock(JobExecutionListener.class);
 		listener.beforeJob(jobExecution);
-		listener.onInterrupt(jobExecution);
+		listener.afterJob(jobExecution);
 		replay(listener);
 
 		job.setJobExecutionListeners(new JobExecutionListener[] { listener });

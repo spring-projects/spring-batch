@@ -39,9 +39,4 @@ public interface JobExecutionListener {
 	 */
 	void afterJob(JobExecution jobExecution);
 
-	/**
-	 * Callback when a job is interrupted or stopped manually.
-	 * @param jobExecution the current {@link JobExecution}
-	 */
-	void onInterrupt(JobExecution jobExecution);
 }
