@@ -2,11 +2,15 @@ package org.springframework.batch.item.file;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
+import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
@@ -15,6 +19,9 @@ import org.springframework.util.ClassUtils;
  * Tests for {@link ResourceLineReader}.
  */
 public class ResourceLineReaderTests {
+
+	// common value used for writing to a file
+	private String TEST_STRING = "FlatFileInputTemplate-TestData";
 
 	private ResourceLineReader<String> reader = new ResourceLineReader<String>();
 
@@ -95,7 +102,58 @@ public class ResourceLineReaderTests {
 		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 	}
 
+	@Test
+	public void testNonExistantResource() throws Exception {
+
+		Resource resource = new NonExistentResource();
+
+		reader.setResource(resource);
+
+		// afterPropertiesSet should only throw an exception if the Resource is
+		// null
+		reader.afterPropertiesSet();
+
+		reader.open(executionContext);
+		assertNull(reader.read());
+
+	}
+
+	@Test
+	public void testRuntimeFileCreation() throws Exception {
+
+		Resource resource = new NonExistentResource();
+
+		reader.setResource(resource);
+
+		// afterPropertiesSet should only throw an exception if the Resource is
+		// null
+		reader.afterPropertiesSet();
+
+		// replace the resource to simulate runtime resource creation
+		reader.setResource(getInputResource(TEST_STRING));
+		reader.open(executionContext);
+		assertEquals(TEST_STRING, reader.read());
+	}
+
 	private Resource getInputResource(String input) {
 		return new ByteArrayResource(input.getBytes());
+	}
+
+	private static class NonExistentResource extends AbstractResource {
+
+		public NonExistentResource() {
+		}
+
+		public boolean exists() {
+			return false;
+		}
+
+		public String getDescription() {
+			return "NonExistantResource";
+		}
+
+		public InputStream getInputStream() throws IOException {
+			return null;
+		}
 	}
 }
