@@ -33,7 +33,7 @@
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="tokenizer" ref="fixedFileTokenizer" />
+				<property name="lineTokenizer" ref="fixedFileTokenizer" />
 				<property name="fieldSetMapper" ref="fieldSetMapper" />
 			</bean>
 		</property>

@@ -28,7 +28,7 @@ public class DefaultLineMapperTests {
 		expect(fsMapper.process(fs)).andReturn(item);
 		replay(fsMapper);
 		
-		tested.setTokenizer(tokenizer);
+		tested.setLineTokenizer(tokenizer);
 		tested.setFieldSetMapper(fsMapper);
 		
 		assertSame(item, tested.mapLine(line, 1));

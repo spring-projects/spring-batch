@@ -20,7 +20,7 @@ public class DefaultLineMapper<T> implements LineMapper<T> {
 		return fieldSetMapper.process(tokenizer.process(line));
 	}
 
-	public void setTokenizer(LineTokenizer tokenizer) {
+	public void setLineTokenizer(LineTokenizer tokenizer) {
 		this.tokenizer = tokenizer;
 	}
 
