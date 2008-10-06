@@ -52,7 +52,8 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * possibly repeated, and each call surrounded by a transaction. The structure
  * is therefore that of a loop with transaction boundary inside the loop. The
  * loop is controlled by the step operations (
- * {@link #setStepOperations(RepeatOperations)}).<br/><br/>
+ * {@link #setStepOperations(RepeatOperations)}).<br/>
+ * <br/>
  * 
  * Clients can use interceptors in the step operations to intercept or listen to
  * the iteration on a step-wide basis, for instance to get a callback when the
@@ -231,7 +232,7 @@ public class TaskletStep extends AbstractStep {
 
 				StepContribution contribution = stepExecution.createStepContribution();
 				stepExecution.getExecutionContext().clearDirtyFlag();
-				
+
 				// Before starting a new transaction, check for
 				// interruption.
 				interruptionPolicy.checkInterrupted(stepExecution);
@@ -251,22 +252,6 @@ public class TaskletStep extends AbstractStep {
 
 					try {
 						exitStatus = tasklet.execute(contribution, attributes);
-					}
-					catch (Error e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						else {
-							logger.error("Ecountered error that should not cause rollback: ", e);
-						}
-					}
-					catch (Exception e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						else {
-							logger.error("Ecountered error that should not cause rollback: ", e);
-						}
 					}
 					finally {
 						// Still some stuff to do with the data in this chunk,
@@ -296,12 +281,15 @@ public class TaskletStep extends AbstractStep {
 						Thread.currentThread().interrupt();
 					}
 
-					//Check to make sure the ExecutionContext hasn't be modified outside a chunk boundary.  Doing so will cause potential
-					//rollback issues.
-					if(stepExecution.getExecutionContext().isDirty()){
-						throw new IllegalStateException("The ExecutionContext cannot be modified outside of the ItemStream#Update method");
+					// Check to make sure the ExecutionContext hasn't be
+					// modified outside a chunk boundary. Doing so will cause
+					// potential
+					// rollback issues.
+					if (stepExecution.getExecutionContext().isDirty()) {
+						throw new IllegalStateException(
+								"The ExecutionContext cannot be modified outside of the ItemStream#Update method");
 					}
-					
+
 					stream.update(stepExecution.getExecutionContext());
 
 					try {
