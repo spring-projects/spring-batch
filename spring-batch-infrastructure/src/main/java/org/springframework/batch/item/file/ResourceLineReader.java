@@ -50,14 +50,37 @@ public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private LineMapper<T> lineMapper;
 
+	private int linesToSkip = 0;
+
+	private LineCallbackHandler skippedLinesCallback;
+
 	public ResourceLineReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
 
 	/**
+	 * skippedLinesCallback will be passed the header line before any items are read.
+	 */
+	public void setSkippedLinesCallback(LineCallbackHandler skippedLinesCallback) {
+		this.skippedLinesCallback = skippedLinesCallback;
+	}
+
+	/**
+	 * Public setter for the number of lines to skip at the start of a file. Can
+	 * be used if the file contains a header without useful (column name)
+	 * information, and without a comment delimiter at the beginning of the
+	 * lines.
+	 * 
+	 * @param linesToSkip the number of lines to skip
+	 */
+	public void setLinesToSkip(int linesToSkip) {
+		this.linesToSkip = linesToSkip;
+	}
+
+	/**
 	 * Setter for line mapper. This property is required to be set.
 	 * @param lineMapper maps line to item
- 	 */
+	 */
 	public void setLineMapper(LineMapper<T> lineMapper) {
 		this.lineMapper = lineMapper;
 	}
@@ -189,7 +212,10 @@ public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemRea
 		}
 
 		reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
-
+		for (int i = 0; i < linesToSkip; i++) {
+			String line = readLine();
+			skippedLinesCallback.handleLine(line);
+		}
 	}
 
 	public void afterPropertiesSet() throws Exception {

@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
 /**
  * Tests for {@link ResourceLineReader}.
  */
-public class ResourceLineReaderTests extends CommonItemStreamItemReaderTests{
+public class ResourceLineReaderCommonTests extends CommonItemStreamItemReaderTests{
 
 	private static final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n"; 
 	
