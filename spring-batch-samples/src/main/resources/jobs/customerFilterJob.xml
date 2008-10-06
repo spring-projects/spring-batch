@@ -34,6 +34,9 @@
 		
 	<bean name="customerFileUploadReader" class="org.springframework.batch.item.file.ResourceLineReader" >
 		<property name="resource" ref="customerFileResource" />
+		<property name="lineMapper">
+		 	<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
+		</property>
 	</bean>
 	
 	<bean name="customerMapper" class="org.springframework.batch.sample.domain.trade.CustomerUpdateFieldSetMapper" />

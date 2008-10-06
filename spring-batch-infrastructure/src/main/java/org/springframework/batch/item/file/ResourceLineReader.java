@@ -9,9 +9,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.file.mapping.LineMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -19,12 +21,13 @@ import org.springframework.util.ClassUtils;
 /**
  * Restartable {@link ItemReader} that reads lines from input
  * {@link #setResource(Resource)}. Line is defined by the
- * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)}.
+ * {@link #setRecordSeparatorPolicy(RecordSeparatorPolicy)} and mapped to item
+ * using {@link #setLineMapper(LineMapper)}.
  * 
  * @author Robert Kasanicky
  */
-public class ResourceLineReader extends AbstractItemCountingItemStreamItemReader<String> implements
-		ResourceAwareItemReaderItemStream<String> {
+public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
+		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
 	private static final Log logger = LogFactory.getLog(ResourceLineReader.class);
 
@@ -44,9 +47,19 @@ public class ResourceLineReader extends AbstractItemCountingItemStreamItemReader
 	private boolean noInput = false;
 
 	private String encoding = DEFAULT_CHARSET;
-	
+
+	private LineMapper<T> lineMapper;
+
 	public ResourceLineReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
+	}
+
+	/**
+	 * Setter for line mapper. This property is required to be set.
+	 * @param lineMapper maps line to item
+ 	 */
+	public void setLineMapper(LineMapper<T> lineMapper) {
+		this.lineMapper = lineMapper;
 	}
 
 	/**
@@ -95,7 +108,7 @@ public class ResourceLineReader extends AbstractItemCountingItemStreamItemReader
 	 * multiple lines in file).
 	 */
 	@Override
-	protected String doRead() {
+	protected T doRead() throws Exception {
 		if (noInput) {
 			return null;
 		}
@@ -106,7 +119,13 @@ public class ResourceLineReader extends AbstractItemCountingItemStreamItemReader
 				record = recordSeparatorPolicy.preProcess(record) + (line = readLine());
 			}
 		}
-		return recordSeparatorPolicy.postProcess(record);
+		String logicalLine = recordSeparatorPolicy.postProcess(record);
+		if (logicalLine == null) {
+			return null;
+		}
+		else {
+			return lineMapper.mapLine(logicalLine, lineCount);
+		}
 	}
 
 	/**
@@ -171,6 +190,10 @@ public class ResourceLineReader extends AbstractItemCountingItemStreamItemReader
 
 		reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
 
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(lineMapper, "LineMapper is required");
 	}
 
 }
