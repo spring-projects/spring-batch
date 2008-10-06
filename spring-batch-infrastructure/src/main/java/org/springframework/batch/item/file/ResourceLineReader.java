@@ -59,7 +59,8 @@ public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemRea
 	}
 
 	/**
-	 * skippedLinesCallback will be passed the header line before any items are read.
+	 * @param skippedLinesCallback will be called for each one of the initial skipped
+	 * lines before any items are read.
 	 */
 	public void setSkippedLinesCallback(LineCallbackHandler skippedLinesCallback) {
 		this.skippedLinesCallback = skippedLinesCallback;
@@ -214,7 +215,9 @@ public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemRea
 		reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), encoding));
 		for (int i = 0; i < linesToSkip; i++) {
 			String line = readLine();
-			skippedLinesCallback.handleLine(line);
+			if (skippedLinesCallback != null) {
+				skippedLinesCallback.handleLine(line);
+			}
 		}
 	}
 
