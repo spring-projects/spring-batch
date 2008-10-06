@@ -52,8 +52,7 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
  * chunk operations ({@link #setChunkOperations(RepeatOperations)}). The inner
  * loop should always be executed in a single thread, so the chunk operations
  * should not do any concurrent execution. N.B. usually that means that the
- * chunk operations should be a {@link RepeatTemplate} (which is the
- * default).<br/>
+ * chunk operations should be a {@link RepeatTemplate} (which is the default).<br/>
  * 
  * Clients can use interceptors in the step operations to intercept or listen to
  * the iteration on a step-wide basis, for instance to get a callback when the
@@ -244,27 +243,14 @@ public class ItemOrientedStep extends AbstractStep {
 				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
 
 				boolean locked = false;
-				//Throwable that contains any exceptions that are caught but are propagated up because
-				//they shouldn't cause a rollback.
+				// Throwable that contains any exceptions that are caught but
+				// are propagated up because
+				// they shouldn't cause a rollback.
 				Throwable nonRollbackException = null;
 
 				try {
-					
-					try {
-						exitStatus = processChunk(stepExecution, contribution);
-					}
-					catch (Error e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						nonRollbackException = e;
-					}
-					catch (Exception e) {
-						if (transactionAttribute.rollbackOn(e)) {
-							throw e;
-						}
-						nonRollbackException = e;
-					}
+
+					exitStatus = processChunk(stepExecution, contribution);
 
 					contribution.incrementCommitCount();
 
@@ -272,8 +258,8 @@ public class ItemOrientedStep extends AbstractStep {
 					// to synchronize changes to the step execution (at a
 					// minimum).
 					try {
-							synchronizer.lock(stepExecution);
-							locked = true;
+						synchronizer.lock(stepExecution);
+						locked = true;
 					}
 					catch (InterruptedException e) {
 						stepExecution.setStatus(BatchStatus.STOPPED);
@@ -318,7 +304,7 @@ public class ItemOrientedStep extends AbstractStep {
 						stepExecution.setStatus(BatchStatus.UNKNOWN);
 						throw new FatalException("Fatal error detected during update of step execution", e);
 					}
-					
+
 				}
 				catch (Error e) {
 					processRollback(stepExecution, contribution, fatalException, transaction);
@@ -329,23 +315,25 @@ public class ItemOrientedStep extends AbstractStep {
 					throw e;
 				}
 				finally {
-						// only release the lock if we acquired it
-						if (locked) {
-							synchronizer.release(stepExecution);
+					// only release the lock if we acquired it
+					if (locked) {
+						synchronizer.release(stepExecution);
+					}
+					locked = false;
+
+					// Even if the TransactionAttributes dictate that an
+					// exception shouldn't cause a rollback,
+					// we still need to throw the exception so the
+					// ExceptionHandler can make a determination about
+					// whether the exception should cause job failure.
+					if (nonRollbackException != null) {
+						if (nonRollbackException instanceof Error) {
+							throw (Error) nonRollbackException;
 						}
-						locked = false;
-						
-						//Even if the TransactionAttributes dictate that an exception shouldn't cause a rollback,
-						//we still need to throw the exception so the ExceptionHandler can make a determination about
-						//whether the exception should cause job failure.
-						if(nonRollbackException != null){
-							if(nonRollbackException instanceof Error){
-								throw (Error)nonRollbackException;
-							}
-							else{
-								throw (Exception)nonRollbackException;
-							}
+						else {
+							throw (Exception) nonRollbackException;
 						}
+					}
 				}
 
 				// Check for interruption after transaction as well, so that
@@ -381,21 +369,9 @@ public class ItemOrientedStep extends AbstractStep {
 				// check for interruption before each item as well
 				interruptionPolicy.checkInterrupted(execution);
 				ExitStatus exitStatus = ExitStatus.FINISHED;
-				
-				try{
-					exitStatus = itemHandler.handle(contribution);
-				}
-				catch (Error e) {
-					if (transactionAttribute.rollbackOn(e)) {
-						throw e;
-					}
-				}
-				catch (Exception e) {
-					if (transactionAttribute.rollbackOn(e)) {
-						throw e;
-					}
-				}
-				
+
+				exitStatus = itemHandler.handle(contribution);
+
 				// check for interruption after each item as well
 				interruptionPolicy.checkInterrupted(execution);
 				return exitStatus;
