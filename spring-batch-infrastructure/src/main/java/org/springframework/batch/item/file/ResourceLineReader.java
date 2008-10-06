@@ -3,6 +3,7 @@ package org.springframework.batch.item.file;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +33,7 @@ public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemRea
 	private static final Log logger = LogFactory.getLog(ResourceLineReader.class);
 
 	// default encoding for input files
-	public static final String DEFAULT_CHARSET = "ISO-8859-1";
+	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
 
 	private RecordSeparatorPolicy recordSeparatorPolicy = new SimpleRecordSeparatorPolicy();
 
