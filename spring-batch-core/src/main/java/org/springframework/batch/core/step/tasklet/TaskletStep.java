@@ -78,7 +78,14 @@ public class TaskletStep extends AbstractStep {
 
 	private PlatformTransactionManager transactionManager;
 
-	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute(){
+
+		@Override
+		public boolean rollbackOn(Throwable ex) {
+			return true;
+		}
+		
+	};
 
 	private Tasklet tasklet;
 

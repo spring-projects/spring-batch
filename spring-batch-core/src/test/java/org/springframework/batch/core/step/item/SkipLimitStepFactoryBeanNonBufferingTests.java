@@ -28,6 +28,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.StringUtils;
 
 public class SkipLimitStepFactoryBeanNonBufferingTests {
@@ -209,12 +210,13 @@ public class SkipLimitStepFactoryBeanNonBufferingTests {
 	 */
 	@Test
 	public void testProcessorRollback() throws Exception {
+		
+		factory.setTransactionAttribute(new DefaultTransactionAttribute());
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
 
-		@SuppressWarnings("unchecked")
-		final Collection<String> NO_FAILURES = Collections.EMPTY_LIST;
+		final Collection<String> NO_FAILURES = Collections.emptyList();
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
 		Step step = (Step) factory.getObject();
@@ -236,8 +238,7 @@ public class SkipLimitStepFactoryBeanNonBufferingTests {
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
 
-		@SuppressWarnings("unchecked")
-		final Collection<String> NO_FAILURES = Collections.EMPTY_LIST;
+		final Collection<String> NO_FAILURES = Collections.emptyList();
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
 		Step step = (Step) factory.getObject();

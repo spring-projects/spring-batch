@@ -253,7 +253,14 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	 * @return the transactionAttribute
 	 */
 	protected TransactionAttribute getTransactionAttribute() {
-		return transactionAttribute!=null?transactionAttribute:new DefaultTransactionAttribute();
+		return transactionAttribute!=null?transactionAttribute:new DefaultTransactionAttribute(){
+
+			@Override
+			public boolean rollbackOn(Throwable ex) {
+				return true;
+			}
+			
+		};
 	}
 
 	/**

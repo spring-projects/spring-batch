@@ -457,12 +457,12 @@ public class SkipLimitStepFactoryBeanTests {
 	 */
 	@Test
 	public void testProcessorRollback() throws Exception {
+		factory.setTransactionAttribute(new DefaultTransactionAttribute());
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
 
-		@SuppressWarnings("unchecked")
-		final Collection<String> NO_FAILURES = Collections.EMPTY_LIST;
+		final Collection<String> NO_FAILURES = Collections.emptyList();
 		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
@@ -485,8 +485,7 @@ public class SkipLimitStepFactoryBeanTests {
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
 
-		@SuppressWarnings("unchecked")
-		final Collection<String> NO_FAILURES = Collections.EMPTY_LIST;
+		final Collection<String> NO_FAILURES = Collections.emptyList();
 		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
