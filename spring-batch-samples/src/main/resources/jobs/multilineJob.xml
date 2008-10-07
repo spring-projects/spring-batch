@@ -33,16 +33,19 @@
 	</bean>
 
 	<bean id="fileItemReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
+		class="org.springframework.batch.item.file.ResourceLineReader">
 		<property name="resource"
 			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
-		<property name="lineTokenizer" ref="fixedFileDescriptor" />
-		<property name="fieldSetMapper">
-			<bean class="org.springframework.batch.item.support.AggregateItemFieldSetMapper">
-				<property name="delegate" ref="tradeLineMapper" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="fixedFileDescriptor" />
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.item.support.AggregateItemFieldSetMapper">
+						<property name="delegate" ref="tradeLineMapper" />
+					</bean>
+				</property>
 			</bean>
 		</property>
-		<!-- <property name="validator" ref="fixedValidator" /> -->
 	</bean>
 
 	<bean id="tradeLineMapper"

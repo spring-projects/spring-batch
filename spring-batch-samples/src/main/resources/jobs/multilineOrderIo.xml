@@ -6,11 +6,15 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.ResourceLineReader">
 		<property name="resource" ref="fileInputLocator" />
-		<property name="lineTokenizer" ref="orderFileTokenizer" />
-		<property name="fieldSetMapper">
-			<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="orderFileTokenizer" />
+				<property name="fieldSetMapper">
+					<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
+				</property>
+			</bean>
 		</property>
 	</bean>
 

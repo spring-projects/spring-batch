@@ -66,11 +66,15 @@
 
 	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
 	<bean id="testItemReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
+		class="org.springframework.batch.item.file.ResourceLineReader">
 		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-		<property name="lineTokenizer" ref="fixedFileTokenizer" />
-		<property name="fieldSetMapper" ref="fieldSetMapper" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="fixedFileTokenizer" />
+				<property name="fieldSetMapper" ref="fieldSetMapper" />
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="fileItemReader" parent="testItemReader"

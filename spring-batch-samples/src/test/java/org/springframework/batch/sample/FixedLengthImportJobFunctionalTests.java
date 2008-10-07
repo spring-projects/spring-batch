@@ -29,7 +29,8 @@ import javax.sql.DataSource;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.ResourceLineReader;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.sample.domain.trade.Trade;
@@ -52,7 +53,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	//auto-injected attributes
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 	private Resource fileLocator;
-	private FlatFileItemReader<Trade> inputSource;
+	private ResourceLineReader<Trade> inputSource;
 	private LineTokenizer lineTokenizer;
 
 	@Autowired
@@ -70,12 +71,15 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	public void onSetUp() throws Exception {
 		simpleJdbcTemplate.update("delete from TRADE");
 		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
-		inputSource = new FlatFileItemReader<Trade>();
+		inputSource = new ResourceLineReader<Trade>();
 		
 		FieldSetMapper<Trade> mapper = new TradeFieldSetMapper();
-		inputSource.setFieldSetMapper(mapper);
+		DefaultLineMapper<Trade> lineMapper = new DefaultLineMapper<Trade>();
+		lineMapper.setLineTokenizer(lineTokenizer);
+		lineMapper.setFieldSetMapper(mapper);
+		inputSource.setLineMapper(lineMapper);
 		
-		inputSource.setLineTokenizer(lineTokenizer);
+		
 		inputSource.setResource(fileLocator);
 	}
 

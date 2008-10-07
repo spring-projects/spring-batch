@@ -38,13 +38,17 @@
 		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.item.file.FlatFileItemReader"
+	<bean class="org.springframework.batch.item.file.ResourceLineReader"
 		id="fileItemReader">
 		<property name="resource" ref="fileLocator" />
-		<property name="lineTokenizer" ref="tradeFileDescriptor" />
-		<property name="fieldSetMapper">
-			<bean
-				class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="tradeFileDescriptor" />
+				<property name="fieldSetMapper">
+					<bean
+						class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+				</property>
+			</bean>
 		</property>
 	</bean>
 
