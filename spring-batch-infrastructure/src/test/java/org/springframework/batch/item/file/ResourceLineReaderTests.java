@@ -84,7 +84,7 @@ public class ResourceLineReaderTests {
 		reader.read();
 		reader.read();
 
-		assertEquals(2, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		assertEquals(2, executionContext.getLong(ClassUtils.getShortName(ResourceLineReader.class) + ".read.count"));
 		// close input
 		reader.close(executionContext);
 
@@ -99,7 +99,7 @@ public class ResourceLineReaderTests {
 		assertEquals("testLine4", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(ResourceLineReader.class) + ".read.count"));
 	}
 
 	@Test

@@ -56,7 +56,7 @@ public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemRea
 	private LineCallbackHandler skippedLinesCallback;
 
 	public ResourceLineReader() {
-		setName(ClassUtils.getShortName(FlatFileItemReader.class));
+		setName(ClassUtils.getShortName(ResourceLineReader.class));
 	}
 
 	/**

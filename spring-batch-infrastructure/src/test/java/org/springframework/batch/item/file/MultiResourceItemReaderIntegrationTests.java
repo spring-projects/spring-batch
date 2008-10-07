@@ -5,8 +5,7 @@ import java.util.Comparator;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.mapping.FieldSet;
-import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
+import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
@@ -15,9 +14,9 @@ import org.springframework.core.io.Resource;
  */
 public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
-	private MultiResourceItemReader<FieldSet> tested = new MultiResourceItemReader<FieldSet>();
+	private MultiResourceItemReader<String> tested = new MultiResourceItemReader<String>();
 
-	private FlatFileItemReader<FieldSet> itemReader = new FlatFileItemReader<FieldSet>();
+	private ResourceLineReader<String> itemReader = new ResourceLineReader<String>();
 
 	private ExecutionContext ctx = new ExecutionContext();
 
@@ -36,8 +35,8 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	 * Setup the tested reader to read from the test resources.
 	 */
 	protected void setUp() throws Exception {
-
-		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
+		
+		itemReader.setLineMapper(new PassThroughLineMapper());
 
 		tested.setDelegate(itemReader);
 		tested.setComparator(new Comparator<Resource>() {
@@ -55,15 +54,15 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
 		tested.open(ctx);
 
-		assertEquals("1", readItem());
-		assertEquals("2", readItem());
-		assertEquals("3", readItem());
-		assertEquals("4", readItem());
-		assertEquals("5", readItem());
-		assertEquals("6", readItem());
-		assertEquals("7", readItem());
-		assertEquals("8", readItem());
-		assertEquals(null, readItem());
+		assertEquals("1", tested.read());
+		assertEquals("2", tested.read());
+		assertEquals("3", tested.read());
+		assertEquals("4", tested.read());
+		assertEquals("5", tested.read());
+		assertEquals("6", tested.read());
+		assertEquals("7", tested.read());
+		assertEquals("8", tested.read());
+		assertEquals(null, tested.read());
 
 		tested.close(ctx);
 	}
@@ -74,18 +73,18 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
 		tested.open(ctx);
 
-		assertEquals("1", readItem());
+		assertEquals("1", tested.read());
 
 		tested.update(ctx);
 
-		assertEquals("2", readItem());
-		assertEquals("3", readItem());
+		assertEquals("2", tested.read());
+		assertEquals("3", tested.read());
 
 		tested.close(ctx);
 
 		tested.open(ctx);
 
-		assertEquals("1", readItem());
+		assertEquals("1", tested.read());
 	}
 
 	/**
@@ -97,44 +96,44 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
 		tested.open(ctx);
 
-		assertEquals("1", readItem());
+		assertEquals("1", tested.read());
 
 		tested.update(ctx);
 
-		assertEquals("2", readItem());
-		assertEquals("3", readItem());
+		assertEquals("2", tested.read());
+		assertEquals("3", tested.read());
 
 		tested.close(ctx);
 
 		tested.open(ctx);
 
-		assertEquals("2", readItem());
-		assertEquals("3", readItem());
-		assertEquals("4", readItem());
+		assertEquals("2", tested.read());
+		assertEquals("3", tested.read());
+		assertEquals("4", tested.read());
 
 		tested.close(ctx);
 
 		tested.open(ctx);
 
-		assertEquals("2", readItem());
-		assertEquals("3", readItem());
-		assertEquals("4", readItem());
-		assertEquals("5", readItem());
+		assertEquals("2", tested.read());
+		assertEquals("3", tested.read());
+		assertEquals("4", tested.read());
+		assertEquals("5", tested.read());
 
 		tested.update(ctx);
 
-		assertEquals("6", readItem());
-		assertEquals("7", readItem());
+		assertEquals("6", tested.read());
+		assertEquals("7", tested.read());
 
 		tested.close(ctx);
 
 		tested.open(ctx);
 
-		assertEquals("6", readItem());
-		assertEquals("7", readItem());
+		assertEquals("6", tested.read());
+		assertEquals("7", tested.read());
 
-		assertEquals("8", readItem());
-		assertEquals(null, readItem());
+		assertEquals("8", tested.read());
+		assertEquals(null, tested.read());
 
 		tested.close(ctx);
 	}
@@ -146,25 +145,25 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
 		tested.open(ctx);
 
-		assertEquals("1", readItem());
-		assertEquals("2", readItem());
-		assertEquals("3", readItem());
-		assertEquals("4", readItem());
+		assertEquals("1", tested.read());
+		assertEquals("2", tested.read());
+		assertEquals("3", tested.read());
+		assertEquals("4", tested.read());
 
 		tested.update(ctx);
 
-		assertEquals("5", readItem());
-		assertEquals("6", readItem());
+		assertEquals("5", tested.read());
+		assertEquals("6", tested.read());
 
 		tested.close(ctx);
 
 		tested.open(ctx);
 
-		assertEquals("5", readItem());
-		assertEquals("6", readItem());
-		assertEquals("7", readItem());
-		assertEquals("8", readItem());
-		assertEquals(null, readItem());
+		assertEquals("5", tested.read());
+		assertEquals("6", tested.read());
+		assertEquals("7", tested.read());
+		assertEquals("8", tested.read());
+		assertEquals(null, tested.read());
 	}
 
 	/**
@@ -208,11 +207,6 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		tested.open(ctx);
 		
 		assertNull(tested.read());
-	}
-	private String readItem() throws Exception {
-		Object result = tested.read();
-		return result == null ? null : ((FieldSet) result).readString(0);
-
 	}
 
 }
