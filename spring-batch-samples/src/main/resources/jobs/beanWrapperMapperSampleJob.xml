@@ -36,7 +36,7 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 	
-	<bean id="tradeFileItemReader" class="org.springframework.batch.item.file.ResourceLineReader">
+	<bean id="tradeFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineMapper">
@@ -47,7 +47,7 @@
 		</property>
 	</bean>
 
-	<bean id="personFileItemReader" class="org.springframework.batch.item.file.ResourceLineReader">
+	<bean id="personFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/beanWrapperMapperSampleJob/input/20070122.teststream.ImportPersonDataStep.txt" />
 		<property name="lineMapper">

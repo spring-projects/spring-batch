@@ -59,7 +59,7 @@
 	</bean>
 
 	<bean id="playerFileItemReader"
-		class="org.springframework.batch.item.file.ResourceLineReader">
+		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/footballjob/input/${player.file.name}" />
 		<property name="lineMapper">
@@ -80,7 +80,7 @@
 	</bean>
 
 	<bean id="gameFileItemReader"
-		class="org.springframework.batch.item.file.ResourceLineReader">
+		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/footballjob/input/${games.file.name}" />
 		<property name="lineMapper">

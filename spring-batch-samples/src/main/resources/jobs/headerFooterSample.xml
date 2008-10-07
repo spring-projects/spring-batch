@@ -28,7 +28,7 @@
 			</bean>
 		</property>
 	</bean>
-	<bean id="reader" class="org.springframework.batch.item.file.ResourceLineReader">
+	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" ref="inputResource" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">

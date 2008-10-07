@@ -19,7 +19,7 @@ public class MultiResourceItemReaderFlatFileTests extends
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
-		ResourceLineReader<Foo> fileReader = new ResourceLineReader<Foo>();
+		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<Foo>();
 
 		fileReader.setLineMapper(new LineMapper<Foo>() {
 

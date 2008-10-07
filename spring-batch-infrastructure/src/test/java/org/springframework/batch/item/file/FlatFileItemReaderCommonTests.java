@@ -9,15 +9,15 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 /**
- * Tests for {@link ResourceLineReader}.
+ * Tests for {@link FlatFileItemReader}.
  */
-public class ResourceLineReaderCommonTests extends CommonItemStreamItemReaderTests{
+public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTests{
 
 	private static final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n"; 
 	
 	@Override
 	protected ItemReader<Foo> getItemReader() throws Exception {
-		ResourceLineReader<Foo> tested = new ResourceLineReader<Foo>();
+		FlatFileItemReader<Foo> tested = new FlatFileItemReader<Foo>();
 		Resource resource = new ByteArrayResource(FOOS.getBytes());
 		tested.setResource(resource);
 		tested.setLineMapper(new LineMapper<Foo>() {
@@ -35,7 +35,7 @@ public class ResourceLineReaderCommonTests extends CommonItemStreamItemReaderTes
 
 	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
-		ResourceLineReader<Foo> reader = (ResourceLineReader<Foo>) tested;
+		FlatFileItemReader<Foo> reader = (FlatFileItemReader<Foo>) tested;
 		reader.close(new ExecutionContext());
 		
 		reader.setResource(new ByteArrayResource("".getBytes()));

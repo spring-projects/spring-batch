@@ -45,7 +45,7 @@
 	</bean>
 
 	<bean id="fileItemReader"
-		class="org.springframework.batch.item.file.ResourceLineReader">
+		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineMapper">

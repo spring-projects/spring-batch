@@ -33,7 +33,7 @@
 	</bean>
 
 	<bean id="fileItemReader"
-		class="org.springframework.batch.item.file.ResourceLineReader">
+		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
 		<property name="lineMapper">

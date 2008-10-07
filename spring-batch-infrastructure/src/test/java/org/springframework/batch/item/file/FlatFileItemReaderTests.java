@@ -16,14 +16,14 @@ import org.springframework.core.io.Resource;
 import org.springframework.util.ClassUtils;
 
 /**
- * Tests for {@link ResourceLineReader}.
+ * Tests for {@link FlatFileItemReader}.
  */
-public class ResourceLineReaderTests {
+public class FlatFileItemReaderTests {
 
 	// common value used for writing to a file
 	private String TEST_STRING = "FlatFileInputTemplate-TestData";
 
-	private ResourceLineReader<String> reader = new ResourceLineReader<String>();
+	private FlatFileItemReader<String> reader = new FlatFileItemReader<String>();
 
 	private ExecutionContext executionContext = new ExecutionContext();
 
@@ -84,7 +84,7 @@ public class ResourceLineReaderTests {
 		reader.read();
 		reader.read();
 
-		assertEquals(2, executionContext.getLong(ClassUtils.getShortName(ResourceLineReader.class) + ".read.count"));
+		assertEquals(2, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 		// close input
 		reader.close(executionContext);
 
@@ -99,7 +99,7 @@ public class ResourceLineReaderTests {
 		assertEquals("testLine4", reader.read().toString());
 
 		reader.update(executionContext);
-		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(ResourceLineReader.class) + ".read.count"));
+		assertEquals(4, executionContext.getLong(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 	}
 
 	@Test

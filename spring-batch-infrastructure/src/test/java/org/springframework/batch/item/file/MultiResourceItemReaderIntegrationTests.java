@@ -16,7 +16,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
 	private MultiResourceItemReader<String> tested = new MultiResourceItemReader<String>();
 
-	private ResourceLineReader<String> itemReader = new ResourceLineReader<String>();
+	private FlatFileItemReader<String> itemReader = new FlatFileItemReader<String>();
 
 	private ExecutionContext ctx = new ExecutionContext();
 

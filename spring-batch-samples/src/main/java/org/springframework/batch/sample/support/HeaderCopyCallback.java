@@ -6,11 +6,11 @@ import java.io.Writer;
 import org.springframework.batch.item.file.FileWriterCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.LineCallbackHandler;
-import org.springframework.batch.item.file.ResourceLineReader;
+import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.util.Assert;
 
 /**
- * Designed to be registered with both {@link ResourceLineReader} and
+ * Designed to be registered with both {@link FlatFileItemReader} and
  * {@link FlatFileItemWriter} and copy header line from input file to output
  * file.
  */

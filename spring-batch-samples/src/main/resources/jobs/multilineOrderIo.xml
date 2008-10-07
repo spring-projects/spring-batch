@@ -6,7 +6,7 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean id="fileItemReader" class="org.springframework.batch.item.file.ResourceLineReader">
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" ref="fileInputLocator" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">

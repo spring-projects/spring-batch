@@ -38,7 +38,7 @@
 		</property>
 	</bean>
 
-	<bean class="org.springframework.batch.item.file.ResourceLineReader"
+	<bean class="org.springframework.batch.item.file.FlatFileItemReader"
 		id="fileItemReader">
 		<property name="resource" ref="fileLocator" />
 		<property name="lineMapper">

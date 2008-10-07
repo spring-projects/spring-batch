@@ -27,10 +27,10 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
+public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
 		ResourceAwareItemReaderItemStream<T>, InitializingBean {
 
-	private static final Log logger = LogFactory.getLog(ResourceLineReader.class);
+	private static final Log logger = LogFactory.getLog(FlatFileItemReader.class);
 
 	// default encoding for input files
 	public static final String DEFAULT_CHARSET = Charset.defaultCharset().name();
@@ -55,8 +55,8 @@ public class ResourceLineReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private LineCallbackHandler skippedLinesCallback;
 
-	public ResourceLineReader() {
-		setName(ClassUtils.getShortName(ResourceLineReader.class));
+	public FlatFileItemReader() {
+		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
 
 	/**
