@@ -57,11 +57,11 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-public class StatefulRetryStepFactoryBeanTests {
+public class FaultTolerantStepFactoryBeanRetryTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SkipLimitStepFactoryBean<String, String> factory = new SkipLimitStepFactoryBean<String, String>();
+	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
 
 	private List<Object> recovered = new ArrayList<Object>();
 

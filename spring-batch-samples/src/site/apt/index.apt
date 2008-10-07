@@ -759,7 +759,7 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
 
 +---
 <bean id="step1" parent="simpleStep"
-    class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean">
+    class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean">
     ...
     <property name="retryLimit" value="3" />
     <property name="retryableExceptionClasses" value="java.lang.Exception" />

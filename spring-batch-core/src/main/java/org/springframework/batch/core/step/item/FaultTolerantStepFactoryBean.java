@@ -44,7 +44,7 @@ import org.springframework.batch.support.Classifier;
  * @author Robert Kasanicky
  * 
  */
-public class SkipLimitStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
+public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
 
 	private int skipLimit = 0;
 

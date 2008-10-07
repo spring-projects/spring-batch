@@ -31,11 +31,11 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.StringUtils;
 
-public class SkipLimitStepFactoryBeanNonBufferingTests {
+public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SkipLimitStepFactoryBean<String, String> factory = new SkipLimitStepFactoryBean<String, String>();
+	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
 
 	@SuppressWarnings("unchecked")
 	private Collection<Class<? extends Throwable>> skippableExceptions = new HashSet<Class<? extends Throwable>>(Arrays

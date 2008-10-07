@@ -37,13 +37,13 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.StringUtils;
 
 /**
- * Tests for {@link SkipLimitStepFactoryBean}.
+ * Tests for {@link FaultTolerantStepFactoryBean}.
  */
-public class SkipLimitStepFactoryBeanTests {
+public class FaultTolerantStepFactoryBeanTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private SkipLimitStepFactoryBean<String, String> factory = new SkipLimitStepFactoryBean<String, String>();
+	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
 
 	@SuppressWarnings("unchecked")
 	private Collection<Class<? extends Throwable>> skippableExceptions = new HashSet<Class<? extends Throwable>>(Arrays

@@ -49,7 +49,7 @@ import org.springframework.util.Assert;
  * This factory does not support configuration of fault-tolerant behavior, use
  * appropriate subclass of this factory bean to configure skip or retry.
  * 
- * @see SkipLimitStepFactoryBean
+ * @see FaultTolerantStepFactoryBean
  * 
  * @author Dave Syer
  * 
