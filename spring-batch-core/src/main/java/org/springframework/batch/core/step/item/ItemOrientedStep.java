@@ -79,7 +79,13 @@ public class ItemOrientedStep extends AbstractStep {
 
 	private PlatformTransactionManager transactionManager;
 
-	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute();
+	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute() {
+
+		public boolean rollbackOn(Throwable ex) {
+			return true;
+		}
+		
+	};
 
 	private ItemHandler itemHandler;
 

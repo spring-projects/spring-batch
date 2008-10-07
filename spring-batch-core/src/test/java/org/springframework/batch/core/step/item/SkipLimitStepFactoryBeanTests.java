@@ -123,7 +123,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 			assertEquals(1, stepExecution.getItemCount().intValue());
 		}
-		
+
 	}
 
 	/**
@@ -328,6 +328,38 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 		assertEquals(1, stepExecution.getSkipCount());
 		// b is processed once and skipped, plus 1, plus c, plus the null at end
 		assertEquals(4, count);
+	}
+
+	/**
+	 * Both checked and unchecked exceptions should cause rollback by default
+	 * i.e. EJB-style {@link DefaultTransactionAttribute} is inappropriate.
+	 */
+	public void testRollback() throws Exception {
+
+		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
+		factory.setSkipLimit(2);
+		factory.setItemReader(new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3"), Collections.EMPTY_SET));
+		factory.setItemWriter(new ItemWriterAdapter() {
+			int count = 0;
+			public void write(Object item) throws Exception {
+				count++;
+				if (count == 1) {
+					throw new RuntimeException();
+				}
+				if (count == 2) {
+					throw new Exception();
+				}
+			}
+			
+		});
+		
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		step.execute(stepExecution);
+
+		assertEquals(2, stepExecution.getSkipCount());
+		assertEquals(2, stepExecution.getRollbackCount().intValue());
 	}
 
 	/**

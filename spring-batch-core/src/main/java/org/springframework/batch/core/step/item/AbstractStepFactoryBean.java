@@ -202,7 +202,13 @@ public abstract class AbstractStepFactoryBean implements FactoryBean, BeanNameAw
 	 * @return the transactionAttribute
 	 */
 	protected TransactionAttribute getTransactionAttribute() {
-		return transactionAttribute!=null?transactionAttribute:new DefaultTransactionAttribute();
+		return transactionAttribute!=null?transactionAttribute:new DefaultTransactionAttribute() {
+
+			public boolean rollbackOn(Throwable ex) {
+				return true;
+			}
+			
+		};
 	}
 
 	/**
