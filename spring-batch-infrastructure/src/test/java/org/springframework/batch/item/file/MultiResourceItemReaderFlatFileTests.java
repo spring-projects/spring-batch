@@ -2,16 +2,15 @@ package org.springframework.batch.item.file;
 
 import java.util.Comparator;
 
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.file.mapping.FieldSet;
-import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.mapping.LineMapper;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
 
 @RunWith(JUnit4ClassRunner.class)
 public class MultiResourceItemReaderFlatFileTests extends
@@ -20,14 +19,16 @@ public class MultiResourceItemReaderFlatFileTests extends
 	protected ItemReader<Foo> getItemReader() throws Exception {
 
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
-		FlatFileItemReader<Foo> fileReader = new FlatFileItemReader<Foo>();
+		ResourceLineReader<Foo> fileReader = new ResourceLineReader<Foo>();
 
-		fileReader.setFieldSetMapper(new FieldSetMapper<Foo>() {
-			public Foo process(FieldSet fs) {
+		fileReader.setLineMapper(new LineMapper<Foo>() {
+
+			public Foo mapLine(String line, int lineNumber) throws Exception {
 				Foo foo = new Foo();
-				foo.setValue(fs.readInt(0));
+				foo.setValue(Integer.valueOf(line));
 				return foo;
 			}
+			
 		});
 		fileReader.setSaveState(true);
 

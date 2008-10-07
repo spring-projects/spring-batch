@@ -22,9 +22,11 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.ResourceLineReader;
+import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -50,12 +52,15 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		provider.open(new ExecutionContext());
 	}
 
-	protected static class TradeItemReader extends FlatFileItemReader<Trade> {
+	protected static class TradeItemReader extends ResourceLineReader<Trade> {
 
 		protected TradeItemReader(Resource resource) throws Exception {
 			super();
 			setResource(resource);
-			setFieldSetMapper(new TradeMapper());
+			DefaultLineMapper<Trade> mapper = new DefaultLineMapper<Trade>();
+			mapper.setLineTokenizer(new DelimitedLineTokenizer());
+			mapper.setFieldSetMapper(new TradeMapper());
+			setLineMapper(mapper);
 			afterPropertiesSet();
 		}
 
