@@ -12,11 +12,11 @@
 		<property name="locateExistingServerIfPossible" value="true" />
 	</bean>
 	<bean id="registry" class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
-		<property name="port" value="1099" />
+		<property name="port" value="61616" />
 	</bean>
 	<bean id="serverConnector" class="org.springframework.jmx.support.ConnectorServerFactoryBean">
 		<property name="objectName" value="connector:name=rmi" />
-		<property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi://localhost:1099/batch-samples" />
+		<property name="serviceUrl" value="service:jmx:rmi://localhost/jndi/rmi://localhost:61616/batch-samples" />
 		<property name="server" ref="mbeanServer" />
 	</bean>
 	<bean class="org.springframework.jmx.export.MBeanExporter">
