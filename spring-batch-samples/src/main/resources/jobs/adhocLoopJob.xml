@@ -23,6 +23,9 @@
 				</property>
 			</bean>
 		</property>
+		<property name="jobParametersIncrementer">
+			<bean class="org.springframework.batch.sample.common.InfiniteLoopIncrementer"/>
+		</property>
 	</bean>
 
 	<aop:config>

@@ -21,7 +21,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -37,7 +37,7 @@ public class JobExecution extends Entity {
 
 	private JobInstance jobInstance;
 
-	private volatile Collection<StepExecution> stepExecutions = new HashSet<StepExecution>();
+	private volatile Collection<StepExecution> stepExecutions = new LinkedHashSet<StepExecution>();
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 

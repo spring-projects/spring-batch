@@ -16,12 +16,12 @@
 package org.springframework.batch.core.launch.support;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -150,7 +150,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see org.springframework.batch.core.launch.JobOperator#getJobNames()
 	 */
 	public Set<String> getJobNames() {
-		return new HashSet<String>(jobRegistry.getJobNames());
+		return new TreeSet<String>(jobRegistry.getJobNames());
 	}
 
 	/*
