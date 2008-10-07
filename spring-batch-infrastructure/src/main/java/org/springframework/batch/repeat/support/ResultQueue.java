@@ -16,12 +16,15 @@
 
 package org.springframework.batch.repeat.support;
 
+import java.util.NoSuchElementException;
+import java.util.concurrent.BlockingQueue;
+
 import org.springframework.core.task.TaskExecutor;
 
 /**
- * Abstraction for queue of {@link ResultHolder} objects. Acts as a
- * BlockingQueue with the ability to count the number of items it expects to
- * ever hold. When clients schedule an item to be added they call
+ * Abstraction for queue of {@link ResultHolder} objects. Acts a bit likeT a
+ * {@link BlockingQueue} with the ability to count the number of items it
+ * expects to ever hold. When clients schedule an item to be added they call
  * {@link #expect()}, and then collect the result later with {@link #take()}.
  * Result providers in another thread call {@link #put(Object)} to notify the
  * expecting client of a new result.
@@ -40,26 +43,33 @@ interface ResultQueue<T> {
 	 * usually managed elsewhere, e.g. by a {@link TaskExecutor}.<br/><br/>
 	 * Implementations may choose to block here, if they need to limit the
 	 * number or rate of tasks being submitted.
+	 * 
 	 * @throws InterruptedException if the call blocks and is then interrupted.
 	 */
 	void expect() throws InterruptedException;
 
 	/**
-	 * In a master-worker pattern, the workers call this method to deposit the
-	 * result of a finished task on the queue for collection.
+	 * Once it is expecting a result, clients call this method to satisfy the
+	 * expectation. In a master-worker pattern, the workers call this method to
+	 * deposit the result of a finished task on the queue for collection.
 	 * 
 	 * @param result the result for later collection.
+	 * 
+	 * @throws IllegalArgumentException if the queue is not expecting a new
+	 * result
 	 */
-	void put(T result);
+	void put(T result) throws IllegalArgumentException;
 
 	/**
-	 * Gets the next available result, blocking if there are none.
+	 * Gets the next available result, blocking if there are none yet available.
 	 * 
 	 * @return a result previously deposited
+	 * 
+	 * @throws NoSuchElementException if there is no result expected
 	 * @throws InterruptedException if the operation is interrupted while
 	 * waiting
 	 */
-	T take() throws InterruptedException;
+	T take() throws NoSuchElementException, InterruptedException;
 
 	/**
 	 * Used by master thread to verify that there are results available from

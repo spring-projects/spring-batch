@@ -16,17 +16,18 @@
 
 package org.springframework.batch.repeat.support;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /**
  * An implementation of the {@link ResultQueue} that throttles the number of
- * expected results, limiting it ti a maximum at any given time.
+ * expected results, limiting it to a maximum at any given time.
  * 
  * @author Dave Syer
  */
-class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
+public class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 
 	// Accumulation of result objects as they finish.
 	private final BlockingQueue<T> results;
@@ -51,15 +52,16 @@ class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		return results.isEmpty();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.repeat.support.ResultQueue#isExpecting()
 	 */
 	public boolean isExpecting() {
-		synchronized (lock) {
-			// Base the decision about whether we expect more results on a
-			// counter of the number of expected results actually collected.
-			return count > 0;
-		}
+		// Base the decision about whether we expect more results on a
+		// counter of the number of expected results actually collected.
+		// Do not synchronize!  Otherwise put and expect can deadlock.
+		return count > 0;
 	}
 
 	/**
@@ -76,7 +78,10 @@ class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		}
 	}
 
-	public void put(T holder) {
+	public void put(T holder) throws IllegalArgumentException {
+		if (!isExpecting()) {
+			throw new IllegalArgumentException("Not expecting a result.  Call expect() before put().");
+		}
 		// There should be no need to block here, or to use offer()
 		results.add(holder);
 		// Take from the waits queue now to allow another result to
@@ -84,7 +89,10 @@ class ThrottleLimitResultQueue<T> implements ResultQueue<T> {
 		waits.release();
 	}
 
-	public T take() throws InterruptedException {
+	public T take() throws NoSuchElementException, InterruptedException {
+		if (!isExpecting()) {
+			throw new NoSuchElementException("Not expecting a result.  Call expect() before take().");
+		}
 		T value;
 		synchronized (lock) {
 			value = results.take();
