@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.item.ItemWriter;
 
@@ -32,13 +33,21 @@ import org.springframework.batch.item.ItemWriter;
  * @author Lucas Ward
  * 
  */
-public class InfiniteLoopWriter extends StepExecutionListenerSupport implements
-		ItemWriter<Object> {
+public class InfiniteLoopWriter extends StepExecutionListenerSupport implements ItemWriter<Object> {
 
 	private StepExecution stepExecution;
+
 	private int count = 0;
-	private static final Log logger = LogFactory
-			.getLog(InfiniteLoopWriter.class);
+
+	private static final Log logger = LogFactory.getLog(InfiniteLoopWriter.class);
+
+	/**
+	 * @see StepExecutionListener#beforeStep(StepExecution)
+	 */
+	@Override
+	public void beforeStep(StepExecution stepExecution) {
+		this.stepExecution = stepExecution;
+	}
 
 	/**
 	 * 
@@ -50,7 +59,8 @@ public class InfiniteLoopWriter extends StepExecutionListenerSupport implements
 	public void write(List<? extends Object> items) throws Exception {
 		try {
 			Thread.sleep(500);
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new RuntimeException("Job interrupted.");
 		}

@@ -172,6 +172,7 @@ public class JobExecutionTests {
 		JobExecution deserialize = (JobExecution) SerializationUtils.deserialize(serialized);
 		assertEquals(execution, deserialize);
 		assertNotNull(deserialize.createStepExecution("foo"));
+		assertNotNull(deserialize.getFailureExceptions());
 	}
 	
 	public void testFailureExceptions(){

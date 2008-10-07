@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -51,7 +53,7 @@ public class JobExecution extends Entity {
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 	
-	private volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
+	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
@@ -158,14 +160,6 @@ public class JobExecution extends Entity {
 		return stepExecution;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.Entity#toString()
-	 */
-	public String toString() {
-		return super.toString() + ", startTime=" + startTime + ", endTime=" + endTime + ", job=[" + jobInstance + "]";
-	}
-
 	/**
 	 * Test if this {@link JobExecution} indicates that it is running. It should
 	 * be noted that this does not necessarily mean that it has been persisted
@@ -262,17 +256,6 @@ public class JobExecution extends Entity {
 	}
 	
 	/**
-	 * Set the list of failure causing exceptions for this JobExecution.  It
-	 * should be noted that the exceptions should only be for the job execution
-	 * not step executions. 
-	 * 
-	 * @param failureExceptions
-	 */
-	public void setFailureExceptions(List<Throwable> failureExceptions) {
-		this.failureExceptions = failureExceptions;
-	}
-	
-	/**
 	 * Add the provided throwable to the failure exception list. 
 	 * 
 	 * @param t
@@ -297,4 +280,21 @@ public class JobExecution extends Entity {
 		
 		return allExceptions;
 	}
+
+	/**
+	 * Deserialise and ensure transient fields are re-instantiated when read back
+	 */
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		failureExceptions = new ArrayList<Throwable>();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Entity#toString()
+	 */
+	public String toString() {
+		return super.toString() + String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s]",startTime,endTime,lastUpdated,status,exitStatus,jobInstance);
+	}
+
 }

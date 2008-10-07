@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -467,6 +469,14 @@ public class StepExecution extends Entity {
 		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()));
 	}
 
+	/**
+	 * Deserialise and ensure transient fields are re-instantiated when read back
+	 */
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		failureExceptions = new ArrayList<Throwable>();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -480,8 +490,8 @@ public class StepExecution extends Entity {
 
 	public String toString() {
 		return super.toString()
-				+ String.format(", name=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
-						+ ", commitCount=%d, rollbackCount=%d", stepName, readCount, filterCount, writeCount, readSkipCount, writeSkipCount,
+				+ String.format(", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
+						+ ", commitCount=%d, rollbackCount=%d", stepName, status, exitStatus, readCount, filterCount, writeCount, readSkipCount, writeSkipCount,
 						commitCount, rollbackCount);
 	}
 

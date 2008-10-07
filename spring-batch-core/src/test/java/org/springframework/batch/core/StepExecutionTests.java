@@ -263,6 +263,7 @@ public class StepExecutionTests {
 		
 		assertEquals(execution, deserialized);
 		assertEquals(status, deserialized.getExitStatus());
+		assertNotNull(deserialized.getFailureExceptions());
 	}
 	
 	@Test
