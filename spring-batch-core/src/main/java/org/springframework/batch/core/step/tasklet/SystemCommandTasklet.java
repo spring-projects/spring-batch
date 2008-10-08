@@ -1,9 +1,12 @@
 package org.springframework.batch.core.step.tasklet;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
 
 import org.apache.commons.lang.time.StopWatch;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -11,27 +14,34 @@ import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.AttributeAccessor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
 
 /**
  * {@link Tasklet} that executes a system command.
  * 
- * The system command is executed in a new thread - timeout value is required to
- * be set, so that the batch job does not hang forever if the external process
- * hangs.
+ * The system command is executed asynchronously using injected
+ * {@link #setTaskExecutor(TaskExecutor)} - timeout value is required to be set,
+ * so that the batch job does not hang forever if the external process hangs.
  * 
  * Tasklet periodically checks for termination status (i.e.
  * {@link #setCommand(String)} finished its execution or
  * {@link #setTimeout(long)} expired or job was interrupted). The check interval
  * is given by {@link #setTerminationCheckInterval(long)}.
  * 
- * When job interrupt is detected the thread executing the system command will
- * be interrupted and tasklet's execution terminated by throwing
- * {@link JobInterruptedException}.
+ * When job interrupt is detected tasklet's execution is terminated immediately
+ * by throwing {@link JobInterruptedException}.
+ * 
+ * {@link #setInterruptOnCancel(boolean)} specifies whether the tasklet should
+ * attempt to interrupt the thread that executes the system command if it is
+ * still running when tasklet exits (abnormally).
  * 
  * @author Robert Kasanicky
  */
 public class SystemCommandTasklet extends StepExecutionListenerSupport implements Tasklet, InitializingBean {
+
+	protected static final Log logger = LogFactory.getLog(SystemCommandTasklet.class);
 
 	private String command;
 
@@ -46,36 +56,50 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	private long checkInterval = 1000;
 
 	private StepExecution execution = null;
-	
+
+	private TaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+
+	private boolean interruptOnCancel = false;
+
 	/**
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
 	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		ExecutorThread executorThread = new ExecutorThread();
-		executorThread.start();
+
+		FutureTask<Integer> systemCommandTask = new FutureTask<Integer>(new Callable<Integer>() {
+
+			public Integer call() throws Exception {
+				Process process = Runtime.getRuntime().exec(command, environmentParams, workingDirectory);
+				return process.waitFor();
+			}
+
+		});
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 
-		while (stopWatch.getTime() < timeout && executorThread.isAlive() && !execution.isTerminateOnly()) {
-			Thread.sleep(checkInterval);
-		}
-		
-		stopWatch.stop();
+		taskExecutor.execute(systemCommandTask);
 
-		if (executorThread.finishedSuccessfully) {
-			return systemProcessExitCodeMapper.getExitStatus(executorThread.exitCode);
+		try {
+			while (true) {
+				Thread.sleep(checkInterval);
+				if (systemCommandTask.isDone()) {
+					return systemProcessExitCodeMapper.getExitStatus(systemCommandTask.get());
+				}
+				else if (stopWatch.getTime() > timeout) {
+					systemCommandTask.cancel(interruptOnCancel);
+					throw new SystemCommandException("Execution of system command did not finish within the timeout");
+				}
+				else if (execution.isTerminateOnly()) {
+					systemCommandTask.cancel(interruptOnCancel);
+					throw new JobInterruptedException("Job interrupted while executing system command '" + command
+							+ "'");
+				}
+			}
 		}
-		else {
-			executorThread.interrupt();
-			if (execution.isTerminateOnly()) {
-				throw new JobInterruptedException("Job interrupted while executing system command '" + command + "'");
-			}
-			else {
-				throw new SystemCommandException(
-						"Execution of system command failed (did not finish successfully within the timeout)");
-			}
+		finally {
+			stopWatch.stop();
 		}
 
 	}
@@ -114,6 +138,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 		Assert.hasLength(command, "'command' property value is required");
 		Assert.notNull(systemProcessExitCodeMapper, "SystemProcessExitCodeMapper must be set");
 		Assert.isTrue(timeout > 0, "timeout value must be greater than zero");
+		Assert.notNull(taskExecutor, "taskExecutor is required");
 	}
 
 	/**
@@ -147,31 +172,26 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	 * Get a reference to {@link StepExecution} for interrupt checks during
 	 * system command execution.
 	 */
+	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		this.execution = stepExecution;
 	}
 
 	/**
-	 * Thread that executes the system command.
+	 * Sets the task executor that will be used to execute the system command
+	 * NB! Avoid using a synchronous task executor
 	 */
-	private class ExecutorThread extends Thread {
-		volatile int exitCode = -1;
+	public void setTaskExecutor(TaskExecutor taskExecutor) {
+		this.taskExecutor = taskExecutor;
+	}
 
-		volatile boolean finishedSuccessfully = false;
-
-		public void run() {
-			try {
-				Process process = Runtime.getRuntime().exec(command, environmentParams, workingDirectory);
-				exitCode = process.waitFor();
-				finishedSuccessfully = true;
-			}
-			catch (IOException e) {
-				throw new SystemCommandException("IO error while executing system command", e);
-			}
-			catch (InterruptedException e) {
-				throw new SystemCommandException("Interrupted while executing system command", e);
-			}
-		}
+	/**
+	 * If <code>true</code> tasklet will attempt to interrupt the thread
+	 * executing the system command if {@link #setTimeout(long)} has been
+	 * exceeded or user interrupts the job. <code>false</code> by default
+	 */
+	public void setInterruptOnCancel(boolean interruptOnCancel) {
+		this.interruptOnCancel = interruptOnCancel;
 	}
 
 }

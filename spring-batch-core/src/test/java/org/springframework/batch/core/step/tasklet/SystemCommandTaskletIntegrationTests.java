@@ -19,6 +19,7 @@ import org.springframework.batch.core.step.tasklet.SystemCommandException;
 import org.springframework.batch.core.step.tasklet.SystemCommandTasklet;
 import org.springframework.batch.core.step.tasklet.SystemProcessExitCodeMapper;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
 
 /**
@@ -30,17 +31,19 @@ public class SystemCommandTaskletIntegrationTests {
 
 	private SystemCommandTasklet tasklet = new SystemCommandTasklet();
 
-	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(
-			1L, new JobParameters(), "systemCommandJob")));
+	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(1L,
+			new JobParameters(), "systemCommandJob")));
 
 	@Before
 	public void setUp() throws Exception {
 		tasklet.setEnvironmentParams(null); // inherit from parent process
 		tasklet.setWorkingDirectory(null); // inherit from parent process
 		tasklet.setSystemProcessExitCodeMapper(new TestExitCodeMapper());
-		tasklet.setTimeout(5000); // long enough timeout
+		tasklet.setTimeout(2000); // long enough timeout
 		tasklet.setTerminationCheckInterval(500);
 		tasklet.setCommand("invalid command, change value for successful execution");
+		tasklet.setInterruptOnCancel(true);
+		tasklet.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		tasklet.afterPropertiesSet();
 
 		tasklet.beforeStep(stepExecution);
@@ -56,7 +59,7 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		ExitStatus exitStatus = tasklet.execute(null,null);
+		ExitStatus exitStatus = tasklet.execute(null, null);
 
 		assertEquals(ExitStatus.FINISHED, exitStatus);
 	}
@@ -71,9 +74,26 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		ExitStatus exitStatus = tasklet.execute(null,null);
+		try {
+			ExitStatus exitStatus = tasklet.execute(null, null);
+			assertEquals(ExitStatus.FAILED, exitStatus);
+		}
+		catch (RuntimeException e) {
+			// on some platforms the system call does not return
+			assertEquals("Execution of system command did not finish within the timeout", e.getMessage());
+		}
+	}
 
-		assertEquals(ExitStatus.FAILED, exitStatus);
+	/*
+	 * The attempt to execute the system command results in exception
+	 */
+	@Test(expected = java.util.concurrent.ExecutionException.class)
+	public void testExecuteException() throws Exception {
+		String command = "non-sense-that-should-cause-exception-when-attempted-to-execute";
+		tasklet.setCommand(command);
+		tasklet.afterPropertiesSet();
+
+		tasklet.execute(null, null);
 	}
 
 	/*
@@ -88,11 +108,11 @@ public class SystemCommandTaskletIntegrationTests {
 
 		log.info("Executing command: " + command);
 		try {
-			tasklet.execute(null,null);
+			tasklet.execute(null, null);
 			fail();
 		}
 		catch (SystemCommandException e) {
-			assertTrue(e.getMessage().indexOf("did not finish successfully within the timeout") > 0);
+			assertTrue(e.getMessage().contains("did not finish within the timeout"));
 		}
 	}
 
@@ -108,13 +128,13 @@ public class SystemCommandTaskletIntegrationTests {
 
 		stepExecution.setTerminateOnly();
 		try {
-			tasklet.execute(null,null);
+			tasklet.execute(null, null);
 			fail();
 		}
 		catch (JobInterruptedException e) {
 			System.out.println(e.getMessage());
-			assertTrue(e.getMessage().indexOf("Job interrupted while executing system command") > -1);
-			assertTrue(e.getMessage().indexOf(command) > -1);
+			assertTrue(e.getMessage().contains("Job interrupted while executing system command"));
+			assertTrue(e.getMessage().contains(command));
 		}
 	}
 
