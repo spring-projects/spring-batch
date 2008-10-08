@@ -1,0 +1,16 @@
+Spring Batch 2.0-m1 Release Notes
+
+* Bugfixes:
+
+  * [BATCH-737] - JdbcCursorItemReader will spin through entire resultset if numberOfProcessRows=0
+  * [BATCH-732] - FlatFileItemReader doesn't take "firstLineIsHeader" flag into account when restarting  * [BATCH-735] - Getting Started page should be updated  * [BATCH-734] - ItemReaders and ItemWriters using Resource(s) should check for file during ItemStream#open  * [BATCH-778] - MapJobRepositoryFactoryBean shouldn't require transactionManager  * [BATCH-693] - Refactor samples along domain contours  * [BATCH-761] - StaxEventItemWriter writes extra end document tag with Woodstox 3.2.6  * [BATCH-765] - StepExecution should be saved on every commit
+  * [BATCH-757] - remove DelegatingItemWriter  * [BATCH-766] - Insufficient error handling in case of a missing resource for a org.springframework.batch.item.xml.StaxEventItemWriter
+  * [BATCH-727] - Move all POMs in trunk to 2.0.0.CI-SNAPSHOT  * [BATCH-744] - restart.count is always 0 in FlatFileItemWriter  * [BATCH-741] - DefaultFieldSet should clone the tokens before exposing them in getValues()  
+  
+* Improvements
+
+  * [BATCH-671] - Upgrade JobParameters and ExecutionContext for Java 5  * [BATCH-770] - Make ItemTransformer a first class citizen and rename as ItemProcessor  * [BATCH-278] - Allow FixedLengthLineAggregator to be configured with different padding/alignment for specific columns  * [BATCH-709] - Change all collections to use generics  * [BATCH-581] - Add filter capability to item oriented paradigm  * [BATCH-743] - ExportedJobLauncher should be able to stop running batches on an individual basis  * [BATCH-230] - Recoverable and ItemProvider.recover() abstractions refactored into correct place in chunk-oriented framework  * [BATCH-745] - strong typing in AggregateItemReader  * [BATCH-544] - Configurable RetryPolicy in SkipLimitStepFactoryBean  * [BATCH-354] - Create JPA ItemReader/Writer  * [BATCH-758] - Generify ExceptionClassifier and ExceptionClassifierSupport  * [BATCH-300] - Improve typesafety of ItemProvider/Processor paradigm  * [BATCH-753] - Listener exception handling  * [BATCH-274] - Support Callable<ExitStatus>  * [BATCH-712] - Upgrade ItemReaders to use Parameterized types  * [BATCH-711] - Upgrade ItemWriter and implementations to use parameterized types  * [BATCH-756] - Upgrade JdbcExecutionContextDao to use enums  * [BATCH-672] - Upgrade samples to Java 5.0  * [BATCH-710] - Upgrade unit tests to use Spring Test Java 5 features  * [BATCH-518] - clean up the *Or* repository methods   	  * [BATCH-662] - simplify FlatFileItemReader  * [BATCH-728] - Add remove(key) method to ExecutionContext class  * [BATCH-570] - Job.getSteps() does not need to be exposed in the interface  * [BATCH-668] - JobRepository needs to distinguish between save and update of execution context  
+  
+* Documentation updates
+
+  * [BATCH-768] - Update documentation for M1  * [BATCH-586] - Documentation for the walkthrough of samples  * [BATCH-769] - Create documentation for JPA Reader  * [BATCH-689] - Document how to access StepExecution and JobExecution in Tasklet
