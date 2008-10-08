@@ -306,8 +306,6 @@ public class SimpleJobTests extends TestCase {
 		jobExecution.stop();
 		job.execute(jobExecution);
 		
-		assertEquals(1, jobExecution.getFailureExceptions().size());
-		assertTrue(jobExecution.getFailureExceptions().get(0) instanceof JobInterruptedException);
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
