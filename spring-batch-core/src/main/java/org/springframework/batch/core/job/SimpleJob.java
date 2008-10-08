@@ -55,65 +55,32 @@ public class SimpleJob extends AbstractJob {
 	 */
 	public void execute(JobExecution execution) {
 
-		JobInstance jobInstance = execution.getJobInstance();
-
-		StepExecution currentStepExecution = null;
-		int startedCount = 0;
+		
 		List<Step> steps = getSteps();
 
 		try {
 
-			// The job was already stopped before we even got this far. Deal
-			// with it in the same way as any other interruption.
-			if (execution.getStatus() == BatchStatus.STOPPING) {
-				throw new JobInterruptedException("JobExecution already stopped before being executed.");
-			}
-
-			execution.setStartTime(new Date());
-			updateStatus(execution, BatchStatus.STARTING);
-
-			getCompositeListener().beforeJob(execution);
-
-			for (Step step : steps) {
-
-				if (execution.getStatus() == BatchStatus.STOPPING) {
-					throw new JobInterruptedException("JobExecution interrupted.");
-				}
-
-				if (shouldStart(jobInstance, step)) {
-
-					startedCount++;
-					updateStatus(execution, BatchStatus.STARTED);
-					currentStepExecution = execution.createStepExecution(step.getName());
-
-					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance,
-							step.getName());
-
-					boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
-							BatchStatus.COMPLETED)) ? true : false;
-
-					if (isRestart) {
-						currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
-					}
-					else {
-						currentStepExecution.setExecutionContext(new ExecutionContext());
-					}
-
-					step.execute(currentStepExecution);
-
-					if (currentStepExecution.getStatus() == BatchStatus.FAILED
-							|| currentStepExecution.getStatus() == BatchStatus.STOPPED) {
-						break;
-					}
+			if (execution.getStatus() != BatchStatus.STOPPING) {
+			
+				execution.setStartTime(new Date());
+				updateStatus(execution, BatchStatus.STARTING);
+	
+				getCompositeListener().beforeJob(execution);
+	
+				StepExecution lastStepExecution = handleSteps(steps, execution);
+	
+				if(lastStepExecution != null){
+					execution.setStatus(lastStepExecution.getStatus());
+					execution.setExitStatus(lastStepExecution.getExitStatus());
 				}
 			}
-
-			// Need to check again for stopped job
-			if (execution.getStatus() == BatchStatus.STOPPING) {
-				throw new JobInterruptedException("JobExecution interrupted.");
+			else{
+				
+				// The job was already stopped before we even got this far. Deal
+				// with it in the same way as any other interruption.
+				execution.setStatus(BatchStatus.STOPPED);
+				execution.setExitStatus(ExitStatus.FINISHED);
 			}
-
-			updateStatus(execution, currentStepExecution.getStatus());
 
 		}
 		catch (JobInterruptedException e) {
@@ -125,8 +92,8 @@ public class SimpleJob extends AbstractJob {
 			execution.addFailureException(t);
 		}
 		finally {
-			ExitStatus status = ExitStatus.FAILED;
-			if (startedCount == 0) {
+			if (execution.getStepExecutions().size() == 0) {
+				ExitStatus status = ExitStatus.FAILED;
 				if (steps.size() > 0) {
 					status = ExitStatus.NOOP
 							.addExitDescription("All steps already completed.  No processing was done.");
@@ -134,14 +101,11 @@ public class SimpleJob extends AbstractJob {
 				else {
 					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
 				}
-			}
-			else if (currentStepExecution != null) {
-				status = currentStepExecution.getExitStatus();
+				
+				execution.setExitStatus(status);
 			}
 
 			execution.setEndTime(new Date());
-			execution.setExitStatus(status);
-			getJobRepository().update(execution);
 
 			try {
 				getCompositeListener().afterJob(execution);
@@ -149,6 +113,8 @@ public class SimpleJob extends AbstractJob {
 			catch (Exception e) {
 				logger.error("Exception encountered in afterStep callback", e);
 			}
+			
+			getJobRepository().update(execution);
 		}
 
 	}
@@ -156,6 +122,51 @@ public class SimpleJob extends AbstractJob {
 	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
 		jobExecution.setStatus(status);
 		getJobRepository().update(jobExecution);
+	}
+	
+	/*
+	 * Private handler of steps.  Returns the last StepExecution successfully processed if it exists, null
+	 * if non were processed.
+	 * 
+	 */
+	private StepExecution handleSteps(List<Step> steps, JobExecution execution) throws JobExecutionException{
+		
+		JobInstance jobInstance = execution.getJobInstance();
+		StepExecution currentStepExecution = null;
+		for (Step step : steps) {
+
+			if (execution.getStatus() == BatchStatus.STOPPING) {
+				throw new JobInterruptedException("JobExecution interrupted.");
+			}
+
+			if (shouldStart(jobInstance, step)) {
+
+				updateStatus(execution, BatchStatus.STARTED);
+				currentStepExecution = execution.createStepExecution(step.getName());
+
+				StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance,
+						step.getName());
+
+				boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
+						BatchStatus.COMPLETED)) ? true : false;
+
+				if (isRestart) {
+					currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+				}
+				else {
+					currentStepExecution.setExecutionContext(new ExecutionContext());
+				}
+
+				step.execute(currentStepExecution);
+
+				if (currentStepExecution.getStatus() == BatchStatus.FAILED
+						|| currentStepExecution.getStatus() == BatchStatus.STOPPED) {
+					return currentStepExecution;
+				}
+			}
+		}
+
+		return currentStepExecution;
 	}
 
 	/*

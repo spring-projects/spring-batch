@@ -235,6 +235,7 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(0, list.size());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
