@@ -47,10 +47,6 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 			//line starts with A,U, or D, so it must be a customer operation.
 			return customerTokenizer.process(line);
 		}
-		else if(line.charAt(0) == 'S'){
-			//header record, ignore
-			return null;
-		}
 		else{
 			//If the line doesn't start with any of the characters above, it must obviously be invalid.
 			throw new IllegalArgumentException("Invalid line encountered for tokenizing: " + line);

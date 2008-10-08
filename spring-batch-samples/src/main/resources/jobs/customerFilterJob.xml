@@ -10,17 +10,7 @@
 			<list>
 				<bean name="uploadCustomer" parent="skipLimitStep">
 					<property name="itemReader" ref="customerFileUploadReader" />
-					<property name="itemProcessor">
-						<bean class="org.springframework.batch.item.support.CompositeItemProcessor" >
-							<property name="itemProcessors">
-								<list>
-									<ref bean="customerTokenizer"/>
-									<ref bean="customerMapper" />
-									<ref bean="customerUpdateProcessor" />
-								</list>
-							</property>
-						</bean>
-					</property>
+					<property name="itemProcessor" ref="customerUpdateProcessor" />
 					<property name="itemWriter" >
 						<bean class="org.springframework.batch.sample.domain.trade.CustomerUpdateWriter" >
 							<property name="customerDao" ref="customerDao" />
@@ -35,8 +25,13 @@
 	<bean name="customerFileUploadReader" class="org.springframework.batch.item.file.FlatFileItemReader" >
 		<property name="resource" ref="customerFileResource" />
 		<property name="lineMapper">
-		 	<bean class="org.springframework.batch.item.file.mapping.PassThroughLineMapper" />
+		 	<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper" >
+		 		<property name="lineTokenizer" ref="customerTokenizer" />
+		 		<property name="fieldSetMapper" ref="customerMapper" />
+		 	</bean>
 		</property>
+		<!-- skip the header -->
+		<property name="linesToSkip" value="1" />
 	</bean>
 	
 	<bean name="customerMapper" class="org.springframework.batch.sample.domain.trade.CustomerUpdateFieldSetMapper" />

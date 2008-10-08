@@ -13,8 +13,8 @@ import org.springframework.batch.item.ItemProcessor;
  */
 public class CustomerUpdateProcessor implements ItemProcessor<CustomerUpdate, CustomerUpdate>{
 
-	CustomerDao customerDao;
-	InvalidCustomerLogger invalidCustomerLogger;
+	private CustomerDao customerDao;
+	private InvalidCustomerLogger invalidCustomerLogger;
 	
 	public CustomerUpdate process(CustomerUpdate item) throws Exception {
 		
