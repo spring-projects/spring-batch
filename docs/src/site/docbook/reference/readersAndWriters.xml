@@ -620,7 +620,7 @@
 
         <programlisting>  
   &lt;bean id="fixedLengthLineTokenizer"
-        class="org.springframework.batch.io.file.transform.FixedLengthTokenizer"&gt;
+        class="org.springframework.batch.item.file.transform.FixedLengthTokenizer"&gt;
     &lt;property name="names" value="ISIN, Quantity, Price, Customer" /&gt;
     &lt;property name="columns" value="1-12, 13-15, 16-20, 21-29" /&gt;
   &lt;/bean&gt;
@@ -676,7 +676,7 @@
         prefix in a line with a particular tokenizer:</para>
 
         <programlisting>  &lt;bean id="orderFileDescriptor"
-        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
+        class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
     &lt;property name="tokenizers"&gt;
      &lt;map&gt;
       &lt;entry key="HEA" value-ref="headerRecordDescriptor" /&gt;
@@ -768,7 +768,7 @@
         would look like the following:</para>
 
         <programlisting>  &lt;bean id="itemWriter"
-        class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
+        class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
     &lt;property name="resource"
               value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
     &lt;property name="lineAggregator"&gt;
