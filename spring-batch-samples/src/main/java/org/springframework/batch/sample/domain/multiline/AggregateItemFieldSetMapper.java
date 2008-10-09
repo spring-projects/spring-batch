@@ -83,7 +83,7 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 	 * @return an {@link AggregateItem} that wraps the return value from the
 	 * delegate
 	 */
-	public AggregateItem<T> process(FieldSet fieldSet) throws Exception {
+	public AggregateItem<T> process(FieldSet fieldSet) {
 
 		if (fieldSet.readString(0).equals(begin)) {
 			return AggregateItem.getHeader();

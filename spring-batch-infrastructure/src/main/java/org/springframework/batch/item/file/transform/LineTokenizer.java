@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.mapping.FieldSet;
 
 
@@ -27,5 +26,7 @@ import org.springframework.batch.item.file.mapping.FieldSet;
  * @author tomas.slanina
  * 
  */
-public interface LineTokenizer extends ItemProcessor<String, FieldSet> {
+public interface LineTokenizer {
+	
+	FieldSet process(String line);
 }

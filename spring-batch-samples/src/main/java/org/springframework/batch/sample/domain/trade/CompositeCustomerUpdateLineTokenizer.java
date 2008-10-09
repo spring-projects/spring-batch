@@ -26,7 +26,7 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
 	 */
-	public FieldSet process(String line) throws Exception {
+	public FieldSet process(String line) {
 		
 		if(line.charAt(0) == 'F'){
 			//line starts with F, so the footer tokenizer should tokenize it.

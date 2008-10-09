@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.batch.item.ItemProcessor;
 
 
 
@@ -25,5 +24,7 @@ import org.springframework.batch.item.ItemProcessor;
  * 
  * @author Dave Syer
  */
-public interface LineAggregator<T> extends ItemProcessor<T, String>{
+public interface LineAggregator<T> {
+	
+	String process(T item);
 }

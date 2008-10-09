@@ -153,7 +153,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
-	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#process(Object)
+	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#process(FieldSet)
 	 */
 	@SuppressWarnings("unchecked")
 	public T process(FieldSet fs) {
