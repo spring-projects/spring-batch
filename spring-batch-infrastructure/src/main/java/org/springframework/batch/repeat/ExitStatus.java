@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
  * Value object used to carry information about the status of a
  * {@link RepeatOperations}.
  * 
- * ExitStatus is immutable and therefore thread-safe. 
+ * ExitStatus is immutable and therefore thread-safe.
  * 
  * @author Dave Syer
  * 
@@ -31,15 +31,16 @@ import org.springframework.util.StringUtils;
 public class ExitStatus implements Serializable {
 
 	/**
-	 * Convenient constant value representing unknown state - assumed
-	 * not continuable.
+	 * Convenient constant value representing unknown state - assumed not
+	 * continuable.
 	 */
 	public static final ExitStatus UNKNOWN = new ExitStatus(false, "UNKNOWN");
 
 	/**
 	 * Convenient constant value representing unfinished processing.
 	 */
-	public static final ExitStatus CONTINUABLE = new ExitStatus(true, "CONTINUABLE");
+	public static final ExitStatus CONTINUABLE = new ExitStatus(true,
+			"CONTINUABLE");
 
 	/**
 	 * Convenient constant value representing finished processing.
@@ -71,7 +72,8 @@ public class ExitStatus implements Serializable {
 		this(continuable, exitCode, "");
 	}
 
-	public ExitStatus(boolean continuable, String exitCode, String exitDescription) {
+	public ExitStatus(boolean continuable, String exitCode,
+			String exitDescription) {
 		super();
 		this.continuable = continuable;
 		this.exitCode = exitCode;
@@ -110,12 +112,14 @@ public class ExitStatus implements Serializable {
 	 * Create a new {@link ExitStatus} with a logical combination of the
 	 * continuable flag.
 	 * 
-	 * @param continuable true if the caller thinks it is safe to continue.
+	 * @param continuable
+	 *            true if the caller thinks it is safe to continue.
 	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the argument provided.
+	 *         logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(boolean continuable) {
-		return new ExitStatus(this.continuable && continuable, this.exitCode, this.exitDescription);
+		return new ExitStatus(this.continuable && continuable, this.exitCode,
+				this.exitDescription);
 	}
 
 	/**
@@ -126,15 +130,17 @@ public class ExitStatus implements Serializable {
 	 * 
 	 * If the input is null just return this.
 	 * 
-	 * @param status an {@link ExitStatus} to combine with this one.
+	 * @param status
+	 *            an {@link ExitStatus} to combine with this one.
 	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the argument provided.
+	 *         logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(ExitStatus status) {
 		if (status == null) {
 			return this;
 		}
-		ExitStatus result = and(status.continuable).addExitDescription(status.exitDescription);
+		ExitStatus result = and(status.continuable).addExitDescription(
+				status.exitDescription);
 		if (result.continuable || !status.continuable) {
 			result = result.replaceExitCode(status.exitCode);
 		}
@@ -147,7 +153,8 @@ public class ExitStatus implements Serializable {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "continuable=" + continuable + ";exitCode=" + exitCode + ";exitDescription=" + exitDescription;
+		return "continuable=" + continuable + ";exitCode=" + exitCode
+				+ ";exitDescription=" + exitDescription;
 	}
 
 	/**
@@ -175,9 +182,10 @@ public class ExitStatus implements Serializable {
 	 * Add an exit code to an existing {@link ExitStatus}. If there is already a
 	 * code present tit will be replaced.
 	 * 
-	 * @param code the code to add
+	 * @param code
+	 *            the code to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
-	 * code.
+	 *         code.
 	 */
 	public ExitStatus replaceExitCode(String code) {
 		return new ExitStatus(continuable, code, exitDescription);
@@ -189,7 +197,8 @@ public class ExitStatus implements Serializable {
 	 * @return true if the exit code is "RUNNING" or "UNKNOWN"
 	 */
 	public boolean isRunning() {
-		return "RUNNING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
+		return "RUNNING".equals(this.exitCode)
+				|| "UNKNOWN".equals(this.exitCode);
 	}
 
 	/**
@@ -197,16 +206,25 @@ public class ExitStatus implements Serializable {
 	 * already a description present the two will be concatenated with a
 	 * semicolon.
 	 * 
-	 * @param description the description to add
+	 * @param description
+	 *            the description to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
-	 * description
+	 *         description
 	 */
 	public ExitStatus addExitDescription(String description) {
-		if (StringUtils.hasText(exitDescription) && StringUtils.hasText(description)
-				&& !exitDescription.equals(description)) {
-			description = exitDescription + "; " + description;
+		StringBuffer buffer = new StringBuffer();
+		boolean changed = StringUtils.hasText(description)
+				&& !exitDescription.equals(description);
+		if (StringUtils.hasText(exitDescription)) {
+			buffer.append(exitDescription);
+			if (changed) {
+				buffer.append("; ");
+			}
 		}
-		return new ExitStatus(continuable, exitCode, description);
+		if (changed) {
+			buffer.append(description);
+		}
+		return new ExitStatus(continuable, exitCode, buffer.toString());
 	}
 
 }

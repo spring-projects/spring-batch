@@ -184,6 +184,8 @@ public class AbstractStepTests extends TestCase {
 		assertEquals(7, events.size());
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
+		String exitDescription = execution.getExitStatus().getExitDescription();
+		assertTrue("Wrong message: "+exitDescription, exitDescription.contains("crash"));
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("onErrorInStep"));
