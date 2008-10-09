@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.item.support;
+package org.springframework.batch.sample.domain.multiline;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.springframework.batch.sample.domain.multiline.AggregateItem;
 
 /**
  * @author Dave Syer
@@ -28,7 +29,7 @@ import org.junit.Test;
 public class AggregateItemTests {
 
 	/**
-	 * Test method for {@link org.springframework.batch.item.support.AggregateItem#getFooter()}.
+	 * Test method for {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getFooter()}.
 	 */
 	@Test
 	public void testGetFooter() {
@@ -37,7 +38,7 @@ public class AggregateItemTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.item.support.AggregateItem#getHeader()}.
+	 * Test method for {@link org.springframework.batch.sample.domain.multiline.AggregateItem#getHeader()}.
 	 */
 	@Test
 	public void testGetHeader() {

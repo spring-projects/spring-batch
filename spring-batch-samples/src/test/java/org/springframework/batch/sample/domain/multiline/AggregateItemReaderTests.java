@@ -1,4 +1,4 @@
-package org.springframework.batch.item.support;
+package org.springframework.batch.sample.domain.multiline;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -9,6 +9,8 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.sample.domain.multiline.AggregateItem;
+import org.springframework.batch.sample.domain.multiline.AggregateItemReader;
 
 public class AggregateItemReaderTests {
 

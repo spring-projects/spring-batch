@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.support;
+package org.springframework.batch.sample.domain.multiline;
 
 import java.util.ArrayList;
 import java.util.List;
