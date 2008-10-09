@@ -209,7 +209,7 @@
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_8KVcbN5JEdyZfZ-HsR_CLw"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_8KVcYt5JEdyZfZ-HsR_CLw" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8KVcY95JEdyZfZ-HsR_CLw" x="58416" y="1451"/>
   </children>
   <children xmi:id="_8KVcbd5JEdyZfZ-HsR_CLw">
@@ -261,7 +261,7 @@
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_8KfNON5JEdyZfZ-HsR_CLw"/>
     </children>
     <styles xmi:type="umlnotation:UMLClassifierStyle" xmi:id="_8KfNLd5JEdyZfZ-HsR_CLw" showStereotype="Label" useClassifierShape="true"/>
-    <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=LineReader%5Bjcu%5Ename=LineReader.java%5Bjpack%5Ename=org.springframework.batch.io.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Interface"/>
+    <element xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=LineReader%5Bjcu%5Ename=LineReader.java%5Bjpack%5Ename=org.springframework.batch.item.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Interface"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8KfNLt5JEdyZfZ-HsR_CLw" x="61815" y="13948"/>
   </children>
   <children xmi:id="_8KfNUd5JEdyZfZ-HsR_CLw">
@@ -278,7 +278,7 @@
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_8KfNXN5JEdyZfZ-HsR_CLw"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_8KfNUt5JEdyZfZ-HsR_CLw" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.io.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.item.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8KfNU95JEdyZfZ-HsR_CLw" x="33456" y="18275"/>
   </children>
   <children xmi:id="_8KfNgd5JEdyZfZ-HsR_CLw">
@@ -448,7 +448,7 @@
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_52353d5LEdyZfZ-HsR_CLw"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_5235095LEdyZfZ-HsR_CLw" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=FlatFileItemWriter%5Bjcu%5Ename=FlatFileItemWriter.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=FlatFileItemWriter%5Bjcu%5Ename=FlatFileItemWriter.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_52351N5LEdyZfZ-HsR_CLw" x="111901" y="19020"/>
   </children>
   <children xmi:id="_52356t5LEdyZfZ-HsR_CLw">
@@ -761,7 +761,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8KoXLN5JEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_8KoXKd5JEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=LineReader%5Bjcu%5Ename=LineReader.java%5Bjpack%5Ename=org.springframework.batch.io.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
+    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=LineReader%5Bjcu%5Ename=LineReader.java%5Bjpack%5Ename=org.springframework.batch.item.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_8KoXKt5JEdyZfZ-HsR_CLw" points="[-13, -6046, 12184, 3413]$[-12211, -7634, -14, 1825]"/>
   </edges>
   <edges xmi:id="_8KoXZt5JEdyZfZ-HsR_CLw" source="_8KLrJN5JEdyZfZ-HsR_CLw" target="_x4iHKt5HEdyZfZ-HsR_CLw">
@@ -851,7 +851,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8K75HN5JEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_8K75Gd5JEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.io.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.item.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_8K75Gt5JEdyZfZ-HsR_CLw" points="[0, -6046, -15174, 3413]$[15160, -7634, -14, 1825]"/>
   </edges>
   <edges xmi:id="_8K75Wt5JEdyZfZ-HsR_CLw" source="_8KLrjt5JEdyZfZ-HsR_CLw" target="_x4iHKt5HEdyZfZ-HsR_CLw">
@@ -872,7 +872,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8K75ft5JEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_8K75e95JEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_8K75fN5JEdyZfZ-HsR_CLw" points="[0, 5001, 9776, -3413]$[-9790, 6588, -14, -1826]"/>
   </edges>
   <edges xmi:id="_8LFDQN5JEdyZfZ-HsR_CLw" source="_8KVcbd5JEdyZfZ-HsR_CLw" target="_x4iHKt5HEdyZfZ-HsR_CLw">
@@ -911,7 +911,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_8LFDdN5JEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_8LFDcd5JEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemReader%5Bjcu%5Ename=ItemReader.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_8LFDct5JEdyZfZ-HsR_CLw" points="[0, 5001, 9776, -3413]$[-9790, 6588, -14, -1826]"/>
   </edges>
   <edges xmi:id="_8LO0AN5JEdyZfZ-HsR_CLw" source="_8KVced5JEdyZfZ-HsR_CLw" target="_x4iHKt5HEdyZfZ-HsR_CLw">
@@ -1027,7 +1027,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_53LcHN5LEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_53LcGd5LEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemWriter%5Bjcu%5Ename=FlatFileItemWriter.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemWriter%5Bjcu%5Ename=ItemWriter.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemWriter%5Bjcu%5Ename=FlatFileItemWriter.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemWriter%5Bjcu%5Ename=ItemWriter.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_53LcGt5LEdyZfZ-HsR_CLw" points="[0, -6046, -6152, 3413]$[6138, -7634, -14, 1825]"/>
   </edges>
   <edges xmi:id="_53LcK95LEdyZfZ-HsR_CLw" source="_5236Vt5LEdyZfZ-HsR_CLw" target="_x4iHN95HEdyZfZ-HsR_CLw">
@@ -1174,7 +1174,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_b0NiGN5MEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_b0NiFd5MEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemWriter%5Bjcu%5Ename=FlatFileItemWriter.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemWriter%5Bjcu%5Ename=FlatFileItemWriter.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_b0NiFt5MEdyZfZ-HsR_CLw" points="[0, -6046, 32756, 3413]$[-32756, -7634, 0, 1825]"/>
   </edges>
   <edges xmi:id="_b0NiG95MEdyZfZ-HsR_CLw" source="_8KfNLN5JEdyZfZ-HsR_CLw" target="_x4r4Ft5HEdyZfZ-HsR_CLw">
@@ -1184,7 +1184,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_b0NiH95MEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_b0NiHN5MEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=LineReader%5Bjcu%5Ename=LineReader.java%5Bjpack%5Ename=org.springframework.batch.io.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
+    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=LineReader%5Bjcu%5Ename=LineReader.java%5Bjpack%5Ename=org.springframework.batch.item.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_b0NiHd5MEdyZfZ-HsR_CLw" points="[-13, -6046, -17647, 3413]$[17634, -7634, 0, 1825]"/>
   </edges>
   <edges xmi:id="_b0NiIt5MEdyZfZ-HsR_CLw" source="_b0Dxbt5MEdyZfZ-HsR_CLw" target="_x4r4Ft5HEdyZfZ-HsR_CLw">
@@ -1247,7 +1247,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_b0XTI95MEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_b0XTIN5MEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Usage"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_b0XTId5MEdyZfZ-HsR_CLw" points="[0, 5001, -20055, -3413]$[20055, 6588, 0, -1826]"/>
   </edges>
   <edges xmi:id="_b0XTJ95MEdyZfZ-HsR_CLw" source="_b0DxPt5MEdyZfZ-HsR_CLw" target="_x4r4Ft5HEdyZfZ-HsR_CLw">
@@ -1328,7 +1328,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_b0XTZd5MEdyZfZ-HsR_CLw" y="-530"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_b0XTYt5MEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.io.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
+    <element xmi:type="uml:InterfaceRealization" href="mmi:///#jimpl%5Bjsrctype%5Ename=FlatFileItemReader%5Bjcu%5Ename=FlatFileItemReader.java%5Bjpack%5Ename=org.springframework.batch.item.file%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStream%5Bjcu%5Ename=ItemStream.java%5Bjpack%5Ename=org.springframework.batch.item%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.InterfaceRealization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_b0XTY95MEdyZfZ-HsR_CLw" points="[0, 5001, -20055, -3413]$[20055, 6588, 0, -1826]"/>
   </edges>
   <edges xmi:id="_b0XTcN5MEdyZfZ-HsR_CLw" source="_8KVcbd5JEdyZfZ-HsR_CLw" target="_x4r4Ft5HEdyZfZ-HsR_CLw">

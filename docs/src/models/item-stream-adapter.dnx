@@ -85,7 +85,7 @@
       <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_7ZFYK99SEdyZfZ-HsR_CLw"/>
     </children>
     <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_7ZFYLN9SEdyZfZ-HsR_CLw" showStereotype="Label"/>
-    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.io.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.item.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D$uml.Class"/>
     <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7ZFYLd9SEdyZfZ-HsR_CLw" x="26749" y="24689"/>
   </children>
   <children xmi:id="_7ZFYLt9SEdyZfZ-HsR_CLw">
@@ -306,7 +306,7 @@
       <layoutConstraint xmi:type="notation:Bounds" xmi:id="_7ZFYzt9SEdyZfZ-HsR_CLw" y="-186"/>
     </children>
     <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_7ZFYz99SEdyZfZ-HsR_CLw" showStereotype="Text"/>
-    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.io.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStreamAdapter%5Bjcu%5Ename=ItemStreamAdapter.java%5Bjpack%5Ename=org.springframework.batch.item.stream%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
+    <element xmi:type="uml:Generalization" href="mmi:///#jgen%5Bjsrctype%5Ename=ResourceLineReader%5Bjcu%5Ename=ResourceLineReader.java%5Bjpack%5Ename=org.springframework.batch.item.file.separator%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=ItemStreamAdapter%5Bjcu%5Ename=ItemStreamAdapter.java%5Bjpack%5Ename=org.springframework.batch.item.stream%5Bjsrcroot%5Esrcfolder=src/main/java%5Bproject%5Eid=spring-batch-infrastructure%5D%5D%5D%5D%5D$uml.Generalization"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_7ZFY0N9SEdyZfZ-HsR_CLw" points="[-14, -5424, -11682, 3770]$[11655, -7011, -13, 2183]"/>
   </edges>
   <edges xmi:id="_7ZFY0d9SEdyZfZ-HsR_CLw" source="_7ZFX8d9SEdyZfZ-HsR_CLw" target="_7ZFYUN9SEdyZfZ-HsR_CLw">
