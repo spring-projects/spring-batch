@@ -1479,9 +1479,74 @@
       returned for the page.</para>
 
       <section>
+        <title>JdbcPagingItemReader</title>
+
+        <para>One implementation of a paging <classname>ItemReader</classname>
+        is the <classname>JdbcPagingItemReader</classname>. The
+        <classname>JdbcPagingItemReader</classname> needs a
+        <classname>PagingQueryProvider</classname> responsible for providing
+        the SQL queries used to retrieve the rows making up a page. Since each
+        database has its own strategy for proviing paging support, we need to
+        use a different <classname>PagingQueryProvider</classname> for each
+        supported database type. There is also the
+        <classname>SimpleDelegatingPagingQueryProvider</classname> that will
+        auto-detect the database that is being used and use that to adjust to
+        use the appropriate <classname>PagingQueryProvider</classname>
+        implementation. This simplifies the configuration and is the
+        recommended best practice.</para>
+
+        <para>The <classname>SimpleDelegatingPagingQueryProvider</classname>
+        requires that you specify a select clause and a from clause. You can
+        also provide an optional where clause. These clauses will be used to
+        build an SQL statement combined with the required sortKey. </para>
+
+        <para>After the reader has been opened, it will pass back one item per
+        call to <methodname>read</methodname> in the same basic fashion as any
+        other <classname>ItemReader</classname>. The paging happens behind the
+        scenes when additional rows are needed. </para>
+
+        <para>Below is an example configuration using a similar 'customer
+        credit' example as the JDBC reader above:</para>
+
+        <programlisting><![CDATA[    <bean id="itemReader"
+        class="org.springframework.batch.item.database.JdbcPagingItemReader">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="queryProvider">
+            <bean class="org.springframework.batch.item.database.support.SimpleDelegatingPagingQueryProvider">
+                <property name="selectClause" value="select id, name, credit"/>
+                <property name="fromClause" value="from customer"/>
+                <property name="whereClause" value="where status=:status"/>
+                <property name="sortKey" value="id"/>
+            </bean>
+        </property>
+        <property name="parameterValues">
+            <map>
+                <entry key=":status" value="NEW"/>
+            </map>
+        </property>
+        <property name="pageSize" value="10"/>
+        <property name="parameterizedRowMapper" ref="customerMapper"/>
+    </bean> 
+]]></programlisting>
+
+        <para>This configured <classname>ItemReader</classname> will return
+        <classname>CustomerCredit</classname> objects using the
+        <classname>ParameterizedRowMapper</classname> that must be specified.
+        The 'pageSize' property determines the number of entities read from
+        the database for each query execution. </para>
+
+        <para>The 'parameterValues' property can be used to specify a Map of
+        parameter values for the query. If you use named parameters in the
+        where clause the key for each entry should match the name of the named
+        parameter. If you use a traditional '?' placeholder then the key for
+        each entry should be the number of the placeholder, starting with
+        1.</para>
+      </section>
+
+      <section>
         <title>JpaPagingItemReader</title>
 
-        <para>Currently the only available implementation of a paging
+        <para>Another implementation of a paging
         <classname>ItemReader</classname> is the
         <classname>JpaPagingItemReader</classname>. JPA doesn't have a concept
         similar to the Hibernate <classname>StatelessSession</classname> so we
@@ -1497,21 +1562,21 @@
         <classname>EntityManagerFactory</classname>. It will then pass back
         one item per call to <methodname>read</methodname> in the same basic
         fashion as any other <classname>ItemReader</classname>. The paging
-        happenes behind the scenes when additional entities are needed. Below
+        happens behind the scenes when additional entities are needed. Below
         is an example configuration using the same 'customer credit' example
         as the JDBC reader above:</para>
 
-        <programlisting>  &lt;bean id="itemReader"
-    class="org.springframework.batch.item.database.JpaPagingItemReader"&gt;
-    &lt;property name="entityManagerFactory" ref="entityManagerFactory"/&gt;
-    &lt;property name="queryString" value="select c from CustomerCredit c"/&gt;
-    &lt;property name="pageSize" value="1000"/&gt;
-  &lt;/bean&gt;
-</programlisting>
+        <programlisting><![CDATA[  <bean id="itemReader"
+    class="org.springframework.batch.item.database.JpaPagingItemReader">
+    <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    <property name="queryString" value="select c from CustomerCredit c"/>
+    <property name="pageSize" value="1000"/>
+  </bean>
+]]></programlisting>
 
         <para>This configured <classname>ItemReader</classname> will return
         <classname>CustomerCredit</classname> objects in the exact same manner
-        as described by the <classname>JdbcCursorItemReader</classname> above,
+        as described by the <classname>JdbcPagingItemReader</classname> above,
         assuming the Customer object has the correct JPA annotations or ORM
         mapping file. The 'pageSize' property determines the number of
         entities read from the database for each query execution.</para>
