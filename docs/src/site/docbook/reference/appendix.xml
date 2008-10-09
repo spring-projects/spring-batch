@@ -56,8 +56,11 @@
 
             <entry align="left">java.lang.Object</entry>
 
-            <entry align="left">Adapts any class to the
-            <classname>ItemReader</classname> interface.</entry>
+            <entry align="left">Extends AbstractMethodInvokingDelegator, which
+            enables dynamically calling of a custom method of the injected
+            object. Provides a convenient API for dynamic method invocation
+            shielding subclasses from the low-level details and exception
+            handling.</entry>
           </row>
 
           <row>
@@ -79,12 +82,11 @@
             <entry align="left">DelegatingItemReader</entry>
 
             <entry align="left">java.lang.Object</entry>
-
-            <entry align="left">Extends AbstractMethodInvokingDelegator, which
-            enables dynamically calling of a custom method of the injected
-            object. Provides a convenient API for dynamic method invocation
-            shielding subclasses from the low-level details and exception
-            handling.</entry>
+            
+            <entry align="left">Passes all calls to delegate
+            ItemReader and serves as a convenient superclass for
+            implementing ItemReader wrappers, such as ValidatingItemReader
+            </entry>
           </row>
 
           <row>
