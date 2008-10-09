@@ -183,6 +183,11 @@ public class ExitStatusTests extends TestCase {
 		assertEquals("Foo", status.getExitDescription());
 	}
 
+	public void testAddEmptyExitDescription() throws Exception {
+		ExitStatus status = ExitStatus.CONTINUABLE.addExitDescription("Foo").addExitDescription(null);
+		assertEquals("Foo", status.getExitDescription());
+	}
+
 	public void testAddExitCodeWithDescription() throws Exception {
 		ExitStatus status = new ExitStatus(true, "BAR", "Bar").replaceExitCode("FOO");
 		assertEquals("FOO", status.getExitCode());

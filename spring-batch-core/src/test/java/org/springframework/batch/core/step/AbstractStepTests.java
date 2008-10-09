@@ -1,10 +1,15 @@
 package org.springframework.batch.core.step;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -18,7 +23,7 @@ import org.springframework.util.Assert;
 /**
  * Tests for {@link AbstractStep}.
  */
-public class AbstractStepTests extends TestCase {
+public class AbstractStepTests {
 
 	AbstractStep tested = new EventTrackingStep();
 
@@ -123,13 +128,15 @@ public class AbstractStepTests extends TestCase {
 
 	}
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		tested.setJobRepository(repository);
 	}
 
 	/**
 	 * Typical step execution scenario.
 	 */
+	@Test
 	public void testExecute() throws Exception {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 		tested.execute(execution);
@@ -155,6 +162,7 @@ public class AbstractStepTests extends TestCase {
 	/**
 	 * Exception during business processing.
 	 */
+	@Test
 	public void testFailure() throws Exception {
 		tested = new EventTrackingStep() {
 			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
@@ -181,6 +189,8 @@ public class AbstractStepTests extends TestCase {
 		assertEquals(7, events.size());
 
 		assertEquals(ExitStatus.FAILED.getExitCode(), execution.getExitStatus().getExitCode());
+		String exitDescription = execution.getExitStatus().getExitDescription();
+		assertTrue("Wrong message: "+exitDescription, exitDescription.contains("crash"));
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("afterStep"));
@@ -189,6 +199,7 @@ public class AbstractStepTests extends TestCase {
 	/**
 	 * Exception during business processing.
 	 */
+	@Test
 	public void testStoppedStep() throws Exception {
 		tested = new EventTrackingStep() {
 			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
@@ -223,6 +234,7 @@ public class AbstractStepTests extends TestCase {
 	/**
 	 * Exception during business processing.
 	 */
+	@Test
 	public void testFailureInSavingExecutionContext() throws Exception {
 		tested = new EventTrackingStep() {
 			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
@@ -254,6 +266,7 @@ public class AbstractStepTests extends TestCase {
 	/**
 	 * JobRepository is a required property.
 	 */
+	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		tested.setJobRepository(null);
 		try {

@@ -335,7 +335,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			exitStatus = new ExitStatus(false, JOB_INTERRUPTED, JobInterruptedException.class.getName());
 		}
 		else if (ex instanceof NoSuchJobException || ex.getCause() instanceof NoSuchJobException) {
-			exitStatus = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB);
+			exitStatus = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB, ex.getClass().getName());
 		}
 		else {
 			StringWriter writer = new StringWriter();
