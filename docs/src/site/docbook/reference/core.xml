@@ -615,20 +615,13 @@
       <title id="stepExecution">StepExecution</title>
 
       <para>A <classname>StepExecution</classname> represents a single attempt
-      to execute a <classname>Step</classname>. Using the example from
-      <classname>JobExecution</classname>, if there is a
-      <classname>JobInstance</classname> for the "EndOfDayJob", with
-      <classname>JobParameters</classname> of "01-01-2008" that fails to
-      successfully complete its work the first time it is run, when it is
-      executed again, a new <classname>StepExecution</classname> will be
-      created. Each of these step executions may represent a different
-      invocation of the batch framework, but they will all correspond to the
-      same <classname>JobInstance</classname>, just as multiple
-      <classname>JobExecutions</classname> belong to the same
-      <classname>JobInstance</classname>. However, if a step fails to execute
-      because the step before it fails, there will be no execution persisted
-      for it. An execution will only be created when the
-      <classname>Step</classname> is actually started.</para>
+      to execute a <classname>Step</classname>. A new
+      <classname>StepExecution</classname> will be created each time a Step is
+      run, similar to <classname>JobExecution</classname>. However, if a step
+      fails to execute because the step before it fails, there will be no
+      execution persisted for it. A <classname>StepExecution</classname> will
+      only be created when it's <classname>Step</classname> is actually
+      started.</para>
 
       <para>Step executions are represented by objects of the
       <classname>StepExecution</classname> class. Each execution contains a
