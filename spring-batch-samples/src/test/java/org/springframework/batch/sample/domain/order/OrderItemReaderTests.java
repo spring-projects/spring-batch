@@ -84,13 +84,13 @@ public class OrderItemReaderTests {
 		// create mock mapper
 		FieldSetMapper mapper = createMock(FieldSetMapper.class);
 		// set how mapper should respond - set return values for mapper
-		expect(mapper.map(headerFS)).andReturn(order);
-		expect(mapper.map(customerFS)).andReturn(customer);
-		expect(mapper.map(billingFS)).andReturn(billing);
-		expect(mapper.map(shippingFS)).andReturn(shipping);
-		expect(mapper.map(billingInfoFS)).andReturn(billingInfo);
-		expect(mapper.map(shippingInfoFS)).andReturn(shippingInfo);
-		expect(mapper.map(itemFS)).andReturn(item).times(3);
+		expect(mapper.mapFieldSet(headerFS)).andReturn(order);
+		expect(mapper.mapFieldSet(customerFS)).andReturn(customer);
+		expect(mapper.mapFieldSet(billingFS)).andReturn(billing);
+		expect(mapper.mapFieldSet(shippingFS)).andReturn(shipping);
+		expect(mapper.mapFieldSet(billingInfoFS)).andReturn(billingInfo);
+		expect(mapper.mapFieldSet(shippingInfoFS)).andReturn(shippingInfo);
+		expect(mapper.mapFieldSet(itemFS)).andReturn(item).times(3);
 		replay(mapper);
 
 		// set-up provider: set mappers

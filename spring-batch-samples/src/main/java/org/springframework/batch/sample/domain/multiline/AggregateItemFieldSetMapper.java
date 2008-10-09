@@ -83,7 +83,7 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 	 * @return an {@link AggregateItem} that wraps the return value from the
 	 * delegate
 	 */
-	public AggregateItem<T> map(FieldSet fieldSet) {
+	public AggregateItem<T> mapFieldSet(FieldSet fieldSet) {
 
 		if (fieldSet.readString(0).equals(begin)) {
 			return AggregateItem.getHeader();
@@ -92,7 +92,7 @@ public class AggregateItemFieldSetMapper<T> implements FieldSetMapper<AggregateI
 			return AggregateItem.getFooter();
 		}
 
-		return new AggregateItem<T>(delegate.map(fieldSet));
+		return new AggregateItem<T>(delegate.mapFieldSet(fieldSet));
 
 	}
 

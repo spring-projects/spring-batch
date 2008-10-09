@@ -6,7 +6,7 @@ import org.springframework.batch.sample.domain.football.Player;
 
 public class PlayerFieldSetMapper implements FieldSetMapper<Player> {
 
-	public Player map(FieldSet fs) {
+	public Player mapFieldSet(FieldSet fs) {
 		
 		if(fs == null){
 			return null;

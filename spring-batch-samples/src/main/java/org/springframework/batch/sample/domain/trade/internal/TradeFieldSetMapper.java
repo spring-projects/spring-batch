@@ -29,7 +29,7 @@ public class TradeFieldSetMapper implements FieldSetMapper<Trade> {
 	public static final int PRICE_COLUMN = 2;
 	public static final int CUSTOMER_COLUMN = 3;
 	
-    public Trade map(FieldSet fieldSet) {
+    public Trade mapFieldSet(FieldSet fieldSet) {
     	
     	Trade trade = new Trade();
     	trade.setIsin(fieldSet.readString(ISIN_COLUMN));
