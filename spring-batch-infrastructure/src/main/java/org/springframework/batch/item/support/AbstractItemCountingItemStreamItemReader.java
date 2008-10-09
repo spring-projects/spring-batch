@@ -4,7 +4,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
@@ -57,7 +56,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 		}
 	}
 
-	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
+	public T read() throws Exception, UnexpectedInputException, ParseException {
 		currentItemCount++;
 		return doRead();
 	}

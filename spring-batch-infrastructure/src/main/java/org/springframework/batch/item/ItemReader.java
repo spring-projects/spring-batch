@@ -46,6 +46,6 @@ public interface ItemReader<T> {
 	 * 
 	 * @throws Exception if an underlying resource is unavailable.
 	 */
-	T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException;
+	T read() throws Exception, UnexpectedInputException, ParseException;
 
 }

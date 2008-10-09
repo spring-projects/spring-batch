@@ -43,7 +43,7 @@ import org.springframework.util.ClassUtils;
  * better performance.
  *
  * In order to reduce the memory usage for large results the persistence context is flushed and cleared
- * after each page is read.  This cuases any entities read to be detached. If you make changes to the
+ * after each page is read.  This causes any entities read to be detached. If you make changes to the
  * entities and want the changes persisted then you must explicitly merge the entities.
  *
  * The reader must be configured with an {@link javax.persistence.EntityManagerFactory}.  All entity access
