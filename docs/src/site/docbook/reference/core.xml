@@ -320,6 +320,20 @@
               by the framework for managing job level
               ExecutionContexts.</entry>
             </row>
+
+            <row>
+              <entry>lastUpdated</entry>
+
+              <entry>A <classname>java.util.Date</classname> representing the
+              last time a JobExecution was persisted.</entry>
+            </row>
+
+            <row>
+              <entry>executionContext</entry>
+
+              <entry>The 'property bag' containing any user data that needs to
+              be persisted between executions.</entry>
+            </row>
           </tbody>
         </tgroup>
       </table>
@@ -681,17 +695,24 @@
             </row>
 
             <row>
+              <entry>readCount</entry>
+
+              <entry>The number of items that have been successfully
+              read</entry>
+            </row>
+
+            <row>
+              <entry>writeCount</entry>
+
+              <entry>The number of items that have been successfully
+              written</entry>
+            </row>
+
+            <row>
               <entry>commitCount</entry>
 
               <entry>The number transactions that have been committed for this
               execution</entry>
-            </row>
-
-            <row>
-              <entry>itemCount</entry>
-
-              <entry>The number of items that have been processed for this
-              execution.</entry>
             </row>
 
             <row>
@@ -706,6 +727,20 @@
 
               <entry>The number of times <methodname>read</methodname> has
               failed, resulting in a skipped item.</entry>
+            </row>
+
+            <row>
+              <entry>processSkipCount</entry>
+
+              <entry>The number of times process has failed, resulting in a
+              skipped item.</entry>
+            </row>
+
+            <row>
+              <entry>filterCount</entry>
+
+              <entry>The number of items that have been 'filtered' by the
+              ItemProcessor</entry>
             </row>
 
             <row>
