@@ -32,7 +32,7 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 	
 	public void testNoTokenizers() throws Exception {
 		try {
-			tokenizer.process("a line");
+			tokenizer.tokenize("a line");
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			// expected
@@ -41,7 +41,7 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 	
 	public void testNullLine() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer())); 
-		FieldSet fields = tokenizer.process(null);
+		FieldSet fields = tokenizer.tokenize(null);
 		assertEquals(0, fields.getFieldCount());
 	}
 	
@@ -49,12 +49,12 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
 		map.put("", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
-			public FieldSet process(String line) {
+			public FieldSet tokenize(String line) {
 				return null;
 			}
 		});
 		tokenizer.setTokenizers(map); 
-		FieldSet fields = tokenizer.process("abc");
+		FieldSet fields = tokenizer.tokenize("abc");
 		assertEquals(1, fields.getFieldCount());
 	}
 
@@ -62,20 +62,20 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 		
 		Map<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
 		map.put("", new LineTokenizer() {
-			public FieldSet process(String line) {
+			public FieldSet tokenize(String line) {
 				return null;
 			}
 		});
 		map.put("foo", new DelimitedLineTokenizer());
 		tokenizer.setTokenizers(map); 
-		FieldSet fields = tokenizer.process("foo,bar");
+		FieldSet fields = tokenizer.tokenize("foo,bar");
 		assertEquals("bar", fields.readString(1));
 	}
 
 	public void testNoMatch() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer())); 
 		try {
-			tokenizer.process("nomatch");
+			tokenizer.tokenize("nomatch");
 			fail("Expected IllegalStateException");
 		} catch (IllegalStateException e) {
 			// expected
@@ -84,11 +84,11 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 	
 	public void testMatchWithPrefix() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new LineTokenizer() {
-			public FieldSet process(String line) {
+			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] {line});
 			}
 		}));
-		FieldSet fields = tokenizer.process("foo bar");
+		FieldSet fields = tokenizer.tokenize("foo bar");
 		assertEquals(1, fields.getFieldCount());
 		assertEquals("foo bar", fields.readString(0));
 	}

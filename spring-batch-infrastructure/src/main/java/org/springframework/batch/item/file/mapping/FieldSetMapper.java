@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.mapping;
 
 
+
 /**
  * Interface that is used to map data obtained from a {@link FieldSet} into an
  * object.
@@ -27,5 +28,10 @@ package org.springframework.batch.item.file.mapping;
  */
 public interface FieldSetMapper<T> {
 	
-	T process(FieldSet fieldSet);
+	/**
+	 * Method used to map data obtained from a {@link FieldSet} into an object.
+	 * 
+	 * @param fieldSet the {@link FieldSet} to map
+	 */
+	T map(FieldSet fieldSet);
 }

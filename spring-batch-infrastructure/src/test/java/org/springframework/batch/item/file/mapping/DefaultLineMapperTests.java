@@ -20,12 +20,12 @@ public class DefaultLineMapperTests {
 		final String item = "ITEM";
 		
 		LineTokenizer tokenizer = createStrictMock(LineTokenizer.class);
-		expect(tokenizer.process(line)).andReturn(fs);
+		expect(tokenizer.tokenize(line)).andReturn(fs);
 		replay(tokenizer);
 		
 		@SuppressWarnings("unchecked")
 		FieldSetMapper<String> fsMapper = createStrictMock(FieldSetMapper.class);
-		expect(fsMapper.process(fs)).andReturn(item);
+		expect(fsMapper.map(fs)).andReturn(item);
 		replay(fsMapper);
 		
 		tested.setLineTokenizer(tokenizer);

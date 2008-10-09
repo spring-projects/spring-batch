@@ -36,7 +36,7 @@ public class FixedLengthTokenizerTests {
 	public void testTokenizeEmptyString() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
 		try {
-			tokenizer.process("");
+			tokenizer.tokenize("");
 			fail("Expected IncorrectLineLengthException");
 		}
 		catch (IncorrectLineLengthException ex) {
@@ -48,14 +48,14 @@ public class FixedLengthTokenizerTests {
 	@Test
 	public void testEmptyStringWithNoRanges() {
 		tokenizer.setColumns(new Range[] {});
-		tokenizer.process("");
+		tokenizer.tokenize("");
 	}
 
 	@Test
 	public void testTokenizeSmallerStringThanRanges() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
 		try {
-			tokenizer.process("12345");
+			tokenizer.tokenize("12345");
 			fail("Expected IncorrectLineLengthException");
 		}
 		catch (IncorrectLineLengthException ex) {
@@ -68,7 +68,7 @@ public class FixedLengthTokenizerTests {
 	@Test
 	public void testTokenizeSmallerStringThanRangesWithWhitespace() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
-		FieldSet tokens = tokenizer.process("12345     ");
+		FieldSet tokens = tokenizer.tokenize("12345     ");
 		assertEquals("12345", tokens.readString(0));
 		assertEquals("", tokens.readString(1));
 	}
@@ -77,7 +77,7 @@ public class FixedLengthTokenizerTests {
 	public void testTokenizeSmallerStringThanRangesNotStrict() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
 		tokenizer.setStrict(false);
-		FieldSet tokens = tokenizer.process("12345");
+		FieldSet tokens = tokenizer.tokenize("12345");
 		assertEquals("12345", tokens.readString(0));
 		assertEquals("", tokens.readString(1));
 	}
@@ -85,7 +85,7 @@ public class FixedLengthTokenizerTests {
 	@Test
 	public void testTokenizeSmallerStringThanRangesWithWhitespaceOpenEnded() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6) });
-		FieldSet tokens = tokenizer.process("12345     ");
+		FieldSet tokens = tokenizer.tokenize("12345     ");
 		assertEquals("12345", tokens.readString(0));
 		assertEquals("", tokens.readString(1));
 	}
@@ -94,7 +94,7 @@ public class FixedLengthTokenizerTests {
 	public void testTokenizeNullString() {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
 		try {
-			tokenizer.process(null);
+			tokenizer.tokenize(null);
 			fail("Expected IncorrectLineLengthException");
 		}
 		catch (IncorrectLineLengthException ex) {
@@ -106,7 +106,7 @@ public class FixedLengthTokenizerTests {
 		tokenizer.setColumns(new Range[] { new Range(1, 2), new Range(3, 7), new Range(8, 12) });
 		// test shorter line as defined by record descriptor
 		line = "H11234512345";
-		FieldSet tokens = tokenizer.process(line);
+		FieldSet tokens = tokenizer.tokenize(line);
 		assertEquals(3, tokens.getFieldCount());
 		assertEquals("H1", tokens.readString(0));
 		assertEquals("12345", tokens.readString(1));
@@ -118,7 +118,7 @@ public class FixedLengthTokenizerTests {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26, 30) });
 		// test shorter line as defined by record descriptor
 		line = "H1        12345678       12345";
-		FieldSet tokens = tokenizer.process(line);
+		FieldSet tokens = tokenizer.tokenize(line);
 		assertEquals(3, tokens.getFieldCount());
 		assertEquals(line.substring(0, 10).trim(), tokens.readString(0));
 		assertEquals(line.substring(10, 25).trim(), tokens.readString(1));
@@ -130,7 +130,7 @@ public class FixedLengthTokenizerTests {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26, 30) });
 		line = "H1        12345678       1234567890";
 		try {
-			tokenizer.process(line);
+			tokenizer.tokenize(line);
 			fail("Expected IncorrectLineLengthException");
 		}
 		catch (IncorrectLineLengthException ex) {
@@ -143,7 +143,7 @@ public class FixedLengthTokenizerTests {
 	public void testLongerLinesOpenRange() throws Exception {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26) });
 		line = "H1        12345678       1234567890";
-		FieldSet tokens = tokenizer.process(line);
+		FieldSet tokens = tokenizer.tokenize(line);
 		assertEquals(line.substring(0, 10).trim(), tokens.readString(0));
 		assertEquals(line.substring(10, 25).trim(), tokens.readString(1));
 		assertEquals(line.substring(25).trim(), tokens.readString(2));
@@ -154,7 +154,7 @@ public class FixedLengthTokenizerTests {
 		tokenizer.setColumns(new Range[] { new Range(1, 10), new Range(11, 25), new Range(26,30) });
 		line = "H1        12345678       1234567890";
 		tokenizer.setStrict(false);
-		FieldSet tokens = tokenizer.process(line);
+		FieldSet tokens = tokenizer.tokenize(line);
 		assertEquals(line.substring(0, 10).trim(), tokens.readString(0));
 		assertEquals(line.substring(10, 25).trim(), tokens.readString(1));
 		assertEquals(line.substring(25, 30).trim(), tokens.readString(2));
@@ -165,7 +165,7 @@ public class FixedLengthTokenizerTests {
 		tokenizer.setColumns(new Range[] { new Range(14, 28), new Range(34, 38), new Range(1, 10) });
 		// test normal length
 		line = "H1        +++12345678       +++++12345";
-		FieldSet tokens = tokenizer.process(line);
+		FieldSet tokens = tokenizer.tokenize(line);
 		assertEquals(3, tokens.getFieldCount());
 		assertEquals(line.substring(0, 10).trim(), tokens.readString(2));
 		assertEquals(line.substring(13, 28).trim(), tokens.readString(0));
@@ -177,7 +177,7 @@ public class FixedLengthTokenizerTests {
 		tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 15), new Range(16, 25), new Range(26, 27) });
 		// test another type of record
 		line = "H2   123456    12345     12";
-		FieldSet tokens = tokenizer.process(line);
+		FieldSet tokens = tokenizer.tokenize(line);
 		assertEquals(4, tokens.getFieldCount());
 		assertEquals(line.substring(0, 5).trim(), tokens.readString(0));
 		assertEquals(line.substring(5, 15).trim(), tokens.readString(1));
@@ -191,7 +191,7 @@ public class FixedLengthTokenizerTests {
 				new Range(34) });
 		// test another type of record
 		line = "H2   123456    12345     12-123456";
-		FieldSet tokens = tokenizer.process(line);
+		FieldSet tokens = tokenizer.tokenize(line);
 		assertEquals(5, tokens.getFieldCount());
 		assertEquals(line.substring(0, 5).trim(), tokens.readString(0));
 		assertEquals(line.substring(5, 15).trim(), tokens.readString(1));
@@ -205,7 +205,7 @@ public class FixedLengthTokenizerTests {
 		tokenizer.setColumns(new Range[] { new Range(1, 5) });
 
 		try {
-			tokenizer.process("12345");
+			tokenizer.tokenize("12345");
 			fail("Exception was expected: too few names provided");
 		}
 		catch (IncorrectTokenCountException e) {

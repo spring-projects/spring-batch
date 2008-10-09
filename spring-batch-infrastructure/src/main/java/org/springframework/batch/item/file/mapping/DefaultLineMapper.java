@@ -17,7 +17,7 @@ public class DefaultLineMapper<T> implements LineMapper<T> {
 	private FieldSetMapper<T> fieldSetMapper;
 
 	public T mapLine(String line, int lineNumber) throws Exception {
-		return fieldSetMapper.process(tokenizer.process(line));
+		return fieldSetMapper.map(tokenizer.tokenize(line));
 	}
 
 	public void setLineTokenizer(LineTokenizer tokenizer) {

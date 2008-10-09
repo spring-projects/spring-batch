@@ -6,7 +6,7 @@ import org.springframework.batch.sample.domain.football.Game;
 
 public class GameFieldSetMapper implements FieldSetMapper<Game> {
 
-	public Game process(FieldSet fs) {
+	public Game map(FieldSet fs) {
 		
 		if(fs == null){
 			return null;

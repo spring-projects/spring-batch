@@ -34,7 +34,7 @@ public class CustomerFieldSetMapper implements FieldSetMapper<Customer> {
 	public static final String REG_ID_COLUMN = "REG_ID";
 	public static final String VIP_COLUMN = "VIP";
 	
-    public Customer process(FieldSet fieldSet) {
+    public Customer map(FieldSet fieldSet) {
         Customer customer = new Customer();
 
         if (Customer.LINE_ID_BUSINESS_CUST.equals(fieldSet.readString(LINE_ID_COLUMN))) {

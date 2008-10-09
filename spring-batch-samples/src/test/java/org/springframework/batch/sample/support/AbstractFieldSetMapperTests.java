@@ -38,7 +38,7 @@ public abstract class AbstractFieldSetMapperTests {
 	 */
 	@Test
 	public void testRegularUse() throws Exception {
-		assertEquals(expectedDomainObject(), fieldSetMapper().process(fieldSet()));
+		assertEquals(expectedDomainObject(), fieldSetMapper().map(fieldSet()));
 	}
 	
 }

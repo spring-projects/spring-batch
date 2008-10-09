@@ -148,7 +148,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithConverter() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
-			public String process(String item) {
+			public String aggregate(String item) {
 				return "FOO:" + item;
 			}
 		});
@@ -168,7 +168,7 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testWriteWithConverterAndString() throws Exception {
 		writer.setLineAggregator(new LineAggregator<String>() {
-			public String process(String item) {
+			public String aggregate(String item) {
 				return "FOO:" + item;
 			}
 		});
@@ -417,7 +417,7 @@ public class FlatFileItemWriterTests {
 
 		writer.setLineAggregator(new LineAggregator<String>() {
 
-			public String process(String item) {
+			public String aggregate(String item) {
 				if (item.equals("2")) {
 					throw new RuntimeException("aggregation failed on " + item);
 				}

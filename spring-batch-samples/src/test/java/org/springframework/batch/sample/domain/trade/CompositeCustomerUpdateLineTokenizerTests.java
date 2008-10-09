@@ -36,7 +36,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	public void testCustomerAdd() throws Exception{
 		
 		String customerAddLine = "AFDASFDASFDFSA";
-		FieldSet fs = compositeTokenizer.process(customerAddLine);
+		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
 		assertEquals(customerFieldSet, fs);
 		assertEquals(customerAddLine, customerTokenizer.getTokenizedLine());
 	}
@@ -45,7 +45,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	public void testCustomerDelete() throws Exception{
 		
 		String customerAddLine = "DFDASFDASFDFSA";
-		FieldSet fs = compositeTokenizer.process(customerAddLine);
+		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
 		assertEquals(customerFieldSet, fs);
 		assertEquals(customerAddLine, customerTokenizer.getTokenizedLine());
 	}
@@ -54,7 +54,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	public void testCustomerUpdate() throws Exception{
 		
 		String customerAddLine = "UFDASFDASFDFSA";
-		FieldSet fs = compositeTokenizer.process(customerAddLine);
+		FieldSet fs = compositeTokenizer.tokenize(customerAddLine);
 		assertEquals(customerFieldSet, fs);
 		assertEquals(customerAddLine, customerTokenizer.getTokenizedLine());
 	}
@@ -63,7 +63,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 	public void testInvalidLine() throws Exception{
 		
 		String invalidLine = "INVALID";
-		compositeTokenizer.process(invalidLine);
+		compositeTokenizer.tokenize(invalidLine);
 	}
 	
 	
@@ -76,7 +76,7 @@ public class CompositeCustomerUpdateLineTokenizerTests {
 			this.fieldSetToReturn = fieldSetToReturn;
 		}
 		
-		public FieldSet process(String line) {
+		public FieldSet tokenize(String line) {
 			this.tokenizedLine = line;
 			return fieldSetToReturn;
 		}

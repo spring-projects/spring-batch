@@ -39,7 +39,7 @@ public class FormatterLineAggregatorTests {
 		String[] args = { "does not matter what is here" };
 
 		try {
-			aggregator.process(args);
+			aggregator.aggregate(args);
 			fail("should not work with no format specified");
 		}
 		catch (IllegalArgumentException expected) {
@@ -56,7 +56,7 @@ public class FormatterLineAggregatorTests {
 		aggregator.setMaximumLength(3);
 		aggregator.setFormat("%3s");
 		try {
-			aggregator.process(args);
+			aggregator.aggregate(args);
 			fail("Invalid text length, exception should have been thrown");
 		}
 		catch (IllegalStateException expected) {
@@ -71,7 +71,7 @@ public class FormatterLineAggregatorTests {
 	public void testAggregate() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%9s%9s");
-		String result = aggregator.process(args);
+		String result = aggregator.aggregate(args);
 		assertEquals("MatchsizeSmallsize", result);
 	}
 
@@ -82,7 +82,7 @@ public class FormatterLineAggregatorTests {
 	public void testAggregateWithLastRangeUnbound() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%-12s%s");
-		String result = aggregator.process(args);
+		String result = aggregator.aggregate(args);
 		assertEquals("Matchsize   Smallsize", result);
 	}
 
@@ -93,7 +93,7 @@ public class FormatterLineAggregatorTests {
 	public void testAggregateFormattedRight() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%13s%10s");
-		String result = aggregator.process(args);
+		String result = aggregator.aggregate(args);
 		assertEquals(23, result.length());
 		assertEquals("    Matchsize Smallsize", result);
 	}
@@ -127,7 +127,7 @@ public class FormatterLineAggregatorTests {
 			}
 		});
 
-		String result = aggregator.process(args);
+		String result = aggregator.aggregate(args);
 		assertEquals("  Matchsize   Smallsize  ", result);
 
 	}
@@ -160,7 +160,7 @@ public class FormatterLineAggregatorTests {
 			}
 		});
 
-		String result = aggregator.process(args);
+		String result = aggregator.aggregate(args);
 		assertEquals("Matchsize....Smallsize..", result);
 	}
 
@@ -171,7 +171,7 @@ public class FormatterLineAggregatorTests {
 	public void testAggregateFormattedLeft() {
 		String[] args = { "Matchsize", "Smallsize" };
 		aggregator.setFormat("%-13s%-11s");
-		String result = aggregator.process(args);
+		String result = aggregator.aggregate(args);
 		assertEquals("Matchsize    Smallsize  ", result);
 	}
 
@@ -183,6 +183,6 @@ public class FormatterLineAggregatorTests {
 	public void testAggregateNullArgument() {
 		String[] args = { null };
 		aggregator.setFormat("%3s");
-		assertEquals("   ", aggregator.process(args));
+		assertEquals("   ", aggregator.aggregate(args));
 	}
 }

@@ -36,7 +36,7 @@ public class DelimitedLineAggregator<T> implements LineAggregator<T[]> {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
-	public String process(T[] item) {
+	public String aggregate(T[] item) {
 		return StringUtils.arrayToDelimitedString(item, delimiter);
 	}
 

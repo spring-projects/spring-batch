@@ -89,7 +89,7 @@ public class OrderItemReader implements ItemReader<Order> {
 		// start a new Order
 		if (Order.LINE_ID_HEADER.equals(lineId)) {
 			log.debug("STARTING NEW RECORD");
-			order = headerMapper.process(fieldSet);
+			order = headerMapper.map(fieldSet);
 
 			return;
 		}
@@ -114,7 +114,7 @@ public class OrderItemReader implements ItemReader<Order> {
 			log.debug("MAPPING CUSTOMER");
 
 			if (order.getCustomer() == null) {
-				order.setCustomer(customerMapper.process(fieldSet));
+				order.setCustomer(customerMapper.map(fieldSet));
 				order.getCustomer().setBusinessCustomer(true);
 			}
 
@@ -125,7 +125,7 @@ public class OrderItemReader implements ItemReader<Order> {
 			log.debug("MAPPING CUSTOMER");
 
 			if (order.getCustomer() == null) {
-				order.setCustomer(customerMapper.process(fieldSet));
+				order.setCustomer(customerMapper.map(fieldSet));
 				order.getCustomer().setBusinessCustomer(false);
 			}
 
@@ -134,25 +134,25 @@ public class OrderItemReader implements ItemReader<Order> {
 
 		if (Address.LINE_ID_BILLING_ADDR.equals(lineId)) {
 			log.debug("MAPPING BILLING ADDRESS");
-			order.setBillingAddress(addressMapper.process(fieldSet));
+			order.setBillingAddress(addressMapper.map(fieldSet));
 			return;
 		}
 
 		if (Address.LINE_ID_SHIPPING_ADDR.equals(lineId)) {
 			log.debug("MAPPING SHIPPING ADDRESS");
-			order.setShippingAddress(addressMapper.process(fieldSet));
+			order.setShippingAddress(addressMapper.map(fieldSet));
 			return;
 		}
 
 		if (BillingInfo.LINE_ID_BILLING_INFO.equals(lineId)) {
 			log.debug("MAPPING BILLING INFO");
-			order.setBilling(billingMapper.process(fieldSet));
+			order.setBilling(billingMapper.map(fieldSet));
 			return;
 		}
 
 		if (ShippingInfo.LINE_ID_SHIPPING_INFO.equals(lineId)) {
 			log.debug("MAPPING SHIPPING INFO");
-			order.setShipping(shippingMapper.process(fieldSet));
+			order.setShipping(shippingMapper.map(fieldSet));
 			return;
 		}
 
@@ -162,7 +162,7 @@ public class OrderItemReader implements ItemReader<Order> {
 			if (order.getLineItems() == null) {
 				order.setLineItems(new ArrayList<LineItem>());
 			}
-			order.getLineItems().add(itemMapper.process(fieldSet));
+			order.getLineItems().add(itemMapper.map(fieldSet));
 
 			return;
 		}

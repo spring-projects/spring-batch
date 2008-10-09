@@ -30,12 +30,12 @@ public class DelimitedLineAggregatorTests {
 	@Test
 	public void testSetDelimiter() {
 		aggregator.setDelimiter(";");
-		assertEquals("foo;bar", aggregator.process(new String[] { "foo", "bar" }));
+		assertEquals("foo;bar", aggregator.aggregate(new String[] { "foo", "bar" }));
 	}
 
 	@Test
 	public void testAggregate() {
-		assertEquals("foo,bar", aggregator.process(new String[] { "foo", "bar" }));
+		assertEquals("foo,bar", aggregator.aggregate(new String[] { "foo", "bar" }));
 	}
 
 }

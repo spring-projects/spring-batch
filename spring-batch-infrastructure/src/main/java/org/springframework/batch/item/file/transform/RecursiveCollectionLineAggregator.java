@@ -31,10 +31,10 @@ public class RecursiveCollectionLineAggregator<T> implements LineAggregator<Coll
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
 	 */
-	public String process(Collection<T> items) {
+	public String aggregate(Collection<T> items) {
 		StringBuilder builder = new StringBuilder();
 		for (T value : items) {
-			builder.append(delegate.process(value) + LINE_SEPARATOR);
+			builder.append(delegate.aggregate(value) + LINE_SEPARATOR);
 		}
 		return builder.delete(builder.length()-LINE_SEPARATOR.length(),builder.length()).toString();
 	}

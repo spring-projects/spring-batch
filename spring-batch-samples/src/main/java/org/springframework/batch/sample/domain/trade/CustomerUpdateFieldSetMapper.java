@@ -16,7 +16,7 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
  */
 public class CustomerUpdateFieldSetMapper implements FieldSetMapper<CustomerUpdate> {
 
-	public CustomerUpdate process(FieldSet fs) {
+	public CustomerUpdate map(FieldSet fs) {
 		
 		CustomerOperation operation = CustomerOperation.fromCode(fs.readChar(0));
 		String name = fs.readString(1);

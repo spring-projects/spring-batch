@@ -67,7 +67,7 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 	}
 
 	protected static class TradeMapper implements FieldSetMapper<Trade> {
-		public Trade process(FieldSet fs) {
+		public Trade map(FieldSet fs) {
 			return new Trade(fs);
 		}
 	}

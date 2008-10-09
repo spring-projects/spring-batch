@@ -18,7 +18,6 @@ package org.springframework.batch.item.file.transform;
 
 import org.springframework.batch.item.file.mapping.FieldSet;
 
-
 /**
  * Interface that is used by framework to split string obtained typically from a
  * file into tokens.
@@ -28,5 +27,13 @@ import org.springframework.batch.item.file.mapping.FieldSet;
  */
 public interface LineTokenizer {
 	
-	FieldSet process(String line);
+	/**
+	 * Yields the tokens resulting from the splitting of the supplied
+	 * <code>line</code>.
+	 * 
+	 * @param line the line to be tokenized (can be <code>null</code>)
+	 * 
+	 * @return the resulting tokens
+	 */
+	FieldSet tokenize(String line);
 }

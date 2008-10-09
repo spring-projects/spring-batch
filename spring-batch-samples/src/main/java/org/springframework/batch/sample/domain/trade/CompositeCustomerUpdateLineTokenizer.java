@@ -26,11 +26,11 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
 	 */
-	public FieldSet process(String line) {
+	public FieldSet tokenize(String line) {
 		
 		if(line.charAt(0) == 'F'){
 			//line starts with F, so the footer tokenizer should tokenize it.
-			FieldSet fs = footerTokenizer.process(line);
+			FieldSet fs = footerTokenizer.tokenize(line);
 			long customerUpdateTotal = stepExecution.getReadCount();
 			long fileUpdateTotal = fs.readLong(1);
 			if(customerUpdateTotal != fileUpdateTotal){
@@ -45,7 +45,7 @@ public class CompositeCustomerUpdateLineTokenizer extends StepExecutionListenerS
 		}
 		else if(line.charAt(0) == 'A' || line.charAt(0) == 'U' || line.charAt(0) == 'D'){
 			//line starts with A,U, or D, so it must be a customer operation.
-			return customerTokenizer.process(line);
+			return customerTokenizer.tokenize(line);
 		}
 		else{
 			//If the line doesn't start with any of the characters above, it must obviously be invalid.
