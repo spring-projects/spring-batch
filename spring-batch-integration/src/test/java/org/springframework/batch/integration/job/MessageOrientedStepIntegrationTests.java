@@ -26,6 +26,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.bus.MessageBus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,6 +39,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MessageOrientedStepIntegrationTests {
 	
 	@Autowired
+	private MessageBus bus;
+
+	@Autowired
 	private JobLauncher jobLauncher;
 	
 	@Autowired
@@ -46,6 +50,7 @@ public class MessageOrientedStepIntegrationTests {
 
 	@Test
 	public void testLaunchJob() throws Exception {
+		bus.start();
 		JobExecution jobExecution = jobLauncher.run(job, new JobParameters());
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 	}

@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.1.0.v200806081427]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.0.v200809261800]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
 	<enableImports><![CDATA[true]]></enableImports>
 	<configs>
-		<config>src/test/resources/integration-context.xml</config>
 		<config>src/test/resources/job-execution-context.xml</config>
 		<config>src/test/resources/simple-job-launcher-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/chunk/ChunkMessageItemWriterIntegrationTests-context.xml</config>
@@ -15,6 +14,7 @@
 		<config>src/test/resources/org/springframework/batch/integration/item/MessageChannelItemWriterIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/job/MessageOrientedStepIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/file/ResourceSplitterIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/retry/TransactionalPollingIntegrationTests-context.xml</config>
 	</configs>
 	<configSets>
 	</configSets>

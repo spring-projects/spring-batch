@@ -10,8 +10,7 @@
                                  http://www.springframework.org/schema/context/spring-context-2.5.xsd
                                  http://www.springframework.org/schema/tx
                                  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-	<message-bus />
-	<annotation-driven />
+	<message-bus auto-startup="false" enable-annotations="true"/>
 	<channel id="requests" />
 	<channel id="replies">
 		<queue capacity="UNBOUNDED" />

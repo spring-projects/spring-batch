@@ -30,6 +30,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.bus.MessageBus;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
@@ -43,6 +44,9 @@ import org.springframework.util.StringUtils;
 public class ChunkMessageItemWriterIntegrationTests {
 
 	private ChunkMessageChannelItemWriter<Object> writer = new ChunkMessageChannelItemWriter<Object>();
+
+	@Autowired
+	private MessageBus bus;
 
 	@Autowired
 	@Qualifier("requests")
@@ -80,6 +84,8 @@ public class ChunkMessageItemWriterIntegrationTests {
 			System.err.println(message);
 			message = replies.receive(10);
 		}
+		
+		bus.start();
 
 	}
 
@@ -87,6 +93,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	public void tearDown() {
 		while (replies.receive(10L) != null) {
 		}
+		bus.stop();
 	}
 
 	@Test

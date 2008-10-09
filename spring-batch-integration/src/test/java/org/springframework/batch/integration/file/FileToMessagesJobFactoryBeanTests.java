@@ -34,8 +34,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.JobRepositorySupport;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.FieldSet;
-import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
+import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -53,9 +52,9 @@ import org.springframework.util.ReflectionUtils;
 public class FileToMessagesJobFactoryBeanTests {
 
 	private static final String FILE_INPUT_PATH = ResourcePayloadAsJobParameterStrategy.FILE_INPUT_PATH;
-	private FileToMessagesJobFactoryBean<FieldSet> factory = new FileToMessagesJobFactoryBean<FieldSet>();
+	private FileToMessagesJobFactoryBean<String> factory = new FileToMessagesJobFactoryBean<String>();
 	private DirectChannel channel = new DirectChannel();
-	private List<FieldSet> receiver = new ArrayList<FieldSet>();
+	private List<String> receiver = new ArrayList<String>();
 	private JobRepositorySupport jobRepository;
 
 	@Before
@@ -63,14 +62,14 @@ public class FileToMessagesJobFactoryBeanTests {
 		jobRepository = new JobRepositorySupport();
 		factory.setJobRepository(jobRepository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
-		FlatFileItemReader<FieldSet> itemReader = new FlatFileItemReader<FieldSet>();
-		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
+		FlatFileItemReader<String> itemReader = new FlatFileItemReader<String>();
+		itemReader.setLineMapper(new PassThroughLineMapper());
 		factory.setItemReader(itemReader);
 		factory.setChannel(channel);
 		channel.subscribe(new MessageConsumer() {
 			public void onMessage(Message<?> message) {
 				// TODO: Ask Mark: unsafe cast...
-				receiver.add((FieldSet) message.getPayload());
+				receiver.add((String) message.getPayload());
 			}
 		});
 	}
@@ -182,7 +181,7 @@ public class FileToMessagesJobFactoryBeanTests {
 		assertNotNull(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		FieldSet payload;
+		String payload;
 
 		// first line from properties file
 		payload = receiver.get(0);

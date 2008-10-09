@@ -41,7 +41,7 @@
 		<property name="commitInterval" value="1" />
 	</bean>
 	<bean id="skipLimitStep"
-		class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"
+		class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean"
 		parent="simpleStep" abstract="true">
 		<property name="skipLimit" value="0" />
 	</bean>

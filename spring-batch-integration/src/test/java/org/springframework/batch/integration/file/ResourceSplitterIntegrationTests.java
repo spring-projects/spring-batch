@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Splitter;
+import org.springframework.integration.bus.MessageBus;
 import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.GenericMessage;
@@ -51,6 +52,9 @@ public class ResourceSplitterIntegrationTests {
 	@Qualifier("requests")
 	private PollableChannel requests;
 
+	@Autowired
+	private MessageBus bus;
+
 	/*
 	 * This is so cool (but see INT-190)...<br/>
 	 * 
@@ -67,6 +71,7 @@ public class ResourceSplitterIntegrationTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testVanillaConversion() throws Exception {
+		bus.start();
 		resources.send(new GenericMessage<String>("classpath:*-context.xml"));
 		Message<Resource> message = (Message<Resource>) requests.receive(200L);
 		assertNotNull(message);

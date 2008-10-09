@@ -9,24 +9,8 @@
 		http://www.springframework.org/schema/integration
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-	<import resource="classpath:simple-job-launcher-context.xml" />
+	<import resource="classpath:/simple-job-launcher-context.xml" />
 	<integration:message-bus auto-startup="false" enable-annotations="true"/>
-	<integration:channel id="requests" />
-	<integration:channel id="response">
-		<integration:queue capacity="UNBOUNDED" />
-	</integration:channel>
-
-	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" method="launch" />
-
-	<bean id="jobLaunchingHandler" class="org.springframework.batch.integration.launch.JobLaunchingMessageHandler">
-		<constructor-arg ref="jobLauncher" />
-	</bean>
-	<bean id="testJob" parent="simpleJob">
-		<property name="steps" ref="step" />
-	</bean>
-	<bean id="step" parent="taskletStep">
-		<property name="tasklet">
-			<bean class="org.springframework.batch.integration.job.TestTasklet" />
-		</property>
-	</bean>
+	<integration:channel id="requests"/>
+	<integration:channel id="replies" />
 </beans>
