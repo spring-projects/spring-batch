@@ -33,5 +33,5 @@ public interface FieldSetMapper<T> {
 	 * 
 	 * @param fieldSet the {@link FieldSet} to map
 	 */
-	T map(FieldSet fieldSet);
+	T mapFieldSet(FieldSet fieldSet);
 }

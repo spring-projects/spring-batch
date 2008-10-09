@@ -25,7 +25,7 @@ public class DefaultLineMapperTests {
 		
 		@SuppressWarnings("unchecked")
 		FieldSetMapper<String> fsMapper = createStrictMock(FieldSetMapper.class);
-		expect(fsMapper.map(fs)).andReturn(item);
+		expect(fsMapper.mapFieldSet(fs)).andReturn(item);
 		replay(fsMapper);
 		
 		tested.setLineTokenizer(tokenizer);
