@@ -334,9 +334,9 @@
         <classname>LineTokenizer</classname> to translate a line of data from
         a resource into an object of the desired type:</para>
 
-        <programlisting>  public interface FieldSetMapper {
+        <programlisting>  public interface FieldSetMapper&lt;T&gt; {
   
-    public Object mapLine(FieldSet fs);
+    T mapFieldSet(FieldSet fieldSet);
 
   }</programlisting>
 
@@ -422,7 +422,7 @@
 
   if (line != null) {
     FieldSet tokenizedLine = tokenizer.tokenize(line);
-    return fieldSetMapper.mapLine(tokenizedLine);
+    return fieldSetMapper.mapFieldSet(tokenizedLine);
   }
  
   return null;</programlisting>
@@ -620,7 +620,7 @@
 
         <programlisting>  
   &lt;bean id="fixedLengthLineTokenizer"
-        class="org.springframework.batch.item.file.transform.FixedLengthTokenizer"&gt;
+        class="org.springframework.batch.io.file.transform.FixedLengthTokenizer"&gt;
     &lt;property name="names" value="ISIN, Quantity, Price, Customer" /&gt;
     &lt;property name="columns" value="1-12, 13-15, 16-20, 21-29" /&gt;
   &lt;/bean&gt;
@@ -676,7 +676,7 @@
         prefix in a line with a particular tokenizer:</para>
 
         <programlisting>  &lt;bean id="orderFileDescriptor"
-        class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
+        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
     &lt;property name="tokenizers"&gt;
      &lt;map&gt;
       &lt;entry key="HEA" value-ref="headerRecordDescriptor" /&gt;
@@ -699,6 +699,108 @@
         continue calling <methodname>read</methodname> until the footer for
         the record is returned, allowing them to return a complete order as
         one 'item'.</para>
+      </section>
+
+      <section>
+        <title>Exception Handling in flat files</title>
+
+        <para>There are many scenarios when tokenizing a line that cause
+        exceptions to be thrown. Many flat files are imperfect and contain
+        records that aren't formatted correctly. Many users choose to skip the
+        lines causing these errors, logging out the issue, original line, and
+        line number, for manual inspection later. (or by another batch job)
+        For this reason, Spring Batch provides a hierarchy of exceptions for
+        handling parse exceptions:
+        <classname>FlatFileParseException</classname> and
+        <classname>FlatFileFormatException</classname>.
+        <classname>FlatFileParseException</classname> is thrown by the
+        <classname>FlatFileItemReader</classname> when any errors are
+        encountered while trying to read a file.
+        <classname>FlatFileFormatException</classname> is thrown by
+        implementations of the <classname>LineTokenizer</classname> interface,
+        and indicates a more specific error encountered while
+        tokenizing.</para>
+
+        <section>
+          <title>IncorrectTokenCountException</title>
+
+          <para>Both <classname>DelimitedLineTokenizer</classname> and
+          <classname>FixedLengthLineTokenizer</classname> have the ability to
+          specify column names that can be used for creating a
+          <classname>FieldSet</classname>. However, if the number of column
+          names doesn't match the number of columns found while tokenizing a
+          line the <classname>FieldSet</classname> can't be created, and a
+          IncorrectTokenCountException is thrown, which contains the number of
+          tokens encountered, and the number expected:</para>
+
+          <programlisting>  
+  tokenizer.setNames(new String[] {"A", "B", "C", "D"});
+  
+  try{
+    tokenizer.tokenize("a,b,c");
+  }
+  catch(IncorrectTokenCountException e){
+    assertEquals(4, e.getExpectedCount());
+    assertEquals(3, e.getActualCount());
+  }
+
+</programlisting>
+
+          <para>Because the tokenizer was configured with 4 columns, but only
+          3 tokens were found in the file, an IncorrectTokenCountException was
+          thrown.</para>
+        </section>
+
+        <section>
+          <title>IncorrectLineLengthException</title>
+
+          <para>Files formatted in a fixed length format have additional
+          requirements when parsing because unlike a delimited format, each
+          column must strictly adhere to the width defined for it. If the
+          total line length doesn't add up to the widest value of this column,
+          an exception is thrown: </para>
+
+          <programlisting>  
+  tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
+  try {
+    tokenizer.tokenize("12345");
+    fail("Expected IncorrectLineLengthException");
+  }
+  catch (IncorrectLineLengthException ex) {
+    assertEquals(15, ex.getExpectedLength());
+    assertEquals(5, ex.getActualLength());
+  }
+
+</programlisting>
+
+          <para>The configured ranges for the tokenizer above are: 1-5, 6-10,
+          and 11-15, thus the total length of the line expected is 15.
+          However, in this case a line of length 5 was passed in, causing an
+          <classname>IncorrectLineLengthException</classname> to be thrown.
+          Throwing an exception here rather than only mapping the first column
+          allows the processing of the line to fail earlier, and with more
+          information than it would if it failed while trying to read in
+          column 2 in a <classname>FieldSetMapper</classname>. However, there
+          are scenarios where the length of the line isn't always constant.
+          For this reason, validation of line length can be turned off via the
+          'strict' property:</para>
+
+          <programlisting>
+  tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
+  tokenizer.setStrict(false);
+  FieldSet tokens = tokenizer.tokenize("12345");
+  assertEquals("12345", tokens.readString(0));
+  assertEquals("", tokens.readString(1));
+
+</programlisting>
+
+          <para>The above example is almost identical to the one before it,
+          except the tokenizer.setStrict(false) was called. This setting tells
+          the tokenizer to not enforce line lengths when tokenizing the line.
+          A <classname>FieldSet</classname> is now correctly created and
+          returned. However, it will only contain empty tokens for the
+          remaining values.</para>
+        </section>
       </section>
     </section>
 
@@ -768,7 +870,7 @@
         would look like the following:</para>
 
         <programlisting>  &lt;bean id="itemWriter"
-        class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
+        class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
     &lt;property name="resource"
               value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
     &lt;property name="lineAggregator"&gt;
