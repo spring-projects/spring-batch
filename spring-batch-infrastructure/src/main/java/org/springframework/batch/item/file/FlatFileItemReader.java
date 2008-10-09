@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.mapping.LineMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy;
@@ -179,8 +178,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			}
 		}
 		catch (IOException e) {
-			throw new UnexpectedInputException("Unable to read from resource '" + resource + "' at line " + lineCount,
-					e);
+			throw new FlatFileParseException("Unable to read from resource: [" + resource + "]", e, line, lineCount );
 		}
 		return line;
 	}
