@@ -52,11 +52,8 @@
 
     <programlisting>public interface ItemReader&lt;T&gt; {
 
-  T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException;
+  T read() throws Exception, UnexpectedInputException, ParseException;
 
-  void mark() throws MarkFailedException;
-
-  void reset() throws ResetFailedException;
 }
 </programlisting>
 
@@ -68,13 +65,11 @@
     (i.e. Trade, Foo, etc) but there is no requirement in the contract to do
     so.</para>
 
-    <para>The <methodname>mark</methodname> and <methodname>reset</methodname>
-    methods are important due to the transactional nature of batch processing.
-    Mark() will be called before reading begins. Calling
-    <methodname>reset</methodname> at anytime will position the
-    <classname>ItemReader</classname> to its position when
-    <methodname>mark</methodname> was last called. The semantics are very
-    similar to <classname>java.io.Reader</classname>.</para>
+    <para>It is expected that implementations of the
+    <classname>ItemReader</classname> interface will be forward only. However,
+    if the underlying resource is transactional (such as a JMS queue) thehn
+    calling read may return the same logical item on subsequent calls in a
+    rollback scenario.</para>
 
     <para>It is also worth noting that a lack of items to process by an
     <classname>ItemReader</classname> will not cause an exception to be
@@ -99,31 +94,22 @@
 
     <programlisting>public interface ItemWriter&lt;T&gt; {
 
-  void write(T item) throws Exception;
+  void write(List&lt;? extends T&gt; items) throws Exception;
 
-  void flush() throws FlushFailedException;
-
-  void clear() throws ClearFailedException;
 }
 </programlisting>
 
     <para>As with <methodname>read</methodname> on
     <classname>ItemReader</classname>, <methodname>write</methodname> provides
     the basic contract of <classname>ItemWriter</classname>, it will attempt
-    to write out the item passed in as long as it is open. As with
-    <methodname>mark</methodname> and <methodname>reset</methodname>,
-    <methodname>flush</methodname> and <methodname>clear</methodname> are
-    necessary due to the transactional nature of batch processing. Because it
-    is generally expected that items will be 'batched' together into a chunk,
-    and then output, it is expected that an <classname>ItemWriter</classname>
-    will perform some type of buffering. <methodname>flush</methodname> will
-    empty the buffer by writing the items out, whereas
-    <methodname>clear</methodname> will simply throw the contents of the
-    buffer away. In most cases, a <classname>Step</classname> implementation
-    will call <methodname>flush</methodname> before a commit and
-    <methodname>clear</methodname> in case of rollback. It is expected that
-    implementations of the <classname>Step</classname> interface will call
-    these methods.</para>
+    to write out the list of items passed in as long as it is open. Because it
+    is generally expected that items will be 'batched' together into a chunk
+    and then output, the interface accepts a list, rather than an item by
+    itself. After writing out the list, any flushing that may be necessary can
+    be performed before returning from the write method. For example, if
+    writing to a Hibernate DAO, multiple calls to write can be made, one for
+    each item. The writer can then call close on the hibernate Session before
+    returning.</para>
   </section>
 
   <section>
@@ -323,6 +309,18 @@
             </tbody>
           </tgroup>
         </table></para>
+
+      <section>
+        <title>LineMapper</title>
+
+        <para>As with <classname>RowMapper</classname>, which takes a low
+        level construct such as <classname>ResultSet and returns an Object,
+        flat file procesing requires the same construct to convert a String
+        line into an Object:</classname><programlisting>public interface LineMapper&lt;T&gt; {
+
+  T mapLine(String line, int lineNumber) throws Exception;
+}</programlisting></para>
+      </section>
 
       <section>
         <title>FieldSetMapper</title>
@@ -2315,10 +2313,6 @@
       }
       return null;
     }
-
-    public void mark() throws MarkFailedException { };
-
-    public void reset() throws ResetFailedException { };
   }</programlisting>
 
       <para>This very simple class takes a list of items, and returns one at a
@@ -2336,83 +2330,6 @@
   assertEquals("2", itemReader.read());
   assertEquals("3", itemReader.read());
   assertNull(itemReader.read());</programlisting>
-
-      <section>
-        <title>Making the <classname>ItemReader</classname>
-        transactional</title>
-
-        <para>This most basic <classname>ItemReader</classname> will work, but
-        what happens if the transaction needs to be rolled back? This will
-        usually caused by an error in the ItemWriter, since the ItmReader
-        generally won't do anything that invalidates the transaction, but
-        without supporting it, there would be erroneous results. ItemReaders
-        are notified about rollbacks via the <methodname>mark</methodname> and
-        <methodname>reset</methodname> methods. In the example above they're
-        empty, but we'll need to add code to them in order to support the
-        rollback scenario:</para>
-
-        <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
-
-    List&lt;T&gt; items;
-    int currentIndex = 0;
-    int lastMarkedIndex = 0;
-
-    public CustomItemReader(List&lt;T&gt; items) {
-      this.items = items;
-    }
-
-    public T read() throws Exception, UnexpectedInputException,
-       NoWorkFoundException, ParseException {
-
-      if (currentIndex &lt; items.size()) {
-        return items.get(currentIndex++);
-      }
-      return null;
-    }
-
-    public void mark() throws MarkFailedException {
-      lastMarkedIndex = currentIndex;
-    };
-
-    public void reset() throws ResetFailedException {
-      currentIndex = lastMarkedIndex;
-    };
-  }</programlisting>
-
-        <para>The <classname>CustomItemReader</classname> has now been
-        modified to keep track of where it is currently, and where it was when
-        mark() was last called. This allows the new
-        <classname>ItemReader</classname> to fulfill the basic contract that
-        calling <methodname>reset</methodname> returns the
-        <classname>ItemReader</classname> to the state it was in when
-        <methodname>mark</methodname> was last called:</para>
-
-        <programlisting>  //Assume same setup as last example, a list with "1", "2", and "3"
-  itemReader.mark();
-  assertEquals("1", itemReader.read());
-  assertEquals("2", itemReader.read());
-  itemReader.reset();
-  assertEquals("1", itemReader.read());</programlisting>
-
-        <para>In most real world scenarios, there will likely be some kind of
-        underlying resource that will require tracking. In the case of a file,
-        <methodname>mark</methodname> will hold the current location within
-        the file, and <methodname>reset</methodname> will move it back. The
-        <classname>JdbcCursorItemReader</classname>, for example, holds on to
-        the current row number, and on reset moves the cursor back by calling
-        the <classname> ResultSet</classname>
-        <methodname>absolute</methodname> method, which moves the current
-        cursor to the row number supplied. The
-        <classname>CustomItemReader</classname> now completely adheres to the
-        entire <classname>ItemReader</classname> contract.
-        <methodname>read</methodname> will return the appropriates items,
-        returning null when empty, and <methodname>reset</methodname> returns
-        the <classname>ItemReader</classname> back to it's state as of the
-        last call to <methodname>mark</methodname>, allowing for correct
-        support of a rollback. (It's assumed a <classname>Step</classname>
-        implementation will call <methodname>mark</methodname> and
-        <methodname>reset</methodname>).</para>
-      </section>
 
       <section>
         <title>Making the <classname>ItemReader</classname>
@@ -2434,11 +2351,10 @@
         implemented with the <classname>ItemStream</classname>
         interface:</para>
 
-        <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream{
+        <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream {
 
     List&lt;T&gt; items;
     int currentIndex = 0;
-    int lastMarkedIndex = 0;
     private static final String CURRENT_INDEX = "current.index";
 
     public CustomItemReader(List&lt;T&gt; items) {
@@ -2446,32 +2362,22 @@
     }
 
     public T read() throws Exception, UnexpectedInputException,
-        NoWorkFoundException, ParseException {
+        ParseException {
 
       if (currentIndex &lt; items.size()) {
         return items.get(currentIndex++);
       }
-     
+      
       return null;
     }
 
-    public void mark() throws MarkFailedException {
-      lastMarkedIndex = currentIndex;
-    }
-
-    public void reset() throws ResetFailedException {
-      currentIndex = lastMarkedIndex;
-    }
-
     public void open(ExecutionContext executionContext) throws ItemStreamException {
-
       if(executionContext.containsKey(CURRENT_INDEX)){
         currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
       }
       else{
         currentIndex = 0;
-        lastMarkedIndex = 0;
-      } 
+      }
     }
 
     public void close(ExecutionContext executionContext) throws ItemStreamException {}
@@ -2534,64 +2440,18 @@
       example. As with the <classname>ItemReader</classname> example, a List
       will be used in order to keep the example as simple as possible:</para>
 
-      <programlisting>  public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt;{
+      <programlisting>  public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
 
-    List&lt;T&gt; output = new ArrayList&lt;T&gt;();
+    List&lt;T&gt; output = TransactionAwareProxyFactory.createTransactionalList();
 
-    public void write(T item) throws Exception {
-      output.add(item);
+    public void write(List&lt;? extends T&gt; items) throws Exception {
+      output.addAll(items);
     }
 
-    public void clear() throws ClearFailedException { }
-
-    public void flush() throws FlushFailedException { }
-  }</programlisting>
-
-      <section>
-        <title>Making the <classname>ItemReader</classname>
-        transactional</title>
-
-        <para>The example is extremely simple, but it's worth showing to
-        illustrate an <classname>ItemWriter</classname> that doesn't respond
-        to rollbacks and commits (i.e. <methodname>clear</methodname> and
-        <methodname>flush</methodname>). If your potential writer is such that
-        it doesn't need to care about rollback or commit, likely because it's
-        writing to a database, then there is little value to the
-        <classname>ItemWriter</classname> interface in that scenario other
-        than using it to meet another class's requirement for an
-        implementation of the <classname>ItemWriter</classname> interface. In
-        that case, the <classname>ItemWriterAdapter</classname> would be a
-        better solution. However, if it does need to be transactional, then
-        <methodname>flush</methodname> and <methodname>clear</methodname>
-        should be implemented to allow for a buffering solution:</para>
-
-        <programlisting>  public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt;{
-
-    List&lt;T&gt; output = new ArrayList&lt;T&gt;();
-    List&lt;T&gt; buffer = new ArrayList&lt;T&gt;();
-
-    public void write(T item) throws Exception {
-      buffer.add(item);
-    }
-  
-    public void clear() throws ClearFailedException {
-      buffer.clear();
-    }
-
-    public void flush() throws FlushFailedException {
-      for(T t:buffer){
-        output.add(t); 
-      }
+    public List&lt;T&gt; getOutput() {
+      return output;
     }
   }</programlisting>
-
-        <para>The <classname>ItemWriter</classname> buffers all output, only
-        writing to the actual output (in this case by added to a list) when
-        the <classname>ItemWriter</classname> <methodname>flush()</methodname>
-        method is called. The contents of the buffer are thrown away when
-        <classname>ItemWriter</classname> <methodname>clear</methodname>() is
-        called.</para>
-      </section>
 
       <section>
         <title>Making the <classname>ItemWriter</classname>

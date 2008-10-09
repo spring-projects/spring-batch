@@ -605,9 +605,9 @@
       <classname>Step</classname> interface. Two step implementation classes
       are available in the Spring Batch framework, and they are each discussed
       in detail in Chatper 4 of this guide. For most situations, the
-      <classname>StepHandlerStep</classname> implementation is sufficient,
-      but for situations where only one call is needed, such as a stored
-      procedure call or a wrapper around existing script, a
+      <classname>StepHandlerStep</classname> implementation is sufficient, but
+      for situations where only one call is needed, such as a stored procedure
+      call or a wrapper around existing script, a
       <classname>TaskletStep</classname> may be a better option.</para>
     </section>
 
@@ -1038,6 +1038,19 @@
     next, only the item that was passed in its current invocation. More
     details about the <classname>ItemWriter</classname> interface and it's
     various implementations can be found in Chapter 3.</para>
+  </section>
+
+  <section>
+    <title>Item Processor</title>
+
+    <para><classname>ItemProcessor</classname> is an abstraction that
+    represents the business processing of an item. While the
+    <classname>ItemReader</classname> reads one item, and the
+    <classname>ItemWriter</classname> writes them, the
+    <classname>ItemProcessor</classname> provides access to transform or apply
+    other business processing. If while processing the item it's determined
+    that it's not valid, returning null indicates that it should not be
+    written out.</para>
   </section>
 
   <section>
