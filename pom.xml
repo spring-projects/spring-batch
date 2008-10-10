@@ -792,6 +792,12 @@
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
 		</pluginRepository>
 		<pluginRepository>
+			<id>com.springsource.repository.bundles.milestone</id>
+			<name>SpringSource Enterprise Bundle Repository -
+				SpringSource Bundle Milestones</name>
+			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+		</pluginRepository>
+		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>
 			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
