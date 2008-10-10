@@ -1608,7 +1608,7 @@
         scenes when additional rows are needed. </para>
 
         <para>Below is an example configuration using a similar 'customer
-        credit' example as the JDBC reader above:</para>
+        credit' example as the cursor based ItemReaders above:</para>
 
         <programlisting><![CDATA[    <bean id="itemReader"
         class="org.springframework.batch.item.database.JdbcPagingItemReader">
@@ -1623,7 +1623,7 @@
         </property>
         <property name="parameterValues">
             <map>
-                <entry key=":status" value="NEW"/>
+                <entry key="status" value="NEW"/>
             </map>
         </property>
         <property name="pageSize" value="10"/>
