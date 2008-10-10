@@ -60,7 +60,7 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.5</spring.framework.version>
-		<bundlor.version>1.0.0.BUILD-20080925.230729-5</bundlor.version>
+		<bundlor.version>1.0.0.M1</bundlor.version>
 	</properties>
 	<profiles>
 		<profile>
