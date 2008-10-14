@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -18,12 +19,17 @@ import org.springframework.util.Assert;
  */
 public class MapJobExecutionDao implements JobExecutionDao {
 
-	private static Map<Long, JobExecution> executionsById =  TransactionAwareProxyFactory.createTransactionalMap();
-	
+	private static Map<Long, JobExecution> executionsById = TransactionAwareProxyFactory.createTransactionalMap();
+
 	private static long currentId = 0;
 
 	public static void clear() {
 		executionsById.clear();
+	}
+
+	private static JobExecution copy(JobExecution original) {
+		JobExecution copy = (JobExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+		return copy;
 	}
 
 	public void saveJobExecution(JobExecution jobExecution) {
@@ -31,14 +37,14 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		Long newId = new Long(currentId++);
 		jobExecution.setId(newId);
 		jobExecution.incrementVersion();
-		executionsById.put(newId, jobExecution);
+		executionsById.put(newId, copy(jobExecution));
 	}
 
 	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
 		List<JobExecution> executions = new ArrayList<JobExecution>();
 		for (JobExecution exec : executionsById.values()) {
 			if (exec.getJobInstance().equals(jobInstance)) {
-				executions.add(exec);
+				executions.add(copy(exec));
 			}
 		}
 		Collections.sort(executions, new Comparator<JobExecution>() {
@@ -47,9 +53,11 @@ public class MapJobExecutionDao implements JobExecutionDao {
 				long result = (e1.getId() - e2.getId());
 				if (result > 0) {
 					return -1;
-				} else if (result < 0) {
+				}
+				else if (result < 0) {
 					return 1;
-				} else {
+				}
+				else {
 					return 0;
 				}
 			}
@@ -62,7 +70,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		Assert.notNull(id, "JobExecution is expected to have an id (should be saved already)");
 		Assert.notNull(executionsById.get(id), "JobExecution must already be saved");
 		jobExecution.incrementVersion();
-		executionsById.put(id, jobExecution);
+		executionsById.put(id, copy(jobExecution));
 	}
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
@@ -78,11 +86,14 @@ public class MapJobExecutionDao implements JobExecutionDao {
 				lastExec = exec;
 			}
 		}
-		return lastExec;
+		return copy(lastExec);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#findRunningJobExecutions(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.springframework.batch.core.repository.dao.JobExecutionDao#
+	 * findRunningJobExecutions(java.lang.String)
 	 */
 	public Set<JobExecution> findRunningJobExecutions(String jobName) {
 		Set<JobExecution> result = new HashSet<JobExecution>();
@@ -90,16 +101,20 @@ public class MapJobExecutionDao implements JobExecutionDao {
 			if (!exec.getJobInstance().getJobName().equals(jobName) || !exec.isRunning()) {
 				continue;
 			}
-			result.add(exec);
+			result.add(copy(exec));
 		}
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobExecutionDao#getJobExecution(java.lang.Long)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.repository.dao.JobExecutionDao#getJobExecution
+	 * (java.lang.Long)
 	 */
 	public JobExecution getJobExecution(Long executionId) {
-		return executionsById.get(executionId);
+		return copy(executionsById.get(executionId));
 	}
 
 	public void synchronizeStatus(JobExecution jobExecution) {
