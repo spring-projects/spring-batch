@@ -3,7 +3,6 @@ package org.springframework.batch.core.repository.dao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -18,7 +18,7 @@ import org.springframework.util.Assert;
  */
 public class MapJobExecutionDao implements JobExecutionDao {
 
-	private static Map<Long, JobExecution> executionsById = new HashMap<Long, JobExecution>();
+	private static Map<Long, JobExecution> executionsById =  TransactionAwareProxyFactory.createTransactionalMap();
 	
 	private static long currentId = 0;
 

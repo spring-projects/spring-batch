@@ -18,13 +18,13 @@ package org.springframework.batch.core.repository.dao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 
@@ -33,7 +33,8 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = new HashMap<Long, Map<String, StepExecution>>();
+	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
+	
 	private static long currentId = 0;
 
 	public static void clear() {
@@ -47,7 +48,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
-			executions = new HashMap<String, StepExecution>();
+			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 		stepExecution.setId(new Long(currentId++));

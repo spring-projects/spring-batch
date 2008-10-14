@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.util.Assert;
 
 /**
@@ -17,7 +17,7 @@ import org.springframework.util.Assert;
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
-	private static Collection<JobInstance> jobInstances = new HashSet<JobInstance>();
+	private static Collection<JobInstance> jobInstances = TransactionAwareProxyFactory.createTransactionalSet();
 
 	private static long currentId = 0;
 
