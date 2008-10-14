@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -40,6 +41,10 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	public static void clear() {
 		executionsByJobExecutionId.clear();
 	}
+	
+	private static StepExecution copy(StepExecution original){
+		return (StepExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
 		Assert.isTrue(stepExecution.getId() == null);
@@ -53,7 +58,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		}
 		stepExecution.setId(new Long(currentId++));
 		stepExecution.incrementVersion();
-		executions.put(stepExecution.getStepName(), stepExecution);
+		executions.put(stepExecution.getStepName(), copy(stepExecution));
 	}
 
 	public void updateStepExecution(StepExecution stepExecution) {
@@ -72,7 +77,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			}
 
 			stepExecution.incrementVersion();
-			executions.put(stepExecution.getStepName(), stepExecution);
+			executions.put(stepExecution.getStepName(), copy(stepExecution));
 		}
 	}
 
@@ -82,7 +87,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			return null;
 		}
 
-		return (StepExecution) executions.get(stepName);
+		return copy(executions.get(stepName));
 	}
 
 	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
@@ -94,6 +99,11 @@ public class MapStepExecutionDao implements StepExecutionDao {
 				return Long.signum(o2.getId() - o1.getId());
 			}
 		});
-		return result;
+		
+		List<StepExecution> copy = new ArrayList<StepExecution>(result.size());
+		for(StepExecution exec : result) {
+			copy.add(copy(exec));
+		}
+		return copy;
 	}
 }

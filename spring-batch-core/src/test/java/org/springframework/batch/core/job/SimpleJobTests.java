@@ -483,6 +483,8 @@ public class SimpleJobTests extends TestCase {
 			}
 			stepExecution.setExitStatus(ExitStatus.FINISHED);
 			stepExecution.setStatus(BatchStatus.COMPLETED);
+			jobRepository.update(stepExecution);
+			jobRepository.updateExecutionContext(stepExecution);
 
 		}
 

@@ -2,6 +2,7 @@ package org.springframework.batch.core.repository.dao;
 
 import java.util.Map;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
@@ -17,22 +18,26 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		contextsByJobExecutionId.clear();
 		contextsByStepExecutionId.clear();
 	}
+	
+	private static ExecutionContext copy(ExecutionContext original) {
+		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
 
 
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
-		return contextsByStepExecutionId.get(stepExecution.getId());
+		return copy(contextsByStepExecutionId.get(stepExecution.getId()));
 	}
 
 	public void persistExecutionContext(StepExecution stepExecution) {
-		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
+		contextsByStepExecutionId.put(stepExecution.getId(), copy(stepExecution.getExecutionContext()));
 	}
 	
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
-		return contextsByJobExecutionId.get(jobExecution.getId());
+		return copy(contextsByJobExecutionId.get(jobExecution.getId()));
 	}
 
 	public void persistExecutionContext(JobExecution jobExecution) {
-		contextsByJobExecutionId.put(jobExecution.getId(), jobExecution.getExecutionContext());
+		contextsByJobExecutionId.put(jobExecution.getId(), copy(jobExecution.getExecutionContext()));
 
 	}
 

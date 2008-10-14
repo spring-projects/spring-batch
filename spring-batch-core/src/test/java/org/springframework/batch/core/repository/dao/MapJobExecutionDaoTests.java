@@ -35,6 +35,10 @@ public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		JobExecution retrieved = tested.getJobExecution(jobExecution.getId());
 		assertNull(retrieved.getStartTime());
 		
+		tested.updateJobExecution(jobExecution);
+		jobExecution.setEndTime(new Date());
+		assertNull(retrieved.getEndTime());
+		
 	}
 
 }
