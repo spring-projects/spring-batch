@@ -45,7 +45,7 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 
 	private RetryOperations retryOperations = new RetryTemplate();
 
-	public void setRetryTemplate(RetryOperations retryTemplate) {
+	public void setRetryOperations(RetryOperations retryTemplate) {
 		Assert.notNull(retryTemplate, "'retryOperations' cannot be null.");
 		this.retryOperations = retryTemplate;
 	}

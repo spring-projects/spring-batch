@@ -76,7 +76,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		});
 		RetryTemplate template = new RetryTemplate();
 		template.setRetryPolicy(new SimpleRetryPolicy(2));
-		interceptor.setRetryTemplate(template);
+		interceptor.setRetryOperations(template);
 		service.service();
 		assertEquals(2, count);
 		assertEquals(2, list.size());
@@ -86,7 +86,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		((Advised) service).addAdvice(interceptor);
 		RetryTemplate template = new RetryTemplate();
 		template.setRetryPolicy(new NeverRetryPolicy());
-		interceptor.setRetryTemplate(template);
+		interceptor.setRetryOperations(template);
 		try {
 			service.service();
 			fail("Expected Exception.");

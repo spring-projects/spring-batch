@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.message.Message;
 import org.springframework.test.context.ContextConfiguration;
@@ -38,6 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MessageChannelItemWriterIntegrationTests {
 
 	@Autowired
+	@Qualifier("requests")
 	private PollableChannel channel;
 	
 	@Autowired

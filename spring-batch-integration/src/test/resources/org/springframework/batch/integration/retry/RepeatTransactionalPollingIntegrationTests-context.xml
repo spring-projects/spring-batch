@@ -9,8 +9,19 @@
 		http://www.springframework.org/schema/integration
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-	<integration:message-bus auto-startup="false" enable-annotations="true"/>
-	<integration:channel id="requests"/>
-	<integration:channel id="replies" />
-	<bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+	<import resource="TransactionalPollingIntegrationTests-context.xml"/>
+	<tx:advice id="txAdvice">
+		<tx:attributes><tx:method name="*"/></tx:attributes>
+	</tx:advice>
+	<bean id="repeatAdvice" class="org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor">
+		<property name="repeatOperations">
+			<bean class="org.springframework.batch.repeat.support.RepeatTemplate">
+				<property name="completionPolicy">
+					<bean class="org.springframework.batch.repeat.policy.SimpleCompletionPolicy">
+						<property name="chunkSize" value="2" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
 </beans>

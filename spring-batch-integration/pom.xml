@@ -66,7 +66,16 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.4</version>
+      <scope>test</scope>
+    </dependency>
+   <dependency>
+      <groupId>aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <scope>test</scope>
+    </dependency>
+   <dependency>
+      <groupId>aspectj</groupId>
+      <artifactId>aspectjweaver</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -31,6 +31,7 @@ import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.policy.AlwaysRetryPolicy;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
+import org.springframework.batch.retry.support.RetryTemplate;
 
 /**
  * @author Dave Syer
@@ -39,6 +40,8 @@ import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 public class StatefulRetryOperationsInterceptorTests extends TestCase {
 
 	private StatefulRetryOperationsInterceptor interceptor;
+
+	private RetryTemplate retryTemplate = new RetryTemplate();
 
 	private Service service;
 
@@ -49,7 +52,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 	public void setUp() throws Exception {
 		interceptor = new StatefulRetryOperationsInterceptor();
 		service = (Service) ProxyFactory.getProxy(Service.class, new SingletonTargetSource(new ServiceImpl()));
-		transformer = (Transformer) ProxyFactory.getProxy(Transformer.class, new SingletonTargetSource(new TransformerImpl()));
+		transformer = (Transformer) ProxyFactory.getProxy(Transformer.class, new SingletonTargetSource(
+				new TransformerImpl()));
 		count = 0;
 	}
 
@@ -80,7 +84,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 	}
 
 	public void testDefaultInterceptorAlwaysRetry() throws Exception {
-		interceptor.setRetryPolicy(new AlwaysRetryPolicy());
+		retryTemplate.setRetryPolicy(new AlwaysRetryPolicy());
+		interceptor.setRetryOperations(retryTemplate);
 		((Advised) service).addAdvice(interceptor);
 		try {
 			service.service("foo");
@@ -102,7 +107,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 				return invocation.proceed();
 			}
 		});
-		interceptor.setRetryPolicy(new SimpleRetryPolicy(2));
+		interceptor.setRetryOperations(retryTemplate);
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2));
 		try {
 			service.service("foo");
 			fail("Expected Exception.");
@@ -119,7 +125,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 
 	public void testTransformerWithSuccessfulRetry() throws Exception {
 		((Advised) transformer).addAdvice(interceptor);
-		interceptor.setRetryPolicy(new SimpleRetryPolicy(2));
+		interceptor.setRetryOperations(retryTemplate);
+		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2));
 		try {
 			transformer.transform("foo");
 			fail("Expected Exception.");
@@ -136,7 +143,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 
 	public void testRetryExceptionAfterTooManyAttemptsWithNoRecovery() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		interceptor.setRetryPolicy(new NeverRetryPolicy());
+		interceptor.setRetryOperations(retryTemplate);
+		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		try {
 			service.service("foo");
 			fail("Expected Exception.");
@@ -149,7 +157,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 		try {
 			service.service("foo");
 			fail("Expected ExhaustedRetryException");
-		} catch (ExhaustedRetryException e) {
+		}
+		catch (ExhaustedRetryException e) {
 			// expected
 			String message = e.getMessage();
 			assertTrue("Wrong message: " + message, message.startsWith("Retry was exhausted but there was no recover"));
@@ -159,7 +168,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 
 	public void testRecoveryAfterTooManyAttempts() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		interceptor.setRetryPolicy(new NeverRetryPolicy());
+		interceptor.setRetryOperations(retryTemplate);
+		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		try {
 			service.service("foo");
 			fail("Expected Exception.");
@@ -181,7 +191,8 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 
 	public void testTransformerRecoveryAfterTooManyAttempts() throws Exception {
 		((Advised) transformer).addAdvice(interceptor);
-		interceptor.setRetryPolicy(new NeverRetryPolicy());
+		interceptor.setRetryOperations(retryTemplate);
+		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		try {
 			transformer.transform("foo");
 			fail("Expected Exception.");
@@ -194,7 +205,7 @@ public class StatefulRetryOperationsInterceptorTests extends TestCase {
 		interceptor.setRecoverer(new MethodInvocationRecoverer<Collection<String>>() {
 			public Collection<String> recover(Object[] data, Throwable cause) {
 				count++;
-				return Collections.singleton((String)data[0]);
+				return Collections.singleton((String) data[0]);
 			}
 		});
 		Collection<String> result = transformer.transform("foo");

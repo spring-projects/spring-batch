@@ -15,6 +15,10 @@
 		<config>src/test/resources/org/springframework/batch/integration/job/MessageOrientedStepIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/file/ResourceSplitterIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/retry/TransactionalPollingIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/retry/RepeatTransactionalPollingIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/retry/RetryRepeatTransactionalPollingIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/SmokeTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/retry/RetryTransactionalPollingIntegrationTests-context.xml</config>
 	</configs>
 	<configSets>
 	</configSets>

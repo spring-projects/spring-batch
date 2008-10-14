@@ -21,12 +21,11 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.ExhaustedRetryException;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryOperations;
-import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
@@ -61,14 +60,21 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 	private NewMethodArgumentsIdentifier newMethodArgumentsIdentifier;
 
-	private final RetryTemplate retryTemplate = new RetryTemplate();
+	private RetryOperations retryOperations;
+
+	public void setRetryOperations(RetryOperations retryTemplate) {
+		Assert.notNull(retryTemplate, "'retryOperations' cannot be null.");
+		this.retryOperations = retryTemplate;
+	}
 
 	/**
 	 * 
 	 */
 	public StatefulRetryOperationsInterceptor() {
 		super();
+		RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
+		retryOperations = retryTemplate;
 	}
 
 	/**
@@ -88,16 +94,6 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 	public void setKeyGenerator(MethodArgumentsKeyGenerator keyGenerator) {
 		this.keyGenerator = keyGenerator;
-	}
-
-	/**
-	 * Public setter for the retryPolicy. The value provided should be a normal
-	 * stateless policy, which is wrapped into a stateful policy inside this
-	 * method.
-	 * @param retryPolicy the retryPolicy to set
-	 */
-	public void setRetryPolicy(RetryPolicy retryPolicy) {
-		retryTemplate.setRetryPolicy(retryPolicy);
 	}
 
 	/**
@@ -141,7 +137,7 @@ public class StatefulRetryOperationsInterceptor implements MethodInterceptor {
 
 		RetryState retryState = new DefaultRetryState(keyGenerator != null ? keyGenerator.getKey(args) : item, newMethodArgumentsIdentifier != null ? newMethodArgumentsIdentifier.isNew(args) : false );
 
-		Object result = retryTemplate.execute(new MethodInvocationRetryCallback(invocation), new ItemRecovererCallback(args, recoverer), retryState);
+		Object result = retryOperations.execute(new MethodInvocationRetryCallback(invocation), new ItemRecovererCallback(args, recoverer), retryState);
 
 		logger.debug("Exiting proxied method in stateful retry with result: (" + result + ")");
 
