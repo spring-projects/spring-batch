@@ -73,7 +73,7 @@
 				<site>
 					<id>static.springframework.org</id>
 					<url>
-						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch
+						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/1.1.x
 					</url>
 				</site>
 			</distributionManagement>
