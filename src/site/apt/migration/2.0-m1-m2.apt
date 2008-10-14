@@ -1,13 +1,76 @@
 Spring Batch 2.0-m2 Release Notes
 
+
+
 * Bugfixes:
 
-  * [BATCH-682] - Use SoftReference and/or expiry to store entries in RetryContextCache implementation(s)  * [BATCH-764] - Truncate flatfile in restart scenarios.  * [BATCH-776] - StaxEventItemWriter headers should not have to be the same type as the T that the writer is parameterised with  * [BATCH-782] - Synchronization issue in ItemOrientedStep if exception is throw in chunk processing  * [BATCH-790] - SQL error caused by changes to JdbcExecutionContextDao  * [BATCH-795] - JdbcJobExecutionDao output sorting  * [BATCH-807] - Serialization bug in JobExecution  * [BATCH-812] - StepExecutionResourceProxy should use a different JobParametersConverter  * [BATCH-813] - SingleColumnJdbcKeyGeneratorIntegrationTests fails in Eclipse  * [BATCH-814] - JobRepository should not require Step or Job (only their names)  * [BATCH-822] - New WRITE_COUNT should count items instead of chunks  * [BATCH-830] - DelegatingItemReader should be removed  * [BATCH-831] - id counter in MapJobInstanceDao should be declared static  * [BATCH-832] - DefaultTransactionAttribute is inappropriate for TaskletStep  * [BATCH-833] - TransactionAttributes swallows Exceptions  * [BATCH-835] - sql error "column ambiguously defined" in JdbcJobInstanceDao  * [BATCH-838] - TimeoutTerminationPolicy does not terminate when eof is encountered  * [BATCH-839] - Reference doc reference deprecated code: 'StatefulRetryStepFactoryBean'  * [BATCH-843] - FlatFileItemWriter handling of failure in LineAggregator  * [BATCH-847] - FaultTolerantChunkOrientedTasklet loses chunks when non-skippable exceptions thrown in read phase  * [BATCH-856] - JobExecution status isn't being updated when Step fails.  * [BATCH-865] - CompositeItemProcessor should handle null properly  
-  
+  * [BATCH-682] - Use SoftReference and/or expiry to store entries in RetryContextCache implementation(s)
+  * [BATCH-764] - Truncate flatfile in restart scenarios.
+  * [BATCH-776] - StaxEventItemWriter headers should not have to be the same type as the T that the writer is parameterised with
+  * [BATCH-782] - Synchronization issue in ItemOrientedStep if exception is throw in chunk processing
+  * [BATCH-790] - SQL error caused by changes to JdbcExecutionContextDao
+  * [BATCH-795] - JdbcJobExecutionDao output sorting
+  * [BATCH-807] - Serialization bug in JobExecution
+  * [BATCH-812] - StepExecutionResourceProxy should use a different JobParametersConverter
+  * [BATCH-813] - SingleColumnJdbcKeyGeneratorIntegrationTests fails in Eclipse
+  * [BATCH-814] - JobRepository should not require Step or Job (only their names)
+  * [BATCH-822] - New WRITE_COUNT should count items instead of chunks
+  * [BATCH-830] - DelegatingItemReader should be removed
+  * [BATCH-831] - id counter in MapJobInstanceDao should be declared static
+  * [BATCH-832] - DefaultTransactionAttribute is inappropriate for TaskletStep
+  * [BATCH-833] - TransactionAttributes swallows Exceptions
+  * [BATCH-835] - sql error "column ambiguously defined" in JdbcJobInstanceDao
+  * [BATCH-838] - TimeoutTerminationPolicy does not terminate when eof is encountered
+  * [BATCH-839] - Reference doc reference deprecated code: 'StatefulRetryStepFactoryBean'
+  * [BATCH-843] - FlatFileItemWriter handling of failure in LineAggregator
+  * [BATCH-847] - FaultTolerantChunkOrientedTasklet loses chunks when non-skippable exceptions thrown in read phase
+  * [BATCH-856] - JobExecution status isn't being updated when Step fails.
+  * [BATCH-865] - CompositeItemProcessor should handle null properly
+
 * Improvements
 
-  * [BATCH-401] - aspect-oriented handling of job interruption logic  * [BATCH-453] - Killed batches cannot be restarted  * [BATCH-592] - RFC: buffer read items in ItemHandler instead of ItemReader  * [BATCH-640] - FieldSetMapper.mapLine() should contain the line number  * [BATCH-719] - API should provide access to original input line in flat file outside of error scenario  * [BATCH-755] - Include Javadocs in distribution  * [BATCH-762] - Change ExecutionContext storage strategy  * [BATCH-763] - Create callback for header and footer writing in xml and flat files  * [BATCH-772] - Upgrade CommandLineJobRunner to use args4j  * [BATCH-775] - Throw exception if ExecutionContext is modified during processing.  * [BATCH-779] - RFC: make FieldSetMapper and LineAggregator extend ItemProcessor  * [BATCH-785] - Fix Parallel Sample to use a batch update for process indicator  * [BATCH-792] - Automatically detect database type in JobRepositoryFactoryBean  * [BATCH-796] - typos in javadoc @links and comments  * [BATCH-802] - Incorrect metadata in fixed-length file example  * [BATCH-825] - Modify JobLauncher contract to not throw exception on job failure.  * [BATCH-826] - Create callback for header and footer reading in xml and flat files  * [BATCH-828] - org.springframework.batch.item.file.MultiResourceItemReader should allow for no resources  * [BATCH-841] - insufficient logging in AbstractStep  * [BATCH-844] - Lacking of DAO's property setting in JobRepositoryFactoryBean  * [BATCH-863] - introduce LineMapper interface to encapsulate string-to-item mapping  * [BATCH-864] - rename SkipLimitStepFactoryBean  * [BATCH-774] - Split item count into read/write/filter  * [BATCH-829] - add persistent processSkipCount to StepExecution  * [BATCH-810] - Need to add DB2MainframeSequenceMaxValueIncrementer to DefaultDataFieldMaxValueIncrementerFactory  * [BATCH-8] - Determine approach for handling file creation/update in restart scenarios  * [BATCH-220] - Chunk-oriented approach to processing  * [BATCH-575] - FlatFileItemReader default charset should mimic java's default charset behavior  * [BATCH-675] - API Analysis  * [BATCH-759] - ItemReader refactoring  * [BATCH-773] - Refactor and extend ExportedJobLauncher to JobOperator  * [BATCH-806] - Resurrect ResourceLineReader  * [BATCH-821] - remove EventSerializer/Deserializer abstractions and use Marshaller/Unmarshaller directly  * [BATCH-827] - Create Sample job for reading and writing headers and footers  * [BATCH-845] - integration tests for database autodetection  
+  * [BATCH-401] - aspect-oriented handling of job interruption logic
+  * [BATCH-453] - Killed batches cannot be restarted
+  * [BATCH-592] - RFC: buffer read items in ItemHandler instead of ItemReader
+  * [BATCH-640] - FieldSetMapper.mapLine() should contain the line number
+  * [BATCH-719] - API should provide access to original input line in flat file outside of error scenario
+  * [BATCH-755] - Include Javadocs in distribution
+  * [BATCH-762] - Change ExecutionContext storage strategy
+  * [BATCH-763] - Create callback for header and footer writing in xml and flat files
+  * [BATCH-772] - Upgrade CommandLineJobRunner to use args4j
+  * [BATCH-775] - Throw exception if ExecutionContext is modified during processing.
+  * [BATCH-779] - RFC: make FieldSetMapper and LineAggregator extend ItemProcessor
+  * [BATCH-785] - Fix Parallel Sample to use a batch update for process indicator
+  * [BATCH-792] - Automatically detect database type in JobRepositoryFactoryBean
+  * [BATCH-796] - typos in javadoc @links and comments
+  * [BATCH-802] - Incorrect metadata in fixed-length file example
+  * [BATCH-825] - Modify JobLauncher contract to not throw exception on job failure.
+  * [BATCH-826] - Create callback for header and footer reading in xml and flat files
+  * [BATCH-828] - org.springframework.batch.item.file.MultiResourceItemReader should allow for no resources
+  * [BATCH-841] - insufficient logging in AbstractStep
+  * [BATCH-844] - Lacking of DAO's property setting in JobRepositoryFactoryBean
+  * [BATCH-863] - introduce LineMapper interface to encapsulate string-to-item mapping
+  * [BATCH-864] - rename SkipLimitStepFactoryBean
+  * [BATCH-774] - Split item count into read/write/filter
+  * [BATCH-829] - add persistent processSkipCount to StepExecution
+  * [BATCH-810] - Need to add DB2MainframeSequenceMaxValueIncrementer to DefaultDataFieldMaxValueIncrementerFactory
+  * [BATCH-8] - Determine approach for handling file creation/update in restart scenarios
+  * [BATCH-220] - Chunk-oriented approach to processing
+  * [BATCH-575] - FlatFileItemReader default charset should mimic java's default charset behavior
+  * [BATCH-675] - API Analysis
+  * [BATCH-759] - ItemReader refactoring
+  * [BATCH-773] - Refactor and extend ExportedJobLauncher to JobOperator
+  * [BATCH-806] - Resurrect ResourceLineReader
+  * [BATCH-821] - remove EventSerializer/Deserializer abstractions and use Marshaller/Unmarshaller directly
+  * [BATCH-827] - Create Sample job for reading and writing headers and footers
+  * [BATCH-845] - integration tests for database autodetection
   
+  
+
 * Documentation updates
 
-  * [BATCH-767] - Update documentation for M2  * [BATCH-823] - Confusing explanation  * [BATCH-718] - Add section on FlatFileItemReader error handling  * [BATCH-784] - Refactor testing chapter to reflect Spring Testing framework changes.  * [BATCH-850] - Create documentation for JdbcPagingItemReader and related classes
+  * [BATCH-767] - Update documentation for M2
+  * [BATCH-823] - Confusing explanation
+  * [BATCH-718] - Add section on FlatFileItemReader error handling
+  * [BATCH-784] - Refactor testing chapter to reflect Spring Testing framework changes.
+  * [BATCH-850] - Create documentation for JdbcPagingItemReader and related classes
