@@ -8,6 +8,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
  * Tests for {@link MapJobRepositoryFactoryBean}.
@@ -22,6 +23,8 @@ public class MapJobRepositoryFactoryBeanTests {
 	 */
 	@Test
 	public void testCreateRepository() throws Exception {
+		tested.setTransactionManager(new ResourcelessTransactionManager());
+		tested.afterPropertiesSet();
 		JobRepository repository = (JobRepository) tested.getObject();
 		Job job = new JobSupport("jobName");
 		JobParameters jobParameters = new JobParameters();

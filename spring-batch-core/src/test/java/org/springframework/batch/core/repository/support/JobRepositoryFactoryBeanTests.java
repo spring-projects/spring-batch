@@ -104,11 +104,13 @@ public class JobRepositoryFactoryBeanTests {
 	@Test
 	public void testMissingTransactionManager() throws Exception {
 
+		factory.setDatabaseType("mockDb");
 		factory.setTransactionManager(null);
 		try {
-			expect(incrementerFactory.isSupportedIncrementerType(null)).andReturn(true);
+			expect(incrementerFactory.isSupportedIncrementerType("mockDb")).andReturn(true);
 			expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
 			replay(incrementerFactory);
+			
 			factory.afterPropertiesSet();
 			fail();
 		}

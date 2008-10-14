@@ -1,11 +1,19 @@
 package org.springframework.batch.core.repository.support;
 
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.springframework.util.Assert;
 
 /**
  * A {@link FactoryBean} that automates the creation of a
@@ -19,7 +27,20 @@ import org.springframework.beans.factory.FactoryBean;
  * @author Lucas Ward
  * @author Robert Kasanicky
  */
-public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean {
+public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, InitializingBean {
+
+	
+
+	private PlatformTransactionManager transactionManager;
+
+	private ProxyFactory proxyFactory;
+
+	private String isolationLevelForCreate = DEFAULT_ISOLATION_LEVEL;
+
+	/**
+	 * Default value for isolation level in create* method.
+	 */
+	private static final String DEFAULT_ISOLATION_LEVEL = "ISOLATION_SERIALIZABLE";
 
 	/**
 	 * @return fully configured {@link JobInstanceDao} implementation.
@@ -35,7 +56,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean {
 	 * @return fully configured {@link StepExecutionDao} implementation.
 	 */
 	protected abstract StepExecutionDao createStepExecutionDao() throws Exception;
-	
+
 	/**
 	 * @return fully configured {@link ExecutionContextDao} implementation.
 	 */
@@ -53,6 +74,59 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean {
 
 	public boolean isSingleton() {
 		return true;
+	}
+
+	/**
+	 * public setter for the isolation level to be used for the transaction when
+	 * job execution entities are initially created. The default is
+	 * ISOLATION_SERIALIZABLE, which prevents accidental concurrent execution of
+	 * the same job (ISOLATION_REPEATABLE_READ would work as well).
+	 * 
+	 * @param isolationLevelForCreate the isolation level name to set
+	 * 
+	 * @see SimpleJobRepository#createJobExecution(String,
+	 * org.springframework.batch.core.JobParameters)
+	 */
+	public void setIsolationLevelForCreate(String isolationLevelForCreate) {
+		this.isolationLevelForCreate = isolationLevelForCreate;
+	}
+
+	/**
+	 * Public setter for the {@link PlatformTransactionManager}.
+	 * @param transactionManager the transactionManager to set
+	 */
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+
+	private void initializeProxy() throws Exception {
+		proxyFactory = new ProxyFactory();
+		TransactionInterceptor advice = new TransactionInterceptor(transactionManager, PropertiesConverter
+				.stringToProperties("create*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
+						+ "\n*=PROPAGATION_REQUIRED"));
+		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advice);
+		NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+		pointcut.addMethodName("*");
+		advisor.setPointcut(pointcut);
+		proxyFactory.addAdvisor(advisor);
+		proxyFactory.setProxyTargetClass(false);
+		proxyFactory.addInterface(JobRepository.class);
+		proxyFactory.setTarget(getTarget());
+	}
+	
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(transactionManager, "TransactionManager must not be null.");
+		
+		initializeProxy();
+	}
+
+	private Object getTarget() throws Exception {
+		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
+				createExecutionContextDao());
+	}
+	
+	public Object getObject() throws Exception {
+		return proxyFactory.getProxy();
 	}
 
 }

@@ -39,9 +39,4 @@ public class MapJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBea
 		return new MapExecutionContextDao();
 	}
 
-	public Object getObject() throws Exception {
-		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
-				createExecutionContextDao());
-	}
-
 }
