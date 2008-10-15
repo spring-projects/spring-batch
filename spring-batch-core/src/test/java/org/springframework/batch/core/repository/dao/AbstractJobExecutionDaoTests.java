@@ -1,7 +1,6 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
@@ -91,11 +90,9 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution exec1 = new JobExecution(jobInstance);
 		exec1.setCreateTime(new Date(0));
 
-		ExecutionContext ctx = new ExecutionContext() {
-			{
-				put("key", "value");
-			}
-		};
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
+		
 		JobExecution exec2 = new JobExecution(jobInstance);
 		exec2.setExecutionContext(ctx);
 		exec2.setCreateTime(new Date(1));
@@ -111,11 +108,8 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 	public void testSaveAndFindContext() {
 		dao.saveJobExecution(execution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
-			{
-				put("key", "value");
-			}
-		});
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
 		execution.setExecutionContext(ctx);
 		dao.saveOrUpdateExecutionContext(execution);
 
@@ -135,11 +129,8 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 	public void testUpdateContext() {
 		dao.saveJobExecution(execution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
-			{
-				put("key", "value");
-			}
-		});
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
 		execution.setExecutionContext(ctx);
 		dao.saveOrUpdateExecutionContext(execution);
 

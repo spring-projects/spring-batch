@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.item.ExecutionContext;
@@ -28,6 +29,14 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		contextsByJobExecutionId.clear();
 	}
 
+	private static final JobExecution copy(JobExecution original) {
+		return (JobExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
+
+	private static final ExecutionContext copy(ExecutionContext original) {
+		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
+
 	public int getJobExecutionCount(JobInstance jobInstance) {
 		int count = 0;
 		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
@@ -44,7 +53,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		Long newId = new Long(currentId++);
 		jobExecution.setId(newId);
 		jobExecution.incrementVersion();
-		executionsById.put(newId, jobExecution);
+		executionsById.put(newId, copy(jobExecution));
 	}
 
 	public List findJobExecutions(JobInstance jobInstance) {
@@ -52,7 +61,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		for (Iterator iterator = executionsById.values().iterator(); iterator.hasNext();) {
 			JobExecution exec = (JobExecution) iterator.next();
 			if (exec.getJobInstance().equals(jobInstance)) {
-				executions.add(exec);
+				executions.add(copy(exec));
 			}
 		}
 		return executions;
@@ -63,7 +72,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		Assert.notNull(id, "JobExecution is expected to have an id (should be saved already)");
 		Assert.notNull(executionsById.get(id), "JobExecution must already be saved");
 		jobExecution.incrementVersion();
-		executionsById.put(id, jobExecution);
+		executionsById.put(id, copy(jobExecution));
 	}
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
@@ -80,15 +89,20 @@ public class MapJobExecutionDao implements JobExecutionDao {
 				lastExec = exec;
 			}
 		}
-		return lastExec;
+		if (lastExec == null) {
+			return null;
+		}
+		else {
+			return copy(lastExec);
+		}
 	}
 
 	public ExecutionContext findExecutionContext(JobExecution jobExecution) {
-		return (ExecutionContext) contextsByJobExecutionId.get(jobExecution.getId());
+		return copy((ExecutionContext) contextsByJobExecutionId.get(jobExecution.getId()));
 	}
 
 	public void saveOrUpdateExecutionContext(JobExecution jobExecution) {
-		contextsByJobExecutionId.put(jobExecution.getId(), jobExecution.getExecutionContext());
+		contextsByJobExecutionId.put(jobExecution.getId(), copy(jobExecution.getExecutionContext()));
 
 	}
 }
