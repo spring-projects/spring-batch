@@ -52,7 +52,7 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractJob implements Job, BeanNameAware, InitializingBean {
 
-	private static final Log logger = LogFactory.getLog(AbstractJob.class);
+	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 
 	private String name;
 
@@ -239,11 +239,13 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 		}
 		catch (JobInterruptedException e) {
 			logger.error(e);
+			execution.setExitStatus(ExitStatus.FAILED);
 			execution.setStatus(BatchStatus.STOPPED);
 			execution.addFailureException(e);
 		}
 		catch (Throwable t) {
 			logger.error(t);
+			execution.setExitStatus(ExitStatus.FAILED);
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
 		}
@@ -271,14 +273,18 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 
 	/**
 	 * Convenience method for subclasses to delegate the handling of a specific
-	 * step in the context of the current {@link JobExecution}.
+	 * step in the context of the current {@link JobExecution}. Clients of this
+	 * method do not need access to the {@link JobRepository}, nor do they need
+	 * to worry about populating the execution context on a restart, nor
+	 * detecting the interrupted state (in job or step execution).
 	 * 
 	 * @param step the {@link Step} to execute
-	 * @param execution the currect {@link JobExecution}
+	 * @param execution the current {@link JobExecution}
 	 * @return the {@link StepExecution} corresponding to this step
 	 * 
 	 * @throws JobInterruptedException if the {@link JobExecution} has been
-	 * interrupted
+	 * interrupted, and in particular if {@link BatchStatus#STOPPED} or
+	 * {@link BatchStatus#STOPPING} is detected
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step
 	 * @throws JobRestartException if the job is in an inconsistent state from
@@ -286,7 +292,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	 */
 	protected final StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
 			JobRestartException, StartLimitExceededException {
-		if (execution.getStatus() == BatchStatus.STOPPING) {
+		if (execution.getStatus() == BatchStatus.STOPPING || execution.getStatus() == BatchStatus.STOPPED) {
 			throw new JobInterruptedException("JobExecution interrupted.");
 		}
 
@@ -312,6 +318,11 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 			}
 
 			step.execute(currentStepExecution);
+
+			if (currentStepExecution.getStatus() == BatchStatus.STOPPED
+					|| currentStepExecution.getStatus() == BatchStatus.STOPPING) {
+				throw new JobInterruptedException("Job interrupted by step execution");
+			}
 
 		}
 

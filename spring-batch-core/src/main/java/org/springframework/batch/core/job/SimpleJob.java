@@ -76,7 +76,7 @@ public class SimpleJob extends AbstractJob {
 		StepExecution stepExecution = null;
 		for (Step step : steps) {
 			stepExecution = handleStep(step, execution);
-			if (stepExecution.getStatus() == BatchStatus.FAILED || stepExecution.getStatus() == BatchStatus.STOPPED) {
+			if (stepExecution.getStatus() != BatchStatus.COMPLETED) {
 				return stepExecution;
 			}
 		}

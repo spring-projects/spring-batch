@@ -21,8 +21,10 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -273,12 +275,12 @@ public class JobExecution extends Entity {
 	 */
 	public List<Throwable> getAllFailureExceptions(){
 		
-		List<Throwable> allExceptions = new ArrayList<Throwable>(failureExceptions);
+		Set<Throwable> allExceptions = new HashSet<Throwable>(failureExceptions);
 		for(StepExecution stepExecution: stepExecutions){
 			allExceptions.addAll(stepExecution.getFailureExceptions());
 		}
 		
-		return allExceptions;
+		return new ArrayList<Throwable>(allExceptions);
 	}
 
 	/**

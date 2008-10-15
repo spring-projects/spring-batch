@@ -19,6 +19,17 @@ import org.springframework.beans.factory.FactoryBean;
  */
 public class MapJobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 
+	/**
+	 * Convenience method to clear all the map daos globally, removing all
+	 * entities.
+	 */
+	public static void clear() {
+		MapJobInstanceDao.clear();
+		MapJobExecutionDao.clear();
+		MapStepExecutionDao.clear();
+		MapExecutionContextDao.clear();
+	}
+
 	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		return new MapJobExecutionDao();

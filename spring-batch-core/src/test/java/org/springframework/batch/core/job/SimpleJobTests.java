@@ -110,20 +110,18 @@ public class SimpleJobTests {
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 
-		step1 = new StubStep("TestStep1");
+		step1 = new StubStep("TestStep1", jobRepository);
 		step1.setCallback(new Runnable() {
 			public void run() {
 				list.add("default");
 			}
 		});
-		step2 = new StubStep("TestStep2");
+		step2 = new StubStep("TestStep2", jobRepository);
 		step2.setCallback(new Runnable() {
 			public void run() {
 				list.add("default");
 			}
 		});
-		step1.setJobRepository(jobRepository);
-		step2.setJobRepository(jobRepository);
 
 		List<Step> steps = new ArrayList<Step>();
 		steps.add(step1);
@@ -250,8 +248,8 @@ public class SimpleJobTests {
 		final JobInterruptedException exception = new JobInterruptedException("Interrupt!");
 		step1.setProcessException(exception);
 		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
+		assertEquals(2, jobExecution.getAllFailureExceptions().size());
+		assertEquals(exception, jobExecution.getStepExecutions().iterator().next().getFailureExceptions().get(0));
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.STOPPED, ExitStatus.FAILED);
 	}
@@ -418,22 +416,24 @@ public class SimpleJobTests {
 	@Test
 	public void testInterruptJob() throws Exception {
 
-		step1 = new StubStep("interruptStep") {
+		step1 = new StubStep("interruptStep", jobRepository) {
 
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,
 					UnexpectedJobExecutionException {
 				stepExecution.getJobExecution().stop();
+				super.execute(stepExecution);
 			}
 
 		};
 
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
 		job.execute(jobExecution);
-		Throwable expected = jobExecution.getAllFailureExceptions().get(0);	
-		assertTrue(expected instanceof JobInterruptedException);
-			assertEquals("JobExecution interrupted.", expected.getMessage());
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
+		assertTrue("Wrong exception "+expected, expected instanceof JobInterruptedException);
+		assertEquals("JobExecution interrupted.", expected.getMessage());
 		
-		assertNull("Second step was not executed", step2.passedInStepContext);
+		assertNull("Second step was not supposed to be executed", step2.passedInStepContext);
 	}
 
 	/*
@@ -446,7 +446,7 @@ public class SimpleJobTests {
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {
-			assertEquals(jobExecution.getExitStatus().getExitCode(), exitStatus.getExitCode());
+			assertEquals(exitStatus.getExitCode(), jobExecution.getExitStatus().getExitCode());
 		}
 	}
 
@@ -469,8 +469,9 @@ public class SimpleJobTests {
 		/**
 		 * @param string
 		 */
-		public StubStep(String string) {
+		public StubStep(String string, JobRepository jobRepository) {
 			super(string);
+			this.jobRepository = jobRepository;
 		}
 
 		/**
@@ -527,15 +528,6 @@ public class SimpleJobTests {
 			jobRepository.update(stepExecution);
 			jobRepository.updateExecutionContext(stepExecution);
 
-		}
-
-		/**
-		 * Public setter for {@link JobRepository}.
-		 * 
-		 * @param jobRepository is a mandatory dependence (no default).
-		 */
-		public void setJobRepository(JobRepository jobRepository) {
-			this.jobRepository = jobRepository;
 		}
 
 	}
