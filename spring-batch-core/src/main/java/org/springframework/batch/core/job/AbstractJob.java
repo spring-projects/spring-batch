@@ -238,10 +238,12 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 
 		}
 		catch (JobInterruptedException e) {
+			logger.error(e);
 			execution.setStatus(BatchStatus.STOPPED);
 			execution.addFailureException(e);
 		}
 		catch (Throwable t) {
+			logger.error(t);
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
 		}
