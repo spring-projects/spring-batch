@@ -18,6 +18,7 @@ package org.springframework.batch.core.repository.dao;
 
 import java.util.Map;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -46,9 +47,17 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		executionsByJobExecutionId.clear();
 		contextsByStepExecutionId.clear();
 	}
+	
+	private static StepExecution copy(StepExecution original) {
+		return (StepExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
+	
+	private static ExecutionContext copy(ExecutionContext original) {
+		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
 
 	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
-		return (ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId());
+		return copy((ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId()));
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
@@ -63,7 +72,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		}
 		stepExecution.setId(new Long(currentId++));
 		stepExecution.incrementVersion();
-		executions.put(stepExecution.getStepName(), stepExecution);
+		executions.put(stepExecution.getStepName(), copy(stepExecution));
 	}
 
 	public void updateStepExecution(StepExecution stepExecution) {
@@ -84,7 +93,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			}
 
 			stepExecution.incrementVersion();
-			executions.put(stepExecution.getStepName(), stepExecution);
+			executions.put(stepExecution.getStepName(), copy(stepExecution));
 		}
 	}
 
@@ -94,11 +103,11 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			return null;
 		}
 
-		return (StepExecution) executions.get(step.getName());
+		return copy((StepExecution) executions.get(step.getName()));
 	}
 
 	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
-		contextsByStepExecutionId.put(stepExecution.getId(), stepExecution.getExecutionContext());
+		contextsByStepExecutionId.put(stepExecution.getId(), copy(stepExecution.getExecutionContext()));
 	}
 
 }

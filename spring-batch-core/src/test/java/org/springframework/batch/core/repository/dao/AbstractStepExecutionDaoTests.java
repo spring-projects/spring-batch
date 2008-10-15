@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.util.HashMap;
-
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -150,11 +148,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	public void testSaveAndFindContext() {
 		dao.saveStepExecution(stepExecution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
-			{
-				put("key", "value");
-			}
-		});
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
 		stepExecution.setExecutionContext(ctx);
 		dao.saveOrUpdateExecutionContext(stepExecution);
 
@@ -174,11 +169,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	public void testUpdateContext() {
 		dao.saveStepExecution(stepExecution);
-		ExecutionContext ctx = new ExecutionContext(new HashMap() {
-			{
-				put("key", "value");
-			}
-		});
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
 		stepExecution.setExecutionContext(ctx);
 		dao.saveOrUpdateExecutionContext(stepExecution);
 
