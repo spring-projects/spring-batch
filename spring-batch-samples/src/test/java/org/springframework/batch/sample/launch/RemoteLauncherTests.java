@@ -28,7 +28,8 @@ import javax.management.MalformedObjectNameException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.batch.core.launch.support.JobRegistryBackgroundJobRunner;
@@ -42,7 +43,7 @@ import org.springframework.jmx.support.MBeanServerConnectionFactoryBean;
  * 
  */
 public class RemoteLauncherTests {
-	
+
 	private static Log logger = LogFactory.getLog(RemoteLauncherTests.class);
 
 	private static List<Exception> errors = new ArrayList<Exception>();
@@ -50,6 +51,8 @@ public class RemoteLauncherTests {
 	private static JobOperator launcher;
 
 	private static JobLoader loader;
+
+	static private Thread thread;
 
 	@Test
 	public void testConnect() throws Exception {
@@ -63,12 +66,13 @@ public class RemoteLauncherTests {
 		assertEquals(0, errors.size());
 		assertTrue(isConnected());
 		try {
-			launcher.start("foo", "time="+(new Date().getTime()));
+			launcher.start("foo", "time=" + (new Date().getTime()));
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
-			//expected;
+		}
+		catch (RuntimeException e) {
+			// expected;
 			String message = e.getMessage();
-			assertTrue("Wrong message: "+message, message.contains("NoSuchJobException"));
+			assertTrue("Wrong message: " + message, message.contains("NoSuchJobException"));
 		}
 	}
 
@@ -81,15 +85,13 @@ public class RemoteLauncherTests {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	@Before
-	public void setUp() throws Exception {
-		if (launcher != null) {
-			return;
-		}
+	@BeforeClass
+	public static void setUp() throws Exception {
 		System.setProperty("com.sun.management.jmxremote", "");
-		Thread thread = new Thread(new Runnable() {
+		thread = new Thread(new Runnable() {
 			public void run() {
 				try {
 					JobRegistryBackgroundJobRunner.main("adhoc-job-launcher-context.xml", "jobs/adhocLoopJob.xml");
@@ -106,6 +108,11 @@ public class RemoteLauncherTests {
 		}
 	}
 
+	@AfterClass
+	public static void cleanUp() {
+		JobRegistryBackgroundJobRunner.stop();
+	}
+
 	private static boolean isConnected() throws Exception {
 		boolean connected = false;
 		if (!JobRegistryBackgroundJobRunner.getErrors().isEmpty()) {
@@ -114,7 +121,8 @@ public class RemoteLauncherTests {
 		if (launcher == null) {
 			MBeanServerConnectionFactoryBean connectionFactory = new MBeanServerConnectionFactoryBean();
 			try {
-				launcher = (JobOperator) getMBean(connectionFactory, "spring:service=batch,bean=jobOperator", JobOperator.class);
+				launcher = (JobOperator) getMBean(connectionFactory, "spring:service=batch,bean=jobOperator",
+						JobOperator.class);
 				loader = (JobLoader) getMBean(connectionFactory, "spring:service=batch,bean=jobLoader", JobLoader.class);
 			}
 			catch (MBeanServerNotFoundException e) {
@@ -124,7 +132,7 @@ public class RemoteLauncherTests {
 		}
 		try {
 			launcher.getJobNames();
-			connected = loader.getConfigurations().size()>0;
+			connected = loader.getConfigurations().size() > 0;
 			logger.info("Configurations loaded: " + loader.getConfigurations());
 		}
 		catch (InvalidInvocationException e) {
@@ -133,8 +141,8 @@ public class RemoteLauncherTests {
 		return connected;
 	}
 
-	private static Object getMBean(MBeanServerConnectionFactoryBean connectionFactory, String objectName, Class<?> interfaceType)
-			throws MalformedObjectNameException {
+	private static Object getMBean(MBeanServerConnectionFactoryBean connectionFactory, String objectName,
+			Class<?> interfaceType) throws MalformedObjectNameException {
 		MBeanProxyFactoryBean factory = new MBeanProxyFactoryBean();
 		factory.setObjectName(objectName);
 		factory.setProxyInterface(interfaceType);

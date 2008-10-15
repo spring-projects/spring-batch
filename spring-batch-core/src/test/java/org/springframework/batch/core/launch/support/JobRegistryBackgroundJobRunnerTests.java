@@ -50,5 +50,6 @@ public class JobRegistryBackgroundJobRunnerTests {
 	public void tearDown() throws Exception {
 		System.clearProperty(JobRegistryBackgroundJobRunner.EMBEDDED);
 		JobRegistryBackgroundJobRunner.getErrors().clear();
+		JobRegistryBackgroundJobRunner.stop();
 	}
 }

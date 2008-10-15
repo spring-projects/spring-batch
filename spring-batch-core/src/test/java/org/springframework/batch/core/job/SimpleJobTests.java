@@ -19,14 +19,21 @@ package org.springframework.batch.core.job;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -58,7 +65,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  * @author Lucas Ward
  */
-public class SimpleJobTests extends TestCase {
+public class SimpleJobTests {
 
 	private JobRepository jobRepository;
 
@@ -88,8 +95,8 @@ public class SimpleJobTests extends TestCase {
 
 	private SimpleJob job;
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
@@ -132,7 +139,30 @@ public class SimpleJobTests extends TestCase {
 
 	}
 
+	/**
+	 * Test method for {@link SimpleJob#setSteps(java.util.List)}.
+	 */
+	@Test
+	public void testSetSteps() {
+		job.setSteps(Collections.singletonList((Step) new StepSupport("step")));
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getStepExecutions().size());
+	}
+
+	/**
+	 * Test method for
+	 * {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
+	 */
+	@Test
+	public void testAddStep() {
+		job.setSteps(Collections.<Step> emptyList());
+		job.addStep(new StepSupport("step"));
+		job.execute(jobExecution);
+		assertEquals(1, jobExecution.getStepExecutions().size());
+	}
+
 	// Test to ensure the exit status returned by the last step is returned
+	@Test
 	public void testExitStatusReturned() throws JobExecutionException {
 
 		final ExitStatus customStatus = new ExitStatus(true, "test");
@@ -162,10 +192,7 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(customStatus, jobExecution.getExitStatus());
 	}
 
-	protected void tearDown() throws Exception {
-		super.tearDown();
-	}
-
+	@Test
 	public void testRunNormally() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
@@ -179,6 +206,7 @@ public class SimpleJobTests extends TestCase {
 		assertFalse(step2.passedInJobContext.isEmpty());
 	}
 
+	@Test
 	public void testRunNormallyWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void beforeJob(JobExecution jobExecution) {
@@ -193,6 +221,7 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(4, list.size());
 	}
 
+	@Test
 	public void testRunWithSimpleStepExecutor() throws Exception {
 
 		job.setJobRepository(jobRepository);
@@ -205,6 +234,7 @@ public class SimpleJobTests extends TestCase {
 
 	}
 
+	@Test
 	public void testExecutionContextIsSet() throws Exception {
 		testRunNormally();
 		assertEquals(jobInstance, jobExecution.getJobInstance());
@@ -213,6 +243,7 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(step2.getName(), stepExecution2.getStepName());
 	}
 
+	@Test
 	public void testInterrupted() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
@@ -225,6 +256,7 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.STOPPED, ExitStatus.FAILED);
 	}
 
+	@Test
 	public void testFailed() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
@@ -239,6 +271,7 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
+	@Test
 	public void testFailedWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void afterJob(JobExecution jobExecution) {
@@ -255,6 +288,7 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
+	@Test
 	public void testFailedWithError() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
@@ -268,6 +302,7 @@ public class SimpleJobTests extends TestCase {
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
+	@Test
 	public void testStepShouldNotStart() throws Exception {
 		// Start policy will return false, keeping the step from being started.
 		step1.setStartLimit(0);
@@ -280,13 +315,14 @@ public class SimpleJobTests extends TestCase {
 					.indexOf("start limit exceeded") >= 0);
 	}
 
+	@Test
 	public void testNoSteps() throws Exception {
 		job.setSteps(new ArrayList<Step>());
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
-				"No steps configured") >= 0);
+				"no steps configured") >= 0);
 	}
 
 	// public void testNoStepsExecuted() throws Exception {
@@ -302,6 +338,7 @@ public class SimpleJobTests extends TestCase {
 	// "steps already completed"));
 	// }
 
+	@Test
 	public void testNotExecutedIfAlreadyStopped() throws Exception {
 		jobExecution.stop();
 		job.execute(jobExecution);
@@ -312,6 +349,7 @@ public class SimpleJobTests extends TestCase {
 		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
 	}
 
+	@Test
 	public void testRestart() throws Exception {
 		step1.setAllowStartIfComplete(true);
 		final RuntimeException exception = new RuntimeException("Foo!");
@@ -328,6 +366,7 @@ public class SimpleJobTests extends TestCase {
 		assertFalse(step2.passedInStepContext.isEmpty());
 	}
 
+	@Test
 	public void testInterruptWithListener() throws Exception {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
@@ -347,6 +386,7 @@ public class SimpleJobTests extends TestCase {
 	/**
 	 * Execution context should be restored on restart.
 	 */
+	@Test
 	public void testRestartScenario() throws Exception {
 
 		job.setRestartable(true);
@@ -375,6 +415,7 @@ public class SimpleJobTests extends TestCase {
 		assertFalse(step2.passedInJobContext.isEmpty());
 	}
 
+	@Test
 	public void testInterruptJob() throws Exception {
 
 		step1 = new StubStep("interruptStep") {

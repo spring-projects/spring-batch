@@ -75,9 +75,11 @@ public class JobRegistryBackgroundJobRunner {
 
 	private ApplicationContext parentContext = null;
 
+	public static boolean testing = false;
+
 	final private String parentContextPath;
 
-	private static List<RuntimeException> errors = new ArrayList<RuntimeException>();
+	private static List<Exception> errors = new ArrayList<Exception>();
 
 	/**
 	 * @param parentContextPath
@@ -100,7 +102,7 @@ public class JobRegistryBackgroundJobRunner {
 	 * creation.
 	 * @return the errors
 	 */
-	public static List<RuntimeException> getErrors() {
+	public static List<Exception> getErrors() {
 		return errors;
 	}
 
@@ -197,8 +199,11 @@ public class JobRegistryBackgroundJobRunner {
 			return;
 		}
 
-		System.out.println("Started application.  Hit any key to exit.");
-		System.in.read();
+		synchronized (JobRegistryBackgroundJobRunner.class) {
+			System.out
+					.println("Started application.  Interrupt (CTRL-C) or call JobRegistryBackgroundJobRunner.stop() to exit.");
+			JobRegistryBackgroundJobRunner.class.wait();
+		}
 
 	}
 
@@ -208,6 +213,15 @@ public class JobRegistryBackgroundJobRunner {
 				AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
 		parent.getAutowireCapableBeanFactory().initializeBean(this, getClass().getSimpleName());
 		this.parentContext = parent;
+	}
+
+	/**
+	 * If embedded in a JVM, call this method to terminate the main method.
+	 */
+	public static void stop() {
+		synchronized (JobRegistryBackgroundJobRunner.class) {
+			JobRegistryBackgroundJobRunner.class.notify();
+		}
 	}
 
 }

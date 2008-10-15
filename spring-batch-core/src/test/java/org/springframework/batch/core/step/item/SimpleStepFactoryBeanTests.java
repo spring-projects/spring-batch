@@ -34,7 +34,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
 import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
@@ -71,15 +70,12 @@ public class SimpleStepFactoryBeanTests {
 
 	private ItemReader<String> reader;
 
-	private AbstractJob job = new SimpleJob() {
-		{
-			setBeanName("simpleJob");
-		}
-	};
+	private SimpleJob job = new SimpleJob();
 
 	@Before
 	public void setUp() throws Exception {
 		job.setJobRepository(repository);
+		job.setBeanName("simpleJob");
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
@@ -151,7 +147,7 @@ public class SimpleStepFactoryBeanTests {
 		job.setSteps(Collections.singletonList(step));
 
 		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
-		
+
 		job.execute(jobExecution);
 		assertEquals("Error!", jobExecution.getAllFailureExceptions().get(0).getMessage());
 

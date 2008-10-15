@@ -16,15 +16,26 @@
 
 package org.springframework.batch.core.job;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.CompositeExecutionJobListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -41,7 +52,7 @@ import org.springframework.util.ClassUtils;
  */
 public abstract class AbstractJob implements Job, BeanNameAware, InitializingBean {
 
-	private List<Step> steps = new ArrayList<Step>();
+	private static final Log logger = LogFactory.getLog(AbstractJob.class);
 
 	private String name;
 
@@ -72,6 +83,15 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	}
 
 	/**
+	 * Assert mandatory properties: {@link JobRepository}.
+	 * 
+	 * @see InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(jobRepository, "JobRepository must be set");
+	}
+
+	/**
 	 * Set the name property if it is not already set. Because of the order of
 	 * the callbacks in a Spring container the name property will be set first
 	 * if it is present. Care is needed with bean definition inheritance - if a
@@ -96,57 +116,42 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.domain.IJob#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.IJob#getSteps()
-	 */
-	protected List<Step> getSteps() {
-		return steps;
-	}
-
-	public void setSteps(List<Step> steps) {
-		this.steps.clear();
-		this.steps.addAll(steps);
-	}
-
-	public void addStep(Step step) {
-		this.steps.add(step);
-	}
-
 	public void setRestartable(boolean restartable) {
 		this.restartable = restartable;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.IJob#isRestartable()
+	/**
+	 * @see Job#isRestartable()
 	 */
 	public boolean isRestartable() {
 		return restartable;
 	}
-	
+
 	/**
 	 * Public setter for the {@link JobParametersIncrementer}.
-	 * @param jobParametersIncrementer the {@link JobParametersIncrementer} to set
+	 * @param jobParametersIncrementer the {@link JobParametersIncrementer} to
+	 * set
 	 */
 	public void setJobParametersIncrementer(JobParametersIncrementer jobParametersIncrementer) {
 		this.jobParametersIncrementer = jobParametersIncrementer;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
 	 */
 	public JobParametersIncrementer getJobParametersIncrementer() {
 		return this.jobParametersIncrementer;
-	}
-
-	public String toString() {
-		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}
 
 	/**
@@ -181,16 +186,189 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
-	
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(getJobRepository(), "JobRepository must be set");
+
+	/**
+	 * Extension point for subclasses allowing them to concentrate on processing
+	 * logic and ignore listeners and repository calls. Implementations usually
+	 * are concerned with the ordering of steps, and delegate actual step
+	 * processing to {@link #handleStep(Step, JobExecution)}.
+	 * 
+	 * @param execution the current {@link JobExecution}
+	 * @return the last {@link StepExecution} (used to compute the final status
+	 * of the {@link JobExecution})
+	 * 
+	 * @throws JobExecutionException to signal a fatal batch framework error
+	 * (not a business or validation exception)
+	 */
+	abstract protected StepExecution doExecute(JobExecution execution) throws JobExecutionException;
+
+	/**
+	 * Run the specified job, handling all listener and repository calls, and
+	 * delegating the actual processing to {@link #doExecute(JobExecution)}.
+	 * 
+	 * @see Job#execute(JobExecution)
+	 * @throws StartLimitExceededException if start limit of one of the steps
+	 * was exceeded
+	 */
+	public final void execute(JobExecution execution) {
+
+		try {
+
+			if (execution.getStatus() != BatchStatus.STOPPING) {
+
+				execution.setStartTime(new Date());
+				updateStatus(execution, BatchStatus.STARTING);
+
+				listener.beforeJob(execution);
+
+				StepExecution lastStepExecution = doExecute(execution);
+
+				if (lastStepExecution != null) {
+					execution.setStatus(lastStepExecution.getStatus());
+					execution.setExitStatus(lastStepExecution.getExitStatus());
+				}
+			}
+			else {
+
+				// The job was already stopped before we even got this far. Deal
+				// with it in the same way as any other interruption.
+				execution.setStatus(BatchStatus.STOPPED);
+				execution.setExitStatus(ExitStatus.FINISHED);
+			}
+
+		}
+		catch (JobInterruptedException e) {
+			execution.setStatus(BatchStatus.STOPPED);
+			execution.addFailureException(e);
+		}
+		catch (Throwable t) {
+			execution.setStatus(BatchStatus.FAILED);
+			execution.addFailureException(t);
+		}
+		finally {
+
+			if (execution.getStepExecutions().isEmpty()) {
+				execution.setExitStatus(ExitStatus.NOOP
+						.addExitDescription("All steps already completed or no steps configured for this job."));
+			}
+
+			execution.setEndTime(new Date());
+
+			try {
+				listener.afterJob(execution);
+			}
+			catch (Exception e) {
+				logger.error("Exception encountered in afterStep callback", e);
+			}
+
+			jobRepository.update(execution);
+
+		}
+
 	}
 
-	protected JobRepository getJobRepository() {
-		return jobRepository;
+	/**
+	 * Convenience method for subclasses to delegate the handling of a specific
+	 * step in the context of the current {@link JobExecution}.
+	 * 
+	 * @param step the {@link Step} to execute
+	 * @param execution the currect {@link JobExecution}
+	 * @return the {@link StepExecution} corresponding to this step
+	 * 
+	 * @throws JobInterruptedException if the {@link JobExecution} has been
+	 * interrupted
+	 * @throws StartLimitExceededException if the start limit has been exceeded
+	 * for this step
+	 * @throws JobRestartException if the job is in an inconsistent state from
+	 * an earlier failure
+	 */
+	protected final StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
+			JobRestartException, StartLimitExceededException {
+		if (execution.getStatus() == BatchStatus.STOPPING) {
+			throw new JobInterruptedException("JobExecution interrupted.");
+		}
+
+		JobInstance jobInstance = execution.getJobInstance();
+
+		StepExecution currentStepExecution = null;
+
+		if (shouldStart(jobInstance, step)) {
+
+			updateStatus(execution, BatchStatus.STARTED);
+			currentStepExecution = execution.createStepExecution(step.getName());
+
+			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
+
+			boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
+					BatchStatus.COMPLETED)) ? true : false;
+
+			if (isRestart) {
+				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+			}
+			else {
+				currentStepExecution.setExecutionContext(new ExecutionContext());
+			}
+
+			step.execute(currentStepExecution);
+
+		}
+
+		return currentStepExecution;
+
 	}
 
-	protected CompositeExecutionJobListener getCompositeListener() {
-		return listener;
+	/**
+	 * Given a step and configuration, return true if the step should start,
+	 * false if it should not, and throw an exception if the job should finish.
+	 * 
+	 * @throws StartLimitExceededException if the start limit has been exceeded
+	 * for this step
+	 * @throws JobRestartException if the job is in an inconsistent state from
+	 * an earlier failure
+	 */
+	private boolean shouldStart(JobInstance jobInstance, Step step) throws JobRestartException,
+			StartLimitExceededException {
+
+		BatchStatus stepStatus;
+		// if the last execution is null, the step has never been executed.
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
+		if (lastStepExecution == null) {
+			stepStatus = BatchStatus.STARTING;
+		}
+		else {
+			stepStatus = lastStepExecution.getStatus();
+		}
+
+		if (stepStatus == BatchStatus.UNKNOWN) {
+			throw new JobRestartException("Cannot restart step from UNKNOWN status.  "
+					+ "The last execution ended with a failure that could not be rolled back, "
+					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
+		}
+
+		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
+			// step is complete, false should be returned, indicating that the
+			// step should not be started
+			return false;
+		}
+
+		if (jobRepository.getStepExecutionCount(jobInstance, step.getName()) < step.getStartLimit()) {
+			// step start count is less than start max, return true
+			return true;
+		}
+		else {
+			// start max has been exceeded, throw an exception.
+			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
+					+ "StartMax: " + step.getStartLimit());
+		}
 	}
+
+	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
+		jobExecution.setStatus(status);
+		jobRepository.update(jobExecution);
+	}
+
+	public String toString() {
+		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
+	}
+
 }
