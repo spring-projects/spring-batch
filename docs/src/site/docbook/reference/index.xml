@@ -5,13 +5,29 @@
   <bookinfo>
     <title>Spring Batch - Reference Documentation</title>
 
-    <releaseinfo>Spring Batch 1.0</releaseinfo>
+    <releaseinfo>Spring Batch 2.0</releaseinfo>
 
     <authorgroup>
+      <author>
+        <firstname>Lucas</firstname>
+	<surname>Ward</surname>
+      </author>
       <author>
         <firstname>Dave</firstname>
 
         <surname>Syer</surname>
+      </author>
+
+      <author>
+        <firstname>Thomas</firstname>
+
+        <surname>Risberg</surname>
+      </author>
+
+      <author>
+        <firstname>Robert</firstname>
+
+        <surname>Kasanicky</surname>
       </author>
 
       <author>
@@ -20,9 +36,6 @@
         <surname>Lund</surname>
       </author>
 
-      <author>
-        <firstname>Lucas Ward</firstname>
-      </author>
     </authorgroup>
 
     <legalnotice>
