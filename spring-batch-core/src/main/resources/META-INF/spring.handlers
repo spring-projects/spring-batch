@@ -1,0 +1,1 @@
+http\://www.springframework.org/schema/batch=org.springframework.batch.core.configuration.xml.CoreNamespaceHandler

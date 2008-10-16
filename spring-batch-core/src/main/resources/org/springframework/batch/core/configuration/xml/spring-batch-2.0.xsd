@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	version="2.0">
+
+	<xsd:import namespace="http://www.springframework.org/schema/beans" />
+	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+
+	<xsd:annotation>
+		<xsd:documentation><![CDATA[
+	Defines the configuration elements for Spring Batch Core.
+		]]></xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="job">
+		<xsd:annotation>
+			<xsd:documentation>
+				Defines a Job.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="step" minOccurs="1" maxOccurs="unbounded" />
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:ID" use="required" />
+			<xsd:attribute name="repository" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[ 
+						A reference to a JobRepository bean definition. Defaults to "jobRepository".
+						]]>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="step">
+		<xsd:annotation>
+			<xsd:documentation>
+				Defines a stage in job processing. The name attribute has to match the id of a bean definition for a
+				Step.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="next" minOccurs="0" maxOccurs="unbounded" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="next">
+		<xsd:annotation>
+			<xsd:documentation>
+				Defines a StepTransition.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="on" type="xsd:string" use="required" />
+			<xsd:attribute name="to" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

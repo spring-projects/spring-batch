@@ -49,7 +49,7 @@ public class ConditionalJob extends AbstractJob {
 
 	private String startStepName;
 
-	private Collection<StepTransition> stepTransitions;
+	private Collection<StepTransition> stepTransitions = new HashSet<StepTransition>();
 
 	/**
 	 * Create a {@link Job} with the given name.

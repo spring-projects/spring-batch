@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.0.3.v200802061800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.0.v200809261800]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -10,6 +10,17 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/support/test-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/job.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/launch/support/2jobs.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/repository/dao/data-source-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/launch/support/job-with-environment.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/launch/support/job2.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/repository/dao/sql-dao-test.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/launch/support/test-environment-with-registry.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/support/trivial-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/BranchStepJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/common-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/OneStepJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/TwoStepJobParserTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
