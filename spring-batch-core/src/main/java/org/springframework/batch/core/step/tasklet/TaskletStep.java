@@ -227,8 +227,8 @@ public class TaskletStep extends AbstractStep {
 	 * 
 	 */
 	@Override
-	protected ExitStatus doExecute(StepContext stepContext) throws Exception {
-		StepExecution stepExecution = stepContext.getStepExecution();
+	protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+		StepContext stepContext = new StepContext(stepExecution);
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 

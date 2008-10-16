@@ -41,7 +41,8 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	/**
 	 * Manage the {@link StepContext} lifecycle to ensure that the current
 	 * thread has a reference to the context, even if the callback is executed
-	 * in a pooled thread.
+	 * in a pooled thread. Handles the registration and de-registration of the
+	 * step context, so clients should not duplicate those calls.
 	 * 
 	 * @see RepeatCallback#doInIteration(RepeatContext)
 	 */

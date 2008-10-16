@@ -16,7 +16,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.scope.StepContext;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
@@ -55,8 +54,8 @@ public class AbstractStepTests {
 			events.add("open");
 		}
 
-		protected ExitStatus doExecute(StepContext context) throws Exception {
-			assertSame(execution, context.getStepExecution());
+		protected ExitStatus doExecute(StepExecution context) throws Exception {
+			assertSame(execution, context);
 			events.add("doExecute");
 			return ExitStatus.FINISHED;
 		}
@@ -167,7 +166,7 @@ public class AbstractStepTests {
 	public void testFailure() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
-			protected ExitStatus doExecute(StepContext context) throws Exception {
+			protected ExitStatus doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
 				throw new RuntimeException("crash!");
 			}
@@ -205,8 +204,8 @@ public class AbstractStepTests {
 	public void testStoppedStep() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
-			protected ExitStatus doExecute(StepContext context) throws Exception {
-				context.getStepExecution().setTerminateOnly();
+			protected ExitStatus doExecute(StepExecution context) throws Exception {
+				context.setTerminateOnly();
 				return super.doExecute(context);
 			}
 		};
@@ -241,7 +240,7 @@ public class AbstractStepTests {
 	public void testFailureInSavingExecutionContext() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
-			protected ExitStatus doExecute(StepContext context) throws Exception {
+			protected ExitStatus doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
 				return ExitStatus.FINISHED;
 			}

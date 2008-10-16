@@ -19,7 +19,6 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
-import org.springframework.batch.core.scope.StepContext;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -98,10 +97,9 @@ public class MessageOrientedStep extends AbstractStep {
 	 * @see AbstractStep#execute(StepExecution)
 	 */
 	@Override
-	public ExitStatus doExecute(StepContext stepContext) throws JobInterruptedException,
+	public ExitStatus doExecute(StepExecution stepExecution) throws JobInterruptedException,
 			UnexpectedJobExecutionException {
 
-		StepExecution stepExecution = stepContext.getStepExecution();
 		JobExecutionRequest request = new JobExecutionRequest(stepExecution .getJobExecution());
 
 		ExecutionContext executionContext = stepExecution.getExecutionContext();

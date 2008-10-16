@@ -145,12 +145,12 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Extension point for subclasses to execute business logic. 
 	 * 
-	 * @param stepContext the current step context
+	 * @param stepExecution the current step context
 	 * @return {@link ExitStatus} to show whether the step is finished
 	 * processing.
 	 * @throws Exception
 	 */
-	protected abstract ExitStatus doExecute(StepContext stepContext) throws Exception;
+	protected abstract ExitStatus doExecute(StepExecution stepExecution) throws Exception;
 
 	/**
 	 * Extension point for subclasses to provide callbacks to their
@@ -177,7 +177,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Template method for step execution logic - calls abstract methods for
 	 * resource initialization ({@link #open(ExecutionContext)}), execution
-	 * logic ({@link #doExecute(StepContext)}) and resource closing ({@link #close(ExecutionContext)}).
+	 * logic ({@link #doExecute(StepExecution)}) and resource closing ({@link #close(ExecutionContext)}).
 	 */
 	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
 			UnexpectedJobExecutionException {
@@ -195,7 +195,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			getCompositeListener().beforeStep(stepExecution);
 			open(stepExecution.getExecutionContext());
 
-			exitStatus = doExecute(stepContext);
+			exitStatus = doExecute(stepExecution);
 
 			// Check if someone is trying to stop us
 			if (stepExecution.isTerminateOnly()) {
