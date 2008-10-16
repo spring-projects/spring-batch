@@ -15,7 +15,9 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
@@ -58,8 +60,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
-	private static final String OUTPUT_BUFFER_KEY = "OUTPUT_BUFFER_KEY";
-
 	private final RepeatOperations repeatOperations;
 
 	final private RetryOperations retryOperations;
@@ -71,6 +71,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	final private ItemSkipPolicy processSkipPolicy;
 
 	final private Classifier<Throwable, Boolean> rollbackClassifier;
+
+	private static final String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_BUFFER_KEY";
 
 	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends T> itemReader,
 			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
@@ -88,7 +90,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 	/**
 	 * Get the next item from {@link #read(StepContribution)} and if not null
-	 * pass the item to {@link #write(Chunk, StepContribution)}. If the
+	 * pass the item to {@link #write(List, StepContribution, List)}. If the
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
 	 * taken from the reader.
 	 * 
@@ -100,7 +102,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 		// TODO: check flags to see if these need to be saved or not (e.g. JMS
 		// not)
 		final Chunk<T> inputs = getBuffer(attributes, INPUT_BUFFER_KEY);
-		final Chunk<S> outputs = getBuffer(attributes, OUTPUT_BUFFER_KEY);
+		final List<S> outputs = new ArrayList<S>();
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
@@ -133,18 +135,11 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 			process(contribution, inputs, outputs);
 		}
 
-		/*
-		 * Savepoint at end of processing and before writing. The processed
-		 * items ready for output are stored so that if writing fails they can
-		 * be picked up again in the next try. The inputs are finished with so
-		 * we can clear their attribute.
-		 */
-		attributes.setAttribute(OUTPUT_BUFFER_KEY, outputs);
-		attributes.removeAttribute(INPUT_BUFFER_KEY);
-
+		List<S> skippedOutputs = getSkippedOutputsBuffer(attributes);
 		// TODO: use ItemWriter interface properly
 		// TODO: make sure exceptions get handled by the appropriate handler
-		write(outputs, contribution);
+		outputs.removeAll(skippedOutputs);
+		write(outputs, contribution, skippedOutputs);
 
 		// On successful completion clear the attributes to signal that there is
 		// no more processing
@@ -152,6 +147,9 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 			for (String key : attributes.attributeNames()) {
 				attributes.removeAttribute(key);
 			}
+			inputs.clear();
+			outputs.clear();
+			skippedOutputs.clear();
 		}
 
 		return result;
@@ -201,12 +199,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	 */
 	/**
 	 * Incorporate retry into the item processor stage.
-	 * 
-	 * @see org.springframework.batch.core.step.item.FaultTolerantChunkOrientedTasklet#process(org.springframework.batch.core.StepContribution,
-	 * org.springframework.batch.core.step.item.Chunk,
-	 * org.springframework.batch.core.step.item.Chunk)
 	 */
-	protected void process(final StepContribution contribution, final Chunk<T> inputs, final Chunk<S> outputs)
+	protected void process(final StepContribution contribution, final Chunk<T> inputs, final List<S> outputs)
 			throws Exception {
 
 		int filtered = 0;
@@ -263,8 +257,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 		contribution.incrementFilterCount(filtered);
 
-		inputs.clear();
-
 	}
 
 	/**
@@ -275,11 +267,12 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	 * exhausted. The listener callback (on write failure) will happen in the
 	 * next transaction automatically.<br/>
 	 */
-	protected void write(final Chunk<S> chunk, final StepContribution contribution) throws Exception {
+	protected void write(final List<S> chunk, final StepContribution contribution, final List<S> skipped)
+			throws Exception {
 
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {
-				doWrite(chunk.getItems());
+				doWrite(chunk);
 				contribution.incrementWriteCount(chunk.size());
 				return null;
 			}
@@ -288,59 +281,51 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 		RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
 			public Object recover(RetryContext context) throws Exception {
-
-				// small optimisation: if there was only one item, then we
-				// don't have to try writing it again to see if it fails...
 				if (chunk.size() == 1) {
 					Exception e = (Exception) context.getLastThrowable();
-					checkSkipPolicy(contribution, chunk.iterator(), e);
+					S item = chunk.get(0);
+					checkSkipPolicy(item, e, contribution);
 					return null;
 				}
-
-				for (Chunk<S>.ChunkIterator iterator = chunk.iterator(); iterator.hasNext();) {
-					S item = iterator.next();
-					try {
-						doWrite(Collections.singletonList(item));
-						contribution.incrementWriteCount(1);
-					}
-					catch (Exception e) {
-						checkSkipPolicy(contribution, iterator, e);
-						if (rollbackClassifier.classify(e)) {
-							throw e;
+				for (S item : chunk) {
+						try {
+							doWrite(Collections.singletonList(item));
+							contribution.incrementWriteCount(1);
 						}
-						else {
-							logger.error("Exception encountered that does not classify for rollback: ", e);
+						catch (Exception e) {
+							checkSkipPolicy(item, e, contribution);
+							if (rollbackClassifier.classify(e)) {
+								throw e;
+							}
+							else {
+								logger.error("Exception encountered that does not classify for rollback: ", e);
+							}
 						}
 					}
-				}
 
 				return null;
 
 			}
-
-			private void checkSkipPolicy(final StepContribution contribution, Chunk<S>.ChunkIterator iterator,
-					Exception e) throws Exception {
+			
+			private void checkSkipPolicy(S item, Exception e, StepContribution contribution) {
 				if (writeSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 					contribution.incrementWriteSkipCount();
-					iterator.remove(e);
+					skipped.add(item);
+					try {
+						listener.onSkipInWrite(item, e);
+					}
+					catch (RuntimeException ex) {
+						throw new SkipListenerFailedException("Fatal exception in skip listener", ex, e);
+					}
 				}
 				else {
 					throw new RetryException("Non-skippable exception in recoverer", e);
 				}
 			}
+
 		};
 
-		retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(chunk, rollbackClassifier));
-
-		for (ItemWrapper<S> skip : chunk.getSkips()) {
-			Exception exception = skip.getException();
-			try {
-				listener.onSkipInWrite(skip.getItem(), exception);
-			}
-			catch (RuntimeException e) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
-			}
-		}
+		retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(skipped, rollbackClassifier));
 
 		chunk.clear();
 
@@ -357,6 +342,17 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 		}
 		@SuppressWarnings("unchecked")
 		Chunk<W> resource = (Chunk<W>) attributes.getAttribute(key);
+		return resource;
+	}
+
+	private List<S> getSkippedOutputsBuffer(AttributeAccessor attributes) {
+		if (!attributes.hasAttribute(SKIPPED_OUTPUTS_KEY)) {
+			List<S> result = new ArrayList<S>();
+			attributes.setAttribute(SKIPPED_OUTPUTS_KEY, result);
+			return result;
+		}
+		@SuppressWarnings("unchecked")
+		List<S> resource = (List<S>) attributes.getAttribute(SKIPPED_OUTPUTS_KEY);
 		return resource;
 	}
 
