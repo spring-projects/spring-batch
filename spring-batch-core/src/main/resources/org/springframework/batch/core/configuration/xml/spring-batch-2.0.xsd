@@ -39,7 +39,7 @@
 		<xsd:annotation>
 			<xsd:documentation>
 				Defines a stage in job processing. The name attribute has to match the id of a bean definition for a
-				Step.
+				Step.  The next attribute is a synonym for &lt;next on="*" .../&gt;
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -47,6 +47,7 @@
 				<xsd:element ref="next" minOccurs="0" maxOccurs="unbounded" />
 			</xsd:sequence>
 			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="next" type="xsd:string" use="optional" />
 		</xsd:complexType>
 	</xsd:element>
 

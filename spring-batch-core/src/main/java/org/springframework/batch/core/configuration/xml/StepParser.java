@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.StepTransition;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -33,7 +34,7 @@ import org.w3c.dom.Element;
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
  * references a bean definition for a {@link Step} and goes on to (optionally)
  * list a set of transitions from that step to others with &lt;next on="pattern"
- * to="stepName"/&gt;.  Used by the {@link JobParser}.
+ * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
  * @see JobParser
  * 
@@ -47,18 +48,27 @@ public class StepParser {
 	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for {@link StepTransition} objects
+	 * @return a collection of bean definitions for {@link StepTransition}
+	 * objects
 	 */
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
 
 		String refAttribute = element.getAttribute("name");
 
 		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
+
+		String shortNextAttribute = element.getAttribute("next");
+		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
+		if (hasNextAttribute) {
+			list.add(getStepTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), "*",
+					shortNextAttribute));
+		}
+
 		@SuppressWarnings("unchecked")
 		List<Element> nextElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "next");
 
 		// If there are no next elements then this must be an end state
-		if (nextElements.isEmpty()) {
+		if (nextElements.isEmpty() && !hasNextAttribute) {
 			list.add(getStepTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), "*", null));
 		}
 		else {
@@ -66,6 +76,10 @@ public class StepParser {
 			for (Element nextElement : nextElements) {
 				String onAttribute = nextElement.getAttribute("on");
 				String nextAttribute = nextElement.getAttribute("to");
+				if (hasNextAttribute && onAttribute.equals("*")) {
+					throw new BeanCreationException("Duplicate transition pattern found for '*' "
+							+ "(only specify one of next= attribute at step level and next element with on='*')");
+				}
 				list.add(getStepTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), onAttribute,
 						nextAttribute));
 			}
