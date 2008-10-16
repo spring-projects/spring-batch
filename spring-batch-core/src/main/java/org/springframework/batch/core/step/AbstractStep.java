@@ -31,6 +31,8 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.StepContext;
+import org.springframework.batch.core.scope.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.BeanNameAware;
@@ -143,12 +145,12 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Extension point for subclasses to execute business logic. 
 	 * 
-	 * @param stepExecution
+	 * @param stepContext the current step context
 	 * @return {@link ExitStatus} to show whether the step is finished
 	 * processing.
 	 * @throws Exception
 	 */
-	protected abstract ExitStatus doExecute(StepExecution stepExecution) throws Exception;
+	protected abstract ExitStatus doExecute(StepContext stepContext) throws Exception;
 
 	/**
 	 * Extension point for subclasses to provide callbacks to their
@@ -175,7 +177,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	/**
 	 * Template method for step execution logic - calls abstract methods for
 	 * resource initialization ({@link #open(ExecutionContext)}), execution
-	 * logic ({@link #doExecute(StepExecution)}) and resource closing ({@link #close(ExecutionContext)}).
+	 * logic ({@link #doExecute(StepContext)}) and resource closing ({@link #close(ExecutionContext)}).
 	 */
 	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
 			UnexpectedJobExecutionException {
@@ -186,11 +188,14 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		Exception commitException = null;
 
+		StepContext stepContext = new StepContext(stepExecution);
+		StepSynchronizationManager.register(stepContext);
+
 		try {
 			getCompositeListener().beforeStep(stepExecution);
 			open(stepExecution.getExecutionContext());
 
-			exitStatus = doExecute(stepExecution);
+			exitStatus = doExecute(stepContext);
 
 			// Check if someone is trying to stop us
 			if (stepExecution.isTerminateOnly()) {
@@ -256,6 +261,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				logger.error("Exception while closing step execution resources", e);
 				stepExecution.addFailureException(e);
 			}
+			
+			StepSynchronizationManager.release();
 
 			if (commitException != null) {
 				stepExecution.setStatus(BatchStatus.UNKNOWN);

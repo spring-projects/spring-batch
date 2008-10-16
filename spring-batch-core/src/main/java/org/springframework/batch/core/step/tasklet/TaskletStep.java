@@ -26,6 +26,8 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.StepContext;
+import org.springframework.batch.core.scope.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
 import org.springframework.batch.core.step.StepExecutionSynchronizerFactory;
@@ -37,7 +39,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -225,16 +226,19 @@ public class TaskletStep extends AbstractStep {
 	 * execution
 	 * 
 	 */
-	protected ExitStatus doExecute(final StepExecution stepExecution) throws Exception {
+	@Override
+	protected ExitStatus doExecute(StepContext stepContext) throws Exception {
+		StepExecution stepExecution = stepContext.getStepExecution();
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
-		return stepOperations.iterate(new RepeatCallback() {
+		return stepOperations.iterate(new StepContextRepeatCallback(stepContext ) {
 
 			final Queue<AttributeAccessor> attributeQueue = new LinkedBlockingQueue<AttributeAccessor>();
 
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public ExitStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
 
+				StepExecution stepExecution = stepContext.getStepExecution();
 				ExceptionHolder fatalException = new ExceptionHolder();
 
 				StepContribution contribution = stepExecution.createStepContribution();
