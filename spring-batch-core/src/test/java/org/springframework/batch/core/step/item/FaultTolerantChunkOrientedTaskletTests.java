@@ -28,9 +28,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.scope.ChunkContext;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
-import org.springframework.batch.core.step.tasklet.BasicAttributeAccessor;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -112,7 +112,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		handler = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, itemWriter, chunkOperations,
 				retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		handler.execute(contribution, new BasicAttributeAccessor());
+		handler.execute(contribution, new ChunkContext());
 		assertEquals(limit, contribution.getReadCount());
 	}
 
@@ -126,7 +126,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 				writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
+		ChunkContext attributes = new ChunkContext();
 		try {
 			handler.execute(contribution, attributes);
 			fail("Expected SkipLimitExceededException");
@@ -148,7 +148,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
+		ChunkContext attributes = new ChunkContext();
 		try {
 			handler.execute(contribution, attributes);
 			fail("Expected RuntimeException");
@@ -174,7 +174,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
+		ChunkContext attributes = new ChunkContext();
 
 		// Count to 3: (try + skip + skip)
 		for (int i = 0; i < 3; i++) {
@@ -193,7 +193,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		// The last recovery for this chunk...
 		handler.execute(contribution, attributes);
 
-		attributes = new BasicAttributeAccessor();
+		attributes = new ChunkContext();
 		try {
 			handler.execute(contribution, attributes);
 			fail("Expected RuntimeException");
@@ -230,7 +230,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 				writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(3));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
+		ChunkContext attributes = new ChunkContext();
 
 		// try
 		try {
@@ -267,7 +267,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 				writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		BasicAttributeAccessor attributes = new BasicAttributeAccessor();
+		ChunkContext attributes = new ChunkContext();
 
 		// Count to 3: (try + skip + try)
 		for (int i = 0; i < 2; i++) {
@@ -288,7 +288,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		handler.execute(contribution, attributes);
 		assertEquals(2, chunk.getSkips().size());
 
-		attributes = new BasicAttributeAccessor();
+		attributes = new ChunkContext();
 		try {
 			handler.execute(contribution, attributes);
 			fail("Expected RuntimeException");

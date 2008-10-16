@@ -129,9 +129,19 @@ public class ExitStatus implements Serializable {
 
 	/**
 	 * Create a new {@link ExitStatus} with a logical combination of the
-	 * continuable flag, and a concatenation of the descriptions. The exit code
-	 * is only replaced if the result is continuable or the input is not
-	 * continuable.<br/>
+	 * continuable flag, and a concatenation of the descriptions. If either
+	 * value has a higher severity then its exit code will be used in the
+	 * result. In the case of equal severity, the exit code is only replaced if
+	 * the result is continuable or the input is not continuable.<br/>
+	 * <br/>
+	 * 
+	 * Severity is defined by the exit code:
+	 * <ul>
+	 * <li>Codes beginning with NOOP have severity 1</li>
+	 * <li>Codes beginning with FAILED have severity 2</li>
+	 * <li>Codes beginning with UNKNOWN have severity 3</li>
+	 * </ul>
+	 * Others have severity 0.<br/>
 	 * 
 	 * If the input is null just return this.
 	 * 
@@ -144,10 +154,32 @@ public class ExitStatus implements Serializable {
 			return this;
 		}
 		ExitStatus result = and(status.continuable).addExitDescription(status.exitDescription);
-		if (result.continuable || !status.continuable) {
+		if (severity(status) > severity(this)) {
 			result = result.replaceExitCode(status.exitCode);
 		}
+		else {
+			if (severity(this) == severity(status) && (result.continuable || !status.continuable)) {
+				result = result.replaceExitCode(status.exitCode);
+			}
+		}
 		return result;
+	}
+
+	/**
+	 * @param status
+	 * @return
+	 */
+	private int severity(ExitStatus status) {
+		if (status.exitCode.startsWith(NOOP.exitCode)) {
+			return 0;
+		}
+		if (status.exitCode.startsWith(FAILED.exitCode)) {
+			return 1;
+		}
+		if (status.exitCode.startsWith(UNKNOWN.exitCode)) {
+			return 2;
+		}
+		return 0;
 	}
 
 	/*
@@ -156,7 +188,7 @@ public class ExitStatus implements Serializable {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "continuable=" + continuable + ";exitCode=" + exitCode + ";exitDescription=" + exitDescription;
+		return String.format("continuable=%s;exitCode=%s;exitDescription=%s", continuable, exitCode, exitDescription);
 	}
 
 	/**

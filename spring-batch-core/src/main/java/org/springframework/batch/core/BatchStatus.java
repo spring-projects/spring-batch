@@ -26,4 +26,15 @@ package org.springframework.batch.core;
 public enum BatchStatus {
 
 	COMPLETED, STARTED, STARTING, FAILED, STOPPING, STOPPED, UNKNOWN;
+	
+	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
+		if (status1.compareTo(status2)<0) {
+			return status2;
+		}
+		if (status1.compareTo(status2)>0) {
+			return status1;
+		}
+		else return status1;
+	}
+
 }

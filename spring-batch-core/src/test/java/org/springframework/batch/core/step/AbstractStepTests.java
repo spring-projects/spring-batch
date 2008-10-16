@@ -1,6 +1,7 @@
 package org.springframework.batch.core.step;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -131,6 +132,34 @@ public class AbstractStepTests {
 	@Before
 	public void setUp() throws Exception {
 		tested.setJobRepository(repository);
+	}
+	
+	@Test
+	public void testBeanName() throws Exception {
+		AbstractStep step = new AbstractStep() {
+			@Override
+			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+				return null;
+			}
+		};
+		assertNull(step.getName());
+		step.setBeanName("foo");
+		assertEquals("foo", step.getName());
+	}
+
+	@Test
+	public void testName() throws Exception {
+		AbstractStep step = new AbstractStep() {
+			@Override
+			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+				return null;
+			}
+		};
+		assertNull(step.getName());
+		step.setName("foo");
+		assertEquals("foo", step.getName());
+		step.setBeanName("bar");
+		assertEquals("foo", step.getName());
 	}
 
 	/**

@@ -126,6 +126,9 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 	}
 	
 	public Object getObject() throws Exception {
+		if (proxyFactory==null) {
+			afterPropertiesSet();
+		}
 		return proxyFactory.getProxy();
 	}
 

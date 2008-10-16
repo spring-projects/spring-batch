@@ -40,6 +40,13 @@ public class BatchStatusTests {
 	}
 
 	@Test
+	public void testMaxStatus() {
+		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED,BatchStatus.COMPLETED));
+		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.FAILED));
+		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.FAILED));
+	}
+
+	@Test
 	public void testGetStatus() {
 		assertEquals(BatchStatus.FAILED, BatchStatus.valueOf(BatchStatus.FAILED.toString()));
 	}

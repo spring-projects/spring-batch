@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -42,7 +39,6 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.core.AttributeAccessor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -79,13 +75,13 @@ public class TaskletStep extends AbstractStep {
 
 	private PlatformTransactionManager transactionManager;
 
-	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute(){
+	private TransactionAttribute transactionAttribute = new DefaultTransactionAttribute() {
 
 		@Override
 		public boolean rollbackOn(Throwable ex) {
 			return true;
 		}
-		
+
 	};
 
 	private Tasklet tasklet;
@@ -217,9 +213,8 @@ public class TaskletStep extends AbstractStep {
 	 * a transaction. The step and its execution and execution context are all
 	 * given an up to date {@link BatchStatus}, and the {@link JobRepository} is
 	 * used to store the result. Various reporting information are also added to
-	 * the current context (the {@link RepeatContext} governing the step
-	 * execution, which would normally be available to the caller somehow
-	 * through the step's {@link ExecutionContext}.<br/>
+	 * the current context governing the step execution, which would normally be
+	 * available to the caller through the step's {@link ExecutionContext}.<br/>
 	 * 
 	 * @throws JobInterruptedException if the step or a chunk is interrupted
 	 * @throws RuntimeException if there is an exception during a chunk
@@ -228,15 +223,14 @@ public class TaskletStep extends AbstractStep {
 	 */
 	@Override
 	protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
-		StepContext stepContext = new StepContext(stepExecution);
+
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
-		return stepOperations.iterate(new StepContextRepeatCallback(stepContext ) {
+		return stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
 
-			final Queue<AttributeAccessor> attributeQueue = new LinkedBlockingQueue<AttributeAccessor>();
-
-			public ExitStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
+			@Override
+			public ExitStatus doInStepContext(RepeatContext repeatContext, StepContext stepContext) throws Exception {
 
 				StepExecution stepExecution = stepContext.getStepExecution();
 				ExceptionHolder fatalException = new ExceptionHolder();
@@ -254,23 +248,12 @@ public class TaskletStep extends AbstractStep {
 
 				boolean locked = false;
 
-				AttributeAccessor attributes = attributeQueue.poll();
-				if (attributes == null) {
-					attributes = new BasicAttributeAccessor();
-				}
-
 				try {
 
 					try {
-						exitStatus = tasklet.execute(contribution, attributes);
+						exitStatus = tasklet.execute(contribution, stepContext);
 					}
 					finally {
-						// Still some stuff to do with the data in this chunk,
-						// pass it back
-						if (attributes.attributeNames().length > 0) {
-							attributeQueue.add(attributes);
-						}
-
 						// Apply the contribution to the step
 						// even if unsuccessful
 						logger.debug("Applying contribution: " + contribution);
@@ -294,8 +277,7 @@ public class TaskletStep extends AbstractStep {
 
 					// Check to make sure the ExecutionContext hasn't be
 					// modified outside a chunk boundary. Doing so will cause
-					// potential
-					// rollback issues.
+					// potential rollback issues.
 					if (stepExecution.getExecutionContext().isDirty()) {
 						throw new IllegalStateException(
 								"The ExecutionContext cannot be modified outside of the ItemStream#Update method");
