@@ -31,7 +31,7 @@ import org.springframework.util.MethodInvoker;
  * 
  * @author Robert Kasanicky
  */
-public class AbstractMethodInvokingDelegator<T> implements InitializingBean {
+public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
 	
 	private Object targetObject;
 	
