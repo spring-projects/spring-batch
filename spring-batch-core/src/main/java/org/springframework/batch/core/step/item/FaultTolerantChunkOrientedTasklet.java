@@ -136,7 +136,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 		}
 
 		List<S> skippedOutputs = getSkippedOutputsBuffer(attributes);
-		// TODO: use ItemWriter interface properly
 		// TODO: make sure exceptions get handled by the appropriate handler
 		outputs.removeAll(skippedOutputs);
 		write(outputs, contribution, skippedOutputs);

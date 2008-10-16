@@ -16,7 +16,8 @@
 	<xsd:element name="job">
 		<xsd:annotation>
 			<xsd:documentation>
-				Defines a Job.
+				Defines a job composed of a set of steps and transitions between steps.  The job will be exposed 
+				in the enclosing bean factory as a component of type Job that can be launched using a JobLauncher.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -38,28 +39,44 @@
 	<xsd:element name="step">
 		<xsd:annotation>
 			<xsd:documentation>
-				Defines a stage in job processing. The name attribute has to match the id of a bean definition for a
-				Step.  The next attribute is a synonym for &lt;next on="*" .../&gt;
+				Defines a stage in job processing. The name attribute has to match the id of a bean definition for
+				a Step. The next attribute is a synonym for &lt;next on="*" .../&gt;
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:sequence>
-				<xsd:element ref="next" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="next" minOccurs="0" maxOccurs="unbounded" >
+					<xsd:annotation>
+						<xsd:documentation>A sequence of next elements specifies the possible transitions from this step to the next one.</xsd:documentation>
+					</xsd:annotation></xsd:element>
 			</xsd:sequence>
-			<xsd:attribute name="name" type="xsd:string" use="required" />
-			<xsd:attribute name="next" type="xsd:string" use="optional" />
+			<xsd:attribute name="name" type="xsd:string" use="required" >
+				<xsd:annotation>
+					<xsd:documentation>The step name is a reference to another bean definition where business logic is specified.  The reference is usually an implementation of Step.</xsd:documentation></xsd:annotation></xsd:attribute>
+			<xsd:attribute name="next" type="xsd:string" use="optional" >
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+A shortcut for specifying the next step to execute after this one, if there is only one choice.  
+If this attribute is specified, then there should be no other transition with a nested &lt;next on="*" .../&gt;]]></xsd:documentation></xsd:annotation></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:element name="next">
 		<xsd:annotation>
 			<xsd:documentation>
-				Defines a StepTransition.
+				Defines a step transition from this step to the next one depending on the value of the exit status.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:attribute name="on" type="xsd:string" use="required" />
-			<xsd:attribute name="to" type="xsd:string" use="required" />
+			<xsd:attribute name="on" type="xsd:string" use="required" >
+				<xsd:annotation>
+					<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. When a step finishes the most 
+specific match will be chosen to select the next step. Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
+				</xsd:annotation></xsd:attribute>
+			<xsd:attribute name="to" type="xsd:string" use="required" >
+				<xsd:annotation>
+					<xsd:documentation>The name of the step to go to next.  Must resolve to one of the other steps in this job.</xsd:documentation>
+				</xsd:annotation></xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 
