@@ -4,10 +4,30 @@ import java.util.Collection;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
+/**
+ * Convenience class for aggregating a set of {@link StepExecution} instances
+ * into a single result.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class StepExecutionAggregator {
 
+	/**
+	 * Take the inputs and aggregate certain fields, putting the aggregates into
+	 * the result.  The aggregated fields are
+	 * <ul>
+	 * <li>status - choosing the highest value using {@link BatchStatus#max(BatchStatus, BatchStatus)}</li>
+	 * <li>exitStatus - using {@link ExitStatus#and(ExitStatus)}</li>
+	 * <li>commitCount, rollbackCount, etc. - by arithmetic sum</li>
+	 * </ul>
+	 * 
+	 * @param result the result to overwrite
+	 * @param executions the inputs
+	 */
 	public void aggregate(StepExecution result, Collection<StepExecution> executions) {
 		Assert.notNull(result, "To aggregate into a result it must be non-null.");
 		if (executions == null || executions.isEmpty()) {

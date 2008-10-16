@@ -8,7 +8,7 @@ import org.springframework.batch.core.StepExecution;
 
 /**
  * Strategy interface for generating input contexts for a partitioned step
- * execution.
+ * execution independent from the fabric they are going to run on.
  * 
  * @author Dave Syer
  * 
@@ -33,8 +33,8 @@ public interface StepExecutionSplitter {
 	 * 
 	 * On a restart clients of the {@link StepExecutionSplitter} should expect
 	 * it to reconstitute the state of the last failed execution and only return
-	 * those executions that need to be restarted. Thus the grid size hint
-	 * should be ignored on a restart.
+	 * those executions that need to be restarted. Thus the grid size hint will
+	 * be ignored on a restart.
 	 * 
 	 * @param stepExecution the {@link StepExecution} to be partitioned.
 	 * @param gridSize a hint for the splitter if the size of the grid is known

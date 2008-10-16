@@ -14,6 +14,19 @@ import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 
+/**
+ * Generic implementation of {@link StepExecutionSplitter} that delegates to a
+ * {@link Partitioner} to generate {@link ExecutionContext} instances. Takes
+ * care of restartability and identifying the step executions from previous runs
+ * of the same job. The generated {@link StepExecution} instances have names
+ * that identify them uniquely in the partition. The name is constructed from a
+ * base (name of the target step) plus a suffix taken from the
+ * {@link Partitioner} identifiers, separated by a colon, e.g.
+ * <code>{step1:partition0, step1:partition1, ...}</code>.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 
 	private static final String STEP_NAME_SEPARATOR = ":";
@@ -30,6 +43,15 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 		this(jobRepository, step, new SimplePartitioner());
 	}
 
+	/**
+	 * Construct a {@link SimpleStepExecutionSplitter} from its mandatory
+	 * properties.
+	 * 
+	 * @param jobRepository the {@link JobRepository}
+	 * @param step the target step (a local version of it)
+	 * @param partitioner a {@link Partitioner} to use for generating input
+	 * parameters
+	 */
 	public SimpleStepExecutionSplitter(JobRepository jobRepository, Step step, Partitioner partitioner) {
 		this.jobRepository = jobRepository;
 		this.step = step;
@@ -95,7 +117,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 
 		boolean isRestart = (lastStepExecution != null && lastStepExecution.getStatus() != BatchStatus.COMPLETED) ? true
 				: false;
-		
+
 		if (isRestart) {
 			stepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
 		}
