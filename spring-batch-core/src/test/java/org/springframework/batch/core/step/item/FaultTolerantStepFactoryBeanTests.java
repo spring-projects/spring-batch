@@ -54,6 +54,8 @@ public class FaultTolerantStepFactoryBeanTests {
 	private SkipWriterStub writer = new SkipWriterStub();
 
 	private JobExecution jobExecution;
+	
+	private List<String> processed = new ArrayList<String>();
 
 	protected int count;
 
@@ -496,6 +498,33 @@ public class FaultTolerantStepFactoryBeanTests {
 		step.execute(stepExecution);
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getRollbackCount());
+	}
+	
+	@Test
+	public void testReprocessingAfterWriterRollback() throws Exception {
+		factory.setItemProcessor(new ItemProcessor<String, String>() {
+			public String process(String item) throws Exception {
+				processed.add(item);
+				return item;
+			}
+		});
+		final Collection<String> NO_FAILURES = Collections.emptyList();
+		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
+		
+		Step step = (Step) factory.getObject();
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		step.execute(stepExecution);
+		//1,2,3,4,3,4,3,4 - two re-processing attempts until the item is identified and skipped
+		assertEquals(8, processed.size());
+		assertEquals("1", processed.get(0));
+		assertEquals("2", processed.get(1));
+		assertEquals("3", processed.get(2));
+		assertEquals("4", processed.get(3));
+		assertEquals("3", processed.get(4));
+		assertEquals("4", processed.get(5));
+		assertEquals("3", processed.get(6));
+		assertEquals("4", processed.get(7));
+		
 	}
 
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
