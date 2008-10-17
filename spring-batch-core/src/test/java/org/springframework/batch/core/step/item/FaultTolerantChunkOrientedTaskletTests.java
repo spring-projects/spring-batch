@@ -61,7 +61,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 
 	private List<Integer> processed = new ArrayList<Integer>();
 
-	private FaultTolerantChunkOrientedTasklet<Integer, String> handler;
+	private FaultTolerantChunkOrientedTasklet<Integer, String> tasklet;
 
 	private RepeatTemplate chunkOperations = new RepeatTemplate();
 
@@ -109,16 +109,16 @@ public class FaultTolerantChunkOrientedTaskletTests {
 
 	@Test
 	public void testBasicHandle() throws Exception {
-		handler = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, itemWriter, chunkOperations,
-				retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, itemWriter,
+				chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
-		handler.execute(contribution, new ChunkContext());
+		tasklet.execute(contribution, new ChunkContext());
 		assertEquals(limit, contribution.getReadCount());
 	}
 
 	@Test
 	public void testSkipOnRead() throws Exception {
-		handler = new FaultTolerantChunkOrientedTasklet<Integer, String>(new ItemReader<Integer>() {
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(new ItemReader<Integer>() {
 			public Integer read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
 				throw new RuntimeException("Barf!");
 			}
@@ -128,7 +128,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		ChunkContext attributes = new ChunkContext();
 		try {
-			handler.execute(contribution, attributes);
+			tasklet.execute(contribution, attributes);
 			fail("Expected SkipLimitExceededException");
 		}
 		catch (SkipLimitExceededException e) {
@@ -140,24 +140,25 @@ public class FaultTolerantChunkOrientedTaskletTests {
 
 	@Test
 	public void testSkipSingleItemOnWrite() throws Exception {
-		handler = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
-			public void write(List<? extends String> items) throws Exception {
-				written.addAll(items);
-				throw new RuntimeException("Barf!");
-			}
-		}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor,
+				new ItemWriter<String>() {
+					public void write(List<? extends String> items) throws Exception {
+						written.addAll(items);
+						throw new RuntimeException("Barf!");
+					}
+				}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(1));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		ChunkContext attributes = new ChunkContext();
 		try {
-			handler.execute(contribution, attributes);
+			tasklet.execute(contribution, attributes);
 			fail("Expected RuntimeException");
 		}
 		catch (Exception e) {
 			assertEquals("Barf!", e.getMessage());
 		}
 		assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_BUFFER_KEY"));
-		handler.execute(contribution, attributes);
+		tasklet.execute(contribution, attributes);
 		assertEquals(1, contribution.getReadCount());
 		assertEquals(1, contribution.getWriteSkipCount());
 		assertEquals(1, written.size());
@@ -165,13 +166,14 @@ public class FaultTolerantChunkOrientedTaskletTests {
 
 	@Test
 	public void testSkipMultipleItemsOnWrite() throws Exception {
-		handler = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, new ItemWriter<String>() {
-			public void write(List<? extends String> items) throws Exception {
-				logger.debug("Writing items: " + items);
-				written.addAll(items);
-				throw new RuntimeException("Barf!");
-			}
-		}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor,
+				new ItemWriter<String>() {
+					public void write(List<? extends String> items) throws Exception {
+						logger.debug("Writing items: " + items);
+						written.addAll(items);
+						throw new RuntimeException("Barf!");
+					}
+				}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		ChunkContext attributes = new ChunkContext();
@@ -179,7 +181,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		// Count to 3: (try + skip + skip)
 		for (int i = 0; i < 3; i++) {
 			try {
-				handler.execute(contribution, attributes);
+				tasklet.execute(contribution, attributes);
 				fail("Expected RuntimeException on i=" + i);
 			}
 			catch (Exception e) {
@@ -191,18 +193,18 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		List<String> chunk = (List<String>) attributes.getAttribute("SKIPPED_OUTPUTS_BUFFER_KEY");
 		assertEquals(1, chunk.size());
 		// The last recovery for this chunk...
-		handler.execute(contribution, attributes);
+		tasklet.execute(contribution, attributes);
 
 		attributes = new ChunkContext();
 		try {
-			handler.execute(contribution, attributes);
+			tasklet.execute(contribution, attributes);
 			fail("Expected RuntimeException");
 		}
 		catch (Exception e) {
 			assertEquals("Barf!", e.getMessage());
 		}
 		try {
-			handler.execute(contribution, attributes);
+			tasklet.execute(contribution, attributes);
 			fail("Expected SkipLimitExceededException");
 		}
 		catch (SkipLimitExceededException e) {
@@ -217,16 +219,17 @@ public class FaultTolerantChunkOrientedTaskletTests {
 
 	@Test
 	public void testSkipSingleItemOnProcess() throws Exception {
-		handler = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
-			public String process(Integer item) throws Exception {
-				logger.debug("Processing item: " + item);
-				processed.add(item);
-				if (item == 3) {
-					throw new RuntimeException("Barf!");
-				}
-				return "p" + item;
-			}
-		}, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy,
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader,
+				new ItemProcessor<Integer, String>() {
+					public String process(Integer item) throws Exception {
+						logger.debug("Processing item: " + item);
+						processed.add(item);
+						if (item == 3) {
+							throw new RuntimeException("Barf!");
+						}
+						return "p" + item;
+					}
+				}, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy,
 				writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(3));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
@@ -234,7 +237,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 
 		// try
 		try {
-			handler.execute(contribution, attributes);
+			tasklet.execute(contribution, attributes);
 			fail("Expected RuntimeException");
 		}
 		catch (Exception e) {
@@ -246,7 +249,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		Chunk<Integer> chunk = (Chunk<Integer>) attributes.getAttribute("INPUT_BUFFER_KEY");
 
 		// skip...
-		handler.execute(contribution, attributes);
+		tasklet.execute(contribution, attributes);
 		assertEquals(1, chunk.getSkips().size());
 
 		assertEquals(3, contribution.getReadCount());
@@ -257,13 +260,14 @@ public class FaultTolerantChunkOrientedTaskletTests {
 
 	@Test
 	public void testSkipOverLimitOnProcess() throws Exception {
-		handler = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, new ItemProcessor<Integer, String>() {
-			public String process(Integer item) throws Exception {
-				logger.debug("Processing item: " + item);
-				processed.add(item);
-				throw new RuntimeException("Barf!");
-			}
-		}, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy,
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader,
+				new ItemProcessor<Integer, String>() {
+					public String process(Integer item) throws Exception {
+						logger.debug("Processing item: " + item);
+						processed.add(item);
+						throw new RuntimeException("Barf!");
+					}
+				}, itemWriter, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy,
 				writeSkipPolicy);
 		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
@@ -272,7 +276,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		// Count to 3: (try + skip + try)
 		for (int i = 0; i < 2; i++) {
 			try {
-				handler.execute(contribution, attributes);
+				tasklet.execute(contribution, attributes);
 				fail("Expected RuntimeException on i=" + i);
 			}
 			catch (Exception e) {
@@ -285,19 +289,19 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		assertEquals(1, chunk.getSkips().size());
 
 		// The last recovery for this chunk...
-		handler.execute(contribution, attributes);
+		tasklet.execute(contribution, attributes);
 		assertEquals(2, chunk.getSkips().size());
 
 		attributes = new ChunkContext();
 		try {
-			handler.execute(contribution, attributes);
+			tasklet.execute(contribution, attributes);
 			fail("Expected RuntimeException");
 		}
 		catch (Exception e) {
 			assertEquals("Barf!", e.getMessage());
 		}
 		try {
-			handler.execute(contribution, attributes);
+			tasklet.execute(contribution, attributes);
 			fail("Expected SkipLimitExceededException");
 		}
 		catch (SkipLimitExceededException e) {
@@ -308,5 +312,42 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		assertEquals(2, contribution.getProcessSkipCount());
 		// Just before the skip at the end we process once more
 		assertEquals(3, processed.size());
+	}
+
+	/**
+	 * When writer throws an exception that causes rollback, items are
+	 * re-processed in next iteration.
+	 */
+	@Test
+	public void testReprocessAfterWriterRollback() {
+		final String WRITER_FAILED_MESSAGE = "writer failed";
+		final int CHUNK_SIZE = 2;
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader,
+				new ItemProcessor<Integer, String>() {
+					public String process(Integer item) throws Exception {
+						processed.add(item);
+						return String.valueOf(item);
+					}
+				}, new ItemWriter<String>() {
+					public void write(List<? extends String> items) throws Exception {
+						throw new RuntimeException(WRITER_FAILED_MESSAGE);
+					}
+
+				}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(CHUNK_SIZE));
+		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
+		ChunkContext attributes = new ChunkContext();
+
+		for (int i = 1; i <= 2; i++) {
+			try {
+				tasklet.execute(contribution, attributes);
+				fail();
+			}
+			catch (Exception e) {
+				assertEquals(WRITER_FAILED_MESSAGE, e.getMessage());
+				assertEquals(i*CHUNK_SIZE, processed.size());
+			}
+		}
+
 	}
 }
