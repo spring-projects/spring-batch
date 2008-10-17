@@ -27,8 +27,6 @@ import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.support.ExecutionContextStringSerializer;
-import org.springframework.batch.core.repository.support.XStreamExecutionContextStringSerializer;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.PreparedStatementSetter;
