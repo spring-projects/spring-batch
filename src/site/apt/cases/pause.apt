@@ -22,7 +22,9 @@ Use Case: Pause and Resume Job Execution
 * Scope
 
   * The instruction to pause comes from processing logic, not from an
-  external signal (like an interrupt)
+  external signal (like an interrupt).  A variation where the signal
+  comes from outside might be a useful extension, but isn't explicitly
+  included here.
 
 * Preconditions
 
