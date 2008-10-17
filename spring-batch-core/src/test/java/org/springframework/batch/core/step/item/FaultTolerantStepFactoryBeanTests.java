@@ -458,7 +458,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	 * Scenario: Exception in processor that shouldn't cause rollback
 	 */
 	@Test
-	public void testProcessorRollback() throws Exception {
+	public void testProcessorNoRollback() throws Exception {
 		factory.setTransactionAttribute(new DefaultTransactionAttribute());
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,3")));
@@ -482,7 +482,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	 * Scenario: Exception in processor that should cause rollback
 	 */
 	@Test
-	public void testProcessorNoRollback() throws Exception {
+	public void testProcessorRollback() throws Exception {
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
@@ -516,14 +516,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		step.execute(stepExecution);
 		//1,2,3,4,3,4,3,4 - two re-processing attempts until the item is identified and skipped
 		assertEquals(8, processed.size());
-		assertEquals("1", processed.get(0));
-		assertEquals("2", processed.get(1));
-		assertEquals("3", processed.get(2));
-		assertEquals("4", processed.get(3));
-		assertEquals("3", processed.get(4));
-		assertEquals("4", processed.get(5));
-		assertEquals("3", processed.get(6));
-		assertEquals("4", processed.get(7));
+		assertEquals("[1, 2, 3, 4, 3, 4, 3, 4]", processed.toString());
 		
 	}
 

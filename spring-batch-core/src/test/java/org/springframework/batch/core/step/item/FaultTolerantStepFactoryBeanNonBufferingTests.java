@@ -209,7 +209,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 * Scenario: Exception in processor that shouldn't cause rollback
 	 */
 	@Test
-	public void testProcessorRollback() throws Exception {
+	public void testProcessorNoRollback() throws Exception {
 		
 		factory.setTransactionAttribute(new DefaultTransactionAttribute());
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
@@ -233,7 +233,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 * Scenario: Exception in processor that should cause rollback
 	 */
 	@Test
-	public void testProcessorNoRollback() throws Exception {
+	public void testProcessorRollback() throws Exception {
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
