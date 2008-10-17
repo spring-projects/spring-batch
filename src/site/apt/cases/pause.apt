@@ -1,0 +1,115 @@
+                                    ------
+                                    Pause Resume Use Case
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    October 2008
+
+Use Case: Pause and Resume Job Execution
+
+* Goal
+
+  Allow a job to pause itself and await further instructions.  A
+  paused status indicates to a user that the job is waiting, either
+  for a remote worker to finish something asynchronously, or for a
+  manual signal to proceed. For instance, a job may require manual
+  verification of business condition before continuing - a sanity
+  check on critical data.
+
+* Scope
+
+  * The instruction to pause comes from processing logic, not from an
+  external signal (like an interrupt)
+
+* Preconditions
+
+  * A job is configured and one of its components can send the signal to pause
+
+  * The launching interface has the ability to resume a paused job
+
+  * The execution meta data can be inspected to verify that a pause has occurred
+
+* Success
+
+  * User launches job and verifies that it has paused at a certain point
+  
+  * User resumes job and verifies that it completes successfully.
+
+  * The end state is indistinguishable from a successful completion of
+  the job in one attempt
+
+* Description
+
+  The vanilla successful case proceeds as follows:
+
+    [[1]] User launches a new job execution.
+
+    [[1]] Framework begins processing, and successfully executes one
+    or more steps.
+
+    [[1]] At the end of a step Framework encounters condition that
+    signals it should pause (e.g. a status flag).
+
+    [[1]] Framework gracefully exits the job execution, marking it as
+    paused so that it can be identifed as such when asked to resume.
+    Often the framework will also be configured to notify a user that
+    the pause has occurred, so that some business condition can be
+    verified manually.
+
+    [[1]] User requests the job execution be resumed.
+
+    [[1]] Framework picks up where it left off, ignoring steps that
+    have already successfully executed and starting with the one after
+    the pause.
+
+    [[1]] Job finishes processing and Framework marks it as
+    sucessfully completed, just as if it hadn't paused in the first
+    place.
+
+* Variations
+
+  * The agent that causes the job to resume is not a User but a remote
+  worker process.
+
+  * Two agents request a resume at the same time.  One of them has to
+  lose (an exception is acceptable).
+
+  * A step pauses in the middle of execution.  The job picks it
+  up and start where it left off, just like in a restart.
+
+  * More than one step was executing when the pause signal was
+  detected.  Framework allows steps that are executing in process to
+  complete (or pause) before exiting the job execution.
+
+  * More than one step is in a paused state when the job resumes.
+  Requires no special treatment from Framework: if those steps were
+  active when the pause reached the job level on the last run, then
+  they will be processed in the same way on a resume (presumably in
+  multiple threads).
+
+* Implementation
+
+  * A new <<<BatchStatus.PAUSED>>>.
+
+  * The <<<JobLauncher>>> interface may not need any more than it already has:
+
++---
+public interface JobLauncher {
+
+	public JobExecution run(Job job, JobParameters jobParameters) throws ....;
+
+}
++---
+
+  In the case that the last execution failed, we already pick up from
+  where we left off with a new <<<JobExecution>>>.  The only
+  difference now is that we don't need a new <<<JobExecution>>>, so we
+  have to be careful about concurrency - what happens if two agents
+  try to resume the job at once.  To be safe we can treat this the
+  same way as a restart - lock the <<<JobExecution>>> table in the
+  database by setting a TX isolation attribute on the
+  <<<JobRepository>>>.
+
+  * When we resume we need to wind forward through the job execution
+  and look at all step executions to see if they are active.  In most
+  cases a pause will
