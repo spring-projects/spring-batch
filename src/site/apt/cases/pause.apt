@@ -11,10 +11,13 @@ Use Case: Pause and Resume Job Execution
 
   Allow a job to pause itself and await further instructions.  A
   paused status indicates to a user that the job is waiting, either
-  for a remote worker to finish something asynchronously, or for a
-  manual signal to proceed. For instance, a job may require manual
-  verification of business condition before continuing - a sanity
-  check on critical data.
+  for a manual signal to proceed, or for a remote worker to finish
+  doing something asynchronously. For instance, a job may require
+  manual verification of business condition before continuing - a
+  sanity check on critical data.  Assume that a job execution could
+  receive hundreds of resume signals, and this is a "normal"
+  situation. It does not look like a horrible mess if we look at the
+  history of the execution - e.g. like hundreds of restarts.
 
 * Scope
 
@@ -111,5 +114,6 @@ public interface JobLauncher {
   <<<JobRepository>>>.
 
   * When we resume we need to wind forward through the job execution
-  and look at all step executions to see if they are active.  In most
-  cases a pause will
+  and look at all step executions to see if they are active.  Once the
+  <<<JobExecution>>> has been identified the process should be no
+  different to a restart.
