@@ -60,7 +60,7 @@ public class XStreamExecutionContextStringSerializer implements ExecutionContext
 		init();
 	}
 
-	public void init() throws Exception {
+	public synchronized void init() throws Exception {
 		if (hierarchicalStreamDriver == null) {
 			this.hierarchicalStreamDriver = new JettisonMappedXmlDriver();
 		}
