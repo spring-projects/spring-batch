@@ -70,7 +70,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	private JobExplorer jobExplorer;
 
 	private JobLauncher jobLauncher;
-	
+
 	private JobRepository jobRepository;
 
 	private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
@@ -112,7 +112,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	public void setJobExplorer(JobExplorer jobExplorer) {
 		this.jobExplorer = jobExplorer;
 	}
-	
+
 	public void setJobRepository(JobRepository jobRepository) {
 		this.jobRepository = jobRepository;
 	}
@@ -166,7 +166,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			list.add(jobInstance.getId());
 		}
 		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
-			throw new NoSuchJobException("No such job (either in registry or in historical data): "+jobName);
+			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
 		}
 		return list;
 	}
@@ -179,10 +179,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * lang.Long)
 	 */
 	public String getParameters(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
-		if (jobExecution == null) {
-			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
-		}
+		JobExecution jobExecution = findExecutionById(executionId);
+
 		return PropertiesConverter.propertiesToString(jobParametersConverter.getProperties(jobExecution
 				.getJobInstance().getJobParameters()));
 	}
@@ -200,7 +198,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			set.add(jobExecution.getId());
 		}
 		if (set.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
-			throw new NoSuchJobException("No such job (either in registry or in historical data): "+jobName);
+			throw new NoSuchJobException("No such job (either in registry or in historical data): " + jobName);
 		}
 		return set;
 	}
@@ -213,10 +211,8 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * (java.lang.Long)
 	 */
 	public Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
-		if (jobExecution == null) {
-			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
-		}
+		JobExecution jobExecution = findExecutionById(executionId);
+
 		Map<Long, String> map = new LinkedHashMap<Long, String>();
 		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 			map.put(stepExecution.getId(), stepExecution.toString());
@@ -232,10 +228,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * .Long)
 	 */
 	public String getSummary(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
-		if (jobExecution == null) {
-			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
-		}
+		JobExecution jobExecution = findExecutionById(executionId);
 		return jobExecution.toString();
 	}
 
@@ -250,10 +243,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 		logger.info("Checking status of job execution with id=" + executionId);
 
-		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
-		if (jobExecution == null) {
-			throw new NoSuchJobExecutionException(String.format("No job execution with id=%d", executionId));
-		}
+		JobExecution jobExecution = findExecutionById(executionId);
 
 		String jobName = jobExecution.getJobInstance().getJobName();
 		Job job = jobRegistry.getJob(jobName);
@@ -366,20 +356,33 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
 	public boolean stop(long executionId) throws NoSuchJobExecutionException {
-		
-		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
-		
-		if(jobExecution == null){
-			throw new NoSuchJobExecutionException("No JobExecution found for id: [" + executionId + "]");
-		}
-		
-		//Indicate the execution should be stopped by setting it's status to 'STOPPING'.  It is assumed that
-		//the step implementation will check this status at chunk boundaries.
+
+		JobExecution jobExecution = findExecutionById(executionId);
+		// Indicate the execution should be stopped by setting it's status to
+		// 'STOPPING'. It is assumed that
+		// the step implementation will check this status at chunk boundaries.
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
-		
+
 		// TODO: I'm not sure that we can really know if the execution stopped
 		return true;
+	}
+
+	public boolean pause(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = findExecutionById(executionId);
+		jobExecution.setStatus(BatchStatus.PAUSED);
+		jobRepository.update(jobExecution);
+		return true;
+	}
+
+	private JobExecution findExecutionById(long executionId) throws NoSuchJobExecutionException {
+		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
+
+		if (jobExecution == null) {
+			throw new NoSuchJobExecutionException("No JobExecution found for id: [" + executionId + "]");
+		}
+		return jobExecution;
+
 	}
 
 }

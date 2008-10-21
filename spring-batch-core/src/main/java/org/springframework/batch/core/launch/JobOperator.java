@@ -74,6 +74,8 @@ public interface JobOperator {
 			JobRestartException, JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
 
 	boolean stop(long executionId) throws NoSuchJobExecutionException;
+	
+	boolean pause(long executionId) throws NoSuchJobExecutionException;
 
 	String getSummary(long executionId) throws NoSuchJobExecutionException;
 

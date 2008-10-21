@@ -390,4 +390,19 @@ public class SimpleJobOperatorTests {
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
 	}
 
+	@Test
+	public void testPause() throws Exception{
+		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
+		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
+		jobExplorer.getJobExecution(111L);
+		expectLastCall().andReturn(jobExecution);
+		jobRepository.update(jobExecution);
+		replay(jobExplorer);
+		replay(jobRepository);
+		jobOperator.pause(111L);
+		verify(jobExplorer);
+		verify(jobRepository);
+		assertEquals(BatchStatus.PAUSED, jobExecution.getStatus());
+	}
+
 }
