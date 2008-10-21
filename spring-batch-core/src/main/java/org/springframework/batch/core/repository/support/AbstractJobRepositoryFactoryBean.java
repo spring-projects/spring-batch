@@ -29,8 +29,6 @@ import org.springframework.util.Assert;
  */
 public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, InitializingBean {
 
-	
-
 	private PlatformTransactionManager transactionManager;
 
 	private ProxyFactory proxyFactory;
@@ -103,6 +101,7 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 		proxyFactory = new ProxyFactory();
 		TransactionInterceptor advice = new TransactionInterceptor(transactionManager, PropertiesConverter
 				.stringToProperties("create*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
+						+ "\ngetLastJobExecution*=PROPAGATION_REQUIRES_NEW," + isolationLevelForCreate
 						+ "\n*=PROPAGATION_REQUIRED"));
 		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(advice);
 		NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
@@ -113,10 +112,10 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 		proxyFactory.addInterface(JobRepository.class);
 		proxyFactory.setTarget(getTarget());
 	}
-	
+
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(transactionManager, "TransactionManager must not be null.");
-		
+
 		initializeProxy();
 	}
 
@@ -124,9 +123,9 @@ public abstract class AbstractJobRepositoryFactoryBean implements FactoryBean, I
 		return new SimpleJobRepository(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(),
 				createExecutionContextDao());
 	}
-	
+
 	public Object getObject() throws Exception {
-		if (proxyFactory==null) {
+		if (proxyFactory == null) {
 			afterPropertiesSet();
 		}
 		return proxyFactory.getProxy();

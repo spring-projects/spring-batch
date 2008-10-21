@@ -83,6 +83,31 @@ public class RemoteLauncherTests {
 		assertTrue(launcher.getJobNames().contains("loopJob"));
 	}
 
+	@Test
+	public void testPauseJob() throws Exception {
+		final int SLEEP_INTERVAL = 500;
+		assertTrue(isConnected());
+		assertTrue(launcher.getJobNames().contains("loopJob"));
+		long executionId = launcher.start("loopJob", "");
+
+		// sleep long enough to avoid race conditions (serializable tx isolation
+		// doesn't work with HSQL)
+		Thread.sleep(SLEEP_INTERVAL);
+		launcher.pause(executionId);
+
+		Thread.sleep(SLEEP_INTERVAL);
+		long resumedId = launcher.resume(executionId);
+		assertEquals("Picked up the same execution after pause and resume", executionId, resumedId);
+	
+//		launcher.pause(executionId);
+//		Thread.sleep(SLEEP_INTERVAL);
+//		long resumeId2 = launcher.resume(executionId);
+//		assertEquals("Picked up the same execution after pause and resume", executionId, resumeId2);
+		
+		launcher.stop(executionId);
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
