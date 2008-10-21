@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.launch;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -37,12 +38,17 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 public interface JobLauncher {
 
 	/**
-	 * Start a job execution for the given {@link Job} and {@link JobParameters}.  If
-	 * a JobExecution was able to be created successfully, it will always be returned
-	 * by this method, regardless of whether or not the execution was successful.
+	 * Start a job execution for the given {@link Job} and {@link JobParameters}
+	 * . If a JobExecution was able to be created successfully, it will always
+	 * be returned by this method, regardless of whether or not the execution
+	 * was successful.
+	 * 
+	 * If there exists a past {@link JobExecution} and its status is
+	 * {@link BatchStatus#PAUSED}, the same JobExecution should be continued
+	 * instead of new one created.
 	 * 
 	 * @return the {@link JobExecution} if it returns synchronously. If the
-	 * implementation is asynchronous, the status might well be unknown.  
+	 * implementation is asynchronous, the status might well be unknown.
 	 * 
 	 * @throws JobExecutionAlreadyRunningException if the JobInstance identified
 	 * by the properties already has an execution running.

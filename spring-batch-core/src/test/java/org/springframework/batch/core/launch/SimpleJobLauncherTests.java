@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -75,8 +76,6 @@ public class SimpleJobLauncherTests {
 
 		JobExecution jobExecution = new JobExecution(null, null);
 
-		// expect(jobRepository.isJobInstanceExists(job.getName(),
-		// jobParameters)).andReturn(false);
 		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
 		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
 		replay(jobRepository);
@@ -110,7 +109,6 @@ public class SimpleJobLauncherTests {
 		testRun();
 		try {
 			reset(jobRepository);
-//			expect(jobRepository.isJobInstanceExists(job.getName(), jobParameters)).andReturn(true);
 			expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
 					new JobExecution(new JobInstance(1L, jobParameters, job.getName())));
 			replay(jobRepository);
@@ -188,6 +186,24 @@ public class SimpleJobLauncherTests {
 		jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet(); // no error
+	}
+	
+	/**
+	 * Same execution is used if the last found has PAUSED status.
+	 */
+	@Test
+	public void testResumePausedInstance() throws Exception {
+		long id = 9;
+		JobExecution jobExecution = new JobExecution(null, id);
+		jobExecution.setStatus(BatchStatus.PAUSED);
+		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
+		replay(jobRepository);
+	
+		jobLauncher.afterPropertiesSet();
+		JobExecution returned = jobLauncher.run(job, jobParameters);
+		assertEquals(jobExecution, returned);
+		
+		verify(jobRepository);
 	}
 
 	private boolean contains(String str, String searchStr) {
