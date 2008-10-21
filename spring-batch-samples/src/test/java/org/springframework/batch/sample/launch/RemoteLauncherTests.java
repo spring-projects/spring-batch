@@ -93,17 +93,24 @@ public class RemoteLauncherTests {
 		// sleep long enough to avoid race conditions (serializable tx isolation
 		// doesn't work with HSQL)
 		Thread.sleep(SLEEP_INTERVAL);
+//		assertEquals(1, launcher.getRunningExecutions("loopJob").size());
 		launcher.pause(executionId);
 
 		Thread.sleep(SLEEP_INTERVAL);
+//		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
+		logger.debug(launcher.getSummary(executionId));
 		long resumedId = launcher.resume(executionId);
 		assertEquals("Picked up the same execution after pause and resume", executionId, resumedId);
-	
-//		launcher.pause(executionId);
-//		Thread.sleep(SLEEP_INTERVAL);
-//		long resumeId2 = launcher.resume(executionId);
-//		assertEquals("Picked up the same execution after pause and resume", executionId, resumeId2);
-		
+
+		Thread.sleep(SLEEP_INTERVAL);
+		launcher.pause(executionId);
+		Thread.sleep(SLEEP_INTERVAL);
+
+//		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
+		logger.debug(launcher.getSummary(executionId));
+		long resumeId2 = launcher.resume(executionId);
+		assertEquals("Picked up the same execution after pause and resume", executionId, resumeId2);
+
 		launcher.stop(executionId);
 
 	}

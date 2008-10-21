@@ -320,8 +320,9 @@ public class SimpleJobRepository implements JobRepository {
 	 * @param stepExecution
 	 */
 	private void checkForInterruption(StepExecution stepExecution){
-		jobExecutionDao.synchronizeStatus(stepExecution.getJobExecution());
-		if(stepExecution.getJobExecution().getStatus() == BatchStatus.STOPPING){
+		JobExecution jobExecution = stepExecution.getJobExecution();
+		jobExecutionDao.synchronizeStatus(jobExecution);
+		if(jobExecution.getStatus() == BatchStatus.STOPPING || jobExecution.getStatus() == BatchStatus.PAUSED){
 			stepExecution.setTerminateOnly();
 		}
 	}

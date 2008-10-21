@@ -87,6 +87,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		if (lastExecution != null) {
 			if (lastExecution.getStatus() == BatchStatus.PAUSED) {
 				jobExecution = lastExecution;
+				// this execution will be continued => delete the end time
+				jobExecution.setEndTime(null);
 			}
 			else if (!job.isRestartable()) {
 				throw new JobRestartException("JobInstance already exists and is not restartable");
