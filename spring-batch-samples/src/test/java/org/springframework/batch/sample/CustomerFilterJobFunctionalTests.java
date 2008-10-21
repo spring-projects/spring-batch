@@ -68,6 +68,7 @@ public class CustomerFilterJobFunctionalTests extends AbstractValidatingBatchLau
 	
 	@After
 	public void tearDown() throws Exception {
+		simpleJdbcTemplate.update("delete from CUSTOMER where ID > 4");
 		simpleJdbcTemplate.update("delete from TRADE");
 	}
 
