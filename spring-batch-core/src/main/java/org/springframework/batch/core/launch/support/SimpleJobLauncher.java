@@ -17,6 +17,7 @@ package org.springframework.batch.core.launch.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -81,17 +82,29 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		Assert.notNull(job, "The Job must not be null.");
 		Assert.notNull(jobParameters, "The JobParameters must not be null.");
 
-		boolean exists = jobRepository.isJobInstanceExists(job.getName(), jobParameters);
-		if (exists && !job.isRestartable()) {
-			throw new JobRestartException("JobInstance already exists and is not restartable");
+		final JobExecution jobExecution;
+		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
+		if (lastExecution != null) {
+			if (lastExecution.getStatus() == BatchStatus.PAUSED) {
+				jobExecution = lastExecution;
+			}
+			else if (!job.isRestartable()) {
+				throw new JobRestartException("JobInstance already exists and is not restartable");
+			}
+			else {
+				/*
+				 * There is a very small probability that a non-restartable job
+				 * can be restarted, but only if another process or thread
+				 * manages to launch <i>and</i> fail a job execution for this
+				 * instance between the last assertion and the next method
+				 * returning successfully.
+				 */
+				jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+			}
 		}
-		/**
-		 * There is a very small probability that a non-restartable job can be
-		 * restarted, but only if another process or thread manages to launch
-		 * <i>and</i> fail a job execution for this instance between the last assertion
-		 * and the next method returning successfully.
-		 */
-		final JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		else {
+			jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		}
 
 		taskExecutor.execute(new Runnable() {
 
@@ -99,8 +112,8 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 				try {
 					logger.info("Job: [" + job + "] launched with the following parameters: [" + jobParameters + "]");
 					job.execute(jobExecution);
-					logger.info("Job: [" + job + "] completed with the following parameters: ["
-							+ jobParameters + "] and the following status: [" + jobExecution.getStatus() + "]");
+					logger.info("Job: [" + job + "] completed with the following parameters: [" + jobParameters
+							+ "] and the following status: [" + jobExecution.getStatus() + "]");
 				}
 				catch (Throwable t) {
 					logger.info("Job: [" + job + "] failed with the following parameters: [" + jobParameters + "]", t);

@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
@@ -74,7 +75,9 @@ public class SimpleJobLauncherTests {
 
 		JobExecution jobExecution = new JobExecution(null, null);
 
-		expect(jobRepository.isJobInstanceExists(job.getName(), jobParameters)).andReturn(false);
+		// expect(jobRepository.isJobInstanceExists(job.getName(),
+		// jobParameters)).andReturn(false);
+		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
 		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
 		replay(jobRepository);
 
@@ -96,6 +99,7 @@ public class SimpleJobLauncherTests {
 			public boolean isRestartable() {
 				return false;
 			}
+
 			@Override
 			public void execute(JobExecution execution) {
 				execution.setExitStatus(ExitStatus.FINISHED);
@@ -106,7 +110,9 @@ public class SimpleJobLauncherTests {
 		testRun();
 		try {
 			reset(jobRepository);
-			expect(jobRepository.isJobInstanceExists(job.getName(), jobParameters)).andReturn(true);
+//			expect(jobRepository.isJobInstanceExists(job.getName(), jobParameters)).andReturn(true);
+			expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
+					new JobExecution(new JobInstance(1L, jobParameters, job.getName())));
 			replay(jobRepository);
 			jobLauncher.run(job, jobParameters);
 			fail("Expected JobRestartException");
@@ -141,7 +147,8 @@ public class SimpleJobLauncherTests {
 		try {
 			testRun();
 			fail("Expected RuntimeException");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("foo", e.getMessage());
 		}
 	}
@@ -157,7 +164,8 @@ public class SimpleJobLauncherTests {
 		try {
 			testRun();
 			fail("Expected Error");
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 	}
@@ -167,10 +175,11 @@ public class SimpleJobLauncherTests {
 		try {
 			new SimpleJobLauncher().afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			// expected
 			assertTrue("Message did not contain repository: " + e.getMessage(), contains(e.getMessage().toLowerCase(),
-			        "repository"));
+					"repository"));
 		}
 	}
 

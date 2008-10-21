@@ -124,4 +124,11 @@ public interface JobRepository {
 	 */
 	int getStepExecutionCount(JobInstance jobInstance, String stepName);
 
+	/**
+	 * @param jobName the name of the job that might have run 
+	 * @param jobParameters parameters identifying the {@link JobInstance}
+	 * @return the last execution of job if exists, null otherwise
+	 */
+	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
+
 }

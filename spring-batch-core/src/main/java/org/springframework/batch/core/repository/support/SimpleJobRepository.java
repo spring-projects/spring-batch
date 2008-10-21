@@ -326,4 +326,9 @@ public class SimpleJobRepository implements JobRepository {
 		}
 	}
 
+	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -75,8 +75,11 @@ public class JobRepositorySupport implements JobRepository {
 	 * @see org.springframework.batch.core.repository.JobRepository#isJobInstanceExists(java.lang.String, org.springframework.batch.core.JobParameters)
 	 */
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
-		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		return null;
 	}
 
 }

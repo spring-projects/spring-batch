@@ -265,6 +265,11 @@ public class TaskletStepExceptionTests {
 		public int getUpdateCount() {
 			return updateCount;
 		}
+
+		public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
 
 }
