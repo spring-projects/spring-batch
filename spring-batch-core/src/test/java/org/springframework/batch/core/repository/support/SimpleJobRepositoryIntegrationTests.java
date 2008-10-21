@@ -47,13 +47,15 @@ public class SimpleJobRepositoryIntegrationTests {
 	 * Create two job executions for same job+parameters tuple. Check both
 	 * executions belong to the same job instance and job.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreateAndFind() throws Exception {
 
 		job.setRestartable(true);
 
 		JobParametersBuilder builder = new JobParametersBuilder();
-		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1).addDate("dateKey", new Date(1L));
+		builder.addString("stringKey", "stringValue").addLong("longKey", 1L).addDouble("doubleKey", 1.1).addDate(
+				"dateKey", new Date(1L));
 		JobParameters jobParams = builder.toJobParameters();
 
 		JobExecution firstExecution = jobRepository.createJobExecution(job.getName(), jobParams);
@@ -75,7 +77,8 @@ public class SimpleJobRepositoryIntegrationTests {
 	 * Create two job executions for same job+parameters tuple. Check both
 	 * executions belong to the same job instance and job.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreateAndFindWithNoStartDate() throws Exception {
 		job.setRestartable(true);
 
@@ -93,7 +96,8 @@ public class SimpleJobRepositoryIntegrationTests {
 	 * Save multiple StepExecutions for the same step and check the returned
 	 * count and last execution are correct.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testGetStepExecutionCountAndLastStepExecution() throws Exception {
 		job.setRestartable(true);
 		StepSupport step = new StepSupport("restartedStep");
@@ -130,7 +134,8 @@ public class SimpleJobRepositoryIntegrationTests {
 	/*
 	 * Save execution context and retrieve it.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testSaveExecutionContext() throws Exception {
 		ExecutionContext ctx = new ExecutionContext() {
 			{
@@ -150,21 +155,23 @@ public class SimpleJobRepositoryIntegrationTests {
 		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step.getName());
 		assertEquals(stepExec, retrievedStepExec);
 		assertEquals(ctx, retrievedStepExec.getExecutionContext());
-		
-//		JobExecution retrievedJobExec = jobRepository.getLastJobExecution(jobExec.getJobInstance());
-//		assertEquals(jobExec, retrievedJobExec);
-//		assertEquals(ctx, retrievedJobExec.getExecutionContext());
+
+		// JobExecution retrievedJobExec =
+		// jobRepository.getLastJobExecution(jobExec.getJobInstance());
+		// assertEquals(jobExec, retrievedJobExec);
+		// assertEquals(ctx, retrievedJobExec.getExecutionContext());
 	}
 
 	/*
 	 * If JobExecution is already running, exception will be thrown in attempt
 	 * to create new execution.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testOnlyOneJobExecutionAllowedRunning() throws Exception {
 		job.setRestartable(true);
 		jobRepository.createJobExecution(job.getName(), jobParameters);
-		
+
 		try {
 			jobRepository.createJobExecution(job.getName(), jobParameters);
 			fail();
@@ -173,5 +180,17 @@ public class SimpleJobRepositoryIntegrationTests {
 			// expected
 		}
 	}
-	
+
+	@Transactional
+	@Test
+	public void testGetLastJobExecution() throws Exception {
+		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		jobExecution.setStatus(BatchStatus.FAILED);
+		jobExecution.setEndTime(new Date());
+		jobRepository.update(jobExecution);
+		Thread.sleep(10);
+		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		assertEquals(jobExecution, jobRepository.getLastJobExecution(job.getName(), jobParameters));
+	}
+
 }

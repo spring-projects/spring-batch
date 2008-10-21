@@ -327,8 +327,12 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-		// TODO Auto-generated method stub
-		return null;
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
+		if (jobInstance == null) {
+			return null;
+		}
+		return jobExecutionDao.getLastJobExecution(jobInstance);
+		
 	}
 
 }
