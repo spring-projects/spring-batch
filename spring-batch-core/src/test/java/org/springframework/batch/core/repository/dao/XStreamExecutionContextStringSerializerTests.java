@@ -11,7 +11,7 @@ import java.util.Date;
 import java.math.BigDecimal;
 
 /**
- * @author trisberg
+ * @author Thomas Risberg
  */
 public class XStreamExecutionContextStringSerializerTests {
 
