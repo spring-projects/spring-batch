@@ -18,7 +18,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.JobRepositorySupport;
-import org.springframework.batch.core.step.skip.NonSkippableReadException;
+import org.springframework.batch.core.step.skip.NonSkippableException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.FlushFailedException;
@@ -30,6 +30,7 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.ResetFailedException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.adapter.ItemWriterAdapter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -101,16 +102,49 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 	}
 
 	/**
+	 * Exception that is not fatal nor skippable should cause failure.
+	 */
+	public void testNonSkippableException() throws Exception {
+		factory.setItemWriter(new AbstractItemWriter() {
+
+			public void write(Object item) throws Exception {
+				throw new RuntimeException("writer failure");
+
+			}
+
+		});
+		AbstractStep step = (AbstractStep) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		try {
+			step.execute(stepExecution);
+			fail("non-skippable exception in writer must cause step failure");
+		}
+		catch (Exception e) {
+			assertTrue(e.getMessage().contains("writer failure"));
+		}
+		finally {
+			logger.debug(stepExecution);
+		}
+	}
+
+	/**
 	 * Non-skippable (and non-fatal) exception causes failure immediately.
 	 * @throws Exception
 	 */
 	public void testNonSkippableExceptionOnRead() throws Exception {
-
+		factory.setCommitInterval(1);
 		// nothing is skippable
 		factory.setSkippableExceptionClasses(new Class[] {});
 
 		// no exceptions on write
-		factory.setItemWriter(new ItemWriterAdapter());
+		factory.setItemWriter(new AbstractItemWriter() {
+
+			public void write(Object item) throws Exception {
+				logger.debug(item);
+			}
+			
+		});
 
 		Step step = (Step) factory.getObject();
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -119,7 +153,7 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 			step.execute(stepExecution);
 			fail();
 		}
-		catch (NonSkippableReadException e) {
+		catch (NonSkippableException e) {
 			assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 			assertEquals(1, stepExecution.getItemCount().intValue());
 		}
@@ -338,9 +372,11 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 
 		factory.setSkippableExceptionClasses(new Class[] { Exception.class });
 		factory.setSkipLimit(2);
-		factory.setItemReader(new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3"), Collections.EMPTY_SET));
+		factory.setItemReader(new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3"),
+				Collections.EMPTY_SET));
 		factory.setItemWriter(new ItemWriterAdapter() {
 			int count = 0;
+
 			public void write(Object item) throws Exception {
 				count++;
 				if (count == 1) {
@@ -350,9 +386,9 @@ public class SkipLimitStepFactoryBeanTests extends TestCase {
 					throw new Exception();
 				}
 			}
-			
+
 		});
-		
+
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);

@@ -10,7 +10,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.listener.CompositeSkipListener;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.core.step.skip.NonSkippableReadException;
+import org.springframework.batch.core.step.skip.NonSkippableException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemKeyGenerator;
 import org.springframework.batch.item.ItemReader;
@@ -206,7 +206,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
 
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
-			addFatalExceptionIfMissing(NonSkippableReadException.class);
+			addFatalExceptionIfMissing(NonSkippableException.class);
 			addFatalExceptionIfMissing(RetryException.class);
 
 			if (retryPolicy == null) {
@@ -387,7 +387,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 							onSkipInRead(e);
 							logger.debug("Skipping failed input", e);
 						} else {
-							throw new NonSkippableReadException("Non-skippable exception during read", e);
+							throw new NonSkippableException("Non-skippable exception during read", e);
 						}
 					} catch (SkipLimitExceededException ex) {
 						// we are headed for a abnormal ending so bake in the
@@ -428,6 +428,9 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 					if (writeSkipPolicy.shouldSkip(t, contribution
 							.getStepSkipCount())) {
 						listener.onSkipInWrite(item, t);
+					}
+					else {
+						throw new NonSkippableException("Non-skippable exception on write", t);
 					}
 					contribution.incrementWriteSkipCount();
 					return null;
