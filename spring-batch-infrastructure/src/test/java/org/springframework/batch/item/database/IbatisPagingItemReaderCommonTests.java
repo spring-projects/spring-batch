@@ -21,7 +21,7 @@ public class IbatisPagingItemReaderCommonTests extends CommonDatabaseItemStreamI
 		SqlMapClient sqlMapClient = createSqlMapClient();
 
 		IbatisPagingItemReader reader = new IbatisPagingItemReader();
-		reader.setQueryId("getAllFoos");
+		reader.setQueryId("getPagedFoos");
 		reader.setSqlMapClient(sqlMapClient);
 		reader.setSaveState(true);
 

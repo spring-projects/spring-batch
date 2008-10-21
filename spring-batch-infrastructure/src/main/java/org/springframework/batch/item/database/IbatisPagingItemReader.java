@@ -94,7 +94,10 @@ public class IbatisPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		if (parameterValues != null) {
 			parameters.putAll(parameterValues);
 		}
-		results = sqlMapClientTemplate.queryForList(queryId, parameters, (page * pageSize), pageSize);
+		parameters.put("_page", page);
+		parameters.put("_pagesize", pageSize);
+		parameters.put("_skiprows", page * pageSize);
+		results = sqlMapClientTemplate.queryForList(queryId, parameters);
 	}
 
 	@Override

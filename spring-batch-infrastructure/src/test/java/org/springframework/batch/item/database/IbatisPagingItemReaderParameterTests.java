@@ -24,7 +24,7 @@ public class IbatisPagingItemReaderParameterTests extends AbstractPagingItemRead
 		SqlMapClient sqlMapClient = createSqlMapClient();
 
 		IbatisPagingItemReader reader = new IbatisPagingItemReader();
-		reader.setQueryId("getFoos3AndUp");
+		reader.setQueryId("getPagedFoos3AndUp");
 		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 3));
 		reader.setSqlMapClient(sqlMapClient);
 		reader.setSaveState(true);
