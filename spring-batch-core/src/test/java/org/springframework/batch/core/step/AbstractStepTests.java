@@ -132,6 +132,7 @@ public class AbstractStepTests {
 	@Before
 	public void setUp() throws Exception {
 		tested.setJobRepository(repository);
+		repository.add(execution);
 	}
 	
 	@Test

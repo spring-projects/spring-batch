@@ -186,7 +186,7 @@ public class TaskletStepTests {
 
 		JobExecution jobExecution = repository.createJobExecution(job.getName(), jobInstance.getJobParameters());
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(1, processed.size());
 	}
@@ -806,7 +806,7 @@ public class TaskletStepTests {
 		public void update(StepExecution stepExecution) {
 			updateCount++;
 			if (updateCount <= 3) {
-				assertEquals(updateCount, stepExecution.getReadCount());
+				assertEquals(updateCount, stepExecution.getReadCount() + 1);
 			}
 		}
 
@@ -814,11 +814,11 @@ public class TaskletStepTests {
 	
 	private static class JobRepositoryFailedUpdateStub extends JobRepositorySupport {
 		
-		private boolean firstCall = true;
+		private int called = 0;
 		
 		public void update(StepExecution stepExecution) {
-			if (firstCall) {
-				firstCall = false;
+			called++;
+			if (called == 3) {
 				throw new DataAccessResourceFailureException("stub exception");
 			}
 		}

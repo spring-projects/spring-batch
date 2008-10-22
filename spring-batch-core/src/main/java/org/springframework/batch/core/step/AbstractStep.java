@@ -183,7 +183,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			UnexpectedJobExecutionException {
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
-		getJobRepository().add(stepExecution);
+		getJobRepository().update(stepExecution);
 
 		ExitStatus exitStatus = ExitStatus.FAILED;
 		Exception commitException = null;

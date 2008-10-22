@@ -90,6 +90,7 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 			boolean startable = getStartable(currentStepExecution, contexts.get(key));
 
 			if (startable) {
+				jobRepository.add(currentStepExecution);
 				set.add(currentStepExecution);
 			}
 

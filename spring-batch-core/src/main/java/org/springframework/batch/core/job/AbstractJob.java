@@ -327,6 +327,8 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 			else {
 				currentStepExecution.setExecutionContext(new ExecutionContext());
 			}
+			
+			jobRepository.add(currentStepExecution);
 
 			step.execute(currentStepExecution);
 

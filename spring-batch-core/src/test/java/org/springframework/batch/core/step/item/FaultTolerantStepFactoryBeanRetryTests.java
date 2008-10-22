@@ -155,6 +155,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 
 		assertEquals(0, stepExecution.getSkipCount());
@@ -192,6 +193,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 
 		assertEquals(2, stepExecution.getSkipCount());
@@ -246,6 +248,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 		step.setName("mytest");
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 
 		assertEquals(2, recovered.size());
@@ -310,6 +313,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 		step.setName("mytest");
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 
 		assertEquals(2, recovered.size());
@@ -358,6 +362,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());	
 			
@@ -410,6 +415,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 		String message = stepExecution.getFailureExceptions().get(0).getMessage();
 		assertTrue("Wrong message: " + message, message.contains("Write error - planned but not skippable."));
@@ -452,6 +458,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		
@@ -500,6 +507,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		AbstractStep step = (AbstractStep) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		

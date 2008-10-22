@@ -69,6 +69,7 @@ public class PartitionStepTests {
 		});
 		step.afterPropertiesSet();
 		StepExecution stepExecution = new JobExecution(0L).createStepExecution("foo");
+		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		// one master and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
@@ -91,6 +92,7 @@ public class PartitionStepTests {
 		});
 		step.afterPropertiesSet();
 		StepExecution stepExecution = new JobExecution(0L).createStepExecution("foo");
+		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		// one master and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());

@@ -87,6 +87,7 @@ public class RestartIntegrationTests {
 		// Two attempts
 		assertEquals(2, afterMaster-beforeMaster);
 		// One failure and two successes
+		System.out.println(afterPartition);
 		assertEquals(3, afterPartition-beforePartition);
 
 	}

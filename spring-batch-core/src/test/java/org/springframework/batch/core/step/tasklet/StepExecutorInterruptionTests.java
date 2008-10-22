@@ -49,13 +49,15 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private ItemWriter<Object> itemWriter;
 	
 	private StepExecution stepExecution;
+	
+	private JobRepository jobRepository;
 
 	public void setUp() throws Exception {
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
 
-		JobRepository jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
+		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 				new MapStepExecutionDao(), new MapExecutionContextDao());
 
 		JobSupport job = new JobSupport();
@@ -169,6 +171,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 			}
 		});
 		
+		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		
 		assertEquals("Planned!", stepExecution.getFailureExceptions().get(0).getMessage());
@@ -182,6 +185,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		Thread processingThread = new Thread() {
 			public void run() {
 				try {
+					jobRepository.add(stepExecution);
 					step.execute(stepExecution);
 				}
 				catch (JobInterruptedException e) {

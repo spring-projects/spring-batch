@@ -90,7 +90,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(1, jobRepository.getUpdateCount());
+		assertEquals(2, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -106,7 +106,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(1, jobRepository.getUpdateCount());
+		assertEquals(2, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -129,7 +129,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(COMPLETED, stepExecution.getStatus());
 		assertFalse(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(3, jobRepository.getUpdateCount());
+		assertEquals(4, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -149,7 +149,7 @@ public class TaskletStepExceptionTests {
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
 		assertFalse(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(1, jobRepository.getUpdateCount());
+		assertEquals(2, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -167,7 +167,7 @@ public class TaskletStepExceptionTests {
 		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(1, jobRepository.getUpdateCount());
+		assertEquals(2, jobRepository.getUpdateCount());
 	}
 
 	@Test
@@ -200,12 +200,17 @@ public class TaskletStepExceptionTests {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setJobRepository(new UpdateCountingJobRepository() {
+			boolean firstCall = true;
 			@Override
 			public void update(StepExecution arg0) {
+				if (firstCall) {
+					firstCall = false;
+					return;
+				}
 				throw exception;
 			}
 		});
-
+		
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));

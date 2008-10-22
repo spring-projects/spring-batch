@@ -130,8 +130,8 @@ public class ChunkOrientedStepIntegrationTests {
 				put("foo", "bar");
 			}
 		});
-		// step.setLastExecution(stepExecution);
-
+		
+		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobExecution.getJobInstance(), step.getName());

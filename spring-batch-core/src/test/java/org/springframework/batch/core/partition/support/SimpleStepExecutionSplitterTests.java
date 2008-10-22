@@ -1,9 +1,10 @@
 package org.springframework.batch.core.partition.support;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +38,12 @@ public class SimpleStepExecutionSplitterTests {
 	@Test
 	public void testSimpleStepExecutionProviderJobRepositoryStep() throws Exception {
 		SimpleStepExecutionSplitter provider = new SimpleStepExecutionSplitter(jobRepository, step);
-		assertEquals(2, provider.split(stepExecution, 2).size());
+		Set<StepExecution> execs = provider.split(stepExecution, 2);
+		assertEquals(2, execs.size());
+		
+		for (StepExecution execution : execs) {
+			assertNotNull("step execution partition is saved", execution.getId());
+		}
 	}
 
 	@Test
