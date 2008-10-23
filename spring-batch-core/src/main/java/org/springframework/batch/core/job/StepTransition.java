@@ -242,7 +242,7 @@ public class StepTransition implements Comparable<StepTransition> {
 
 	/**
 	 * Sorts by decreasing specificity of pattern, based on just counting
-	 * wildcards (with * taking precedence over ?). If wodlcard counts are equal
+	 * wildcards (with * taking precedence over ?). If wildcard counts are equal
 	 * then falls back to alphabetic comparison. Hence * &gt; foo* &gt; ??? &gt;
 	 * fo? > foo.
 	 * @see Comparable#compareTo(Object)
