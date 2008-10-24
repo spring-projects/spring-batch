@@ -224,6 +224,12 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 					if (processSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						contribution.incrementProcessSkipCount();
 						iterator.remove(e);
+						try {
+							listener.onSkipInProcess(item, e);
+						}
+						catch (RuntimeException ex) {
+							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+						}
 						return null;
 					}
 					else {
@@ -242,16 +248,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 				filtered++;
 			}
 
-		}
-
-		for (ItemWrapper<T> skip : inputs.getSkips()) {
-			Exception exception = skip.getException();
-			try {
-				listener.onSkipInProcess(skip.getItem(), exception);
-			}
-			catch (RuntimeException e) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", e, exception);
-			}
 		}
 
 		contribution.incrementFilterCount(filtered);
@@ -287,25 +283,25 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 					return null;
 				}
 				for (S item : chunk) {
-						try {
-							doWrite(Collections.singletonList(item));
-							contribution.incrementWriteCount(1);
+					try {
+						doWrite(Collections.singletonList(item));
+						contribution.incrementWriteCount(1);
+					}
+					catch (Exception e) {
+						checkSkipPolicy(item, e, contribution);
+						if (rollbackClassifier.classify(e)) {
+							throw e;
 						}
-						catch (Exception e) {
-							checkSkipPolicy(item, e, contribution);
-							if (rollbackClassifier.classify(e)) {
-								throw e;
-							}
-							else {
-								logger.error("Exception encountered that does not classify for rollback: ", e);
-							}
+						else {
+							logger.error("Exception encountered that does not classify for rollback: ", e);
 						}
 					}
+				}
 
 				return null;
 
 			}
-			
+
 			private void checkSkipPolicy(S item, Exception e, StepContribution contribution) {
 				if (writeSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 					contribution.incrementWriteSkipCount();

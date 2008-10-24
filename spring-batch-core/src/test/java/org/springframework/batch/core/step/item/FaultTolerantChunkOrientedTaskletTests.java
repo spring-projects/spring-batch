@@ -19,6 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import static org.easymock.EasyMock.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.ChunkContext;
@@ -345,9 +348,84 @@ public class FaultTolerantChunkOrientedTaskletTests {
 			}
 			catch (Exception e) {
 				assertEquals(WRITER_FAILED_MESSAGE, e.getMessage());
-				assertEquals(i*CHUNK_SIZE, processed.size());
+				assertEquals(i * CHUNK_SIZE, processed.size());
 			}
 		}
 
 	}
+
+	/**
+	 * Make sure skip counts are correct when items are skipped on both process
+	 * and write in the same chunk.
+	 */
+	@Test
+	public void testSkipItemOnProcessAndWrite() throws Exception {
+		final String WRITER_FAILED_MESSAGE = "writer failed";
+		final String PROCESSOR_FAILED_MESSAGE = "processor failed";
+		final RuntimeException writerException = new RuntimeException(WRITER_FAILED_MESSAGE);
+		final RuntimeException processorException = new RuntimeException(PROCESSOR_FAILED_MESSAGE);
+		final int CHUNK_SIZE = 2;
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader,
+				new ItemProcessor<Integer, String>() {
+					public String process(Integer item) throws Exception {
+						if (item == 1) {
+							throw processorException; 
+						}
+						processed.add(item);
+						return String.valueOf(item);
+					}
+				}, new ItemWriter<String>() {
+					public void write(List<? extends String> items) throws Exception {
+						throw writerException; 
+					}
+
+				}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+		chunkOperations.setCompletionPolicy(new SimpleCompletionPolicy(CHUNK_SIZE));
+		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
+		ChunkContext attributes = new ChunkContext();
+
+		// mock checks skip listener is called as expected
+		@SuppressWarnings("unchecked")
+		SkipListener<Integer, String> skipListener = createStrictMock(SkipListener.class);
+		tasklet.registerListener(skipListener);
+		skipListener.onSkipInProcess(1, processorException);
+		expectLastCall();
+		skipListener.onSkipInWrite("2", writerException);
+		expectLastCall();
+		replay(skipListener);
+		
+		// processor fails first
+		try {
+			tasklet.execute(contribution, attributes);
+			fail();
+		}
+		catch (Exception e) {
+			assertEquals(PROCESSOR_FAILED_MESSAGE, e.getMessage());
+		}
+
+		// we've only rolled back, nothing has been skipped yet
+		assertEquals(0, contribution.getProcessSkipCount());
+		assertEquals(0, contribution.getWriteSkipCount());
+
+		try {
+			tasklet.execute(contribution, attributes);
+			fail();
+		}
+		catch (Exception e) {
+			assertEquals(WRITER_FAILED_MESSAGE, e.getMessage());
+		}
+
+		// processor skipped failed item, writer fails and causes rollback
+		assertEquals(1, contribution.getProcessSkipCount());
+		assertEquals(0, contribution.getWriteSkipCount());
+
+		tasklet.execute(contribution, attributes);
+
+		// both processor and writer skipped
+		assertEquals(1, contribution.getProcessSkipCount());
+		assertEquals(1, contribution.getWriteSkipCount());
+
+		verify(skipListener);
+	}
+
 }
