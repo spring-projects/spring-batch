@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.core.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
 
 /**

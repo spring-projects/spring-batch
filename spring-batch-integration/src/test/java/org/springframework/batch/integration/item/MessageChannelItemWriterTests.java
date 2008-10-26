@@ -26,12 +26,10 @@ import java.util.Collections;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.integration.adapter.MessageHandler;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.ThreadLocalChannel;
-import org.springframework.integration.endpoint.ServiceActivatorEndpoint;
-import org.springframework.integration.message.Message;
+import org.springframework.integration.core.Message;
+import org.springframework.integration.core.MessageChannel;
 import org.springframework.integration.message.MessageConsumer;
 import org.springframework.util.ReflectionUtils;
 
@@ -43,8 +41,7 @@ public class MessageChannelItemWriterTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.item.MessageChannelItemWriter#setChannel(org.springframework.integration.channel.MessageChannel)}
-	 * .
+	 * {@link MessageChannelItemWriter#setChannel(MessageChannel)} .
 	 */
 	@Test
 	public void testSetChannel() {
@@ -89,12 +86,11 @@ public class MessageChannelItemWriterTests {
 	@Test
 	public void testWriteWithRollbackOnEndpoint() throws Exception {
 		DirectChannel channel = new DirectChannel();
-		ServiceActivatorEndpoint endpoint = new ServiceActivatorEndpoint(new MessageHandler() {
-			public Message<?> handle(Message<?> message) {
+		channel.subscribe(new MessageConsumer() {
+			public void onMessage(Message<?> message) {
 				throw new RuntimeException("Planned failure");
 			}
 		});
-		channel.subscribe(endpoint);
 		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
 		writer.setChannel(channel);
 		try {
@@ -104,7 +100,7 @@ public class MessageChannelItemWriterTests {
 		catch (RuntimeException e) {
 			// INT-377: this assertion fails because the exception is wrapped
 			// too tightly
-			assertEquals("Planned failure", e.getCause().getMessage());
+			assertEquals("Planned failure", e.getMessage());
 		}
 	}
 }

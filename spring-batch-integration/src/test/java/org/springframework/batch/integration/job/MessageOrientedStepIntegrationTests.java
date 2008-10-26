@@ -17,6 +17,7 @@ package org.springframework.batch.integration.job;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
@@ -47,6 +48,11 @@ public class MessageOrientedStepIntegrationTests {
 	@Autowired
 	@Qualifier("job")
 	private Job job;
+	
+	@After
+	public void shutdown() {
+		bus.stop();
+	}
 
 	@Test
 	public void testLaunchJob() throws Exception {

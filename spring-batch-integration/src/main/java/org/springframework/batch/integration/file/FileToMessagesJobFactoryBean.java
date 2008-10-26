@@ -33,7 +33,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.core.MessageChannel;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 

@@ -90,7 +90,7 @@ public class StepExecutionMessageHandler {
 				if (!isRestart(jobInstance, lastStepExecution)) {
 					stepExecution.setExecutionContext(new ExecutionContext());
 				}
-
+				jobRepository.add(stepExecution);
 				step.execute(stepExecution);
 
 			}

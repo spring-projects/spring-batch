@@ -21,7 +21,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.core.io.Resource;
-import org.springframework.integration.message.Message;
+import org.springframework.integration.core.Message;
 
 /**
  * @author Dave Syer
@@ -38,7 +38,7 @@ public class ResourcePayloadAsJobParameterStrategy implements MessageToJobParame
 	 * Convert a message payload which is a {@link Resource} to its URL
 	 * representation and load that into a job parameter.
 	 * 
-	 * @see org.springframework.batch.integration.file.MessageToJobParametersStrategy#getJobParameters(org.springframework.integration.message.Message)
+	 * @see MessageToJobParametersStrategy#getJobParameters(Message)
 	 */
 	public JobParameters getJobParameters(Message<?> message) {
 		JobParametersBuilder builder = new JobParametersBuilder();

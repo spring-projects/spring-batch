@@ -17,12 +17,12 @@ import org.springframework.batch.integration.JobSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.bus.MessageBus;
-import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.PollableChannel;
+import org.springframework.integration.core.Message;
+import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.core.MessageHeaders;
+import org.springframework.integration.core.MessagingException;
 import org.springframework.integration.message.GenericMessage;
-import org.springframework.integration.message.Message;
-import org.springframework.integration.message.MessageHeaders;
-import org.springframework.integration.message.MessagingException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -75,7 +75,7 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("dontclash", "12");
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(MessageHeaders.RETURN_ADDRESS, "response");
+		map.put(MessageHeaders.REPLY_CHANNEL, "response");
 		MessageHeaders headers = new MessageHeaders(map);
 		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job,
 				builder.toJobParameters()), headers);

@@ -80,4 +80,11 @@ public class JobRepositorySupport implements JobRepository {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.JobRepository#getLastJobExecution(java.lang.String, org.springframework.batch.core.JobParameters)
+	 */
+	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		return null;
+	}
+
 }

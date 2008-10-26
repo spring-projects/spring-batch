@@ -39,8 +39,8 @@ import org.springframework.batch.support.transaction.ResourcelessTransactionMana
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.channel.MessageChannel;
-import org.springframework.integration.message.Message;
+import org.springframework.integration.core.Message;
+import org.springframework.integration.core.MessageChannel;
 import org.springframework.integration.message.MessageConsumer;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
@@ -100,7 +100,7 @@ public class FileToMessagesJobFactoryBeanTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.file.FileToMessagesJobFactoryBean#setChannel(org.springframework.integration.channel.MessageChannel)}.
+	 * {@link FileToMessagesJobFactoryBean#setChannel(MessageChannel)}.
 	 */
 	@Test
 	public void testSetChannel() {
