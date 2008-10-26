@@ -131,7 +131,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
