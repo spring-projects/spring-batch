@@ -249,12 +249,8 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		}
 		assertTrue(attributes.hasAttribute("INPUT_BUFFER_KEY"));
 
-		@SuppressWarnings("unchecked")
-		Chunk<Integer> chunk = (Chunk<Integer>) attributes.getAttribute("INPUT_BUFFER_KEY");
-
 		// skip...
 		tasklet.execute(contribution, attributes);
-		assertEquals(1, chunk.getSkips().size());
 
 		assertEquals(3, contribution.getReadCount());
 		assertEquals(1, contribution.getProcessSkipCount());
@@ -277,7 +273,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		StepContribution contribution = new StepExecution("foo", null).createStepContribution();
 		ChunkContext attributes = new ChunkContext();
 
-		// Count to 3: (try + skip + try)
+		// Count to 2: (try first + fail) + (skip first + try second + fail)
 		for (int i = 0; i < 2; i++) {
 			try {
 				tasklet.execute(contribution, attributes);
@@ -289,12 +285,11 @@ public class FaultTolerantChunkOrientedTaskletTests {
 			assertTrue(attributes.hasAttribute("INPUT_BUFFER_KEY"));
 		}
 		@SuppressWarnings("unchecked")
-		Chunk<Integer> chunk = (Chunk<Integer>) attributes.getAttribute("INPUT_BUFFER_KEY");
-		assertEquals(1, chunk.getSkips().size());
+		Map<Integer, Exception > skips = (Map<Integer, Exception>) attributes.getAttribute("SKIPPED_INPUTS_BUFFER_KEY");
+		assertEquals(1, skips.size());
 
 		// The last recovery for this chunk...
 		tasklet.execute(contribution, attributes);
-		assertEquals(2, chunk.getSkips().size());
 
 		attributes = new ChunkContext();
 		try {
