@@ -13,29 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.flow;
 
-package org.springframework.batch.core;
-
+import java.util.Collection;
 
 /**
- * Enumeration representing the status of a an Execution.
+ * Strategy interface for aggregating {@link FlowExecution} instances into a
+ * single exit status.
  * 
- * @author Lucas Ward
  * @author Dave Syer
+ * 
  */
+public interface FlowExecutionAggregator {
 
-public enum BatchStatus {
-
-	COMPLETED, STARTED, STARTING, PAUSED, FAILED, STOPPING, STOPPED, UNKNOWN;
-	
-	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.compareTo(status2)<0) {
-			return status2;
-		}
-		if (status1.compareTo(status2)>0) {
-			return status1;
-		}
-		else return status1;
-	}
+	/**
+	 * @param executions the executions to aggregate
+	 * @return a summary status for the whole lot
+	 */
+	String aggregate(Collection<FlowExecution> executions);
 
 }

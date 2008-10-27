@@ -30,7 +30,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
@@ -195,7 +194,7 @@ public class SimpleJobLauncherTests {
 	public void testResumePausedInstance() throws Exception {
 		long id = 9;
 		JobExecution jobExecution = new JobExecution(null, id);
-		jobExecution.setStatus(BatchStatus.PAUSED);
+		jobExecution.pause();
 		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
 		replay(jobRepository);
 	

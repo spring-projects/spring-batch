@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.flow;
 
-package org.springframework.batch.core;
-
+import org.springframework.batch.flow.AbstractState;
+import org.springframework.batch.flow.FlowExecution;
 
 /**
- * Enumeration representing the status of a an Execution.
+ * Base class for {@link State} implementations.
  * 
- * @author Lucas Ward
  * @author Dave Syer
+ *
  */
+public class StateSupport<T> extends AbstractState<T> {
 
-public enum BatchStatus {
+	/**
+	 * @param name
+	 */
+	public StateSupport(String name) {
+		super(name);
+	}
 
-	COMPLETED, STARTED, STARTING, PAUSED, FAILED, STOPPING, STOPPED, UNKNOWN;
-	
-	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.compareTo(status2)<0) {
-			return status2;
-		}
-		if (status1.compareTo(status2)>0) {
-			return status1;
-		}
-		else return status1;
+	@Override
+	public String handle(T context) throws Exception {
+		return FlowExecution.COMPLETED;
 	}
 
 }

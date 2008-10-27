@@ -194,6 +194,24 @@ public class JobExecution extends Entity {
 	}
 
 	/**
+	 * Signal that this job execution wishes to be paused.
+	 */
+	public void pause() {
+		status = BatchStatus.PAUSED;
+	}
+	
+	/**
+	 * Test if the {@link JobExecution} has been paused.
+	 * 
+	 * @see #pause()
+	 * 
+	 * @return true if this instance is paused
+	 */
+	public boolean isPaused() {
+		return status==BatchStatus.PAUSED;
+	}
+
+	/**
 	 * Sets the {@link ExecutionContext} for this execution
 	 * 
 	 * @param executionContext the context

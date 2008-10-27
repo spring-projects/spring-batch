@@ -13,29 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.springframework.batch.core;
-
+package org.springframework.batch.flow;
 
 /**
- * Enumeration representing the status of a an Execution.
- * 
- * @author Lucas Ward
  * @author Dave Syer
+ *
  */
+public class FlowExecutionException extends Exception {
 
-public enum BatchStatus {
+	/**
+	 * @param message
+	 */
+	public FlowExecutionException(String message) {
+		super(message);
+	}
 
-	COMPLETED, STARTED, STARTING, PAUSED, FAILED, STOPPING, STOPPED, UNKNOWN;
-	
-	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.compareTo(status2)<0) {
-			return status2;
-		}
-		if (status1.compareTo(status2)>0) {
-			return status1;
-		}
-		else return status1;
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public FlowExecutionException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }

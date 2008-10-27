@@ -370,7 +370,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 
 	public boolean pause(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = findExecutionById(executionId);
-		jobExecution.setStatus(BatchStatus.PAUSED);
+		jobExecution.pause();
 		jobRepository.update(jobExecution);
 		return true;
 	}

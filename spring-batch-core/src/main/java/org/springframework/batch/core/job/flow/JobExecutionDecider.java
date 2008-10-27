@@ -13,29 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.core.job.flow;
 
-package org.springframework.batch.core;
-
+import org.springframework.batch.core.JobExecution;
 
 /**
- * Enumeration representing the status of a an Execution.
- * 
- * @author Lucas Ward
  * @author Dave Syer
+ * 
  */
+public interface JobExecutionDecider {
 
-public enum BatchStatus {
-
-	COMPLETED, STARTED, STARTING, PAUSED, FAILED, STOPPING, STOPPED, UNKNOWN;
-	
-	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.compareTo(status2)<0) {
-			return status2;
-		}
-		if (status1.compareTo(status2)>0) {
-			return status1;
-		}
-		else return status1;
-	}
+	/**
+	 * Strategy for branching an execution based on the state of an ongoing
+	 * {@link JobExecution}. The return value will be used as a status to
+	 * determine the next step in the job.
+	 * 
+	 * @param jobExecution a job execution
+	 * @return the exit status code
+	 */
+	String decide(JobExecution jobExecution);
 
 }

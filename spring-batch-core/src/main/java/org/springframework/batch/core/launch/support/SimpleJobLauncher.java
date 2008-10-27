@@ -17,16 +17,15 @@ package org.springframework.batch.core.launch.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -85,7 +84,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		final JobExecution jobExecution;
 		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
 		if (lastExecution != null) {
-			if (lastExecution.getStatus() == BatchStatus.PAUSED) {
+			if (lastExecution.isPaused()) {
 				jobExecution = lastExecution;
 				// this execution will be continued => delete the end time
 				jobExecution.setEndTime(null);

@@ -217,14 +217,22 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 			if (execution.getStatus() != BatchStatus.STOPPING) {
 
 				execution.setStartTime(new Date());
-				updateStatus(execution, BatchStatus.STARTING);
+				// If paused we need to retain the status so that subclasses can
+				// handle the resume, otherwise we mark it as started...
+				if (!execution.isPaused()) {
+					updateStatus(execution, BatchStatus.STARTED);
+				}			
 
 				listener.beforeJob(execution);
 
 				StepExecution lastStepExecution = doExecute(execution);
 
 				if (lastStepExecution != null) {
-					execution.setStatus(lastStepExecution.getStatus());
+					if (!execution.isPaused()) {
+						// If the subclass wants to pause don't change the
+						// status.
+						execution.setStatus(lastStepExecution.getStatus());
+					}
 					execution.setExitStatus(lastStepExecution.getExitStatus());
 				}
 			}
@@ -232,27 +240,17 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 
 				// The job was already stopped before we even got this far. Deal
 				// with it in the same way as any other interruption.
-				if (execution.getStatus() == BatchStatus.PAUSED) {
-					// do nothing
-				}
-				else {
+				execution.setStatus(BatchStatus.STOPPED);
+				execution.setExitStatus(ExitStatus.FINISHED);
 
-					execution.setStatus(BatchStatus.STOPPED);
-					execution.setExitStatus(ExitStatus.FINISHED);
-				}
 			}
 
 		}
 		catch (JobInterruptedException e) {
 			logger.error(e);
-			if (execution.getStatus() == BatchStatus.PAUSED) {
-				// do nothing
-			}
-			else {
-				execution.setExitStatus(ExitStatus.FAILED);
-				execution.setStatus(BatchStatus.STOPPED);
-				execution.addFailureException(e);
-			}
+			execution.setExitStatus(ExitStatus.FAILED);
+			execution.setStatus(BatchStatus.STOPPED);
+			execution.addFailureException(e);
 		}
 		catch (Throwable t) {
 			logger.error(t);
@@ -313,7 +311,6 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 
 		if (shouldStart(jobInstance, step)) {
 
-			updateStatus(execution, BatchStatus.STARTED);
 			currentStepExecution = execution.createStepExecution(step.getName());
 
 			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
@@ -327,7 +324,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 			else {
 				currentStepExecution.setExecutionContext(new ExecutionContext());
 			}
-			
+
 			jobRepository.add(currentStepExecution);
 
 			step.execute(currentStepExecution);

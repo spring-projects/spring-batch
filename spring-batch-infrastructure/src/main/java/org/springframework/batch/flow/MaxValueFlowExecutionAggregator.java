@@ -13,29 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.springframework.batch.flow;
 
-package org.springframework.batch.core;
-
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Enumeration representing the status of a an Execution.
- * 
- * @author Lucas Ward
  * @author Dave Syer
+ *
  */
+public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator {
 
-public enum BatchStatus {
-
-	COMPLETED, STARTED, STARTING, PAUSED, FAILED, STOPPING, STOPPED, UNKNOWN;
-	
-	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.compareTo(status2)<0) {
-			return status2;
+	/**
+	 * @see FlowExecutionAggregator#aggregate(Collection)
+	 */
+	public String aggregate(Collection<FlowExecution> executions) {
+		if (executions==null || executions.size()==0) {
+			return FlowExecution.UNKNOWN;
 		}
-		if (status1.compareTo(status2)>0) {
-			return status1;
-		}
-		else return status1;
+		return Collections.max(executions).getStatus();
 	}
 
 }

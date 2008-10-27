@@ -13,29 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.springframework.batch.core;
+package org.springframework.batch.flow;
 
 
 /**
- * Enumeration representing the status of a an Execution.
- * 
- * @author Lucas Ward
  * @author Dave Syer
+ *
+ * @param <T>
  */
+public interface Flow<T> {
 
-public enum BatchStatus {
+	/**
+	 * @return the name of the flow
+	 */
+	String getName();
 
-	COMPLETED, STARTED, STARTING, PAUSED, FAILED, STOPPING, STOPPED, UNKNOWN;
-	
-	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.compareTo(status2)<0) {
-			return status2;
-		}
-		if (status1.compareTo(status2)>0) {
-			return status1;
-		}
-		else return status1;
-	}
+	/**
+	 * @throws FlowExecutionException
+	 */
+	FlowExecution start(T context) throws FlowExecutionException;
+
+	/**
+	 * @param stateName the name of the {@link State} to resume on
+	 * @param context the context to be passed into each {@link State} executed
+	 * @return a {@link FlowExecution} containing the exit status of the flow
+	 * @throws FlowExecutionException
+	 */
+	FlowExecution resume(String stateName, T context) throws FlowExecutionException;
 
 }
