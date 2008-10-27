@@ -13,7 +13,7 @@ public class DecisionState extends AbstractState<JobFlowExecutor> {
 	/**
 	 * @param name
 	 */
-	DecisionState(String name, JobExecutionDecider decider) {
+	DecisionState(JobExecutionDecider decider, String name) {
 		super(name);
 		this.decider = decider;
 	}

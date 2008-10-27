@@ -164,9 +164,9 @@ public class FlowJobTests {
 		};
 		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "*", "decision"));
-		transitions.add(StateTransition.createStateTransition(new DecisionState("decision", decider), "*", "step2"));
+		transitions.add(StateTransition.createStateTransition(new DecisionState(decider, "decision"), "*", "step2"));
 		transitions.add(StateTransition
-				.createStateTransition(new DecisionState("decision", decider), "SWITCH", "step3"));
+				.createStateTransition(new DecisionState(decider, "decision"), "SWITCH", "step3"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2")), "*"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step3")), "*"));
 		flow.setStateTransitions(transitions);

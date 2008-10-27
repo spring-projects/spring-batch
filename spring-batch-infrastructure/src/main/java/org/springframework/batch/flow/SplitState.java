@@ -42,7 +42,7 @@ public class SplitState<T> extends AbstractState<T> {
 	/**
 	 * @param name
 	 */
-	public SplitState(String name, Collection<Flow<T>> flows) {
+	public SplitState(Collection<Flow<T>> flows, String name) {
 		super(name);
 		this.flows = flows;
 	}

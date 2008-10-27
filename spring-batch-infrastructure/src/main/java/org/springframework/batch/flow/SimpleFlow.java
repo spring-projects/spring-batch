@@ -37,7 +37,7 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
  * @author Dave Syer
  * 
  */
-public class SimpleFlow<T> implements Flow<T> {
+public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 
 	private State<T> startState;
 
@@ -87,7 +87,7 @@ public class SimpleFlow<T> implements Flow<T> {
 	}
 
 	/**
-	 * Locate start step and pre-populate data structures needed for execution.
+	 * Locate start state and pre-populate data structures needed for execution.
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
 	 */
@@ -132,7 +132,7 @@ public class SimpleFlow<T> implements Flow<T> {
 	 * @return the next {@link Step} (or null if this is the end)
 	 * @throws JobExecutionException
 	 */
-	private State<T> nextState(String stepName, String status) throws FlowExecutionException {
+	private State<T> nextState(String stateName, String status) throws FlowExecutionException {
 
 		// Special status value indicating that a state wishes to pause
 		// execution
@@ -140,11 +140,11 @@ public class SimpleFlow<T> implements Flow<T> {
 			return null;
 		}
 
-		Set<StateTransition<T>> set = transitionMap.get(stepName);
+		Set<StateTransition<T>> set = transitionMap.get(stateName);
 
 		if (set == null) {
 			throw new FlowExecutionException(String.format("No transitions found in flow=%s for state=%s", getName(),
-					stepName));
+					stateName));
 		}
 
 		String next = null;
@@ -161,7 +161,7 @@ public class SimpleFlow<T> implements Flow<T> {
 
 		if (next == null) {
 			throw new FlowExecutionException(String.format(
-					"Next state not found in flow=%s for step=%s with exit status=%s", getName(), stepName, status));
+					"Next state not found in flow=%s for state=%s with exit status=%s", getName(), stateName, status));
 		}
 
 		if (!stateMap.containsKey(next)) {
@@ -183,9 +183,9 @@ public class SimpleFlow<T> implements Flow<T> {
 		stateMap.clear();
 		boolean hasEndStep = false;
 
-		for (StateTransition<T> stepTransition : stateTransitions) {
-			State<T> step = stepTransition.getState();
-			stateMap.put(step.getName(), step);
+		for (StateTransition<T> stateTransition : stateTransitions) {
+			State<T> state = stateTransition.getState();
+			stateMap.put(state.getName(), state);
 		}
 
 		for (StateTransition<T> stateTransition : stateTransitions) {
@@ -197,7 +197,7 @@ public class SimpleFlow<T> implements Flow<T> {
 				String next = stateTransition.getNext();
 
 				if (!stateMap.containsKey(next)) {
-					throw new IllegalArgumentException("Missing step for [" + stateTransition + "]");
+					throw new IllegalArgumentException("Missing state for [" + stateTransition + "]");
 				}
 
 			}
@@ -218,7 +218,7 @@ public class SimpleFlow<T> implements Flow<T> {
 
 		if (!hasEndStep) {
 			throw new IllegalArgumentException(
-					"No end step was found.  You must specify at least one transition with no next state.");
+					"No end state was found.  You must specify at least one transition with no next state.");
 		}
 
 		if (startStateName != null) {
@@ -237,16 +237,16 @@ public class SimpleFlow<T> implements Flow<T> {
 
 			Set<String> nextStateNames = new HashSet<String>();
 
-			for (StateTransition<T> stepTransition : stateTransitions) {
-				nextStateNames.add(stepTransition.getNext());
+			for (StateTransition<T> stateTransition : stateTransitions) {
+				nextStateNames.add(stateTransition.getNext());
 			}
 
-			for (StateTransition<T> stepTransition : stateTransitions) {
-				State<T> state = stepTransition.getState();
+			for (StateTransition<T> stateTransition : stateTransitions) {
+				State<T> state = stateTransition.getState();
 				if (!nextStateNames.contains(state.getName())) {
 					if (startState != null && !startState.getName().equals(state.getName())) {
 						throw new IllegalArgumentException(String.format(
-								"Multiple possible start steps found: [%s, %s].  "
+								"Multiple possible start states found: [%s, %s].  "
 										+ "Please specify one explicitly with the startStateName property.", startState
 										.getName(), state.getName()));
 					}

@@ -21,5 +21,6 @@
 	</bean>
 	<bean id="step2" parent="step1"/>
 	<bean id="step3" parent="step1"/>
+	<bean id="step4" parent="step1"/>
 
 </beans>

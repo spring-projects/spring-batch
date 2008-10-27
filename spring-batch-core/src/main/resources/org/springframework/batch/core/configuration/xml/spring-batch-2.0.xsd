@@ -30,7 +30,7 @@
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 				</xsd:extension>
 			</xsd:complexContent>
-		</xsd:complexType>		
+		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:element name="step">
@@ -76,12 +76,22 @@ specific match will be chosen to select the next step. Hint: always include a de
 		</xsd:complexType>
 	</xsd:element>
 	
-	<xsd:element name="pause" type="transitionWithNextType">
+	<xsd:element name="pause">
 		<xsd:annotation>
 			<xsd:documentation>
 				Declares job should be paused at this point and provides pointer where execution should continue.
 			</xsd:documentation>
 		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="next" type="xsd:string" use="required" >
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+	Specifies the next step to execute after job is resumed.]]>
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="id" type="xsd:ID" use="required" />
+		</xsd:complexType>		
 	</xsd:element>
 
 	<xsd:element name="decision">
@@ -112,13 +122,18 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:sequence minOccurs="2" maxOccurs="unbounded" >
-				<xsd:element name="flow" type="flowType">
-					<xsd:annotation><xsd:documentation>
-					A subflow within a job, having the same format as a job, but without a separate identity.
-					</xsd:documentation></xsd:annotation>
-				</xsd:element>			
-			</xsd:sequence>
+			<xsd:complexContent>
+				<xsd:extension base="transitionWithNextType">
+					<xsd:sequence minOccurs="2" maxOccurs="unbounded" >
+						<xsd:element name="flow" type="flowType">
+							<xsd:annotation><xsd:documentation>
+							A subflow within a job, having the same format as a job, but without a separate identity.
+							</xsd:documentation></xsd:annotation>
+						</xsd:element>			
+					</xsd:sequence>
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+				</xsd:extension>
+			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 
@@ -165,5 +180,5 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
-		
+
 </xsd:schema>

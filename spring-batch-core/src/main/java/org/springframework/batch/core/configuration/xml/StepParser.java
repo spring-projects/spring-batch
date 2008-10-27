@@ -23,6 +23,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.StepState;
 import org.springframework.batch.flow.StateTransition;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -92,20 +93,33 @@ public class StepParser {
 	}
 
 	/**
-	 * @param parserContext the parser context
-	 * @param stepReference a reference to the step implementation
-	 * @param on the pattern value
-	 * @param next the next step id
-	 * @return a bean definition for a {@link StepTransition}
+	 * @param parserContext
+	 * @param runtimeBeanReference
+	 * @param onAttribute
+	 * @param nextAttribute
+	 * @return
 	 */
 	private RuntimeBeanReference getStateTransitionReference(ParserContext parserContext,
-			RuntimeBeanReference stepReference, String on, String next) {
+			RuntimeBeanReference runtimeBeanReference, String onAttribute, String nextAttribute) {
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+		stateBuilder.addConstructorArgValue(runtimeBeanReference);
+		return getStateTransitionReference(parserContext, stateBuilder.getBeanDefinition(), onAttribute,
+				nextAttribute);
+	}
+
+	/**
+	 * @param parserContext the parser context
+	 * @param stateDefinition a reference to the state implementation
+	 * @param on the pattern value
+	 * @param next the next step id
+	 * @return a bean definition for a {@link StateTransition}
+	 */
+	public static RuntimeBeanReference getStateTransitionReference(ParserContext parserContext,
+			BeanDefinition stateDefinition, String on,
+			String next) {
 
 		BeanDefinitionBuilder nextBuilder = BeanDefinitionBuilder.genericBeanDefinition(StateTransition.class);
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
-		stateBuilder.addConstructorArgValue(stepReference);
-
-		nextBuilder.addConstructorArgValue(stateBuilder.getBeanDefinition());
+		nextBuilder.addConstructorArgValue(stateDefinition);
 
 		if (StringUtils.hasText(on)) {
 			nextBuilder.addConstructorArgValue(on);
@@ -114,7 +128,8 @@ public class StepParser {
 		if (StringUtils.hasText(next)) {
 			nextBuilder.setFactoryMethod("createStateTransition");
 			nextBuilder.addConstructorArgValue(next);
-		} else {
+		}
+		else {
 			nextBuilder.setFactoryMethod("createEndStateTransition");
 		}
 

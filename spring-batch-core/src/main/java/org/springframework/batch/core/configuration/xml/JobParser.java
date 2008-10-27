@@ -15,21 +15,14 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.flow.SimpleFlow;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -62,22 +55,11 @@ public class JobParser extends AbstractBeanDefinitionParser {
 		}
 		builder.addPropertyReference("jobRepository", repositoryAttribute);
 
-		StepParser stepParser = new StepParser();
-		List<RuntimeBeanReference> stepTransitions = new ArrayList<RuntimeBeanReference>();
+		FlowParser flowParser = new FlowParser();
+		AbstractBeanDefinition flowDef = flowParser.parse(element, parserContext, jobName);
 
-		@SuppressWarnings("unchecked")
-		List<Element> stepElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "step");
-		for (Element stepElement : stepElements) {
-			stepTransitions.addAll(stepParser.parse(stepElement, parserContext));
-		}
-		ManagedList managedList = new ManagedList();
-		@SuppressWarnings( { "unchecked", "unused" })
-		boolean dummy = managedList.addAll(stepTransitions);
-		BeanDefinitionBuilder flowBuilder = BeanDefinitionBuilder.genericBeanDefinition(SimpleFlow.class);
-		flowBuilder.addConstructorArgValue(jobName );
-		flowBuilder.addPropertyValue("stateTransitions", managedList);
-		builder.addPropertyValue("flow", flowBuilder.getBeanDefinition());
-
+		builder.addPropertyValue("flow", flowDef);
+	
 		return builder.getBeanDefinition();
 	}
 

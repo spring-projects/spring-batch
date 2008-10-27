@@ -45,7 +45,7 @@ public class SplitStateTests {
 		flows.add(flow1);
 		flows.add(flow2);
 
-		SplitState<Object> state = new SplitState<Object>("foo", flows);
+		SplitState<Object> state = new SplitState<Object>(flows, "foo");
 
 		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
 		EasyMock.expect(flow2.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
@@ -69,7 +69,7 @@ public class SplitStateTests {
 		flows.add(flow1);
 		flows.add(flow2);
 
-		SplitState<Object> state = new SplitState<Object>("foo", flows);
+		SplitState<Object> state = new SplitState<Object>(flows, "foo");
 		state.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
 		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
