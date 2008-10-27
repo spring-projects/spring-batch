@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.junit.Test;
@@ -54,7 +55,8 @@ public class DateFormatTests {
 	 */
 	public DateFormatTests(String pattern, String input, String output, int hour) {
 		this.output = output;
-		this.format = new SimpleDateFormat(pattern);
+		this.format = new SimpleDateFormat(pattern, Locale.UK);
+		format.setTimeZone(TimeZone.getTimeZone("GMT"));
 		this.input = input;
 		this.hour = hour;
 	}
@@ -63,8 +65,7 @@ public class DateFormatTests {
 	public void testDateFormat() throws Exception {
 
 		Date date = format.parse(input);
-		GregorianCalendar calendar = new GregorianCalendar();
-		calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
+		GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"), Locale.UK);
 		calendar.setTime(date);
 
 		// System.err.println(format.toPattern() + " + " + input + " --> " +
@@ -84,14 +85,15 @@ public class DateFormatTests {
 		String format = "yyyy-MM-dd HH:mm:ss.S z";
 
 		/*
-		 * On 2008/10/26 when the clocks went back to GMT these failed the first
+		 * When the date format has an explicit time zone these are OK. But on
+		 * 2008/10/26 when the clocks went back to GMT these failed the hour
 		 * assertion (with the hour coming back as 12). On 2008/10/27, the day
-		 * after, they are fine, but the toString still doesn't match:
+		 * after, they are fine, but the toString still didn't match.
 		 */
-		params.add(new Object[] { format, "1970-01-01 11:20:34.0 GMT", "1970-01-01 12:20:34.0 GMT", 11 });
-		params.add(new Object[] { format, "1971-02-01 11:20:34.0 GMT", "1971-02-01 12:20:34.0 GMT", 11 });
+		params.add(new Object[] { format, "1970-01-01 11:20:34.0 GMT", "1970-01-01 11:20:34.0 GMT", 11 });
+		params.add(new Object[] { format, "1971-02-01 11:20:34.0 GMT", "1971-02-01 11:20:34.0 GMT", 11 });
 
-		// After 1972 you get the right answer
+		// After 1972 you always get the right answer
 		params.add(new Object[] { format, "1972-02-01 11:20:34.0 GMT", "1972-02-01 11:20:34.0 GMT", 11 });
 		params.add(new Object[] { format, "1976-02-01 11:20:34.0 GMT", "1976-02-01 11:20:34.0 GMT", 11 });
 		params.add(new Object[] { format, "1982-02-01 11:20:34.0 GMT", "1982-02-01 11:20:34.0 GMT", 11 });
