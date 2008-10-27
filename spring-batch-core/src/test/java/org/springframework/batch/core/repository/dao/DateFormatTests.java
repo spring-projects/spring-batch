@@ -31,6 +31,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
+ * Test case showing some weirdnesses in date formatting. Looks like a bug in
+ * SimpleDateFormat / GregorianCalendar, and it affects the JSON deserialization
+ * that we use in the ExecutionContext around daylight savings.
+ * 
  * @author Dave Syer
  * 
  */
@@ -39,42 +43,62 @@ public class DateFormatTests {
 
 	private final SimpleDateFormat format;
 
-	private final String value;
+	private final String input;
 
 	private final int hour;
+
+	private final String output;
 
 	/**
 	 * 
 	 */
-	public DateFormatTests(String pattern, String value, int hour) {
+	public DateFormatTests(String pattern, String input, String output, int hour) {
+		this.output = output;
 		this.format = new SimpleDateFormat(pattern);
-		this.value = value;
+		this.input = input;
 		this.hour = hour;
 	}
 
 	@Test
 	public void testDateFormat() throws Exception {
-		Date date = format.parse(value);
-		System.err.println(format.toPattern() + " + " + value + " --> " + date);
+
+		Date date = format.parse(input);
 		GregorianCalendar calendar = new GregorianCalendar();
 		calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
 		calendar.setTime(date);
+
+		// System.err.println(format.toPattern() + " + " + input + " --> " +
+		// calendar.getTime());
+
+		// This assertion is true...
 		assertEquals(hour, calendar.get(Calendar.HOUR_OF_DAY));
+		// ...but the toString() does not match in 1970 and 1971
+		assertEquals(output, format.format(date));
+
 	}
 
 	@Parameters
 	public static List<Object[]> data() {
+
 		List<Object[]> params = new ArrayList<Object[]>();
-		// On 2008/10/26 when the clocks went back to GMT these failed (with the
-		// hour coming back as 12).  On 2008/10/27, the day after, they are fine.
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1970-01-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1971-02-01 11:20:34.0 GMT", 11 });
+		String format = "yyyy-MM-dd HH:mm:ss.S z";
+
+		/*
+		 * On 2008/10/26 when the clocks went back to GMT these failed the first
+		 * assertion (with the hour coming back as 12). On 2008/10/27, the day
+		 * after, they are fine, but the toString still doesn't match:
+		 */
+		params.add(new Object[] { format, "1970-01-01 11:20:34.0 GMT", "1970-01-01 12:20:34.0 GMT", 11 });
+		params.add(new Object[] { format, "1971-02-01 11:20:34.0 GMT", "1971-02-01 12:20:34.0 GMT", 11 });
+
 		// After 1972 you get the right answer
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1972-02-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1976-02-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1982-02-01 11:20:34.0 GMT", 11 });
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "2008-02-01 11:20:34.0 GMT", 11 });
+		params.add(new Object[] { format, "1972-02-01 11:20:34.0 GMT", "1972-02-01 11:20:34.0 GMT", 11 });
+		params.add(new Object[] { format, "1976-02-01 11:20:34.0 GMT", "1976-02-01 11:20:34.0 GMT", 11 });
+		params.add(new Object[] { format, "1982-02-01 11:20:34.0 GMT", "1982-02-01 11:20:34.0 GMT", 11 });
+		params.add(new Object[] { format, "2008-02-01 11:20:34.0 GMT", "2008-02-01 11:20:34.0 GMT", 11 });
+
 		return params;
+
 	}
 
 }
