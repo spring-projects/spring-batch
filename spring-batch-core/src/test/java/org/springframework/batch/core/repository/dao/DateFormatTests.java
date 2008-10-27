@@ -23,6 +23,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +57,7 @@ public class DateFormatTests {
 		Date date = format.parse(value);
 		System.err.println(format.toPattern() + " + " + value + " --> " + date);
 		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTimeZone(TimeZone.getTimeZone("GMT"));
 		calendar.setTime(date);
 		assertEquals(hour, calendar.get(Calendar.HOUR_OF_DAY));
 	}
@@ -63,8 +65,10 @@ public class DateFormatTests {
 	@Parameters
 	public static List<Object[]> data() {
 		List<Object[]> params = new ArrayList<Object[]>();
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1970-01-01 11:20:34.0 GMT", 12 });
-		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1971-02-01 11:20:34.0 GMT", 12 });
+		// On 2008/10/26 when the clocks went back to GMT these failed (with the
+		// hour coming back as 12).  On 2008/10/27, the day after, they are fine.
+		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1970-01-01 11:20:34.0 GMT", 11 });
+		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1971-02-01 11:20:34.0 GMT", 11 });
 		// After 1972 you get the right answer
 		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1972-02-01 11:20:34.0 GMT", 11 });
 		params.add(new Object[] { "yyyy-MM-dd HH:mm:ss.S z", "1976-02-01 11:20:34.0 GMT", 11 });
