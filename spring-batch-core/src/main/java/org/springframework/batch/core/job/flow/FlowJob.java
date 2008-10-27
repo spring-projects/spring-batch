@@ -36,6 +36,20 @@ import org.springframework.util.Assert;
 public class FlowJob extends AbstractJob {
 
 	private Flow<JobFlowExecutor> flow;
+	
+	/**
+	 * Create a {@link FlowJob} with null name and no flow (invalid state).
+	 */
+	public FlowJob() {
+		super();
+	}
+
+	/**
+	 * Create a {@link FlowJob} with provided name and no flow (invalid state).
+	 */
+	public FlowJob(String name) {
+		super(name);
+	}
 
 	/**
 	 * Public setter for the flow.

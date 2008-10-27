@@ -20,11 +20,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.StepTransition;
+import org.springframework.batch.core.job.flow.StepState;
+import org.springframework.batch.flow.StateTransition;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
@@ -48,8 +50,8 @@ public class StepParser {
 	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for {@link StepTransition}
-	 * objects
+	 * @return a collection of bean definitions for {@link StateTransition}
+	 * instances objects
 	 */
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
 
@@ -60,7 +62,7 @@ public class StepParser {
 		String shortNextAttribute = element.getAttribute("next");
 		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
 		if (hasNextAttribute) {
-			list.add(getStepTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), "*",
+			list.add(getStateTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), null,
 					shortNextAttribute));
 		}
 
@@ -69,7 +71,7 @@ public class StepParser {
 
 		// If there are no next elements then this must be an end state
 		if (nextElements.isEmpty() && !hasNextAttribute) {
-			list.add(getStepTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), "*", null));
+			list.add(getStateTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), null, null));
 		}
 		else {
 			// Otherwise we need to capture the "to" state
@@ -80,8 +82,8 @@ public class StepParser {
 					throw new BeanCreationException("Duplicate transition pattern found for '*' "
 							+ "(only specify one of next= attribute at step level and next element with on='*')");
 				}
-				list.add(getStepTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), onAttribute,
-						nextAttribute));
+				list.add(getStateTransitionReference(parserContext, new RuntimeBeanReference(refAttribute),
+						onAttribute, nextAttribute));
 			}
 		}
 
@@ -91,23 +93,33 @@ public class StepParser {
 
 	/**
 	 * @param parserContext the parser context
-	 * @param runtimeBeanReference a reference to the step implementation
+	 * @param stepReference a reference to the step implementation
 	 * @param on the pattern value
 	 * @param next the next step id
 	 * @return a bean definition for a {@link StepTransition}
 	 */
-	private RuntimeBeanReference getStepTransitionReference(ParserContext parserContext,
-			RuntimeBeanReference runtimeBeanReference, String on, String next) {
+	private RuntimeBeanReference getStateTransitionReference(ParserContext parserContext,
+			RuntimeBeanReference stepReference, String on, String next) {
 
-		RootBeanDefinition nextDef = new RootBeanDefinition(StepTransition.class);
-		nextDef.getConstructorArgumentValues().addIndexedArgumentValue(0, runtimeBeanReference);
-		nextDef.getConstructorArgumentValues().addIndexedArgumentValue(1, on);
+		BeanDefinitionBuilder nextBuilder = BeanDefinitionBuilder.genericBeanDefinition(StateTransition.class);
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+		stateBuilder.addConstructorArgValue(stepReference);
+
+		nextBuilder.addConstructorArgValue(stateBuilder.getBeanDefinition());
+
+		if (StringUtils.hasText(on)) {
+			nextBuilder.addConstructorArgValue(on);
+		}
 
 		if (StringUtils.hasText(next)) {
-			nextDef.getConstructorArgumentValues().addIndexedArgumentValue(2, next);
+			nextBuilder.setFactoryMethod("createStateTransition");
+			nextBuilder.addConstructorArgValue(next);
+		} else {
+			nextBuilder.setFactoryMethod("createEndStateTransition");
 		}
 
 		// TODO: do we need to use RuntimeBeanReference?
+		AbstractBeanDefinition nextDef = nextBuilder.getBeanDefinition();
 		String nextDefName = parserContext.getReaderContext().generateBeanName(nextDef);
 		BeanComponentDefinition nextDefComponent = new BeanComponentDefinition(nextDef, nextDefName);
 		parserContext.registerBeanComponent(nextDefComponent);

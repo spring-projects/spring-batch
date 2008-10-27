@@ -19,8 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.job.ConditionalJob;
+import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.flow.SimpleFlow;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -41,7 +42,7 @@ import org.w3c.dom.Element;
 public class JobParser extends AbstractBeanDefinitionParser {
 
 	/**
-	 * Create a bean definition for a {@link ConditionalJob}. The
+	 * Create a bean definition for a {@link FlowJob}. The
 	 * <code>jobRepository</code> attribute is a reference to a
 	 * {@link JobRepository} and defaults to "jobRepository". Nested step
 	 * elements are delegated to a {@link StepParser}.
@@ -51,7 +52,10 @@ public class JobParser extends AbstractBeanDefinitionParser {
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(ConditionalJob.class);
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(FlowJob.class);
+		String jobName = element.getAttribute("id");
+		builder.addConstructorArgValue(jobName);
+		
 		String repositoryAttribute = element.getAttribute("repository");
 		if (!StringUtils.hasText(repositoryAttribute)) {
 			repositoryAttribute = "jobRepository";
@@ -69,7 +73,10 @@ public class JobParser extends AbstractBeanDefinitionParser {
 		ManagedList managedList = new ManagedList();
 		@SuppressWarnings( { "unchecked", "unused" })
 		boolean dummy = managedList.addAll(stepTransitions);
-		builder.addPropertyValue("stepTransitions", managedList);
+		BeanDefinitionBuilder flowBuilder = BeanDefinitionBuilder.genericBeanDefinition(SimpleFlow.class);
+		flowBuilder.addConstructorArgValue(jobName );
+		flowBuilder.addPropertyValue("stateTransitions", managedList);
+		builder.addPropertyValue("flow", flowBuilder.getBeanDefinition());
 
 		return builder.getBeanDefinition();
 	}
