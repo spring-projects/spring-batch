@@ -23,6 +23,7 @@ import static org.easymock.EasyMock.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -193,8 +194,8 @@ public class FaultTolerantChunkOrientedTaskletTests {
 			assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_BUFFER_KEY"));
 		}
 		@SuppressWarnings("unchecked")
-		List<String> chunk = (List<String>) attributes.getAttribute("SKIPPED_OUTPUTS_BUFFER_KEY");
-		assertEquals(1, chunk.size());
+		Map<String, Exception> skips = (Map<String, Exception>) attributes.getAttribute("SKIPPED_OUTPUTS_BUFFER_KEY");
+		assertEquals(1, skips.size());
 		// The last recovery for this chunk...
 		tasklet.execute(contribution, attributes);
 
