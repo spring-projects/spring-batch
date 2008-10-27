@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.springframework.org/schema/batch"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:tool="http://www.springframework.org/schema/tool"
-	targetNamespace="http://www.springframework.org/schema/batch"
-	elementFormDefault="qualified" attributeFormDefault="unqualified"
+<xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
 	version="2.0">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
@@ -20,53 +18,41 @@
 			<xsd:documentation>
 				Defines a job composed of a set of steps and
 				transitions between steps. The job will be exposed
-				in the enclosing bean factory as a component of type Job that can be
+				in
+				the enclosing bean factory as a component of type Job
+				that can be
 				launched using a JobLauncher.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:choice minOccurs="1" maxOccurs="unbounded" >
-					<xsd:element ref="step" />
-					<xsd:element ref="suspend" />
-				</xsd:choice>
-			</xsd:sequence>
-			<xsd:attribute name="id" type="xsd:ID" use="required" />
-			<xsd:attribute name="repository" type="xsd:string" use="optional">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[ 
-						A reference to a JobRepository bean definition. Defaults to "jobRepository".
-						]]>
-					</xsd:documentation>
-				</xsd:annotation>
-			</xsd:attribute>
-		</xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="flowType">
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>		
 	</xsd:element>
 
 	<xsd:element name="step">
 		<xsd:annotation>
 			<xsd:documentation>
-				Defines a stage in job processing. The name
-				attribute has to match the id of a bean definition for
+				Defines a stage in job processing backed by a Step. The name
+				attribute has to match the id of a
+				bean definition for
 				a Step. The
 				next attribute is a synonym for &lt;next on="*" .../&gt;
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:sequence>
-				<xsd:element ref="next" minOccurs="0" maxOccurs="unbounded" >
-					<xsd:annotation>
-						<xsd:documentation>A sequence of next elements specifies the possible transitions from this step to the next one.</xsd:documentation>
-					</xsd:annotation></xsd:element>
-			</xsd:sequence>
-			<xsd:attribute name="name" type="xsd:string" use="required" >
-				<xsd:annotation>
-					<xsd:documentation>The step name is a reference to another bean definition where business logic is specified.  The reference is usually an implementation of Step.</xsd:documentation></xsd:annotation></xsd:attribute>
-			<xsd:attribute name="next" type="xsd:string" use="optional" >
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-A shortcut for specifying the next step to execute after this one, if there is only one choice.  
-If this attribute is specified, then there should be no other transition with a nested &lt;next on="*" .../&gt;]]></xsd:documentation></xsd:annotation></xsd:attribute>
+			<xsd:complexContent>
+				<xsd:extension base="transitionWithNextType">
+					<xsd:attribute name="name" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>The step name is a reference to another bean definition where business logic is specified.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 
@@ -85,19 +71,99 @@ specific match will be chosen to select the next step. Hint: always include a de
 			<xsd:attribute name="to" type="xsd:string" use="required" >
 				<xsd:annotation>
 					<xsd:documentation>The name of the step to go to next.  Must resolve to one of the other steps in this job.</xsd:documentation>
-				</xsd:annotation></xsd:attribute>
+				</xsd:annotation>
+			</xsd:attribute>
 		</xsd:complexType>
 	</xsd:element>
 	
-	<xsd:element name="suspend">
+	<xsd:element name="pause" type="transitionWithNextType">
 		<xsd:annotation>
 			<xsd:documentation>
 				Declares job should be paused at this point and provides pointer where execution should continue.
 			</xsd:documentation>
 		</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="decision">
+		<xsd:annotation>
+			<xsd:documentation>
+				Declares job should query a decider to determine where execution should go next.
+			</xsd:documentation>
+		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:attribute name="next" type="xsd:string" use="required" />
+			<xsd:complexContent>
+				<xsd:extension base="transitionType">
+					<xsd:attribute name="decider" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>							
+The decider is a reference to a JobExecutionDecider that can produce a status to base the next transition on.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="split">
+		<xsd:annotation>
+			<xsd:documentation>
+				Declares job should split here into two or more subflows.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence minOccurs="2" maxOccurs="unbounded" >
+				<xsd:element name="flow" type="flowType">
+					<xsd:annotation><xsd:documentation>
+					A subflow within a job, having the same format as a job, but without a separate identity.
+					</xsd:documentation></xsd:annotation>
+				</xsd:element>			
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="flowType">
+		<xsd:sequence>
+			<xsd:choice minOccurs="1" maxOccurs="unbounded" >
+				<xsd:element ref="step" />
+				<xsd:element ref="split" />
+				<xsd:element ref="decision" />
+				<xsd:element ref="pause" />
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="repository" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[ 
+					A reference to a JobRepository bean definition. Defaults to "jobRepository".
+					]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	
+	<xsd:complexType name="transitionWithNextType">
+		<xsd:complexContent>
+			<xsd:extension base="transitionType">
+				<xsd:attribute name="next" type="xsd:string" use="optional" >
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+		A shortcut for specifying the next step to execute after this one, if there is only one choice.  
+		If this attribute is specified, then there should be no other transition with a nested &lt;next on="*" .../&gt;]]>
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="transitionType">
+		<xsd:sequence>
+			<xsd:element ref="next" minOccurs="0" maxOccurs="unbounded" >
+				<xsd:annotation>
+					<xsd:documentation>A sequence of next elements specifies the possible transitions from this step to the next one.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+		
 </xsd:schema>
