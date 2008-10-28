@@ -28,6 +28,14 @@
 			<xsd:complexContent>
 				<xsd:extension base="flowType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attribute name="repository" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[ 
+								A reference to a JobRepository bean definition. Defaults to "jobRepository".
+								]]>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -146,14 +154,6 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 				<xsd:element ref="pause" />
 			</xsd:choice>
 		</xsd:sequence>
-		<xsd:attribute name="repository" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[ 
-					A reference to a JobRepository bean definition. Defaults to "jobRepository".
-					]]>
-				</xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
 	</xsd:complexType>
 	
 	<xsd:complexType name="transitionWithNextType">
