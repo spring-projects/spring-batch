@@ -306,7 +306,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 				Exception le = (Exception) context.getLastThrowable();
 				if (!rollbackClassifier.classify(le)) {
 					throw new RetryException(
-							"Invalid retry state caused during write by exception that does not classify for rollback: ", le);
+							"Invalid retry state during write caused by exception that does not classify for rollback: ", le);
 				}
 				for (S item : chunk) {
 					try {
@@ -320,7 +320,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 						}
 						else {
 							throw new RetryException(
-									"Invalid retry state caused during recovery by exception that does not classify for rollback: ", e);
+									"Invalid retry state during recovery caused by exception that does not classify for rollback: ", e);
 						}
 					}
 				}
