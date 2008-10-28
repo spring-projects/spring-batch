@@ -88,7 +88,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 	}
 
 	@Transactional @Test
-	public void testSaveAndFindExecution() {
+	public void testSaveAndGetExecution() {
 		
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);
@@ -104,12 +104,13 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		StepExecution retrieved = dao.getStepExecution(jobExecution, step.getName());
 		
 		assertStepExecutionsAreEqual(stepExecution, retrieved);
+		assertNotNull(retrieved.getVersion());
 		
 		assertNull(dao.getStepExecution(jobExecution, "not-existing step"));
 	}
 
 	@Transactional @Test
-	public void testSaveAndGetExecution() {
+	public void testSaveAndFindExecution() {
 		
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);

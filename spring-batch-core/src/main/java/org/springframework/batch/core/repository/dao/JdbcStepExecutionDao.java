@@ -50,7 +50,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			+ " where STEP_EXECUTION_ID = ? and VERSION = ?";
 
 	private static final String GET_RAW_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
-			+ " READ_COUNT, FILTER_COUNT, WRITE_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID = ?";
+			+ " READ_COUNT, FILTER_COUNT, WRITE_COUNT, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, READ_SKIP_COUNT, WRITE_SKIP_COUNT, PROCESS_SKIP_COUNT, ROLLBACK_COUNT, LAST_UPDATED, VERSION from %PREFIX%STEP_EXECUTION where JOB_EXECUTION_ID = ?";
 
 	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " order by STEP_EXECUTION_ID";
 
@@ -243,6 +243,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 			stepExecution.setProcessSkipCount(rs.getInt(15));
 			stepExecution.setRollbackCount(rs.getInt(16));
 			stepExecution.setLastUpdated(rs.getTimestamp(17));
+			stepExecution.setVersion(rs.getInt(18));
 			return stepExecution;
 		}
 

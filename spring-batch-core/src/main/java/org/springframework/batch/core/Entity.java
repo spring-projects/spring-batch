@@ -63,9 +63,17 @@ public class Entity implements Serializable {
 	public Integer getVersion() {
 		return version;
 	}
+	
+	/**
+	 * Public setter for the version needed only by repository methods.
+	 * @param version the version to set
+	 */
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
 
 	/**
-	 * 
+	 * Increment the version number
 	 */
 	public void incrementVersion() {
 		if (version == null) {

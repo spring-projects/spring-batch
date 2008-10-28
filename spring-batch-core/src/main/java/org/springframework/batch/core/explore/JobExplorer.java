@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.StepExecution;
 
 /**
  * @author Dave Syer
@@ -35,10 +36,17 @@ public interface JobExplorer {
 	List<JobInstance> getLastJobInstances(String jobName, int count);
 
 	/**
-	 * @param executionId
+	 * @param executionId the job execution id
 	 * @return the {@link JobExecution} with this id, or null if not found
 	 */
 	JobExecution getJobExecution(Long executionId);
+
+	/**
+	 * @param jobExecutionId the parent job execution id
+	 * @param stepName the step name identifier for the required {@link StepExecution}
+	 * @return the {@link StepExecution} with this id, or null if not found
+	 */
+	StepExecution getStepExecution(Long jobExecutionId, String stepName);
 
 	/**
 	 * @param instanceId

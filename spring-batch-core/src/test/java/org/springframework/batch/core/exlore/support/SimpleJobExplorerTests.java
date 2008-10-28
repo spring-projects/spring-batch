@@ -73,6 +73,15 @@ public class SimpleJobExplorerTests extends TestCase {
 	}
 
 	@Test
+	public void testGetStepExecution() throws Exception {
+		expect(jobExecutionDao.getJobExecution(123L)).andReturn(jobExecution);
+		expect(stepExecutionDao.getStepExecution(jobExecution, "foo")).andReturn(null);
+		replay(jobExecutionDao, stepExecutionDao);
+		jobExplorer.getStepExecution(123L,"foo");
+		verify(jobExecutionDao, stepExecutionDao);
+	}
+
+	@Test
 	public void testFindRunningJobExecutions() throws Exception {
 		expect(jobExecutionDao.findRunningJobExecutions("job")).andReturn(Collections.singleton(jobExecution));
 		expect(jobInstanceDao.getJobInstance(jobExecution)).andReturn(jobInstance);

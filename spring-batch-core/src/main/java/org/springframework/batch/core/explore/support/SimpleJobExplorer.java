@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
@@ -92,6 +93,14 @@ public class SimpleJobExplorer implements JobExplorer {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(executionId);
 		getJobExecutionDependencies(jobExecution);
 		return jobExecution;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.explore.JobExplorer#getStepExecution(java.lang.Long)
+	 */
+	public StepExecution getStepExecution(Long executionId, String stepName) {
+		JobExecution jobExecution = jobExecutionDao.getJobExecution(executionId);
+		return stepExecutionDao.getStepExecution(jobExecution, stepName);
 	}
 
 	/* (non-Javadoc)
