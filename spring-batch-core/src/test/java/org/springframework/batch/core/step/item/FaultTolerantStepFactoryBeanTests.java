@@ -159,7 +159,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	}
 
 	/**
-	 * Check rollback write exception does not cause rollback when included on
+	 * Check that rollback write exception does cause rollback when included on
 	 * transaction attributes as "no rollback for".
 	 */
 	@Test
@@ -172,14 +172,15 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		
 		step.execute(stepExecution);
 
-		assertEquals(2, stepExecution.getSkipCount());
+		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(1, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(0, stepExecution.getWriteSkipCount());
 
-		// no rollbacks
-		assertEquals(0, stepExecution.getRollbackCount());
+		// one rollback for write exception
+		assertEquals(1, stepExecution.getRollbackCount());
 
 		assertEquals(4, stepExecution.getReadCount());
 

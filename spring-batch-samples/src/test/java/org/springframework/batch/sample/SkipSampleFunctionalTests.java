@@ -45,8 +45,8 @@ public class SkipSampleFunctionalTests extends AbstractValidatingBatchLauncherTe
 		// 5 input records, 1 skipped => 4 written to output
 		assertEquals(before + 4, after);
 		
-		// no item was processed twice (no rollback occurred despite error on write)
-		assertEquals(after, writer.getItems().size());
+		// no item was processed twice (one rollback occurred due to validation error)
+		assertEquals(after - 1, writer.getItems().size());
 	}
 
 }

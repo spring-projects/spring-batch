@@ -16,20 +16,33 @@
 				<bean id="step1" parent="skipLimitStep">
 					<property name="skipLimit" value="1" />
 					<property name="itemReader" ref="fileItemReader" />
+					<property name="itemProcessor">
+						<bean
+							class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"
+							p:validationFailure="3" />
+					</property>
 					<property name="itemWriter">
 						<bean
 							class="org.springframework.batch.sample.domain.trade.internal.TradeWriter"
-							p:dao-ref="tradeDao" p:failure="3" />
+							p:dao-ref="tradeDao" />
 					</property>
 				</bean>
 				<bean id="step2" parent="skipLimitStep">
 					<property name="commitInterval" value="2" />
 					<property name="skipLimit" value="1" />
 					<!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
-					<property name="transactionAttribute"
-						value="+org.springframework.batch.item.validator.ValidationException" />
+					<property name="skippableExceptionClasses">
+			            <list>
+			                <value>org.springframework.batch.item.validator.ValidationException</value>
+			            </list>
+					</property>
 					<property name="itemReader"
 						ref="tradeSqlItemReader" />
+					<property name="itemProcessor">
+						<bean
+							class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"
+							p:validationFailure="2" />
+					</property>
 					<property name="itemWriter"
 						ref="itemTrackingWriter" />
 				</bean>
@@ -38,8 +51,7 @@
 	</bean>
 
 	<bean id="itemTrackingWriter"
-		class="org.springframework.batch.sample.support.ItemTrackingItemWriter"
-		p:validationFailure="2" />
+		class="org.springframework.batch.sample.support.ItemTrackingItemWriter" />
 
 	<bean id="tradeSqlItemReader"
 		class="org.springframework.batch.item.database.JdbcCursorItemReader">

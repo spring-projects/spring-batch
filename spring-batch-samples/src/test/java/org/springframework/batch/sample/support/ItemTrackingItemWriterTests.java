@@ -42,13 +42,13 @@ public class ItemTrackingItemWriterTests {
 	}
 
 	@Test
-	public void testValidationFailure() throws Exception {
-		writer.setValidationFailure(2);
+	public void testWriteFailure() throws Exception {
+		writer.setWriteFailure(2);
 		try {
 			writer.write(Arrays.asList("a", "b", "c"));
-			fail("Expected ValidationException");
+			fail("Expected Write Failure Exception");
 		}
-		catch (ValidationException e) {
+		catch (RuntimeException e) {
 			// expected
 		}
 		// the failed item is removed
@@ -57,9 +57,9 @@ public class ItemTrackingItemWriterTests {
 		assertEquals(5, writer.getItems().size());
 		try {
 			writer.write(Arrays.asList("f", "b", "g"));
-			fail("Expected ValidationException");
+			fail("Expected RuntimeException");
 		}
-		catch (ValidationException e) {
+		catch (RuntimeException e) {
 			// expected
 		}
 		// barf immediately if a failure is detected

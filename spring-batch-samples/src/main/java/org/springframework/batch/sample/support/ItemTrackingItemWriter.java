@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.validator.ValidationException;
 
 /**
  * Remembers all items written - useful for testing.
@@ -21,7 +20,7 @@ public class ItemTrackingItemWriter<T> implements ItemWriter<T> {
 
 	public void write(List<? extends T> items) throws Exception {
 		if (failed!=null && items.contains(failed)) {
-			throw new ValidationException("validation failed");			
+			throw new RuntimeException("write failed again");			
 		}
 		this.items.addAll(items);
 		int current = counter;
@@ -29,7 +28,7 @@ public class ItemTrackingItemWriter<T> implements ItemWriter<T> {
 		if (current < failure && counter >= failure) {
 			failed = items.get(failure-current-1);
 			this.items.remove(failed);
-			throw new ValidationException("validation failed");
+			throw new RuntimeException("write failed");
 		}
 	}
 
@@ -37,7 +36,7 @@ public class ItemTrackingItemWriter<T> implements ItemWriter<T> {
 		return items;
 	}
 
-	public void setValidationFailure(int failure) {
+	public void setWriteFailure(int failure) {
 		this.failure = failure;
 	}
 
