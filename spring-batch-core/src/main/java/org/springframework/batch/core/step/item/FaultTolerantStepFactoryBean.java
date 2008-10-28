@@ -71,10 +71,10 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private RetryContextCache retryContextCache;
 
-	private boolean isReaderTransactional = false;
+	private boolean isReaderTransactionalQueue = false;
 
-	public void setIsReaderTransactional(boolean isReaderTransactional) {
-		this.isReaderTransactional = isReaderTransactional;
+	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
+		this.isReaderTransactionalQueue = isReaderTransactionalQueue;
 	}
 
 	/**
@@ -257,7 +257,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
 
-			if (isReaderTransactional) {
+			if (isReaderTransactionalQueue) {
 				NonbufferingFaultTolerantChunkOrientedTasklet<T, S> tasklet = new NonbufferingFaultTolerantChunkOrientedTasklet<T, S>(
 						getItemReader(), getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate,
 						rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
