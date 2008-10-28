@@ -250,7 +250,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 					if (processSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						contribution.incrementProcessSkipCount();
 						skippedInputs.put(item, e);
-
+						logger.debug("Skipping after failed process", e);
 						return null;
 					}
 					else {
@@ -303,6 +303,11 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 					checkSkipPolicy(item, e, contribution);
 					return null;
 				}
+				Exception le = (Exception) context.getLastThrowable();
+				if (!rollbackClassifier.classify(le)) {
+					throw new RetryException(
+							"Invalid retry state caused by exception that does not classify for rollback during write: ", le);
+				}
 				for (S item : chunk) {
 					try {
 						doWrite(Collections.singletonList(item));
@@ -314,7 +319,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 							throw e;
 						}
 						else {
-							logger.error("Exception encountered that does not classify for rollback: ", e);
+							throw new RetryException(
+									"Invalid retry state caused by exception that does not classify for rollback during recovery: ", e);
 						}
 					}
 				}
@@ -327,6 +333,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 				if (writeSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 					contribution.incrementWriteSkipCount();
 					skipped.put(item, e);
+					logger.debug("Skipping after failed write", e);
 				}
 				else {
 					throw new RetryException("Non-skippable exception in recoverer", e);
