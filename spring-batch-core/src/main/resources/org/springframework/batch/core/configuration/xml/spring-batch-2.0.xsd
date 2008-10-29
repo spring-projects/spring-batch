@@ -84,21 +84,52 @@ specific match will be chosen to select the next step. Hint: always include a de
 		</xsd:complexType>
 	</xsd:element>
 	
-	<xsd:element name="pause">
+	<xsd:element name="stop">
 		<xsd:annotation>
 			<xsd:documentation>
-				Declares job should be paused at this point and provides pointer where execution should continue.
+				Declares job should be stop at this point and provides pointer where execution should continue.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:attribute name="next" type="xsd:string" use="required" >
+			<xsd:attribute name="on" type="xsd:string" use="required" >
 				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-	Specifies the next step to execute after job is resumed.]]>
-					</xsd:documentation>
+					<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. When a step finishes the most 
+specific match will be chosen to select the next step. Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
+				</xsd:annotation></xsd:attribute>
+			<xsd:attribute name="to" type="xsd:string" use="required" >
+				<xsd:annotation>
+					<xsd:documentation>The name of the step to go to next.  
+					Must resolve to one of the other steps in this job.</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="id" type="xsd:ID" use="required" />
+		</xsd:complexType>		
+	</xsd:element>
+
+	<xsd:element name="end">
+		<xsd:annotation>
+			<xsd:documentation>
+				Declares job should be stop at this point and provides optional pointer where execution should continue.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:attribute name="on" type="xsd:string" use="required" >
+				<xsd:annotation>
+					<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. When a step finishes the most 
+specific match will be chosen to select the next step. Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="status" use="optional" default="COMPLETED">
+				<xsd:annotation>
+					<xsd:documentation>The BatchStatus value to end on, defaults to COMPLETED.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="COMPLETED"></xsd:enumeration>
+						<xsd:enumeration value="FAILED"></xsd:enumeration>
+						<xsd:enumeration value="STOPPED"></xsd:enumeration>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
 		</xsd:complexType>		
 	</xsd:element>
 
@@ -111,6 +142,7 @@ specific match will be chosen to select the next step. Hint: always include a de
 		<xsd:complexType>
 			<xsd:complexContent>
 				<xsd:extension base="transitionType">
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attribute name="decider" type="xsd:string" use="required" >
 						<xsd:annotation>
 							<xsd:documentation>							
@@ -151,7 +183,6 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 				<xsd:element ref="step" />
 				<xsd:element ref="split" />
 				<xsd:element ref="decision" />
-				<xsd:element ref="pause" />
 			</xsd:choice>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -173,11 +204,11 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 
 	<xsd:complexType name="transitionType">
 		<xsd:sequence>
-			<xsd:element ref="next" minOccurs="0" maxOccurs="unbounded" >
-				<xsd:annotation>
-					<xsd:documentation>A sequence of next elements specifies the possible transitions from this step to the next one.</xsd:documentation>
-				</xsd:annotation>
-			</xsd:element>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded" >
+				<xsd:element ref="next"/>
+				<xsd:element ref="stop"/>
+				<xsd:element ref="end"/>
+			</xsd:choice>
 		</xsd:sequence>
 	</xsd:complexType>
 

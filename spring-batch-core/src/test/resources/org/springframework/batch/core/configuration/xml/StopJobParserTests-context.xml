@@ -6,9 +6,16 @@
 
 	<beans:import resource="common-context.xml" />
 	
+	<beans:bean id="decider" class="org.springframework.batch.core.configuration.xml.StopJobParserTests$TestDecider"/>
+
 	<job id="job">
-		<step name="step1" next="pause"/>
-		<pause id="pause" next="step2"/>
+		<step name="step1">
+			<stop on="COMPLETED" to="decision"/>
+		</step>
+		<decision id="decision" decider="decider">
+			<next on="FOO" to="step2"/>
+			<end on="*" status="FAILED"/>
+		</decision>
 		<step name="step2" />
 	</job>
 

@@ -25,6 +25,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class PauseJobParserTests {
+public class StopJobParserTests {
 
 	@Autowired
 	@Qualifier("job")
@@ -53,15 +54,22 @@ public class PauseJobParserTests {
 	}
 
 	@Test
-	public void testPauseState() throws Exception {
+	public void testStopState() throws Exception {
 		assertNotNull(job);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
-		assertEquals(BatchStatus.PAUSED, jobExecution.getStatus());
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
+		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(2, jobExecution.getStepExecutions().size());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+	}
+
+	public static class TestDecider implements JobExecutionDecider {
+		public String decide(JobExecution jobExecution) {
+			return "FOO";
+		}
 	}
 
 }

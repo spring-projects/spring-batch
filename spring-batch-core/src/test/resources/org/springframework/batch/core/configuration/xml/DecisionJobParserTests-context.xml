@@ -9,7 +9,7 @@
 	<beans:bean id="decider" class="org.springframework.batch.core.configuration.xml.DecisionJobParserTests$TestDecider"/>
 	
 	<job id="job">
-		<decision decider="decider">
+		<decision id="decision" decider="decider">
 			<next on="FOO" to="step1"/>
 			<next on="*" to="step2"/>
 		</decision>

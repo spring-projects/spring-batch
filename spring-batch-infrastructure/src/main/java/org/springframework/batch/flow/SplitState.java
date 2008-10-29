@@ -77,11 +77,7 @@ public class SplitState<T> extends AbstractState<T> {
 			tasks.add(task);
 
 			try {
-				taskExecutor.execute(new Runnable() {
-					public void run() {
-						task.run();
-					}
-				});
+				taskExecutor.execute(task);
 			}
 			catch (TaskRejectedException e) {
 				throw new FlowExecutionException("TaskExecutor rejected task for flow=" + flow.getName());

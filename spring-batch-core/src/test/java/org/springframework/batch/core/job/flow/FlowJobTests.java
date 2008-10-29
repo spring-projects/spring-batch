@@ -124,11 +124,69 @@ public class FlowJobTests {
 	}
 
 	@Test
+	public void testEndStateStopped() throws Exception {
+		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
+		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
+		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.STOPPED, "end"), "step2"));
+		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
+		flow.setStateTransitions(transitions);
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		try {
+			job.doExecute(jobExecution);
+			fail("Expected JobInterruptedException");
+		}
+		catch (JobInterruptedException e) {
+			// expected
+		}
+		assertEquals(1, jobExecution.getStepExecutions().size());
+	}
+
+	public void testEndStateFailed() throws Exception {
+		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
+		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
+		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.FAILED, "end"), "step2"));
+		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
+		flow.setStateTransitions(transitions);
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		job.doExecute(jobExecution);
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+	}
+
+	@Test
+	public void testEndStateStoppedWithRestart() throws Exception {
+		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
+		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
+		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.STOPPED, "end"), "step2"));
+		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
+		flow.setStateTransitions(transitions);
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+
+		// To test a restart we have to use the AbstractJob.execute()...
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+
+		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+
+	}
+
+	@Test
 	public void testBranching() throws Exception {
 		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
 		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "COMPLETED", "step3"));
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "COMPLETED",
+				"step3"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step3"))));
 		flow.setStateTransitions(transitions);

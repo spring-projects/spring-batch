@@ -58,13 +58,6 @@ public class FlowParser {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Element> pauseElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "pause");
-		PauseParser pauseParser = new PauseParser();
-		for (Element stepElement : pauseElements) {
-			stateTransitions.add(pauseParser.parse(stepElement, parserContext));
-		}
-
-		@SuppressWarnings("unchecked")
 		List<Element> splitElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "split");
 		SplitParser splitParser = new SplitParser();
 		for (Element stepElement : splitElements) {

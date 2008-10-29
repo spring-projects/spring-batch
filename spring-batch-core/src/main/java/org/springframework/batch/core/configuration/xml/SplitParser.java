@@ -22,13 +22,11 @@ import java.util.List;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.flow.SplitState;
 import org.springframework.batch.flow.StateTransition;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
@@ -76,40 +74,8 @@ public class SplitParser {
 		stateBuilder.addConstructorArgValue(managedList);
 		stateBuilder.addConstructorArgValue(idAttribute);
 		
-		// TODO: extract common code from StepParser
 		// TODO: allow TaskExecutor etc. to be set
-
-		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
-
-		String shortNextAttribute = element.getAttribute("next");
-		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
-		if (hasNextAttribute) {
-			list.add(StepParser.getStateTransitionReference(parserContext, stateBuilder.getBeanDefinition(), null,
-					shortNextAttribute));
-		}
-
-		@SuppressWarnings("unchecked")
-		List<Element> nextElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "next");
-
-		// If there are no next elements then this must be an end state
-		if (nextElements.isEmpty() && !hasNextAttribute) {
-			list.add(StepParser.getStateTransitionReference(parserContext, stateBuilder.getBeanDefinition(), null, null));
-		}
-		else {
-			// Otherwise we need to capture the "to" state
-			for (Element nextElement : nextElements) {
-				String onAttribute = nextElement.getAttribute("on");
-				String nextAttribute = nextElement.getAttribute("to");
-				if (hasNextAttribute && onAttribute.equals("*")) {
-					throw new BeanCreationException("Duplicate transition pattern found for '*' "
-							+ "(only specify one of next= attribute at step level and next element with on='*')");
-				}
-				list.add(StepParser.getStateTransitionReference(parserContext, stateBuilder.getBeanDefinition(),
-						onAttribute, nextAttribute));
-			}
-		}
-
-		return list;
+		return StepParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
 

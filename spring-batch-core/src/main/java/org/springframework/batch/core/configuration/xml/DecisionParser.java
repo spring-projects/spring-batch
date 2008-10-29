@@ -15,9 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.batch.core.job.flow.DecisionState;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
@@ -25,7 +23,6 @@ import org.springframework.batch.flow.StateTransition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -52,23 +49,12 @@ public class DecisionParser {
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
 
 		String refAttribute = element.getAttribute("decider");
+		String idAttribute = element.getAttribute("id");
 
-		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
-
-		@SuppressWarnings("unchecked")
-		List<Element> nextElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "next");
-
-		for (Element nextElement : nextElements) {
-			String onAttribute = nextElement.getAttribute("on");
-			String nextAttribute = nextElement.getAttribute("to");
-			BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(DecisionState.class);
-			stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
-			stateBuilder.addConstructorArgValue(parserContext.getReaderContext().generateBeanName(stateBuilder.getBeanDefinition()));
-			list.add(StepParser.getStateTransitionReference(parserContext, stateBuilder.getBeanDefinition(),
-					onAttribute, nextAttribute));
-		}
-
-		return list;
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(DecisionState.class);
+		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
+		stateBuilder.addConstructorArgValue(idAttribute);
+		return StepParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
 }

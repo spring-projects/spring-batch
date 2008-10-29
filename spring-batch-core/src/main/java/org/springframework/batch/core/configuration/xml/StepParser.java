@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.flow.EndState;
 import org.springframework.batch.core.job.flow.StepState;
 import org.springframework.batch.flow.StateTransition;
 import org.springframework.beans.factory.BeanCreationException;
@@ -46,6 +48,9 @@ import org.w3c.dom.Element;
  */
 public class StepParser {
 
+	// For generating unique state names for end transitions
+	private static int endCounter = 0;
+
 	/**
 	 * Parse the step and turn it into a list of transitions.
 	 * 
@@ -56,55 +61,73 @@ public class StepParser {
 	 */
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
 
-		String refAttribute = element.getAttribute("name");
+		RuntimeBeanReference stateDef = new RuntimeBeanReference(element.getAttribute("name"));
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+		stateBuilder.addConstructorArgValue(stateDef);
+		return getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
+
+	}
+
+	/**
+	 * @param parserContext
+	 * @param stateDef
+	 * @param element
+	 * @return a collection of {@link StateTransition} references
+	 */
+	public static Collection<RuntimeBeanReference> getNextElements(ParserContext parserContext,
+			BeanDefinition stateDef, Element element) {
 
 		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
 
 		String shortNextAttribute = element.getAttribute("next");
 		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
 		if (hasNextAttribute) {
-			list.add(getStateTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), null,
-					shortNextAttribute));
+			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
 		}
 
 		@SuppressWarnings("unchecked")
 		List<Element> nextElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "next");
+		@SuppressWarnings("unchecked")
+		List<Element> stopElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "stop");
+		nextElements.addAll(stopElements);
+		@SuppressWarnings("unchecked")
+		List<Element> endElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "end");
+		nextElements.addAll(endElements);
 
-		// If there are no next elements then this must be an end state
-		if (nextElements.isEmpty() && !hasNextAttribute) {
-			list.add(getStateTransitionReference(parserContext, new RuntimeBeanReference(refAttribute), null, null));
-		}
-		else {
-			// Otherwise we need to capture the "to" state
-			for (Element nextElement : nextElements) {
-				String onAttribute = nextElement.getAttribute("on");
-				String nextAttribute = nextElement.getAttribute("to");
-				if (hasNextAttribute && onAttribute.equals("*")) {
-					throw new BeanCreationException("Duplicate transition pattern found for '*' "
-							+ "(only specify one of next= attribute at step level and next element with on='*')");
-				}
-				list.add(getStateTransitionReference(parserContext, new RuntimeBeanReference(refAttribute),
-						onAttribute, nextAttribute));
+		for (Element nextElement : nextElements) {
+			String onAttribute = nextElement.getAttribute("on");
+			String nextAttribute = nextElement.getAttribute("to");
+			if (hasNextAttribute && onAttribute.equals("*")) {
+				throw new BeanCreationException("Duplicate transition pattern found for '*' "
+						+ "(only specify one of next= attribute at step level and next element with on='*')");
 			}
+
+			String name = nextElement.getNodeName();
+			if ("stop".equals(name) || "end".equals(name)) {
+
+				String statusName = nextElement.getAttribute("status");
+				BatchStatus status = StringUtils.hasText(statusName) ? BatchStatus.valueOf(statusName)
+						: BatchStatus.STOPPED;
+				String nextOnEnd = StringUtils.hasText(statusName) ? null : nextAttribute;
+
+				BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder.genericBeanDefinition(EndState.class);
+				endBuilder.addConstructorArgValue(status);
+				String endName = "end" + endCounter;
+				endCounter++;
+
+				endBuilder.addConstructorArgValue(endName);
+				list.add(getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), onAttribute, nextOnEnd));
+				nextAttribute = endName;
+	
+			}
+			list.add(getStateTransitionReference(parserContext, stateDef, onAttribute, nextAttribute));
+		}
+
+		if (list.isEmpty() && !hasNextAttribute) {
+			list.add(getStateTransitionReference(parserContext, stateDef, null, null));
 		}
 
 		return list;
-
-	}
-
-	/**
-	 * @param parserContext
-	 * @param runtimeBeanReference
-	 * @param onAttribute
-	 * @param nextAttribute
-	 * @return
-	 */
-	private RuntimeBeanReference getStateTransitionReference(ParserContext parserContext,
-			RuntimeBeanReference runtimeBeanReference, String onAttribute, String nextAttribute) {
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
-		stateBuilder.addConstructorArgValue(runtimeBeanReference);
-		return getStateTransitionReference(parserContext, stateBuilder.getBeanDefinition(), onAttribute,
-				nextAttribute);
 	}
 
 	/**
@@ -115,8 +138,7 @@ public class StepParser {
 	 * @return a bean definition for a {@link StateTransition}
 	 */
 	public static RuntimeBeanReference getStateTransitionReference(ParserContext parserContext,
-			BeanDefinition stateDefinition, String on,
-			String next) {
+			BeanDefinition stateDefinition, String on, String next) {
 
 		BeanDefinitionBuilder nextBuilder = BeanDefinitionBuilder.genericBeanDefinition(StateTransition.class);
 		nextBuilder.addConstructorArgValue(stateDefinition);
