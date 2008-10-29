@@ -63,11 +63,7 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 			});
 
 			try {
-				taskExecutor.execute(new Runnable() {
-					public void run() {
-						task.run();
-					}
-				});
+				taskExecutor.execute(task);
 				tasks.add(task);
 			}
 			catch (TaskRejectedException e) {
