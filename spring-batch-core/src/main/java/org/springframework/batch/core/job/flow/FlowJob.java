@@ -26,6 +26,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.flow.Flow;
 import org.springframework.batch.flow.FlowExecution;
 import org.springframework.batch.flow.FlowExecutionException;
+import org.springframework.batch.flow.FlowExecutionListenerSupport;
 import org.springframework.util.Assert;
 
 
@@ -65,15 +66,7 @@ public class FlowJob extends AbstractJob {
 	@Override
 	protected StepExecution doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
-			FlowExecution result = flow.start(new JobFlowExecutor() {
-				public String executeStep(Step step) throws JobInterruptedException, JobRestartException, StartLimitExceededException {
-					StepExecution stepExecution = handleStep(step, execution);
-					return stepExecution==null ? FlowExecution.COMPLETED : stepExecution.getExitStatus().getExitCode();
-				}
-				public JobExecution getJobExecution() {
-					return execution;
-				}
-			});
+			FlowExecution result = flow.start(new SimpleJobFlowExecutor(execution));
 			return getLastStepExecution(execution, result);
 		}
 		catch (FlowExecutionException e) {
@@ -126,6 +119,44 @@ public class FlowJob extends AbstractJob {
 			return false;
 		}
 		return first.getEndTime().after(second.getEndTime());
+	}
+
+	/**
+	 * @author Dave Syer
+	 *
+	 */
+	private class SimpleJobFlowExecutor extends FlowExecutionListenerSupport implements JobFlowExecutor {
+
+		private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<StepExecution>();
+		private final JobExecution execution;
+
+		/**
+		 * @param execution
+		 */
+		private SimpleJobFlowExecutor(JobExecution execution) {
+			this.execution = execution;
+			stepExecutionHolder.set(null);
+		}
+
+		public String executeStep(Step step) throws JobInterruptedException, JobRestartException, StartLimitExceededException {
+			StepExecution stepExecution = handleStep(step, execution);
+			stepExecutionHolder.set(stepExecution);
+			return stepExecution==null ? FlowExecution.COMPLETED : stepExecution.getExitStatus().getExitCode();
+		}
+
+		public JobExecution getJobExecution() {
+			return execution;
+		}
+		
+		public StepExecution getStepExecution() {
+			return stepExecutionHolder.get();
+		}
+		
+		@Override
+		public void close(FlowExecution result) {
+			stepExecutionHolder.set(null);
+		}
+
 	}
 
 }

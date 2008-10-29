@@ -20,7 +20,7 @@ public class DecisionState extends AbstractState<JobFlowExecutor> {
 
 	@Override
 	public String handle(JobFlowExecutor context) throws Exception {
-		return decider.decide(context.getJobExecution());
+		return decider.decide(context.getJobExecution(), context.getStepExecution());
 	}
 
 }

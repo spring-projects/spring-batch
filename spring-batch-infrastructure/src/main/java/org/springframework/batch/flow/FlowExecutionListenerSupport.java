@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow;
-
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.StepExecution;
+package org.springframework.batch.flow;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public interface JobExecutionDecider {
+public class FlowExecutionListenerSupport implements FlowExecutionListener {
 
 	/**
-	 * Strategy for branching an execution based on the state of an ongoing
-	 * {@link JobExecution}. The return value will be used as a status to
-	 * determine the next step in the job.
-	 * 
-	 * @param jobExecution a job execution
-	 * @param stepExecution the latest step execution (may be null)
-	 * @return the exit status code
+	 * No-op implementation.
+	 * @see FlowExecutionListener#close(FlowExecution)
 	 */
-	String decide(JobExecution jobExecution, StepExecution stepExecution);
+	public void close(FlowExecution result) {
+	}
 
 }

@@ -25,6 +25,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -64,7 +65,7 @@ public class DecisionJobParserTests {
 	}
 	
 	public static class TestDecider implements JobExecutionDecider {
-		public String decide(JobExecution jobExecution) {
+		public String decide(JobExecution jobExecution, StepExecution stepExecution) {
 			return "FOO";
 		}
 	}

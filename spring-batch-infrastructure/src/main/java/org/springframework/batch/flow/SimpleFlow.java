@@ -111,21 +111,37 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 	 * @see Flow#resume(String, Object)
 	 */
 	public FlowExecution resume(String stateName, T context) throws FlowExecutionException {
+
 		String status = FlowExecution.UNKNOWN;
 		State<T> state = stateMap.get(stateName);
+
+		FlowExecutionListener listener = new FlowExecutionListenerSupport();
+		if (context instanceof FlowExecutionListener) {
+			listener = (FlowExecutionListener)context;
+		}
+
 		// Terminate if there are no more states
 		while (state != null) {
+
 			stateName = state.getName();
+
 			try {
 				status = state.handle(context);
 			}
 			catch (Exception e) {
+				listener.close(new FlowExecution(stateName, status));
 				throw new FlowExecutionException(String.format("Ended flow=%s at state=%s with exception", name,
 						stateName), e);
 			}
+
 			state = nextState(stateName, status);
+
 		}
-		return new FlowExecution(stateName, status);
+
+		FlowExecution result = new FlowExecution(stateName, status);
+		listener.close(result);
+		return result; 
+
 	}
 
 	/**

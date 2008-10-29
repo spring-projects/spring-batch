@@ -19,6 +19,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.flow.Flow;
 
@@ -44,5 +45,10 @@ public interface JobFlowExecutor {
 	 * @return the current {@link JobExecution}
 	 */
 	JobExecution getJobExecution();
+
+	/**
+	 * @return the latest {@link StepExecution} or null if there is none
+	 */
+	StepExecution getStepExecution();
 
 }

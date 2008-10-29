@@ -94,6 +94,38 @@ public class JobExecutionTests {
 
 	/**
 	 * Test method for
+	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 */
+	@Test
+	public void testUpgradeStatus() {
+		assertEquals(BatchStatus.STARTING, execution.getStatus());
+		execution.upgradeStatus(BatchStatus.COMPLETED);
+		assertEquals(BatchStatus.COMPLETED, execution.getStatus());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.JobExecution#pause()}.
+	 */
+	@Test
+	public void testPause() {
+		execution.pause();
+		assertEquals(BatchStatus.PAUSED, execution.getStatus());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 */
+	@Test
+	public void testDowngradeStatus() {
+		execution.setStatus(BatchStatus.FAILED);
+		execution.upgradeStatus(BatchStatus.COMPLETED);
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+	}
+
+	/**
+	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
 	@Test

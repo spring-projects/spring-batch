@@ -48,13 +48,13 @@ public class JobExecution extends Entity {
 	private volatile Date createTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
-	
+
 	private volatile Date lastUpdated = null;
 
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
-	
+
 	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
@@ -76,8 +76,8 @@ public class JobExecution extends Entity {
 	public JobExecution(JobInstance job) {
 		this(job, null);
 	}
-	
-	public JobExecution(Long id){
+
+	public JobExecution(Long id) {
 		super(id);
 	}
 
@@ -88,7 +88,7 @@ public class JobExecution extends Entity {
 	public void setJobInstance(JobInstance jobInstance) {
 		this.jobInstance = jobInstance;
 	}
-	
+
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
@@ -105,8 +105,26 @@ public class JobExecution extends Entity {
 		return status;
 	}
 
+	/**
+	 * Set the value of the status field.
+	 * 
+	 * @param status the status to set
+	 */
 	public void setStatus(BatchStatus status) {
 		this.status = status;
+	}
+
+	/**
+	 * Upgrade the status field if the provided value is greater than the
+	 * existing one. Clients using this method to set the status can be sure
+	 * that they don't overwrite a failed status with an successful one.
+	 * 
+	 * @param status the new status value
+	 */
+	public void upgradeStatus(BatchStatus status) {
+		if (status.compareTo(this.status) > 0) {
+			this.status = status;
+		}
 	}
 
 	/**
@@ -194,12 +212,14 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Signal that this job execution wishes to be paused.
+	 * Signal that this job execution wishes to be paused. Uses
+	 * {@link #upgradeStatus(BatchStatus)} so that a failed execution stays
+	 * failed.
 	 */
 	public void pause() {
-		status = BatchStatus.PAUSED;
+		upgradeStatus(BatchStatus.PAUSED);
 	}
-	
+
 	/**
 	 * Test if the {@link JobExecution} has been paused.
 	 * 
@@ -208,7 +228,7 @@ public class JobExecution extends Entity {
 	 * @return true if this instance is paused
 	 */
 	public boolean isPaused() {
-		return status==BatchStatus.PAUSED;
+		return status == BatchStatus.PAUSED;
 	}
 
 	/**
@@ -253,8 +273,8 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Get the date representing the last time this JobExecution was updated in the
-	 * JobRepository.
+	 * Get the date representing the last time this JobExecution was updated in
+	 * the JobRepository.
 	 * 
 	 * @return Date representing the last time this JobExecution was updated.
 	 */
@@ -270,39 +290,40 @@ public class JobExecution extends Entity {
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
-	
+
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}
-	
+
 	/**
-	 * Add the provided throwable to the failure exception list. 
+	 * Add the provided throwable to the failure exception list.
 	 * 
 	 * @param t
 	 */
-	public void addFailureException(Throwable t){
+	public void addFailureException(Throwable t) {
 		this.failureExceptions.add(t);
 	}
-	
+
 	/**
 	 * Return all failure causing exceptions for this JobExecution, including
 	 * step executions.
 	 * 
-	 * @return List<Throwable> containing all exceptions causing failure for this
-	 * JobExecution.
+	 * @return List<Throwable> containing all exceptions causing failure for
+	 * this JobExecution.
 	 */
-	public List<Throwable> getAllFailureExceptions(){
-		
+	public List<Throwable> getAllFailureExceptions() {
+
 		Set<Throwable> allExceptions = new HashSet<Throwable>(failureExceptions);
-		for(StepExecution stepExecution: stepExecutions){
+		for (StepExecution stepExecution : stepExecutions) {
 			allExceptions.addAll(stepExecution.getFailureExceptions());
 		}
-		
+
 		return new ArrayList<Throwable>(allExceptions);
 	}
 
 	/**
-	 * Deserialise and ensure transient fields are re-instantiated when read back
+	 * Deserialise and ensure transient fields are re-instantiated when read
+	 * back
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
@@ -311,10 +332,13 @@ public class JobExecution extends Entity {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.domain.Entity#toString()
 	 */
 	public String toString() {
-		return super.toString() + String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s]",startTime,endTime,lastUpdated,status,exitStatus,jobInstance);
+		return super.toString()
+				+ String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s]",
+						startTime, endTime, lastUpdated, status, exitStatus, jobInstance);
 	}
 
 }

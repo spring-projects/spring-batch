@@ -22,6 +22,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Test;
 import org.springframework.batch.flow.FlowExecution;
@@ -35,34 +36,34 @@ import org.springframework.batch.flow.StateTransition;
  */
 public class BasicFlowTests {
 
-	private SimpleFlow<String> flow = new SimpleFlow<String>("job");
+	private SimpleFlow<Object> flow = new SimpleFlow<Object>("job");
 
-	private String executor = "data";
+	private Object executor = "data";
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testEmptySteps() throws Exception {
-		flow.setStateTransitions(Collections.<StateTransition<String>> emptySet());
+		flow.setStateTransitions(Collections.<StateTransition<Object>> emptySet());
 		flow.afterPropertiesSet();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoNextStepSpecified() throws Exception {
-		flow.setStateTransitions(Collections.singleton(StateTransition.createStateTransition(new StateSupport<String>(
+		flow.setStateTransitions(Collections.singleton(StateTransition.createStateTransition(new StateSupport<Object>(
 				"step"), "foo")));
 		flow.afterPropertiesSet();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoStartStep() throws Exception {
-		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StateSupport<String>("step"),
+		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StateSupport<Object>("step"),
 				FlowExecution.FAILED, "step"), StateTransition
-				.createEndStateTransition(new StateSupport<String>("step"))));
+				.createEndStateTransition(new StateSupport<Object>("step"))));
 		flow.afterPropertiesSet();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoEndStep() throws Exception {
-		flow.setStateTransitions(Collections.singleton(StateTransition.createStateTransition(new StateSupport<String>(
+		flow.setStateTransitions(Collections.singleton(StateTransition.createStateTransition(new StateSupport<Object>(
 				"step"), FlowExecution.FAILED, "step")));
 		flow.setStartStateName("step");
 		flow.afterPropertiesSet();
@@ -102,6 +103,24 @@ public class BasicFlowTests {
 	}
 
 	@Test
+	public void testOneStepWithListenerCallsClose() throws Exception {
+		flow.setStateTransitions(Collections
+				.singleton(StateTransition.createEndStateTransition(new StubState("step1"))));
+		flow.afterPropertiesSet();
+		final List<FlowExecution> list = new ArrayList<FlowExecution>();
+		executor = new FlowExecutionListenerSupport() {
+			@Override
+			public void close(FlowExecution result) {
+				list.add(result);
+			}
+		};
+		FlowExecution execution = flow.start(executor);
+		assertEquals(1, list.size());
+		assertEquals(FlowExecution.COMPLETED, execution.getStatus());
+		assertEquals("step1", execution.getName());
+	}
+
+	@Test
 	public void testExplicitStartStep() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step"),
 				FlowExecution.FAILED, "step"), StateTransition.createEndStateTransition(new StubState("step"))));
@@ -136,7 +155,7 @@ public class BasicFlowTests {
 	public void testFailedStep() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1") {
 			@Override
-			public String handle(String executor) {
+			public String handle(Object executor) {
 				return FlowExecution.FAILED;
 			}
 		}, "step2"), StateTransition.createEndStateTransition(new StubState("step2"))));
@@ -165,7 +184,7 @@ public class BasicFlowTests {
 					private boolean paused = false;
 
 					@Override
-					public String handle(String executor) throws Exception {
+					public String handle(Object executor) throws Exception {
 						if (!paused) {
 							paused = true;
 							return FlowExecution.PAUSED;
@@ -184,23 +203,23 @@ public class BasicFlowTests {
 		assertEquals("step3", execution.getName());
 	}
 
-	private Collection<StateTransition<String>> collect(StateTransition<String> s1, StateTransition<String> s2) {
-		Collection<StateTransition<String>> list = new ArrayList<StateTransition<String>>();
+	private Collection<StateTransition<Object>> collect(StateTransition<Object> s1, StateTransition<Object> s2) {
+		Collection<StateTransition<Object>> list = new ArrayList<StateTransition<Object>>();
 		list.add(s1);
 		list.add(s2);
 		return list;
 	}
 
-	private Collection<StateTransition<String>> collect(StateTransition<String> s1, StateTransition<String> s2,
-			StateTransition<String> s3) {
-		Collection<StateTransition<String>> list = collect(s1, s2);
+	private Collection<StateTransition<Object>> collect(StateTransition<Object> s1, StateTransition<Object> s2,
+			StateTransition<Object> s3) {
+		Collection<StateTransition<Object>> list = collect(s1, s2);
 		list.add(s3);
 		return list;
 	}
 
-	private Collection<StateTransition<String>> collect(StateTransition<String> s1, StateTransition<String> s2,
-			StateTransition<String> s3, StateTransition<String> s4) {
-		Collection<StateTransition<String>> list = collect(s1, s2, s3);
+	private Collection<StateTransition<Object>> collect(StateTransition<Object> s1, StateTransition<Object> s2,
+			StateTransition<Object> s3, StateTransition<Object> s4) {
+		Collection<StateTransition<Object>> list = collect(s1, s2, s3);
 		list.add(s4);
 		return list;
 	}
@@ -209,7 +228,7 @@ public class BasicFlowTests {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class StubState extends StateSupport<String> {
+	private static class StubState extends StateSupport<Object> {
 
 		/**
 		 * @param string

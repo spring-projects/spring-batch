@@ -16,6 +16,7 @@
 package org.springframework.batch.core.job.flow;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -214,12 +215,15 @@ public class FlowJobTests {
 
 	@Test
 	public void testDecisionFlow() throws Throwable {
+
 		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
-			public String decide(JobExecution jobExecution) {
+			public String decide(JobExecution jobExecution, StepExecution stepExecution) {
+				assertNotNull(stepExecution);
 				return "SWITCH";
 			}
 		};
+
 		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "*", "decision"));
 		transitions.add(StateTransition.createStateTransition(new DecisionState(decider, "decision"), "*", "step2"));
@@ -228,14 +232,17 @@ public class FlowJobTests {
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2")), "*"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step3")), "*"));
 		flow.setStateTransitions(transitions);
+
 		job.setFlow(flow);
 		StepExecution stepExecution = job.doExecute(jobExecution);
 		if (!jobExecution.getAllFailureExceptions().isEmpty()) {
 			throw jobExecution.getAllFailureExceptions().get(0);
 		}
+
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertEquals("step3", stepExecution.getStepName());
+
 	}
 
 	@Test

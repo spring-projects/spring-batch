@@ -16,23 +16,30 @@
 package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.StartLimitExceededException;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.flow.FlowExecution;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
-public interface JobExecutionDecider {
+public class JobFlowExecutorSupport implements JobFlowExecutor {
 
-	/**
-	 * Strategy for branching an execution based on the state of an ongoing
-	 * {@link JobExecution}. The return value will be used as a status to
-	 * determine the next step in the job.
-	 * 
-	 * @param jobExecution a job execution
-	 * @param stepExecution the latest step execution (may be null)
-	 * @return the exit status code
-	 */
-	String decide(JobExecution jobExecution, StepExecution stepExecution);
+	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
+			StartLimitExceededException {
+		return FlowExecution.COMPLETED;
+	}
+
+	public JobExecution getJobExecution() {
+		return null;
+	}
+
+	public StepExecution getStepExecution() {
+		return null;
+	}
 
 }

@@ -38,7 +38,7 @@ public class EndState extends AbstractState<JobFlowExecutor> {
 		// If there are no step executions, then we are at the beginning of a
 		// restart
 		if (!jobExecution.getStepExecutions().isEmpty()) {
-			jobExecution.setStatus(status);
+			jobExecution.upgradeStatus(status);
 		}
 		return FlowExecution.COMPLETED;
 	}
