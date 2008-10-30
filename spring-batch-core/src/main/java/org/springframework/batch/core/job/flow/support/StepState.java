@@ -1,6 +1,7 @@
-package org.springframework.batch.core.job.flow;
+package org.springframework.batch.core.job.flow.support;
 
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.flow.JobFlowExecutor;
 
 /**
  * {@link State} implementation that delegates to a {@link JobFlowExecutor} to
@@ -16,7 +17,7 @@ public class StepState extends AbstractState {
 	/**
 	 * @param step the step that will be executed
 	 */
-	StepState(Step step) {
+	public StepState(Step step) {
 		super(step.getName());
 		this.step = step;
 	}

@@ -13,30 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow;
+package org.springframework.batch.core.job.flow.support;
 
-import org.springframework.batch.core.job.flow.AbstractState;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.State;
 
 /**
- * Base class for {@link State} implementations.
- * 
  * @author Dave Syer
  *
  */
-public class StateSupport extends AbstractState {
+public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator {
 
 	/**
-	 * @param name
+	 * @see FlowExecutionAggregator#aggregate(Collection)
 	 */
-	public StateSupport(String name) {
-		super(name);
-	}
-
-	@Override
-	public String handle(JobFlowExecutor executor) throws Exception {
-		return FlowExecution.COMPLETED;
+	public String aggregate(Collection<FlowExecution> executions) {
+		if (executions==null || executions.size()==0) {
+			return FlowExecution.UNKNOWN;
+		}
+		return Collections.max(executions).getStatus();
 	}
 
 }

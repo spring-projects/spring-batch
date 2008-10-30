@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.job.flow;
 
-
 /**
  * @author Dave Syer
  *
@@ -33,8 +32,8 @@ public interface Flow {
 	FlowExecution start(JobFlowExecutor executor) throws FlowExecutionException;
 
 	/**
-	 * @param stateName the name of the {@link State} to resume on
-	 * @param executor the context to be passed into each {@link State} executed
+	 * @param stateName the name of the state to resume on
+	 * @param executor the context to be passed into each state executed
 	 * @return a {@link FlowExecution} containing the exit status of the flow
 	 * @throws FlowExecutionException
 	 */

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow;
+package org.springframework.batch.core.job.flow.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,6 +25,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
+import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionException;
+import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.support.SimpleFlow;
+import org.springframework.batch.core.job.flow.support.StateTransition;
 
 /**
  * @author Dave Syer

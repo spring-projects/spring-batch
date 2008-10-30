@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow;
+package org.springframework.batch.core.job.flow.support;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -24,6 +24,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionException;
+import org.springframework.batch.core.job.flow.JobFlowExecutor;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;

@@ -1,7 +1,9 @@
-package org.springframework.batch.core.job.flow;
+package org.springframework.batch.core.job.flow.support;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.JobFlowExecutor;
 
 /**
  * {@link State} implementation for ending a job if it is in progress and
@@ -17,7 +19,7 @@ public class EndState extends AbstractState {
 	/**
 	 * @param name
 	 */
-	EndState(BatchStatus status, String name) {
+	public EndState(BatchStatus status, String name) {
 		super(name);
 		this.status = status;
 	}

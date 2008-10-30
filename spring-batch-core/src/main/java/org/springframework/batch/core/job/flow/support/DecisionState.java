@@ -1,4 +1,6 @@
-package org.springframework.batch.core.job.flow;
+package org.springframework.batch.core.job.flow.support;
+
+import org.springframework.batch.core.job.flow.JobFlowExecutor;
 
 
 /**
@@ -12,7 +14,7 @@ public class DecisionState extends AbstractState {
 	/**
 	 * @param name
 	 */
-	DecisionState(JobExecutionDecider decider, String name) {
+	public DecisionState(JobExecutionDecider decider, String name) {
 		super(name);
 		this.decider = decider;
 	}

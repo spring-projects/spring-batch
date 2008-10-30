@@ -17,9 +17,9 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.job.flow.DecisionState;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.core.job.flow.StateTransition;
+import org.springframework.batch.core.job.flow.support.DecisionState;
+import org.springframework.batch.core.job.flow.support.JobExecutionDecider;
+import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
