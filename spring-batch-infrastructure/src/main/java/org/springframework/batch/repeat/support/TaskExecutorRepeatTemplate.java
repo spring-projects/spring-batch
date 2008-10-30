@@ -177,11 +177,11 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * 
 	 */
 	private static class ExecutingRunnable implements Runnable, ResultHolder {
-		private volatile RepeatCallback callback;
+		private final RepeatCallback callback;
 
-		private volatile RepeatContext context;
+		private final RepeatContext context;
 
-		private volatile ResultQueue queue;
+		private final ResultQueue queue;
 
 		private volatile ExitStatus result;
 
