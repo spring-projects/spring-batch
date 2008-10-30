@@ -29,7 +29,7 @@ public interface Flow {
 	/**
 	 * @throws FlowExecutionException
 	 */
-	FlowExecution start(JobFlowExecutor executor) throws FlowExecutionException;
+	FlowExecution start(FlowExecutor executor) throws FlowExecutionException;
 
 	/**
 	 * @param stateName the name of the state to resume on
@@ -37,6 +37,6 @@ public interface Flow {
 	 * @return a {@link FlowExecution} containing the exit status of the flow
 	 * @throws FlowExecutionException
 	 */
-	FlowExecution resume(String stateName, JobFlowExecutor executor) throws FlowExecutionException;
+	FlowExecution resume(String stateName, FlowExecutor executor) throws FlowExecutionException;
 
 }

@@ -27,7 +27,7 @@ import java.util.List;
 import org.junit.Test;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 
@@ -35,11 +35,11 @@ import org.springframework.batch.core.job.flow.support.StateTransition;
  * @author Dave Syer
  * 
  */
-public class BasicFlowTests {
+public class SimpleFlowTests {
 
 	private SimpleFlow flow = new SimpleFlow("job");
 
-	private JobFlowExecutor executor = new JobFlowExecutorSupport();
+	private FlowExecutor executor = new JobFlowExecutorSupport();
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testEmptySteps() throws Exception {
@@ -156,7 +156,7 @@ public class BasicFlowTests {
 	public void testFailedStep() throws Exception {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1") {
 			@Override
-			public String handle(JobFlowExecutor executor) {
+			public String handle(FlowExecutor executor) {
 				return FlowExecution.FAILED;
 			}
 		}, "step2"), StateTransition.createEndStateTransition(new StubState("step2"))));
@@ -185,7 +185,7 @@ public class BasicFlowTests {
 					private boolean paused = false;
 
 					@Override
-					public String handle(JobFlowExecutor executor) throws Exception {
+					public String handle(FlowExecutor executor) throws Exception {
 						if (!paused) {
 							paused = true;
 							return FlowExecution.PAUSED;

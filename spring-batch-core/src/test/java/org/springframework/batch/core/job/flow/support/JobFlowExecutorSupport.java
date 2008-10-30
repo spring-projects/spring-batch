@@ -21,14 +21,14 @@ import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.repository.JobRestartException;
 
 /**
  * @author Dave Syer
  *
  */
-public class JobFlowExecutorSupport implements JobFlowExecutor {
+public class JobFlowExecutorSupport implements FlowExecutor {
 
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
 			StartLimitExceededException {

@@ -29,7 +29,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * @author Dave Syer
  * 
  */
-public interface JobFlowExecutor {
+public interface FlowExecutor {
 
 	/**
 	 * @param step a {@link Step} to execute

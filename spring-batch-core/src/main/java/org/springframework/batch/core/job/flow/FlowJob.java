@@ -62,7 +62,7 @@ public class FlowJob extends AbstractJob {
 	@Override
 	protected StepExecution doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
-			FlowExecution result = flow.start(new SimpleJobFlowExecutor(execution));
+			FlowExecution result = flow.start(new JobFlowExecutor(execution));
 			return getLastStepExecution(execution, result);
 		}
 		catch (FlowExecutionException e) {
@@ -121,7 +121,7 @@ public class FlowJob extends AbstractJob {
 	 * @author Dave Syer
 	 *
 	 */
-	private class SimpleJobFlowExecutor implements JobFlowExecutor {
+	private class JobFlowExecutor implements FlowExecutor {
 
 		private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<StepExecution>();
 		private final JobExecution execution;
@@ -129,7 +129,7 @@ public class FlowJob extends AbstractJob {
 		/**
 		 * @param execution
 		 */
-		private SimpleJobFlowExecutor(JobExecution execution) {
+		private JobFlowExecutor(JobExecution execution) {
 			this.execution = execution;
 			stepExecutionHolder.set(null);
 		}

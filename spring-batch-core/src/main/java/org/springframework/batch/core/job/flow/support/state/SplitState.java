@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow.support;
+package org.springframework.batch.core.job.flow.support.state;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +23,8 @@ import java.util.concurrent.FutureTask;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.support.State;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
@@ -63,10 +64,10 @@ public class SplitState extends AbstractState {
 	 * Execute the flows in parallel by passing them to the {@link TaskExecutor}
 	 * and wait for all of them to finish before proceeding.
 	 * 
-	 * @see State#handle(JobFlowExecutor)
+	 * @see State#handle(FlowExecutor)
 	 */
 	@Override
-	public String handle(final JobFlowExecutor executor) throws Exception {
+	public String handle(final FlowExecutor executor) throws Exception {
 
 		Collection<FutureTask<FlowExecution>> tasks = new ArrayList<FutureTask<FlowExecution>>();
 

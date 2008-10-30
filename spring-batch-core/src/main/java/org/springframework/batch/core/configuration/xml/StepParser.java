@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.flow.support.EndState;
 import org.springframework.batch.core.job.flow.support.StateTransition;
-import org.springframework.batch.core.job.flow.support.StepState;
+import org.springframework.batch.core.job.flow.support.state.EndState;
+import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;

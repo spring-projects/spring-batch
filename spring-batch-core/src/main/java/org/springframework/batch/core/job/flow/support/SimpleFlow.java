@@ -27,7 +27,7 @@ import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
@@ -101,9 +101,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 	}
 
 	/**
-	 * @see Flow#start(JobFlowExecutor)
+	 * @see Flow#start(FlowExecutor)
 	 */
-	public FlowExecution start(JobFlowExecutor executor) throws FlowExecutionException {
+	public FlowExecution start(FlowExecutor executor) throws FlowExecutionException {
 		if (startState == null) {
 			initializeTransitions();
 		}
@@ -113,9 +113,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 	}
 
 	/**
-	 * @see Flow#resume(String, JobFlowExecutor)
+	 * @see Flow#resume(String, FlowExecutor)
 	 */
-	public FlowExecution resume(String stateName, JobFlowExecutor executor) throws FlowExecutionException {
+	public FlowExecution resume(String stateName, FlowExecutor executor) throws FlowExecutionException {
 
 		String status = FlowExecution.UNKNOWN;
 		State state = stateMap.get(stateName);

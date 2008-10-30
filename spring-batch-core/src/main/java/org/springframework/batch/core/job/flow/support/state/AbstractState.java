@@ -13,25 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow.support;
+package org.springframework.batch.core.job.flow.support.state;
 
-import java.util.Collection;
+import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.support.State;
 
-import org.springframework.batch.core.job.flow.FlowExecution;
 
 /**
- * Strategy interface for aggregating {@link FlowExecution} instances into a
- * single exit status.
- * 
  * @author Dave Syer
- * 
+ *
  */
-public interface FlowExecutionAggregator {
+public abstract class AbstractState implements State {
+	
+	private final String name;
 
 	/**
-	 * @param executions the executions to aggregate
-	 * @return a summary status for the whole lot
+	 * 
 	 */
-	String aggregate(Collection<FlowExecution> executions);
+	public AbstractState(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": name=["+name+"]";
+	}
+	
+	public abstract String handle(FlowExecutor executor) throws Exception;
 
 }

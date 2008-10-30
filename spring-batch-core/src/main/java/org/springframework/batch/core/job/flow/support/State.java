@@ -16,7 +16,7 @@
 package org.springframework.batch.core.job.flow.support;
 
 import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.FlowExecutor;
 
 
 /**
@@ -45,6 +45,6 @@ public interface State {
 	 * @return a status for the execution
 	 * @throws Exception if anything goes wrong
 	 */
-	String handle(JobFlowExecutor executor) throws Exception;
+	String handle(FlowExecutor executor) throws Exception;
 
 }

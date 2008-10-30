@@ -13,38 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow.support;
+package org.springframework.batch.core.job.flow.support.state;
 
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import java.util.Collection;
+import java.util.Collections;
 
+import org.springframework.batch.core.job.flow.FlowExecution;
 
 /**
  * @author Dave Syer
  *
  */
-public abstract class AbstractState implements State {
-	
-	private final String name;
+public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator {
 
 	/**
-	 * 
+	 * @see FlowExecutionAggregator#aggregate(Collection)
 	 */
-	public AbstractState(String name) {
-		this.name = name;
+	public String aggregate(Collection<FlowExecution> executions) {
+		if (executions==null || executions.size()==0) {
+			return FlowExecution.UNKNOWN;
+		}
+		return Collections.max(executions).getStatus();
 	}
-
-	public String getName() {
-		return name;
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return getClass().getSimpleName()+": name=["+name+"]";
-	}
-	
-	public abstract String handle(JobFlowExecutor executor) throws Exception;
 
 }

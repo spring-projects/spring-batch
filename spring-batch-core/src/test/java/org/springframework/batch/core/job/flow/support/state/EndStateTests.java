@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.job.flow.support;
+package org.springframework.batch.core.job.flow.support.state;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,7 +21,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
+import org.springframework.batch.core.job.flow.support.state.EndState;
 
 /**
  * @author Dave Syer
@@ -37,7 +39,7 @@ public class EndStateTests {
 	}
 
 	/**
-	 * Test method for {@link EndState#handle(JobFlowExecutor)}.
+	 * Test method for {@link EndState#handle(FlowExecutor)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -58,7 +60,7 @@ public class EndStateTests {
 	}
 
 	/**
-	 * Test method for {@link EndState#handle(JobFlowExecutor)}.
+	 * Test method for {@link EndState#handle(FlowExecutor)}.
 	 * @throws Exception 
 	 */
 	@Test
@@ -79,7 +81,7 @@ public class EndStateTests {
 	}
 
 	/**
-	 * Test method for {@link EndState#handle(JobFlowExecutor)}.
+	 * Test method for {@link EndState#handle(FlowExecutor)}.
 	 * @throws Exception 
 	 */
 	@Test

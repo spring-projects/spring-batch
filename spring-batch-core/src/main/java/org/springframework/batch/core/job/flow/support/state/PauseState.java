@@ -1,9 +1,9 @@
-package org.springframework.batch.core.job.flow.support;
+package org.springframework.batch.core.job.flow.support.state;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.JobFlowExecutor;
+import org.springframework.batch.core.job.flow.FlowExecutor;
 
 /**
  * @author Dave Syer
@@ -19,7 +19,7 @@ public class PauseState extends AbstractState {
 	}
 
 	@Override
-	public String handle(JobFlowExecutor executor) throws Exception {
+	public String handle(FlowExecutor executor) throws Exception {
 
 		JobExecution jobExecution = executor.getJobExecution();
 
