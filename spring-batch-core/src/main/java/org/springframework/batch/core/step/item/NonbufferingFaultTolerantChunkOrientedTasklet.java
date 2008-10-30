@@ -2,10 +2,11 @@ package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
@@ -47,6 +48,8 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 
 	private static final String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_KEY";
 
+	private static final String SKIPPED_READS_KEY = "SKIPPED_READS_KEY";
+
 	private final RepeatOperations repeatOperations;
 
 	private final RetryOperations retryOperations;
@@ -73,6 +76,20 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		this.processSkipPolicy = processSkipPolicy;
 	}
 
+	private static <T> List<T> getBufferList(AttributeAccessor attributes, String key) {
+		List<T> buffer;
+		if (!attributes.hasAttribute(key)) {
+			buffer = new ArrayList<T>();
+			attributes.setAttribute(key, buffer);
+		}
+		else {
+			@SuppressWarnings("unchecked")
+			List<T> casted = (List<T>) attributes.getAttribute(key);
+			buffer = casted;
+		}
+		return buffer;
+	}
+
 	/**
 	 * 
 	 * @param <T> buffer type
@@ -80,15 +97,15 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	 * @param key the key buffer is stored under in the attributes
 	 * @return newly created or existing buffer stored under the given key
 	 */
-	private static <T> Set<T> getBuffer(AttributeAccessor attributes, String key) {
-		Set<T> buffer;
+	private static <T> Map<T, Exception> getBuffer(AttributeAccessor attributes, String key) {
+		Map<T, Exception> buffer;
 		if (!attributes.hasAttribute(key)) {
-			buffer = new HashSet<T>();
+			buffer = new LinkedHashMap<T, Exception>();
 			attributes.setAttribute(key, buffer);
 		}
 		else {
 			@SuppressWarnings("unchecked")
-			Set<T> casted = (Set<T>) attributes.getAttribute(key);
+			Map<T, Exception> casted = (Map<T, Exception>) attributes.getAttribute(key);
 			buffer = casted;
 		}
 		return buffer;
@@ -102,10 +119,11 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		ExitStatus result = ExitStatus.CONTINUABLE;
 		final List<I> inputs = new ArrayList<I>();
 
+		final List<Exception> skippedReads = getBufferList(attributes, SKIPPED_READS_KEY);
 		result = repeatOperations.iterate(new RepeatCallback() {
 
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-				I item = read(contribution);
+				I item = read(contribution, skippedReads);
 
 				if (item == null) {
 					return ExitStatus.FINISHED;
@@ -117,23 +135,47 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		});
 
 		// filter inputs marked for skipping
-		Set<I> skippedInputs = getBuffer(attributes, SKIPPED_INPUTS_KEY);
-		inputs.removeAll(skippedInputs);
+		final Map<I, Exception> skippedInputs = getBuffer(attributes, SKIPPED_INPUTS_KEY);
+		inputs.removeAll(skippedInputs.keySet());
 
 		// If there is no input we don't have to do anything more
 		if (inputs.isEmpty()) {
 			return result;
 		}
 
-		List<O> outputs = new ArrayList<O>();
+		final List<O> outputs = new ArrayList<O>();
 		process(contribution, inputs, outputs, skippedInputs);
 
 		// filter outputs marked for skipping
-		Set<O> skippedOutputs = getBuffer(attributes, SKIPPED_OUTPUTS_KEY);
-		outputs.removeAll(skippedOutputs);
+		final Map<O, Exception> skippedOutputs = getBuffer(attributes, SKIPPED_OUTPUTS_KEY);
+		outputs.removeAll(skippedOutputs.keySet());
 
 		write(contribution, outputs, skippedOutputs);
-
+		
+		for (Exception e : skippedReads) {
+			try {
+				listener.onSkipInRead(e);
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+			}
+		}
+		for (Entry<I, Exception> skip : skippedInputs.entrySet()) {
+			try {
+				listener.onSkipInProcess(skip.getKey(), skip.getValue());
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, skip.getValue());
+			}
+		}
+		for (Entry<O, Exception> skip : skippedOutputs.entrySet()) {
+			try {
+				listener.onSkipInWrite(skip.getKey(), skip.getValue());
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, skip.getValue());
+			}
+		}
 		return result;
 	}
 
@@ -146,7 +188,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	 * @param contribution current StepContribution holding skipped items count
 	 * @return next item for processing
 	 */
-	private I read(StepContribution contribution) throws Exception {
+	private I read(StepContribution contribution, final List<Exception> skipped) throws Exception {
 
 		try {
 			return doRead();
@@ -156,12 +198,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 			if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 				// increment skip count and try again
 				contribution.incrementReadSkipCount();
-				try {
-					listener.onSkipInRead(e);
-				}
-				catch (RuntimeException ex) {
-					throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-				}
+				skipped.add(e);
 				logger.debug("Skipping failed input", e);
 			}
 
@@ -179,7 +216,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	 * @param skippedInputs container for items marked for skipping
 	 */
 	private void process(final StepContribution contribution, final List<I> inputs, final List<O> outputs,
-			final Set<I> skippedInputs) throws Exception {
+			final Map<I, Exception> skippedInputs) throws Exception {
 
 		int filtered = 0;
 
@@ -202,13 +239,8 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 					Exception e = (Exception) context.getLastThrowable();
 					if (processSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 						contribution.incrementProcessSkipCount();
-						skippedInputs.add(item);
-						try {
-							listener.onSkipInProcess(item, e);
-						}
-						catch (RuntimeException ex) {
-							throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-						}
+						skippedInputs.put(item, e);
+
 						return null;
 					}
 					else {
@@ -243,8 +275,8 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 	 * 
 	 * @param skippedOutputs container for items marked for skipping
 	 */
-	private void write(final StepContribution contribution, final List<O> outputs,  final Set<O> skippedOutputs)
-			throws Exception {
+	private void write(final StepContribution contribution, final List<O> outputs,
+			final Map<O, Exception> skippedOutputs) throws Exception {
 
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {
@@ -266,13 +298,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 					catch (Exception e) {
 						if (writeSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 							contribution.incrementWriteSkipCount();
-							skippedOutputs.add(item);
-							try {
-								listener.onSkipInWrite(item, e);
-							}
-							catch (RuntimeException ex) {
-								throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-							}
+							skippedOutputs.put(item, e);
 						}
 						else {
 							throw new RetryException("Non-skippable exception in recoverer", e);
