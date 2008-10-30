@@ -15,12 +15,12 @@
  */
 package org.springframework.batch.sample.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.springframework.batch.item.validator.ValidationException;
 
 /**
  * @author Dave Syer
