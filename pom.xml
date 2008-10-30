@@ -746,6 +746,11 @@
 			<name>Robert Kasanicky</name>
 			<email>robert.kasanicky@accenture.com</email>
 		</developer>
+		<developer>
+			<id>trisberg</id>
+			<name>Thomas Risberg</name>
+			<email>thomas.risberg@springsource.com</email>
+		</developer>
 	</developers>
 	<repositories>
 		<repository>
