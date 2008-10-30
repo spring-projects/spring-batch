@@ -5,7 +5,7 @@
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
-	<enableImports><![CDATA[false]]></enableImports>
+	<enableImports><![CDATA[true]]></enableImports>
 	<configs>
 		<config>src/test/resources/org/springframework/batch/core/configuration/support/test-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/launch/support/job.xml</config>
