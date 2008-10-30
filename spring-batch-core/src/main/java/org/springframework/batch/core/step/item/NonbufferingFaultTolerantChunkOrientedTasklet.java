@@ -3,15 +3,12 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
-import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -76,40 +73,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		this.processSkipPolicy = processSkipPolicy;
 	}
 
-	private static <T> List<T> getBufferList(AttributeAccessor attributes, String key) {
-		List<T> buffer;
-		if (!attributes.hasAttribute(key)) {
-			buffer = new ArrayList<T>();
-			attributes.setAttribute(key, buffer);
-		}
-		else {
-			@SuppressWarnings("unchecked")
-			List<T> casted = (List<T>) attributes.getAttribute(key);
-			buffer = casted;
-		}
-		return buffer;
-	}
-
-	/**
-	 * 
-	 * @param <T> buffer type
-	 * @param attributes used to store the state of the tasklet
-	 * @param key the key buffer is stored under in the attributes
-	 * @return newly created or existing buffer stored under the given key
-	 */
-	private static <T> Map<T, Exception> getBuffer(AttributeAccessor attributes, String key) {
-		Map<T, Exception> buffer;
-		if (!attributes.hasAttribute(key)) {
-			buffer = new LinkedHashMap<T, Exception>();
-			attributes.setAttribute(key, buffer);
-		}
-		else {
-			@SuppressWarnings("unchecked")
-			Map<T, Exception> casted = (Map<T, Exception>) attributes.getAttribute(key);
-			buffer = casted;
-		}
-		return buffer;
-	}
+	
 
 	/**
 	 * Read-process-write a list of items. Uses fault-tolerant read, process and
@@ -119,7 +83,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		ExitStatus result = ExitStatus.CONTINUABLE;
 		final List<I> inputs = new ArrayList<I>();
 
-		final List<Exception> skippedReads = getBufferList(attributes, SKIPPED_READS_KEY);
+		final List<Exception> skippedReads = getBufferedList(attributes, SKIPPED_READS_KEY);
 		result = repeatOperations.iterate(new RepeatCallback() {
 
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
@@ -135,7 +99,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		});
 
 		// filter inputs marked for skipping
-		final Map<I, Exception> skippedInputs = getBuffer(attributes, SKIPPED_INPUTS_KEY);
+		final Map<I, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
 		inputs.removeAll(skippedInputs.keySet());
 
 		// If there is no input we don't have to do anything more
@@ -147,35 +111,13 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends Abstrac
 		process(contribution, inputs, outputs, skippedInputs);
 
 		// filter outputs marked for skipping
-		final Map<O, Exception> skippedOutputs = getBuffer(attributes, SKIPPED_OUTPUTS_KEY);
+		final Map<O, Exception> skippedOutputs = getBufferedSkips(attributes, SKIPPED_OUTPUTS_KEY);
 		outputs.removeAll(skippedOutputs.keySet());
 
 		write(contribution, outputs, skippedOutputs);
 		
-		for (Exception e : skippedReads) {
-			try {
-				listener.onSkipInRead(e);
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-			}
-		}
-		for (Entry<I, Exception> skip : skippedInputs.entrySet()) {
-			try {
-				listener.onSkipInProcess(skip.getKey(), skip.getValue());
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, skip.getValue());
-			}
-		}
-		for (Entry<O, Exception> skip : skippedOutputs.entrySet()) {
-			try {
-				listener.onSkipInWrite(skip.getKey(), skip.getValue());
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, skip.getValue());
-			}
-		}
+		callSkipListeners(skippedReads, skippedInputs, skippedOutputs);
+		
 		return result;
 	}
 

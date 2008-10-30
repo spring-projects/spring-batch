@@ -17,16 +17,13 @@ package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
-import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -105,12 +102,12 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	 */
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
-		final List<T> inputs = getBuffer(attributes, INPUT_BUFFER_KEY);
+		final List<T> inputs = getBufferedList(attributes, INPUT_BUFFER_KEY);
 		final List<S> outputs = new ArrayList<S>();
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
-		final List<Exception> skippedReads = getBuffer(attributes, SKIPPED_READS_KEY);
+		final List<Exception> skippedReads = getBufferedList(attributes, SKIPPED_READS_KEY);
 
 		if (inputs.isEmpty() && outputs.isEmpty()) {
 
@@ -134,41 +131,17 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 		}
 
-		Map<T, Exception> skippedInputs = getSkippedBuffer(attributes, SKIPPED_INPUTS_KEY);
+		Map<T, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
 		if (!inputs.isEmpty()) {
 			inputs.removeAll(skippedInputs.keySet());
 			process(contribution, inputs, outputs, skippedInputs);
 		}
 
-		Map<S, Exception> skippedOutputs = getSkippedBuffer(attributes, SKIPPED_OUTPUTS_KEY);
+		Map<S, Exception> skippedOutputs = getBufferedSkips(attributes, SKIPPED_OUTPUTS_KEY);
 		outputs.removeAll(skippedOutputs.keySet());
 		write(outputs, contribution, skippedOutputs);
 
-		for (Exception e : skippedReads) {
-			try {
-				listener.onSkipInRead(e);
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-			}
-		}
-		for (Entry<T, Exception> skip : skippedInputs.entrySet()) {
-			try {
-				listener.onSkipInProcess(skip.getKey(), skip.getValue());
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, skip.getValue());
-			}
-		}
-
-		for (Entry<S, Exception> skip : skippedOutputs.entrySet()) {
-			try {
-				listener.onSkipInWrite(skip.getKey(), skip.getValue());
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in skip listener", ex, skip.getValue());
-			}
-		}
+		callSkipListeners(skippedReads, skippedInputs, skippedOutputs);
 
 		// On successful completion clear the attributes to signal that there is
 		// no more processing
@@ -346,28 +319,6 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 		chunk.clear();
 
-	}
-
-	private static <W> List<W> getBuffer(AttributeAccessor attributes, String key) {
-		if (!attributes.hasAttribute(key)) {
-			List<W> emptyList = new ArrayList<W>();
-			attributes.setAttribute(key, emptyList);
-			return emptyList;
-		}
-		@SuppressWarnings("unchecked")
-		List<W> resource = (List<W>) attributes.getAttribute(key);
-		return resource;
-	}
-
-	private static <E> Map<E, Exception> getSkippedBuffer(AttributeAccessor attributes, String key) {
-		if (!attributes.hasAttribute(key)) {
-			Map<E, Exception> emptyMap = new LinkedHashMap<E, Exception>();
-			attributes.setAttribute(key, emptyMap);
-			return emptyMap;
-		}
-		@SuppressWarnings("unchecked")
-		Map<E, Exception> resource = (Map<E, Exception>) attributes.getAttribute(key);
-		return resource;
 	}
 
 }
