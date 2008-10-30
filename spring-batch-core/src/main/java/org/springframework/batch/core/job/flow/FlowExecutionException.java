@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
-
-import java.util.Collection;
-import java.util.Collections;
+package org.springframework.batch.core.job.flow;
 
 /**
  * @author Dave Syer
  *
  */
-public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator {
+public class FlowExecutionException extends Exception {
 
 	/**
-	 * @see FlowExecutionAggregator#aggregate(Collection)
+	 * @param message
 	 */
-	public String aggregate(Collection<FlowExecution> executions) {
-		if (executions==null || executions.size()==0) {
-			return FlowExecution.UNKNOWN;
-		}
-		return Collections.max(executions).getStatus();
+	public FlowExecutionException(String message) {
+		super(message);
+	}
+
+	/**
+	 * @param message
+	 * @param cause
+	 */
+	public FlowExecutionException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }

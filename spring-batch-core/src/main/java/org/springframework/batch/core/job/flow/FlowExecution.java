@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
+package org.springframework.batch.core.job.flow;
 
 /**
  * @author Dave Syer

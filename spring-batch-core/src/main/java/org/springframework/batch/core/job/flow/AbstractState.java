@@ -13,19 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
+package org.springframework.batch.core.job.flow;
+
 
 /**
  * @author Dave Syer
  *
  */
-public class FlowExecutionListenerSupport implements FlowExecutionListener {
+public abstract class AbstractState<T> implements State<T> {
+	
+	private final String name;
 
 	/**
-	 * No-op implementation.
-	 * @see FlowExecutionListener#close(FlowExecution)
+	 * 
 	 */
-	public void close(FlowExecution result) {
+	public AbstractState(String name) {
+		this.name = name;
 	}
+
+	public String getName() {
+		return name;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return getClass().getSimpleName()+": name=["+name+"]";
+	}
+	
+	public abstract String handle(T context) throws Exception;
 
 }

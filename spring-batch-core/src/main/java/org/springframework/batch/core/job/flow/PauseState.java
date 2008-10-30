@@ -2,8 +2,6 @@ package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.flow.AbstractState;
-import org.springframework.batch.flow.FlowExecution;
 
 /**
  * @author Dave Syer

@@ -77,3 +77,8 @@ autowiring
 strategizing
 initialized
 locale
+savepoint
+middleware
+fallback
+idempotent
+reconstitute

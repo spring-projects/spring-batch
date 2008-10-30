@@ -1,6 +1,5 @@
 package org.springframework.batch.core.job.flow;
 
-import org.springframework.batch.flow.AbstractState;
 
 /**
  * @author Dave Syer

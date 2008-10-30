@@ -13,27 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
+package org.springframework.batch.core.job.flow;
 
 /**
  * @author Dave Syer
  *
  */
-public class FlowExecutionException extends Exception {
+public class FlowExecutionListenerSupport implements FlowExecutionListener {
 
 	/**
-	 * @param message
+	 * No-op implementation.
+	 * @see FlowExecutionListener#close(FlowExecution)
 	 */
-	public FlowExecutionException(String message) {
-		super(message);
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public FlowExecutionException(String message, Throwable cause) {
-		super(message, cause);
+	public void close(FlowExecution result) {
 	}
 
 }

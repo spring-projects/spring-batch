@@ -35,8 +35,6 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.StepSupport;
-import org.springframework.batch.flow.SimpleFlow;
-import org.springframework.batch.flow.StateTransition;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 

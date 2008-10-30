@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
+package org.springframework.batch.core.job.flow;
 
 import static org.junit.Assert.assertEquals;
 
@@ -22,9 +22,9 @@ import java.util.Collection;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.springframework.batch.flow.Flow;
-import org.springframework.batch.flow.FlowExecution;
-import org.springframework.batch.flow.SplitState;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.SplitState;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 

@@ -18,8 +18,8 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.flow.Flow;
-import org.springframework.batch.flow.SimpleFlow;
+import org.springframework.batch.core.job.flow.Flow;
+import org.springframework.batch.core.job.flow.SimpleFlow;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

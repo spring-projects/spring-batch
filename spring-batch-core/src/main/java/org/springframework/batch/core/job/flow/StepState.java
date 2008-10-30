@@ -1,8 +1,6 @@
 package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.Step;
-import org.springframework.batch.flow.AbstractState;
-import org.springframework.batch.flow.State;
 
 /**
  * {@link State} implementation that delegates to a {@link JobFlowExecutor} to

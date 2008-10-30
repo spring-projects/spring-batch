@@ -13,29 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
-
-import org.springframework.batch.flow.AbstractState;
-import org.springframework.batch.flow.FlowExecution;
+package org.springframework.batch.core.job.flow;
 
 /**
- * Base class for {@link State} implementations.
- * 
  * @author Dave Syer
  *
  */
-public class StateSupport<T> extends AbstractState<T> {
+public interface FlowExecutionListener {
 
 	/**
-	 * @param name
+	 * @param result
 	 */
-	public StateSupport(String name) {
-		super(name);
-	}
-
-	@Override
-	public String handle(T context) throws Exception {
-		return FlowExecution.COMPLETED;
-	}
+	void close(FlowExecution result);
 
 }

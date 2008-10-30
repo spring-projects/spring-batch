@@ -13,36 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
+package org.springframework.batch.core.job.flow;
 
+import org.springframework.batch.core.job.flow.AbstractState;
+import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.State;
 
 /**
+ * Base class for {@link State} implementations.
+ * 
  * @author Dave Syer
  *
  */
-public abstract class AbstractState<T> implements State<T> {
-	
-	private final String name;
+public class StateSupport<T> extends AbstractState<T> {
 
 	/**
-	 * 
+	 * @param name
 	 */
-	public AbstractState(String name) {
-		this.name = name;
+	public StateSupport(String name) {
+		super(name);
 	}
 
-	public String getName() {
-		return name;
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
-	public String toString() {
-		return getClass().getSimpleName()+": name=["+name+"]";
+	public String handle(T context) throws Exception {
+		return FlowExecution.COMPLETED;
 	}
-	
-	public abstract String handle(T context) throws Exception;
 
 }

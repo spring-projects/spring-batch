@@ -19,7 +19,7 @@ import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.DecisionState;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.flow.StateTransition;
+import org.springframework.batch.core.job.flow.StateTransition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;

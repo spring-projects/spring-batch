@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.flow;
+package org.springframework.batch.core.job.flow;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
- * Strategy interface for aggregating {@link FlowExecution} instances into a
- * single exit status.
- * 
  * @author Dave Syer
- * 
+ *
  */
-public interface FlowExecutionAggregator {
+public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator {
 
 	/**
-	 * @param executions the executions to aggregate
-	 * @return a summary status for the whole lot
+	 * @see FlowExecutionAggregator#aggregate(Collection)
 	 */
-	String aggregate(Collection<FlowExecution> executions);
+	public String aggregate(Collection<FlowExecution> executions) {
+		if (executions==null || executions.size()==0) {
+			return FlowExecution.UNKNOWN;
+		}
+		return Collections.max(executions).getStatus();
+	}
 
 }

@@ -20,8 +20,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-import org.springframework.batch.flow.SplitState;
-import org.springframework.batch.flow.StateTransition;
+import org.springframework.batch.core.job.flow.SplitState;
+import org.springframework.batch.core.job.flow.StateTransition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

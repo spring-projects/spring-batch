@@ -16,8 +16,8 @@ Use Case: Pause and Resume Job Execution
   manual verification of business condition before continuing - a
   sanity check on critical data.  Assume that a job execution could
   receive hundreds of resume signals, and this is a "normal"
-  situation. It does not look like a horrible mess if we look at the
-  history of the execution - e.g. like hundreds of restarts.
+  situation, so it does not create a horrible mess in the history of
+  the execution - e.g. looking like hundreds of restarts.
 
 * Scope
 
