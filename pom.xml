@@ -25,9 +25,9 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>http://fisheye3.cenqua.com/browse/springframework/spring-batch/tags/spring-batch-2.0.0.CI-SNAPSHOT</url>
-		<connection>scm:svn:http://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-2.0.0.CI-SNAPSHOT</connection>
-		<developerConnection>scm:svn:https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-2.0.0.CI-SNAPSHOT</developerConnection>
+		<url>https://fisheye.springframework.org/browse/spring-batch</url>
+		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</connection>
+		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
