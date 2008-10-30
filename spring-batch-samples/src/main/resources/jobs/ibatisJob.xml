@@ -15,9 +15,12 @@
 		<property name="steps">
 			<bean id="step1" parent="simpleStep">
 				<property name="itemReader" ref="ibatisItemReader" />
+				<property name="itemProcessor">
+					<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />	
+				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseWriter">
+						class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditItemWriter">
 						<property name="customerCreditDao">
 							<bean
 								class="org.springframework.batch.sample.domain.trade.internal.IbatisCustomerCreditDao">

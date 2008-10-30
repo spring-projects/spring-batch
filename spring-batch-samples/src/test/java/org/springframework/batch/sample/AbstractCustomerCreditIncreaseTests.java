@@ -10,11 +10,11 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseWriter;
+import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -33,7 +33,7 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 	protected PlatformTransactionManager transactionManager;
 
-	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseWriter.FIXED_AMOUNT;
+	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
 	
 	private static String[] customers = { "INSERT INTO customer (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
 		"INSERT INTO customer (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",

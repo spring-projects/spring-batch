@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
@@ -12,29 +10,28 @@
 	<description>Example for Hibernate integration.</description>
 
 	<bean id="hibernateJob" parent="simpleJob">
-		<!-- set restartable=false so that this job can be used by more than one test -->
+		<!--
+			set restartable=false so that this job can be used by more than one
+			test
+		-->
 		<property name="restartable" value="false" />
 		<property name="steps">
 			<bean id="step1" parent="skipLimitStep">
 				<property name="skipLimit" value="5" />
 				<property name="itemReader" ref="hibernateItemReader" />
-				<property name="itemWriter" ref="hibernateItemWriter" />
+				<property name="itemProcessor" ref="creditIncreaseProcessor" />
+				<property name="itemWriter" ref="hibernateCreditWriter" />
 				<property name="commitInterval" value="3" />
 			</bean>
 		</property>
 	</bean>
 
-
-	<!-- This is a framework class that needs a delegate and also needs to be registered as a RepeatInterceptor in the chunk -->
-	<bean id="hibernateItemWriter"
-		class="org.springframework.batch.item.database.HibernateAwareItemWriter">
-		<property name="sessionFactory" ref="sessionFactory" />
-		<property name="delegate" ref="hibernateCreditWriter" />
-	</bean>
+	<bean id="creditIncreaseProcessor" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<bean id="hibernateCreditWriter"
-		class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseWriter">
-		<property name="customerCreditDao" ref="customerCreditDao" />
+		class="org.springframework.batch.sample.domain.trade.internal.HibernateAwareCustomerCreditItemWriter">
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="dao" ref="customerCreditDao" />
 	</bean>
 
 	<bean id="customerCreditDao"

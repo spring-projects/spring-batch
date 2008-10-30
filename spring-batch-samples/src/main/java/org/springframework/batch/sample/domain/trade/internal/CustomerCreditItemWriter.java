@@ -1,6 +1,5 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
@@ -8,13 +7,11 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 
 /**
- * Increases customer's credit by fixed amount.
+ * Delegates actual writing to a custom DAO. 
  * 
  * @author Robert Kasanicky
  */
-public class CustomerCreditIncreaseWriter implements ItemWriter<CustomerCredit> {
-
-	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("1000");
+public class CustomerCreditItemWriter implements ItemWriter<CustomerCredit> {
 
 	private CustomerCreditDao customerCreditDao;
 
@@ -26,17 +23,9 @@ public class CustomerCreditIncreaseWriter implements ItemWriter<CustomerCredit> 
 		this.customerCreditDao = customerCreditDao;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.item.processor.DelegatingItemWriter#doProcess
-	 * (java.lang.Object)
-	 */
 	public void write(List<? extends CustomerCredit> customerCredits) throws Exception {
 		for (CustomerCredit customerCredit : customerCredits) {
-			CustomerCredit result = customerCredit.increaseCreditBy(FIXED_AMOUNT);
-			customerCreditDao.writeCredit(result);
+			customerCreditDao.writeCredit(customerCredit);
 		}
 	}
 
