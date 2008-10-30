@@ -11,7 +11,7 @@
     objects that represent them in Java. For example, JobInstance,
     JobExecution, JobParameters, StepExecution, and ExecutionContext map to
     BATCH_JOB_INSTANCE, BATCH_JOB_EXECUTION, BATCH_JOB_PARAMS,
-    BATCH_STEP_EXECUTION, BATCH_STEP_EXECUTION_CONTEXT, respectively. The
+    BATCH_STEP_EXECUTION, BATCH_EXECUTION_CONTEXT, respectively. The
     <classname>JobRepository</classname> is responsible for saving and storing
     each Java object into it's correct table. The following appendix describes
     the meta-data tables in detail, along with many of the design decisions
@@ -19,18 +19,29 @@
     statements below, it is important to realize that the data types used are
     as generic as possible. Spring Batch provides many schemas as examples,
     which all have varying data types due to variations in individual database
-    vendors' handling of data types. Below is an ERD model of all 5 tables and
+    vendors' handling of data types.</para> 
+    
+    <para>We provide schema creation scripts and also scripts for upgrading from a Spring Batch 1.0 schema. 
+    These scripts are provided for recent versions of DB2, Derby, HSQL, MySQL, MS SQLServer, Oracle, 
+    PostgreSQL and Sybase ASE. They are located in the sources/spring-batch-core/src/main/resources directory
+    of the download.</para>
+    
+    <para>Below is an ERD model of all 5 tables and
     their relationships to one another:</para>
 
     <mediaobject>
-      <imageobject role="html">
-        <imagedata align="center" fileref="images/meta-data-erd.png" />
+
+      <imageobject role="fo">
+        <imagedata fileref="src/site/resources/reference/images/meta-data-schema.png"
+                   format="PNG" width="400"/>
       </imageobject>
 
       <imageobject role="html">
-        <imagedata fileref="src/site/resources/reference/images/meta-data-erd.png"
+        <imagedata align="center" fileref="images/meta-data-schema.png"
                    format="PNG" />
       </imageobject>
+
+      <caption><para>Meta-Data Model</para></caption>
     </mediaobject>
 
     <section>
@@ -62,12 +73,12 @@
       requiring it, sequences were used. Each variation of the schema will
       contain some form of the following:</para>
 
-      <programlisting>CREATE SEQUENCE BATCH_STEP_EXECUTION_SEQ;
-CREATE SEQUENCE BATCH_JOB_EXECUTION_SEQ;
-CREATE SEQUENCE BATCH_JOB_SEQ;</programlisting>
+      <programlisting>CREATE SEQUENCE BATCH_STEP_EXECUTION_SEQ MAXVALUE 9223372036854775807 NOCYCLE;
+CREATE SEQUENCE BATCH_JOB_EXECUTION_SEQ MAXVALUE 9223372036854775807 NOCYCLE;
+CREATE SEQUENCE BATCH_JOB_SEQ MAXVALUE 9223372036854775807 NOCYCLE;</programlisting>
 
       <para>Many database vendors don't support sequences. In these cases,
-      work arounds are used, such as the following for mySQL:</para>
+      work arounds are used, such as the following for MySQL:</para>
 
       <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
 INSERT INTO BATCH_STEP_EXECUTION_SEQ values(0);
@@ -378,7 +389,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
   <section>
     <title>BATCH_EXECUTION_CONTEXT</title>
 
-    <para>The BATCH_STEP_EXECUTION_CONTEXT table holds all information
+    <para>The BATCH_EXECUTION_CONTEXT table holds all information
     relevant to an <classname>ExecutionContext</classname>. There is exactly
     one <classname>ExecutionContext</classname> per
     <classname>StepExecution</classname>, and it contains all user defined
@@ -388,14 +399,14 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     with the BATCH_JOB_PARAMS table, this table has been denormalized and uses
     a column to determine the type:</para>
 
-    <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
+    <programlisting>CREATE TABLE BATCH_EXECUTION_CONTEXT  (
   EXECUTION_ID BIGINT NOT NULL ,
   DISCRIMINATOR VARCHAR2(1) NOT NULL,
   TYPE_CD VARCHAR(6) NOT NULL ,
   KEY_NAME VARCHAR(1000) NOT NULL , 
   STRING_VAL VARCHAR(1000) , 
   DATE_VAL TIMESTAMP DEFAULT NULL ,
-  LONG_VAL VARCHAR(10) ,
+  LONG_VAL BIGINT ,
   DOUBLE_VAL DOUBLE PRECISION ,
   OBJECT_VAL BLOB,
 ) ;</programlisting>
