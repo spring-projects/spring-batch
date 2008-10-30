@@ -17,10 +17,10 @@
 package org.springframework.batch.item;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.util.Assert;
 
@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
  */
 public class ExecutionContext implements Serializable {
 
-	private boolean dirty = false;
+	private volatile boolean dirty = false;
 
 	private final Map<String, Object> map;
 
@@ -43,7 +43,7 @@ public class ExecutionContext implements Serializable {
 	 * internal map.
 	 */
 	public ExecutionContext() {
-		map = new HashMap<String, Object>();
+		map = new ConcurrentHashMap<String, Object>();
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class ExecutionContext implements Serializable {
 	 * @param map Initial contents of context.
 	 */
 	public ExecutionContext(Map<String, Object> map) {
-		this.map = new HashMap<String, Object>(map);
+		this.map = new ConcurrentHashMap<String, Object>(map);
 	}
 
 	/**
