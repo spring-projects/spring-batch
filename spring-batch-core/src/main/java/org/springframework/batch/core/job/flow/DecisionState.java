@@ -5,7 +5,7 @@ package org.springframework.batch.core.job.flow;
  * @author Dave Syer
  * 
  */
-public class DecisionState extends AbstractState<JobFlowExecutor> {
+public class DecisionState extends AbstractState {
 
 	private final JobExecutionDecider decider;
 
@@ -18,8 +18,8 @@ public class DecisionState extends AbstractState<JobFlowExecutor> {
 	}
 
 	@Override
-	public String handle(JobFlowExecutor context) throws Exception {
-		return decider.decide(context.getJobExecution(), context.getStepExecution());
+	public String handle(JobFlowExecutor executor) throws Exception {
+		return decider.decide(executor.getJobExecution(), executor.getStepExecution());
 	}
 
 }

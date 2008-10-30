@@ -19,9 +19,8 @@ package org.springframework.batch.core.job.flow;
 /**
  * @author Dave Syer
  *
- * @param <T>
  */
-public interface Flow<T> {
+public interface Flow {
 
 	/**
 	 * @return the name of the flow
@@ -31,14 +30,14 @@ public interface Flow<T> {
 	/**
 	 * @throws FlowExecutionException
 	 */
-	FlowExecution start(T context) throws FlowExecutionException;
+	FlowExecution start(JobFlowExecutor executor) throws FlowExecutionException;
 
 	/**
 	 * @param stateName the name of the {@link State} to resume on
-	 * @param context the context to be passed into each {@link State} executed
+	 * @param executor the context to be passed into each {@link State} executed
 	 * @return a {@link FlowExecution} containing the exit status of the flow
 	 * @throws FlowExecutionException
 	 */
-	FlowExecution resume(String stateName, T context) throws FlowExecutionException;
+	FlowExecution resume(String stateName, JobFlowExecutor executor) throws FlowExecutionException;
 
 }

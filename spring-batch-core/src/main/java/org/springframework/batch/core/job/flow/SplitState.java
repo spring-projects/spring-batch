@@ -31,9 +31,9 @@ import org.springframework.core.task.TaskRejectedException;
  * @author Dave Syer
  * 
  */
-public class SplitState<T> extends AbstractState<T> {
+public class SplitState extends AbstractState {
 
-	private final Collection<Flow<T>> flows;
+	private final Collection<Flow> flows;
 
 	private TaskExecutor taskExecutor = new SyncTaskExecutor();
 
@@ -42,7 +42,7 @@ public class SplitState<T> extends AbstractState<T> {
 	/**
 	 * @param name
 	 */
-	public SplitState(Collection<Flow<T>> flows, String name) {
+	public SplitState(Collection<Flow> flows, String name) {
 		super(name);
 		this.flows = flows;
 	}
@@ -59,18 +59,18 @@ public class SplitState<T> extends AbstractState<T> {
 	 * Execute the flows in parallel by passing them to the {@link TaskExecutor}
 	 * and wait for all of them to finish before proceeding.
 	 * 
-	 * @see State#handle(Object)
+	 * @see State#handle(JobFlowExecutor)
 	 */
 	@Override
-	public String handle(final T context) throws Exception {
+	public String handle(final JobFlowExecutor executor) throws Exception {
 
 		Collection<FutureTask<FlowExecution>> tasks = new ArrayList<FutureTask<FlowExecution>>();
 
-		for (final Flow<T> flow : flows) {
+		for (final Flow flow : flows) {
 
 			final FutureTask<FlowExecution> task = new FutureTask<FlowExecution>(new Callable<FlowExecution>() {
 				public FlowExecution call() throws Exception {
-					return flow.start(context);
+					return flow.start(executor);
 				}
 			});
 

@@ -27,9 +27,9 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-public class StateTransition<T> implements Comparable<StateTransition<T>> {
+public class StateTransition implements Comparable<StateTransition> {
 
-	private final State<T> state;
+	private final State state;
 
 	private final String pattern;
 
@@ -43,7 +43,7 @@ public class StateTransition<T> implements Comparable<StateTransition<T>> {
 	 * @param state the {@link State} used to generate the outcome for this
 	 * transition
 	 */
-	public static <T> StateTransition<T> createEndStateTransition(State<T> state) {
+	public static StateTransition createEndStateTransition(State state) {
 		return createStateTransition(state, null, null);
 	}
 
@@ -57,7 +57,7 @@ public class StateTransition<T> implements Comparable<StateTransition<T>> {
 	 * @param pattern the pattern to match in the exit status of the
 	 * {@link State}
 	 */
-	public static <T> StateTransition<T> createEndStateTransition(State<T> state, String pattern) {
+	public static StateTransition createEndStateTransition(State state, String pattern) {
 		return createStateTransition(state, pattern, null);
 	}
 
@@ -69,7 +69,7 @@ public class StateTransition<T> implements Comparable<StateTransition<T>> {
 	 * transition
 	 * @param next the name of the next {@link State} to execute
 	 */
-	public static <T> StateTransition<T> createStateTransition(State<T> state, String next) {
+	public static StateTransition createStateTransition(State state, String next) {
 		return createStateTransition(state, null, next);
 	}
 
@@ -83,11 +83,11 @@ public class StateTransition<T> implements Comparable<StateTransition<T>> {
 	 * {@link State}
 	 * @param next the name of the next {@link State} to execute
 	 */
-	public static <T> StateTransition<T> createStateTransition(State<T> state, String pattern, String next) {
-		return new StateTransition<T>(state, pattern, next);
+	public static StateTransition createStateTransition(State state, String pattern, String next) {
+		return new StateTransition(state, pattern, next);
 	}
 
-	private StateTransition(State<T> state, String pattern, String next) {
+	private StateTransition(State state, String pattern, String next) {
 		super();
 		if (!StringUtils.hasText(pattern)) {
 			this.pattern = "*";
@@ -103,7 +103,7 @@ public class StateTransition<T> implements Comparable<StateTransition<T>> {
 	 * Public getter for the State.
 	 * @return the State
 	 */
-	public State<T> getState() {
+	public State getState() {
 		return state;
 	}
 
@@ -142,7 +142,7 @@ public class StateTransition<T> implements Comparable<StateTransition<T>> {
 	 * fo? > foo.
 	 * @see Comparable#compareTo(Object)
 	 */
-	public int compareTo(StateTransition<T> other) {
+	public int compareTo(StateTransition other) {
 		String value = other.pattern;
 		if (pattern.equals(value)) {
 			return 0;

@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.flow.State;
  * @author Dave Syer
  *
  */
-public class StateSupport<T> extends AbstractState<T> {
+public class StateSupport extends AbstractState {
 
 	/**
 	 * @param name
@@ -35,7 +35,7 @@ public class StateSupport<T> extends AbstractState<T> {
 	}
 
 	@Override
-	public String handle(T context) throws Exception {
+	public String handle(JobFlowExecutor executor) throws Exception {
 		return FlowExecution.COMPLETED;
 	}
 

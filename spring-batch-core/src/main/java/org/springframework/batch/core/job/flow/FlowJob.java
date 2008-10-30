@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  */
 public class FlowJob extends AbstractJob {
 
-	private Flow<JobFlowExecutor> flow;
+	private Flow flow;
 	
 	/**
 	 * Create a {@link FlowJob} with null name and no flow (invalid state).
@@ -52,7 +52,7 @@ public class FlowJob extends AbstractJob {
 	 * Public setter for the flow.
 	 * @param flow the flow to set
 	 */
-	public void setFlow(Flow<JobFlowExecutor> flow) {
+	public void setFlow(Flow flow) {
 		this.flow = flow;
 	}
 
@@ -121,7 +121,7 @@ public class FlowJob extends AbstractJob {
 	 * @author Dave Syer
 	 *
 	 */
-	private class SimpleJobFlowExecutor extends FlowExecutionListenerSupport implements JobFlowExecutor {
+	private class SimpleJobFlowExecutor implements JobFlowExecutor {
 
 		private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<StepExecution>();
 		private final JobExecution execution;
@@ -148,7 +148,6 @@ public class FlowJob extends AbstractJob {
 			return stepExecutionHolder.get();
 		}
 		
-		@Override
 		public void close(FlowExecution result) {
 			stepExecutionHolder.set(null);
 		}

@@ -41,4 +41,7 @@ public class JobFlowExecutorSupport implements JobFlowExecutor {
 		return null;
 	}
 
+	public void close(FlowExecution result) {
+	}
+
 }

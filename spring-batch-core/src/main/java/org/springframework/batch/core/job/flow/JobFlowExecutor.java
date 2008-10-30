@@ -49,5 +49,11 @@ public interface JobFlowExecutor {
 	 * @return the latest {@link StepExecution} or null if there is none
 	 */
 	StepExecution getStepExecution();
+	
+	/**
+	 * Chance to clean up resources at the end of a flow (whether it completed successfully or not).
+	 * @param result the final {@link FlowExecution}
+	 */
+	void close(FlowExecution result);
 
 }

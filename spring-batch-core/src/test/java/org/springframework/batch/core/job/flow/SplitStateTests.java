@@ -22,9 +22,6 @@ import java.util.Collection;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.SplitState;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 
@@ -37,15 +34,13 @@ public class SplitStateTests {
 	@Test
 	public void testBasicHandling() throws Exception {
 
-		Collection<Flow<Object>> flows  = new ArrayList<Flow<Object>>();
-		@SuppressWarnings("unchecked")
-		Flow<Object> flow1 = EasyMock.createMock(Flow.class);
-		@SuppressWarnings("unchecked")
-		Flow<Object> flow2 = EasyMock.createMock(Flow.class);
+		Collection<Flow> flows  = new ArrayList<Flow>();
+		Flow flow1 = EasyMock.createMock(Flow.class);
+		Flow flow2 = EasyMock.createMock(Flow.class);
 		flows.add(flow1);
 		flows.add(flow2);
 
-		SplitState<Object> state = new SplitState<Object>(flows, "foo");
+		SplitState state = new SplitState(flows, "foo");
 
 		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
 		EasyMock.expect(flow2.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
@@ -61,15 +56,13 @@ public class SplitStateTests {
 	@Test
 	public void testConcurrentHandling() throws Exception {
 
-		Collection<Flow<Object>> flows  = new ArrayList<Flow<Object>>();
-		@SuppressWarnings("unchecked")
-		Flow<Object> flow1 = EasyMock.createMock(Flow.class);
-		@SuppressWarnings("unchecked")
-		Flow<Object> flow2 = EasyMock.createMock(Flow.class);
+		Collection<Flow> flows  = new ArrayList<Flow>();
+		Flow flow1 = EasyMock.createMock(Flow.class);
+		Flow flow2 = EasyMock.createMock(Flow.class);
 		flows.add(flow1);
 		flows.add(flow2);
 
-		SplitState<Object> state = new SplitState<Object>(flows, "foo");
+		SplitState state = new SplitState(flows, "foo");
 		state.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
 		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));

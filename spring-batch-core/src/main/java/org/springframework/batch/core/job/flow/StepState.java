@@ -9,7 +9,7 @@ import org.springframework.batch.core.Step;
  * @author Dave Syer
  * 
  */
-public class StepState extends AbstractState<JobFlowExecutor> {
+public class StepState extends AbstractState {
 
 	private final Step step;
 
@@ -22,8 +22,8 @@ public class StepState extends AbstractState<JobFlowExecutor> {
 	}
 
 	@Override
-	public String handle(JobFlowExecutor context) throws Exception {
-		return context.executeStep(step);
+	public String handle(JobFlowExecutor executor) throws Exception {
+		return executor.executeStep(step);
 	}
 
 }

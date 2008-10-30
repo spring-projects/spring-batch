@@ -10,7 +10,7 @@ import org.springframework.batch.core.JobExecution;
  * @author Dave Syer
  * 
  */
-public class EndState extends AbstractState<JobFlowExecutor> {
+public class EndState extends AbstractState {
 
 	private final BatchStatus status;
 
@@ -27,11 +27,11 @@ public class EndState extends AbstractState<JobFlowExecutor> {
 	 * is the first place we came after a restart we do nothing (otherwise the
 	 * same outcome that ended the job on the last run will occur).
 	 * 
-	 * @see State#handle(Object)
+	 * @see State#handle(JobFlowExecutor)
 	 */
 	@Override
-	public String handle(JobFlowExecutor context) throws Exception {
-		JobExecution jobExecution = context.getJobExecution();
+	public String handle(JobFlowExecutor executor) throws Exception {
+		JobExecution jobExecution = executor.getJobExecution();
 		// If there are no step executions, then we are at the beginning of a
 		// restart
 		if (!jobExecution.getStepExecutions().isEmpty()) {

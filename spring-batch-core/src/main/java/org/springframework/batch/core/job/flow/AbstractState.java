@@ -20,7 +20,7 @@ package org.springframework.batch.core.job.flow;
  * @author Dave Syer
  *
  */
-public abstract class AbstractState<T> implements State<T> {
+public abstract class AbstractState implements State {
 	
 	private final String name;
 
@@ -43,6 +43,6 @@ public abstract class AbstractState<T> implements State<T> {
 		return getClass().getSimpleName()+": name=["+name+"]";
 	}
 	
-	public abstract String handle(T context) throws Exception;
+	public abstract String handle(JobFlowExecutor executor) throws Exception;
 
 }

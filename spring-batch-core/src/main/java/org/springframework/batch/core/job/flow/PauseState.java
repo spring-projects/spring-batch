@@ -7,7 +7,7 @@ import org.springframework.batch.core.JobExecution;
  * @author Dave Syer
  * 
  */
-public class PauseState extends AbstractState<JobFlowExecutor> {
+public class PauseState extends AbstractState {
 
 	/**
 	 * @param name
@@ -17,9 +17,9 @@ public class PauseState extends AbstractState<JobFlowExecutor> {
 	}
 
 	@Override
-	public String handle(JobFlowExecutor context) throws Exception {
+	public String handle(JobFlowExecutor executor) throws Exception {
 
-		JobExecution jobExecution = context.getJobExecution();
+		JobExecution jobExecution = executor.getJobExecution();
 
 		// This state is just a toggle for the status of the job execution. If
 		// not already paused we pause it, and expect the flow to respect the

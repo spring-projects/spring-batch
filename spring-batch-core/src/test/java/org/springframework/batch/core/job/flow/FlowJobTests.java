@@ -63,8 +63,8 @@ public class FlowJobTests {
 
 	@Test
 	public void testTwoSteps() throws Exception {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
 		flow.setStateTransitions(transitions);
@@ -77,8 +77,8 @@ public class FlowJobTests {
 
 	@Test
 	public void testFailedStep() throws Exception {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StepSupport("step1") {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,
@@ -99,8 +99,8 @@ public class FlowJobTests {
 
 	@Test
 	public void testStoppingStep() throws Exception {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StepSupport("step1") {
 			@Override
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,
@@ -124,8 +124,8 @@ public class FlowJobTests {
 
 	@Test
 	public void testEndStateStopped() throws Exception {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.STOPPED, "end"), "step2"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
@@ -143,8 +143,8 @@ public class FlowJobTests {
 	}
 
 	public void testEndStateFailed() throws Exception {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.FAILED, "end"), "step2"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
@@ -158,8 +158,8 @@ public class FlowJobTests {
 
 	@Test
 	public void testEndStateStoppedWithRestart() throws Exception {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
 		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.STOPPED, "end"), "step2"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2"))));
@@ -181,8 +181,8 @@ public class FlowJobTests {
 
 	@Test
 	public void testBranching() throws Exception {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "COMPLETED",
 				"step3"));
@@ -199,7 +199,7 @@ public class FlowJobTests {
 
 	@Test
 	public void testBasicFlow() throws Throwable {
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
+		SimpleFlow flow = new SimpleFlow("job");
 		Step step = new StubStep("step");
 		flow.setStateTransitions(Collections.singleton(StateTransition.createEndStateTransition(new StepState(step),
 				"*")));
@@ -214,7 +214,7 @@ public class FlowJobTests {
 	@Test
 	public void testDecisionFlow() throws Throwable {
 
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
+		SimpleFlow flow = new SimpleFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
 			public String decide(JobExecution jobExecution, StepExecution stepExecution) {
 				assertNotNull(stepExecution);
@@ -222,7 +222,7 @@ public class FlowJobTests {
 			}
 		};
 
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "*", "decision"));
 		transitions.add(StateTransition.createStateTransition(new DecisionState(decider, "decision"), "*", "step2"));
 		transitions.add(StateTransition
@@ -246,8 +246,8 @@ public class FlowJobTests {
 	@Test
 	public void testPauseFlow() throws Throwable {
 
-		SimpleFlow<JobFlowExecutor> flow = new SimpleFlow<JobFlowExecutor>("job");
-		Collection<StateTransition<JobFlowExecutor>> transitions = new ArrayList<StateTransition<JobFlowExecutor>>();
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
 		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "*", "pause"));
 		transitions.add(StateTransition.createStateTransition(new PauseState("pause"), "*", "step2"));
 		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2")), "*"));

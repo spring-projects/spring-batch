@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
@@ -37,17 +38,17 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
  * @author Dave Syer
  * 
  */
-public class SimpleFlow<T> implements Flow<T>, InitializingBean {
+public class SimpleFlow implements Flow, InitializingBean {
 
-	private State<T> startState;
+	private State startState;
 
-	private Map<String, SortedSet<StateTransition<T>>> transitionMap = new HashMap<String, SortedSet<StateTransition<T>>>();
+	private Map<String, SortedSet<StateTransition>> transitionMap = new HashMap<String, SortedSet<StateTransition>>();
 
-	private Map<String, State<T>> stateMap = new HashMap<String, State<T>>();
+	private Map<String, State> stateMap = new HashMap<String, State>();
 
 	private String startStateName;
 
-	private Collection<StateTransition<T>> stateTransitions = new HashSet<StateTransition<T>>();
+	private Collection<StateTransition> stateTransitions = new HashSet<StateTransition>();
 
 	private final String name;
 
@@ -81,7 +82,7 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 	 * Public setter for the stateTransitions.
 	 * @param stateTransitions the stateTransitions to set
 	 */
-	public void setStateTransitions(Collection<StateTransition<T>> stateTransitions) {
+	public void setStateTransitions(Collection<StateTransition> stateTransitions) {
 
 		this.stateTransitions = stateTransitions;
 	}
@@ -96,29 +97,24 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 	}
 
 	/**
-	 * @see Flow#start(Object)
+	 * @see Flow#start(JobFlowExecutor)
 	 */
-	public FlowExecution start(T context) throws FlowExecutionException {
+	public FlowExecution start(JobFlowExecutor executor) throws FlowExecutionException {
 		if (startState == null) {
 			initializeTransitions();
 		}
-		State<T> state = startState;
+		State state = startState;
 		String stateName = state.getName();
-		return resume(stateName, context);
+		return resume(stateName, executor);
 	}
 
 	/**
-	 * @see Flow#resume(String, Object)
+	 * @see Flow#resume(String, JobFlowExecutor)
 	 */
-	public FlowExecution resume(String stateName, T context) throws FlowExecutionException {
+	public FlowExecution resume(String stateName, JobFlowExecutor executor) throws FlowExecutionException {
 
 		String status = FlowExecution.UNKNOWN;
-		State<T> state = stateMap.get(stateName);
-
-		FlowExecutionListener listener = new FlowExecutionListenerSupport();
-		if (context instanceof FlowExecutionListener) {
-			listener = (FlowExecutionListener)context;
-		}
+		State state = stateMap.get(stateName);
 
 		// Terminate if there are no more states
 		while (state != null) {
@@ -126,10 +122,10 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 			stateName = state.getName();
 
 			try {
-				status = state.handle(context);
+				status = state.handle(executor);
 			}
 			catch (Exception e) {
-				listener.close(new FlowExecution(stateName, status));
+				executor.close(new FlowExecution(stateName, status));
 				throw new FlowExecutionException(String.format("Ended flow=%s at state=%s with exception", name,
 						stateName), e);
 			}
@@ -139,7 +135,7 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 		}
 
 		FlowExecution result = new FlowExecution(stateName, status);
-		listener.close(result);
+		executor.close(result);
 		return result; 
 
 	}
@@ -148,7 +144,7 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 	 * @return the next {@link Step} (or null if this is the end)
 	 * @throws JobExecutionException
 	 */
-	private State<T> nextState(String stateName, String status) throws FlowExecutionException {
+	private State nextState(String stateName, String status) throws FlowExecutionException {
 
 		// Special status value indicating that a state wishes to pause
 		// execution
@@ -156,7 +152,7 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 			return null;
 		}
 
-		Set<StateTransition<T>> set = transitionMap.get(stateName);
+		Set<StateTransition> set = transitionMap.get(stateName);
 
 		if (set == null) {
 			throw new FlowExecutionException(String.format("No transitions found in flow=%s for state=%s", getName(),
@@ -164,7 +160,7 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 		}
 
 		String next = null;
-		for (StateTransition<T> stateTransition : set) {
+		for (StateTransition stateTransition : set) {
 			if (stateTransition.matches(status)) {
 				if (stateTransition.isEnd()) {
 					// End of job
@@ -199,14 +195,14 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 		stateMap.clear();
 		boolean hasEndStep = false;
 
-		for (StateTransition<T> stateTransition : stateTransitions) {
-			State<T> state = stateTransition.getState();
+		for (StateTransition stateTransition : stateTransitions) {
+			State state = stateTransition.getState();
 			stateMap.put(state.getName(), state);
 		}
 
-		for (StateTransition<T> stateTransition : stateTransitions) {
+		for (StateTransition stateTransition : stateTransitions) {
 
-			State<T> state = stateTransition.getState();
+			State state = stateTransition.getState();
 
 			if (!stateTransition.isEnd()) {
 
@@ -223,9 +219,9 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 
 			String name = state.getName();
 
-			SortedSet<StateTransition<T>> set = transitionMap.get(name);
+			SortedSet<StateTransition> set = transitionMap.get(name);
 			if (set == null) {
-				set = new TreeSet<StateTransition<T>>();
+				set = new TreeSet<StateTransition>();
 				transitionMap.put(name, set);
 			}
 			set.add(stateTransition);
@@ -253,12 +249,12 @@ public class SimpleFlow<T> implements Flow<T>, InitializingBean {
 
 			Set<String> nextStateNames = new HashSet<String>();
 
-			for (StateTransition<T> stateTransition : stateTransitions) {
+			for (StateTransition stateTransition : stateTransitions) {
 				nextStateNames.add(stateTransition.getNext());
 			}
 
-			for (StateTransition<T> stateTransition : stateTransitions) {
-				State<T> state = stateTransition.getState();
+			for (StateTransition stateTransition : stateTransitions) {
+				State state = stateTransition.getState();
 				if (!nextStateNames.contains(state.getName())) {
 					if (startState != null && !startState.getName().equals(state.getName())) {
 						throw new IllegalArgumentException(String.format(

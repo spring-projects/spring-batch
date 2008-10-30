@@ -20,7 +20,7 @@ package org.springframework.batch.core.job.flow;
  * @author Dave Syer
  * 
  */
-public interface State<T> {
+public interface State {
 
 	/**
 	 * The name of the state. Should be unique within a flow.
@@ -38,10 +38,10 @@ public interface State<T> {
 	 * {@link State} instances, so implementations should be careful that the
 	 * context is thread safe, or used in a thread safe manner.
 	 * 
-	 * @param context the context passed in by the caller
+	 * @param executor the context passed in by the caller
 	 * @return a status for the execution
 	 * @throws Exception if anything goes wrong
 	 */
-	String handle(T context) throws Exception;
+	String handle(JobFlowExecutor executor) throws Exception;
 
 }
