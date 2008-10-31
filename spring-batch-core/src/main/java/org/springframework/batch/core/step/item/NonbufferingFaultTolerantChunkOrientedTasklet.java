@@ -34,15 +34,7 @@ import org.springframework.core.AttributeAccessor;
 public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 		AbstractFaultTolerantChunkOrientedTasklet<I, O> {
 
-	private static final String SKIPPED_INPUTS_KEY = "SKIPPED_INPUTS_KEY";
-
-	private static final String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_KEY";
-
-	private static final String SKIPPED_READS_KEY = "SKIPPED_READS_KEY";
-
-	private final RepeatOperations repeatOperations;
-
-	private final ItemSkipPolicy readSkipPolicy;
+	final private RepeatOperations repeatOperations;
 
 	public NonbufferingFaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter,
@@ -50,10 +42,9 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 			Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
 			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
 
-		super(itemReader, itemProcessor, itemWriter, retryTemplate, processSkipPolicy, writeSkipPolicy,
+		super(itemReader, itemProcessor, itemWriter, retryTemplate, readSkipPolicy, processSkipPolicy, writeSkipPolicy,
 				rollbackClassifier);
 		this.repeatOperations = chunkOperations;
-		this.readSkipPolicy = readSkipPolicy;
 	}
 
 	/**
@@ -118,7 +109,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 		}
 		catch (Exception e) {
 
-			if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+			if (getReadSkipPolicy().shouldSkip(e, contribution.getStepSkipCount())) {
 				// increment skip count and try again
 				contribution.incrementReadSkipCount();
 				skipped.add(e);

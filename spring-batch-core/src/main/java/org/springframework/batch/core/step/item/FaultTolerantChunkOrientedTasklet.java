@@ -42,7 +42,7 @@ import org.springframework.core.AttributeAccessor;
  * listener is invoked and the skip count incremented. A retryable exception is
  * thus also effectively also implicitly skippable.
  * 
- * ItemProcessor is assumed to be transactional. In case of rollback caused by
+ * <code>ItemProcessor</code> is assumed to be transactional. In case of rollback caused by
  * error on write the processing phase will be repeated.
  * 
  * @author Dave Syer
@@ -50,17 +50,9 @@ import org.springframework.core.AttributeAccessor;
  */
 public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolerantChunkOrientedTasklet<I, S> {
 
-	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
+	final static private String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
-	private final RepeatOperations repeatOperations;
-
-	final private ItemSkipPolicy readSkipPolicy;
-
-	private static final String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_BUFFER_KEY";
-
-	private static final String SKIPPED_INPUTS_KEY = "SKIPPED_INPUTS_BUFFER_KEY";
-
-	private static final String SKIPPED_READS_KEY = "SKIPPED_READS_BUFFER_KEY";
+	final private RepeatOperations repeatOperations;
 
 	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
@@ -68,10 +60,9 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 			Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
 			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
 
-		super(itemReader, itemProcessor, itemWriter, retryTemplate, processSkipPolicy, writeSkipPolicy,
+		super(itemReader, itemProcessor, itemWriter, retryTemplate, readSkipPolicy, processSkipPolicy, writeSkipPolicy,
 				rollbackClassifier);
 		this.repeatOperations = chunkOperations;
-		this.readSkipPolicy = readSkipPolicy;
 	}
 
 	/**
@@ -156,7 +147,7 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 			}
 			catch (Exception e) {
 
-				if (readSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+				if (getReadSkipPolicy().shouldSkip(e, contribution.getStepSkipCount())) {
 					// increment skip count and try again
 					contribution.incrementReadSkipCount();
 					skippedReads.add(e);

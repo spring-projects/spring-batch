@@ -36,6 +36,12 @@ import org.springframework.core.AttributeAccessor;
  * @author Robert Kasanicky
  */
 public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends AbstractItemOrientedTasklet<I, O> {
+	
+	final static protected String SKIPPED_INPUTS_KEY = "SKIPPED_INPUTS_KEY";
+
+	final static protected String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_KEY";
+
+	final static protected String SKIPPED_READS_KEY = "SKIPPED_READS_KEY";
 
 	final private RetryOperations retryOperations;
 
@@ -43,18 +49,25 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 
 	final private ItemSkipPolicy processSkipPolicy;
 
+	final private ItemSkipPolicy readSkipPolicy;
+
 	final private Classifier<Throwable, Boolean> rollbackClassifier;
 
 	public AbstractFaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter,
-			RetryOperations retryOperations, ItemSkipPolicy processSkipPolicy, ItemSkipPolicy writeSkipPolicy,
-			Classifier<Throwable, Boolean> rollbackClassifier) {
+			RetryOperations retryOperations, ItemSkipPolicy readSkipPolicy, ItemSkipPolicy processSkipPolicy,
+			ItemSkipPolicy writeSkipPolicy, Classifier<Throwable, Boolean> rollbackClassifier) {
 
 		super(itemReader, itemProcessor, itemWriter);
 		this.retryOperations = retryOperations;
+		this.readSkipPolicy = readSkipPolicy;
 		this.processSkipPolicy = processSkipPolicy;
 		this.writeSkipPolicy = writeSkipPolicy;
 		this.rollbackClassifier = rollbackClassifier;
+	}
+
+	protected ItemSkipPolicy getReadSkipPolicy() {
+		return readSkipPolicy;
 	}
 
 	/**

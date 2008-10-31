@@ -161,7 +161,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		catch (Exception e) {
 			assertEquals("Barf!", e.getMessage());
 		}
-		assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_BUFFER_KEY"));
+		assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_KEY"));
 		tasklet.execute(contribution, attributes);
 		assertEquals(1, contribution.getReadCount());
 		assertEquals(1, contribution.getWriteSkipCount());
@@ -191,10 +191,10 @@ public class FaultTolerantChunkOrientedTaskletTests {
 			catch (Exception e) {
 				assertEquals("Barf!", e.getMessage());
 			}
-			assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_BUFFER_KEY"));
+			assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_KEY"));
 		}
 		@SuppressWarnings("unchecked")
-		Map<String, Exception> skips = (Map<String, Exception>) attributes.getAttribute("SKIPPED_OUTPUTS_BUFFER_KEY");
+		Map<String, Exception> skips = (Map<String, Exception>) attributes.getAttribute("SKIPPED_OUTPUTS_KEY");
 		assertEquals(1, skips.size());
 		// The last recovery for this chunk...
 		tasklet.execute(contribution, attributes);
@@ -214,7 +214,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		catch (SkipLimitExceededException e) {
 			// expected
 		}
-		assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_BUFFER_KEY"));
+		assertTrue(attributes.hasAttribute("SKIPPED_OUTPUTS_KEY"));
 		assertEquals(3, contribution.getReadCount());
 		assertEquals(0, contribution.getFilterCount());
 		assertEquals(2, contribution.getWriteSkipCount());
@@ -285,7 +285,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 			assertTrue(attributes.hasAttribute("INPUT_BUFFER_KEY"));
 		}
 		@SuppressWarnings("unchecked")
-		Map<Integer, Exception > skips = (Map<Integer, Exception>) attributes.getAttribute("SKIPPED_INPUTS_BUFFER_KEY");
+		Map<Integer, Exception > skips = (Map<Integer, Exception>) attributes.getAttribute("SKIPPED_INPUTS_KEY");
 		assertEquals(1, skips.size());
 
 		// The last recovery for this chunk...
