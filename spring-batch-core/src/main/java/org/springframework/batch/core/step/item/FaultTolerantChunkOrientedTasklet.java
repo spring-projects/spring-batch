@@ -55,7 +55,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOrientedTasklet<T, S> {
+public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolerantChunkOrientedTasklet<I, S> {
 
 	private static final String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
@@ -77,8 +77,8 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 	private static final String SKIPPED_READS_KEY = "SKIPPED_READS_BUFFER_KEY";
 
-	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends T> itemReader,
-			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
+	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
+			ItemProcessor<? super I, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
 			Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
 			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
@@ -102,7 +102,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	 */
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
-		final List<T> inputs = getBufferedList(attributes, INPUT_BUFFER_KEY);
+		final List<I> inputs = getBufferedList(attributes, INPUT_BUFFER_KEY);
 		final List<S> outputs = new ArrayList<S>();
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
@@ -113,7 +113,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 			result = repeatOperations.iterate(new RepeatCallback() {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
-					T item = read(contribution, skippedReads);
+					I item = read(contribution, skippedReads);
 
 					if (item == null) {
 						return ExitStatus.FINISHED;
@@ -131,7 +131,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 
 		}
 
-		Map<T, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
+		Map<I, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
 		if (!inputs.isEmpty()) {
 			inputs.removeAll(skippedInputs.keySet());
 			process(contribution, inputs, outputs, skippedInputs);
@@ -167,7 +167,7 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	 * @param skippedReads
 	 * @return next item for processing
 	 */
-	protected T read(StepContribution contribution, List<Exception> skippedReads) throws Exception {
+	protected I read(StepContribution contribution, List<Exception> skippedReads) throws Exception {
 
 		while (true) {
 			try {
@@ -200,12 +200,12 @@ public class FaultTolerantChunkOrientedTasklet<T, S> extends AbstractItemOriente
 	/**
 	 * Incorporate retry into the item processor stage.
 	 */
-	protected void process(final StepContribution contribution, final List<T> inputs, final List<S> outputs,
-			final Map<T, Exception> skippedInputs) throws Exception {
+	protected void process(final StepContribution contribution, final List<I> inputs, final List<S> outputs,
+			final Map<I, Exception> skippedInputs) throws Exception {
 
 		int filtered = 0;
 
-		for (final T item : inputs) {
+		for (final I item : inputs) {
 
 			RetryCallback<S> retryCallback = new RetryCallback<S>() {
 

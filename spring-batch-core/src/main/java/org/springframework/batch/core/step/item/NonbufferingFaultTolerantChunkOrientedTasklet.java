@@ -39,7 +39,7 @@ import org.springframework.core.AttributeAccessor;
  * @param <I> input item type
  * @param <O> output item type
  */
-public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends AbstractItemOrientedTasklet<I, O> {
+public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolerantChunkOrientedTasklet<I, O> {
 
 	private static final String SKIPPED_INPUTS_KEY = "SKIPPED_INPUTS_KEY";
 
