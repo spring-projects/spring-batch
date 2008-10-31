@@ -16,11 +16,9 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
@@ -31,12 +29,7 @@ import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.retry.RecoveryCallback;
-import org.springframework.batch.retry.RetryCallback;
-import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryOperations;
-import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.support.Classifier;
 import org.springframework.core.AttributeAccessor;
 
@@ -61,15 +54,7 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 
 	private final RepeatOperations repeatOperations;
 
-	final private RetryOperations retryOperations;
-
 	final private ItemSkipPolicy readSkipPolicy;
-
-	final private ItemSkipPolicy writeSkipPolicy;
-
-	final private ItemSkipPolicy processSkipPolicy;
-
-	final private Classifier<Throwable, Boolean> rollbackClassifier;
 
 	private static final String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_BUFFER_KEY";
 
@@ -82,18 +67,16 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
 			Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
 			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
-		super(itemReader, itemProcessor, itemWriter);
+
+		super(itemReader, itemProcessor, itemWriter, retryTemplate, processSkipPolicy, writeSkipPolicy,
+				rollbackClassifier);
 		this.repeatOperations = chunkOperations;
-		this.retryOperations = retryTemplate;
-		this.rollbackClassifier = rollbackClassifier;
 		this.readSkipPolicy = readSkipPolicy;
-		this.writeSkipPolicy = writeSkipPolicy;
-		this.processSkipPolicy = processSkipPolicy;
 	}
 
 	/**
-	 * Get the next item from {@link #read(StepContribution, List)} and if not null
-	 * pass the item to {@link #write(List, StepContribution, Map)}. If the
+	 * Get the next item from {@link #read(StepContribution, List)} and if not
+	 * null pass the item to {@link #write(List, StepContribution, Map)}. If the
 	 * {@link ItemProcessor} returns null, the write is omitted and another item
 	 * taken from the reader.
 	 * 
@@ -145,15 +128,13 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 
 		// On successful completion clear the attributes to signal that there is
 		// no more processing
-		if (outputs.isEmpty()) {
-			for (String key : attributes.attributeNames()) {
-				attributes.removeAttribute(key);
-			}
-			inputs.clear();
-			outputs.clear();
-			skippedInputs.clear();
-			skippedOutputs.clear();
+		for (String key : attributes.attributeNames()) {
+			attributes.removeAttribute(key);
 		}
+
+		inputs.clear();
+		skippedInputs.clear();
+		skippedOutputs.clear();
 
 		return result;
 
@@ -188,136 +169,6 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 
 			}
 		}
-
-	}
-
-	/**
-	 * 
-	 * @param inputs the items to process
-	 * @param outputs the items to write
-	 * @param contribution current context
-	 */
-	/**
-	 * Incorporate retry into the item processor stage.
-	 */
-	protected void process(final StepContribution contribution, final List<I> inputs, final List<S> outputs,
-			final Map<I, Exception> skippedInputs) throws Exception {
-
-		int filtered = 0;
-
-		for (final I item : inputs) {
-
-			RetryCallback<S> retryCallback = new RetryCallback<S>() {
-
-				public S doWithRetry(RetryContext context) throws Exception {
-					S output = doProcess(item);
-					return output;
-				}
-
-			};
-
-			RecoveryCallback<S> recoveryCallback = new RecoveryCallback<S>() {
-
-				public S recover(RetryContext context) throws Exception {
-					Exception e = (Exception) context.getLastThrowable();
-					if (processSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
-						contribution.incrementProcessSkipCount();
-						skippedInputs.put(item, e);
-						logger.debug("Skipping after failed process", e);
-						return null;
-					}
-					else {
-						throw new RetryException("Non-skippable exception in recoverer while processing", e);
-					}
-				}
-
-			};
-
-			S output = retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(item,
-					rollbackClassifier));
-			if (output != null) {
-				outputs.add(output);
-			}
-			else {
-				filtered++;
-			}
-
-		}
-
-		contribution.incrementFilterCount(filtered);
-
-	}
-
-	/**
-	 * Execute the business logic, delegating to the writer.<br/>
-	 * 
-	 * Process the items with the {@link ItemWriter} in a stateful retry. Any
-	 * {@link SkipListener} provided is called when retry attempts are
-	 * exhausted. The listener callback (on write failure) will happen in the
-	 * next transaction automatically.<br/>
-	 */
-	protected void write(final List<S> chunk, final StepContribution contribution, final Map<S, Exception> skipped)
-			throws Exception {
-
-		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
-			public Object doWithRetry(RetryContext context) throws Exception {
-				doWrite(chunk);
-				contribution.incrementWriteCount(chunk.size());
-				return null;
-			}
-		};
-
-		RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
-
-			public Object recover(RetryContext context) throws Exception {
-				if (chunk.size() == 1) {
-					Exception e = (Exception) context.getLastThrowable();
-					S item = chunk.get(0);
-					checkSkipPolicy(item, e, contribution);
-					return null;
-				}
-				Exception le = (Exception) context.getLastThrowable();
-				if (!rollbackClassifier.classify(le)) {
-					throw new RetryException(
-							"Invalid retry state during write caused by exception that does not classify for rollback: ", le);
-				}
-				for (S item : chunk) {
-					try {
-						doWrite(Collections.singletonList(item));
-						contribution.incrementWriteCount(1);
-					}
-					catch (Exception e) {
-						checkSkipPolicy(item, e, contribution);
-						if (rollbackClassifier.classify(e)) {
-							throw e;
-						}
-						else {
-							throw new RetryException(
-									"Invalid retry state during recovery caused by exception that does not classify for rollback: ", e);
-						}
-					}
-				}
-
-				return null;
-
-			}
-
-			private void checkSkipPolicy(S item, Exception e, StepContribution contribution) {
-				if (writeSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
-					contribution.incrementWriteSkipCount();
-					skipped.put(item, e);
-					logger.debug("Skipping after failed write", e);
-				}
-				else {
-					throw new RetryException("Non-skippable exception in recoverer", e);
-				}
-			}
-
-		};
-
-		retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(skipped, rollbackClassifier));
-
-		chunk.clear();
 
 	}
 
