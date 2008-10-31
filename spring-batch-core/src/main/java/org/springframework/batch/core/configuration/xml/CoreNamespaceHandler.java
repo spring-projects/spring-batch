@@ -31,5 +31,6 @@ public class CoreNamespaceHandler extends NamespaceHandlerSupport {
 	 */
 	public void init() {
 		this.registerBeanDefinitionParser("job", new JobParser());
+		this.registerBeanDefinitionParser("job-repository", new JobRepositoryParser());
 	}
 }

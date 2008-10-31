@@ -177,6 +177,48 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 		</xsd:complexType>
 	</xsd:element>
 
+    <xsd:element name="job-repository">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+			Configures a SimplJobRepository using a JobRepositoryFactoryBean.
+			]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="beans:identifiedType">
+					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
+						<xsd:annotation>
+							<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+							The bean name of the DataSource that is to be used. This attribute 
+							is not required, and only needs to be specified explicitly
+							if the bean name of the desired DataSource is not 'dataSource'.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="javax.sql.DataSource"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="transaction-manager" type="xsd:string" default="transactionManager">
+						<xsd:annotation>
+							<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+							The bean name of the TransactionManager that is to be used. This attribute 
+							is not required, and only needs to be specified explicitly
+							if the bean name of the desired TransactionManager is not 'transactionManager'.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.transaction.PlatformTransactionManager"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
 	<xsd:complexType name="flowType">
 		<xsd:sequence>
 			<xsd:choice minOccurs="1" maxOccurs="unbounded" >
