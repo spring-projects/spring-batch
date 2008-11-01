@@ -188,7 +188,7 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 				<xsd:extension base="beans:identifiedType">
 					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
 						<xsd:annotation>
-							<xsd:documentation source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+							<xsd:documentation source="java:javax.sql.DataSource"><![CDATA[
 							The bean name of the DataSource that is to be used. This attribute 
 							is not required, and only needs to be specified explicitly
 							if the bean name of the desired DataSource is not 'dataSource'.
@@ -212,6 +212,24 @@ The decider is a reference to a JobExecutionDecider that can produce a status to
 									<tool:expected-type type="org.springframework.transaction.PlatformTransactionManager"/>
 								</tool:annotation>
 							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="isolation-level-for-create" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The isolation level to use for creation of job execution entities.
+							The default is ISOLATION_SERIALIZABLE, which prevents accidental 
+							concurrent execution of the same job (ISOLATION_REPEATABLE_READ 
+							would work as well).
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="table-prefix" type="xsd:string">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The the table prefix to use for all the batch meta-data tables.
+							Defaults to "BATCH_".
+							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
 				</xsd:extension>

@@ -15,12 +15,11 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -32,8 +31,6 @@ import org.w3c.dom.Element;
  * 
  */
 public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
-
-	private final Log logger = LogFactory.getLog(getClass());
 
     protected String getBeanClassName(Element element) {
         return "org.springframework.batch.core.repository.support.JobRepositoryFactoryBean";
@@ -49,15 +46,20 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
 
         String transactionManager = element.getAttribute("transaction-manager");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Using data-source: " + dataSource);
-            logger.debug("Using transaction-manager: " + transactionManager);
-        }
-
+        String isolationLevelForCreate = element.getAttribute("isolation-level-for-create");
+        
+        String tablePrefix = element.getAttribute("table-prefix");
+        
         RuntimeBeanReference ds = new RuntimeBeanReference(dataSource);
         builder.addPropertyValue("dataSource", ds);
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
         builder.addPropertyValue("transactionManager", tx);
+        if (StringUtils.hasText(isolationLevelForCreate)) {
+            builder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
+        }
+        if (StringUtils.hasText(tablePrefix)) {
+            builder.addPropertyValue("tablePrefix", tablePrefix);
+        }
 
         builder.setRole(BeanDefinition.ROLE_SUPPORT);
 

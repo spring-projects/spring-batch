@@ -12,6 +12,6 @@
 		<beans:property name="dataSource" ref="dataSource"/>
 	</beans:bean>
 
-	<job-repository id="jobRepo1"/>	
+	<job-repository id="jobRepo1"/>
 
 </beans:beans>
