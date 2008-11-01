@@ -2,7 +2,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-docs</artifactId>
-  <version>1.1.3.CI-SNAPSHOT</version>
+  <version>1.1.4.CI-SNAPSHOT</version>
 	<name>Documentation</name>
 	<packaging>pom</packaging>
 	<description>Spring Batch Documentation - reference guide and user manuals.</description>
@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>1.1.3.CI-SNAPSHOT</version>
+		<version>1.1.4.CI-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
