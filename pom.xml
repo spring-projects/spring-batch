@@ -8,7 +8,7 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-	<version>1.1.3.CI-SNAPSHOT</version>
+	<version>1.1.3.RELEASE</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-infrastructure</module>
@@ -25,9 +25,9 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>https://fisheye.springframework.org/browse/spring-batch</url>
-		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</developerConnection>
+		<url>https://fisheye.springframework.org/browse/spring-batch/tags/spring-batch-1.1.3.RELEASE</url>
+		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/tags/spring-batch-1.1.3.RELEASE</connection>
+		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/tags/spring-batch-1.1.3.RELEASE</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
