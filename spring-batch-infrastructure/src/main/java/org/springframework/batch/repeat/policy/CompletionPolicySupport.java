@@ -30,7 +30,7 @@ import org.springframework.batch.repeat.context.RepeatContextSupport;
 public class CompletionPolicySupport implements CompletionPolicy {
 
 	/**
-	 * If exit status is not continuable return <code>true</code>, otherwise
+	 * Return <code>true</code> if exit status is not continuable, otherwise
 	 * delegate to {@link #isComplete(RepeatContext)}.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,

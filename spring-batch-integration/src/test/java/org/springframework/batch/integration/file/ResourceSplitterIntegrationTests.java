@@ -27,11 +27,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Splitter;
-import org.springframework.integration.bus.MessageBus;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.message.Message;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -41,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration()
 @RunWith(SpringJUnit4ClassRunner.class)
-@MessageEndpoint
+@MessageEndpoint(input = "resources", output = "requests")
 public class ResourceSplitterIntegrationTests {
 
 	@Autowired
@@ -50,10 +48,7 @@ public class ResourceSplitterIntegrationTests {
 
 	@Autowired
 	@Qualifier("requests")
-	private PollableChannel requests;
-
-	@Autowired
-	private MessageBus bus;
+	private MessageChannel requests;
 
 	/*
 	 * This is so cool (but see INT-190)...<br/>
@@ -61,7 +56,7 @@ public class ResourceSplitterIntegrationTests {
 	 * The incoming message is a Resource pattern, and it is converted to the
 	 * correct payload type with Spring's default strategy
 	 */
-	@Splitter(inputChannel = "resources", outputChannel = "requests")
+	@Splitter
 	public Resource[] handle(Resource[] message) {
 		List<Resource> list = Arrays.asList(message);
 		System.err.println(list);
@@ -71,9 +66,8 @@ public class ResourceSplitterIntegrationTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testVanillaConversion() throws Exception {
-		bus.start();
 		resources.send(new GenericMessage<String>("classpath:*-context.xml"));
-		Message<Resource> message = (Message<Resource>) requests.receive(200L);
+		Message<Resource> message = (Message<Resource>) requests.receive(100L);
 		assertNotNull(message);
 		message = (Message<Resource>) requests.receive(100L);
 		assertNotNull(message);

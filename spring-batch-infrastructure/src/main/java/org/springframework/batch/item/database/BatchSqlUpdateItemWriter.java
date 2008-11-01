@@ -17,9 +17,13 @@ package org.springframework.batch.item.database;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -32,14 +36,15 @@ import org.springframework.util.Assert;
  * {@link PreparedStatement} if available and can take some rudimentary steps to
  * locate a failure during a flush, and identify the items that failed. When one
  * of those items is encountered again the batch is flushed aggressively so that
- * the bad item is eventually identified and can be dealt with in
- * isolation.<br/>
+ * the bad item is eventually identified and can be dealt with in isolation.<br/>
  * 
  * The user must provide an SQL query and a special callback
  * {@link ItemPreparedStatementSetter}, which is responsible for mapping the
  * item to a PreparedStatement.<br/>
  * 
- * It is expected that {@link #write(List)} is called inside a transaction.<br/>
+ * It is expected that {@link #write(Object)} is called inside a transaction,
+ * and that {@link #flush()} is then subsequently called before the transaction
+ * commits, or {@link #clear()} before it rolls back.<br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
  * behaviour), so it can be used to write in multiple concurrent transactions.
@@ -51,11 +56,16 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class BatchSqlUpdateItemWriter<T> implements ItemWriter<T>, InitializingBean {
+public class BatchSqlUpdateItemWriter extends AbstractTransactionalResourceItemWriter implements InitializingBean {
+
+	/**
+	 * Key for items processed in the current transaction {@link RepeatContext}.
+	 */
+	private static final String ITEMS_PROCESSED = BatchSqlUpdateItemWriter.class.getName() + ".ITEMS_PROCESSED";
 
 	private JdbcOperations jdbcTemplate;
 
-	private ItemPreparedStatementSetter<T> preparedStatementSetter;
+	private ItemPreparedStatementSetter preparedStatementSetter;
 
 	private String sql;
 
@@ -85,7 +95,7 @@ public class BatchSqlUpdateItemWriter<T> implements ItemWriter<T>, InitializingB
 	 * @param preparedStatementSetter the {@link ItemPreparedStatementSetter} to
 	 * set
 	 */
-	public void setItemPreparedStatementSetter(ItemPreparedStatementSetter<T> preparedStatementSetter) {
+	public void setItemPreparedStatementSetter(ItemPreparedStatementSetter preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
 	}
 
@@ -104,18 +114,21 @@ public class BatchSqlUpdateItemWriter<T> implements ItemWriter<T>, InitializingB
 		Assert.notNull(jdbcTemplate, "BatchSqlUpdateItemWriter requires an data source.");
 		Assert.notNull(preparedStatementSetter, "BatchSqlUpdateItemWriter requires a ItemPreparedStatementSetter");
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.ItemWriter#write(java.util.List)
-	 */
-	public void write(final List<? extends T> items) throws Exception {
 
-		if (!items.isEmpty()) {
+	/**
+	 * Create and execute batch prepared statement.
+	 * @throws EmptyResultDataAccessException if any of the items does not cause an update
+	 */
+	protected void doFlush() throws EmptyResultDataAccessException {
+
+		final List processed = new ArrayList(getProcessed());
+
+		if (!processed.isEmpty()) {
 
 			int[] values = (int[]) jdbcTemplate.execute(sql, new PreparedStatementCallback() {
 				public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
-
-					for (T item : items) {
+					for (Iterator iterator = processed.iterator(); iterator.hasNext();) {
+						Object item = (Object) iterator.next();
 						preparedStatementSetter.setValues(item, ps);
 						ps.addBatch();
 					}
@@ -128,13 +141,29 @@ public class BatchSqlUpdateItemWriter<T> implements ItemWriter<T>, InitializingB
 					int value = values[i];
 					if (value == 0) {
 						throw new EmptyResultDataAccessException("Item " + i + " of " + values.length
-								+ " did not update any rows: [" + items.get(i) + "]", 1);
+								+ " did not update any rows: [" + processed.get(i) + "]", 1);
 					}
 				}
 			}
 
 		}
 
+	}
+
+	protected String getResourceKey() {
+		return ITEMS_PROCESSED;
+	}
+
+	/**
+	 * No-op.
+	 */
+	protected void doWrite(Object output) {
+	}
+
+	/**
+	 * No-op.
+	 */
+	protected void doClear() throws ClearFailedException {
 	}
 
 }

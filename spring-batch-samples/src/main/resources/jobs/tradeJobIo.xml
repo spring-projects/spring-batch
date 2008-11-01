@@ -4,13 +4,13 @@
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
-       		http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
        		http://www.springframework.org/schema/aop
- 			http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+ 			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 
-	<bean class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao"
-		id="tradeDao" p:dataSource-ref="dataSource">
+	<bean class="org.springframework.batch.sample.dao.JdbcTradeDao"
+		id="tradeDao" p:jdbcTemplate-ref="jdbcTemplate">
 		<property name="incrementer">
 			<bean parent="incrementerParent">
 				<property name="incrementerName" value="TRADE_SEQ" />
@@ -19,20 +19,20 @@
 	</bean>
 
 	<bean
-		class="org.springframework.batch.sample.domain.trade.internal.JdbcCustomerDebitDao"
-		id="customerDao" p:dataSource-ref="dataSource" />
+		class="org.springframework.batch.sample.dao.JdbcCustomerDebitDao"
+		id="customerDao" p:jdbcTemplate-ref="jdbcTemplate" />
 
 	<bean
-		class="org.springframework.batch.sample.domain.trade.internal.FlatFileCustomerCreditDao"
+		class="org.springframework.batch.sample.dao.FlatFileCustomerCreditDao"
 		id="customerReportItemWriter">
 		<property name="itemWriter">
 			<bean
 				class="org.springframework.batch.item.file.FlatFileItemWriter"
 				id="customerFlatFileOutputSource">
 				<property name="resource" ref="customerFileLocator" />
-				<property name="lineAggregator">
+				<property name="fieldSetCreator">
 					<bean
-						class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+						class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" />
 				</property>
 			</bean>
 		</property>
@@ -41,14 +41,10 @@
 	<bean class="org.springframework.batch.item.file.FlatFileItemReader"
 		id="fileItemReader">
 		<property name="resource" ref="fileLocator" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer" ref="tradeFileDescriptor" />
-				<property name="fieldSetMapper">
-					<bean
-						class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
-				</property>
-			</bean>
+		<property name="lineTokenizer" ref="tradeFileDescriptor" />
+		<property name="fieldSetMapper">
+			<bean
+				class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 		</property>
 	</bean>
 

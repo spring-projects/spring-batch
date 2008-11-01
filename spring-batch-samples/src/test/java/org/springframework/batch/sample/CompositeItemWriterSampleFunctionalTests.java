@@ -1,29 +1,21 @@
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.io.IOUtils;
-import org.junit.runner.RunWith;
-import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.sample.domain.Trade;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
 public class CompositeItemWriterSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private static final String GET_TRADES = "SELECT isin, quantity, price, customer FROM trade order by isin";
@@ -35,23 +27,18 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 		"Trade: [isin=UK21341EAH44,quantity=214,price=34.11,customer=customer4]" +
 		"Trade: [isin=UK21341EAH45,quantity=215,price=35.11,customer=customer5]";
 	
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 	
 	private int activeRow = 0;
 	
 	private int before;
 	
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
-	}
-
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.sample.AbstractLifecycleSpringContextTests#validatePreConditions()
 	 */
 	protected void validatePreConditions() throws Exception {
-		simpleJdbcTemplate.update("DELETE from TRADE");
-		before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		jdbcTemplate.update("DELETE from TRADE");
+		before = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 	}
 	
 	protected void validatePostConditions() throws Exception {	
@@ -60,7 +47,7 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 	}
 	
 	private void checkOutputTable() {
-		final List<Trade> trades = new ArrayList<Trade>() {{
+		final List trades = new ArrayList() {{
 				add(new Trade("UK21341EAH41", 211, new BigDecimal("31.11"), "customer1"));
 				add(new Trade("UK21341EAH42", 212, new BigDecimal("32.11"), "customer2"));
 				add(new Trade("UK21341EAH43", 213, new BigDecimal("33.11"), "customer3"));
@@ -68,13 +55,13 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 				add(new Trade("UK21341EAH45", 215, new BigDecimal("35.11"), "customer5"));
 		}};
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 		
 		assertEquals(before+5, after);
 		
-		simpleJdbcTemplate.getJdbcOperations().query(GET_TRADES, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 			public void processRow(ResultSet rs) throws SQLException {
-				Trade trade = trades.get(activeRow++);
+				Trade trade = (Trade)trades.get(activeRow++);
 				
 				assertEquals(trade.getIsin(), rs.getString(1));
 				assertEquals(trade.getQuantity(), rs.getLong(2));
@@ -85,17 +72,20 @@ public class CompositeItemWriterSampleFunctionalTests extends AbstractValidating
 		
 	}
 
-	@SuppressWarnings("unchecked")
-	private void checkOutputFile() throws IOException {
-		List<String> outputLines = IOUtils.readLines(
+	private void checkOutputFile() throws FileNotFoundException, IOException {
+		List outputLines = IOUtils.readLines(
 				new FileInputStream("target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt"));
 		
 		String output = "";
-		for (String line : outputLines) {
+		for (Iterator iterator = outputLines.listIterator(); iterator.hasNext();) {
+			String line = (String) iterator.next();
 			output += line;
 		}
 		
 		assertEquals(EXPECTED_OUTPUT_FILE, output);
 	}
 	
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
 }

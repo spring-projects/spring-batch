@@ -46,4 +46,20 @@ public class UnexpectedJobExecutionException extends RuntimeException {
 		super(msg, nested);
 	}
 
+	/**
+	 * Constructs a new instance with a nested exception. The message is empty.
+	 * @deprecated use one of the other constructors
+	 */
+	public UnexpectedJobExecutionException(Throwable nested) {
+		super(nested);
+	}
+
+	/**
+	 * Constructs a new instance, the message is empty.
+	 * @deprecated use one of the other constructors
+	 */
+	public UnexpectedJobExecutionException() {
+		super();
+	}
+
 }

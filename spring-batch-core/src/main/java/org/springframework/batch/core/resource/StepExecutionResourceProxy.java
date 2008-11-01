@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.Map.Entry;
 
@@ -258,7 +259,8 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 		fileName = replacePattern(fileName, STEP_NAME_PATTERN, stepName);
 
 		if (properties != null) {
-			for (Entry<Object, Object> entry : properties.entrySet()) {
+			for (Iterator iterator = properties.entrySet().iterator(); iterator.hasNext();) {
+				Entry entry = (Entry) iterator.next();
 				String key = (String) entry.getKey();
 				fileName = replacePattern(fileName, "%" + key + "%", (String) entry.getValue());
 			}
@@ -282,7 +284,14 @@ public class StepExecutionResourceProxy extends StepExecutionListenerSupport imp
 		String jobName = execution.getJobExecution().getJobInstance().getJobName();
 		Properties properties = jobParametersConverter.getProperties(execution.getJobExecution().getJobInstance()
 				.getJobParameters());
-		delegate = resourceLoader.getResource(createFileName(jobName, stepName, properties));
+		String fileName = createFileName(jobName, stepName, properties);
+		if(fileName.indexOf("%") > -1){
+			//if a % is still left in the fileName after matching, we have to assume that either no job parameter was found,
+			//or an invalid path was used.
+			throw new IllegalStateException("Invalid file pattern provided: [" + this.filePattern + "], tokens still remain after parameter matching: [" +
+					fileName + "]");
+		}
+		delegate = resourceLoader.getResource(fileName);
 	}
 
 	/**

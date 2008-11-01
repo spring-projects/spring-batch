@@ -23,25 +23,25 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import static org.easymock.EasyMock.*;
+import org.easymock.MockControl;
 
 import com.bea.xml.stream.events.StartDocumentEvent;
 import com.bea.xml.stream.util.NamespaceContextImpl;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
 public class AbstractEventWriterWrapperTests extends TestCase {
 
 	AbstractEventWriterWrapper eventWriterWrapper;
-
+	MockControl mockEventWriterControl = MockControl.createControl(XMLEventWriter.class);
 	XMLEventWriter xmlEventWriter;
 
 	protected void setUp() throws Exception {
 		super.setUp();
 
-		xmlEventWriter = createMock(XMLEventWriter.class);
+		xmlEventWriter = (XMLEventWriter)mockEventWriterControl.getMock();
 		eventWriterWrapper = new StubEventWriter(xmlEventWriter);
 	}
 
@@ -49,72 +49,71 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 
 		XMLEvent event = new StartDocumentEvent();
 		xmlEventWriter.add(event);
-		expectLastCall();
-		replay(xmlEventWriter);
+		mockEventWriterControl.replay();
 		eventWriterWrapper.add(event);
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 
 	}
 
 	public void testAddReader() throws XMLStreamException {
 
-		XMLEventReader reader = createMock(XMLEventReader.class);
+		MockControl readerControl = MockControl.createControl(XMLEventReader.class);
+		XMLEventReader reader = (XMLEventReader)readerControl.getMock();
 		xmlEventWriter.add(reader);
-		expectLastCall().once();
-		replay(xmlEventWriter);
+		mockEventWriterControl.replay();
 		eventWriterWrapper.add(reader);
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
 	public void testClose() throws XMLStreamException {
 		xmlEventWriter.close();
-		expectLastCall().once();
-		replay(xmlEventWriter);
+		mockEventWriterControl.replay();
 		eventWriterWrapper.close();
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
 	public void testFlush() throws XMLStreamException {
 		xmlEventWriter.flush();
-		expectLastCall().once();
-		replay(xmlEventWriter);
+		mockEventWriterControl.replay();
 		eventWriterWrapper.flush();
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
 	public void testGetNamespaceContext() {
 		NamespaceContext context = new NamespaceContextImpl();
-		expect(xmlEventWriter.getNamespaceContext()).andReturn(context);
-		replay(xmlEventWriter);
+		xmlEventWriter.getNamespaceContext();
+		mockEventWriterControl.setReturnValue(context);
+		mockEventWriterControl.replay();
 		assertEquals(eventWriterWrapper.getNamespaceContext(), context);
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
 	public void testGetPrefix() throws XMLStreamException {
+
 		String uri = "uri";
-		expect(xmlEventWriter.getPrefix(uri)).andReturn(uri);
-		replay(xmlEventWriter);
+		xmlEventWriter.getPrefix(uri);
+		mockEventWriterControl.setReturnValue(uri);
+		mockEventWriterControl.replay();
 		assertEquals(eventWriterWrapper.getPrefix(uri), uri);
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
 	public void testSetDefaultNamespace() throws XMLStreamException {
 		String uri = "uri";
 		xmlEventWriter.setDefaultNamespace(uri);
-		expectLastCall().once();
-		replay(xmlEventWriter);
+		mockEventWriterControl.replay();
 		eventWriterWrapper.setDefaultNamespace(uri);
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
-	public void testSetNamespaceContext() throws XMLStreamException {
+	public void testSetNamespaceContext()
+			throws XMLStreamException {
 
 		NamespaceContext context = new NamespaceContextImpl();
 		xmlEventWriter.setNamespaceContext(context);
-		expectLastCall().once();
-		replay(xmlEventWriter);
+		mockEventWriterControl.replay();
 		eventWriterWrapper.setNamespaceContext(context);
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
 	public void testSetPrefix() throws XMLStreamException {
@@ -122,13 +121,12 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 		String uri = "uri";
 		String prefix = "prefix";
 		xmlEventWriter.setPrefix(prefix, uri);
-		expectLastCall().once();
-		replay(xmlEventWriter);
+		mockEventWriterControl.replay();
 		eventWriterWrapper.setPrefix(prefix, uri);
-		verify(xmlEventWriter);
+		mockEventWriterControl.verify();
 	}
 
-	private static class StubEventWriter extends AbstractEventWriterWrapper {
+	private static class StubEventWriter extends AbstractEventWriterWrapper{
 		public StubEventWriter(XMLEventWriter wrappedEventWriter) {
 			super(wrappedEventWriter);
 		}

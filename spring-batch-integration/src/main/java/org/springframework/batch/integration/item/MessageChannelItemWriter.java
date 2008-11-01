@@ -15,18 +15,16 @@
  */
 package org.springframework.batch.integration.item;
 
-import java.util.List;
-
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
 
 /**
  * @author Dave Syer
  * 
  */
-public class MessageChannelItemWriter<T> implements ItemWriter<T> {
+public class MessageChannelItemWriter extends AbstractItemWriter {
 
 	private MessageChannel channel;
 
@@ -41,13 +39,10 @@ public class MessageChannelItemWriter<T> implements ItemWriter<T> {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.springframework.batch.item.ItemWriter#write(java.lang.Object)
 	 */
-	public void write(List<? extends T> items) throws Exception {
-		for (T item : items) {
-			channel.send(new GenericMessage<T>(item));
-		}
+	public void write(Object item) throws Exception {
+		channel.send(new GenericMessage<Object>(item));
 	}
 
 }

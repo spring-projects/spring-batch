@@ -16,19 +16,33 @@
 
 package org.springframework.batch.core.step;
 
+import org.springframework.core.JdkVersion;
+import org.springframework.util.ClassUtils;
+
 /**
- * A factory for {@link StepExecutionSynchronizer} which simply creates one from
- * java.util.concurrent components.
+ * A factory that properly determines which version of the {@link StepExecutionSynchronizer} to return based on the
+ * availabilty of Java 5 or Backport Concurrent.
  * 
  * @author Ben Hale
- * @author Dave Syer
  */
 public class StepExecutionSynchronizerFactory {
+
+	/** Whether the backport-concurrent library is present on the classpath */
+	private static final boolean backportConcurrentAvailable = ClassUtils.isPresent(
+	        "edu.emory.mathcs.backport.java.util.concurrent.Semaphore", StepExecutionSynchronizerFactory.class
+	                .getClassLoader());
 
 	private final StepExecutionSynchronizer synchronizer;
 
 	public StepExecutionSynchronizerFactory() {
-		synchronizer = new JdkConcurrentStepExecutionSynchronizer();
+		if (JdkVersion.isAtLeastJava15()) {
+			synchronizer = new JdkConcurrentStepExecutionSynchronizer();
+		} else if (backportConcurrentAvailable) {
+			synchronizer = new BackportConcurrentStepExecutionSynchronizer();
+		} else {
+			throw new IllegalStateException("Cannot create StepExecutionSynchronizer - "
+			        + "neither JDK 1.5 nor backport-concurrent available on the classpath");
+		}
 	}
 
 	public StepExecutionSynchronizer getStepExecutionSynchronizer() {

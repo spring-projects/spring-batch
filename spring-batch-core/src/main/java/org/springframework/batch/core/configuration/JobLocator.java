@@ -16,7 +16,7 @@
 package org.springframework.batch.core.configuration;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.repository.NoSuchJobException;
 
 /**
  * A runtime service locator interface for retrieving job configurations by

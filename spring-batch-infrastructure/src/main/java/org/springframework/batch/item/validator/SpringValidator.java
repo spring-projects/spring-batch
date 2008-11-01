@@ -17,6 +17,7 @@
 package org.springframework.batch.item.validator;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -69,10 +70,10 @@ public class SpringValidator implements Validator, InitializingBean {
 	 * Append the string representation of elements of the collection (separated
 	 * by new lines) to the given StringBuilder.
 	 */
-	private void appendCollection(Collection<?> collection, StringBuffer builder) {
-		for (Object value : collection) {
+	private void appendCollection(Collection collection, StringBuffer builder) {
+		for (Iterator iterator = collection.iterator(); iterator.hasNext();) {
 			builder.append("\n");
-			builder.append(value.toString());
+			builder.append(iterator.next().toString());
 		}
 	}
 

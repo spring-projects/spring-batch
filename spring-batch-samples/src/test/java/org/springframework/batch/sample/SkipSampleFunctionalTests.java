@@ -1,16 +1,7 @@
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.sql.DataSource;
-
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.springframework.batch.sample.support.ItemTrackingItemWriter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.batch.sample.item.writer.ItemTrackingItemWriter;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Error is encountered during writing - transaction is rolled back and the
@@ -18,35 +9,35 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * 
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
 public class SkipSampleFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	int before = -1;
 
-	SimpleJdbcTemplate simpleJdbcTemplate;
+	JdbcTemplate jdbcTemplate;
 
-	@Autowired
-	ItemTrackingItemWriter<?> writer;
+	ItemTrackingItemWriter writer;
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	// auto-injection
+	public void setWriter(ItemTrackingItemWriter writer) {
+		this.writer = writer;
 	}
 
-	@Before
-	public void onSetUp() throws Exception {
-		before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+	// auto-injection
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	protected void onSetUp() throws Exception {
+		before = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 	}
 
 	protected void validatePostConditions() throws Exception {
-
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from TRADE");
 		// 5 input records, 1 skipped => 4 written to output
 		assertEquals(before + 4, after);
 		
-		// no item was processed twice (one rollback occurred due to validation error)
-		assertEquals(after - 1, writer.getItems().size());
+		// no item was processed twice (no rollback occurred despite error on write)
+		assertEquals(after, writer.getItems().size());
 	}
 
 }

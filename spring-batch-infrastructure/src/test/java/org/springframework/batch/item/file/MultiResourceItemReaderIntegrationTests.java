@@ -5,7 +5,8 @@ import java.util.Comparator;
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
+import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
@@ -14,9 +15,9 @@ import org.springframework.core.io.Resource;
  */
 public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
-	private MultiResourceItemReader<String> tested = new MultiResourceItemReader<String>();
+	private MultiResourceItemReader tested = new MultiResourceItemReader();
 
-	private FlatFileItemReader<String> itemReader = new FlatFileItemReader<String>();
+	private FlatFileItemReader itemReader = new FlatFileItemReader();
 
 	private ExecutionContext ctx = new ExecutionContext();
 
@@ -35,15 +36,14 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	 * Setup the tested reader to read from the test resources.
 	 */
 	protected void setUp() throws Exception {
-		
-		itemReader.setLineMapper(new PassThroughLineMapper());
+
+		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
 
 		tested.setDelegate(itemReader);
-		tested.setComparator(new Comparator<Resource>() {
-			public int compare(Resource o1, Resource o2) {
+		tested.setComparator(new Comparator() {
+			public int compare(Object o1, Object o2) {
 				return 0; // do not change ordering
-			}
-		});
+			}});
 		tested.setResources(new Resource[] { r1, r2, r3, r4, r5 });
 	}
 
@@ -54,86 +54,59 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 
 		tested.open(ctx);
 
-		assertEquals("1", tested.read());
-		assertEquals("2", tested.read());
-		assertEquals("3", tested.read());
-		assertEquals("4", tested.read());
-		assertEquals("5", tested.read());
-		assertEquals("6", tested.read());
-		assertEquals("7", tested.read());
-		assertEquals("8", tested.read());
-		assertEquals(null, tested.read());
+		assertEquals("1", readItem());
+		assertEquals("2", readItem());
+		assertEquals("3", readItem());
+		assertEquals("4", readItem());
+		assertEquals("5", readItem());
+		assertEquals("6", readItem());
+		assertEquals("7", readItem());
+		assertEquals("8", readItem());
+		assertEquals(null, readItem());
 
 		tested.close(ctx);
-	}
-
-	public void testRestartWhenStateNotSaved() throws Exception {
-
-		tested.setSaveState(false);
-
-		tested.open(ctx);
-
-		assertEquals("1", tested.read());
-
-		tested.update(ctx);
-
-		assertEquals("2", tested.read());
-		assertEquals("3", tested.read());
-
-		tested.close(ctx);
-
-		tested.open(ctx);
-
-		assertEquals("1", tested.read());
 	}
 
 	/**
-	 * 
 	 * Read items with a couple of rollbacks, requiring to jump back to items
 	 * from previous resources.
 	 */
-	public void testRestartAcrossResourceBoundary() throws Exception {
+	public void testReset() throws Exception {
 
 		tested.open(ctx);
 
-		assertEquals("1", tested.read());
+		assertEquals("1", readItem());
 
-		tested.update(ctx);
+		tested.mark();
 
-		assertEquals("2", tested.read());
-		assertEquals("3", tested.read());
+		assertEquals("2", readItem());
+		assertEquals("3", readItem());
 
-		tested.close(ctx);
+		tested.reset();
 
-		tested.open(ctx);
+		assertEquals("2", readItem());
+		assertEquals("3", readItem());
+		assertEquals("4", readItem());
 
-		assertEquals("2", tested.read());
-		assertEquals("3", tested.read());
-		assertEquals("4", tested.read());
+		tested.reset();
 
-		tested.close(ctx);
+		assertEquals("2", readItem());
+		assertEquals("3", readItem());
+		assertEquals("4", readItem());
+		assertEquals("5", readItem());
 
-		tested.open(ctx);
+		tested.mark();
 
-		assertEquals("2", tested.read());
-		assertEquals("3", tested.read());
-		assertEquals("4", tested.read());
-		assertEquals("5", tested.read());
+		assertEquals("6", readItem());
+		assertEquals("7", readItem());
 
-		tested.update(ctx);
+		tested.reset();
 
-		assertEquals("6", tested.read());
-		assertEquals("7", tested.read());
+		assertEquals("6", readItem());
+		assertEquals("7", readItem());
 
-		tested.close(ctx);
-
-		tested.open(ctx);
-
-		assertEquals("6", tested.read());
-		assertEquals("7", tested.read());
-
-		assertEquals("8", tested.read());
-		assertEquals(null, tested.read());
+		assertEquals("8", readItem());
+		assertEquals(null, readItem());
 
 		tested.close(ctx);
 	}
@@ -143,46 +116,50 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	 */
 	public void testRestart() throws Exception {
 
+		itemReader.setSaveState(true);
+		tested.setSaveState(true);
+
 		tested.open(ctx);
 
-		assertEquals("1", tested.read());
-		assertEquals("2", tested.read());
-		assertEquals("3", tested.read());
-		assertEquals("4", tested.read());
+		assertEquals("1", readItem());
+		assertEquals("2", readItem());
+		assertEquals("3", readItem());
+		assertEquals("4", readItem());
 
 		tested.update(ctx);
 
-		assertEquals("5", tested.read());
-		assertEquals("6", tested.read());
+		assertEquals("5", readItem());
+		assertEquals("6", readItem());
 
 		tested.close(ctx);
 
 		tested.open(ctx);
 
-		assertEquals("5", tested.read());
-		assertEquals("6", tested.read());
-		assertEquals("7", tested.read());
-		assertEquals("8", tested.read());
-		assertEquals(null, tested.read());
+		assertEquals("5", readItem());
+		assertEquals("6", readItem());
+		assertEquals("7", readItem());
+		assertEquals("8", readItem());
+		assertEquals(null, readItem());
 	}
 
 	/**
 	 * Resources are ordered according to injected comparator.
 	 */
 	public void testResourceOrderingWithCustomComparator() {
-
+		
 		Resource r1 = new ByteArrayResource("".getBytes(), "b");
 		Resource r2 = new ByteArrayResource("".getBytes(), "a");
 		Resource r3 = new ByteArrayResource("".getBytes(), "c");
-
-		Resource[] resources = new Resource[] { r1, r2, r3 };
-
-		Comparator<Resource> comp = new Comparator<Resource>() {
+		
+		
+		Resource[] resources = new Resource[] {r1, r2, r3};
+		
+		Comparator comp = new Comparator() {
 
 			/**
 			 * Reversed ordering by filename.
 			 */
-			public int compare(Resource o1, Resource o2) {
+			public int compare(Object o1, Object o2) {
 				Resource r1 = (Resource) o1;
 				Resource r2 = (Resource) o2;
 				return -r1.getDescription().compareTo(r2.getDescription());
@@ -198,7 +175,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertSame(r1, resources[1]);
 		assertSame(r2, resources[2]);
 	}
-
+	
 	/**
 	 * Empty resource list is OK.
 	 */
@@ -207,6 +184,36 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		tested.open(ctx);
 		
 		assertNull(tested.read());
+	}
+
+	private String readItem() throws Exception {
+		Object result = tested.read();
+		return result == null ? null : ((FieldSet) result).readString(0);
+
+	}
+	
+	public void testNullResourceInOpen() throws Exception{
+		
+		tested.setResources(null);
+		try{
+			tested.open(new ExecutionContext());
+			fail();
+		}
+		catch(Exception ex){
+			//expected
+		}
+	}
+	
+	public void testNullDelegateInOpen() throws Exception{
+		
+		tested.setDelegate(null);
+		try{
+			tested.open(new ExecutionContext());
+			fail();
+		}
+		catch(Exception ex){
+			//expected
+		}
 	}
 
 }

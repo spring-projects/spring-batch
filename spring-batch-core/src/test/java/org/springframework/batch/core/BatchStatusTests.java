@@ -15,46 +15,42 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.*;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
  * 
  */
-public class BatchStatusTests {
+public class BatchStatusTests extends TestCase {
 
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.core.BatchStatus#toString()}.
 	 */
-	@Test
 	public void testToString() {
 		assertEquals("FAILED", BatchStatus.FAILED.toString());
 	}
 
-	@Test
-	public void testMaxStatus() {
-		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED,BatchStatus.COMPLETED));
-		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.FAILED));
-		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.FAILED));
-	}
-
-	@Test
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
+	 */
 	public void testGetStatus() {
-		assertEquals(BatchStatus.FAILED, BatchStatus.valueOf(BatchStatus.FAILED.toString()));
+		assertEquals(BatchStatus.FAILED, BatchStatus.getStatus(BatchStatus.FAILED.toString()));
 	}
 
-	@Test
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
+	 */
 	public void testGetStatusWrongCode() {
 		try {
-			BatchStatus.valueOf("foo");
+			BatchStatus.getStatus("foo");
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
@@ -62,12 +58,14 @@ public class BatchStatusTests {
 		}
 	}
 
-	@Test(expected=NullPointerException.class)
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.BatchStatus#getStatus(java.lang.String)}.
+	 */
 	public void testGetStatusNullCode() {
-		assertNull(BatchStatus.valueOf(null));
+		assertNull(BatchStatus.getStatus(null));
 	}
 
-	@Test
 	public void testSerialization() throws Exception {
 
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();

@@ -1,8 +1,10 @@
 package org.springframework.batch.integration;
 
+import java.util.List;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersIncrementer;
+import org.springframework.batch.core.JobExecutionException;
 
 public class JobSupport implements Job {
 	
@@ -12,19 +14,23 @@ public class JobSupport implements Job {
 		this.name = name;
 	}
 
-	public void execute(JobExecution execution) {
+	public void execute(JobExecution execution) throws JobExecutionException {
+		// TODO Auto-generated method stub
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public boolean isRestartable() {
-		return false;
-	}
-	
-	public JobParametersIncrementer getJobParametersIncrementer() {
+	@SuppressWarnings("unchecked")
+	public List getSteps() {
+		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public boolean isRestartable() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration;
 
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.repository.DuplicateJobException;
 
 /**
  * A runtime service registry interface for registering job configurations by

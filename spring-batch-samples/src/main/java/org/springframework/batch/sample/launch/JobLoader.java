@@ -26,7 +26,7 @@ public interface JobLoader {
 	
 	void loadResource(String path);
 	
-	Map<String, String> getConfigurations();
+	Map getConfigurations();
 	
 	Object getJobConfiguration(String path);
 	

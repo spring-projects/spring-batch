@@ -1,10 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>spring-batch-dist</artifactId>
 	<name>Distribution</name>
-    <packaging>pom</packaging>
+	<packaging>pom</packaging>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch Distribution - used to create a .zip package for distribution of the main sub modules.]]>
@@ -15,13 +15,11 @@
 		<version>1.1.3.RELEASE</version>
 		<relativePath>..</relativePath>
 	</parent>
-
 	<modules>
 		<module>../spring-batch-infrastructure</module>
 		<module>../spring-batch-core</module>
 		<module>../spring-batch-samples</module>
 	</modules>
-
 	<build>
 		<extensions>
 			<extension>
@@ -59,7 +57,7 @@
 						<phase>generate-sources</phase>
 						<configuration>
 							<tasks>
-								<copy file="../pom.xml" todir="target"/>
+								<copy file="../pom.xml" todir="target" />
 							</tasks>
 						</configuration>
 						<goals>
@@ -70,5 +68,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

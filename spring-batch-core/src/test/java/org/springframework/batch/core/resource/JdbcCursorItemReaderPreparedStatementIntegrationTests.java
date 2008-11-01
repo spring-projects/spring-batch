@@ -1,7 +1,5 @@
 package org.springframework.batch.core.resource;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,36 +8,22 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.dao.AbstractJobDaoTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.util.ClassUtils;
 
-import javax.sql.DataSource;
+public class JdbcCursorItemReaderPreparedStatementIntegrationTests extends
+	AbstractTransactionalDataSourceSpringContextTests {
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/data-source-context.xml")
-public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
-
-	JdbcCursorItemReader<Foo> itemReader;
-
-	private DataSource dataSource;
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
+	JdbcCursorItemReader itemReader;
 	
-	@Before
-	public void onSetUpInTransaction() throws Exception {
+	protected void onSetUpInTransaction() throws Exception {
+		super.onSetUpInTransaction();
 		
-		itemReader = new JdbcCursorItemReader<Foo>();
-		itemReader.setDataSource(dataSource);
+		itemReader = new JdbcCursorItemReader();
+		itemReader.setDataSource(super.getJdbcTemplate().getDataSource());
 		itemReader.setSql("select ID, NAME, VALUE from T_FOOS where ID > ? and ID < ?");
 		itemReader.setIgnoreWarnings(true);
 		itemReader.setVerifyCursorPosition(true);
@@ -50,13 +34,13 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		itemReader.setQueryTimeout(1000);
 		itemReader.setSaveState(true);
 		StepExecutionPreparedStatementSetter pss = new StepExecutionPreparedStatementSetter();
-		JobParameters jobParameters = new JobParametersBuilder().addLong("begin.id", 1L).addLong("end.id", 4L).toJobParameters();
-		JobInstance jobInstance = new JobInstance(1L, jobParameters, "simpleJob");
-		JobExecution jobExecution = new JobExecution(jobInstance, (long) 2);
-		StepExecution stepExecution = new StepExecution("taskletStep", jobExecution, 3L);
+		JobParameters jobParameters = new JobParametersBuilder().addLong("begin.id", new Long(1)).addLong("end.id", new Long(4)).toJobParameters();
+		JobInstance jobInstance = new JobInstance(new Long(1), jobParameters, "simpleJob");
+		JobExecution jobExecution = new JobExecution(jobInstance, new Long(2));
+		StepExecution stepExecution = new StepExecution("taskletStep", jobExecution, new Long(3) );
 		pss.beforeStep(stepExecution);
 		
-		List<String> parameterNames = new ArrayList<String>();
+		List parameterNames = new ArrayList();
 		parameterNames.add("begin.id");
 		parameterNames.add("end.id");
 		pss.setParameterKeys(parameterNames);
@@ -64,14 +48,16 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		itemReader.setPreparedStatementSetter(pss);
 	}
 	
-	@Transactional @Test
 	public void testRead() throws Exception{
 		itemReader.open(new ExecutionContext());
-		Foo foo = itemReader.read();
+		Foo foo = (Foo)itemReader.read();
 		assertEquals(2, foo.getId());
-		foo = itemReader.read();
+		foo = (Foo)itemReader.read();
 		assertEquals(3, foo.getId());
 		assertNull(itemReader.read());
 	}
 	
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(AbstractJobDaoTests.class, "data-source-context.xml") };
+	}
 }

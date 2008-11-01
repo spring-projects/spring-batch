@@ -17,6 +17,7 @@ package org.springframework.batch.item.support;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
@@ -31,7 +32,7 @@ import org.springframework.batch.item.ItemStreamException;
  */
 public class CompositeItemStream implements ItemStream {
 
-	private List<ItemStream> streams = new ArrayList<ItemStream>();
+	private List streams = new ArrayList();
 
 	/**
 	 * Public setter for the listeners.
@@ -49,6 +50,7 @@ public class CompositeItemStream implements ItemStream {
 		super();
 	}
 
+
 	/**
 	 * Simple aggregate {@link ExecutionContext} provider for the contributions
 	 * registered under the given key.
@@ -57,7 +59,8 @@ public class CompositeItemStream implements ItemStream {
 	 */
 	public void update(ExecutionContext executionContext) {
 		synchronized (streams) {
-			for (ItemStream itemStream : streams) {
+			for (Iterator it = streams.iterator(); it.hasNext();) {
+				ItemStream itemStream = (ItemStream) it.next();
 				itemStream.update(executionContext);
 			}
 		}
@@ -82,7 +85,8 @@ public class CompositeItemStream implements ItemStream {
 	 */
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
 		synchronized (streams) {
-			for (ItemStream itemStream : streams) {
+			for (Iterator it = streams.iterator(); it.hasNext();) {
+				ItemStream itemStream = (ItemStream) it.next();
 				itemStream.close(executionContext);
 			}
 		}
@@ -94,7 +98,8 @@ public class CompositeItemStream implements ItemStream {
 	 */
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		synchronized (streams) {
-			for (ItemStream itemStream : streams) {
+			for (Iterator it = streams.iterator(); it.hasNext();) {
+				ItemStream itemStream = (ItemStream) it.next();
 				itemStream.open(executionContext);
 			}
 		}

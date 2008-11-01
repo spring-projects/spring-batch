@@ -25,6 +25,6 @@ import org.springframework.batch.item.ItemStreamSupport;
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemStreamItemReader<T> extends ItemStreamSupport implements ItemReader<T> {
+public abstract class AbstractItemStreamItemReader extends ItemStreamSupport implements ItemReader {
 
 }

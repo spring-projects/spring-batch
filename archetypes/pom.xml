@@ -5,6 +5,14 @@
   <version>1.1.3.RELEASE</version>
 	<packaging>pom</packaging>
 	<name>Archetypes</name>
+
+	<parent>
+		<groupId>org.springframework.batch</groupId>
+		<artifactId>spring-batch</artifactId>
+		<version>1.1.3.RELEASE</version>
+		<relativePath>..</relativePath>
+	</parent>
+
 	<description>
 		<![CDATA[
 	Spring Batch archetypes are simple project templates containing just enough code
@@ -15,13 +23,6 @@
 	copy one into Eclipse and use Q4E to manage the dependencies. 
 ]]>
 	</description>
-
-	<parent>
-		<groupId>org.springframework.batch</groupId>
-		<artifactId>spring-batch</artifactId>
-		<version>1.1.3.RELEASE</version>
-		<relativePath>..</relativePath>
-	</parent>
 
 	<modules>
 		<module>simple-cli</module>

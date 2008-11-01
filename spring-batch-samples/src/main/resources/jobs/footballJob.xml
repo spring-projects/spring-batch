@@ -19,10 +19,10 @@
 						ref="playerFileItemReader" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.football.internal.PlayerItemWriter">
+							class="org.springframework.batch.sample.item.writer.PlayerItemWriter">
 							<property name="playerDao">
 								<bean
-									class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerDao">
+									class="org.springframework.batch.sample.dao.JdbcPlayerDao">
 									<property name="dataSource"
 										ref="dataSource" />
 								</bean>
@@ -35,7 +35,7 @@
 						ref="gameFileItemReader" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.football.internal.JdbcGameDao">
+							class="org.springframework.batch.sample.dao.JdbcGameDao">
 							<property name="dataSource"
 								ref="dataSource" />
 						</bean>
@@ -48,7 +48,7 @@
 						ref="playerSummarizationSource" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.football.internal.JdbcPlayerSummaryDao">
+							class="org.springframework.batch.sample.dao.JdbcPlayerSummaryDao">
 							<property name="dataSource"
 								ref="dataSource" />
 						</bean>
@@ -62,20 +62,16 @@
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/footballjob/input/${player.file.name}" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer">
-					<bean
-						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
-						<property name="names"
-							value="ID,lastName,firstName,position,birthYear,debutYear" />
-					</bean>
-				</property>
-				<property name="fieldSetMapper">
-					<bean
-						class="org.springframework.batch.sample.domain.football.internal.PlayerFieldSetMapper" />
-				</property>
+		<property name="lineTokenizer">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+				<property name="names"
+					value="ID,lastName,firstName,position,birthYear,debutYear" />
 			</bean>
+		</property>
+		<property name="fieldSetMapper">
+			<bean
+				class="org.springframework.batch.sample.mapping.PlayerFieldSetMapper" />
 		</property>
 	</bean>
 
@@ -83,20 +79,16 @@
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/footballjob/input/${games.file.name}" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer">
-					<bean
-						class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
-						<property name="names"
-							value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
-					</bean>
-				</property>
-				<property name="fieldSetMapper">
-					<bean
-						class="org.springframework.batch.sample.domain.football.internal.GameFieldSetMapper" />
-				</property>
+		<property name="lineTokenizer">
+			<bean
+				class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer">
+				<property name="names"
+					value="id,year,team,week,opponent,completes,attempts,passingYards,passingTd,interceptions,rushes,rushYards,receptions,receptionYards,totalTd" />
 			</bean>
+		</property>
+		<property name="fieldSetMapper">
+			<bean
+				class="org.springframework.batch.sample.mapping.GameFieldSetMapper" />
 		</property>
 	</bean>
 
@@ -105,7 +97,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.domain.football.internal.PlayerSummaryMapper" />
+				class="org.springframework.batch.sample.mapping.PlayerSummaryMapper" />
 		</property>
 		<property name="sql">
 			<value>

@@ -38,4 +38,10 @@ public class StepExecutionListenerSupport implements StepExecutionListener {
 	public void beforeStep(StepExecution stepExecution) {
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.StepListener#onError(java.lang.Throwable)
+	 */
+	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
+		return null;
+	}
 }

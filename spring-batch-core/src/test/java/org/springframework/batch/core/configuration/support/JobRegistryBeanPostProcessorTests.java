@@ -19,11 +19,11 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.repository.DuplicateJobException;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -103,7 +103,7 @@ public class JobRegistryBeanPostProcessorTests extends TestCase {
 				"test-context.xml", getClass());
 		MapJobRegistry registry = (MapJobRegistry) context
 				.getBean("registry");
-		Collection<String> configurations = registry.getJobNames();
+		Collection configurations = registry.getJobNames();
 		// System.err.println(configurations);
 		String[] names = context.getBeanNamesForType(JobSupport.class);
 		int count = names.length;

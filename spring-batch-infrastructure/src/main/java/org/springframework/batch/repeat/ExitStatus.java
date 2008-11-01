@@ -39,16 +39,8 @@ public class ExitStatus implements Serializable {
 	/**
 	 * Convenient constant value representing unfinished processing.
 	 */
-	public static final ExitStatus CONTINUABLE = new ExitStatus(true, "CONTINUABLE");
-
-	/**
-	 * Convenient constant value representing continuable state where processing
-	 * is still taking place, so no further action is required. Used for
-	 * asynchronous execution scenarios where the processing is happening in
-	 * another thread or process and the caller is not required to wait for the
-	 * result.
-	 */
-	public static final ExitStatus EXECUTING = new ExitStatus(true, "EXECUTING");
+	public static final ExitStatus CONTINUABLE = new ExitStatus(true,
+			"CONTINUABLE");
 
 	/**
 	 * Convenient constant value representing finished processing.
@@ -80,7 +72,8 @@ public class ExitStatus implements Serializable {
 		this(continuable, exitCode, "");
 	}
 
-	public ExitStatus(boolean continuable, String exitCode, String exitDescription) {
+	public ExitStatus(boolean continuable, String exitCode,
+			String exitDescription) {
 		super();
 		this.continuable = continuable;
 		this.exitCode = exitCode;
@@ -119,67 +112,39 @@ public class ExitStatus implements Serializable {
 	 * Create a new {@link ExitStatus} with a logical combination of the
 	 * continuable flag.
 	 * 
-	 * @param continuable true if the caller thinks it is safe to continue.
+	 * @param continuable
+	 *            true if the caller thinks it is safe to continue.
 	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the argument provided.
+	 *         logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(boolean continuable) {
-		return new ExitStatus(this.continuable && continuable, this.exitCode, this.exitDescription);
+		return new ExitStatus(this.continuable && continuable, this.exitCode,
+				this.exitDescription);
 	}
 
 	/**
 	 * Create a new {@link ExitStatus} with a logical combination of the
-	 * continuable flag, and a concatenation of the descriptions. If either
-	 * value has a higher severity then its exit code will be used in the
-	 * result. In the case of equal severity, the exit code is only replaced if
-	 * the result is continuable or the input is not continuable.<br/>
-	 * <br/>
-	 * 
-	 * Severity is defined by the exit code:
-	 * <ul>
-	 * <li>Codes beginning with NOOP have severity 1</li>
-	 * <li>Codes beginning with FAILED have severity 2</li>
-	 * <li>Codes beginning with UNKNOWN have severity 3</li>
-	 * </ul>
-	 * Others have severity 0.<br/>
+	 * continuable flag, and a concatenation of the descriptions. The exit code
+	 * is only replaced if the result is continuable or the input is not
+	 * continuable.<br/>
 	 * 
 	 * If the input is null just return this.
 	 * 
-	 * @param status an {@link ExitStatus} to combine with this one.
+	 * @param status
+	 *            an {@link ExitStatus} to combine with this one.
 	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the argument provided.
+	 *         logical and of the current value and the argument provided.
 	 */
 	public ExitStatus and(ExitStatus status) {
 		if (status == null) {
 			return this;
 		}
-		ExitStatus result = and(status.continuable).addExitDescription(status.exitDescription);
-		if (severity(status) > severity(this)) {
+		ExitStatus result = and(status.continuable).addExitDescription(
+				status.exitDescription);
+		if (result.continuable || !status.continuable) {
 			result = result.replaceExitCode(status.exitCode);
 		}
-		else {
-			if (severity(this) == severity(status) && (result.continuable || !status.continuable)) {
-				result = result.replaceExitCode(status.exitCode);
-			}
-		}
 		return result;
-	}
-
-	/**
-	 * @param status
-	 * @return
-	 */
-	private int severity(ExitStatus status) {
-		if (status.exitCode.startsWith(NOOP.exitCode)) {
-			return 0;
-		}
-		if (status.exitCode.startsWith(FAILED.exitCode)) {
-			return 1;
-		}
-		if (status.exitCode.startsWith(UNKNOWN.exitCode)) {
-			return 2;
-		}
-		return 0;
 	}
 
 	/*
@@ -188,7 +153,8 @@ public class ExitStatus implements Serializable {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return String.format("continuable=%s;exitCode=%s;exitDescription=%s", continuable, exitCode, exitDescription);
+		return "continuable=" + continuable + ";exitCode=" + exitCode
+				+ ";exitDescription=" + exitDescription;
 	}
 
 	/**
@@ -216,9 +182,10 @@ public class ExitStatus implements Serializable {
 	 * Add an exit code to an existing {@link ExitStatus}. If there is already a
 	 * code present tit will be replaced.
 	 * 
-	 * @param code the code to add
+	 * @param code
+	 *            the code to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
-	 * code.
+	 *         code.
 	 */
 	public ExitStatus replaceExitCode(String code) {
 		return new ExitStatus(continuable, code, exitDescription);
@@ -230,7 +197,8 @@ public class ExitStatus implements Serializable {
 	 * @return true if the exit code is "RUNNING" or "UNKNOWN"
 	 */
 	public boolean isRunning() {
-		return "RUNNING".equals(this.exitCode) || "UNKNOWN".equals(this.exitCode);
+		return "RUNNING".equals(this.exitCode)
+				|| "UNKNOWN".equals(this.exitCode);
 	}
 
 	/**
@@ -238,13 +206,15 @@ public class ExitStatus implements Serializable {
 	 * already a description present the two will be concatenated with a
 	 * semicolon.
 	 * 
-	 * @param description the description to add
+	 * @param description
+	 *            the description to add
 	 * @return a new {@link ExitStatus} with the same properties but a new exit
-	 * description
+	 *         description
 	 */
 	public ExitStatus addExitDescription(String description) {
 		StringBuffer buffer = new StringBuffer();
-		boolean changed = StringUtils.hasText(description) && !exitDescription.equals(description);
+		boolean changed = StringUtils.hasText(description)
+				&& !exitDescription.equals(description);
 		if (StringUtils.hasText(exitDescription)) {
 			buffer.append(exitDescription);
 			if (changed) {

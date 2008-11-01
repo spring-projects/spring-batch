@@ -13,7 +13,7 @@
 				<property name="streams" ref="fileItemReader"/>
 				<property name="itemReader">
 					<bean
-						class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
+						class="org.springframework.batch.item.support.AggregateItemReader">
 						<property name="itemReader"
 							ref="fileItemReader" />
 					</bean>
@@ -23,8 +23,8 @@
 						class="org.springframework.batch.item.file.FlatFileItemWriter">
 						<property name="resource"
 							value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
-							<property name="lineAggregator">
-								<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+							<property name="fieldSetCreator">
+								<bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper"/>
 							</property>
 					</bean>
 				</property>
@@ -36,20 +36,13 @@
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer" ref="fixedFileDescriptor" />
-				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapper">
-						<property name="delegate" ref="tradeLineMapper" />
-					</bean>
-				</property>
-			</bean>
-		</property>
+		<property name="lineTokenizer" ref="fixedFileDescriptor" />
+		<property name="fieldSetMapper" ref="tradeLineMapper" />
+		<!-- <property name="validator" ref="fixedValidator" /> -->
 	</bean>
 
 	<bean id="tradeLineMapper"
-		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
 	<bean id="fixedFileDescriptor"
 		class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">

@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.item.file.transform;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
-import org.junit.Test;
+import org.springframework.batch.item.file.mapping.DefaultFieldSet;
 
 /**
- * @author Dave Syer
+ * Unit tests for {@link DelimitedLineAggregator}
  * 
+ * @author robert.kasanicky
  */
-public class DelimitedLineAggregatorTests {
+public class DelimitedLineAggregatorTests extends TestCase {
+	private DelimitedLineAggregator aggregator;
 
-	private DelimitedLineAggregator<String> aggregator = new DelimitedLineAggregator<String>();
-
-	@Test
-	public void testSetDelimiter() {
-		aggregator.setDelimiter(";");
-		assertEquals("foo;bar", aggregator.aggregate(new String[] { "foo", "bar" }));
-	}
-
-	@Test
 	public void testAggregate() {
-		assertEquals("foo,bar", aggregator.aggregate(new String[] { "foo", "bar" }));
+		aggregator = new DelimitedLineAggregator();
+		aggregator.setDelimiter(":");
+
+		String[] args = { "a", "bc", "def" };
+		String expectedResult = "a:bc:def";
+		String result = aggregator.aggregate(new DefaultFieldSet(args));
+		assertEquals(result, expectedResult);
 	}
 
 }

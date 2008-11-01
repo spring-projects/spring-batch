@@ -16,22 +16,10 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import javax.sql.DataSource;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.support.PropertiesConverter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.BeforeTransaction;
+import org.springframework.jdbc.core.JdbcOperations;
 
 /**
  * Simple restart scenario.
@@ -39,21 +27,26 @@ import org.springframework.test.context.transaction.BeforeTransaction;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
 public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// auto-injected attributes
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	/**
+	 * Public setter for the jdbcTemplate.
+	 * 
+	 * @param jdbcTemplate the jdbcTemplate to set
+	 */
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	@BeforeTransaction
-	public void onTearDown() throws Exception {
-		simpleJdbcTemplate.update("DELETE FROM TRADE");
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
+	 */
+	protected void onTearDown() throws Exception {
+		jdbcTemplate.update("DELETE FROM TRADE");
 	}
 
 	/**
@@ -62,36 +55,37 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	 * finish successfully, because it continues execution where the previous
 	 * run stopped (module throws exception after fixed number of processed
 	 * records).
-	 * @throws Exception the exception thrown
+	 * @throws Exception
 	 */
-	@Test
 	public void testRestart() throws Exception {
 
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
-		JobExecution jobExecution = runJobForRestartTest();
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		
-		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
-		assertTrue("Not planned exception: " + expected.getMessage(), expected.getMessage().toLowerCase().indexOf(
+		try {
+			runJob();
+			fail("First run of the job is expected to fail.");
+		}
+		catch (UnexpectedJobExecutionException expected) {
+			// expected
+			assertTrue("Not planned exception: " + expected.getMessage(), expected.getMessage().toLowerCase().indexOf(
 					"planned") >= 0);
+		}
 
-		int medium = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int medium = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		// assert based on commit interval = 2
 		assertEquals(before + 2, medium);
 
-		jobExecution = runJobForRestartTest();
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		runJob();
 
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		assertEquals(before + 5, after);
 	}
 
 	// load the application context and launch the job
-	private JobExecution runJobForRestartTest() throws Exception {
-		return getLauncher().run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
-				.stringToProperties("parameter=true")));
+	private void runJob() throws Exception {
+		launcher.run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
+				.stringToProperties("restart=true")));
 	}
 
 }

@@ -1,19 +1,13 @@
 package org.springframework.batch.core.step;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.batch.core.BatchStatus;
+import junit.framework.TestCase;
+
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -24,7 +18,7 @@ import org.springframework.util.Assert;
 /**
  * Tests for {@link AbstractStep}.
  */
-public class AbstractStepTests {
+public class AbstractStepTests extends TestCase {
 
 	AbstractStep tested = new EventTrackingStep();
 
@@ -37,7 +31,7 @@ public class AbstractStepTests {
 	/**
 	 * Sequence of events encountered during step execution.
 	 */
-	final List<String> events = new ArrayList<String>();
+	final List events = new ArrayList();
 
 	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(new Long(1),
 			new JobParameters(), "jobName")));
@@ -55,8 +49,8 @@ public class AbstractStepTests {
 			events.add("open");
 		}
 
-		protected ExitStatus doExecute(StepExecution context) throws Exception {
-			assertSame(execution, context);
+		protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+			assertSame(execution, stepExecution);
 			events.add("doExecute");
 			return ExitStatus.FINISHED;
 		}
@@ -108,65 +102,34 @@ public class AbstractStepTests {
 	 * Remembers the last saved values of execution context.
 	 */
 	private static class JobRepositoryStub extends JobRepositorySupport {
-
-		ExecutionContext saved = new ExecutionContext();
 		
 		static long counter = 0;
 
-		public void updateExecutionContext(StepExecution stepExecution) {
-			Assert.state(stepExecution.getId() != null, "StepExecution must already be saved");
+		ExecutionContext saved = new ExecutionContext();
+
+		public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+			Assert.state(stepExecution.getId() != null, "StepExecution must be already saved");
 			saved = stepExecution.getExecutionContext();
 		}
 
-		@Override
-		public void add(StepExecution stepExecution) {
+		public void saveOrUpdate(StepExecution stepExecution) {
 			if (stepExecution.getId() == null) {
-				stepExecution.setId(counter);
+				stepExecution.setId(new Long(counter));
 				counter++;
 			}
 		}
 		
+		
 
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		tested.setJobRepository(repository);
-		repository.add(execution);
-	}
-	
-	@Test
-	public void testBeanName() throws Exception {
-		AbstractStep step = new AbstractStep() {
-			@Override
-			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
-				return null;
-			}
-		};
-		assertNull(step.getName());
-		step.setBeanName("foo");
-		assertEquals("foo", step.getName());
-	}
-
-	@Test
-	public void testName() throws Exception {
-		AbstractStep step = new AbstractStep() {
-			@Override
-			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
-				return null;
-			}
-		};
-		assertNull(step.getName());
-		step.setName("foo");
-		assertEquals("foo", step.getName());
-		step.setBeanName("bar");
-		assertEquals("foo", step.getName());
 	}
 
 	/**
 	 * Typical step execution scenario.
 	 */
-	@Test
 	public void testExecute() throws Exception {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 		tested.execute(execution);
@@ -192,30 +155,31 @@ public class AbstractStepTests {
 	/**
 	 * Exception during business processing.
 	 */
-	@Test
 	public void testFailure() throws Exception {
 		tested = new EventTrackingStep() {
-			@Override
-			protected ExitStatus doExecute(StepExecution context) throws Exception {
-				super.doExecute(context);
+			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+				super.doExecute(stepExecution);
 				throw new RuntimeException("crash!");
 			}
 		};
 		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
-		tested.execute(execution);
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-		Throwable expected = execution.getFailureExceptions().get(0);
-		assertEquals("crash!", expected.getMessage());
+		try {
+			tested.execute(execution);
+			fail();
+		}
+		catch (RuntimeException expected) {
+			assertEquals("crash!", expected.getMessage());
+		}
 
 		int i = 0;
 		assertEquals("listener1#beforeStep", events.get(i++));
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener2#afterStep", events.get(i++));
-		assertEquals("listener1#afterStep", events.get(i++));
+		assertEquals("listener2#onErrorInStep", events.get(i++));
+		assertEquals("listener1#onErrorInStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
@@ -224,68 +188,70 @@ public class AbstractStepTests {
 		assertTrue("Wrong message: "+exitDescription, exitDescription.contains("crash"));
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("afterStep"));
+				.containsKey("onErrorInStep"));
 	}
 
 	/**
 	 * Exception during business processing.
 	 */
-	@Test
 	public void testStoppedStep() throws Exception {
 		tested = new EventTrackingStep() {
-			@Override
-			protected ExitStatus doExecute(StepExecution context) throws Exception {
-				context.setTerminateOnly();
-				return super.doExecute(context);
+			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+				stepExecution.setTerminateOnly();
+				return super.doExecute(stepExecution);
 			}
 		};
 		tested.setJobRepository(repository);
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
-		tested.execute(execution);
-		assertEquals(BatchStatus.STOPPED, execution.getStatus());
-		Throwable expected = execution.getFailureExceptions().get(0);
-		assertEquals("JobExecution interrupted.", expected.getMessage());
+		try {
+			tested.execute(execution);
+			fail();
+		}
+		catch (JobInterruptedException expected) {
+			assertEquals("JobExecution interrupted.", expected.getMessage());
+		}
 
 		int i = 0;
 		assertEquals("listener1#beforeStep", events.get(i++));
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener2#afterStep", events.get(i++));
-		assertEquals("listener1#afterStep", events.get(i++));
+		assertEquals("listener2#onErrorInStep", events.get(i++));
+		assertEquals("listener1#onErrorInStep", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
 		assertEquals("JOB_INTERRUPTED", execution.getExitStatus().getExitCode());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
-				.containsKey("afterStep"));
+				.containsKey("onErrorInStep"));
 	}
 
 	/**
 	 * Exception during business processing.
 	 */
-	@Test
 	public void testFailureInSavingExecutionContext() throws Exception {
 		tested = new EventTrackingStep() {
-			@Override
-			protected ExitStatus doExecute(StepExecution context) throws Exception {
-				super.doExecute(context);
+			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+				super.doExecute(stepExecution);
 				return ExitStatus.FINISHED;
 			}
 		};
 		repository = new JobRepositoryStub() {
-			public void updateExecutionContext(StepExecution stepExecution) {
+			public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 				throw new RuntimeException("Bad context!");
 			}
 		};
 		tested.setJobRepository(repository);
 
-		tested.execute(execution);
-		assertEquals(BatchStatus.UNKNOWN, execution.getStatus());
-		Throwable expected = execution.getFailureExceptions().get(0);
-		assertEquals("Bad context!", expected.getMessage());
+		try {
+			tested.execute(execution);
+			fail();
+		}
+		catch (RuntimeException expected) {
+			assertEquals("Bad context!", expected.getCause().getMessage());
+		}
 
 		int i = 0;
 		assertEquals("open", events.get(i++));
@@ -299,7 +265,6 @@ public class AbstractStepTests {
 	/**
 	 * JobRepository is a required property.
 	 */
-	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		tested.setJobRepository(null);
 		try {

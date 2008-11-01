@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.item.file.mapping;
 
+
 /**
  * Pass through {@link FieldSetMapper} useful for passing a {@link FieldSet}
  * back directly rather than a mapped object.
@@ -22,17 +23,31 @@ package org.springframework.batch.item.file.mapping;
  * @author Lucas Ward
  * 
  */
-public class PassThroughFieldSetMapper implements FieldSetMapper<FieldSet> {
+public class PassThroughFieldSetMapper implements FieldSetMapper, FieldSetCreator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.item.file.FieldSetMapper#mapLine(org.springframework
-	 * .batch.io.file.FieldSet)
+	 * @see org.springframework.batch.item.file.FieldSetMapper#mapLine(org.springframework.batch.item.file.FieldSet)
 	 */
-	public FieldSet mapFieldSet(FieldSet fs) {
+	public Object mapLine(FieldSet fs) {
 		return fs;
+	}
+
+	/**
+	 * If the input is a {@link FieldSet} pass it to the caller. Otherwise
+	 * convert to a String with toString() and convert it to a single field
+	 * {@link FieldSet}.
+	 * 
+	 * @see org.springframework.batch.item.file.mapping.FieldSetCreator#mapItem(java.lang.Object)
+	 */
+	public FieldSet mapItem(Object data) {
+		if (data instanceof FieldSet) {
+			return (FieldSet) data;
+		}
+		if (!(data instanceof String)) {
+			data = "" + data;
+		}
+		return new DefaultFieldSet(new String[] { (String) data });
 	}
 
 }

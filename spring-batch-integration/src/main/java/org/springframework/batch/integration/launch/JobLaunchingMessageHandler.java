@@ -6,7 +6,7 @@ import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.annotation.Handler;
 
 /**
  * Message handler which uses strategies to convert a Message into a job and a
@@ -27,7 +27,7 @@ public class JobLaunchingMessageHandler {
 		this.jobLauncher = jobLauncher;
 	}
 
-	@ServiceActivator
+	@Handler
 	public JobExecution launch(JobLaunchRequest request) {
 		Job job = request.getJob();
 		JobParameters jobParameters = request.getJobParameters();

@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 import org.springframework.core.Ordered;
@@ -24,61 +23,53 @@ import junit.framework.TestCase;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class OrderedCompositeTests extends TestCase {
-
-	private OrderedComposite<Object> list = new OrderedComposite<Object>();
+	
+	private OrderedComposite list = new OrderedComposite();
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.OrderedComposite#setItems(java.util.List)}
-	 * .
+	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#setItems(java.lang.Object[])}.
 	 */
 	public void testSetItems() {
-		list.setItems(Arrays.asList(new Object[] { "1", "2" }));
-		Iterator<Object> iterator = list.iterator();
+		list.setItems(new String[] {"1", "2"});
+		Iterator iterator = list.iterator();
 		assertEquals("1", iterator.next());
 		assertEquals("2", iterator.next());
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}
-	 * .
+	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}.
 	 */
 	public void testAdd() {
-		list.setItems(Arrays.asList((Object) "1"));
+		list.setItems(new String[] {"1"});
 		list.add("3");
-		Iterator<Object> iterator = list.iterator();
+		Iterator iterator = list.iterator();
 		assertEquals("1", iterator.next());
 		assertEquals("3", iterator.next());
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}
-	 * .
+	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}.
 	 */
 	public void testAddOrdered() {
-		list.setItems(Arrays.asList((Object) "1"));
+		list.setItems(new String[] {"1"});
 		list.add(new Ordered() {
 			public int getOrder() {
 				return 0;
 			}
 		});
-		Iterator<Object> iterator = list.iterator();
+		Iterator iterator = list.iterator();
 		iterator.next();
 		assertEquals("1", iterator.next());
 	}
 
 	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}
-	 * .
+	 * Test method for {@link org.springframework.batch.core.listener.OrderedComposite#add(java.lang.Object)}.
 	 */
 	public void testAddMultipleOrdered() {
-		list.setItems(Arrays.asList((Object) "1"));
+		list.setItems(new String[] {"1"});
 		list.add(new Ordered() {
 			public int getOrder() {
 				return 1;
@@ -89,7 +80,7 @@ public class OrderedCompositeTests extends TestCase {
 				return 0;
 			}
 		});
-		Iterator<Object> iterator = list.iterator();
+		Iterator iterator = list.iterator();
 		assertEquals(0, ((Ordered) iterator.next()).getOrder());
 		assertEquals(1, ((Ordered) iterator.next()).getOrder());
 		assertEquals("1", iterator.next());

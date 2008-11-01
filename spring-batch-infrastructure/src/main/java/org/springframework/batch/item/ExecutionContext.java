@@ -17,33 +17,36 @@
 package org.springframework.batch.item;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.util.Assert;
 
 /**
- * Object representing a context for an {@link ItemStream}. It is a thin wrapper
- * for a map that allows optionally for type safety on reads. It also allows for
- * dirty checking by setting a 'dirty' flag whenever any put is called.
+ * Object representing a context for an {@link ItemStream}. It is a thin
+ * wrapper for a map that allows optionally for type safety on reads. It also
+ * allows for dirty checking by setting a 'dirty' flag whenever any put is
+ * called.
  * 
  * @author Lucas Ward
  * @author Douglas Kaminsky
  */
 public class ExecutionContext implements Serializable {
 
-	private volatile boolean dirty = false;
+	private boolean dirty = false;
 
-	private final Map<String, Object> map;
+	private final Map map;
 
 	/**
 	 * Default constructor. Initializes a new execution context with an empty
 	 * internal map.
 	 */
 	public ExecutionContext() {
-		map = new ConcurrentHashMap<String, Object>();
+		map = new HashMap();
 	}
 
 	/**
@@ -51,8 +54,8 @@ public class ExecutionContext implements Serializable {
 	 * 
 	 * @param map Initial contents of context.
 	 */
-	public ExecutionContext(Map<String, Object> map) {
-		this.map = new ConcurrentHashMap<String, Object>(map);
+	public ExecutionContext(Map map) {
+		this.map = map;
 	}
 
 	/**
@@ -60,10 +63,11 @@ public class ExecutionContext implements Serializable {
 	 */
 	public ExecutionContext(ExecutionContext executionContext) {
 		this();
-		if (executionContext == null) {
+		if (executionContext==null) {
 			return;
 		}
-		for (Entry<String, Object> entry : executionContext.entrySet()) {
+		for (Iterator iterator = executionContext.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry) iterator.next();
 			this.map.put(entry.getKey(), entry.getValue());
 		}
 	}
@@ -229,7 +233,7 @@ public class ExecutionContext implements Serializable {
 	 * @param type Class against which value should be validated
 	 * @return Value typed to the specified <code>Class</code>
 	 */
-	private Object readAndValidate(String key, Class<?> type) {
+	private Object readAndValidate(String key, Class type) {
 
 		Object value = map.get(key);
 
@@ -264,7 +268,7 @@ public class ExecutionContext implements Serializable {
 	 * @return A set representing the contents of the context
 	 * @see java.util.Map#entrySet()
 	 */
-	public Set<Entry<String, Object>> entrySet() {
+	public Set entrySet() {
 		return map.entrySet();
 	}
 
@@ -280,15 +284,6 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Removes the mapping for a key from this context if it is present.
-	 * 
-	 * @see java.util.Map#remove(Object)
-	 */
-	public Object remove(String key) {
-		return map.remove(key);
-	}
-
-	/**
 	 * Indicates whether or not a value is represented in this context.
 	 * 
 	 * @param value Value to check existence for
@@ -299,9 +294,27 @@ public class ExecutionContext implements Serializable {
 		return map.containsValue(value);
 	}
 
+	/**
+	 * Returns a <code>Properties</code> object containing <code>String</code>
+	 * versions of the contents of the context.
+	 * 
+	 * @return Contents of context as a {@link java.util.Properties}
+	 * 
+	 * @deprecated to be removed with no replacement in 2.0. Should not be part
+	 * of public API (test purposes only)
+	 */
+	public Properties getProperties() {
+		Properties props = new Properties();
+		for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
+			Entry entry = (Entry) it.next();
+			props.setProperty(entry.getKey().toString(), entry.getValue().toString());
+		}
+
+		return props;
+	}
+
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object obj) {
@@ -317,7 +330,6 @@ public class ExecutionContext implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode() {
@@ -326,7 +338,6 @@ public class ExecutionContext implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {

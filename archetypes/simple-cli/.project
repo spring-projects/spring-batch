@@ -35,4 +35,11 @@ $ mvn archetype:create -DgroupId=com.mycompany -DartifactId=batch \
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.devzuz.q.maven.jdt.core.mavenNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>archetypes-pom.xml</name>
+			<type>1</type>
+			<locationURI>SPRING_BATCH/archetypes/pom.xml</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

@@ -29,7 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
@@ -73,11 +73,11 @@ import org.springframework.util.ClassUtils;
  * 
  * <p>
  * Transactions: The same ResultSet is held open regardless of commits or roll
- * backs in a surrounding transaction. When a transaction is committed, the
- * reader will be notified through the {@link #update(ExecutionContext)} so that
- * it can save it's current row number. Clients of this reader are responsible
- * for buffering the items in the case that they need to be re-presented on a
- * rollback.
+ * backs in a surrounding transaction. This means that when such a transaction
+ * is committed, the reader is notified through the {@link #mark()} and
+ * {@link #reset()} so that it can save it's current row number. Later, if the
+ * transaction is rolled back, the current row can be moved back to the same row
+ * number as it was on when commit was called.
  * </p>
  * 
  * <p>
@@ -97,7 +97,7 @@ import org.springframework.util.ClassUtils;
  * @author Peter Zozom
  * @author Robert Kasanicky
  */
-public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
+public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream implements InitializingBean {
 
 	private static Log log = LogFactory.getLog(JdbcCursorItemReader.class);
 
@@ -232,7 +232,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * Throw a SQLWarningException if we're not ignoring warnings, else log the
 	 * warnings (at debug level).
 	 * 
-	 * @param warnings the warnings object from the current statement. May be
+	 * @param warning the warnings object from the current statement. May be
 	 * <code>null</code>, in which case this method does nothing.
 	 * 
 	 * @see org.springframework.jdbc.SQLWarningException
@@ -259,8 +259,11 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	private void moveCursorToRow(int row) {
 		try {
 			int count = 0;
-			while (row != count && rs.next()) {
+			while (count!=row && rs.next()) {
 				count++;
+				if (count == row) {
+					break;
+				}
 			}
 		}
 		catch (SQLException se) {
@@ -294,8 +297,9 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	/**
 	 * Sets the number of seconds the driver will wait for a
-	 * <code>Statement</code> object to execute to the given number of seconds.
-	 * If the limit is exceeded, an <code>SQLException</code> is thrown.
+	 * <code>Statement</code> object to execute to the given number of
+	 * seconds. If the limit is exceeded, an <code>SQLException</code> is
+	 * thrown.
 	 * 
 	 * @param queryTimeout seconds the new query timeout limit in seconds; zero
 	 * means there is no limit
@@ -358,9 +362,9 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	/**
 	 * Indicate whether the JDBC driver supports setting the absolute row on a
 	 * {@link ResultSet}. It is recommended that this is set to
-	 * <code>true</code> for JDBC drivers that supports ResultSet.absolute() as
-	 * it may improve performance, especially if a step fails while working with
-	 * a large data set.
+	 * <code>true</code> for JDBC drivers that supports ResultSet.absolute()
+	 * as it may improve performance, especially if a step fails while working
+	 * with a large data set.
 	 * 
 	 * @see ResultSet#absolute(int)
 	 * 
@@ -409,14 +413,13 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * Read next row and map it to item, verify cursor position if
 	 * {@link #setVerifyCursorPosition(boolean)} is true.
 	 */
-	@SuppressWarnings("unchecked")
-	protected T doRead() throws Exception {
+	protected Object doRead() throws Exception {
 		try {
 			if (!rs.next()) {
 				return null;
 			}
 			int currentRow = getCurrentItemCount();
-			T item = (T) mapper.mapRow(rs, currentRow);
+			Object item = mapper.mapRow(rs, currentRow);
 			verifyCursorPosition(currentRow);
 			return item;
 		}

@@ -16,30 +16,35 @@
 
 package org.springframework.batch.retry.policy;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-
 import junit.framework.TestCase;
 
 import org.springframework.batch.retry.RetryContext;
 
 public class SimpleRetryPolicyTests extends TestCase {
 
+	public void testSetInvalidExceptionClass() throws Exception {
+		try {
+			new SimpleRetryPolicy().setRetryableExceptionClasses(new Class[] { String.class });
+			fail("Should only be able to set Exception classes.");
+		}
+		catch (IllegalArgumentException ex) {
+
+		}
+	}
+
 	public void testCanRetryIfNoException() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertTrue(policy.canRetry(context));
 	}
 
-	@SuppressWarnings("unchecked")
 	public void testEmptyExceptionsNeverRetry() throws Exception {
 
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 
 		// We can't retry any exceptions...
-		policy.setRetryableExceptionClasses(Collections.EMPTY_SET);
+		policy.setRetryableExceptionClasses(new Class[0]);
 
 		// ...so we can't retry this one...
 		policy.registerThrowable(context, new IllegalStateException());
@@ -48,16 +53,16 @@ public class SimpleRetryPolicyTests extends TestCase {
 
 	public void testRetryLimitInitialState() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertTrue(policy.canRetry(context));
 		policy.setMaxAttempts(0);
-		context = policy.open(null);
+		context = policy.open(null, null);
 		assertFalse(policy.canRetry(context));
 	}
 
 	public void testRetryLimitSubsequentState() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		policy.setMaxAttempts(2);
 		assertTrue(policy.canRetry(context));
 		policy.registerThrowable(context, new Exception());
@@ -68,7 +73,7 @@ public class SimpleRetryPolicyTests extends TestCase {
 
 	public void testRetryCount() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, null);
 		assertEquals(0, context.getRetryCount());
@@ -77,30 +82,28 @@ public class SimpleRetryPolicyTests extends TestCase {
 		assertEquals("foo", context.getLastThrowable().getMessage());
 	}
 
+	public void testDefaultFatal() throws Exception {
+		SimpleRetryPolicy policy = new SimpleRetryPolicy();
+		RetryContext context = policy.open(null, null);
+		assertNotNull(context);
+		policy.registerThrowable(context, new Error("foo"));
+		assertFalse(policy.canRetry(context));
+	}
+
 	public void testFatalOverridesRetryable() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		policy.setFatalExceptionClasses(getClasses(Exception.class));
-		policy.setRetryableExceptionClasses(getClasses(RuntimeException.class));
-		RetryContext context = policy.open(null);
+		policy.setFatalExceptionClasses(new Class[] {Exception.class});
+		policy.setRetryableExceptionClasses(new Class[] {RuntimeException.class});
+		RetryContext context = policy.open(null, null);
 		assertNotNull(context);
 		policy.registerThrowable(context, new RuntimeException("foo"));
 		assertFalse(policy.canRetry(context));
 	}
 
-	/**
-	 * @param cls
-	 * @return
-	 */
-	private Collection<Class<? extends Throwable>> getClasses(Class<? extends Throwable> cls) {
-		Collection<Class<? extends Throwable>> classes = new HashSet<Class<? extends Throwable>>();
-		classes.add(cls);
-		return classes;
-	}
-
 	public void testParent() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
-		RetryContext context = policy.open(null);
-		RetryContext child = policy.open(context);
+		RetryContext context = policy.open(null, null);
+		RetryContext child = policy.open(null, context);
 		assertNotSame(child, context);
 		assertSame(context, child.getParent());
 	}

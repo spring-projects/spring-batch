@@ -19,16 +19,8 @@ import javax.sql.DataSource;
 
 import junit.framework.TestCase;
 
-import static org.easymock.EasyMock.*;
-import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.HsqlMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.MySQLMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.DB2MainframeSequenceMaxValueIncrementer;
+import org.easymock.MockControl;
+import org.springframework.jdbc.support.incrementer.*;
 
 /**
  * @author Lucas Ward
@@ -44,7 +36,7 @@ public class DefaultDataFieldMaxValueIncrementerFactoryTests extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		DataSource dataSource = createMock(DataSource.class);
+		DataSource dataSource = (DataSource)MockControl.createControl(DataSource.class).getMock();
 		factory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
 	}
 	

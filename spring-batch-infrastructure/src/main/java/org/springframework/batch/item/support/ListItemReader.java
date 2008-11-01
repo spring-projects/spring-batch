@@ -28,22 +28,22 @@ import org.springframework.batch.item.ItemReader;
  * @author Dave Syer
  * 
  */
-public class ListItemReader<T> implements ItemReader<T> {
+public class ListItemReader extends AbstractItemReader {
 
-	private List<T> list;
+	private List list;
 
-	public ListItemReader(List<T> list) {
+	public ListItemReader(List list) {
 		// If it is a proxy we assume it knows how to deal with its own state.
 		// (It's probably transaction aware.)
 		if (AopUtils.isAopProxy(list)) {
 			this.list = list;
 		}
 		else {
-			this.list = new ArrayList<T>(list);
+			this.list = new ArrayList(list);
 		}
 	}
 
-	public T read() {
+	public Object read() {
 		if (!list.isEmpty()) {
 			return list.remove(0);
 		}

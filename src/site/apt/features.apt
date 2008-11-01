@@ -1,15 +1,15 @@
                                     ------
                                     Spring Batch Features
                                     ------
-                                    Dave Syer
+                                    Dave Syer, Thomas Risberg
                                     ------
-                                    July 2007, February 2008
+                                    July 2007, February 2008, July 2008
 
 Spring Batch Features and Roadmap
 
-* 1.0 Features
+* 1.1 Features
 
-  The following features are supported by Spring Batch 1.0:
+  The following features are supported by Spring Batch 1.1:
 
 ** Optimisation and Infrastructure
 
@@ -80,7 +80,7 @@ Spring Batch Features and Roadmap
   represenation of the state of the job - can be augmented by
   developers).
 
-  * StepHandlerStep - uses an ItemReader to obtain the next record to
+  * ItemOrientedStep - uses an ItemReader to obtain the next record to
   process, and hands it to an ItemWriter if it is not null.  It can
   run a StepExecution in the same process (VM).
 
@@ -106,7 +106,7 @@ Spring Batch Features and Roadmap
   use a common simple configuration and extend in various ways to show
   the different features of the Execution module.
 
-* Roadmap (Beyond 1.0).
+* Roadmap (Beyond 1.1).
 
   * Remote or distributed execution of steps.  The step proceeds as in
   the single JVM case, but each chunk is passed on to the remote
@@ -123,7 +123,7 @@ Spring Batch Features and Roadmap
   of a job can be properly managed.
 
   * Auditing.  Implement hooks to monitor not only what jobs execute
-  and the result of the execution (as per 1.0 possibly with some
+  and the result of the execution (as per 1.1 possibly with some
   richer options for detailed outcome reports), but also who has
   executed the job, what changes they made to runtime parameters.
 

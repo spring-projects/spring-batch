@@ -20,13 +20,8 @@ import java.io.FileReader;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
 public class XmlStaxJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 	
 	private static final String OUTPUT_FILE = "target/test-outputs/20070918.testStream.xmlFileStep.output.xml";

@@ -16,60 +16,60 @@
 
 package org.springframework.batch.repeat.exception;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.util.Collections;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
+import junit.framework.TestCase;
+
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.context.RepeatContextCounter;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
+import org.springframework.batch.support.ExceptionClassifierSupport;
 
-public class RethrowOnThresholdExceptionHandlerTests {
+public class RethrowOnThresholdExceptionHandlerTests extends TestCase {
 
 	private RethrowOnThresholdExceptionHandler handler = new RethrowOnThresholdExceptionHandler();
-
 	private RepeatContext parent = new RepeatContextSupport(null);
-
 	private RepeatContext context = new RepeatContextSupport(parent);
-
-	@Test
+	
 	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
 
-	@Test
 	public void testError() throws Throwable {
 		try {
 			handler.handleException(context, new Error("Foo"));
 			fail("Expected Error");
-		}
-		catch (Error e) {
+		} catch (Error e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
-
-	@Test
+	
 	public void testNotRethrownWithThreshold() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return "RuntimeException";
+			}
+		});
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
-		AtomicInteger counter = (AtomicInteger) context.getAttribute(context.attributeNames()[0]);
+		RepeatContextCounter counter = new RepeatContextCounter(context, RethrowOnThresholdExceptionHandler.class.getName() + ".RuntimeException");
 		assertNotNull(counter);
-		assertEquals(1, counter.get());
+		assertEquals(1, counter.getCount());
 	}
-
-	@Test
+	
 	public void testRethrowOnThreshold() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 2));
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return "RuntimeException";
+			}
+		});
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(2)));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		handler.handleException(context, new RuntimeException("Foo"));
@@ -82,9 +82,23 @@ public class RethrowOnThresholdExceptionHandlerTests {
 		}
 	}
 
-	@Test
+	public void testNonIntegerAsThreshold() throws Exception {
+		try {
+			handler.setThresholds(Collections.singletonMap("RuntimeException", new Long(1)));
+			fail("Expected IllegalStateException");
+		}
+		catch (IllegalStateException e) {
+			// expected
+		}
+	}
+	
 	public void testNotUseParent() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return "RuntimeException";
+			}
+		});
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
 		context = new RepeatContextSupport(parent);
@@ -97,9 +111,13 @@ public class RethrowOnThresholdExceptionHandlerTests {
 		}
 	}
 
-	@Test
 	public void testUseParent() throws Throwable {
-		handler.setThresholds(Collections.<Class<? extends Throwable>, Integer> singletonMap(Exception.class, 1));
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return "RuntimeException";
+			}
+		});
+		handler.setThresholds(Collections.singletonMap("RuntimeException", new Integer(1)));
 		handler.setUseParent(true);
 		// No exception...
 		handler.handleException(context, new RuntimeException("Foo"));
@@ -111,6 +129,17 @@ public class RethrowOnThresholdExceptionHandlerTests {
 		catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
 		}
+	}
+	
+	public void testNotStringAsKey() throws Exception {
+		try {
+			handler.setThresholds(Collections.singletonMap(RuntimeException.class, new Integer(1)));
+			// It's not an error, but not advised...
+		}
+		catch (RuntimeException e) {
+			throw e;
+		}
+		
 	}
 
 }

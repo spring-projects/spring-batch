@@ -16,69 +16,64 @@
 
 package org.springframework.batch.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-import org.junit.Test;
+import org.springframework.batch.support.SubclassExceptionClassifier;
 
-public class SubclassExceptionClassifierTests {
+import junit.framework.TestCase;
 
-	SubclassClassifier<Throwable, String> classifier = new SubclassClassifier<Throwable, String>();
+public class SubclassExceptionClassifierTests extends TestCase {
 
-	@Test
+	SubclassExceptionClassifier classifier = new SubclassExceptionClassifier();
+
 	public void testClassifyNullIsDefault() {
 		assertEquals(classifier.classify(null), classifier.getDefault());
 	}
 
-	@Test
-	public void testClassifyNull() {
-		assertNull(classifier.classify(null));
-	}
-
-	@Test
-	public void testClassifyNullNonDefault() {
-		classifier = new SubclassClassifier<Throwable, String>("foo");
-		assertEquals("foo", classifier.classify(null));
-	}
-
-	@Test
 	public void testClassifyRandomException() {
-		assertNull(classifier.classify(new IllegalStateException("Foo")));
+		assertEquals(classifier.classify(new IllegalStateException("Foo")), classifier.getDefault());
 	}
 
-	@Test
+	public void testIllegalMapWithNonClass() {
+		try {
+			classifier.setTypeMap(Collections.singletonMap("bar", "foo"));
+			fail("Expected IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
+	public void testIllegalMapWithClass() {
+		try {
+			classifier.setTypeMap(Collections.singletonMap(String.class, "foo"));
+			fail("Expected IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			// expected
+		}
+	}
+
 	public void testClassifyExactMatch() {
-		classifier.setTypeMap(Collections.<Class<? extends Throwable>, String> singletonMap(
-				IllegalStateException.class, "foo"));
+		classifier.setTypeMap(Collections.singletonMap(IllegalStateException.class, "foo"));
 		assertEquals("foo", classifier.classify(new IllegalStateException("Foo")));
 	}
 
-	@Test
 	public void testClassifySubclassMatch() {
-		classifier.setTypeMap(Collections.<Class<? extends Throwable>, String> singletonMap(RuntimeException.class,
-				"foo"));
+		classifier.setTypeMap(Collections.singletonMap(RuntimeException.class, "foo"));
 		assertEquals("foo", classifier.classify(new IllegalStateException("Foo")));
 	}
 
-	@Test
 	public void testClassifySuperclassDoesNotMatch() {
-		classifier.setTypeMap(Collections.<Class<? extends Throwable>, String> singletonMap(
-				IllegalStateException.class, "foo"));
+		classifier.setTypeMap(Collections.singletonMap(IllegalStateException.class, "foo"));
 		assertEquals(classifier.getDefault(), classifier.classify(new RuntimeException("Foo")));
 	}
 
-	@Test
 	public void testClassifyAncestorMatch() {
-		classifier.setTypeMap(new HashMap<Class<? extends Throwable>, String>() {
-			{
-				put(Exception.class, "foo");
-				put(IllegalArgumentException.class, "bar");
-				put(RuntimeException.class, "spam");
-			}
-		});
-		assertEquals("spam", classifier.classify(new IllegalStateException("Foo")));
+		classifier.setTypeMap(new LinkedHashMap() {{
+			put(Exception.class, "bar");
+			put(IllegalArgumentException.class, "foo");
+			put(RuntimeException.class, "bucket");
+		}});
+		assertEquals("bucket", classifier.classify(new IllegalStateException("Foo")));
 	}
 }

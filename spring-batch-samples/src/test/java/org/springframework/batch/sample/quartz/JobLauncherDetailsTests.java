@@ -15,16 +15,13 @@
  */
 package org.springframework.batch.sample.quartz;
 
-import static org.easymock.EasyMock.createNiceMock;
-import static org.junit.Assert.assertEquals;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import junit.framework.TestCase;
+
+import org.easymock.MockControl;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
@@ -35,25 +32,24 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.sample.support.JobSupport;
+import org.springframework.batch.core.repository.NoSuchJobException;
+import org.springframework.batch.sample.tasklet.JobSupport;
 
 /**
  * @author Dave Syer
  * 
  */
-public class JobLauncherDetailsTests {
+public class JobLauncherDetailsTests extends TestCase {
 
 	private JobLauncherDetails details = new JobLauncherDetails();
 	
 	private TriggerFiredBundle firedBundle;
 	
-	private List<Serializable> list = new ArrayList<Serializable>();
+	private List list = new ArrayList();
 	
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		details.setJobLauncher(new JobLauncher() {
 			public JobExecution run(org.springframework.batch.core.Job job, JobParameters jobParameters)
 					throws JobExecutionAlreadyRunningException, JobRestartException {
@@ -69,6 +65,10 @@ public class JobLauncherDetailsTests {
 		});
 	}
 
+	/**
+	 * @return 
+	 * 
+	 */
 	private JobExecutionContext createContext(JobDetail jobDetail) {
 		firedBundle = new TriggerFiredBundle(jobDetail, new SimpleTrigger(), null, false, new Date(), new Date(), new Date(), new Date());
 		return new StubJobExecutionContext();
@@ -78,7 +78,6 @@ public class JobLauncherDetailsTests {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
-	@Test
 	public void testExecuteWithNoJobParameters() {
 		JobDetail jobDetail = new JobDetail();
 		JobExecutionContext context = createContext(jobDetail);
@@ -92,7 +91,6 @@ public class JobLauncherDetailsTests {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
-	@Test
 	public void testExecuteWithJobName() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
@@ -106,7 +104,6 @@ public class JobLauncherDetailsTests {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
-	@Test
 	public void testExecuteWithSomeJobParameters() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put("foo", "bar");
@@ -121,7 +118,6 @@ public class JobLauncherDetailsTests {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
-	@Test
 	public void testExecuteWithJobNameAndParameters() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
@@ -138,7 +134,6 @@ public class JobLauncherDetailsTests {
 	 * Test method for
 	 * {@link org.springframework.batch.sample.quartz.JobLauncherDetails#executeInternal(org.quartz.JobExecutionContext)}.
 	 */
-	@Test
 	public void testExecuteWithJobNameAndComplexParameters() {
 		JobDetail jobDetail = new JobDetail();
 		jobDetail.getJobDataMap().put(JobLauncherDetails.JOB_NAME, "FOO");
@@ -153,11 +148,15 @@ public class JobLauncherDetailsTests {
 	}
 
 	private final class StubJobExecutionContext extends JobExecutionContext {
-
+		/**
+		 * @param scheduler
+		 * @param firedBundle
+		 * @param job
+		 */
 		private StubJobExecutionContext() {
-			super(createNiceMock(Scheduler.class), firedBundle, createNiceMock(Job.class));
+			super((Scheduler) MockControl.createNiceControl(Scheduler.class).getMock(), firedBundle, (Job) MockControl.createNiceControl(Job.class)
+					.getMock());
 		}
-
 	}
 
 }

@@ -17,11 +17,12 @@ package org.springframework.batch.core.configuration.support;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobLocator;
 import org.springframework.batch.core.configuration.JobRegistry;
+import org.springframework.batch.core.repository.DuplicateJobException;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.DisposableBean;
@@ -44,7 +45,7 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	// It doesn't make sense for this to have a default value...
 	private JobRegistry jobConfigurationRegistry = null;
 
-	private Collection<String> jobNames = new HashSet<String>();
+	private Collection jobNames = new HashSet();
 
 	/**
 	 * Injection setter for {@link JobRegistry}.
@@ -70,7 +71,8 @@ public class JobRegistryBeanPostProcessor implements BeanPostProcessor, Initiali
 	 * @see org.springframework.beans.factory.DisposableBean#destroy()
 	 */
 	public void destroy() throws Exception {
-		for (String name : jobNames) {
+		for (Iterator iter = jobNames.iterator(); iter.hasNext();) {
+			String name = (String) iter.next();
 			jobConfigurationRegistry.unregister(name);
 		}
 		jobNames.clear();

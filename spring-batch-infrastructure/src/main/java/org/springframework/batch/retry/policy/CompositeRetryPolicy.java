@@ -19,8 +19,10 @@ package org.springframework.batch.retry.policy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.context.RetryContextSupport;
 
 /**
@@ -30,7 +32,7 @@ import org.springframework.batch.retry.context.RetryContextSupport;
  * @author Dave Syer
  * 
  */
-public class CompositeRetryPolicy implements RetryPolicy {
+public class CompositeRetryPolicy extends AbstractStatelessRetryPolicy {
 
 	RetryPolicy[] policies = new RetryPolicy[0];
 
@@ -91,12 +93,13 @@ public class CompositeRetryPolicy implements RetryPolicy {
 	 * Creates a new context that copies the existing policies and keeps a list
 	 * of the contexts from each one.
 	 * 
-	 * @see org.springframework.batch.retry.RetryPolicy#open(RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
+	 * RetryContext)
 	 */
-	public RetryContext open(RetryContext parent) {
-		List<RetryContext> list = new ArrayList<RetryContext>();
+	public RetryContext open(RetryCallback callback, RetryContext parent) {
+		List list = new ArrayList();
 		for (int i = 0; i < policies.length; i++) {
-			list.add(policies[i].open(parent));
+			list.add(policies[i].open(callback, parent));
 		}
 		return new CompositeRetryContext(parent, list);
 	}
@@ -107,7 +110,7 @@ public class CompositeRetryPolicy implements RetryPolicy {
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#close(org.springframework.batch.retry.RetryContext)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) {
+	public void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException {
 		RetryContext[] contexts = ((CompositeRetryContext) context).contexts;
 		RetryPolicy[] policies = ((CompositeRetryContext) context).policies;
 		for (int i = 0; i < contexts.length; i++) {
@@ -121,9 +124,9 @@ public class CompositeRetryPolicy implements RetryPolicy {
 
 		RetryPolicy[] policies;
 
-		public CompositeRetryContext(RetryContext parent, List<RetryContext> contexts) {
+		public CompositeRetryContext(RetryContext parent, List contexts) {
 			super(parent);
-			this.contexts = contexts.toArray(new RetryContext[0]);
+			this.contexts = (RetryContext[]) contexts.toArray(new RetryContext[0]);
 			this.policies = CompositeRetryPolicy.this.policies;
 		}
 

@@ -16,38 +16,31 @@
 
 package org.springframework.batch.retry.support;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.fail;
+import junit.framework.TestCase;
 
-import java.util.Collections;
-
-import org.junit.Test;
 import org.springframework.batch.retry.ExhaustedRetryException;
-import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.RetryException;
+import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.backoff.BackOffContext;
 import org.springframework.batch.retry.backoff.BackOffInterruptedException;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.backoff.StatelessBackOffPolicy;
+import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
  * @author Rob Harrop
- * @author Dave Syer
+ * @since 2.1
  */
-public class RetryTemplateTests {
+public class RetryTemplateTests extends TestCase {
 
 	RetryContext context;
 
 	int count = 0;
 
-	@Test
 	public void testSuccessfulRetry() throws Exception {
 		for (int x = 1; x <= 10; x++) {
 			MockRetryCallback callback = new MockRetryCallback();
@@ -59,23 +52,6 @@ public class RetryTemplateTests {
 		}
 	}
 
-	@Test
-	public void testSuccessfulRecovery() throws Exception {
-		MockRetryCallback callback = new MockRetryCallback();
-		callback.setAttemptsBeforeSuccess(3);
-		RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(2));
-		final Object value = new Object();
-		Object result = retryTemplate.execute(callback, new RecoveryCallback<Object>() {
-			public Object recover(RetryContext context) throws Exception {
-				return value;
-			}
-		});
-		assertEquals(2, callback.attempts);
-		assertEquals(value, result);
-	}
-
-	@Test
 	public void testAlwaysTryAtLeastOnce() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 		RetryTemplate retryTemplate = new RetryTemplate();
@@ -84,10 +60,9 @@ public class RetryTemplateTests {
 		assertEquals(1, callback.attempts);
 	}
 
-	@Test
 	public void testNoSuccessRetry() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
-		// Something that won't be thrown by JUnit...
+		// Somthing that won't be thrwon by JUnit...
 		callback.setExceptionToThrow(new IllegalArgumentException());
 		callback.setAttemptsBeforeSuccess(Integer.MAX_VALUE);
 		RetryTemplate retryTemplate = new RetryTemplate();
@@ -105,7 +80,6 @@ public class RetryTemplateTests {
 		fail("Expected IllegalArgumentException");
 	}
 
-	@Test
 	public void testDefaultConfigWithExceptionSubclass() throws Exception {
 		MockRetryCallback callback = new MockRetryCallback();
 		int attempts = 3;
@@ -118,27 +92,11 @@ public class RetryTemplateTests {
 		assertEquals(attempts, callback.attempts);
 	}
 
-	@Test
-	public void testRollbackClassifierOverridesRetryPolicy() throws Exception {
-		MockRetryCallback callback = new MockRetryCallback();
-		int attempts = 3;
-		callback.setAttemptsBeforeSuccess(attempts);
-		callback.setExceptionToThrow(new IllegalArgumentException());
-
-		RetryTemplate retryTemplate = new RetryTemplate();
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts));
-		BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(Collections
-				.<Class<? extends Throwable>> singleton(IllegalArgumentException.class), false);
-		retryTemplate.execute(callback, new DefaultRetryState("foo",classifier));
-		assertEquals(attempts, callback.attempts);
-	}
-
-	@Test
 	public void testSetExceptions() throws Exception {
 		RetryTemplate template = new RetryTemplate();
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		template.setRetryPolicy(policy);
-		policy.setRetryableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(RuntimeException.class));
+		policy.setRetryableExceptionClasses(new Class[] { RuntimeException.class });
 
 		int attempts = 3;
 
@@ -158,7 +116,6 @@ public class RetryTemplateTests {
 		assertEquals(attempts, callback.attempts);
 	}
 
-	@Test
 	public void testBackOffInvoked() throws Exception {
 		for (int x = 1; x <= 10; x++) {
 			MockRetryCallback callback = new MockRetryCallback();
@@ -174,17 +131,16 @@ public class RetryTemplateTests {
 		}
 	}
 
-	@Test
 	public void testEarlyTermination() throws Exception {
 		try {
 			RetryTemplate retryTemplate = new RetryTemplate();
-			retryTemplate.execute(new RetryCallback<Object>() {
-				public Object doWithRetry(RetryContext status) throws Exception {
+			retryTemplate.execute(new RetryCallback() {
+				public Object doWithRetry(RetryContext status) throws Throwable {
 					status.setExhaustedOnly();
 					throw new IllegalStateException("Retry this operation");
 				}
 			});
-			fail("Expected ExhaustedRetryException");
+			fail("Expected TerminatedRetryException");
 		}
 		catch (ExhaustedRetryException ex) {
 			// Expected for internal retry policy (external would recover
@@ -193,16 +149,15 @@ public class RetryTemplateTests {
 		}
 	}
 
-	@Test
 	public void testNestedContexts() throws Exception {
 		RetryTemplate outer = new RetryTemplate();
 		final RetryTemplate inner = new RetryTemplate();
-		outer.execute(new RetryCallback<Object>() {
-			public Object doWithRetry(RetryContext status) throws Exception {
+		outer.execute(new RetryCallback() {
+			public Object doWithRetry(RetryContext status) throws Throwable {
 				context = status;
 				count++;
-				Object result = inner.execute(new RetryCallback<Object>() {
-					public Object doWithRetry(RetryContext status) throws Exception {
+				Object result = inner.execute(new RetryCallback() {
+					public Object doWithRetry(RetryContext status) throws Throwable {
 						count++;
 						assertNotNull(context);
 						assertNotSame(status, context);
@@ -218,13 +173,12 @@ public class RetryTemplateTests {
 		assertEquals(2, count);
 	}
 
-	@Test
 	public void testRethrowError() throws Exception {
 		RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setRetryPolicy(new NeverRetryPolicy());
 		try {
-			retryTemplate.execute(new RetryCallback<Object>() {
-				public Object doWithRetry(RetryContext context) throws Exception {
+			retryTemplate.execute(new RetryCallback() {
+				public Object doWithRetry(RetryContext context) throws Throwable {
 					throw new Error("Realllly bad!");
 				}
 			});
@@ -235,7 +189,6 @@ public class RetryTemplateTests {
 		}
 	}
 
-	@Test
 	public void testBackOffInterrupted() throws Exception {
 		RetryTemplate retryTemplate = new RetryTemplate();
 		retryTemplate.setBackOffPolicy(new StatelessBackOffPolicy() {
@@ -244,8 +197,8 @@ public class RetryTemplateTests {
 			}
 		});
 		try {
-			retryTemplate.execute(new RetryCallback<Object>() {
-				public Object doWithRetry(RetryContext context) throws Exception {
+			retryTemplate.execute(new RetryCallback() {
+				public Object doWithRetry(RetryContext context) throws Throwable {
 					throw new RuntimeException("Bad!");
 				}
 			});
@@ -256,7 +209,99 @@ public class RetryTemplateTests {
 		}
 	}
 
-	private static class MockRetryCallback implements RetryCallback<Object> {
+	public void testFallThroughToEndUnsuccessfully() throws Exception {
+		MockRetryCallback callback = new MockRetryCallback();
+		int attempts = 3;
+		callback.setAttemptsBeforeSuccess(attempts);
+		callback.setExceptionToThrow(new IllegalArgumentException());
+
+		RetryTemplate retryTemplate = new RetryTemplate();
+		retryTemplate.setRetryPolicy(new NeverRetryPolicy() {
+			public boolean shouldRethrow(RetryContext context) {
+				// The opposite of normal...
+				// cause the retry to drop through to the end
+				// neither throwing exception nor returning successfully.
+				return false;
+			}
+		});
+		try {
+			retryTemplate.execute(callback);
+			fail("Expected ExhaustedRetryException");
+		}
+		catch (ExhaustedRetryException e) {
+			assertTrue(e.getMessage().indexOf("exhausted") >= 0);
+		}
+	}
+
+	/**
+	 * Throwables that aren't Exception nor Error are wrapped into
+	 * RetryException.
+	 */
+	public void testThrowableWrapping() throws Exception {
+		RetryCallback callback = new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				throw new Throwable("throwable in callback");
+			}
+		};
+		RetryTemplate template = new RetryTemplate();
+
+		try {
+			template.execute(callback);
+			fail();
+		}
+		catch (RetryException expected) {
+			assertTrue(expected.getMessage().contains("Unclassified Throwable encountered"));
+			assertEquals("throwable in callback", expected.getCause().getMessage());
+		}
+	}
+
+	/**
+	 * If nested template wraps unclassified Throwable into RetryException the
+	 * Throwable is unwrapped before passed to collaborators.
+	 */
+	public void testThrowableUnwrapping() throws Exception {
+
+		final RetryCallback throwingCallback = new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				throw new Throwable("Crashed terribly");
+			}
+		};
+		final RetryTemplate nested = new RetryTemplate();
+
+		RetryCallback callNested = new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				return nested.execute(throwingCallback);
+			}
+		};
+		ExceptionCheckingListener listener = new ExceptionCheckingListener();
+		RetryTemplate template = new RetryTemplate();
+		template.setListeners(new RetryListener[] { listener });
+
+		try {
+			template.execute(callNested);
+			fail();
+		}
+		catch (RetryException expected) {
+			assertTrue(expected.getMessage().contains("Unclassified Throwable encountered"));
+			assertEquals("Crashed terribly", expected.getCause().getMessage());
+		}
+		assertTrue(listener.called);
+	}
+
+	private static class ExceptionCheckingListener extends RetryListenerSupport {
+
+		boolean called = false;
+
+		public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
+			called = true;
+			assertFalse(throwable instanceof Exception);
+			assertFalse(throwable instanceof Error);
+			assertEquals("Crashed terribly", throwable.getMessage());
+		}
+
+	}
+
+	private static class MockRetryCallback implements RetryCallback {
 
 		private int attempts;
 

@@ -2,17 +2,12 @@ package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.sample.Foo;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.Test;
 
-@RunWith(JUnit4ClassRunner.class)
 public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
-	protected ItemReader<Foo> getItemReader() throws Exception {
+	protected ItemReader getItemReader() throws Exception {
 
-		JdbcCursorItemReader<Foo> result = new JdbcCursorItemReader<Foo>();
+		JdbcCursorItemReader result = new JdbcCursorItemReader();
 		result.setDataSource(getDataSource());
 		result.setSql("select ID, NAME, VALUE from T_FOOS");
 		result.setIgnoreWarnings(true);
@@ -28,17 +23,16 @@ public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamIte
 		return result;
 	}
 
-	@Test
 	public void testRestartWithDriverSupportsAbsolute() throws Exception {
 		tested = getItemReader();
-		((JdbcCursorItemReader<Foo>) tested).setDriverSupportsAbsolute(true);
+		((JdbcCursorItemReader) tested).setDriverSupportsAbsolute(true);
 		testedAsStream().open(executionContext);
 
 		testRestart();
 	}
 
-	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
-		JdbcCursorItemReader<Foo> reader = (JdbcCursorItemReader<Foo>) tested;
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		JdbcCursorItemReader reader = (JdbcCursorItemReader) tested;
 		reader.close(new ExecutionContext());
 		reader.setSql("select ID from T_FOOS where ID < 0");
 		reader.afterPropertiesSet();

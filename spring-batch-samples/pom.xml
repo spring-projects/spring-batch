@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-samples</artifactId>
-	<version>1.1.3.RELEASE</version>
+  <version>1.1.3.RELEASE</version>
 	<packaging>jar</packaging>
 	<name>Samples</name>
 	<description>
@@ -104,14 +104,28 @@
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
+			<version>1.0.0</version>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>geronimo-spec</groupId>
@@ -120,7 +134,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.easymock</groupId>
+			<groupId>easymock</groupId>
 			<artifactId>easymock</artifactId>
 		</dependency>
 		<!-- optional dependency from infrastructure -->
@@ -160,6 +174,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>backport-util-concurrent</groupId>
+			<artifactId>backport-util-concurrent</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.ibatis</groupId>
 			<artifactId>ibatis-sqlmap</artifactId>
 			<version>2.3.0</version>
@@ -168,12 +187,6 @@
 		<dependency>
 			<groupId>org.apache.derby</groupId>
 			<artifactId>derby</artifactId>
-			<version>10.2.1.6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derbyclient</artifactId>
 			<version>10.2.1.6</version>
 			<scope>test</scope>
 		</dependency>
@@ -189,21 +202,6 @@
 			<version>10.2.0.2</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>8.2-504.jdbc3</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- db2 driver needs to be installed locally in maven first -->
-		<!--
-		<dependency>
-			<groupId>com.ibm</groupId>
-			<artifactId>db2jcc</artifactId>
-			<version>9.5.0</version>
-			<scope>test</scope>
-		</dependency>
-		-->
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -239,6 +237,20 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
 			<scope>test</scope>
+		</dependency>
+		
+		<!-- JMX for Java 1.4 -->
+		<dependency>
+			<groupId>mx4j</groupId>
+			<artifactId>mx4j</artifactId>
+			<version>3.0.2</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>mx4j</groupId>
+			<artifactId>mx4j-remote</artifactId>
+			<version>3.0.2</version>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>xerces</groupId>

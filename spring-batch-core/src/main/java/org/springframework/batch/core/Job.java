@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core;
 
+import java.util.List;
+
 /**
  * Batch domain object representing a job. Job is an explicit abstraction
  * representing the configuration of a job specified by a developer. It should
@@ -29,29 +31,20 @@ public interface Job {
 	String getName();
 
 	/**
-	 * Flag to indicate if this job can be restarted, at least in principle.
-	 * 
-	 * @return true if this job can be restarted after a failure
+	 * @deprecated planned for removal in 2.0
+	 * @return the {@link Step}s executed as part of this job.
 	 */
+	List getSteps();
+
 	boolean isRestartable();
 
 	/**
 	 * Run the {@link JobExecution} and update the meta information like status
-	 * and statistics as necessary. This method should not throw any exceptions
-	 * for failed execution. Clients should be careful to inspect the
-	 * {@link JobExecution} status to determine success or failure.
+	 * and statistics as necessary.
 	 * 
 	 * @param execution a {@link JobExecution}
+	 * @throws JobExecutionException
 	 */
-	void execute(JobExecution execution);
-
-	/**
-	 * If clients need to generate new parameters for the next execution in a
-	 * sequence they can use this incrementer. The return value may be null, in
-	 * the case that this job does not have a natural sequence.
-	 * 
-	 * @return in incrementer to be used for creating new parameters
-	 */
-	JobParametersIncrementer getJobParametersIncrementer();
+	void execute(JobExecution execution) throws JobExecutionException;
 
 }

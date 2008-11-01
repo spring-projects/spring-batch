@@ -1,9 +1,9 @@
                                     ------
                                     Spring Batch Getting Started
                                     ------
-                                    Dave Syer
+                                    Dave Syer, Thomas Risberg
                                     ------
-                                    December 2007
+                                    December 2007, July 2008
 
 Spring Batch Getting Started
 
@@ -64,34 +64,5 @@ $ mvn test
   * Check out the Spring Batch project from Subversion (instructions are available {{{source-repository.html}here}}).
 
   * Run Maven from the command line in the samples directory.  There are additional building instructions and suggestions about what to do if it goes wrong {{{building.html}here}}.
-
-The Original 1.0-{m3} Distribution
-
-  The original "1.0-m3" release had some issues like missing dependencies, so if you are using that either get the newer release, or see below.  (The m3a release is just an update of the .Zip packages - there is no corresponding update of the jar files, which did not change.)
-
-  If you are using not using Maven you will need some dependencies that were missing from the distro, so get these jar files from somewhere else:
-
-    * Servlet API (2.3 or better)
-
-    * spring-test-2.5.jar 
-
-    * spring-web-2.5.jar
-
-    * easymock.jar (1.1 or 1.2)
-
-    * commons-io (1.3.1)
-
-    * xmlunit (1.1)
-
-    * aspectjweaver (1.5.3)
-
-    * hsqldb (1.8.0.7)
-
-  If you are using Maven get the parent project pom by downloading it from Subversion (export from {{{https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0.m3/parent}here}}):
-
-+---
-$ cd samples
-$ svn export https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0.m3/parent parent
-+---
 
 

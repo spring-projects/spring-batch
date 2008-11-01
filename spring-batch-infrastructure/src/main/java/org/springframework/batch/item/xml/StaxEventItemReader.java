@@ -11,16 +11,14 @@ import javax.xml.stream.events.StartElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.file.ResourceAwareItemReaderItemStream;
-import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
 import org.springframework.batch.item.xml.stax.DefaultFragmentEventReader;
 import org.springframework.batch.item.xml.stax.FragmentEventReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.oxm.Unmarshaller;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.xml.transform.StaxSource;
 
 /**
  * Item reader for reading XML input based on StAX.
@@ -34,16 +32,16 @@ import org.springframework.xml.transform.StaxSource;
  * 
  * @author Robert Kasanicky
  */
-public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements
-		ResourceAwareItemReaderItemStream<T>, InitializingBean {
-
-	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
+public class StaxEventItemReader extends AbstractBufferedItemReaderItemStream implements
+		ResourceAwareItemReaderItemStream, InitializingBean {
 	
+	private static final Log logger = LogFactory.getLog(StaxEventItemReader.class);
+
 	private FragmentEventReader fragmentReader;
 
 	private XMLEventReader eventReader;
 
-	private Unmarshaller unmarshaller;
+	private EventReaderDeserializer eventReaderDeserializer;
 
 	private Resource resource;
 
@@ -62,11 +60,11 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	}
 
 	/**
-	 * @param unmarshaller maps xml fragments corresponding to
+	 * @param eventReaderDeserializer maps xml fragments corresponding to
 	 * records to objects
 	 */
-	public void setUnmarshaller(Unmarshaller unmarshaller) {
-		this.unmarshaller = unmarshaller;
+	public void setFragmentDeserializer(EventReaderDeserializer eventReaderDeserializer) {
+		this.eventReaderDeserializer = eventReaderDeserializer;
 	}
 
 	/**
@@ -87,7 +85,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	 * @throws IllegalStateException if the Resource does not exist.
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(unmarshaller, "The Unmarshaller must not be null.");
+		Assert.notNull(eventReaderDeserializer, "The FragmentDeserializer must not be null.");
 		Assert.hasLength(fragmentRootElementName, "The FragmentRootElementName must not be null");
 	}
 
@@ -160,21 +158,16 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 	/**
 	 * Move to next fragment and map it to item.
 	 */
-	protected T doRead() throws Exception {
-		
+	protected Object doRead() throws Exception {
 		if (noInput) {
 			return null;
 		}
 		
-		T item = null;
+		Object item = null;
 
 		if (moveCursorToNextFragment(fragmentReader)) {
 			fragmentReader.markStartFragment();
-			
-			@SuppressWarnings("unchecked")
-			T mappedFragment = (T) unmarshaller.unmarshal(new StaxSource(fragmentReader));
-			
-			item = mappedFragment;
+			item = eventReaderDeserializer.deserializeFragment(fragmentReader);
 			fragmentReader.markFragmentProcessed();
 		}
 

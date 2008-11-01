@@ -2,13 +2,14 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
-	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
-		<property name="dataSource" ref="dataSource" />
+	<bean id="dataSource" class="test.jdbc.datasource.InitializingDataSourceFactoryBean">
+		<property name="dataSource" ref="hsql" />
 		<property name="initScripts" value="org/springframework/batch/jms/init.sql" />
-		<property name="destroyScripts" value="org/springframework/batch/jms/destroy.sql" />
+		<property name="destroyScript" value="org/springframework/batch/jms/destroy.sql" />
 	</bean>
 
-	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true">
+	<bean id="hsql" class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true"
+		autowire-candidate="false">
 		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
 		<property name="url" value="jdbc:hsqldb:mem:testdb" />
 	</bean>

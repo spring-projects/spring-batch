@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-infrastructure</artifactId>
-	<version>1.1.3.RELEASE</version>
+  <version>1.1.3.RELEASE</version>
 	<packaging>jar</packaging>
 	<name>Infrastructure</name>
 	<description>
@@ -14,9 +14,6 @@
 		<version>1.1.3.RELEASE</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<properties>
-		<bundle.symbolic.name>${pom.groupId}.infrastructure</bundle.symbolic.name>
-	</properties>
 	<profiles>
 		<profile>
 			<id>clover</id>
@@ -42,8 +39,13 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>com.springsource.bundlor</groupId>
-				<artifactId>com.springsource.bundlor.maven</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -70,6 +72,10 @@
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>backport-util-concurrent</groupId>
+			<artifactId>backport-util-concurrent</artifactId>
 		</dependency>
 		<dependency>
 			<!-- This is just for the JMS spec - could use javax.jms -->
@@ -107,7 +113,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.easymock</groupId>
+			<groupId>easymock</groupId>
 			<artifactId>easymock</artifactId>
 		</dependency>
 		<dependency>
@@ -123,20 +129,22 @@
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
 			<artifactId>spring-oxm</artifactId>
+			<version>1.0.3</version>
+			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-beans</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring-core</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -147,10 +155,7 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<!--
-				Force Hibernate to use a particular nodep version of cglib in case
-				of clash with Spring AOP
-			-->
+			<!-- Force Hibernate to use a particular nodep version of cglib in case of clash with Spring AOP -->
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
 			<optional>true</optional>
@@ -161,13 +166,7 @@
 			<version>2.3.0</version>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>com.springsource.javax.persistence</artifactId>
-			<version>1.0.0</version>
-			<optional>true</optional>
-		</dependency>
-		<!-- Spring Dependencies -->
+<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>

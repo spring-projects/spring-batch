@@ -1,48 +1,44 @@
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.sql.DataSource;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
 /**
  * Tests for {@link HibernateCursorItemReader} using {@link StatelessSession}.
  * 
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "data-source-context.xml")
-public class HibernateCursorProjectionItemReaderIntegrationTests {
+public class HibernateCursorProjectionItemReaderIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	protected ItemReader<?> reader;
+	protected ItemReader reader;
+	protected ExecutionContext executionContext;
 
-	@Autowired
-	protected DataSource dataSource;
+	protected String[] getConfigLocations() {
+		return new String[] { "org/springframework/batch/item/database/data-source-context.xml" };
+	}
 
-	@Before
-	public void onSetUp() throws Exception {
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
+	 */
+	protected void onSetUpInTransaction() throws Exception {
+		super.onSetUpInTransaction();
 		reader = createItemReader();
+		executionContext = new ExecutionContext();
 	}
 
 	
-	protected ItemReader<?> createItemReader() throws Exception {
+	protected ItemReader createItemReader() throws Exception {
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
-		factoryBean.setDataSource(dataSource);
+		factoryBean.setDataSource(super.getJdbcTemplate().getDataSource());
 		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("Foo.hbm.xml", getClass()) });
 		factoryBean.afterPropertiesSet();
 
@@ -50,7 +46,7 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 
 		String hsqlQuery = "select f.value, f.name from Foo f";
 
-		HibernateCursorItemReader<Object> inputSource = new HibernateCursorItemReader<Object>();
+		HibernateCursorItemReader inputSource = new HibernateCursorItemReader();
 		inputSource.setQueryString(hsqlQuery);
 		inputSource.setSessionFactory(sessionFactory);
 		inputSource.afterPropertiesSet();
@@ -59,12 +55,11 @@ public class HibernateCursorProjectionItemReaderIntegrationTests {
 		return inputSource;
 	}
 
-	@Test
-	public void testNormalProcessing() throws Exception {
+	public void testNormalProcessing() throws Exception {	
 		((InitializingBean) reader).afterPropertiesSet();
 		((ItemStream) reader).open(new ExecutionContext());
 		Object[] foo1 = (Object[]) reader.read();
-		assertEquals(1, foo1[0]);
+		assertEquals(new Integer(1), foo1[0]);
 	}
 
 }

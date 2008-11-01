@@ -1,33 +1,18 @@
 package org.springframework.batch.core.repository.dao;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.junit.Assert;
-import org.junit.runner.RunWith;
+import org.springframework.util.ClassUtils;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "sql-dao-test.xml")
 public class JdbcJobInstanceDaoTests extends AbstractJobInstanceDaoTests {
 	
 	protected JobInstanceDao getJobInstanceDao() {
-		deleteFromTables("BATCH_JOB_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
-				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE");
-		return (JobInstanceDao) applicationContext.getBean("jobInstanceDao");
+		deleteFromTables(new String[] { "BATCH_EXECUTION_CONTEXT", "BATCH_STEP_EXECUTION", "BATCH_JOB_EXECUTION",
+				"BATCH_JOB_PARAMS", "BATCH_JOB_INSTANCE" });
+		return (JobInstanceDao) getApplicationContext().getBean("jobInstanceDao");
+	}
+	
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "sql-dao-test.xml") };
 	}
 
-	public void testFindJobInstanceByExecution(){
-		
-		JobExecutionDao jobExecutionDao = (JobExecutionDao) applicationContext.getBean("jobExecutionDao");
-		
-		JobInstance jobInstance = dao.createJobInstance("testInstance", new JobParameters());
-		JobExecution jobExecution = new JobExecution(jobInstance, 2L);
-		jobExecutionDao.saveJobExecution(jobExecution);
-		
-		JobInstance returnedInstance = dao.getJobInstance(jobExecution);
-		Assert.assertEquals(jobInstance, returnedInstance);
-	}
 }

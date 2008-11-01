@@ -21,9 +21,8 @@ package org.springframework.batch.retry;
  * {@link RetryOperations}.
  * 
  * @author Rob Harrop
- * @author Dave Syer
  */
-public interface RetryCallback<T> {
+public interface RetryCallback {
 
 	/**
 	 * Execute an operation with retry semantics. Operations should generally be
@@ -31,7 +30,6 @@ public interface RetryCallback<T> {
 	 * semantics when an operation is retried.
 	 * @param context the current retry context.
 	 * @return the result of the successful operation.
-	 * @throws Exception if processing fails
 	 */
-	T doWithRetry(RetryContext context) throws Exception;
+	Object doWithRetry(RetryContext context) throws Throwable;
 }

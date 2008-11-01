@@ -15,14 +15,13 @@
  */
 package org.springframework.batch.integration.file;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.integration.file.ResourcePayloadAsJobParameterStrategy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.integration.core.Message;
 import org.springframework.integration.message.GenericMessage;
 
 /**
@@ -37,7 +36,7 @@ public class ResourcePayloadAsJobParameterStrategyTests {
 	private static final String INPUT_FILE_PATH = ResourcePayloadAsJobParameterStrategy.FILE_INPUT_PATH;
 
 	/**
-	 * Test method for {@link ResourcePayloadAsJobParameterStrategy#getJobParameters(Message)}.
+	 * Test method for {@link org.springframework.batch.integration.file.ResourcePayloadAsJobParameterStrategy#getJobParameters(org.springframework.integration.message.Message)}.
 	 */
 	@Test
 	public void testGetJobParameters() {
@@ -47,7 +46,7 @@ public class ResourcePayloadAsJobParameterStrategyTests {
 	}
 
 	/**
-	 * Test method for {@link ResourcePayloadAsJobParameterStrategy#getJobParameters(Message)}.
+	 * Test method for {@link org.springframework.batch.integration.file.ResourcePayloadAsJobParameterStrategy#getJobParameters(org.springframework.integration.message.Message)}.
 	 */
 	@Test
 	public void testGetJobParametersWithWrongPayload() {

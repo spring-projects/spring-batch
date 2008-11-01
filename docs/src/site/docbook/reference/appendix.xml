@@ -25,14 +25,12 @@
 
         <tbody>
           <row>
-            <entry
-            align="left">AbstractItemCountingItemStreamItemReader</entry>
+            <entry align="left">AbstractBufferedItemReaderItemStream</entry>
 
             <entry align="left">java.lang.Object</entry>
 
-            <entry align="left">Abstract base class that provides basic
-            restart capabilities by counting the number of items returned from
-            an <classname>ItemReader</classname>.</entry>
+            <entry align="left">Abstract base class that provides bufferring
+            functionality for any subclass.</entry>
           </row>
 
           <row>
@@ -45,12 +43,24 @@
           </row>
 
           <row>
+            <entry align="left">ValidatingItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">A simple extension of DelegatingItemReader
+            that provides for validation before returning input.</entry>
+          </row>
+
+          <row>
             <entry align="left">ItemReaderAdapter</entry>
 
             <entry align="left">java.lang.Object</entry>
 
-            <entry align="left">Adapts any class to the
-            <classname>ItemReader</classname> interface.</entry>
+            <entry align="left">Extends AbstractMethodInvokingDelegator, which
+            enables dynamically calling of a custom method of the injected
+            object. Provides a convenient API for dynamic method invocation
+            shielding subclasses from the low-level details and exception
+            handling.</entry>
           </row>
 
           <row>
@@ -66,6 +76,17 @@
             role="bold">BEGIN_RECORD</emphasis> and
             AggregateItemReader#<emphasis
             role="bold">END_RECORD</emphasis></entry>
+          </row>
+
+          <row>
+            <entry align="left">DelegatingItemReader</entry>
+
+            <entry align="left">java.lang.Object</entry>
+            
+            <entry align="left">Passes all calls to delegate
+            ItemReader and serves as a convenient superclass for
+            implementing ItemReader wrappers, such as ValidatingItemReader
+            </entry>
           </row>
 
           <row>
@@ -133,26 +154,6 @@
             Destination or destination name to send errors, provides items
             received through the injected JmsOperations receive()
             method</entry>
-          </row>
-
-          <row>
-            <entry align="left">JpaPagingItemReader</entry>
-
-            <entry align="left">java.lang.Object</entry>
-
-            <entry align="left">Given a JPQL statement, pages through the
-            rows, such that large datasets can be read without running out of
-            memory</entry>
-          </row>
-
-          <row>
-            <entry align="left">JdbcPagingItemReader</entry>
-
-            <entry align="left">java.lang.Object</entry>
-
-            <entry align="left">Given a SQL statement, pages through the rows,
-            such that large datasets can be read without running out of
-            memory</entry>
           </row>
         </tbody>
       </tgroup>
@@ -222,6 +223,16 @@
           </row>
 
           <row>
+            <entry align="left">DelegatingItemWriter</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Wraps ItemWriter and is BeanAware allowing it
+            to respond to Spring Bean events like
+            afterPropertiesSet().</entry>
+          </row>
+
+          <row>
             <entry align="left">ItemWriterAdapter</entry>
 
             <entry align="left">java.lang.Object</entry>
@@ -243,6 +254,17 @@
           </row>
 
           <row>
+            <entry align="left">ItemTransformerItemWriter</entry>
+
+            <entry align="left">java.lang.Object</entry>
+
+            <entry align="left">Extends <emphasis
+            role="bold">DelegatingItemWriter</emphasis> by defining its
+            <emphasis role="bold">doProcess</emphasis> method to call an
+            injected <emphasis role="bold">ItemTransformer</emphasis></entry>
+          </row>
+
+          <row>
             <entry align="left">FlatFileItemWriter</entry>
 
             <entry align="left">java.lang.Object</entry>
@@ -250,8 +272,8 @@
             <entry align="left">Attempts to convert the item to a <emphasis
             role="bold">String</emphasis>, <emphasis
             role="bold">Collection</emphasis> or array using an injected
-            <emphasis role="bold">Coverter</emphasis> and then
-            recurses.</entry>
+            <emphasis role="bold">Coverter</emphasis> and then recurses. See
+            [HOWTO - Write to a File]</entry>
           </row>
 
           <row>
@@ -262,19 +284,8 @@
             <entry align="left">This item writer is hibernate session aware
             and handles some transaction-related work that a non-"hibernate
             aware" item writer would not need to know about and then delegates
-            to another item writer to do the actual writing. </entry>
-          </row>
-
-          <row>
-            <entry align="left">JpaAwareItemWriter</entry>
-
-            <entry align="left">java.lang.Object</entry>
-
-            <entry align="left">This item writer is JPA EntityManager aware
-            and handles some transaction-related work that a non-"jpa aware"
-            <classname>ItemWriter</classname> would not need to know about and
-            then delegates to another writer to do the actual writing.
-            </entry>
+            to another item writer to do the actual writing. See [HOWTO -
+            Write to a Database]</entry>
           </row>
 
           <row>
@@ -285,7 +296,7 @@
             <entry align="left">Uses an <emphasis
             role="bold">ObjectToXmlSerializer</emphasis> implementation to
             convert each item to XML and then writes it to an XML file using
-            StAX.</entry>
+            StAX. See [HOWTO - Write to a File]</entry>
           </row>
         </tbody>
       </tgroup>

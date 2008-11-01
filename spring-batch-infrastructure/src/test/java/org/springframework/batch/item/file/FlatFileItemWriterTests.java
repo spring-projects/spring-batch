@@ -16,28 +16,22 @@
 
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Writer;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import junit.framework.TestCase;
+
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.file.transform.LineAggregator;
-import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
+import org.springframework.batch.item.file.mapping.DefaultFieldSet;
+import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.mapping.FieldSetCreator;
+import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.util.Assert;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -45,14 +39,14 @@ import org.springframework.util.ClassUtils;
  * in separate TestCase classes with different <code>setUp</code> and
  * <code>tearDown</code> methods
  * 
- * @author Robert Kasanicky
+ * @author robert.kasanicky
  * @author Dave Syer
  * 
  */
-public class FlatFileItemWriterTests {
+public class FlatFileItemWriterTests extends TestCase {
 
 	// object under test
-	private FlatFileItemWriter<String> writer = new FlatFileItemWriter<String>();
+	private FlatFileItemWriter writer = new FlatFileItemWriter();
 
 	// String to be written into file by the FlatFileInputTemplate
 	private static final String TEST_STRING = "FlatFileOutputTemplateTest-OutputData";
@@ -69,13 +63,17 @@ public class FlatFileItemWriterTests {
 	 * Create temporary output file, define mock behaviour, set dependencies and
 	 * initialize the object under test
 	 */
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 
-		outputFile = File.createTempFile("flatfile-test-output-", ".tmp");
+		if (TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.clearSynchronization();
+		}
+		TransactionSynchronizationManager.initSynchronization();
+
+		outputFile = File.createTempFile("flatfile-output-", ".tmp");
 
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		executionContext = new ExecutionContext();
@@ -84,8 +82,7 @@ public class FlatFileItemWriterTests {
 	/**
 	 * Release resources and delete the temporary output file
 	 */
-	@After
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 		if (reader != null) {
 			reader.close();
 		}
@@ -106,21 +103,21 @@ public class FlatFileItemWriterTests {
 
 		return reader.readLine();
 	}
-
-	@Test
-	public void testWriteWithMultipleOpen() throws Exception {
-
+	
+	public void testWriteWithMultipleOpen() throws Exception{
+		
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test1"));
+		writer.write("test1");
+		writer.flush();
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("test2"));
+		writer.write("test2");
+		writer.flush();
 		assertEquals("test1", readLine());
 		assertEquals("test2", readLine());
 	}
-
-	@Test
-	public void testOpenTwice() {
-		// opening the writer twice should cause no issues
+	
+	public void testOpenTwice(){
+		//opening the writer twice should cause no issues
 		writer.open(executionContext);
 		writer.open(executionContext);
 	}
@@ -130,10 +127,10 @@ public class FlatFileItemWriterTests {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
 	public void testWriteString() throws Exception {
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.flush();
 		writer.close(null);
 		String lineFromFile = readLine();
 
@@ -145,19 +142,19 @@ public class FlatFileItemWriterTests {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
 	public void testWriteWithConverter() throws Exception {
-		writer.setLineAggregator(new LineAggregator<String>() {
-			public String aggregate(String item) {
-				return "FOO:" + item;
+		writer.setFieldSetCreator(new FieldSetCreator() {
+			public FieldSet mapItem(Object data) {
+				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
-		String data = "string";
+		Object data = new Object();
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(data));
+		writer.write(data);
+		writer.flush();
 		String lineFromFile = readLine();
 		// converter not used if input is String
-		assertEquals("FOO:" + data, lineFromFile);
+		assertEquals("FOO:" + data.toString(), lineFromFile);
 	}
 
 	/**
@@ -165,15 +162,35 @@ public class FlatFileItemWriterTests {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
+	public void testWriteWithConverterAndInfiniteLoop() throws Exception {
+		writer.setFieldSetCreator(new FieldSetCreator() {
+			public FieldSet mapItem(Object data) {
+				return new DefaultFieldSet(new String[] { "FOO:" + data });
+			}
+		});
+		Object data = new Object();
+		writer.open(executionContext);
+		writer.write(data);
+		writer.flush();
+		String lineFromFile = readLine();
+		// converter not used if input is String
+		assertEquals("FOO:" + data.toString(), lineFromFile);
+	}
+
+	/**
+	 * Regular usage of <code>write(String)</code> method
+	 * 
+	 * @throws Exception
+	 */
 	public void testWriteWithConverterAndString() throws Exception {
-		writer.setLineAggregator(new LineAggregator<String>() {
-			public String aggregate(String item) {
-				return "FOO:" + item;
+		writer.setFieldSetCreator(new FieldSetCreator() {
+			public FieldSet mapItem(Object data) {
+				return new DefaultFieldSet(new String[] { "FOO:" + data });
 			}
 		});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.flush();
 		String lineFromFile = readLine();
 		assertEquals("FOO:" + TEST_STRING, lineFromFile);
 	}
@@ -183,39 +200,70 @@ public class FlatFileItemWriterTests {
 	 * 
 	 * @throws Exception
 	 */
-	@Test
 	public void testWriteRecord() throws Exception {
+		String args = "1";
 		writer.open(executionContext);
-		writer.write(Collections.singletonList("1"));
+		writer.write(args);
+		writer.flush();
 		String lineFromFile = readLine();
-		assertEquals("1", lineFromFile);
+		assertEquals(args, lineFromFile);
 	}
 
-	@Test
 	public void testWriteRecordWithrecordSeparator() throws Exception {
 		writer.setLineSeparator("|");
 		writer.open(executionContext);
-		writer.write(Arrays.asList(new String[] { "1", "2" }));
+		writer.write("1");
+		writer.write("2");
+		writer.flush();
 		String lineFromFile = readLine();
 		assertEquals("1|2|", lineFromFile);
 	}
 
-	@Test
+	public void testRollback() throws Exception {
+		writer.open(executionContext);
+		writer.write("testLine1");
+		// rollback
+		rollback();
+		writer.flush();
+		writer.close(null);
+		String lineFromFile = readLine();
+		assertEquals(null, lineFromFile);
+	}
+
+	public void testCommit() throws Exception {
+		writer.open(executionContext);
+		writer.write("testLine1");
+		// rollback
+		commit();
+		writer.close(null);
+		String lineFromFile = readLine();
+		assertEquals("testLine1", lineFromFile);
+	}
+
 	public void testRestart() throws Exception {
-
-		writer.setFooterCallback(new FileWriterCallback() {
-
-			public void write(Writer writer) throws IOException {
-				writer.write("footer");
-			}
-
-		});
-
+		
 		writer.open(executionContext);
 		// write some lines
-		writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
+		writer.write("testLine1");
+		writer.write("testLine2");
+		writer.write("testLine3");
+
+		// commit
+		commit();
+
+		// this will be rolled back...
+		writer.write("this will be rolled back");
+
+		// rollback
+		rollback();
+
 		// write more lines
-		writer.write(Arrays.asList(new String[] { "testLine4", "testLine5" }));
+		writer.write("testLine4");
+		writer.write("testLine5");
+
+		// commit
+		commit();
+
 		// get restart data
 		writer.update(executionContext);
 		// close template
@@ -223,49 +271,48 @@ public class FlatFileItemWriterTests {
 
 		// init with correct data
 		writer.open(executionContext);
+
 		// write more lines
-		writer.write(Arrays.asList(new String[] { "testLine6", "testLine7", "testLine8" }));
+		writer.write("testLine6");
+		writer.write("testLine7");
+		writer.write("testLine8");
+
+		commit();
+
 		// get statistics
 		writer.update(executionContext);
 		// close template
 		writer.close(executionContext);
 
 		// verify what was written to the file
-		for (int i = 1; i <= 8; i++) {
+		for (int i = 1; i < 9; i++) {
 			assertEquals("testLine" + i, readLine());
 		}
-
-		assertEquals("footer", readLine());
 
 		// 3 lines were written to the file after restart
 		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
 
 	}
-
-	@Test
+	
 	public void testOpenWithNonWritableFile() throws Exception {
-		writer = new FlatFileItemWriter<String>();
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer = new FlatFileItemWriter();
+		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
 		FileSystemResource file = new FileSystemResource("target/no-such-file.foo");
 		writer.setResource(file);
-		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
-		Assert.state(file.exists(), "Test file must exist");
-		Assert.state(file.getFile().setReadOnly(), "Test file set to read-only");
+		file.getFile().setReadOnly();
 		writer.afterPropertiesSet();
 		try {
 			writer.open(executionContext);
 			fail("Expected IllegalStateException");
-		}
-		catch (IllegalStateException e) {
+		} catch (IllegalStateException e) {
 			String message = e.getMessage();
-			assertTrue("Message does not contain 'writable': " + message, message.indexOf("writable") >= 0);
+			assertTrue("Message does not contain 'writable': "+message, message.indexOf("writable")>=0);
 		}
 	}
 
-	@Test
 	public void testAfterPropertiesSetChecksMandatory() throws Exception {
-		writer = new FlatFileItemWriter<String>();
+		writer = new FlatFileItemWriter();
 		try {
 			writer.afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
@@ -275,21 +322,24 @@ public class FlatFileItemWriterTests {
 		}
 	}
 
-	@Test
 	public void testDefaultStreamContext() throws Exception {
-		writer = new FlatFileItemWriter<String>();
+		writer = new FlatFileItemWriter();
 		writer.setResource(new FileSystemResource(outputFile));
-		writer.setLineAggregator(new PassThroughLineAggregator<String>());
+		writer.setFieldSetCreator(new PassThroughFieldSetMapper());
 		writer.afterPropertiesSet();
 		writer.setSaveState(true);
 		writer.open(executionContext);
 		writer.update(executionContext);
 		assertNotNull(executionContext);
-		assertEquals(2, executionContext.entrySet().size());
+		assertEquals(3, executionContext.entrySet().size());
 		assertEquals(0, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".current.count"));
 	}
 
-	@Test
+	/**
+	 * Regular usage of <code>write(String)</code> method
+	 * 
+	 * @throws Exception
+	 */
 	public void testWriteStringWithBogusEncoding() throws Exception {
 		writer.setEncoding("BOGUS");
 		try {
@@ -302,45 +352,27 @@ public class FlatFileItemWriterTests {
 		writer.close(null);
 	}
 
-	@Test
+	/**
+	 * Regular usage of <code>write(String)</code> method
+	 * 
+	 * @throws Exception
+	 */
 	public void testWriteStringWithEncodingAfterClose() throws Exception {
 		testWriteStringWithBogusEncoding();
 		writer.setEncoding("UTF-8");
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.flush();
 		String lineFromFile = readLine();
 
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
-	@Test
-	public void testWriteFooter() throws Exception {
-		writer.setFooterCallback(new FileWriterCallback() {
-
-			public void write(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
-		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(executionContext);
-		assertEquals(TEST_STRING, readLine());
-		assertEquals("a", readLine());
-		assertEquals("b", readLine());
-	}
-
-	@Test
 	public void testWriteHeader() throws Exception {
-		writer.setHeaderCallback(new FileWriterCallback() {
-
-			public void write(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderLines(new String[] {"a", "b"});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.flush();
 		writer.close(null);
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
@@ -350,20 +382,15 @@ public class FlatFileItemWriterTests {
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
-	@Test
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
-		writer.setHeaderCallback(new FileWriterCallback() {
-
-			public void write(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderLines(new String[] {"a", "b"});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.clear();
 		writer.close(executionContext);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.flush();
 		writer.close(executionContext);
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
@@ -375,19 +402,14 @@ public class FlatFileItemWriterTests {
 		assertEquals(null, lineFromFile);
 	}
 
-	@Test
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
-		writer.setHeaderCallback(new FileWriterCallback() {
-
-			public void write(Writer writer) throws IOException {
-				writer.write("a\nb");
-			}
-
-		});
+		writer.setHeaderLines(new String[] {"a", "b"});
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.flush();
 		writer.update(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.clear();
 		writer.close(executionContext);
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
@@ -396,7 +418,8 @@ public class FlatFileItemWriterTests {
 		lineFromFile = readLine();
 		assertEquals(TEST_STRING, lineFromFile);
 		writer.open(executionContext);
-		writer.write(Collections.singletonList(TEST_STRING));
+		writer.write(TEST_STRING);
+		writer.flush();
 		writer.close(executionContext);
 		reader = null;
 		lineFromFile = readLine();
@@ -409,39 +432,12 @@ public class FlatFileItemWriterTests {
 		assertEquals(TEST_STRING, lineFromFile);
 	}
 
-	@Test
-	/**
-	 * Nothing gets written to file if line aggregation fails.
-	 */
-	public void testLineAggregatorFailure() throws Exception {
-
-		writer.setLineAggregator(new LineAggregator<String>() {
-
-			public String aggregate(String item) {
-				if (item.equals("2")) {
-					throw new RuntimeException("aggregation failed on " + item);
-				}
-				return item;
-			}
-		});
-		List<String> items = new ArrayList<String>() {
-			{
-				add("1");
-				add("2");
-				add("3");
-			}
-		};
-
-		writer.open(executionContext);
-		try {
-			writer.write(items);
-			fail();
-		}
-		catch (RuntimeException expected) {
-			assertEquals("aggregation failed on 2", expected.getMessage());
-		}
-		
-		// nothing was written to output
-		assertNull(readLine());
+	private void commit() throws Exception {
+		writer.flush();
 	}
+
+	private void rollback() throws Exception {
+		writer.clear();
+	}
+
 }

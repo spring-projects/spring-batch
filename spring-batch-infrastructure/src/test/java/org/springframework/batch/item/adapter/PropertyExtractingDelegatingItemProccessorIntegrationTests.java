@@ -1,56 +1,57 @@
 package org.springframework.batch.item.adapter;
 
-import static org.junit.Assert.*;
-import org.junit.runner.RunWith;
-import org.junit.Test;
-
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
  * Tests for {@link PropertyExtractingDelegatingItemWriter}
  * 
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "pe-delegating-item-writer.xml")
-public class PropertyExtractingDelegatingItemProccessorIntegrationTests {
+public class PropertyExtractingDelegatingItemProccessorIntegrationTests extends
+        AbstractDependencyInjectionSpringContextTests {
 
-	@Autowired
-	private PropertyExtractingDelegatingItemWriter<Foo> processor;
+	private PropertyExtractingDelegatingItemWriter processor;
 
-	@Autowired
 	private FooService fooService;
 
-	/*
+	protected String getConfigPath() {
+		return "pe-delegating-item-writer.xml";
+	}
+
+	/**
 	 * Regular usage scenario - input object should be passed to the service the injected invoker points to.
 	 */
-	@Test
 	public void testProcess() throws Exception {
 		Foo foo;
 		while ((foo = fooService.generateFoo()) != null) {
-			processor.write(Collections.singletonList(foo));
+			processor.write(foo);
 		}
 
-		List<Foo> input = fooService.getGeneratedFoos();
-		List<Foo> processed = fooService.getProcessedFooNameValuePairs();
+		List input = fooService.getGeneratedFoos();
+		List processed = fooService.getProcessedFooNameValuePairs();
 		assertEquals(input.size(), processed.size());
 		assertFalse(fooService.getProcessedFooNameValuePairs().isEmpty());
 
 		for (int i = 0; i < input.size(); i++) {
-			Foo inputFoo = input.get(i);
-			Foo outputFoo = processed.get(i);
+			Foo inputFoo = (Foo) input.get(i);
+			Foo outputFoo = (Foo) processed.get(i);
 			assertEquals(inputFoo.getName(), outputFoo.getName());
 			assertEquals(inputFoo.getValue(), outputFoo.getValue());
 			assertEquals(0, outputFoo.getId());
 		}
 
+	}
+
+	public void setProcessor(PropertyExtractingDelegatingItemWriter processor) {
+		this.processor = processor;
+	}
+
+	public void setFooService(FooService fooService) {
+		this.fooService = fooService;
 	}
 
 }

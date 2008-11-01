@@ -16,11 +16,7 @@
 
 package org.springframework.batch.core;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -45,9 +41,7 @@ public class StepExecution extends Entity {
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
-	private volatile int readCount = 0;
-
-	private volatile int writeCount = 0;
+	private volatile int itemCount = 0;
 
 	private volatile int commitCount = 0;
 
@@ -55,25 +49,17 @@ public class StepExecution extends Entity {
 
 	private volatile int readSkipCount = 0;
 	
-	private volatile int processSkipCount = 0;
-
 	private volatile int writeSkipCount = 0;
 
 	private volatile Date startTime = new Date(System.currentTimeMillis());
 
 	private volatile Date endTime = null;
 
-	private volatile Date lastUpdated = null;
-
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
 	private volatile ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
 	private volatile boolean terminateOnly;
-
-	private volatile int filterCount;
-	
-	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
 	 * Constructor with mandatory properties.
@@ -83,11 +69,10 @@ public class StepExecution extends Entity {
 	 * @param id the id of this execution
 	 */
 	public StepExecution(String stepName, JobExecution jobExecution, Long id) {
-		this(stepName, jobExecution);
-		Assert.notNull(jobExecution, "JobExecution must be provided to re-hydrate an existing StepExecution");
-		Assert.notNull(id, "The entity Id must be provided to re-hydrate an existing StepExecution");
-		setId(id);
-		jobExecution.addStepExecution(this);
+		super(id);
+		Assert.hasLength(stepName);
+		this.stepName = stepName;
+		this.jobExecution = jobExecution;
 	}
 
 	/**
@@ -97,10 +82,7 @@ public class StepExecution extends Entity {
 	 * @param jobExecution the current job execution
 	 */
 	public StepExecution(String stepName, JobExecution jobExecution) {
-		super();
-		Assert.hasLength(stepName);
-		this.stepName = stepName;
-		this.jobExecution = jobExecution;
+		this(stepName, jobExecution, null);
 	}
 
 	/**
@@ -126,8 +108,8 @@ public class StepExecution extends Entity {
 	 * 
 	 * @return the current number of commits
 	 */
-	public int getCommitCount() {
-		return commitCount;
+	public Integer getCommitCount() {
+		return new Integer(commitCount);
 	}
 
 	/**
@@ -156,41 +138,23 @@ public class StepExecution extends Entity {
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
-	
+
 	/**
-	 * Returns the current number of items read for this execution
+	 * Returns the current number of items processed for this execution
 	 * 
-	 * @return the current number of items read for this execution
+	 * @return the current number of items processed for this execution
 	 */
-	public int getReadCount() {
-		return readCount;
+	public Integer getItemCount() {
+		return new Integer(itemCount);
 	}
 
 	/**
-	 * Sets the current number of read items for this execution
+	 * Sets the current number of processed items for this execution
 	 * 
-	 * @param readCount the current number of read items for this execution
+	 * @param itemCount the current number of processed items for this execution
 	 */
-	public void setReadCount(int readCount) {
-		this.readCount = readCount;
-	}
-
-	/**
-	 * Returns the current number of items written for this execution
-	 * 
-	 * @return the current number of items written for this execution
-	 */
-	public int getWriteCount() {
-		return writeCount;
-	}
-
-	/**
-	 * Sets the current number of written items for this execution
-	 * 
-	 * @param writeCount the current number of written items for this execution
-	 */
-	public void setWriteCount(int writeCount) {
-		this.writeCount = writeCount;
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
 	}
 
 	/**
@@ -198,25 +162,8 @@ public class StepExecution extends Entity {
 	 * 
 	 * @return the current number of rollbacks for this execution
 	 */
-	public int getRollbackCount() {
-		return rollbackCount;
-	}
-
-	/**
-	 * Returns the current number of items filtered out of this execution
-	 * 
-	 * @return the current number of items filtered out of this execution
-	 */
-	public int getFilterCount() {
-		return filterCount;
-	}
-	
-	/**
-	 * Public setter for the number of items filtered out of this execution.
-	 * @param filterCount the number of items filtered out of this execution to set
-	 */
-	public void setFilterCount(int filterCount) {
-		this.filterCount = filterCount;
+	public Integer getRollbackCount() {
+		return new Integer(rollbackCount);
 	}
 
 	/**
@@ -281,6 +228,38 @@ public class StepExecution extends Entity {
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.container.common.domain.Entity#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+
+		Object jobExecutionId = getJobExecutionId();
+		if (jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
+			return super.equals(obj);
+		}
+		StepExecution other = (StepExecution) obj;
+
+		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
+	 */
+	public int hashCode() {
+		Object jobExecutionId = getJobExecutionId();
+		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0) + 91
+				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
+	}
+
+	public String toString() {
+		return super.toString() + ", name=" + stepName + ", itemCount=" + itemCount + ", commitCount="
+				+ commitCount + ", rollbackCount=" + rollbackCount;
+	}
+
 	/**
 	 * @param exitStatus
 	 */
@@ -322,12 +301,12 @@ public class StepExecution extends Entity {
 	 * @param contribution
 	 */
 	public synchronized void apply(StepContribution contribution) {
+		itemCount += contribution.getItemCount();
+		commitCount += contribution.getCommitCount();
+		
+		contribution.combineSkipCounts();
 		readSkipCount += contribution.getReadSkipCount();
 		writeSkipCount += contribution.getWriteSkipCount();
-		processSkipCount += contribution.getProcessSkipCount();
-		filterCount += contribution.getFilterCount();
-		readCount += contribution.getReadCount();
-		writeCount += contribution.getWriteCount();
 	}
 
 	/**
@@ -352,18 +331,16 @@ public class StepExecution extends Entity {
 		this.terminateOnly = true;
 	}
 
-	/**
-	 * @return the total number of items skipped.
-	 */
 	public int getSkipCount() {
-		return readSkipCount + processSkipCount + writeSkipCount;
+		return readSkipCount + writeSkipCount;
 	}
 
-	/**
-	 * Increment the number of commits
-	 */
-	public void incrementCommitCount() {
-		commitCount++;
+	public void incrementReadSkipCountBy(int count) {
+		readSkipCount += count;
+	}
+	
+	public void incrementWriteSkipCountBy(int count) {
+		writeSkipCount += count;
 	}
 
 	/**
@@ -379,120 +356,20 @@ public class StepExecution extends Entity {
 		return jobExecution.getJobInstance().getJobParameters();
 	}
 
-	/**
-	 * @return the number of records skipped on read
-	 */
-	public int getReadSkipCount() {
-		return readSkipCount;
+	public Integer getReadSkipCount() {
+		return new Integer(readSkipCount);
 	}
 
-	/**
-	 * @return the number of records skipped on write
-	 */
-	public int getWriteSkipCount() {
-		return writeSkipCount;
+	public Integer getWriteSkipCount() {
+		return new Integer(writeSkipCount);
 	}
 
-	/**
-	 * Set the number of records skipped on read
-	 * 
-	 * @param readSkipCount
-	 */
 	public void setReadSkipCount(int readSkipCount) {
 		this.readSkipCount = readSkipCount;
 	}
 
-	/**
-	 * Set the number of records skipped on write
-	 * 
-	 * @param writeSkipCount
-	 */
 	public void setWriteSkipCount(int writeSkipCount) {
 		this.writeSkipCount = writeSkipCount;
-	}
-	
-	/**
-	 * @return the number of records skipped during processing
-	 */
-	public int getProcessSkipCount() {
-		return processSkipCount;
-	}
-
-	/**
-	 * Set the number of records skipped during processing.
-	 * 
-	 * @param processSkipCount
-	 */
-	public void setProcessSkipCount(int processSkipCount) {
-		this.processSkipCount = processSkipCount;
-	}
-
-	/**
-	 * @return the Date representing the last time this execution was persisted.
-	 */
-	public Date getLastUpdated() {
-		return lastUpdated;
-	}
-
-	/**
-	 * Set the time when the StepExecution was last updated before persisting
-	 * 
-	 * @param lastUpdated
-	 */
-	public void setLastUpdated(Date lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
-	
-	public List<Throwable> getFailureExceptions() {
-		return failureExceptions;
-	}
-	
-	public void addFailureException(Throwable throwable){
-		this.failureExceptions.add(throwable);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.container.common.domain.Entity#equals(java.
-	 * lang.Object)
-	 */
-	public boolean equals(Object obj) {
-
-		Object jobExecutionId = getJobExecutionId();
-		if (jobExecutionId == null || !(obj instanceof StepExecution) || getId() == null) {
-			return super.equals(obj);
-		}
-		StepExecution other = (StepExecution) obj;
-
-		return stepName.equals(other.getStepName()) && (jobExecutionId.equals(other.getJobExecutionId()));
-	}
-
-	/**
-	 * Deserialise and ensure transient fields are re-instantiated when read back
-	 */
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		failureExceptions = new ArrayList<Throwable>();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.container.common.domain.Entity#hashCode()
-	 */
-	public int hashCode() {
-		Object jobExecutionId = getJobExecutionId();
-		return super.hashCode() + 31 * (stepName != null ? stepName.hashCode() : 0) + 91
-				* (jobExecutionId != null ? jobExecutionId.hashCode() : 0);
-	}
-
-	public String toString() {
-		return super.toString()
-				+ String.format(", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
-						+ ", commitCount=%d, rollbackCount=%d", stepName, status, exitStatus, readCount, filterCount, writeCount, readSkipCount, writeSkipCount,
-						commitCount, rollbackCount);
 	}
 
 }

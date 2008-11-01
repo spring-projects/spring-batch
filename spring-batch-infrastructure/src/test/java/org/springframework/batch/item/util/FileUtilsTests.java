@@ -5,11 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import junit.framework.TestCase;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.util.Assert;
 
@@ -18,7 +15,7 @@ import org.springframework.util.Assert;
  *
  * @author Robert Kasanicky
  */
-public class FileUtilsTests {
+public class FileUtilsTests extends TestCase {
 
 	private File file = new File("FileUtilsTests.tmp");
 
@@ -26,7 +23,6 @@ public class FileUtilsTests {
 	 * No restart + file should not be overwritten => file is created if it does
 	 * not exist, exception is thrown if it already exists
 	 */
-	@Test
 	public void testNoRestart() throws Exception {
 		FileUtils.setUpOutputFile(file, false, false);
 		assertTrue(file.exists());
@@ -62,7 +58,6 @@ public class FileUtilsTests {
 	 * In case of restart, the file is supposed to exist and exception is thrown
 	 * if it does not.
 	 */
-	@Test
 	public void testRestart() throws Exception {
 		try {
 			FileUtils.setUpOutputFile(file, true, false);
@@ -91,7 +86,6 @@ public class FileUtilsTests {
 	/**
 	 * If the directories on the file path do not exist, they should be created
 	 */
-	@Test
 	public void testCreateDirectoryStructure() {
 		File file = new File("testDirectory/testDirectory2/testFile.tmp");
 		File dir1 = new File("testDirectory");
@@ -110,7 +104,6 @@ public class FileUtilsTests {
 		}
 	}
 
-	@Test
 	public void testBadFile(){
 
 		File file = new File("new file"){
@@ -128,35 +121,28 @@ public class FileUtilsTests {
 		}
 	}
 	
-	@Test
 	public void testCouldntCreateFile(){
 
 		File file = new File("new file"){
-			
-			@Override
 			public boolean exists() {
 				return false;
 			}
-			
 		};
 		try{
 			FileUtils.setUpOutputFile(file, false, false);
 			fail();
-		}catch(ItemStreamException ex){
-			String message = ex.getMessage();
-			assertTrue("Wrong message: "+message, message.startsWith("Output file was not created"));
+		}catch(IllegalStateException ex){
+			assertEquals("Output file must exist", ex.getMessage());
 		}finally{
 			file.delete();
 		}
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		Assert.state(!file.exists());
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
 		file.delete();
 	}
 

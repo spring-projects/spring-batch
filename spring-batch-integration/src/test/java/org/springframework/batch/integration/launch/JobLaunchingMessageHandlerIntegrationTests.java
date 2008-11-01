@@ -4,9 +4,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,13 +13,10 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.integration.JobSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.bus.MessageBus;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.core.MessageHeaders;
-import org.springframework.integration.core.MessagingException;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.message.Message;
+import org.springframework.integration.message.MessageHandlingException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -32,36 +26,31 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class JobLaunchingMessageHandlerIntegrationTests {
 
 	@Autowired
-	private MessageBus bus;
-
-	@Autowired
 	@Qualifier("requests")
 	private MessageChannel requestChannel;
 
 	@Autowired
 	@Qualifier("response")
-	private PollableChannel responseChannel;
+	private MessageChannel responseChannel;
 
 	private JobSupport job = new JobSupport("testJob");
 
 	@Before
 	public void setUp() {
+		requestChannel.purge(null);
 		responseChannel.purge(null);
-		bus.start();
 	}
 
 	@Test
 	@DirtiesContext
 	@SuppressWarnings("unchecked")
 	public void testNoReply() {
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job,
-				new JobParameters()));
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job, new JobParameters()));
 		try {
 			requestChannel.send(trigger);
-		}
-		catch (MessagingException e) {
+		} catch (MessageHandlingException e) {
 			String message = e.getMessage();
-			assertTrue("Wrong message: " + message, message.contains("reply channel"));
+			assertTrue("Wrong message: "+message, message.contains("reply channel"));
 		}
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
@@ -74,17 +63,14 @@ public class JobLaunchingMessageHandlerIntegrationTests {
 	public void testReply() {
 		JobParametersBuilder builder = new JobParametersBuilder();
 		builder.addString("dontclash", "12");
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(MessageHeaders.REPLY_CHANNEL, "response");
-		MessageHeaders headers = new MessageHeaders(map);
-		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job,
-				builder.toJobParameters()), headers);
+		GenericMessage<JobLaunchRequest> trigger = new GenericMessage<JobLaunchRequest>(new JobLaunchRequest(job, builder.toJobParameters()));
+		trigger.getHeader().setReturnAddress("response");
 		requestChannel.send(trigger);
 		Message<JobExecution> executionMessage = (Message<JobExecution>) responseChannel.receive(1000);
 
 		assertNotNull("No response received", executionMessage);
 		JobExecution execution = executionMessage.getPayload();
-		assertNotNull("JobExecution not returned", execution);
+		assertNotNull("JobExectuion not returned", execution);
 	}
 
 }

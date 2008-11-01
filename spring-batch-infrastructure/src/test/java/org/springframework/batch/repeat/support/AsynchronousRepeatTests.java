@@ -16,13 +16,13 @@
 
 package org.springframework.batch.repeat.support;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.callback.ItemReaderRepeatCallback;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
@@ -39,16 +39,16 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
 		final String threadName = Thread.currentThread().getName();
-		final Set<String> threadNames = new HashSet<String>();
+		final Set threadNames = new HashSet();
 
 		final RepeatCallback callback = new RepeatCallback() {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
-				Trade item = provider.read();
+				Object item = provider.read();
 				if (item!=null) {
-					processor.write(Collections.singletonList(item));
+					processor.write(item);
 				}
 				return new ExitStatus(item!=null);
 			}
@@ -75,9 +75,9 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		jobTemplate.setTaskExecutor(taskExecutor);
 
 		final String threadName = Thread.currentThread().getName();
-		final Set<String> threadNames = new HashSet<String>();
+		final Set threadNames = new HashSet();
 
-		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
+		final RepeatCallback stepCallback = new ItemReaderRepeatCallback(provider, processor) {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());

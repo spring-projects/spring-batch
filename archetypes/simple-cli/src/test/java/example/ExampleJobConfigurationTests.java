@@ -15,27 +15,32 @@
  */
 package example;
 
-import static org.junit.Assert.assertNotNull;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
  * @author Dave Syer
  *
  */
-@ContextConfiguration(locations={"/launch-context.xml"})
-@RunWith(SpringJUnit4ClassRunner.class)
-public class ExampleJobConfigurationTests {
+public class ExampleJobConfigurationTests extends AbstractDependencyInjectionSpringContextTests {
 	
-	@Autowired
 	private JobLauncher jobLauncher;
 	
-	@Test
+	/**
+	 * Public setter for the {@link JobLauncher}.
+	 * @param jobLauncher the {@link JobLauncher} to set
+	 */
+	public void setJobLauncher(JobLauncher jobLauncher) {
+		this.jobLauncher = jobLauncher;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.test.AbstractSingleSpringContextTests#getConfigLocations()
+	 */
+	protected String[] getConfigLocations() {
+		return new String[] {"example/simpleJob.xml"};
+	}
+	
 	public void testSimpleProperties() throws Exception {
 		assertNotNull(jobLauncher);
 	}

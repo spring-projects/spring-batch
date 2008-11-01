@@ -22,14 +22,13 @@ package org.springframework.batch.retry;
  * 
  * @since 1.1
  */
-public interface RecoveryCallback<T> {
+public interface RecoveryCallback {
 
 	/**
 	 * @param context the current retry context
 	 * @return an Object that can be used to replace the callback result that
 	 * failed
-	 * @throws Exception 
 	 */
-	T recover(RetryContext context) throws Exception;
+	Object recover(RetryContext context);
 
 }

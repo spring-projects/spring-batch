@@ -15,37 +15,28 @@
  */
 package org.springframework.batch.item.database;
 
-import java.util.Map;
-
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.MultipleColumnJdbcKeyCollector;
-import org.springframework.batch.item.sample.Foo;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Lucas Ward
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "data-source-context.xml")
-@SuppressWarnings("deprecation")
 public class MultipleColumnJdbcDrivingQueryItemReaderIntegrationTests extends
 		AbstractJdbcItemReaderIntegrationTests {
 
-	protected ItemReader<Foo> createItemReader() throws Exception {
+	protected ItemReader createItemReader() throws Exception {
 
-		MultipleColumnJdbcKeyCollector<Map<?,?>> keyGenerator =
-			new MultipleColumnJdbcKeyCollector<Map<?,?>>(simpleJdbcTemplate.getJdbcOperations(),
+		MultipleColumnJdbcKeyCollector keyGenerator =
+			new MultipleColumnJdbcKeyCollector(getJdbcTemplate(),
 					"SELECT ID, VALUE from T_FOOS order by ID, VALUE");
 
 		keyGenerator.setRestartSql("SELECT ID, VALUE from T_FOOS where ID > ? and VALUE > ? order by ID");
-		DrivingQueryItemReader<Map<?,?>> inputSource = new DrivingQueryItemReader<Map<?,?>>();
+		DrivingQueryItemReader inputSource = new DrivingQueryItemReader();
 		inputSource.setSaveState(true);
 		inputSource.setKeyCollector(keyGenerator);
-		FooItemReader fooItemReader = new FooItemReader(inputSource, dataSource);
-		fooItemReader.setFooDao(new CompositeKeyFooDao(dataSource));
+		FooItemReader fooItemReader = new FooItemReader(inputSource, getJdbcTemplate());
+		fooItemReader.setFooDao(new CompositeKeyFooDao(getJdbcTemplate()));
 		return fooItemReader;
 	}
 

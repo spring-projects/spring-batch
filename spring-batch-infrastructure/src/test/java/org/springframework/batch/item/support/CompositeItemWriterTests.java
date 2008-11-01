@@ -1,16 +1,14 @@
 package org.springframework.batch.item.support;
 
-import static org.easymock.EasyMock.createStrictMock;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.easymock.MockControl;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.CompositeItemWriter;
 
 /**
  * Tests for {@link CompositeItemWriter}
@@ -20,37 +18,38 @@ import org.springframework.batch.item.ItemWriter;
 public class CompositeItemWriterTests extends TestCase {
 
 	// object under test
-	private CompositeItemWriter<Object> itemProcessor = new CompositeItemWriter<Object>();
+	private CompositeItemWriter itemProcessor = new CompositeItemWriter();
 	
 	/**
 	 * Regular usage scenario.
 	 * All injected processors should be called.
 	 */
-	
 	public void testProcess() throws Exception {
 		
-		final int NUMBER_OF_WRITERS = 10;
-		List<Object> data = Collections.singletonList(new Object());
+		final int NUMBER_OF_PROCESSORS = 10;
+		Object data = new Object();
 		
-		@SuppressWarnings("unchecked")
-		ItemWriter<Object>[] writers = new ItemWriter[NUMBER_OF_WRITERS];
+		List controls = new ArrayList(NUMBER_OF_PROCESSORS);
+		List processors = new ArrayList(NUMBER_OF_PROCESSORS);
 		
-		for (int i = 0; i < NUMBER_OF_WRITERS; i++) {
-			@SuppressWarnings("unchecked")
-			ItemWriter<Object> writer = createStrictMock(ItemWriter.class);
+		for (int i = 0; i < NUMBER_OF_PROCESSORS; i++) {
+			MockControl control = MockControl.createStrictControl(ItemWriter.class);
+			ItemWriter processor = (ItemWriter) control.getMock();
 			
-			writer.write(data);
-			expectLastCall().once();
-			replay(writer);
+			processor.write(data);
+			control.setVoidCallable();
+			control.replay();
 			
-			writers[i] = writer;
+			processors.add(processor);
+			controls.add(control);
 		}
 		
-		itemProcessor.setDelegates(writers);
+		itemProcessor.setDelegates(processors);
 		itemProcessor.write(data);
 		
-		for (ItemWriter<Object> writer : writers) {
-			verify(writer);
+		for (Iterator iterator = controls.iterator(); iterator.hasNext();) {
+			MockControl control = (MockControl) iterator.next();
+			control.verify();
 		}
 	}
 	

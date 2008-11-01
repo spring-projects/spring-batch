@@ -11,9 +11,8 @@
 		http://www.springframework.org/schema/integration
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-	<integration:message-bus auto-startup="false" enable-annotations="true"/>
+	<integration:message-bus auto-create-channels="true" />
+	<integration:annotation-driven/>
 	<integration:channel id="resources" />
-	<integration:channel id="requests">
-		<integration:queue capacity="UNBOUNDED"/>
-	</integration:channel>
+	<integration:channel id="requests" />
 </beans>

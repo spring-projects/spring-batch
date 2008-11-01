@@ -45,16 +45,16 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 
 	private RetryOperations retryOperations = new RetryTemplate();
 
-	public void setRetryOperations(RetryOperations retryTemplate) {
+	public void setRetryTemplate(RetryOperations retryTemplate) {
 		Assert.notNull(retryTemplate, "'retryOperations' cannot be null.");
 		this.retryOperations = retryTemplate;
 	}
 
 	public Object invoke(final MethodInvocation invocation) throws Throwable {
 
-		return this.retryOperations.execute(new RetryCallback<Object>() {
+		return this.retryOperations.execute(new RetryCallback() {
 
-			public Object doWithRetry(RetryContext context) throws Exception {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 
 				/*
 				 * If we don't copy the invocation carefully it won't keep a
@@ -64,17 +64,8 @@ public class RetryOperationsInterceptor implements MethodInterceptor {
 				 * implementation come along?).
 				 */
 				if (invocation instanceof ProxyMethodInvocation) {
-					try {
-						return ((ProxyMethodInvocation) invocation)
-								.invocableClone().proceed();
-					}
-					catch (Exception e) {
-						throw e;
-					} catch (Error e) {
-						throw e;
-					} catch (Throwable e) {
-						throw new IllegalStateException(e);
-					}
+					return ((ProxyMethodInvocation) invocation)
+							.invocableClone().proceed();
 				} else {
 					throw new IllegalStateException(
 							"MethodInvocation of the wrong type detected - this should not happen with Spring AOP, so please raise an issue if you see this exception");

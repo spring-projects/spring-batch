@@ -67,7 +67,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 
 	public void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		final List<String> list = new ArrayList<String>();
+		final List list = new ArrayList();
 		((Advised) service).addAdvice(new MethodInterceptor() {
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				list.add("chain");
@@ -76,7 +76,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		});
 		RetryTemplate template = new RetryTemplate();
 		template.setRetryPolicy(new SimpleRetryPolicy(2));
-		interceptor.setRetryOperations(template);
+		interceptor.setRetryTemplate(template);
 		service.service();
 		assertEquals(2, count);
 		assertEquals(2, list.size());
@@ -86,7 +86,7 @@ public class RetryOperationsInterceptorTests extends TestCase {
 		((Advised) service).addAdvice(interceptor);
 		RetryTemplate template = new RetryTemplate();
 		template.setRetryPolicy(new NeverRetryPolicy());
-		interceptor.setRetryOperations(template);
+		interceptor.setRetryTemplate(template);
 		try {
 			service.service();
 			fail("Expected Exception.");

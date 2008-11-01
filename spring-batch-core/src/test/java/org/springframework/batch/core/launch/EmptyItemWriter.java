@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.launch;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -27,10 +28,10 @@ import org.springframework.batch.support.transaction.TransactionAwareProxyFactor
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * Mock {@link ItemWriter} that will throw an exception when a certain number of
- * items have been written.
+ * Mock {@link ItemWriter} that will throw an exception when a certain
+ * number of items have been written. 
  */
-public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
+public class EmptyItemWriter implements ItemWriter, InitializingBean {
 
 	private boolean failed = false;
 
@@ -39,37 +40,36 @@ public class EmptyItemWriter<T> implements ItemWriter<T>, InitializingBean {
 
 	protected Log logger = LogFactory.getLog(EmptyItemWriter.class);
 
-	List<Object> list;
+	List list;
 
 	public void afterPropertiesSet() throws Exception {
-		list = TransactionAwareProxyFactory.createTransactionalList();
+		TransactionAwareProxyFactory factory = new TransactionAwareProxyFactory(new ArrayList());
+		list = (List) factory.createInstance();
 	}
 
 	public void setFailurePoint(int failurePoint) {
 		this.failurePoint = failurePoint;
 	}
 
-	public void write(List<? extends T> items) {
-		for (T data : items) {
-			if (!failed && list.size() == failurePoint) {
-				failed = true;
-				throw new RuntimeException("Failed processing: [" + data + "]");
-			}
-			logger.info("Processing: [" + data + "]");
-			list.add(data);
+	public void write(Object data) {
+		if (!failed && list.size() == failurePoint) {
+			failed = true;
+			throw new RuntimeException("Failed processing: [" + data + "]");
 		}
+		logger.info("Processing: [" + data + "]");
+		list.add(data);
 	}
 
-	public List<Object> getList() {
+	public List getList() {
 		return list;
 	}
 
 	public void clear() throws ClearFailedException {
-		// no-op
+		//no-op
 	}
 
 	public void flush() throws FlushFailedException {
-		// no-op
+		//no-op
 	}
 
 }

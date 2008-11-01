@@ -16,6 +16,7 @@
 
 package org.springframework.batch.retry;
 
+
 /**
  * A {@link RetryPolicy} is responsible for allocating and managing resources
  * needed by {@link RetryOperations}. The {@link RetryPolicy} allows retry
@@ -36,19 +37,28 @@ public interface RetryPolicy {
 	boolean canRetry(RetryContext context);
 
 	/**
+	 * @param context the current context.
+	 * @return true if the policy determines that the last exception should be
+	 * re-thrown.
+	 */
+	boolean shouldRethrow(RetryContext context);
+
+	/**
 	 * Acquire resources needed for the retry operation. The callback is passed
 	 * in so that marker interfaces can be used and a manager can collaborate
 	 * with the callback to set up some state in the status token.
-	 * @param parent the parent context if we are in a nested retry.
 	 * 
+	 * @param callback the {@link RetryCallback} that will execute the unit of
+	 * work for this retry.
+	 * @param parent the parent context if we are in a nested retry.
 	 * @return a {@link RetryContext} object specific to this manager.
 	 * 
 	 */
-	RetryContext open(RetryContext parent);
+	RetryContext open(RetryCallback callback, RetryContext parent);
 
 	/**
-	 * @param context a retry status created by the
-	 * {@link #open(RetryContext)} method of this manager.
+	 * @param context a retry status created by the {@link #open(RetryCallback, RetryContext)}
+	 * method of this manager.
 	 */
 	void close(RetryContext context);
 
@@ -57,7 +67,19 @@ public interface RetryPolicy {
 	 * 
 	 * @param context the current status object.
 	 * 
+	 * @throws TerminatedRetryException if the status is set to terminate only.
+	 * 
 	 */
-	void registerThrowable(RetryContext context, Exception throwable);
+	void registerThrowable(RetryContext context, Throwable throwable) throws TerminatedRetryException;
 
+	/**
+	 * Handle an exhausted retry. Default will be to throw an exception, but
+	 * implementations may provide recovery path.
+	 * 
+	 * @param context the current retry context.
+	 * @return an appropriate value possibly from the callback.
+	 * 
+	 * @throws ExhaustedRetryException if there is no recovery path.
+	 */
+	Object handleRetryExhausted(RetryContext context) throws ExhaustedRetryException;
 }

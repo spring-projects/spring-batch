@@ -21,61 +21,70 @@ import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Collections;
 
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.channel.ThreadLocalChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.message.MessageConsumer;
+import org.springframework.integration.dispatcher.DirectChannel;
+import org.springframework.integration.endpoint.HandlerEndpoint;
+import org.springframework.integration.handler.MessageHandler;
+import org.springframework.integration.message.Message;
+import org.springframework.integration.message.MessageTarget;
 import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Dave Syer
- * 
+ *
  */
 public class MessageChannelItemWriterTests {
 
 	/**
-	 * Test method for
-	 * {@link MessageChannelItemWriter#setChannel(MessageChannel)} .
+	 * Test method for {@link org.springframework.batch.integration.item.MessageChannelItemWriter#setChannel(org.springframework.integration.channel.MessageChannel)}.
 	 */
 	@Test
 	public void testSetChannel() {
-		Method method = ReflectionUtils.findMethod(MessageChannelItemWriter.class, "setChannel",
-				new Class<?>[] { MessageChannel.class });
+		Method method = ReflectionUtils.findMethod(MessageChannelItemWriter.class, "setChannel", new Class<?>[] {MessageChannel.class});
 		assertNotNull(method);
 		Annotation[] annotations = AnnotationUtils.getAnnotations(method);
 		assertEquals(1, annotations.length);
 		assertEquals(Required.class, annotations[0].annotationType());
 	}
 
+	/**
+	 * Test method for {@link org.springframework.batch.integration.item.MessageChannelItemWriter#write(java.lang.Object)}.
+	 * @throws Exception 
+	 */
 	@Test
 	public void testWrite() throws Exception {
+		DirectChannel channel = new DirectChannel();
 		ThreadLocalChannel receiver = new ThreadLocalChannel();
-		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
-		writer.setChannel(receiver);
-		writer.write(Collections.singletonList("foo"));
+		channel.subscribe(receiver);
+		MessageChannelItemWriter writer = new MessageChannelItemWriter();
+		writer.setChannel(channel);
+		writer.write("foo");
 		Message<?> message = receiver.receive(10);
 		assertNotNull(message);
 		assertEquals("foo", message.getPayload());
 	}
 
+	/**
+	 * Test method for {@link org.springframework.batch.integration.item.MessageChannelItemWriter#write(java.lang.Object)}.
+	 * @throws Exception 
+	 */
 	@Test
 	public void testWriteWithRollback() throws Exception {
 		DirectChannel channel = new DirectChannel();
-		channel.subscribe(new MessageConsumer() {
-			public void onMessage(Message<?> message) {
+		channel.subscribe(new MessageTarget() {
+			public boolean send(Message<?> message) {
 				throw new RuntimeException("Planned failure");
 			}
 		});
-		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
+		MessageChannelItemWriter writer = new MessageChannelItemWriter();
 		writer.setChannel(channel);
 		try {
-			writer.write(Collections.singletonList("foo"));
+			writer.write("foo");
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
@@ -83,23 +92,33 @@ public class MessageChannelItemWriterTests {
 		}
 	}
 
+	/**
+	 * Test method for {@link org.springframework.batch.integration.item.MessageChannelItemWriter#write(java.lang.Object)}.
+	 * @throws Exception 
+	 */
 	@Test
 	public void testWriteWithRollbackOnEndpoint() throws Exception {
 		DirectChannel channel = new DirectChannel();
-		channel.subscribe(new MessageConsumer() {
-			public void onMessage(Message<?> message) {
+		HandlerEndpoint endpoint = new HandlerEndpoint(new MessageHandler() {
+			public Message<?> handle(Message<?> message) {
 				throw new RuntimeException("Planned failure");
 			}
 		});
-		MessageChannelItemWriter<String> writer = new MessageChannelItemWriter<String>();
+		// INT-184: this shouldn't be necessary?
+//		endpoint.setErrorHandler(new ErrorHandler() {
+//			public void handle(Throwable t) {
+//				throw (RuntimeException)t;
+//			}
+//		});
+		channel.subscribe(endpoint);
+		endpoint.start();
+		MessageChannelItemWriter writer = new MessageChannelItemWriter();
 		writer.setChannel(channel);
 		try {
-			writer.write(Collections.singletonList("foo"));
+			writer.write("foo");
 			fail("Expected RuntimeException");
 		}
 		catch (RuntimeException e) {
-			// INT-377: this assertion fails because the exception is wrapped
-			// too tightly
 			assertEquals("Planned failure", e.getMessage());
 		}
 	}

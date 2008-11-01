@@ -1,9 +1,9 @@
 package org.springframework.batch.core.repository.dao;
 
-import java.util.List;
-
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 
 public interface StepExecutionDao {
 
@@ -28,21 +28,21 @@ public interface StepExecutionDao {
 	void updateStepExecution(StepExecution stepExecution);
 
 	/**
-	 * Retrieve a {@link StepExecution} from its parent {@link JobExecution} and
-	 * step name.
+	 * Find all {@link ExecutionContext} for the given {@link StepExecution}.
 	 * 
-	 * @param jobExecution the parent job execution
-	 * @param stepName the name of the step that was used to create the step execution
-	 * @return a {@link StepExecution}
+	 * @throws IllegalArgumentException if the id is null.
 	 */
-	StepExecution getStepExecution(JobExecution jobExecution, String stepName);
-	
+	ExecutionContext findExecutionContext(StepExecution stepExecution);
+
 	/**
-	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.
+	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
 	 * 
-	 * @param jobExecution the parent job execution
-	 * @return a list of {@link StepExecution}
+	 * @param stepExecution the {@link StepExecution} containing the
+	 * {@link ExecutionContext} to be saved.
+	 * @throws IllegalArgumentException if the attributes are null.
 	 */
-	List<StepExecution> getStepExecutions(JobExecution jobExecution);
+	void saveOrUpdateExecutionContext(StepExecution stepExecution);
+
+	StepExecution getStepExecution(JobExecution jobExecution, Step step);
 
 }

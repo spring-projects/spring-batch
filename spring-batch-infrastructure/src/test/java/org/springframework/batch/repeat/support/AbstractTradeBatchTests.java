@@ -16,17 +16,13 @@
 
 package org.springframework.batch.repeat.support;
 
-import java.util.List;
-
 import junit.framework.TestCase;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
-import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
+import org.springframework.batch.item.support.AbstractItemWriter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -52,32 +48,29 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 		provider.open(new ExecutionContext());
 	}
 
-	protected static class TradeItemReader extends FlatFileItemReader<Trade> {
+	protected static class TradeItemReader extends FlatFileItemReader {
 
 		protected TradeItemReader(Resource resource) throws Exception {
 			super();
 			setResource(resource);
-			DefaultLineMapper<Trade> mapper = new DefaultLineMapper<Trade>();
-			mapper.setLineTokenizer(new DelimitedLineTokenizer());
-			mapper.setFieldSetMapper(new TradeMapper());
-			setLineMapper(mapper);
+			setFieldSetMapper(new TradeMapper());
 			afterPropertiesSet();
 		}
 
 	}
 
-	protected static class TradeMapper implements FieldSetMapper<Trade> {
-		public Trade mapFieldSet(FieldSet fs) {
+	protected static class TradeMapper implements FieldSetMapper{
+		public Object mapLine(FieldSet fs) {
 			return new Trade(fs);
 		}
 	}
 
-	protected static class TradeWriter implements ItemWriter<Trade> {
+	protected static class TradeWriter extends AbstractItemWriter {
 		int count = 0;
 
 		// This has to be synchronized because we are going to test the state
 		// (count) at the end of a concurrent batch run.
-		public synchronized void write(List<? extends Trade> data) {
+		public synchronized void write(Object data) {
 			count++;
 			System.out.println("Executing trade '" + data + "'");
 		}

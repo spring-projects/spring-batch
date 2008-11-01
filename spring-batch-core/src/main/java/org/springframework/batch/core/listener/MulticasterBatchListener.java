@@ -15,10 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.List;
-
 import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.SkipListener;
@@ -32,20 +29,18 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Dave Syer
  * 
  */
-public class MulticasterBatchListener<T, S> implements StepExecutionListener, ChunkListener, ItemReadListener<T>,
-		ItemProcessListener<T, S>, ItemWriteListener<S>, SkipListener<T,S> {
+public class MulticasterBatchListener implements StepExecutionListener, ChunkListener, ItemReadListener,
+		ItemWriteListener, SkipListener {
 
 	private CompositeStepExecutionListener stepListener = new CompositeStepExecutionListener();
 
 	private CompositeChunkListener chunkListener = new CompositeChunkListener();
 
-	private CompositeItemReadListener<T> itemReadListener = new CompositeItemReadListener<T>();
+	private CompositeItemReadListener itemReadListener = new CompositeItemReadListener();
 
-	private CompositeItemProcessListener<T, S> itemProcessListener = new CompositeItemProcessListener<T, S>();
+	private CompositeItemWriteListener itemWriteListener = new CompositeItemWriteListener();
 
-	private CompositeItemWriteListener<S> itemWriteListener = new CompositeItemWriteListener<S>();
-
-	private CompositeSkipListener<T,S> skipListener = new CompositeSkipListener<T,S>();
+	private CompositeSkipListener skipListener = new CompositeSkipListener();
 
 	/**
 	 * Initialise the listener instance.
@@ -58,11 +53,12 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * Register each of the objects as listeners. Once registered, calls to the
 	 * {@link MulticasterBatchListener} broadcast to the individual listeners.
 	 * 
-	 * @param listeners listener objects of types known to the multicaster.
+	 * @param listeners an array of listener objects of types known to the
+	 * multicaster.
 	 */
-	public void setListeners(List<? extends StepListener> listeners) {
-		for (StepListener stepListener : listeners) {
-			register(stepListener);
+	public void setListeners(StepListener[] listeners) {
+		for (int i = 0; i < listeners.length; i++) {
+			register(listeners[i]);
 		}
 	}
 
@@ -79,67 +75,13 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 			this.chunkListener.register((ChunkListener) listener);
 		}
 		if (listener instanceof ItemReadListener) {
-			@SuppressWarnings("unchecked")
-			ItemReadListener<T> itemReadListener = (ItemReadListener) listener;
-			this.itemReadListener.register(itemReadListener);
-		}
-		if (listener instanceof ItemProcessListener) {
-			@SuppressWarnings("unchecked")
-			ItemProcessListener<T,S> itemProcessListener = (ItemProcessListener) listener;
-			this.itemProcessListener.register(itemProcessListener);
+			this.itemReadListener.register((ItemReadListener) listener);
 		}
 		if (listener instanceof ItemWriteListener) {
-			@SuppressWarnings("unchecked")
-			ItemWriteListener<S> itemWriteListener = (ItemWriteListener) listener;
-			this.itemWriteListener.register(itemWriteListener);
+			this.itemWriteListener.register((ItemWriteListener) listener);
 		}
 		if (listener instanceof SkipListener) {
-			@SuppressWarnings("unchecked")
-			SkipListener<T,S> skipListener = (SkipListener) listener;
-			this.skipListener.register(skipListener);
-		}
-	}
-
-	/**
-	 * @param item
-	 * @param result
-	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#afterProcess(java.lang.Object,
-	 * java.lang.Object)
-	 */
-	public void afterProcess(T item, S result) {
-		try {
-			itemProcessListener.afterProcess(item, result);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterProcess.", e);
-		}
-	}
-
-	/**
-	 * @param item
-	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#beforeProcess(java.lang.Object)
-	 */
-	public void beforeProcess(T item) {
-		try {
-			itemProcessListener.beforeProcess(item);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeProcess.", e);
-		}
-	}
-
-	/**
-	 * @param item
-	 * @param ex
-	 * @see org.springframework.batch.core.listener.CompositeItemProcessListener#onProcessError(java.lang.Object,
-	 * java.lang.Exception)
-	 */
-	public void onProcessError(T item, Exception ex) {
-		try {
-			itemProcessListener.onProcessError(item, ex);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onProcessError.", e);
+			this.skipListener.register((SkipListener) listener);
 		}
 	}
 
@@ -147,12 +89,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#afterStep(StepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		try {
-			return stepListener.afterStep(stepExecution);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterStep.", e);
-		}
+		return stepListener.afterStep(stepExecution);
 	}
 
 	/**
@@ -160,12 +97,15 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
 	 */
 	public void beforeStep(StepExecution stepExecution) {
-		try {
-			stepListener.beforeStep(stepExecution);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeStep.", e);
-		}
+		stepListener.beforeStep(stepExecution);
+	}
+
+	/**
+	 * @param e
+	 * @see org.springframework.batch.core.listener.CompositeStepExecutionListener#onErrorInStep(StepExecution, Throwable)
+	 */
+	public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
+		return stepListener.onErrorInStep(stepExecution, e);
 	}
 
 	/**
@@ -173,12 +113,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#afterChunk()
 	 */
 	public void afterChunk() {
-		try {
-			chunkListener.afterChunk();
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterChunk.", e);
-		}
+		chunkListener.afterChunk();
 	}
 
 	/**
@@ -186,25 +121,15 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeChunkListener#beforeChunk()
 	 */
 	public void beforeChunk() {
-		try {
-			chunkListener.beforeChunk();
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeChunk.", e);
-		}
+		chunkListener.beforeChunk();
 	}
 
 	/**
 	 * @param item
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#afterRead(java.lang.Object)
 	 */
-	public void afterRead(T item) {
-		try {
-			itemReadListener.afterRead(item);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterRead.", e);
-		}
+	public void afterRead(Object item) {
+		itemReadListener.afterRead(item);
 	}
 
 	/**
@@ -212,12 +137,7 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#beforeRead()
 	 */
 	public void beforeRead() {
-		try {
-			itemReadListener.beforeRead();
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeRead.", e);
-		}
+		itemReadListener.beforeRead();
 	}
 
 	/**
@@ -225,52 +145,33 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	 * @see org.springframework.batch.core.listener.CompositeItemReadListener#onReadError(java.lang.Exception)
 	 */
 	public void onReadError(Exception ex) {
-		try {
-			itemReadListener.onReadError(ex);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onReadError.", ex, e);
-		}
+		itemReadListener.onReadError(ex);
 	}
 
 	/**
 	 * 
-	 * @see ItemWriteListener#afterWrite(List)
+	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#afterWrite(Object)
 	 */
-	public void afterWrite(List<? extends S> items) {
-		try {
-			itemWriteListener.afterWrite(items);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in afterWrite.", e);
-		}
+	public void afterWrite(Object item) {
+		itemWriteListener.afterWrite(item);
 	}
 
 	/**
-	 * @param items
-	 * @see ItemWriteListener#beforeWrite(List)
+	 * @param item
+	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#beforeWrite(java.lang.Object)
 	 */
-	public void beforeWrite(List<? extends S> items) {
-		try {
-			itemWriteListener.beforeWrite(items);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in beforeWrite.", e);
-		}
+	public void beforeWrite(Object item) {
+		itemWriteListener.beforeWrite(item);
 	}
 
 	/**
 	 * @param ex
-	 * @param items
-	 * @see ItemWriteListener#onWriteError(Exception, List)
+	 * @param item
+	 * @see org.springframework.batch.core.listener.CompositeItemWriteListener#onWriteError(java.lang.Exception,
+	 * java.lang.Object)
 	 */
-	public void onWriteError(Exception ex, List<? extends S> items) {
-		try {
-			itemWriteListener.onWriteError(ex, items);
-		}
-		catch (RuntimeException e) {
-			throw new StepListenerFailedException("Error in onWriteError.", ex, e);
-		}
+	public void onWriteError(Exception ex, Object item) {
+		itemWriteListener.onWriteError(ex, item);
 	}
 
 	/**
@@ -284,20 +185,10 @@ public class MulticasterBatchListener<T, S> implements StepExecutionListener, Ch
 	/**
 	 * @param item
 	 * @param t
-	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object,
-	 * java.lang.Throwable)
+	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInWrite(java.lang.Object, java.lang.Throwable)
 	 */
-	public void onSkipInWrite(S item, Throwable t) {
+	public void onSkipInWrite(Object item, Throwable t) {
 		skipListener.onSkipInWrite(item, t);
-	}
-
-	/**
-	 * @param item
-	 * @param t
-	 * @see org.springframework.batch.core.listener.CompositeSkipListener#onSkipInProcess(Object, Throwable)
-	 */
-	public void onSkipInProcess(T item, Throwable t) {
-		skipListener.onSkipInProcess(item, t);
 	}
 
 }

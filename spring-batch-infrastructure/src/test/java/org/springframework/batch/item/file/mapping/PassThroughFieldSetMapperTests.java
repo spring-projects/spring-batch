@@ -27,12 +27,36 @@ public class PassThroughFieldSetMapperTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapFieldSet(org.springframework.batch.item.file.mapping.FieldSet)}.
+	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet)}.
 	 */
 	public void testMapLine() {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
-		assertEquals(fieldSet, mapper.mapFieldSet(fieldSet));
+		assertEquals(fieldSet, mapper.mapLine(fieldSet));
 	}
 
-	
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapItem(java.lang.Object)}.
+	 */
+	public void testUnmapItemAsFieldSet() {
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
+		assertEquals(fieldSet, mapper.mapItem(fieldSet));
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapItem(java.lang.Object)}.
+	 */
+	public void testUnmapItemAsString() {
+		assertEquals(new DefaultFieldSet(new String[] { "foo" }), mapper.mapItem("foo"));
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapItem(java.lang.Object)}.
+	 */
+	public void testUnmapItemAsNonString() {
+		Object object = new Object();
+		assertEquals(new DefaultFieldSet(new String[] { "" + object }), mapper.mapItem(object));
+	}
 }

@@ -17,9 +17,9 @@
 package org.springframework.batch.repeat;
 
 /**
- * Callback interface for batch operations. Many simple processes will be able
- * to use off-the-shelf implementations of this interface, enabling the
- * application developer to concentrate on business logic.
+ * Callback interface for batch operations. Many simple batch processes will be
+ * able to use off-the-shelf implementations of this interface, enabling the
+ * batch developer to concentrate on business logic.
  * 
  * @see RepeatOperations
  * 
@@ -30,13 +30,12 @@ public interface RepeatCallback {
 
 	/**
 	 * Implementations return true if they can continue processing - e.g. there
-	 * is a data source that is not yet exhausted. Exceptions are not necessarily
-	 * fatal - processing might continue depending on the Exception type and the
+	 * is a datasource that is not yet exhausted. Exceptions are not necessarily
+	 * fatal - the batch might continue depending on the Exception type and the
 	 * implementation of the caller.
 	 * 
 	 * @param context the current context passed in by the caller.
-	 * @return an {@link ExitStatus} which is continuable if there is (or may
-	 * be) more data to process.
+	 * @return true if there is (or may be) more data to process.
 	 * @throws Exception if there is a problem with the processing.
 	 */
 	ExitStatus doInIteration(RepeatContext context) throws Exception;

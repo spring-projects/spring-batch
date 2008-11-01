@@ -28,7 +28,7 @@ public class DerbyDataSourceFactoryBean extends AbstractFactoryBean {
 		return ds;
 	}
 
-	public Class<DataSource> getObjectType() {
+	public Class getObjectType() {
 		return DataSource.class;
 	}
 

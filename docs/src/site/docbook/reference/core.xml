@@ -320,20 +320,6 @@
               by the framework for managing job level
               ExecutionContexts.</entry>
             </row>
-
-            <row>
-              <entry>lastUpdated</entry>
-
-              <entry>A <classname>java.util.Date</classname> representing the
-              last time a JobExecution was persisted.</entry>
-            </row>
-
-            <row>
-              <entry>executionContext</entry>
-
-              <entry>The 'property bag' containing any user data that needs to
-              be persisted between executions.</entry>
-            </row>
           </tbody>
         </tgroup>
       </table>
@@ -619,9 +605,9 @@
       <classname>Step</classname> interface. Two step implementation classes
       are available in the Spring Batch framework, and they are each discussed
       in detail in Chatper 4 of this guide. For most situations, the
-      <classname>StepHandlerStep</classname> implementation is sufficient, but
-      for situations where only one call is needed, such as a stored procedure
-      call or a wrapper around existing script, a
+      <classname>ItemOrientedStep</classname> implementation is sufficient,
+      but for situations where only one call is needed, such as a stored
+      procedure call or a wrapper around existing script, a
       <classname>TaskletStep</classname> may be a better option.</para>
     </section>
 
@@ -629,13 +615,20 @@
       <title id="stepExecution">StepExecution</title>
 
       <para>A <classname>StepExecution</classname> represents a single attempt
-      to execute a <classname>Step</classname>. A new
-      <classname>StepExecution</classname> will be created each time a Step is
-      run, similar to <classname>JobExecution</classname>. However, if a step
-      fails to execute because the step before it fails, there will be no
-      execution persisted for it. A <classname>StepExecution</classname> will
-      only be created when it's <classname>Step</classname> is actually
-      started.</para>
+      to execute a <classname>Step</classname>. Using the example from
+      <classname>JobExecution</classname>, if there is a
+      <classname>JobInstance</classname> for the "EndOfDayJob", with
+      <classname>JobParameters</classname> of "01-01-2008" that fails to
+      successfully complete its work the first time it is run, when it is
+      executed again, a new <classname>StepExecution</classname> will be
+      created. Each of these step executions may represent a different
+      invocation of the batch framework, but they will all correspond to the
+      same <classname>JobInstance</classname>, just as multiple
+      <classname>JobExecutions</classname> belong to the same
+      <classname>JobInstance</classname>. However, if a step fails to execute
+      because the step before it fails, there will be no execution persisted
+      for it. An execution will only be created when the
+      <classname>Step</classname> is actually started.</para>
 
       <para>Step executions are represented by objects of the
       <classname>StepExecution</classname> class. Each execution contains a
@@ -695,24 +688,17 @@
             </row>
 
             <row>
-              <entry>readCount</entry>
-
-              <entry>The number of items that have been successfully
-              read</entry>
-            </row>
-
-            <row>
-              <entry>writeCount</entry>
-
-              <entry>The number of items that have been successfully
-              written</entry>
-            </row>
-
-            <row>
               <entry>commitCount</entry>
 
               <entry>The number transactions that have been committed for this
               execution</entry>
+            </row>
+
+            <row>
+              <entry>itemCount</entry>
+
+              <entry>The number of items that have been processed for this
+              execution.</entry>
             </row>
 
             <row>
@@ -727,20 +713,6 @@
 
               <entry>The number of times <methodname>read</methodname> has
               failed, resulting in a skipped item.</entry>
-            </row>
-
-            <row>
-              <entry>processSkipCount</entry>
-
-              <entry>The number of times process has failed, resulting in a
-              skipped item.</entry>
-            </row>
-
-            <row>
-              <entry>filterCount</entry>
-
-              <entry>The number of items that have been 'filtered' by the
-              ItemProcessor</entry>
             </row>
 
             <row>
@@ -991,13 +963,11 @@
     public JobExecution createJobExecution(Job job, JobParameters jobParameters)
          throws JobExecutionAlreadyRunningException, JobRestartException;
 
-    void add(StepExecution stepExecution);
+    void saveOrUpdate(JobExecution jobExecution);
 
-    void update(JobExecution jobExecution);
+    void saveOrUpdate(StepExecution stepExecution);
 
-    void update(StepExecution stepExecution);
-
-    void updateExecutionContext(StepExecution stepExecution);
+    void saveOrUpdateExecutionContext(StepExecution stepExecution);
 
     StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
 
@@ -1066,19 +1036,6 @@
     next, only the item that was passed in its current invocation. More
     details about the <classname>ItemWriter</classname> interface and it's
     various implementations can be found in Chapter 3.</para>
-  </section>
-
-  <section>
-    <title>Item Processor</title>
-
-    <para><classname>ItemProcessor</classname> is an abstraction that
-    represents the business processing of an item. While the
-    <classname>ItemReader</classname> reads one item, and the
-    <classname>ItemWriter</classname> writes them, the
-    <classname>ItemProcessor</classname> provides access to transform or apply
-    other business processing. If while processing the item it's determined
-    that it's not valid, returning null indicates that it should not be
-    written out.</para>
   </section>
 
   <section>

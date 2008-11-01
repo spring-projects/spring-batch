@@ -16,7 +16,6 @@
 package org.springframework.batch.core.listener;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.core.Ordered;
@@ -25,16 +24,16 @@ import org.springframework.core.Ordered;
  * @author Dave Syer
  * 
  */
-public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
+public class CompositeSkipListener implements SkipListener {
 
-	private OrderedComposite<SkipListener<? super T,? super S>> listeners = new OrderedComposite<SkipListener<? super T,? super S>>();
+	private OrderedComposite listeners = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
 	 * 
 	 * @param listeners
 	 */
-	public void setListeners(List<? extends SkipListener<? super T,? super S>> listeners) {
+	public void setListeners(SkipListener[] listeners) {
 		this.listeners.setItems(listeners);
 	}
 
@@ -43,7 +42,7 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	 * 
 	 * @param listener
 	 */
-	public void register(SkipListener<? super T,? super S> listener) {
+	public void register(SkipListener listener) {
 		listeners.add(listener);
 	}
 
@@ -53,8 +52,8 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInRead(java.lang.Throwable)
 	 */
 	public void onSkipInRead(Throwable t) {
-		for (Iterator<SkipListener<? super T,? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
-			SkipListener<? super T,? super S> listener = iterator.next();
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			SkipListener listener = (SkipListener) iterator.next();
 			listener.onSkipInRead(t);
 		}
 	}
@@ -65,24 +64,10 @@ public class CompositeSkipListener<T,S> implements SkipListener<T,S> {
 	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
 	 * java.lang.Throwable)
 	 */
-	public void onSkipInWrite(S item, Throwable t) {
-		for (Iterator<SkipListener<? super T,? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
-			SkipListener<? super T,? super S> listener = iterator.next();
+	public void onSkipInWrite(Object item, Throwable t) {
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			SkipListener listener = (SkipListener) iterator.next();
 			listener.onSkipInWrite(item, t);
 		}
 	}
-
-	/**
-	 * Call the registered listeners in order, respecting and prioritising those
-	 * that implement {@link Ordered}.
-	 * @see org.springframework.batch.core.SkipListener#onSkipInWrite(java.lang.Object,
-	 * java.lang.Throwable)
-	 */
-	public void onSkipInProcess(T item, Throwable t) {
-		for (Iterator<SkipListener<? super T,? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
-			SkipListener<? super T,? super S> listener = iterator.next();
-			listener.onSkipInProcess(item, t);
-		}
-	}
-
 }

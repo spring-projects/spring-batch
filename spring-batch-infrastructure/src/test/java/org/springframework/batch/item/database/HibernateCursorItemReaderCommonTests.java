@@ -3,23 +3,19 @@ package org.springframework.batch.item.database;
 import org.hibernate.SessionFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
 
-@RunWith(JUnit4ClassRunner.class)
 public class HibernateCursorItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
-	protected ItemReader<Foo> getItemReader() throws Exception {
+	protected ItemReader getItemReader() throws Exception {
 		
 		SessionFactory sessionFactory = createSessionFactory();
 
 		String hsqlQuery = "from Foo";
 
-		HibernateCursorItemReader<Foo> reader = new HibernateCursorItemReader<Foo>();
+		HibernateCursorItemReader reader = new HibernateCursorItemReader();
 		reader.setQueryString(hsqlQuery);
 		reader.setSessionFactory(sessionFactory);
 		reader.setUseStatelessSession(true);
@@ -39,8 +35,8 @@ public class HibernateCursorItemReaderCommonTests extends CommonDatabaseItemStre
 
 	}
 
-	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
-		HibernateCursorItemReader<Foo> reader = (HibernateCursorItemReader<Foo>) tested;
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		HibernateCursorItemReader reader = (HibernateCursorItemReader) tested;
 		reader.close(new ExecutionContext());
 		reader.setQueryString("from Foo foo where foo.id = -1");
 		reader.afterPropertiesSet();

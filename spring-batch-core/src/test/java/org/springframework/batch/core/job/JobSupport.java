@@ -19,11 +19,10 @@ package org.springframework.batch.core.job;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.ClassUtils;
 
@@ -38,7 +37,7 @@ import org.springframework.util.ClassUtils;
  */
 public class JobSupport implements BeanNameAware, Job {
 
-	private List<Step> steps = new ArrayList<Step>();
+	private List steps = new ArrayList();
 
 	private String name;
 
@@ -89,16 +88,21 @@ public class JobSupport implements BeanNameAware, Job {
 		this.name = name;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.IJob#getName()
 	 */
 	public String getName() {
 		return name;
 	}
 
-	public void setSteps(List<Step> steps) {
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.IJob#getSteps()
+	 */
+	public List getSteps() {
+		return steps;
+	}
+
+	public void setSteps(List steps) {
 		this.steps.clear();
 		this.steps.addAll(steps);
 	}
@@ -107,9 +111,7 @@ public class JobSupport implements BeanNameAware, Job {
 		this.steps.add(step);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.IJob#getStartLimit()
 	 */
 	public int getStartLimit() {
@@ -124,37 +126,21 @@ public class JobSupport implements BeanNameAware, Job {
 		this.restartable = restartable;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.IJob#isRestartable()
 	 */
 	public boolean isRestartable() {
 		return restartable;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.domain.Job#run(org.springframework.batch
-	 * .core.domain.JobExecution)
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Job#run(org.springframework.batch.core.domain.JobExecution)
 	 */
 	public void execute(JobExecution execution) throws UnexpectedJobExecutionException {
-		throw new UnsupportedOperationException(
-				"JobSupport does not provide an implementation of execute().  Use a smarter subclass.");
+		throw new UnsupportedOperationException("JobSupport does not provide an implementation of run().  Use a smarter subclass.");
 	}
 
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.Job#getJobParametersIncrementer()
-	 */
-	public JobParametersIncrementer getJobParametersIncrementer() {
-		return null;
 	}
 }

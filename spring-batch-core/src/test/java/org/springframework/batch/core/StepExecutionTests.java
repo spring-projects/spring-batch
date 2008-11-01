@@ -15,44 +15,32 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.*;
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.lang.SerializationUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.support.PropertiesConverter;
 
 /**
  * @author Dave Syer
  * 
  */
-public class StepExecutionTests {
+public class StepExecutionTests extends TestCase {
 
 	private StepExecution execution = newStepExecution(new StepSupport("stepName"), new Long(23));
 
 	private StepExecution blankExecution = newStepExecution(new StepSupport("blank"), null);
-	
-	private ExecutionContext foobarEc = new ExecutionContext();
-	
-	
 
-	@Before
-	public void setUp() throws Exception {
-		foobarEc.put("foo", "bar");
-	}
-
-	@Test
 	public void testStepExecution() {
 		assertNull(new StepExecution("step", null).getId());
 	}
 
-	@Test
 	public void testStepExecutionWithNullId() {
 		assertNull(new StepExecution("stepName", new JobExecution(new JobInstance(null,null,"foo"))).getId());
 	}
@@ -61,7 +49,6 @@ public class StepExecutionTests {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getEndTime()}.
 	 */
-	@Test
 	public void testGetEndTime() {
 		assertNull(execution.getEndTime());
 		execution.setEndTime(new Date(0L));
@@ -72,7 +59,6 @@ public class StepExecutionTests {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getStartTime()}.
 	 */
-	@Test
 	public void testGetStartTime() {
 		assertNotNull(execution.getStartTime());
 		execution.setStartTime(new Date(10L));
@@ -83,7 +69,6 @@ public class StepExecutionTests {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
 	 */
-	@Test
 	public void testGetStatus() {
 		assertEquals(BatchStatus.STARTING, execution.getStatus());
 		execution.setStatus(BatchStatus.COMPLETED);
@@ -94,7 +79,6 @@ public class StepExecutionTests {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getJobId()}.
 	 */
-	@Test
 	public void testGetJobId() {
 		assertEquals(23, execution.getJobExecutionId().longValue());
 	}
@@ -103,7 +87,6 @@ public class StepExecutionTests {
 	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getExitStatus()}.
 	 */
-	@Test
 	public void testGetExitCode() {
 		assertEquals(ExitStatus.CONTINUABLE, execution.getExitStatus());
 		execution.setExitStatus(ExitStatus.FINISHED);
@@ -114,47 +97,37 @@ public class StepExecutionTests {
 	 * Test method for
 	 * {@link org.springframework.batch.core.StepExecution#getCommitCount()}.
 	 */
-	@Test
 	public void testGetCommitCount() {
 		execution.setCommitCount(123);
-		assertEquals(123, execution.getCommitCount());
+		assertEquals(123, execution.getCommitCount().intValue());
 	}
 
-	@Test
-	public void testGetFilterCount() {
-		execution.setFilterCount(123);
-		assertEquals(123, execution.getFilterCount());
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.StepExecution#getItemCount()}.
+	 */
+	public void testGetTaskCount() {
+		execution.setItemCount(123);
+		assertEquals(123, execution.getItemCount().intValue());
 	}
 
-	@Test
 	public void testGetJobExecution() throws Exception {
 		assertNotNull(execution.getJobExecution());
 	}
 
-	@Test
 	public void testApplyContribution() throws Exception {
 		StepContribution contribution = execution.createStepContribution();
-		contribution.incrementReadSkipCount();
-		contribution.incrementWriteSkipCount();
-		contribution.incrementReadCount();
-		contribution.incrementWriteCount(7);
-		contribution.incrementFilterCount(1);
+		contribution.incrementCommitCount();
 		execution.apply(contribution);
-		assertEquals(1, execution.getReadSkipCount());
-		assertEquals(1, execution.getWriteSkipCount());
-		assertEquals(1, execution.getReadCount());
-		assertEquals(7, execution.getWriteCount());
-		assertEquals(1, execution.getFilterCount());
+		assertEquals(new Integer(1), execution.getCommitCount());
 	}
 
-	@Test
 	public void testTerminateOnly() throws Exception {
 		assertFalse(execution.isTerminateOnly());
 		execution.setTerminateOnly();
 		assertTrue(execution.isTerminateOnly());
 	}
 
-	@Test
 	public void testNullNameIsIllegal() throws Exception {
 		try {
 			new StepExecution(null, new JobExecution(new JobInstance(null, null, "job")));
@@ -165,17 +138,13 @@ public class StepExecutionTests {
 		}
 	}
 
-	@Test
 	public void testToString() throws Exception {
-		assertTrue("Should contain read count: " + execution.toString(), execution.toString().indexOf("read") >= 0);
-		assertTrue("Should contain write count: " + execution.toString(), execution.toString().indexOf("write") >= 0);
-		assertTrue("Should contain filter count: " + execution.toString(), execution.toString().indexOf("filter") >= 0);
+		assertTrue("Should contain item count: " + execution.toString(), execution.toString().indexOf("item") >= 0);
 		assertTrue("Should contain commit count: " + execution.toString(), execution.toString().indexOf("commit") >= 0);
 		assertTrue("Should contain rollback count: " + execution.toString(),
 				execution.toString().indexOf("rollback") >= 0);
 	}
 
-	@Test
 	public void testExecutionContext() throws Exception {
 		assertNotNull(execution.getExecutionContext());
 		ExecutionContext context = new ExecutionContext();
@@ -184,7 +153,6 @@ public class StepExecutionTests {
 		assertEquals("bar", execution.getExecutionContext().getString("foo"));
 	}
 
-	@Test
 	public void testEqualsWithSameIdentifier() throws Exception {
 		Step step = new StepSupport("stepName");
 		Entity stepExecution1 = newStepExecution(step, new Long(11));
@@ -192,36 +160,30 @@ public class StepExecutionTests {
 		assertEquals(stepExecution1, stepExecution2);
 	}
 
-	@Test
 	public void testEqualsWithNull() throws Exception {
 		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
 		assertFalse(stepExecution.equals(null));
 	}
 
-	@Test
 	public void testEqualsWithNullIdentifiers() throws Exception {
 		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
 		assertFalse(stepExecution.equals(blankExecution));
 	}
 
-	@Test
 	public void testEqualsWithNullJob() throws Exception {
 		Entity stepExecution = newStepExecution(new StepSupport("stepName"), new Long(11));
 		assertFalse(stepExecution.equals(blankExecution));
 	}
 
-	@Test
 	public void testEqualsWithSelf() throws Exception {
 		assertTrue(execution.equals(execution));
 	}
 
-	@Test
 	public void testEqualsWithDifferent() throws Exception {
 		Entity stepExecution = newStepExecution(new StepSupport("foo"), new Long(13));
 		assertFalse(execution.equals(stepExecution));
 	}
 
-	@Test
 	public void testEqualsWithNullStepId() throws Exception {
 		Step step = new StepSupport("name");
 		execution = newStepExecution(step, new Long(31));
@@ -231,49 +193,34 @@ public class StepExecutionTests {
 		assertTrue(execution.equals(stepExecution));
 	}
 
-	@Test
 	public void testHashCode() throws Exception {
 		assertTrue("Hash code same as parent", new Entity(execution.getId()).hashCode() != execution.hashCode());
 	}
 
-	@Test
 	public void testHashCodeWithNullIds() throws Exception {
 		assertTrue("Hash code not same as parent", new Entity(execution.getId()).hashCode() != blankExecution
 				.hashCode());
 	}
 
-	@Test
 	public void testHashCodeViaHashSet() throws Exception {
-		Set<StepExecution> set = new HashSet<StepExecution>();
+		Set set = new HashSet();
 		set.add(execution);
 		assertTrue(set.contains(execution));
-		execution.setExecutionContext(foobarEc);
+		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
 		assertTrue(set.contains(execution));
 	}
 	
-	@Test
 	public void testSerialization() throws Exception {
 		
 		ExitStatus status = ExitStatus.NOOP;
 		execution.setExitStatus(status);
-		execution.setExecutionContext(foobarEc);
+		execution.setExecutionContext(new ExecutionContext(PropertiesConverter.stringToProperties("foo=bar")));
 		
 		byte[] serialized = SerializationUtils.serialize(execution);
 		StepExecution deserialized = (StepExecution) SerializationUtils.deserialize(serialized);
 		
 		assertEquals(execution, deserialized);
 		assertEquals(status, deserialized.getExitStatus());
-		assertNotNull(deserialized.getFailureExceptions());
-	}
-	
-	@Test
-	public void testAddException() throws Exception{
-		
-		RuntimeException exception = new RuntimeException();
-		assertEquals(0, execution.getFailureExceptions().size());
-		execution.addFailureException(exception);
-		assertEquals(1, execution.getFailureExceptions().size());
-		assertEquals(exception, execution.getFailureExceptions().get(0));
 	}
 
 	private StepExecution newStepExecution(Step step, Long long2) {

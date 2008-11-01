@@ -34,24 +34,24 @@ public class RetryListenerTests extends TestCase {
 
 	int count = 0;
 
-	List<String> list = new ArrayList<String>();
+	List list = new ArrayList();
 
 	public void testOpenInterceptors() throws Exception {
 		template.setListeners(new RetryListener[] { new RetryListenerSupport() {
-			public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
+			public boolean open(RetryContext context, RetryCallback callback) {
 				count++;
 				list.add("1:" + count);
 				return true;
 			}
 		}, new RetryListenerSupport() {
-			public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
+			public boolean open(RetryContext context, RetryCallback callback) {
 				count++;
 				list.add("2:" + count);
 				return true;
 			}
 		} });
-		template.execute(new RetryCallback<String>() {
-			public String doWithRetry(RetryContext context) throws Exception {
+		template.execute(new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 				return null;
 			}
 		});
@@ -62,14 +62,14 @@ public class RetryListenerTests extends TestCase {
 
 	public void testOpenCanVetoRetry() throws Exception {
 		template.registerListener(new RetryListenerSupport() {
-			public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
+			public boolean open(RetryContext context, RetryCallback callback) {
 				list.add("1");
 				return false;
 			}
 		});
 		try {
-			template.execute(new RetryCallback<String>() {
-				public String doWithRetry(RetryContext context) throws Exception {
+			template.execute(new RetryCallback() {
+				public Object doWithRetry(RetryContext context) throws Throwable {
 					count++;
 					return null;
 				}
@@ -86,18 +86,18 @@ public class RetryListenerTests extends TestCase {
 
 	public void testCloseInterceptors() throws Exception {
 		template.setListeners(new RetryListener[] { new RetryListenerSupport() {
-			public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable t) {
+			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				count++;
 				list.add("1:" + count);
 			}
 		}, new RetryListenerSupport() {
-			public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable t) {
+			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				count++;
 				list.add("2:" + count);
 			}
 		} });
-		template.execute(new RetryCallback<String>() {
-			public String doWithRetry(RetryContext context) throws Exception {
+		template.execute(new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 				return null;
 			}
 		});
@@ -110,22 +110,22 @@ public class RetryListenerTests extends TestCase {
 	public void testOnError() throws Exception {
 		template.setRetryPolicy(new NeverRetryPolicy());
 		template.setListeners(new RetryListener[] { new RetryListenerSupport() {
-			public <T> void onError(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
+			public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
 				list.add("1");
 			}
 		}, new RetryListenerSupport() {
-			public <T> void onError(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
+			public void onError(RetryContext context, RetryCallback callback, Throwable throwable) {
 				list.add("2");
 			}
 		} });
 		try {
-			template.execute(new RetryCallback<String>() {
-				public String doWithRetry(RetryContext context) throws Exception {
+			template.execute(new RetryCallback() {
+				public Object doWithRetry(RetryContext context) throws Throwable {
 					count++;
 					throw new IllegalStateException("foo");
 				}
 			});
-			fail("Expected IllegalStateException");
+			fail("Expected TerminatedRetryException");
 		}
 		catch (IllegalStateException e) {
 			assertEquals("foo", e.getMessage());
@@ -140,14 +140,14 @@ public class RetryListenerTests extends TestCase {
 
 	public void testCloseInterceptorsAfterRetry() throws Exception {
 		template.registerListener(new RetryListenerSupport() {
-			public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable t) {
+			public void close(RetryContext context, RetryCallback callback, Throwable t) {
 				list.add("" + count);
 				// The last attempt should have been successful:
 				assertNull(t);
 			}
 		});
-		template.execute(new RetryCallback<String>() {
-			public String doWithRetry(RetryContext context) throws Exception {
+		template.execute(new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
 				if (count++ < 1)
 					throw new RuntimeException("Retry!");
 				return null;

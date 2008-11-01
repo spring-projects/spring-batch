@@ -91,32 +91,31 @@ public class RangeArrayPropertyEditor extends PropertyEditorSupport {
 		return sb.toString();
 	}
 	
-	private void setMaxValues(final Range[] ranges) {
+	private void setMaxValues(Range[] ranges) {
 		
-		// Array of integers to track range values by index
-		Integer[] c = new Integer[ranges.length];
-		for (int i=0; i<c.length; i++) {
-			c[i] = i;
-		}
+		//clone array, original array should stay same
+		Range[] c = (Range[])ranges.clone();
 		
 		//sort array of Ranges
-		Arrays.sort(c, new Comparator<Integer>() {
-				public int compare(Integer r1, Integer r2) {
-					return ranges[r1].getMin()-ranges[r2].getMin();
+		Arrays.sort(c, new Comparator() {
+				public int compare(Object o1, Object o2) {
+					Range c1 = (Range)o1;
+					Range c2 = (Range)o2;
+					return c1.getMin()-c2.getMin();
 				}								
 			}
 		);
-		
+
 		//set max values for all unbound ranges (except last range)
 		for (int i = 0; i < c.length - 1; i++) {
-			if (!ranges[c[i]].hasMaxValue()) {
+			if (!c[i].hasMaxValue()) {
 				//set max value to (min value - 1) of the next range
-				ranges[c[i]] = new Range(ranges[c[i]].getMin(),ranges[c[i+1]].getMin() - 1);
+				c[i].setMax(c[i+1].getMin() - 1);
 			}
 		}
 		
 		if (forceDisjointRanges) {
-			verifyRanges(ranges);
+			verifyRanges(c);
 		}
 	}
 	

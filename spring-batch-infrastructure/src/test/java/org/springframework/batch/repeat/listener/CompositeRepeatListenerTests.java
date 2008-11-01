@@ -33,7 +33,7 @@ public class CompositeRepeatListenerTests extends TestCase {
 	private CompositeRepeatListener listener = new CompositeRepeatListener();
 	private RepeatContext context = new RepeatContextSupport(null);
 
-	private List<Object> list = new ArrayList<Object>();
+	private List list = new ArrayList();
 
 	/**
 	 * Test method for {@link CompositeRepeatListener#setListeners(RepeatListener[])}.

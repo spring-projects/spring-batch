@@ -38,8 +38,7 @@
 			<item name="Forums" href="http://forum.springframework.org/forumdisplay.php?f=41"/>
 			<item name="JIRA" href="http://jira.springframework.org/browse/BATCH"/>
 			<item name="Downloads" href="downloads.html"/>
-            <item name="1.0.x" href="http://www.springframework.org/spring-batch/1.0.x/index.html"/>
-            <item name="1.1.x" href="http://www.springframework.org/spring-batch/1.1.x/index.html"/>
+            <item name="1.0.x" href="http://www.springframework.org/spring-batch-old/1.0.x/index.html"/>
 		</menu>
 		<menu ref="modules"/>
 		<menu ref="reports"/>

@@ -37,17 +37,17 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
-	private Map<String, Integer> mapping;
+	private Map mapping;
 
 	public SimpleJvmExitCodeMapper() {
-		mapping = new HashMap<String, Integer>();
+		mapping = new HashMap();
 		mapping.put(ExitStatus.FINISHED.getExitCode(), new Integer(JVM_EXITCODE_COMPLETED));
 		mapping.put(ExitStatus.FAILED.getExitCode(), new Integer(JVM_EXITCODE_GENERIC_ERROR));
 		mapping.put(ExitCodeMapper.JOB_NOT_PROVIDED, new Integer(JVM_EXITCODE_JOB_ERROR));
 		mapping.put(ExitCodeMapper.NO_SUCH_JOB, new Integer(JVM_EXITCODE_JOB_ERROR));
 	}
 
-	public Map<String, Integer> getMapping() {
+	public Map getMapping() {
 		return mapping;
 	}
 
@@ -56,7 +56,7 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 	 * @param exitCodeMap A set of mappings between environment specific exit
 	 * codes and batch framework internal exit codes
 	 */
-	public void setMapping(Map<String, Integer> exitCodeMap) {
+	public void setMapping(Map exitCodeMap) {
 		mapping.putAll(exitCodeMap);
 	}
 

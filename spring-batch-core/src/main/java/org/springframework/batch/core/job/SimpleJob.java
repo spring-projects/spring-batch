@@ -16,20 +16,24 @@
 
 package org.springframework.batch.core.job;
 
-import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.ExitStatus;
 
 /**
- * Simple implementation of {@link Job} interface providing the ability to run a
+ * Simple implementation of (@link Job} interface providing the ability to run a
  * {@link JobExecution}. Sequentially executes a job by iterating through its
  * list of steps.
  * 
@@ -38,50 +42,164 @@ import org.springframework.batch.core.repository.JobRestartException;
  */
 public class SimpleJob extends AbstractJob {
 
-	private List<Step> steps = new ArrayList<Step>();
-
 	/**
-	 * Public setter for the steps in this job. Overrides any calls to
-	 * {@link #addStep(Step)}.
+	 * Run the specified job by looping through the steps and delegating to the
+	 * {@link Step}.
 	 * 
-	 * @param steps the steps to execute
+	 * @see org.springframework.batch.core.Job#execute(org.springframework.batch.core.JobExecution)
+	 * @throws StartLimitExceededException if start limit of one of the steps
+	 * was exceeded
 	 */
-	public void setSteps(List<Step> steps) {
-		this.steps.clear();
-		this.steps.addAll(steps);
-	}
+	public void execute(JobExecution execution) throws JobExecutionException {
 
-	/**
-	 * Convenience method for adding a single step to the job.
-	 * 
-	 * @param step a {@link Step} to add
-	 */
-	public void addStep(Step step) {
-		this.steps.add(step);
-	}
+		JobInstance jobInstance = execution.getJobInstance();
 
-	/**
-	 * Handler of steps sequentially as provided, checking each one for success
-	 * before moving to the next. Returns the last {@link StepExecution}
-	 * successfully processed if it exists, and null if none were processed.
-	 * 
-	 * @param execution the current {@link JobExecution}
-	 * @return the last successful {@link StepExecution}
-	 * 
-	 * @see AbstractJob#handleStep(Step, JobExecution)
-	 */
-	protected StepExecution doExecute(JobExecution execution) throws JobInterruptedException, JobRestartException,
-			StartLimitExceededException {
+		StepExecution currentStepExecution = null;
+		int startedCount = 0;
+		List steps = getSteps();
 
-		StepExecution stepExecution = null;
-		for (Step step : steps) {
-			stepExecution = handleStep(step, execution);
-			if (stepExecution.getStatus() != BatchStatus.COMPLETED) {
-				return stepExecution;
+		try {
+
+			// The job was already stopped before we even got this far. Deal
+			// with it in the same way as any other interruption.
+			if (execution.getStatus() == BatchStatus.STOPPING) {
+				throw new JobInterruptedException("JobExecution already stopped before being executed.");
 			}
+
+			execution.setStartTime(new Date());
+			updateStatus(execution, BatchStatus.STARTING);
+
+			getCompositeListener().beforeJob(execution);
+
+			for (Iterator i = steps.iterator(); i.hasNext();) {
+
+				if (execution.getStatus() == BatchStatus.STOPPING) {
+					throw new JobInterruptedException("JobExecution interrupted.");
+				}
+
+				Step step = (Step) i.next();
+
+				if (shouldStart(jobInstance, step)) {
+
+					startedCount++;
+					updateStatus(execution, BatchStatus.STARTED);
+					currentStepExecution = execution.createStepExecution(step);
+
+					StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step);
+
+					boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
+							BatchStatus.COMPLETED)) ? true : false;
+
+					if (isRestart) {
+						currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
+					}
+					else {
+						currentStepExecution.setExecutionContext(new ExecutionContext());
+					}
+
+					step.execute(currentStepExecution);
+
+				}
+			}
+
+			// Need to check again for stopped job
+			if (execution.getStatus() == BatchStatus.STOPPING) {
+				throw new JobInterruptedException("JobExecution interrupted.");
+			}
+
+			updateStatus(execution, BatchStatus.COMPLETED);
+
+			getCompositeListener().afterJob(execution);
+
+		}
+		catch (JobInterruptedException e) {
+			execution.setStatus(BatchStatus.STOPPED);
+			getCompositeListener().onInterrupt(execution);
+			rethrow(e);
+		}
+		catch (Throwable t) {
+			execution.setStatus(BatchStatus.FAILED);
+			getCompositeListener().onError(execution, t);
+			rethrow(t);
+		}
+		finally {
+			ExitStatus status = ExitStatus.FAILED;
+			if (startedCount == 0) {
+				if (steps.size() > 0) {
+					status = ExitStatus.NOOP
+							.addExitDescription("All steps already completed.  No processing was done.");
+				}
+				else {
+					status = ExitStatus.NOOP.addExitDescription("No steps configured for this job.");
+				}
+			}
+			else if (currentStepExecution != null) {
+				status = currentStepExecution.getExitStatus();
+			}
+
+			execution.setEndTime(new Date());
+			execution.setExitStatus(status);
+			getJobRepository().saveOrUpdate(execution);
 		}
 
-		return stepExecution;
 	}
 
+	private void updateStatus(JobExecution jobExecution, BatchStatus status) {
+		jobExecution.setStatus(status);
+		getJobRepository().saveOrUpdate(jobExecution);
+	}
+
+	/*
+	 * Given a step and configuration, return true if the step should start,
+	 * false if it should not, and throw an exception if the job should finish.
+	 */
+	private boolean shouldStart(JobInstance jobInstance, Step step) throws JobExecutionException {
+
+		BatchStatus stepStatus;
+		// if the last execution is null, the step has never been executed.
+		StepExecution lastStepExecution = getJobRepository().getLastStepExecution(jobInstance, step);
+		if (lastStepExecution == null) {
+			stepStatus = BatchStatus.STARTING;
+		}
+		else {
+			stepStatus = lastStepExecution.getStatus();
+		}
+
+		if (stepStatus == BatchStatus.UNKNOWN) {
+			throw new JobExecutionException("Cannot restart step from UNKNOWN status.  "
+					+ "The last execution ended with a failure that could not be rolled back, "
+					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
+		}
+
+		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
+			// step is complete, false should be returned, indicating that the
+			// step should not be started
+			return false;
+		}
+
+		if (getJobRepository().getStepExecutionCount(jobInstance, step) < step.getStartLimit()) {
+			// step start count is less than start max, return true
+			return true;
+		}
+		else {
+			// start max has been exceeded, throw an exception.
+			throw new StartLimitExceededException("Maximum start limit exceeded for step: " + step.getName()
+					+ "StartMax: " + step.getStartLimit());
+		}
+	}
+
+	/**
+	 * @param t
+	 */
+	private static void rethrow(Throwable t) throws RuntimeException {
+		if (t instanceof RuntimeException) {
+			throw (RuntimeException) t;
+		}
+		else if (t instanceof Error) {
+			throw (Error) t;
+		}
+		else {
+			throw new UnexpectedJobExecutionException("Unexpected checked exception in job execution", t);
+		}
+	}
 }

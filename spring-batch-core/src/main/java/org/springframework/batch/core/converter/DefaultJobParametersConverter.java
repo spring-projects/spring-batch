@@ -26,10 +26,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.JobParameter.ParameterType;
 import org.springframework.util.StringUtils;
 
 /**
@@ -80,8 +78,8 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 
 		JobParametersBuilder propertiesBuilder = new JobParametersBuilder();
 
-		for (Iterator<Entry<Object, Object>> it = props.entrySet().iterator(); it.hasNext();) {
-			Entry<Object, Object> entry = it.next();
+		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
+			Entry entry = (Entry) it.next();
 			String key = (String) entry.getKey();
 			String value = (String) entry.getValue();
 			if (key.endsWith(DATE_TYPE)) {
@@ -154,18 +152,17 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 			return new Properties();
 		}
 
-		Map<String, JobParameter> parameters = params.getParameters();
+		Map parameters = params.getParameters();
 		Properties result = new Properties();
-		for (Entry<String, JobParameter> entry : parameters.entrySet()) {
-			
-			String key = entry.getKey();
-			JobParameter jobParameter = entry.getValue();
-			Object value = jobParameter.getValue();
-			if (jobParameter.getType() == ParameterType.DATE) {
-				result.setProperty(key + DATE_TYPE, dateFormat.format(value));
+		for (Iterator iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry) iterator.next();
+			String key = (String) entry.getKey();
+			Object value = entry.getValue();
+			if (value instanceof Date) {
+				result.setProperty(key, dateFormat.format(value));
 			}
-			else if (jobParameter.getType() == ParameterType.LONG) {
-				result.setProperty(key + LONG_TYPE, numberFormat.format(value));
+			else if (value instanceof Long) {
+				result.setProperty(key, numberFormat.format(value));
 			}
 			else {
 				result.setProperty(key, "" + value);

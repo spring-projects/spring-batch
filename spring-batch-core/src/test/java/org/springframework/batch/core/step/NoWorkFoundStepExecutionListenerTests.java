@@ -37,7 +37,7 @@ public class NoWorkFoundStepExecutionListenerTests extends TestCase {
                 new JobExecution(
                 new JobInstance(new Long(1), new JobParameters(), "NoProcessingJob")));
 
-        stepExecution.setReadCount(0);
+        stepExecution.setItemCount(0);
 
         try {
             tested.afterStep(stepExecution);

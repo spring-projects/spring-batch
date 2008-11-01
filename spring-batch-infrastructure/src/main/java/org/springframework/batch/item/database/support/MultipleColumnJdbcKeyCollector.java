@@ -25,9 +25,9 @@ import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.jdbc.core.ColumnMapRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -44,26 +44,19 @@ import org.springframework.util.StringUtils;
  * {@link #setPreparedStatementSetter(ItemPreparedStatementSetter)} and
  * {@link #setKeyMapper(RowMapper)} are thread-safe (true for default values).
  * 
- * 
  * @author Lucas Ward
  * 
  * @see DrivingQueryItemReader
  * @see ItemPreparedStatementSetter
- * 
- * TODO this class has nothing to do with "multiple columns" other than default
- * values form keyMapper and preparedStatementSetter. This should be sorted out for 2.0
- * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
- * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
-public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
+public class MultipleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
 	private static final String CURRENT_KEY = "current.key";
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private RowMapper keyMapper = new ColumnMapRowMapper();
 
-	@SuppressWarnings("unchecked")
 	private ItemPreparedStatementSetter preparedStatementSetter = new ColumnMapItemPreparedStatementSetter();
 
 	private String sql;
@@ -80,7 +73,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 	 * @param jdbcTemplate
 	 * @param sql - SQL statement that returns all keys to process. object.
 	 */
-	public MultipleColumnJdbcKeyCollector(JdbcOperations jdbcTemplate, String sql) {
+	public MultipleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
 		this();
 		Assert.notNull(jdbcTemplate, "The JdbcTemplate must not be null.");
 		Assert.hasText(sql, "The sql statement must not be null or empty.");
@@ -95,15 +88,14 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 	 * org.springframework.batch.io.sql.scratch.AbstractDrivingQueryItemReader
 	 * #retrieveKeys()
 	 */
-	@SuppressWarnings("unchecked")
-	public List<T> retrieveKeys(ExecutionContext executionContext) {
+	public List retrieveKeys(ExecutionContext executionContext) {
 
 		Assert.state(keyMapper != null, "KeyMapper must not be null.");
 		Assert.state(StringUtils.hasText(restartSql), "The RestartQuery must not be null or empty"
 				+ " in order to restart.");
 
 		if (executionContext.size() > 0) {
-			T key = (T) executionContext.get(getKey(CURRENT_KEY));
+			Object key = executionContext.get(getKey(CURRENT_KEY));
 			return jdbcTemplate.query(restartSql, new PreparedStatementSetterKeyWrapper(key, preparedStatementSetter),
 					keyMapper);
 		}
@@ -119,7 +111,7 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 	 * org.springframework.batch.io.driving.KeyGenerator#getKeyAsExecutionContext
 	 * (java.lang.Object)
 	 */
-	public void updateContext(T key, ExecutionContext executionContext) {
+	public void updateContext(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "The key must not be null");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 		executionContext.put(getKey(CURRENT_KEY), key);
@@ -165,21 +157,21 @@ public class MultipleColumnJdbcKeyCollector<T> extends ExecutionContextUserSuppo
 		this.sql = sql;
 	}
 
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 
-	public void setPreparedStatementSetter(ItemPreparedStatementSetter<T> preparedStatementSetter) {
+	public void setPreparedStatementSetter(ItemPreparedStatementSetter preparedStatementSetter) {
 		this.preparedStatementSetter = preparedStatementSetter;
 	}
 
-	private class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter {
+	private static class PreparedStatementSetterKeyWrapper implements PreparedStatementSetter {
 
-		private T key;
+		private Object key;
 
-		private ItemPreparedStatementSetter<T> pss;
+		private ItemPreparedStatementSetter pss;
 
-		public PreparedStatementSetterKeyWrapper(T key, ItemPreparedStatementSetter<T> pss) {
+		public PreparedStatementSetterKeyWrapper(Object key, ItemPreparedStatementSetter pss) {
 			this.key = key;
 			this.pss = pss;
 		}

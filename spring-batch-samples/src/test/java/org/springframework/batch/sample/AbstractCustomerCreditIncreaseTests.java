@@ -1,20 +1,14 @@
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
-import org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.batch.sample.item.writer.CustomerCreditIncreaseWriter;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -29,11 +23,11 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValidatingBatchLauncherTests {
 
-	protected SimpleJdbcTemplate simpleJdbcTemplate;
+	protected JdbcOperations jdbcTemplate;
 
 	protected PlatformTransactionManager transactionManager;
 
-	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseProcessor.FIXED_AMOUNT;
+	private static final BigDecimal CREDIT_INCREASE = CustomerCreditIncreaseWriter.FIXED_AMOUNT;
 	
 	private static String[] customers = { "INSERT INTO customer (id, version, name, credit) VALUES (1, 0, 'customer1', 100000)",
 		"INSERT INTO customer (id, version, name, credit) VALUES (2, 0, 'customer2', 100000)",
@@ -48,14 +42,19 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 
 	protected static final String ID_COLUMN = "ID";
 
-	private List<BigDecimal> creditsBeforeUpdate;
+	private List creditsBeforeUpdate;
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	/**
+	 * @param jdbcTemplate
+	 */
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
-
-	@Autowired
+	
+	/**
+	 * Public setter for the PlatformTransactionManager.
+	 * @param transactionManager the transactionManager to set
+	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
@@ -63,14 +62,14 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	/**
 	 * All customers have the same credit
 	 */
-	@SuppressWarnings("unchecked")
 	protected void validatePreConditions() throws Exception {
 		super.validatePreConditions();
 		ensureState();
-		creditsBeforeUpdate = (List<BigDecimal>) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(TransactionStatus status) {				
-				return simpleJdbcTemplate.query(ALL_CUSTOMERS, new ParameterizedRowMapper<BigDecimal>() {
-					public BigDecimal mapRow(ResultSet rs, int rowNum) throws SQLException {
+		creditsBeforeUpdate = (List) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				
+				return jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
 						return rs.getBigDecimal(CREDIT_COLUMN);
 					}
 				});
@@ -86,9 +85,9 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback(){
 
 			public Object doInTransaction(TransactionStatus status) {
-				simpleJdbcTemplate.update(DELETE_CUSTOMERS);
-				for (String customer : customers) {
-					simpleJdbcTemplate.update(customer);
+				jdbcTemplate.update(DELETE_CUSTOMERS);
+				for(int i = 0; i < customers.length;i++){
+					jdbcTemplate.update(customers[i]);
 				}
 				return null;
 			}
@@ -101,22 +100,24 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 	 */
 	protected void validatePostConditions() throws Exception {
 
-		final List<BigDecimal> matches = new ArrayList<BigDecimal>();
+		final List matches = new ArrayList();
 
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
-				simpleJdbcTemplate.getJdbcOperations().query(ALL_CUSTOMERS, new RowCallbackHandler() {
+				jdbcTemplate.query(ALL_CUSTOMERS, new RowMapper() {
 
-					private int i = 0;
-
-					public void processRow(ResultSet rs) throws SQLException {
-						final BigDecimal creditBeforeUpdate = creditsBeforeUpdate.get(i++);
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+						final BigDecimal creditBeforeUpdate = (BigDecimal) creditsBeforeUpdate.get(rowNum);
+						System.out.print("BEFORE:" + creditBeforeUpdate);
 						final BigDecimal expectedCredit = creditBeforeUpdate.add(CREDIT_INCREASE);
+						System.out.print(" EXPECTED:" + expectedCredit);
 						if (expectedCredit.equals(rs.getBigDecimal(CREDIT_COLUMN))) {
 							matches.add(rs.getBigDecimal(ID_COLUMN));
 						}
+						System.out.println(" ACTUAL: " + rs.getBigDecimal(CREDIT_COLUMN));
+						return null;
 					}
-					
+
 				});
 				return null;
 			}
@@ -126,7 +127,10 @@ public abstract class AbstractCustomerCreditIncreaseTests extends AbstractValida
 		checkMatches(matches);		
 	}
 
-	protected void checkMatches(List<BigDecimal> matches) {
+	/**
+	 * @param matches
+	 */
+	protected void checkMatches(List matches) {
 		// no-op...
 	}
 

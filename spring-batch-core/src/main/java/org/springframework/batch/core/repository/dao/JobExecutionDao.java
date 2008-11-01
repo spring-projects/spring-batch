@@ -1,10 +1,10 @@
 package org.springframework.batch.core.repository.dao;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * Data Access Object for job executions.
@@ -17,8 +17,7 @@ public interface JobExecutionDao {
 	/**
 	 * Save a new JobExecution.
 	 * 
-	 * Preconditions: jobInstance the jobExecution belongs to must have a
-	 * jobInstanceId.
+	 * Preconditions: jobInstance the jobExecution belongs to must have a jobInstanceId.
 	 * 
 	 * @param jobExecution
 	 */
@@ -35,37 +34,39 @@ public interface JobExecutionDao {
 	void updateJobExecution(JobExecution jobExecution);
 
 	/**
-	 * Return all {@link JobExecution} for given {@link JobInstance}, sorted
-	 * backwards by creation order (so the first element is the most recent).
+	 * Return the number of JobExecutions for the given JobInstance
+	 * 
+	 * Preconditions: jobInstance must have an id.
 	 */
-	List<JobExecution> findJobExecutions(JobInstance jobInstance);
+	int getJobExecutionCount(JobInstance jobInstance);
 
 	/**
-	 * Find the last {@link JobExecution} to have been created for a given
-	 * {@link JobInstance}.
-	 * @param jobInstance the {@link JobInstance}
-	 * @return the last {@link JobExecution} to execute for this instance
+	 * Return list of JobExecutions for given JobInstance.
+	 * 
+	 * @param jobInstance
+	 * @return list of jobExecutions.
+	 */
+	List findJobExecutions(JobInstance jobInstance);
+
+	/**
+	 * @return last JobExecution for given JobInstance.
 	 */
 	JobExecution getLastJobExecution(JobInstance jobInstance);
-
+	
 	/**
-	 * @return all {@link JobExecution} that are still running (or indeterminate
-	 * state), i.e. having null end date, for the specified job name.
-	 */
-	Set<JobExecution> findRunningJobExecutions(String jobName);
-
-	/**
-	 * @return the {@link JobExecution} for given identifier.
-	 */
-	JobExecution getJobExecution(Long executionId);
-
-	/**
-	 * Because it may be possible that the status of a JobExecution is updated
-	 * while running, the following method while synchronize only the status
-	 * field.
+	 * Find the {@link ExecutionContext} for the given {@link JobExecution}.
 	 * 
-	 * @param jobExecution to be updated.
+	 * @throws IllegalArgumentException if the id is null.
 	 */
-	void synchronizeStatus(JobExecution jobExecution);
+	ExecutionContext findExecutionContext(JobExecution jobExecution);
+
+	/**
+	 * Save the {@link ExecutionContext} of the given {@link JobExecution}.
+	 * 
+	 * @param jobExecution the {@link JobExecution} containing the
+	 * {@link ExecutionContext} to be saved.
+	 * @throws IllegalArgumentException if the attributes are null.
+	 */
+	void saveOrUpdateExecutionContext(JobExecution jobExecution);
 
 }

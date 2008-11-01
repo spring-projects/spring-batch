@@ -15,14 +15,12 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.List;
-
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.repeat.ExitStatus;
 
 /**
@@ -31,8 +29,8 @@ import org.springframework.batch.repeat.ExitStatus;
  * @author Lucas Ward
  *
  */
-public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkListener,
-		ItemReadListener<T>, ItemWriteListener<S> {
+public class StepListenerSupport implements StepExecutionListener, ChunkListener,
+		ItemReadListener, ItemWriteListener {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
@@ -69,7 +67,7 @@ public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkLis
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
 	 */
-	public void afterRead(T item) {
+	public void afterRead(Object item) {
 	}
 
 	/* (non-Javadoc)
@@ -85,21 +83,21 @@ public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkLis
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemWriteListener#afterWrite(java.util.List)
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
 	 */
-	public void afterWrite(List<? extends S> items) {
+	public void afterWrite(Object item) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemWriteListener#beforeWrite(java.util.List)
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#beforeWrite(java.lang.Object)
 	 */
-	public void beforeWrite(List<? extends S> items) {
+	public void beforeWrite(Object item) {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.ItemWriteListener#onWriteError(java.lang.Exception, java.util.List)
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#onWriteError(java.lang.Exception, java.lang.Object)
 	 */
-	public void onWriteError(Exception exception, List<? extends S> items) {
+	public void onWriteError(Exception ex, Object item) {
 	}
 
 }

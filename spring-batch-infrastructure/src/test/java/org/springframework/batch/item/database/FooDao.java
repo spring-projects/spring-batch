@@ -16,8 +16,7 @@
 package org.springframework.batch.item.database;
 
 import org.springframework.batch.item.sample.Foo;
-
-import javax.sql.DataSource;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Lucas Ward
@@ -27,5 +26,5 @@ public interface FooDao {
 
 	Foo getFoo(Object key);
 
-	void setDataSource(DataSource dataSource);
+	void setJdbcTemplate(JdbcTemplate jdbcTemplate);
 }

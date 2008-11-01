@@ -20,13 +20,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
-import org.springframework.batch.support.Classifier;
-import org.springframework.batch.support.ClassifierSupport;
+import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.ExceptionClassifierSupport;
 
 /**
- * Implementation of {@link ExceptionHandler} based on an {@link Classifier}.
- * The classifier determines whether to log the exception or rethrow it. The
- * keys in the classifier must be the same as the static enum in this class.
+ * Implementation of {@link ExceptionHandler} based on an {@link ExceptionClassifier}. The classifier determines
+ * whether to log the exception or rethrow it. The keys in the classifier must be the same as the static contants in
+ * this class.
  * 
  * @author Dave Syer
  * 
@@ -34,57 +34,46 @@ import org.springframework.batch.support.ClassifierSupport;
 public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 
 	/**
-	 * Logging levels for the handler.
-	 * 
-	 * @author Dave Syer
-	 * 
+	 * Key for {@link ExceptionClassifier} signalling that the throwable should be rethrown. If the throwable is not a
+	 * RuntimeException it is wrapped in a {@link RepeatException}.
 	 */
-	public static enum Level {
+	public static final String RETHROW = "rethrow";
 
-		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * rethrown. If the throwable is not a RuntimeException it is wrapped in
-		 * a {@link RepeatException}.
-		 */
-		RETHROW,
+	/**
+	 * Key for {@link ExceptionClassifier} signalling that the throwable should be logged at debug level.
+	 */
+	public static final String DEBUG = "debug";
 
-		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * logged at debug level.
-		 */
-		DEBUG,
+	/**
+	 * Key for {@link ExceptionClassifier} signalling that the throwable should be logged at warn level.
+	 */
+	public static final String WARN = "warn";
 
-		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * logged at warn level.
-		 */
-		WARN,
-
-		/**
-		 * Key for {@link Classifier} signalling that the throwable should be
-		 * logged at error level.
-		 */
-		ERROR
-
-	}
+	/**
+	 * Key for {@link ExceptionClassifier} signalling that the throwable should be logged at error level.
+	 */
+	public static final String ERROR = "error";
 
 	protected final Log logger = LogFactory.getLog(LogOrRethrowExceptionHandler.class);
 
-	private Classifier<Throwable, Level> exceptionClassifier = new ClassifierSupport<Throwable, Level>(Level.RETHROW);
+	private ExceptionClassifier exceptionClassifier = new ExceptionClassifierSupport() {
+		public Object classify(Throwable throwable) {
+			return RETHROW;
+		}
+	};
 
 	/**
-	 * Setter for the {@link Classifier} used by this handler. The default is to
-	 * map all throwable instances to {@link Level#RETHROW}.
+	 * Setter for the {@link ExceptionClassifier} used by this handler. The default is to map all throwable instances to
+	 * {@link #RETHROW}.
 	 * 
-	 * @param exceptionClassifier the ExceptionClassifier to use
+	 * @param exceptionClassifier
 	 */
-	public void setExceptionClassifier(Classifier<Throwable, Level> exceptionClassifier) {
+	public void setExceptionClassifier(ExceptionClassifier exceptionClassifier) {
 		this.exceptionClassifier = exceptionClassifier;
 	}
 
 	/**
-	 * Classify the throwables and decide whether to rethrow based on the
-	 * result. The context is not used.
+	 * Classify the throwables and decide whether to rethrow based on the result. The context is not used.
 	 * 
 	 * @throws Throwable
 	 * 
@@ -92,18 +81,18 @@ public class LogOrRethrowExceptionHandler implements ExceptionHandler {
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
-		Level key = exceptionClassifier.classify(throwable);
-		if (Level.ERROR.equals(key)) {
+		Object key = exceptionClassifier.classify(throwable);
+		if (ERROR.equals(key)) {
 			logger.error("Exception encountered in batch repeat.", throwable);
-		}
-		else if (Level.WARN.equals(key)) {
+		} else if (WARN.equals(key)) {
 			logger.warn("Exception encountered in batch repeat.", throwable);
-		}
-		else if (Level.DEBUG.equals(key) && logger.isDebugEnabled()) {
+		} else if (DEBUG.equals(key) && logger.isDebugEnabled()) {
 			logger.debug("Exception encountered in batch repeat.", throwable);
-		}
-		else if (Level.RETHROW.equals(key)) {
+		} else if (RETHROW.equals(key)) {
 			throw throwable;
+		} else {
+			throw new IllegalStateException(
+			        "Unclassified exception encountered.  Did you mean to classifiy this as 'rethrow'?");
 		}
 
 	}

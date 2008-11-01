@@ -23,10 +23,9 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.message.Message;
 import org.springframework.util.Assert;
 
 /**
@@ -40,9 +39,9 @@ public class MessageOrientedStep extends AbstractStep {
 	 */
 	public static final String WAITING = MessageOrientedStep.class.getName() + ".WAITING";
 
-	private MessageChannel outputChannel;
+	private MessageChannel requestChannel;
 
-	private PollableChannel source;
+	private MessageChannel replyChannel;
 
 	private static int MINUTE = 1000 * 60;
 
@@ -76,31 +75,32 @@ public class MessageOrientedStep extends AbstractStep {
 	}
 
 	/**
-	 * Public setter for the target.
-	 * @param outputChannel the target to set
+	 * Public setter for the requestChannel.
+	 * @param requestChannel the requestChannel to set
 	 */
 	@Required
-	public void setOutputChannel(MessageChannel outputChannel) {
-		this.outputChannel = outputChannel;
+	public void setRequestChannel(MessageChannel requestChannel) {
+		this.requestChannel = requestChannel;
 	}
 
 	/**
-	 * Public setter for the source.
-	 * @param source the source to set
+	 * Public setter for the replyChannel.
+	 * @param replyChannel the replyChannel to set
 	 */
 	@Required
-	public void setInputChannel(PollableChannel source) {
-		this.source = source;
+	public void setReplyChannel(MessageChannel replyChannel) {
+		this.replyChannel = replyChannel;
 	}
 
-	/**
-	 * @see AbstractStep#execute(StepExecution)
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.step.AbstractStep#execute(org.springframework.batch.core.StepExecution)
 	 */
 	@Override
 	public ExitStatus doExecute(StepExecution stepExecution) throws JobInterruptedException,
 			UnexpectedJobExecutionException {
 
-		JobExecutionRequest request = new JobExecutionRequest(stepExecution .getJobExecution());
+		JobExecutionRequest request = new JobExecutionRequest(stepExecution.getJobExecution());
 
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 
@@ -111,13 +111,31 @@ public class MessageOrientedStep extends AbstractStep {
 		else {
 			executionContext.putString(WAITING, "true");
 			// TODO: need these two lines to be atomic
-			getJobRepository().update(stepExecution);
-			outputChannel.send(new GenericMessage<JobExecutionRequest>(request));
+			getJobRepository().saveOrUpdate(stepExecution);
+			requestChannel.send(new GenericMessage<JobExecutionRequest>(request));
 			waitForReply(request.getJobId());
 		}
 
 		return ExitStatus.FINISHED;
 
+	}
+
+	/**
+	 * Do nothing.
+	 * 
+	 * @see org.springframework.batch.core.step.AbstractStep#open(org.springframework.batch.item.ExecutionContext)
+	 */
+	@Override
+	protected void open(ExecutionContext ctx) throws Exception {
+	}
+
+	/**
+	 * Do nothing.
+	 * 
+	 * @see org.springframework.batch.core.step.AbstractStep#close(org.springframework.batch.item.ExecutionContext)
+	 */
+	@Override
+	protected void close(ExecutionContext ctx) throws Exception {
 	}
 
 	/**
@@ -128,15 +146,14 @@ public class MessageOrientedStep extends AbstractStep {
 		long maxCount = executionTimeout / timeout;
 		long count = 0;
 
+		// TODO: use a ReponseCorrelator?, or just a SynchronousChannel
 		while (count++ < maxCount) {
 
-			// TODO: timeout?
-			@SuppressWarnings("unchecked")
-			Message<JobExecutionRequest> message = (Message<JobExecutionRequest>) source.receive(timeout);
+			Message<?> message = replyChannel.receive(timeout);
 
 			if (message != null) {
 
-				JobExecutionRequest payload = message.getPayload();
+				JobExecutionRequest payload = (JobExecutionRequest) message.getPayload();
 				Long jobInstanceId = payload.getJobId();
 				Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
 				Assert.state(jobInstanceId.equals(expectedJobId), "Message contained wrong job instance id ["

@@ -20,37 +20,34 @@ import java.io.StringWriter;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.apache.log4j.WriterAppender;
 import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.exception.LogOrRethrowExceptionHandler.Level;
-import org.springframework.batch.support.ClassifierSupport;
+import org.springframework.batch.support.ExceptionClassifierSupport;
 
 public class LogOrRethrowExceptionHandlerTests extends TestCase {
 
 	private LogOrRethrowExceptionHandler handler = new LogOrRethrowExceptionHandler();
-
 	private StringWriter writer;
-
 	private RepeatContext context = null;
-
+	
 	protected void setUp() throws Exception {
 		super.setUp();
 		Logger logger = Logger.getLogger(LogOrRethrowExceptionHandler.class);
-		logger.setLevel(org.apache.log4j.Level.DEBUG);
+		logger.setLevel(Level.DEBUG);
 		writer = new StringWriter();
 		logger.removeAllAppenders();
 		logger.getParent().removeAllAppenders();
 		logger.addAppender(new WriterAppender(new SimpleLayout(), writer));
 	}
-
+	
 	public void testRuntimeException() throws Throwable {
 		try {
 			handler.handleException(context, new RuntimeException("Foo"));
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
@@ -59,16 +56,15 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		try {
 			handler.handleException(context, new Error("Foo"));
 			fail("Expected Error");
-		}
-		catch (Error e) {
+		} catch (Error e) {
 			assertEquals("Foo", e.getMessage());
 		}
 	}
-
+	
 	public void testNotRethrownErrorLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
-			public Level classify(Throwable throwable) {
-				return Level.ERROR;
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return LogOrRethrowExceptionHandler.ERROR;
 			}
 		});
 		// No exception...
@@ -77,9 +73,20 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 	}
 
 	public void testNotRethrownWarnLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
-			public Level classify(Throwable throwable) {
-				return Level.WARN;
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return LogOrRethrowExceptionHandler.WARN;
+			}
+		});
+		// No exception...
+		handler.handleException(context, new Error("Foo"));
+		assertNotNull(writer.toString());
+	}
+	
+	public void testNotRethrownDebugLevel() throws Throwable {
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return LogOrRethrowExceptionHandler.DEBUG;
 			}
 		});
 		// No exception...
@@ -87,15 +94,18 @@ public class LogOrRethrowExceptionHandlerTests extends TestCase {
 		assertNotNull(writer.toString());
 	}
 
-	public void testNotRethrownDebugLevel() throws Throwable {
-		handler.setExceptionClassifier(new ClassifierSupport<Throwable,Level>(Level.RETHROW) {
-			public Level classify(Throwable throwable) {
-				return Level.DEBUG;
+	public void testUnclassifiedException() throws Throwable {
+		handler.setExceptionClassifier(new ExceptionClassifierSupport() {
+			public Object classify(Throwable throwable) {
+				return "DEFAULT";
 			}
 		});
-		// No exception...
-		handler.handleException(context, new Error("Foo"));
-		assertNotNull(writer.toString());
+		try {
+			handler.handleException(context, new Error("Foo"));
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException e) {
+			assertTrue(e.getMessage().toLowerCase().indexOf("unclassified")>=0);
+		}
 	}
 
 }

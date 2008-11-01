@@ -16,7 +16,6 @@
 package org.springframework.batch.core.listener;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.core.Ordered;
@@ -26,61 +25,62 @@ import org.springframework.core.Ordered;
  * @author Dave Syer
  * 
  */
-public class CompositeItemWriteListener<S> implements ItemWriteListener<S> {
+public class CompositeItemWriteListener implements ItemWriteListener {
 
-	private OrderedComposite<ItemWriteListener<? super S>> listeners = new OrderedComposite<ItemWriteListener<? super S>>();
+	private OrderedComposite listeners = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
 	 * 
 	 * @param itemWriteListeners
 	 */
-	public void setListeners(List<? extends ItemWriteListener<? super S>> itemWriteListeners) {
+	public void setListeners(ItemWriteListener[] itemWriteListeners) {
 		this.listeners.setItems(itemWriteListeners);
 	}
 
 	/**
 	 * Register additional listener.
 	 * 
-	 * @param itemWriteListener
+	 * @param itemReaderListener
 	 */
-	public void register(ItemWriteListener<? super S> itemWriteListener) {
-		listeners.add(itemWriteListener);
+	public void register(ItemWriteListener itemReaderListener) {
+		listeners.add(itemReaderListener);
 	}
 
 	/**
 	 * Call the registered listeners in reverse order, respecting and
 	 * prioritising those that implement {@link Ordered}.
-	 * @see ItemWriteListener#afterWrite(java.util.List)
+	 * @see org.springframework.batch.core.ItemWriteListener#afterWrite(java.lang.Object)
 	 */
-	public void afterWrite(List<? extends S> items) {
-		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
-			ItemWriteListener<? super S> listener = iterator.next();
-			listener.afterWrite(items);
+	public void afterWrite(Object item) {
+		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
+			ItemWriteListener listener = (ItemWriteListener) iterator.next();
+			listener.afterWrite(item);
 		}
 	}
 
 	/**
 	 * Call the registered listeners in order, respecting and prioritising those
 	 * that implement {@link Ordered}.
-	 * @see ItemWriteListener#beforeWrite(List)
+	 * @see org.springframework.batch.core.ItemWriteListener#beforeWrite(java.lang.Object)
 	 */
-	public void beforeWrite(List<? extends S> items) {
-		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.iterator(); iterator.hasNext();) {
-			ItemWriteListener<? super S> listener = iterator.next();
-			listener.beforeWrite(items);
+	public void beforeWrite(Object item) {
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			ItemWriteListener listener = (ItemWriteListener) iterator.next();
+			listener.beforeWrite(item);
 		}
 	}
 
 	/**
 	 * Call the registered listeners in reverse order, respecting and
 	 * prioritising those that implement {@link Ordered}.
-	 * @see ItemWriteListener#onWriteError(Exception, List)
+	 * @see org.springframework.batch.core.ItemWriteListener#onWriteError(java.lang.Exception,
+	 * java.lang.Object)
 	 */
-	public void onWriteError(Exception ex, List<? extends S> items) {
-		for (Iterator<ItemWriteListener<? super S>> iterator = listeners.reverse(); iterator.hasNext();) {
-			ItemWriteListener<? super S> listener = iterator.next();
-			listener.onWriteError(ex, items);
+	public void onWriteError(Exception ex, Object item) {
+		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
+			ItemWriteListener listener = (ItemWriteListener) iterator.next();
+			listener.onWriteError(ex, item);
 		}
 	}
 }

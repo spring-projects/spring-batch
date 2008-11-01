@@ -21,11 +21,9 @@ import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
+import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStream;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -53,7 +51,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
+public class HibernateCursorItemReader extends AbstractBufferedItemReaderItemStream implements ItemStream,
 		InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -123,11 +121,17 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	}
 
 	/**
-	 * Clears the session if not stateful and delegates to super class.
+	 * Mark is supported as long as this {@link ItemStream} is used in a
+	 * single-threaded environment. The state backing the mark is a single
+	 * counter, keeping track of the current position, so multiple threads
+	 * cannot be accommodated.
+	 * 
+	 * @see org.springframework.batch.item.ItemReader#mark()
 	 */
-	@Override
-	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		super.update(executionContext);
+	public void mark() {
+
+		super.mark();
+
 		if (!useStatelessSession) {
 			statefulSession.clear();
 		}
@@ -146,8 +150,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		this.fetchSize = fetchSize;
 	}
 
-	@SuppressWarnings("unchecked")
-	protected T doRead() throws Exception {
+	protected Object doRead() throws Exception {
 		if (cursor.next()) {
 			Object[] data = cursor.get();
 			Object item;
@@ -159,7 +162,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 				item = data[0];
 			}
 
-			return (T) item;
+			return item;
 		}
 		return null;
 	}

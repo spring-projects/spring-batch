@@ -1,23 +1,13 @@
 package org.springframework.batch.item.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
-import javax.sql.DataSource;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.sample.Foo;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.util.Assert;
 
 /**
  * Common scenarios for testing {@link ItemReader} implementations which read data from database.
@@ -25,72 +15,68 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Lucas Ward
  * @author Robert Kasanicky
  */
-public abstract class AbstractJdbcItemReaderIntegrationTests {
+public abstract class AbstractJdbcItemReaderIntegrationTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	protected ItemReader<Foo> itemReader;
+	protected ItemReader itemReader;
 
 	protected ExecutionContext executionContext;
 	
-	protected abstract ItemReader<Foo> createItemReader() throws Exception;
+	/**
+	 * @return input source with all necessary dependencies set
+	 */
+	protected abstract ItemReader createItemReader() throws Exception;
 
-	protected DataSource dataSource;
-
-	protected SimpleJdbcTemplate simpleJdbcTemplate;
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	protected String[] getConfigLocations(){
+		return new String[] { "org/springframework/batch/item/database/data-source-context.xml"};
 	}
 
-	@Before
-	public void onSetUp()throws Exception{
+	protected void onSetUp()throws Exception{
+		super.onSetUp();
 		itemReader = createItemReader();
 		getAsInitializingBean(itemReader).afterPropertiesSet();
 		executionContext = new ExecutionContext();
 	}
 
-	@After
-	public void onTearDown()throws Exception {
+	protected void onTearDown()throws Exception {
 		getAsDisposableBean(itemReader).destroy();
+		super.onTearDown();
 	}
 
-	/*
+	/**
 	 * Regular scenario - read all rows and eventually return null.
 	 */
-	@Transactional @Test
 	public void testNormalProcessing() throws Exception {
 		getAsInitializingBean(itemReader).afterPropertiesSet();
 		getAsItemStream(itemReader).open(executionContext);
 
-		Foo foo1 = itemReader.read();
+		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = itemReader.read();
+		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
-		Foo foo3 = itemReader.read();
+		Foo foo3 = (Foo) itemReader.read();
 		assertEquals(3, foo3.getValue());
 
-		Foo foo4 = itemReader.read();
+		Foo foo4 = (Foo) itemReader.read();
 		assertEquals(4, foo4.getValue());
 
-		Foo foo5 = itemReader.read();
+		Foo foo5 = (Foo) itemReader.read();
 		assertEquals(5, foo5.getValue());
 
 		assertNull(itemReader.read());
 	}
 
-	/*
+	/**
 	 * Restart scenario.
+	 * @throws Exception
 	 */
-	@Transactional @Test
 	public void testRestart() throws Exception {
 		getAsItemStream(itemReader).open(executionContext);
-		Foo foo1 = itemReader.read();
+		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = itemReader.read();
+		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
 		getAsItemStream(itemReader).update(executionContext);
@@ -99,21 +85,20 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 		itemReader = createItemReader();
 		getAsItemStream(itemReader).open(executionContext);
 
-		Foo fooAfterRestart = itemReader.read();
+		Foo fooAfterRestart = (Foo) itemReader.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 
-	/*
+	/**
 	 * Reading from an input source and then trying to restore causes an error.
 	 */
-	@Transactional @Test
 	public void testInvalidRestore() throws Exception {
 
 		getAsItemStream(itemReader).open(executionContext);
-		Foo foo1 = itemReader.read();
+		Foo foo1 = (Foo) itemReader.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = itemReader.read();
+		Foo foo2 = (Foo) itemReader.read();
 		assertEquals(2, foo2.getValue());
 
 		getAsItemStream(itemReader).update(executionContext);
@@ -122,7 +107,7 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 		itemReader = createItemReader();
 		getAsItemStream(itemReader).open(new ExecutionContext());
 
-		Foo foo = itemReader.read();
+		Foo foo = (Foo) itemReader.read();
 		assertEquals(1, foo.getValue());
 
 		try {
@@ -134,26 +119,56 @@ public abstract class AbstractJdbcItemReaderIntegrationTests {
 		}
 	}
 
-	/*
+	/**
 	 * Empty restart data should be handled gracefully.
+	 * @throws Exception 
 	 */
-	@Transactional @Test
 	public void testRestoreFromEmptyData() throws Exception {
 		ExecutionContext streamContext = new ExecutionContext();
 		getAsItemStream(itemReader).open(streamContext);
-		Foo foo = itemReader.read();
+		Foo foo = (Foo) itemReader.read();
 		assertEquals(1, foo.getValue());
 	}
 
-	private ItemStream getAsItemStream(ItemReader<Foo> source) {
+	/**
+	 * Rollback scenario.
+	 * @throws Exception 
+	 */
+	public void testRollback() throws Exception {
+		getAsItemStream(itemReader).open(executionContext);
+		Foo foo1 = (Foo) itemReader.read();
+
+		commit();
+
+		Foo foo2 = (Foo) itemReader.read();
+		Assert.state(!foo2.equals(foo1));
+
+		Foo foo3 = (Foo) itemReader.read();
+		Assert.state(!foo2.equals(foo3));
+
+		rollback();
+
+		assertEquals(foo2, itemReader.read());
+	}
+
+
+	private void commit() {
+		itemReader.mark();
+	}
+
+	private void rollback() {
+		itemReader.reset();
+	}
+
+	private ItemStream getAsItemStream(ItemReader source) {
 		return (ItemStream) source;
 	}
 
-	private InitializingBean getAsInitializingBean(ItemReader<Foo> source) {
+	private InitializingBean getAsInitializingBean(ItemReader source) {
 		return (InitializingBean) source;
 	}
 
-	private DisposableBean getAsDisposableBean(ItemReader<Foo> source) {
+	private DisposableBean getAsDisposableBean(ItemReader source) {
 		return (DisposableBean) source;
 	}
 

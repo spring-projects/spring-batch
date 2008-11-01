@@ -1,28 +1,21 @@
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertTrue;
-
 import javax.sql.DataSource;
 
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class FootballJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+public class FootballJobFunctionalTests extends
+		AbstractValidatingBatchLauncherTests {
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
-	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
 	protected void validatePostConditions() throws Exception {
-		int count = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
+		int count = jdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
 		assertTrue(count>0);
 	}
 

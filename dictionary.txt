@@ -70,15 +70,3 @@ rethrow
 rethrown
 tokenizer
 tokenizes
-interceptions
-immutable
-stateless
-autowiring
-strategizing
-initialized
-locale
-savepoint
-middleware
-fallback
-idempotent
-reconstitute

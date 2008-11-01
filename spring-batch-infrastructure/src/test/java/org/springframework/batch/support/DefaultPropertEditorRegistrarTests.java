@@ -60,6 +60,17 @@ public class DefaultPropertEditorRegistrarTests extends TestCase {
 		}
 	}
 
+
+	public void testSetCustomEditorsWithInvalidEditor() throws Exception {
+
+		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
+		try {
+			mapper.setCustomEditors(Collections.singletonMap(Long.class, "FOO"));
+		} catch (IllegalArgumentException e) {	
+			// expected
+		}
+	}
+
 	private static class BeanWithIntArray {
 		private int[] numbers;
 

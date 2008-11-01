@@ -22,18 +22,6 @@
   	select ID, NAME, VALUE from T_FOOS
   </select>
 
-  <select id="getPagedFoos" resultMap="fooResult">
-  	select LIMIT #_skiprows# #_pagesize# ID, NAME, VALUE from T_FOOS order by ID
-  </select>
-
-  <select id="getPagedFoos3AndUp" resultMap="fooResult">
-  	select LIMIT #_skiprows# #_pagesize# ID, NAME, VALUE from T_FOOS where VALUE >= #limit# order by ID
-  </select>
-
-  <select id="getFoos3AndUp" resultMap="fooResult">
-  	select ID, NAME, VALUE from T_FOOS where VALUE >= #limit#
-  </select>
-
   <select id="getAllFooIdsRestart" resultClass="int">
   	select ID from T_FOOS where ID > #id#
   </select>

@@ -35,7 +35,7 @@ package org.springframework.batch.item;
  * @author Lucas Ward
  * @since 1.0
  */
-public interface ItemReader<T> {
+public interface ItemReader {
 
 	/**
 	 * Reads a piece of input data and advance to the next one. Implementations
@@ -46,6 +46,31 @@ public interface ItemReader<T> {
 	 * 
 	 * @throws Exception if an underlying resource is unavailable.
 	 */
-	T read() throws Exception, UnexpectedInputException, ParseException;
+	Object read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException;
+
+	/**
+	 * Mark the stream so that it can be reset later and the items backed
+	 * out.<br/>
+	 * 
+	 * Mark is called before reading a new chunk of items - in case of rollback
+	 * mark will not be called again before re-processing the chunk.<br/>
+	 * 
+	 * @throws MarkFailedException if there is a problem with the mark. If a
+	 * mark fails inside a transaction, it would be worrying, but not normally
+	 * fatal.
+	 */
+	void mark() throws MarkFailedException;
+
+	/**
+	 * Reset the stream to the last mark. After a reset the stream state will be
+	 * such that changes (items read or written) since the last call to mark
+	 * will not be visible after a call to close.<br/>
+	 * 
+	 * @throws ResetFailedException if there is a problem with the reset. If a
+	 * reset fails inside a transaction, it would normally be fatal, and would
+	 * leave the stream in an inconsistent state. So while this is an unchecked
+	 * exception, it may be important for a client to catch it explicitly.
+	 */
+	void reset() throws ResetFailedException;
 
 }

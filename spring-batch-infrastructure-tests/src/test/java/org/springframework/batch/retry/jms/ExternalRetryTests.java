@@ -16,100 +16,106 @@
 
 package org.springframework.batch.retry.jms;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.support.AbstractItemReader;
+import org.springframework.batch.item.support.AbstractItemWriter;
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.support.DefaultRetryState;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.ClassUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class ExternalRetryTests {
+public class ExternalRetryTests extends AbstractDependencyInjectionSpringContextTests {
 
-	@Autowired
 	private JmsTemplate jmsTemplate;
 
 	private RetryTemplate retryTemplate;
 
-	private ItemReader<String> provider;
+	private ItemReaderRecoverer provider;
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void onSetUp() throws Exception {
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+
+	public void setJmsTemplate(JmsTemplate jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
+	}
+
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
+				"jms-context.xml") };
+	}
+
+	protected void onSetUp() throws Exception {
+		super.onSetUp();
 		getMessages(); // drain queue
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
-		provider = new ItemReader<String>() {
-			public String read() {
+		provider = new ItemReaderRecoverer() {
+			public Object read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
+			}
+
+			public Object recover(Object data, Throwable cause) {
+				recovered.add(data);
+				return data;
 			}
 		};
 		retryTemplate = new RetryTemplate();
 	}
 
 	private void assertInitialState() {
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 	}
 
-	private List<String> list = new ArrayList<String>();
+	private List list = new ArrayList();
 
-	private List<Object> recovered = new ArrayList<Object>();
+	private List recovered = new ArrayList();
 
-	/*
+	/**
 	 * Message processing is successful on the second attempt but must receive
 	 * the message again.
+	 * 
+	 * @throws Exception
 	 */
-	@Test
 	public void testExternalRetrySuccessOnSecondAttempt() throws Exception {
 
 		assertInitialState();
 
-		final ItemWriter<Object> writer = new ItemWriter<Object>() {
-			public void write(final List<? extends Object> texts) {
+		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
 
-				for (Object text : texts) {
-
-					simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(),
-							text);
-					if (list.size() == 1) {
-						throw new RuntimeException("Rollback!");
-					}
-
+		final AbstractItemWriter writer = new AbstractItemWriter() {
+			public void write(final Object text) {
+				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
+						new Integer(list.size()), text });
+				if (list.size() == 1) {
+					throw new RuntimeException("Rollback!");
 				}
 
 			}
@@ -120,13 +126,13 @@ public class ExternalRetryTests {
 				public Object doInTransaction(TransactionStatus status) {
 					try {
 						final Object item = provider.read();
-						RetryCallback<Object> callback = new RetryCallback<Object>() {
-							public Object doWithRetry(RetryContext context) throws Exception {
-								writer.write(Collections.singletonList(item));
+						RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+							public Object doWithRetry(RetryContext context) throws Throwable {
+								writer.write(item);
 								return null;
 							}
-						};
-						return retryTemplate.execute(callback, new DefaultRetryState(item));
+						});
+						return retryTemplate.execute(callback);
 					}
 					catch (Exception e) {
 						throw new RuntimeException(e.getMessage(), e);
@@ -147,14 +153,14 @@ public class ExternalRetryTests {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				try {
-					final String item = provider.read();
-					RetryCallback<Object> callback = new RetryCallback<Object>() {
-						public Object doWithRetry(RetryContext context) throws Exception {
-							writer.write(Collections.singletonList(item));
+					final Object item = provider.read();
+					RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+						public Object doWithRetry(RetryContext context) throws Throwable {
+							writer.write(item);
 							return null;
 						}
-					};
-					return retryTemplate.execute(callback, new DefaultRetryState(item));
+					});
+					return retryTemplate.execute(callback);
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e.getMessage(), e);
@@ -162,47 +168,50 @@ public class ExternalRetryTests {
 			}
 		});
 
-		List<String> msgs = getMessages();
+		List msgs = getMessages();
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(1, count);
 
 		// ... and so did the message session.
 		assertEquals("[]", msgs.toString());
 	}
 
-	/*
+	/**
 	 * Message processing fails on both attempts.
+	 * 
+	 * @throws Exception
 	 */
-	@Test
 	public void testExternalRetryWithRecovery() throws Exception {
 
 		assertInitialState();
 
-		final String item = provider.read();
-		final RetryCallback<String> callback = new RetryCallback<String>() {
-			public String doWithRetry(RetryContext context) throws Exception {
-				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), item);
+		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy());
+
+		final Object item = provider.read();
+		final RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+			public Object doWithRetry(RetryContext context) throws Throwable {
+				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
+						new Integer(list.size()), item });
 				throw new RuntimeException("Rollback!");
 			}
-		};
-
-		final RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
-			public String recover(RetryContext context) {
-				recovered.add(item);
-				return item;
+		});
+		
+		callback.setRecoveryCallback(new RecoveryCallback() {
+			public Object recover(RetryContext context) {
+				return provider.recover(item, context.getLastThrowable());
 			}
-		};
+		});
 
-		String result = "start";
+		Object result = "start";
 
 		for (int i = 0; i < 4; i++) {
 			try {
-				result = (String) new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+				result = new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
 						try {
-							return retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
+							return retryTemplate.execute(callback);
 						}
 						catch (Exception e) {
 							throw new RuntimeException(e.getMessage(), e);
@@ -225,12 +234,12 @@ public class ExternalRetryTests {
 		// Last attempt should return last item.
 		assertEquals("foo", result);
 
-		List<String> msgs = getMessages();
+		List msgs = getMessages();
 
 		assertEquals(1, recovered.size());
 
 		// The database portion committed once...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
 		// ... and so did the message session.
@@ -238,15 +247,19 @@ public class ExternalRetryTests {
 
 	}
 
-	private List<String> getMessages() {
+	private List getMessages() {
 		String next = "";
-		List<String> msgs = new ArrayList<String>();
+		List msgs = new ArrayList();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)
 				msgs.add(next);
 		}
 		return msgs;
+	}
+
+	private abstract class ItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
+
 	}
 
 }

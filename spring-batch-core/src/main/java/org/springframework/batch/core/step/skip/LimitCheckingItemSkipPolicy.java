@@ -16,13 +16,17 @@
 package org.springframework.batch.core.step.skip;
 
 import java.io.FileNotFoundException;
-import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.FlatFileParseException;
-import org.springframework.batch.support.BinaryExceptionClassifier;
-import org.springframework.batch.support.Classifier;
+import org.springframework.batch.support.ExceptionClassifier;
+import org.springframework.batch.support.SubclassExceptionClassifier;
 
 /**
  * <p>
@@ -54,11 +58,19 @@ import org.springframework.batch.support.Classifier;
  */
 public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 
+	/**
+	 * Label for classifying skippable exceptions.
+	 */
+	private static final String SKIP = "skip";
+
+	/**
+	 * Label for classifying fatal exceptions - these are never skipped.
+	 */
+	private static final String NEVER_SKIP = "neverSkip";
+
 	private final int skipLimit;
 
-	private final Classifier<Throwable, Boolean> fatalExceptionClassifier;
-
-	private final Classifier<Throwable, Boolean> skippableExceptionClassifier;
+	private ExceptionClassifier exceptionClassifier;
 
 	/**
 	 * Convenience constructor that assumes all exception types are skippable
@@ -66,8 +78,7 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * @param skipLimit the number of exceptions allowed to skip
 	 */
 	public LimitCheckingItemSkipPolicy(int skipLimit) {
-		this(skipLimit, Collections.<Class<? extends Throwable>> singleton(Exception.class), Collections
-				.<Class<? extends Throwable>> emptyList());
+		this(skipLimit, Collections.singletonList(Exception.class), Collections.EMPTY_LIST);
 	}
 
 	/**
@@ -78,11 +89,20 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * (non-critical)
 	 * @param fatalExceptions exception classes that should never be skipped
 	 */
-	public LimitCheckingItemSkipPolicy(int skipLimit, Collection<Class<? extends Throwable>> skippableExceptions,
-			Collection<Class<? extends Throwable>> fatalExceptions) {
+	public LimitCheckingItemSkipPolicy(int skipLimit, List skippableExceptions, List fatalExceptions) {
 		this.skipLimit = skipLimit;
-		skippableExceptionClassifier = new BinaryExceptionClassifier(skippableExceptions);
-		fatalExceptionClassifier = new BinaryExceptionClassifier(fatalExceptions);
+		SubclassExceptionClassifier exceptionClassifier = new SubclassExceptionClassifier();
+		Map typeMap = new HashMap();
+		for (Iterator iterator = skippableExceptions.iterator(); iterator.hasNext();) {
+			Class throwable = (Class) iterator.next();
+			typeMap.put(throwable, SKIP);
+		}
+		for (Iterator iterator = fatalExceptions.iterator(); iterator.hasNext();) {
+			Class throwable = (Class) iterator.next();
+			typeMap.put(throwable, NEVER_SKIP);
+		}
+		exceptionClassifier.setTypeMap(typeMap);
+		this.exceptionClassifier = exceptionClassifier;
 	}
 
 	/**
@@ -95,10 +115,10 @@ public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
 	 * {@link SkipLimitExceededException} will be thrown.
 	 */
 	public boolean shouldSkip(Throwable t, int skipCount) {
-		if (fatalExceptionClassifier.classify(t)) {
+		if (exceptionClassifier.classify(t).equals(NEVER_SKIP)) {
 			return false;
 		}
-		if (skippableExceptionClassifier.classify(t)) {
+		if (exceptionClassifier.classify(t).equals(SKIP)) {
 			if (skipCount < skipLimit) {
 				return true;
 			}

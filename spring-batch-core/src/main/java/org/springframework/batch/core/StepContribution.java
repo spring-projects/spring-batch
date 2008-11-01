@@ -16,27 +16,25 @@
 package org.springframework.batch.core;
 
 /**
- * Represents a contribution to a {@link StepExecution}, buffering changes until
- * they can be applied at a chunk boundary.
+ * Represents a contribution to a {@link StepExecution}, buffering changes
+ * until they can be applied at a chunk boundary.
  * 
  * @author Dave Syer
  * 
  */
 public class StepContribution {
 
-	private volatile int readCount = 0;
-
-	private volatile int writeCount = 0;
-
-	private volatile int filterCount = 0;
+	private volatile int itemCount = 0;
 
 	private final int parentSkipCount;
+
+	private volatile int commitCount;
 
 	private volatile int readSkipCount;
 
 	private volatile int writeSkipCount;
 
-	private volatile int processSkipCount;
+	private volatile int uncommitedReadSkipCount;
 
 	/**
 	 * @param execution
@@ -48,79 +46,57 @@ public class StepContribution {
 	/**
 	 * Increment the counter for the number of items processed.
 	 */
-	public void incrementFilterCount(int count) {
-		filterCount += count;
+	public void incrementItemCount() {
+		itemCount++;
 	}
 
 	/**
-	 * Increment the counter for the number of items read.
-	 */
-	public void incrementReadCount() {
-		readCount++;
-	}
-
-	/**
-	 * Increment the counter for the number of items written.
-	 */
-	public void incrementWriteCount(int count) {
-		writeCount += count;
-	}
-
-	/**
-	 * Public access to the read counter.
+	 * Public access to the item counter.
 	 * 
 	 * @return the item counter.
 	 */
-	public int getReadCount() {
-		return readCount;
+	public int getItemCount() {
+		return itemCount;
 	}
 
 	/**
-	 * Public access to the write counter.
-	 * 
-	 * @return the item counter.
+	 * Increment the commit counter.
 	 */
-	public int getWriteCount() {
-		return writeCount;
+	public void incrementCommitCount() {
+		commitCount++;
 	}
 
 	/**
-	 * Public getter for the filter counter.
-	 * @return the filter counter
+	 * Public getter for the commit counter.
+	 * @return the commitCount
 	 */
-	public int getFilterCount() {
-		return filterCount;
+	public int getCommitCount() {
+		return commitCount;
 	}
 
 	/**
 	 * @return the sum of skips accumulated in the parent {@link StepExecution}
-	 * and this <code>StepContribution</code>.
+	 * and this <code>StepContribution</code>, including uncommitted read
+	 * skips.
 	 */
 	public int getStepSkipCount() {
-		return readSkipCount + writeSkipCount + processSkipCount + parentSkipCount;
+		return uncommitedReadSkipCount + readSkipCount + writeSkipCount + parentSkipCount;
 	}
 
 	/**
 	 * @return the number of skips collected in this
 	 * <code>StepContribution</code> (not including skips accumulated in the
-	 * parent {@link StepExecution}).
+	 * parent {@link StepExecution}.
 	 */
 	public int getSkipCount() {
-		return readSkipCount + writeSkipCount + processSkipCount;
+		return readSkipCount + writeSkipCount;
 	}
 
 	/**
 	 * Increment the read skip count for this contribution
 	 */
-	public void incrementReadSkipCount() {
+	public void incrementReadsSkipCount() {
 		readSkipCount++;
-	}
-
-	/**
-	 * Increment the read skip count for this contribution
-	 */
-	public void incrementReadSkipCount(int count) {
-		readSkipCount += count;
 	}
 
 	/**
@@ -131,10 +107,10 @@ public class StepContribution {
 	}
 
 	/**
-	 * 
+	 * Increment the counter for temporary skipped reads
 	 */
-	public void incrementProcessSkipCount() {
-		processSkipCount++;
+	public void incrementTemporaryReadSkipCount() {
+		uncommitedReadSkipCount++;
 	}
 
 	/**
@@ -152,22 +128,21 @@ public class StepContribution {
 	}
 
 	/**
-	 * Public getter for the process skip count.
-	 * @return the process skip count
+	 * Add the temporary read skip count to read skip count and reset the
+	 * temporary counter.
 	 */
-	public int getProcessSkipCount() {
-		return processSkipCount;
+	public void combineSkipCounts() {
+		readSkipCount += uncommitedReadSkipCount;
+		uncommitedReadSkipCount = 0;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return "[StepContribution: read=" + readCount + ", written=" + writeCount + ", filtered=" + filterCount
-				+ ", readSkips=" + readSkipCount + ", writeSkips=" + writeSkipCount + ", processSkips="
-				+ processSkipCount + "]";
+		return "[StepContribution: items=" + itemCount + ", commits=" + commitCount + ", uncommitedReadSkips="
+				+ uncommitedReadSkipCount + ", readSkips=" + readSkipCount + "writeSkips=" + writeSkipCount + "]";
 	}
 
 }

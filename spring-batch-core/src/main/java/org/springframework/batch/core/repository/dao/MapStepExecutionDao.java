@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.core.repository.dao;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.SerializationUtils;
-import org.springframework.batch.core.Entity;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
@@ -34,16 +32,32 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
-	
+	private static Map executionsByJobExecutionId;
+
+	private static Map contextsByStepExecutionId;
+
 	private static long currentId = 0;
+
+	static {
+		executionsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
+		contextsByStepExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
+	}
 
 	public static void clear() {
 		executionsByJobExecutionId.clear();
+		contextsByStepExecutionId.clear();
 	}
 	
-	private static StepExecution copy(StepExecution original){
+	private static StepExecution copy(StepExecution original) {
 		return (StepExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
+	
+	private static ExecutionContext copy(ExecutionContext original) {
+		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
+	}
+
+	public ExecutionContext findExecutionContext(StepExecution stepExecution) {
+		return copy((ExecutionContext) contextsByStepExecutionId.get(stepExecution.getId()));
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
@@ -51,7 +65,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		Assert.isTrue(stepExecution.getVersion() == null);
 		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
 
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
 			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
@@ -65,7 +79,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		Assert.notNull(stepExecution.getJobExecutionId());
 
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		Map executions = (Map) executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");
 
 		StepExecution persistedExecution = (StepExecution) executions.get(stepExecution.getStepName());
@@ -73,7 +87,9 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 		synchronized (stepExecution) {
 			if (!persistedExecution.getVersion().equals(stepExecution.getVersion())) {
-				throw new OptimisticLockingFailureException("Attempt to update step execution id=" + stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + "), where current version is " + persistedExecution.getVersion());
+				throw new OptimisticLockingFailureException("Attempt to update step execution id="
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
+						+ "), where current version is " + persistedExecution.getVersion());
 			}
 
 			stepExecution.incrementVersion();
@@ -81,29 +97,17 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		}
 	}
 
-	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
+	public StepExecution getStepExecution(JobExecution jobExecution, Step step) {
+		Map executions = (Map) executionsByJobExecutionId.get(jobExecution.getId());
 		if (executions == null) {
 			return null;
 		}
 
-		return copy(executions.get(stepName));
+		return copy((StepExecution) executions.get(step.getName()));
 	}
 
-	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
-		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
-		Collections.sort(result, new Comparator<Entity>() {
-
-			public int compare(Entity o1, Entity o2) {
-				return Long.signum(o2.getId() - o1.getId());
-			}
-		});
-		
-		List<StepExecution> copy = new ArrayList<StepExecution>(result.size());
-		for(StepExecution exec : result) {
-			copy.add(copy(exec));
-		}
-		return copy;
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
+		contextsByStepExecutionId.put(stepExecution.getId(), copy(stepExecution.getExecutionContext()));
 	}
+
 }

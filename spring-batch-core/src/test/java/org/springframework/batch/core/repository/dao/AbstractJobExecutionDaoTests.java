@@ -1,30 +1,20 @@
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
 
-public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
+public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalDataSourceSpringContextTests {
 
 	JobExecutionDao dao;
 
-	JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "execTestJob");
+	JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "execTestJob");
 
 	JobExecution execution = new JobExecution(jobInstance);
 
@@ -33,78 +23,25 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	 */
 	protected abstract JobExecutionDao getJobExecutionDao();
 
-	/**
-	 * @return tested object ready for use
-	 */
-	protected StepExecutionDao getStepExecutionDao() {
-		return null;
-	}
-
-	@Before
-	public void onSetUp() throws Exception {
+	protected void onSetUp() throws Exception {
 		dao = getJobExecutionDao();
 	}
 
 	/**
 	 * Save and find a job execution.
 	 */
-	@Transactional
-	@Test
 	public void testSaveAndFind() {
 
-		execution.setStartTime(new Date(System.currentTimeMillis()));
-		execution.setLastUpdated(new Date(System.currentTimeMillis()));
-		execution.setExitStatus(ExitStatus.UNKNOWN);
-		execution.setEndTime(new Date(System.currentTimeMillis()));
 		dao.saveJobExecution(execution);
 
-		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
-		assertEquals(1, executions.size());
+		List executions = dao.findJobExecutions(jobInstance);
+		assertTrue(executions.size() == 1);
 		assertEquals(execution, executions.get(0));
-		assertExecutionsAreEqual(execution, executions.get(0));
-	}
-	
-	/**
-	 * Executions should be returned in the reverse order they were saved.
-	 */
-	@Transactional
-	@Test
-	public void testFindExecutionsOrdering() {
-		
-		List<JobExecution> execs = new ArrayList<JobExecution>();
-		
-		for (int i = 0; i < 10; i++) {
-			JobExecution exec = new JobExecution(jobInstance);
-			exec.setCreateTime(new Date(i));
-			execs.add(exec);
-			dao.saveJobExecution(exec);
-		}
-		
-		List<JobExecution> retrieved = dao.findJobExecutions(jobInstance);
-		Collections.reverse(retrieved);
-		
-		
-		for (int i = 0; i < 10; i++) {
-			assertExecutionsAreEqual(execs.get(i), retrieved.get(i));
-		}
-		
-	}
-
-	/**
-	 * Save and find a job execution.
-	 */
-	@Transactional
-	@Test
-	public void testFindNonExistentExecutions() {
-		List<JobExecution> executions = dao.findJobExecutions(jobInstance);
-		assertEquals(0, executions.size());
 	}
 
 	/**
 	 * Saving sets id to the entity.
 	 */
-	@Transactional
-	@Test
 	public void testSaveAddsIdAndVersion() {
 
 		assertNull(execution.getId());
@@ -115,138 +52,93 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	}
 
 	/**
+	 * Execution count increases by one with every save for the same job
+	 * instance.
+	 */
+	public void testGetExecutionCount() {
+
+		JobExecution exec1 = new JobExecution(jobInstance);
+		JobExecution exec2 = new JobExecution(jobInstance);
+
+		dao.saveJobExecution(exec1);
+		assertEquals(1, dao.getJobExecutionCount(jobInstance));
+
+		dao.saveJobExecution(exec2);
+		assertEquals(2, dao.getJobExecutionCount(jobInstance));
+	}
+
+	/**
 	 * Update and retrieve job execution - check attributes have changed as
 	 * expected.
 	 */
-	@Transactional
-	@Test
 	public void testUpdateExecution() {
 		execution.setStatus(BatchStatus.STARTED);
 		dao.saveJobExecution(execution);
 
-		execution.setLastUpdated(new Date(0));
 		execution.setStatus(BatchStatus.COMPLETED);
 		dao.updateJobExecution(execution);
 
-		JobExecution updated = dao.findJobExecutions(jobInstance).get(0);
+		JobExecution updated = (JobExecution) dao.findJobExecutions(jobInstance).get(0);
 		assertEquals(execution, updated);
 		assertEquals(BatchStatus.COMPLETED, updated.getStatus());
-		assertExecutionsAreEqual(execution, updated);
 	}
 
 	/**
 	 * Check the execution with most recent start time is returned
 	 */
-	@Transactional
-	@Test
 	public void testGetLastExecution() {
 		JobExecution exec1 = new JobExecution(jobInstance);
 		exec1.setCreateTime(new Date(0));
 
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
+		
 		JobExecution exec2 = new JobExecution(jobInstance);
+		exec2.setExecutionContext(ctx);
 		exec2.setCreateTime(new Date(1));
 
 		dao.saveJobExecution(exec1);
 		dao.saveJobExecution(exec2);
+		dao.saveOrUpdateExecutionContext(exec2);
 
 		JobExecution last = dao.getLastJobExecution(jobInstance);
 		assertEquals(exec2, last);
+		assertEquals("value", last.getExecutionContext().getString("key"));
 	}
 
-	/**
-	 * Check the execution is returned
-	 */
-	@Transactional
-	@Test
-	public void testGetMissingLastExecution() {
-		JobExecution value = dao.getLastJobExecution(jobInstance);
-		assertNull(value);
-	}
-	
-	/**
-	 * Check the execution is returned
-	 */
-	@Transactional
-	@Test
-	public void testFindRunningExecutions() {
-		JobExecution exec = new JobExecution(jobInstance);
-		exec.setCreateTime(new Date(0));
-		exec.setEndTime(new Date(1L));
-		exec.setLastUpdated(new Date(5L));
-		dao.saveJobExecution(exec);
-		exec = new JobExecution(jobInstance);
-		exec.setLastUpdated(new Date(5L));
-		exec.createStepExecution("step");
-		dao.saveJobExecution(exec);
-		StepExecutionDao stepExecutionDao = getStepExecutionDao();
-		if (stepExecutionDao != null) {
-			for (StepExecution stepExecution : exec.getStepExecutions()) {
-				stepExecutionDao.saveStepExecution(stepExecution);
-			}
-		}
-		Set<JobExecution> values = dao.findRunningJobExecutions(exec.getJobInstance().getJobName());
+	public void testSaveAndFindContext() {
+		dao.saveJobExecution(execution);
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
+		execution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(execution);
 
-		assertEquals(1, values.size());
-		JobExecution value = values.iterator().next();
-		assertEquals(exec, value);
-		assertEquals(5L,  value.getLastUpdated().getTime());
+		ExecutionContext retrieved = dao.findExecutionContext(execution);
+		assertEquals(ctx, retrieved);
 	}
 
-	/**
-	 * Check the execution is returned
-	 */
-	@Transactional
-	@Test
-	public void testNoRunningExecutions() {
-		Set<JobExecution> values = dao.findRunningJobExecutions("no-such-job");
-		assertEquals(0, values.size());
-	}
-	
-	/**
-	 * Check the execution is returned
-	 */
-	@Transactional
-	@Test
-	public void testGetExecution() {
-		JobExecution exec = new JobExecution(jobInstance);
-		exec.setCreateTime(new Date(0));
-		exec.createStepExecution("step");
+	public void testSaveAndFindEmptyContext() {
+		dao.saveJobExecution(execution);
+		ExecutionContext ctx = new ExecutionContext();
+		execution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(execution);
 
-		dao.saveJobExecution(exec);
-		StepExecutionDao stepExecutionDao = getStepExecutionDao();
-		if (stepExecutionDao != null) {
-			for (StepExecution stepExecution : exec.getStepExecutions()) {
-				stepExecutionDao.saveStepExecution(stepExecution);
-			}
-		}
-		JobExecution value = dao.getJobExecution(exec.getId());
-
-		assertEquals(exec, value);
+		ExecutionContext retrieved = dao.findExecutionContext(execution);
+		assertEquals(ctx, retrieved);
 	}
 
-	/**
-	 * Check the execution is returned
-	 */
-	@Transactional
-	@Test
-	public void testGetMissingExecution() {
-		JobExecution value = dao.getJobExecution(54321L);
-		assertNull(value);
+	public void testUpdateContext() {
+		dao.saveJobExecution(execution);
+		ExecutionContext ctx = new ExecutionContext();
+		ctx.put("key", "value");
+		execution.setExecutionContext(ctx);
+		dao.saveOrUpdateExecutionContext(execution);
+
+		ctx.putLong("longKey", 7);
+		dao.saveOrUpdateExecutionContext(execution);
+
+		ExecutionContext retrieved = dao.findExecutionContext(execution);
+		assertEquals(ctx, retrieved);
+		assertEquals(7, retrieved.getLong("longKey"));
 	}
-	
-	/*
-	 * Check to make sure the executions are equal.  Normally, comparing the id's is 
-	 * sufficient.  However, for testing purposes, especially of a dao, we need to make
-	 * sure all the fields are being stored/retrieved correctly.
-	 */
-	private void assertExecutionsAreEqual(JobExecution lhs, JobExecution rhs){
-		
-		assertEquals(lhs.getId(), rhs.getId());
-		assertEquals(lhs.getStartTime(), rhs.getStartTime());
-		assertEquals(lhs.getStatus(), rhs.getStatus());
-		assertEquals(lhs.getEndTime(), rhs.getEndTime());
-		assertEquals(lhs.getCreateTime(), rhs.getCreateTime());
-		assertEquals(lhs.getLastUpdated(), rhs.getLastUpdated());
-	}
-	
 }

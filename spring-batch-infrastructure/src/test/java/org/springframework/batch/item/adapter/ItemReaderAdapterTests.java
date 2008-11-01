@@ -1,51 +1,51 @@
 package org.springframework.batch.item.adapter;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.sample.Foo;
 import org.springframework.batch.item.sample.FooService;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 
 /**
  * Tests for {@link ItemReaderAdapter}.
  * 
  * @author Robert Kasanicky
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "delegating-item-provider.xml")
-public class ItemReaderAdapterTests {
+public class ItemReaderAdapterTests extends AbstractDependencyInjectionSpringContextTests {
 
-	@Autowired
-	private ItemReaderAdapter<Foo> provider;
+	private ItemReaderAdapter provider;
 
-	@Autowired
 	private FooService fooService;
 
-	/*
+	protected String getConfigPath() {
+		return "delegating-item-provider.xml";
+	}
+
+	/**
 	 * Regular usage scenario - items are retrieved from the service injected invoker points to.
 	 */
-	@Test
 	public void testNext() throws Exception {
-		List<Object> returnedItems = new ArrayList<Object>();
+		List returnedItems = new ArrayList();
 		Object item;
 		while ((item = provider.read()) != null) {
 			returnedItems.add(item);
 		}
 
-		List<Foo> input = fooService.getGeneratedFoos();
+		List input = fooService.getGeneratedFoos();
 		assertEquals(input.size(), returnedItems.size());
 		assertFalse(returnedItems.isEmpty());
 
 		for (int i = 0; i < input.size(); i++) {
 			assertSame(input.get(i), returnedItems.get(i));
 		}
+	}
+
+	public void setProvider(ItemReaderAdapter provider) {
+		this.provider = provider;
+	}
+
+	public void setFooService(FooService fooService) {
+		this.fooService = fooService;
 	}
 
 }

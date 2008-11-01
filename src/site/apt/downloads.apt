@@ -1,13 +1,13 @@
                                     ---------
                                     Downloads
                                     ---------
-                                    Dave Syer, Ben Hale
+                                    Dave Syer, Ben Hale, Thomas Risberg
                                     ------
-                                    December 2007
+                                    December 2007, July 2008
 
 Spring Batch Downloads
 
-  The current GA release is <<1.1.2.RELEASE>>, the latest snapshots are <<2.0.0.CI-SNAPSHOT>>.
+  The current GA release is <<1.1.3.RELEASE>>, the latest snapshots are <<2.0.0.CI-SNAPSHOT>>.
 
 * Zip Downloads
 
@@ -37,7 +37,7 @@ Spring Batch Downloads
 <dependency>
     <groupId>org.springframework.batch</groupId>
     <artifactId>spring-batch-core</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.3</version>
 </dependency>
 +---------------
 

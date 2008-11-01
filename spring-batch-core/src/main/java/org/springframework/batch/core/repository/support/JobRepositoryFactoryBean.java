@@ -18,11 +18,7 @@ package org.springframework.batch.core.repository.support;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
-import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
 import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
@@ -31,11 +27,9 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
 import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -48,13 +42,11 @@ import org.springframework.util.StringUtils;
  * @author Ben Hale
  * @author Lucas Ward
  */
-public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean implements InitializingBean {
-
-	protected static final Log logger = LogFactory.getLog(JobRepositoryFactoryBean.class);
+public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean {
 
 	private DataSource dataSource;
 
-	private SimpleJdbcOperations jdbcTemplate;
+	private JdbcOperations jdbcTemplate;
 
 	private String databaseType;
 
@@ -107,16 +99,10 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
-
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 
 		if (incrementerFactory == null) {
 			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
-		}
-
-		if (databaseType == null) {
-			databaseType = DatabaseType.fromMetaData(dataSource).name();
-			logger.info("No database type set, using meta data indicating: " + databaseType);
 		}
 
 		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
@@ -124,10 +110,8 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
 		super.afterPropertiesSet();
-
 	}
 
-	@Override
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcTemplate);
@@ -137,7 +121,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		return dao;
 	}
 
-	@Override
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
@@ -149,7 +132,6 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		return dao;
 	}
 
-	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
@@ -160,14 +142,4 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.afterPropertiesSet();
 		return dao;
 	}
-
-	@Override
-	protected ExecutionContextDao createExecutionContextDao() throws Exception {
-		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
-		dao.setJdbcTemplate(jdbcTemplate);
-		dao.setTablePrefix(tablePrefix);
-		dao.afterPropertiesSet();
-		return dao;
-	}
-
 }

@@ -35,7 +35,7 @@ import org.springframework.context.support.StaticApplicationContext;
 public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 	public void testNameAndTypeSpecified() throws Exception {
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		mapper.setTargetType(TestObject.class);
 		mapper.setPrototypeBeanName("foo");
 		try {
@@ -47,7 +47,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 	}
 
 	public void testNameNorTypeSpecified() throws Exception {
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		try {
 			mapper.afterPropertiesSet();
 		}
@@ -57,20 +57,20 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 	}
 
 	public void testVanillaBeanCreatedFromType() throws Exception {
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		mapper.setTargetType(TestObject.class);
 		mapper.afterPropertiesSet();
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });
-		TestObject result = mapper.mapFieldSet(fieldSet);
+		TestObject result = (TestObject) mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 
 	public void testMapperWithSingleton() throws Exception {
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", new TestObject());
@@ -78,14 +78,14 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });
-		TestObject result = mapper.mapFieldSet(fieldSet);
+		TestObject result = (TestObject) mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 
 	public void testPropertyNameMatching() throws Exception {
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", new TestObject());
@@ -93,21 +93,20 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "VarString", "VAR_BOOLEAN", "VAR_CHAR" });
-		TestObject result = mapper.mapFieldSet(fieldSet);
+		TestObject result = (TestObject) mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
 	}
 
-	@SuppressWarnings("unchecked")
 	public void testMapperWithPrototype() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean-wrapper.xml", getClass());
 
-		BeanWrapperFieldSetMapper<TestObject> mapper = (BeanWrapperFieldSetMapper<TestObject>) context.getBean("fieldSetMapper");
+		BeanWrapperFieldSetMapper mapper = (BeanWrapperFieldSetMapper) context.getBean("fieldSetMapper");
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });
-		TestObject result = mapper.mapFieldSet(fieldSet);
+		TestObject result = (TestObject) mapper.mapLine(fieldSet);
 		assertEquals("This is some dummy string", result.getVarString());
 		assertEquals(true, result.isVarBoolean());
 		assertEquals('C', result.getVarChar());
@@ -120,7 +119,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		testNestedA.setTestObjectB(testNestedB);
 		testNestedB.setTestObjectC(new TestNestedC());
 
-		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -130,7 +129,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 				new String[] { "This is some dummy string", "1", "Another dummy", "2" }, new String[] { "valueA",
 						"valueB", "testObjectB.valueA", "testObjectB.testObjectC.value" });
 
-		TestNestedA result = mapper.mapFieldSet(fieldSet);
+		TestNestedA result = (TestNestedA) mapper.mapLine(fieldSet);
 
 		assertEquals("This is some dummy string", result.getValueA());
 		assertEquals(1, result.getValueB());
@@ -141,7 +140,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 	public void testMapperWithSimilarNamePropertyMatches() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 
-		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -150,7 +149,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "1" }, new String[] {
 				"VALUE_A", "VALUE_B" });
 
-		TestNestedA result = (TestNestedA) mapper.mapFieldSet(fieldSet);
+		TestNestedA result = (TestNestedA) mapper.mapLine(fieldSet);
 
 		assertEquals("This is some dummy string", result.getValueA());
 		assertEquals(1, result.getValueB());
@@ -159,7 +158,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 	public void testMapperWithNotVerySimilarNamePropertyMatches() throws Exception {
 		TestNestedC testNestedC = new TestNestedC();
 
-		BeanWrapperFieldSetMapper<TestNestedC> mapper = new BeanWrapperFieldSetMapper<TestNestedC>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedC);
@@ -167,7 +166,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1" }, new String[] { "foo" });
 
-		TestNestedC result = mapper.mapFieldSet(fieldSet);
+		TestNestedC result = (TestNestedC) mapper.mapLine(fieldSet);
 
 		// "foo" is similar enough to "value" that it matches - but only because
 		// nothing else does...
@@ -180,7 +179,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		testNestedA.setTestObjectB(testNestedB);
 		testNestedB.setTestObjectC(new TestNestedC());
 
-		BeanWrapperFieldSetMapper<TestNestedA> mapper = new BeanWrapperFieldSetMapper<TestNestedA>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -189,7 +188,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy", "2" }, new String[] {
 				"TestObjectB.ValueA", "TestObjectB.TestObjectC.Value" });
 
-		TestNestedA result = mapper.mapFieldSet(fieldSet);
+		TestNestedA result = (TestNestedA) mapper.mapLine(fieldSet);
 
 		assertEquals("Another dummy", result.getTestObjectB().getValueA());
 		assertEquals(2, result.getTestObjectB().getTestObjectC().getValue());
@@ -200,7 +199,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		TestNestedB testNestedB = new TestNestedB();
 		testNestedA.setTestObjectB(testNestedB);
 
-		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -209,7 +208,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "Another dummy" }, new String[] { "TestObjectB.foo" });
 
 		try {
-			mapper.mapFieldSet(fieldSet);
+			mapper.mapLine(fieldSet);
 			fail("Expected NotWritablePropertyException");
 		}
 		catch (NotWritablePropertyException e) {
@@ -222,7 +221,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		TestNestedB testNestedB = new TestNestedB();
 		testNestedA.setTestObjectB(testNestedB);
 
-		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", testNestedA);
@@ -231,7 +230,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "2" }, new String[] { "TestObjectA.garbage" });
 
 		try {
-			mapper.mapFieldSet(fieldSet);
+			mapper.mapLine(fieldSet);
 			fail("Expected NotWritablePropertyException");
 		}
 		catch (NotWritablePropertyException e) {
@@ -256,13 +255,13 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 	public void testNestedList() {
 
 		TestNestedList nestedList = new TestNestedList();
-		List<Object> nestedC = new ArrayList<Object>();
+		List nestedC = new ArrayList();
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
 		nestedC.add(new TestNestedC());
 		nestedList.setNestedC(nestedC);
 
-		BeanWrapperFieldSetMapper<?> mapper = new BeanWrapperFieldSetMapper<Object>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		StaticApplicationContext context = new StaticApplicationContext();
 		mapper.setBeanFactory(context);
 		context.getBeanFactory().registerSingleton("bean", nestedList);
@@ -271,7 +270,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "1", "2", "3" }, new String[] { "NestedC[0].Value",
 				"NestedC[1].Value", "NestedC[2].Value" });
 
-		mapper.mapFieldSet(fieldSet);
+		mapper.mapLine(fieldSet);
 
 		assertEquals(1, ((TestNestedC) nestedList.getNestedC().get(0)).getValue());
 		assertEquals(2, ((TestNestedC) nestedList.getNestedC().get(1)).getValue());
@@ -281,39 +280,39 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 	public void testPaddedLongWithNoEditor() throws Exception {
 
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		mapper.setTargetType(TestObject.class);
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "00009" }, new String[] { "varLong" });
-		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
 		// since Spring 2.5.5 this is OK (before that BATCH-261)
 		assertEquals(9, bean.getVarLong());
 	}
 
 	public void testPaddedLongWithEditor() throws Exception {
 
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		mapper.setTargetType(TestObject.class);
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "00009" }, new String[] { "varLong" });
 
 		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
 				.getNumberInstance(), true)));
-		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
 	}
 
 	public void testPaddedLongWithDefaultAndCustomEditor() throws Exception {
 
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		BeanWrapperFieldSetMapper mapper = new BeanWrapperFieldSetMapper();
 		mapper.setTargetType(TestObject.class);
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "00009", "78" }, new String[] { "varLong", "varInt" });
 
 		mapper.setCustomEditors(Collections.singletonMap(Long.TYPE, new CustomNumberEditor(Long.class, NumberFormat
 				.getNumberInstance(), true)));
-		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+		TestObject bean = (TestObject) mapper.mapLine(fieldSet);
 
 		assertEquals(9, bean.getVarLong());
 		assertEquals(78, bean.getVarInt());
@@ -321,13 +320,13 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 	private static class TestNestedList {
 
-		List<Object> nestedC;
+		List nestedC;
 
-		public List<Object> getNestedC() {
+		public List getNestedC() {
 			return nestedC;
 		}
 
-		public void setNestedC(List<Object> nestedC) {
+		public void setNestedC(List nestedC) {
 			this.nestedC = nestedC;
 		}
 

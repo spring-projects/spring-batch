@@ -16,8 +16,7 @@
 package org.springframework.batch.item;
 
 /**
- * Unchecked exception indicating that an error has occurred while trying to
- * clear a buffer on a rollback.
+ * Unchecked exception indicating that an error has occurred while trying to call {@link ItemWriter#clear()}
  * 
  * @author Lucas Ward
  * @author Ben Hale
@@ -25,8 +24,7 @@ package org.springframework.batch.item;
 public class ClearFailedException extends ItemWriterException {
 
 	/**
-	 * Create a new {@link ClearFailedException} based on a message and another
-	 * exception.
+	 * Create a new {@link ClearFailedException} based on a message and another exception.
 	 * 
 	 * @param message the message for this exception
 	 * @param cause the other exception

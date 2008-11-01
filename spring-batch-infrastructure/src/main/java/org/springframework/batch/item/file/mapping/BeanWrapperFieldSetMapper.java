@@ -19,6 +19,7 @@ package org.springframework.batch.item.file.mapping;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,19 +42,18 @@ import org.springframework.validation.ObjectError;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
- * {@link DefaultFieldSet} to be mapped should have field name meta data
- * corresponding to bean property paths in a prototype instance of the desired
- * type. The prototype instance is initialized either by referring to to object
- * by bean name in the enclosing BeanFactory, or by providing a class to
- * instantiate reflectively.<br/>
+ * {@link DefaultFieldSet} to be mapped should have field name meta data corresponding
+ * to bean property paths in a prototype instance of the desired type. The
+ * prototype instance is initialized either by referring to to object by bean
+ * name in the enclosing BeanFactory, or by providing a class to instantiate
+ * reflectively.<br/>
  * 
  * Nested property paths, including indexed properties in maps and collections,
- * can be referenced by the {@link DefaultFieldSet} names. They will be
- * converted to nested bean properties inside the prototype. The
- * {@link DefaultFieldSet} and the prototype are thus tightly coupled by the
- * fields that are available and those that can be initialized. If some of the
- * nested properties are optional (e.g. collection members) they need to be
- * removed by a post processor.<br/>
+ * can be referenced by the {@link DefaultFieldSet} names. They will be converted to
+ * nested bean properties inside the prototype. The {@link DefaultFieldSet} and the
+ * prototype are thus tightly coupled by the fields that are available and those
+ * that can be initialized. If some of the nested properties are optional (e.g.
+ * collection members) they need to be removed by a post processor.<br/>
  * 
  * Property name matching is "fuzzy" in the sense that it tolerates close
  * matches, as long as the match is unique. For instance:
@@ -76,25 +76,22 @@ import org.springframework.validation.ObjectError;
  * @author Dave Syer
  * 
  */
-public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar implements FieldSetMapper<T>,
-		BeanFactoryAware, InitializingBean {
+public class BeanWrapperFieldSetMapper extends DefaultPropertyEditorRegistrar implements FieldSetMapper, BeanFactoryAware, InitializingBean {
 
 	private String name;
 
-	private Class<? extends T> type;
+	private Class type;
 
 	private BeanFactory beanFactory;
 
-	private static Map<Class<?>, Map<String, String>> propertiesMatched = new HashMap<Class<?>, Map<String, String>>();
+	private static Map propertiesMatched = new HashMap();
 
 	private static int distanceLimit = 5;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org
-	 * .springframework.beans.factory.BeanFactory)
+	 * @see org.springframework.beans.factory.BeanFactoryAware#setBeanFactory(org.springframework.beans.factory.BeanFactory)
 	 */
 	public void setBeanFactory(BeanFactory beanFactory) {
 		this.beanFactory = beanFactory;
@@ -102,7 +99,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	/**
 	 * The bean name (id) for an object that can be populated from the field set
-	 * that will be passed into {@link #mapFieldSet(FieldSet)}. Typically a
+	 * that will be passed into {@link #mapLine(FieldSet)}. Typically a
 	 * prototype scoped bean so that a new instance is returned for each field
 	 * set mapped.
 	 * 
@@ -118,14 +115,14 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	/**
 	 * Public setter for the type of bean to create instead of using a prototype
 	 * bean. An object of this type will be created from its default constructor
-	 * for every call to {@link #mapFieldSet(FieldSet)}.<br/>
+	 * for every call to {@link #mapLine(FieldSet)}.<br/>
 	 * 
 	 * Either this property or the prototype bean name must be specified, but
 	 * not both.
 	 * 
 	 * @param type the type to set
 	 */
-	public void setTargetType(Class<? extends T> type) {
+	public void setTargetType(Class type) {
 		this.type = type;
 	}
 
@@ -143,27 +140,27 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	/**
-	 * Map the {@link DefaultFieldSet} to an object retrieved from the enclosing
-	 * Spring context, or to a new instance of the required type if no prototype
-	 * is available.
+	 * Map the {@link DefaultFieldSet} to an object retrieved from the enclosing Spring
+	 * context, or to a new instance of the required type if no prototype is
+	 * available.
 	 * 
-	 * @throws NotWritablePropertyException if the {@link DefaultFieldSet}
-	 * contains a field that cannot be mapped to a bean property.
+	 * @throws NotWritablePropertyException if the {@link DefaultFieldSet} contains a
+	 * field that cannot be mapped to a bean property.
 	 * @throws BindingException if there is a type conversion or other error (if
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
 	 * 
-	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapFieldSet(FieldSet)
+	 * @see org.springframework.batch.item.file.mapping.FieldSetMapper#mapLine(org.springframework.batch.item.file.mapping.FieldSet)
 	 */
-	@SuppressWarnings("unchecked")
-	public T mapFieldSet(FieldSet fs) {
-		T copy = getBean();
+	public Object mapLine(FieldSet fs) {
+		Object copy = getBean();
 		DataBinder binder = createBinder(copy);
 		binder.bind(new MutablePropertyValues(getBeanProperties(copy, fs.getProperties())));
 		if (binder.getBindingResult().hasErrors()) {
-			List<ObjectError> errors = binder.getBindingResult().getAllErrors();
-			List<String> messages = new ArrayList<String>(errors.size());
-			for (ObjectError error : errors) {
+			List errors = binder.getBindingResult().getAllErrors();
+			List messages = new ArrayList(errors.size());
+			for (Iterator iterator = errors.iterator(); iterator.hasNext();) {
+				ObjectError error = (ObjectError) iterator.next();
 				messages.add(error.getDefaultMessage());
 			}
 			throw new BindingException("" + messages);
@@ -192,8 +189,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	/**
 	 * Initialize a new binder instance. This hook allows customization of
-	 * binder settings such as the {@link DataBinder#initDirectFieldAccess()
-	 * direct field access}. Called by {@link #createBinder(Object)}.
+	 * binder settings such as the
+	 * {@link DataBinder#initDirectFieldAccess() direct field access}. Called
+	 * by {@link #createBinder(Object)}.
 	 * <p>
 	 * Note that registration of custom property editors should be done in
 	 * {@link #registerCustomEditors(PropertyEditorRegistry)}, not here! This
@@ -204,10 +202,9 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	protected void initBinder(DataBinder binder) {
 	}
 
-	@SuppressWarnings("unchecked")
-	private T getBean() {
+	private Object getBean() {
 		if (name != null) {
-			return (T) beanFactory.getBean(name);
+			return beanFactory.getBean(name);
 		}
 		try {
 			return type.newInstance();
@@ -227,23 +224,23 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 * @param properties
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	private Properties getBeanProperties(Object bean, Properties properties) {
 
-		Class<?> cls = bean.getClass();
+		Class cls = bean.getClass();
 
 		// Map from field names to property names
-		Map<String, String> matches = propertiesMatched.get(cls);
+		Map matches = (Map) propertiesMatched.get(cls);
 		if (matches == null) {
-			matches = new HashMap<String, String>();
+			matches = new HashMap();
 			propertiesMatched.put(cls, matches);
 		}
 
-		Set<String> keys = new HashSet(properties.keySet());
-		for (String key : keys) {
+		Set keys = new HashSet(properties.keySet());
+		for (Iterator iter = keys.iterator(); iter.hasNext();) {
+			String key = (String) iter.next();
 
 			if (matches.containsKey(key)) {
-				switchPropertyNames(properties, key, matches.get(key));
+				switchPropertyNames(properties, key, (String) matches.get(key));
 				continue;
 			}
 
@@ -260,7 +257,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 
 	private String findPropertyName(Object bean, String key) {
 
-		Class<?> cls = bean.getClass();
+		Class cls = bean.getClass();
 
 		int index = PropertyAccessorUtils.getFirstNestedPropertySeparatorIndex(key);
 		String prefix;

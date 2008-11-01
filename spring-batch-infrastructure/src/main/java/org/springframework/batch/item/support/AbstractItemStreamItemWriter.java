@@ -25,6 +25,6 @@ import org.springframework.batch.item.ItemWriter;
  * @author Dave Syer
  *
  */
-public abstract class AbstractItemStreamItemWriter<T> extends ItemStreamSupport implements ItemWriter<T> {
+public abstract class AbstractItemStreamItemWriter extends ItemStreamSupport implements ItemWriter {
 
 }

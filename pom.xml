@@ -15,7 +15,7 @@
 		<module>spring-batch-infrastructure-tests</module>
 		<module>spring-batch-core</module>
 		<module>spring-batch-samples</module>
-		<!--		<module>spring-batch-integration</module>-->
+		<module>spring-batch-integration</module>
 		<module>docs</module>
 		<module>archetypes</module>
 	</modules>
@@ -59,7 +59,6 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.5</spring.framework.version>
-		<bundlor.version>1.0.0.M1</bundlor.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -74,7 +73,7 @@
 				<site>
 					<id>static.springframework.org</id>
 					<url>
-						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk
+						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/1.1.x
 					</url>
 				</site>
 			</distributionManagement>
@@ -115,43 +114,13 @@
 			<build>
 				<pluginManagement>
 					<plugins>
-						<!--
-							This seems to work better than the default (2008/03/19) because
-							links on sub-module sites are not broken
-						-->
+						<!-- This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken -->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
 							<version>2.0-beta-7-SNAPSHOT</version>
 						</plugin>
 					</plugins>
 				</pluginManagement>
-			</build>
-		</profile>
-		<profile>
-			<id>manifest</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.springsource.bundlor</groupId>
-						<artifactId>com.springsource.bundlor.maven</artifactId>
-						<version>${bundlor.version}</version>
-						<executions>
-							<execution>
-								<id>bundlor-manifest</id>
-								<phase>package</phase>
-								<goals>
-									<goal>manifest</goal>
-								</goals>
-								<configuration>
-									<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
 			</build>
 		</profile>
 		<profile>
@@ -233,9 +202,9 @@
 			<url>file:///${user.dir}/target/staging</url>
 		</site>
 		<repository>
-			<id>spring-milestone</id>
+			<id>spring-release</id>
 			<name>Spring Milestone Repository</name>
-			<url>s3://maven.springframework.org/milestone</url>
+			<url>s3://maven.springframework.org/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
@@ -332,54 +301,6 @@
 						</dependency>
 					</dependencies>
 				</plugin>
-				<plugin>
-					<groupId>com.springsource.bundlor</groupId>
-					<artifactId>com.springsource.bundlor.maven</artifactId>
-					<version>${bundlor.version}</version>
-					<executions>
-						<execution>
-							<id>bundlor-transform</id>
-						<!-- This isn't necessary, but Q4E barfs without it. -->
-							<phase>package</phase>
-							<goals>
-								<goal>transform</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<executions>
-						<execution>
-							<id>javadoc</id>
-							<phase>package</phase>
-							<goals>
-								<goal>jar</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<links>
-							<link>http://java.sun.com/j2ee/1.4/docs/api</link>
-							<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-							<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
-							<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
-							<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
-							<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
-							<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-							<link>http://jakarta.apache.org/commons/logging/apidocs/</link>
-							<link>http://junit.sourceforge.net/javadoc/</link>
-							<link>http://logging.apache.org/log4j/docs/api/</link>
-							<link>http://jakarta.apache.org/regexp/apidocs/</link>
-							<link>http://jakarta.apache.org/velocity/api/</link>
-							<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
-							<link>http://static.springframework.org/spring-batch/apidocs/</link>
-							<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
-						</links>
-						<aggregate>true</aggregate>
-						<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
-					</configuration>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -387,8 +308,8 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.4</source>
+					<target>1.4</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -435,9 +356,6 @@
 					</filesets>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-javadoc-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 	<dependencyManagement>
@@ -453,15 +371,21 @@
 				<version>1.5.3</version>
 			</dependency>
 			<dependency>
+				<groupId>backport-util-concurrent</groupId>
+				<artifactId>backport-util-concurrent</artifactId>
+				<version>3.0</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.4</version>
+				<version>3.8.1</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate</artifactId>
-				<version>3.2.6.ga</version>
+				<version>3.2.3.ga</version>
 				<exclusions>
 					<exclusion>
 						<groupId>commons-logging</groupId>
@@ -488,22 +412,6 @@
 						<artifactId>asm</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-entitymanager</artifactId>
-				<version>3.3.2.GA</version>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.transaction</groupId>
-						<artifactId>jta</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-annotations</artifactId>
-				<version>3.3.1.GA</version>
 			</dependency>
 			<dependency>
 				<groupId>cglib</groupId>
@@ -533,7 +441,6 @@
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
 				<version>2.1</version>
-				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -551,20 +458,16 @@
 				<version>1.8.0.7</version>
 			</dependency>
 			<dependency>
-				<groupId>org.easymock</groupId>
+				<groupId>easymock</groupId>
 				<artifactId>easymock</artifactId>
-				<version>2.4</version>
+				<version>1.1</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
 				<artifactId>xstream</artifactId>
-				<version>1.3</version>
-			</dependency>
-			<dependency>
-				<groupId>org.codehaus.jettison</groupId>
-				<artifactId>jettison</artifactId>
-				<version>1.0.1</version>
+				<version>1.2.1</version>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>stax</groupId>
@@ -587,12 +490,6 @@
 				<groupId>org.apache.ibatis</groupId>
 				<artifactId>ibatis-sqlmap</artifactId>
 				<version>2.3.0</version>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>javax.persistence</groupId>
-				<artifactId>com.springsource.javax.persistence</artifactId>
-				<version>1.0.0</version>
 				<optional>true</optional>
 			</dependency>
 			<!-- Spring Dependencies -->
@@ -674,11 +571,6 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.osgi</groupId>
-				<artifactId>spring-osgi-core</artifactId>
-				<version>1.1.0</version>
-			</dependency>
-			<dependency>
 				<groupId>xerces</groupId>
 				<artifactId>xercesImpl</artifactId>
 				<version>2.8.1</version>
@@ -712,15 +604,32 @@
 				<reportSets>
 					<reportSet>
 						<id>html</id>
+						<configuration>
+							<links>
+								<link>http://java.sun.com/j2ee/1.4/docs/api</link>
+								<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+								<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+								<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
+								<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+								<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+								<link>http://jakarta.apache.org/commons/logging/api/</link>
+								<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+								<link>http://www.junit.org/junit/javadoc/</link>
+								<link>http://logging.apache.org/log4j/docs/api/</link>
+								<link>http://jakarta.apache.org/regexp/apidocs/</link>
+								<link>http://jakarta.apache.org/velocity/api/</link>
+								<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
+								<link>http://static.springframework.org/spring-batch/apidocs/</link>
+								<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
+							</links>
+							<aggregate>true</aggregate>
+							<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
+						</configuration>
 						<reports>
 							<report>javadoc</report>
 						</reports>
 					</reportSet>
 				</reportSets>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -746,11 +655,6 @@
 			<name>Robert Kasanicky</name>
 			<email>robert.kasanicky@accenture.com</email>
 		</developer>
-		<developer>
-			<id>trisberg</id>
-			<name>Thomas Risberg</name>
-			<email>thomas.risberg@springsource.com</email>
-		</developer>
 	</developers>
 	<repositories>
 		<repository>
@@ -775,30 +679,16 @@
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.release</id>
-			<name>SpringSource Enterprise Bundle Repository -
-				SpringSource Bundle Releases</name>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/release</url>
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
-			<name>SpringSource Enterprise Bundle Repository -
-				External Bundle Releases</name>
+			<name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
-		</repository>
+		</repository> 
 	</repositories>
 	<pluginRepositories>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.snapshot</id>
-			<name>SpringSource Enterprise Bundle Repository -
-				SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.milestone</id>
-			<name>SpringSource Enterprise Bundle Repository -
-				SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone</url>
-		</pluginRepository>
 		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>

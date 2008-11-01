@@ -15,34 +15,30 @@
 			<list>
 				<bean id="step1" parent="skipLimitStep">
 					<property name="skipLimit" value="1" />
-					<property name="itemReader" ref="fileItemReader" />
-					<property name="itemProcessor">
+					<property name="streams" ref="fileItemReader" />
+					<property name="itemReader">
 						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"
-							p:validationFailure="3" />
+							class="org.springframework.batch.item.validator.ValidatingItemReader">
+							<property name="itemReader"
+								ref="fileItemReader" />
+							<property name="validator"
+								ref="tradeValidator" />
+						</bean>
 					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeWriter"
-							p:dao-ref="tradeDao" />
+							class="org.springframework.batch.sample.item.writer.TradeWriter"
+							p:dao-ref="tradeDao" p:failure="3" />
 					</property>
 				</bean>
 				<bean id="step2" parent="skipLimitStep">
 					<property name="commitInterval" value="2" />
 					<property name="skipLimit" value="1" />
 					<!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
-					<property name="skippableExceptionClasses">
-			            <list>
-			                <value>org.springframework.batch.item.validator.ValidationException</value>
-			            </list>
-					</property>
+					<property name="transactionAttribute"
+						value="+org.springframework.batch.item.validator.ValidationException" />
 					<property name="itemReader"
 						ref="tradeSqlItemReader" />
-					<property name="itemProcessor">
-						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"
-							p:validationFailure="2" />
-					</property>
 					<property name="itemWriter"
 						ref="itemTrackingWriter" />
 				</bean>
@@ -51,16 +47,17 @@
 	</bean>
 
 	<bean id="itemTrackingWriter"
-		class="org.springframework.batch.sample.support.ItemTrackingItemWriter" />
+		class="org.springframework.batch.sample.item.writer.ItemTrackingItemWriter"
+		p:validationFailure="2" />
 
 	<bean id="tradeSqlItemReader"
 		class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
-			value="SELECT isin, quantity, price, customer from TRADE" />
+			value="SELECT id, quantity, price, customer from TRADE" />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.domain.trade.internal.TradeRowMapper" />
+				class="org.springframework.batch.sample.mapping.TradeRowMapper" />
 		</property>
 	</bean>
 
@@ -71,7 +68,7 @@
 			value="SELECT id, name, credit FROM customer " />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
+				class="org.springframework.batch.sample.mapping.CustomerCreditRowMapper" />
 		</property>
 	</bean>
 

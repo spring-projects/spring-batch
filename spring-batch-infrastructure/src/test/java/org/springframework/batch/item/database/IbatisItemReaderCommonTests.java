@@ -3,19 +3,14 @@ package org.springframework.batch.item.database;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.IbatisKeyCollector;
-import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
 
 import com.ibatis.sqlmap.client.SqlMapClient;
 
-@SuppressWarnings({"unchecked", "deprecation"})
-@RunWith(JUnit4ClassRunner.class)
 public class IbatisItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
-	protected ItemReader<Foo> getItemReader() throws Exception {
+	protected ItemReader getItemReader() throws Exception {
 		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
 		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));
 		factory.setDataSource(getDataSource());
@@ -23,7 +18,7 @@ public class IbatisItemReaderCommonTests extends CommonDatabaseItemStreamItemRea
 		SqlMapClient sqlMapClient = createSqlMapClient();
 
 		IbatisDrivingQueryItemReader reader = new IbatisDrivingQueryItemReader();
-		IbatisKeyCollector<Long> keyGenerator = new IbatisKeyCollector<Long>();
+		IbatisKeyCollector keyGenerator = new IbatisKeyCollector();
 		keyGenerator.setDrivingQueryId("getAllFooIds");
 		reader.setDetailsQueryId("getFooById");
 		keyGenerator.setRestartQueryId("getAllFooIdsRestart");
@@ -43,11 +38,11 @@ public class IbatisItemReaderCommonTests extends CommonDatabaseItemStreamItemRea
 		return (SqlMapClient) factory.getObject();
 	}
 
-	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
 		IbatisDrivingQueryItemReader reader = (IbatisDrivingQueryItemReader) tested;
 		reader.close(new ExecutionContext());
 		
-		IbatisKeyCollector<Long> keyCollector = new IbatisKeyCollector<Long>();
+		IbatisKeyCollector keyCollector = new IbatisKeyCollector();
 		keyCollector.setDrivingQueryId("getNoFoos");
 		keyCollector.setSqlMapClient(createSqlMapClient());
 		

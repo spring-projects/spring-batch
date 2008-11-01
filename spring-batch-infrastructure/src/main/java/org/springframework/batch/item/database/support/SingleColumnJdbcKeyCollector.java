@@ -20,45 +20,38 @@ import java.util.List;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.KeyCollector;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.SingleColumnRowMapper;
-import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
  * <p>
- * Jdbc {@link KeyCollector} implementation that only works for a single column
- * key. A sql query must be passed in which will be used to return a list of
- * keys. Each key will be mapped by a {@link RowMapper} that returns a mapped
- * key. By default, the {@link SingleColumnRowMapper} is used, and will convert
- * keys into well known types at runtime. It is extremely important to note that
- * only one column should be mapped to an object and returned as a key. If
- * multiple columns are returned as a key in this strategy, then restart will
- * not function properly. Instead a strategy that supports keys comprised of
- * multiple columns should be used.
+ * Jdbc {@link KeyCollector} implementation that only works for a single column key. A sql query must be passed in which
+ * will be used to return a list of keys. Each key will be mapped by a {@link RowMapper} that returns a mapped key. By
+ * default, the {@link SingleColumnRowMapper} is used, and will convert keys into well known types at runtime. It is
+ * extremely important to note that only one column should be mapped to an object and returned as a key. If multiple
+ * columns are returned as a key in this strategy, then restart will not function properly. Instead a strategy that
+ * supports keys comprised of multiple columns should be used.
  * </p>
  * 
  * <p>
- * Restartability: Because the key is only one column, restart is made much more
- * simple. Before each commit, the last processed key is returned to be stored
- * as restart data. Upon restart, that same key is given back to restore from,
- * using a separate 'RestartQuery'. This means that only the keys remaining to
- * be processed are returned, rather than returning the original list of keys
- * and iterating forward to that last committed point.
+ * Restartability: Because the key is only one column, restart is made much more simple. Before each commit, the last
+ * processed key is returned to be stored as restart data. Upon restart, that same key is given back to restore from,
+ * using a separate 'RestartQuery'. This means that only the keys remaining to be processed are returned, rather than
+ * returning the original list of keys and iterating forward to that last committed point.
  * </p>
  * 
  * @author Lucas Ward
  * @see SingleColumnRowMapper
- * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
- * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
-public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
+public class SingleColumnJdbcKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
 	private static final String RESTART_KEY = "key";
 
-	private JdbcOperations jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
 	private String sql;
 
@@ -71,15 +64,15 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	}
 
 	/**
-	 * Constructs a new instance using the provided jdbcTemplate and string
-	 * representing the sql statement that should be used to retrieve keys.
+	 * Constructs a new instance using the provided jdbcTemplate and string representing the sql statement that should
+	 * be used to retrieve keys.
 	 * 
 	 * @param jdbcTemplate
 	 * @param sql
 	 * @throws IllegalArgumentException if jdbcTemplate is null.
 	 * @throws IllegalArgumentException if sql string is empty or null.
 	 */
-	public SingleColumnJdbcKeyCollector(JdbcOperations jdbcTemplate, String sql) {
+	public SingleColumnJdbcKeyCollector(JdbcTemplate jdbcTemplate, String sql) {
 		this();
 		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null.");
 		Assert.hasText(sql, "The sql statement must not be null or empty.");
@@ -90,21 +83,17 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.io.driving.KeyGenerationStrategy#retrieveKeys()
+	 * @see org.springframework.batch.io.driving.KeyGenerationStrategy#retrieveKeys()
 	 */
-	@SuppressWarnings("unchecked")
-	public List<T> retrieveKeys(ExecutionContext executionContext) {
+	public List retrieveKeys(ExecutionContext executionContext) {
 
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 
 		if (executionContext.containsKey(getKey(RESTART_KEY))) {
 			Assert.state(StringUtils.hasText(restartSql), "The restart sql query must not be null or empty"
-					+ " in order to restart.");
-			return jdbcTemplate
-					.query(restartSql, new Object[] { executionContext.get(getKey(RESTART_KEY)) }, keyMapper);
-		}
-		else {
+			        + " in order to restart.");
+			return jdbcTemplate.query(restartSql, new Object[] { executionContext.get(getKey(RESTART_KEY)) }, keyMapper);
+		} else {
 			return jdbcTemplate.query(sql, keyMapper);
 		}
 	}
@@ -114,7 +103,7 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	 * 
 	 * @throws IllegalArgumentException if key is null.
 	 */
-	public void updateContext(T key, ExecutionContext executionContext) {
+	public void updateContext(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "The key must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null");
 		executionContext.put(getKey(RESTART_KEY), key);
@@ -123,8 +112,7 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(jdbcTemplate, "JdbcTemplate must not be null.");
@@ -141,8 +129,7 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	}
 
 	/**
-	 * Set the SQL query to be used to return the remaining keys to be
-	 * processed.
+	 * Set the SQL query to be used to return the remaining keys to be processed.
 	 * 
 	 * @param restartSql
 	 */
@@ -158,13 +145,13 @@ public class SingleColumnJdbcKeyCollector<T> extends ExecutionContextUserSupport
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
-
+	
 	/**
-	 * Set the {@link JdbcOperations} to be used.
+	 * Set the {@link JdbcTemplate} to be used.
 	 * 
 	 * @param jdbcTemplate
 	 */
-	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
 }

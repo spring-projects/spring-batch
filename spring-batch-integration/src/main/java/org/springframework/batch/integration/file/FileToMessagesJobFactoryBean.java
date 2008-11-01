@@ -32,17 +32,17 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.io.Resource;
-import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.dispatcher.DirectChannel;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
 /**
  * A FactoryBean for a {@link Job} with a single step which just pumps messages
- * from a file into a channel. The channel has to be a {@link DirectChannel} to
- * ensure that failures propagate up to the step and fail the job execution.
- * Normally this job will be used in conjunction with a
- * {@link JobLaunchingMessageHandler} and a
+ * from a file into a channel. The channel has to be a
+ * {@link DirectChannel} to ensure that failures propagate up to the step
+ * and fail the job execution. Normally this job will be used in conjunction
+ * with a {@link JobLaunchingMessageHandler} and a
  * {@link ResourcePayloadAsJobParameterStrategy}, so that the user can just
  * send a message to a request channel listing the files to be processed, and
  * everything else just happens by magic. After a failure the job will be
@@ -51,11 +51,11 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAware {
+public class FileToMessagesJobFactoryBean implements FactoryBean, BeanNameAware {
 
 	private String name = "fileToMessageJob";
 
-	private ItemReader<? extends T> itemReader;
+	private ItemReader itemReader;
 
 	private MessageChannel channel;
 
@@ -80,7 +80,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	 * @param itemReader the itemReader to set
 	 */
 	@Required
-	public void setItemReader(ItemReader<? extends T> itemReader) {
+	public void setItemReader(ItemReader itemReader) {
 		this.itemReader = itemReader;
 	}
 
@@ -125,7 +125,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 		job.setName(name);
 		job.setJobRepository(jobRepository);
 
-		SimpleStepFactoryBean<T, T> stepFactory = new SimpleStepFactoryBean<T, T>();
+		SimpleStepFactoryBean stepFactory = new SimpleStepFactoryBean();
 		stepFactory.setBeanName("step");
 
 		Assert.state((itemReader instanceof FlatFileItemReader) || (itemReader instanceof StaxEventItemReader),
@@ -139,7 +139,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 		Assert.notNull(channel, "A channel must be provided");
 		Assert.state(channel instanceof DirectChannel,
 				"The channel must be a DirectChannel (otherwise failures can not be recovered from)");
-		MessageChannelItemWriter<? super T> itemWriter = new MessageChannelItemWriter<T>();
+		MessageChannelItemWriter itemWriter = new MessageChannelItemWriter();
 		itemWriter.setChannel(channel);
 		stepFactory.setItemWriter(itemWriter);
 
@@ -157,12 +157,12 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	 * @param itemReader
 	 * @param resource
 	 */
-	private void setResource(ItemReader<? extends T> itemReader, Resource resource) {
+	private void setResource(ItemReader itemReader, Resource resource) {
 		if (itemReader instanceof FlatFileItemReader) {
-			((FlatFileItemReader<? extends T>) itemReader).setResource(resource);
+			((FlatFileItemReader) itemReader).setResource(resource);
 		}
 		else {
-			((StaxEventItemReader<? extends T>) itemReader).setResource(resource);
+			((StaxEventItemReader) itemReader).setResource(resource);
 		}
 	}
 
@@ -170,7 +170,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	 * Always returns {@link Job}.
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
-	public Class<Job> getObjectType() {
+	public Class<?> getObjectType() {
 		return Job.class;
 	}
 

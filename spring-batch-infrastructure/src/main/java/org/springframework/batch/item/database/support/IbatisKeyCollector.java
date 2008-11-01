@@ -25,10 +25,8 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * @author Robert Kasanicky
  * @author Lucas Ward
  * @see DrivingQueryItemReader
- * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
- * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
-public class IbatisKeyCollector<T> extends ExecutionContextUserSupport implements KeyCollector<T> {
+public class IbatisKeyCollector extends ExecutionContextUserSupport implements KeyCollector {
 
 	private static final String RESTART_KEY = "key.index";
 
@@ -47,8 +45,7 @@ public class IbatisKeyCollector<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @see KeyCollector#retrieveKeys()
 	 */
-	@SuppressWarnings("unchecked")
-	public List<T> retrieveKeys(ExecutionContext executionContext) {
+	public List retrieveKeys(ExecutionContext executionContext) {
 		if (executionContext.containsKey(getKey(RESTART_KEY))) {
 			Object key = executionContext.get(getKey(RESTART_KEY));
 			return sqlMapClientTemplate.queryForList(restartQueryId, key);
@@ -63,7 +60,7 @@ public class IbatisKeyCollector<T> extends ExecutionContextUserSupport implement
 	 * 
 	 * @see KeyCollector#saveState(Object, ExecutionContext)
 	 */
-	public void updateContext(T key, ExecutionContext executionContext) {
+	public void updateContext(Object key, ExecutionContext executionContext) {
 		Assert.notNull(key, "Key must not be null");
 		Assert.notNull(executionContext, "ExecutionContext must be null");
 		executionContext.put(getKey(RESTART_KEY), key);

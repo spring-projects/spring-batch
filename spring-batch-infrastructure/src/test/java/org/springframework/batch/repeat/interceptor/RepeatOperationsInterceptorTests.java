@@ -66,7 +66,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	}
 
 	public void testSetTemplate() throws Exception {
-		final List<Object> calls = new ArrayList<Object>();
+		final List calls = new ArrayList();
 		interceptor.setRepeatOperations(new RepeatOperations() {
 			public ExitStatus iterate(RepeatCallback callback) {
 				try {
@@ -85,7 +85,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	}
 
 	public void testCallbackNotExecuted() throws Exception {
-		final List<Object> calls = new ArrayList<Object>();
+		final List calls = new ArrayList();
 		interceptor.setRepeatOperations(new RepeatOperations() {
 			public ExitStatus iterate(RepeatCallback callback) {
 				calls.add(null);
@@ -157,7 +157,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 
 	public void testInterceptorChainWithRetry() throws Exception {
 		((Advised) service).addAdvice(interceptor);
-		final List<Object> list = new ArrayList<Object>();
+		final List list = new ArrayList();
 		((Advised) service).addAdvice(new MethodInterceptor() {
 			public Object invoke(MethodInvocation invocation) throws Throwable {
 				list.add("chain");

@@ -25,7 +25,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 
 /**
@@ -36,7 +35,7 @@ public class JdbcJobDaoQueryTests extends TestCase {
 
 	JdbcJobExecutionDao jobExecutionDao;
 
-	List<String> list = new ArrayList<String>();
+	List list = new ArrayList();
 
 	/*
 	 * (non-Javadoc)
@@ -64,17 +63,17 @@ public class JdbcJobDaoQueryTests extends TestCase {
 
 	public void testTablePrefix() throws Exception {
 		jobExecutionDao.setTablePrefix("FOO_");
-		jobExecutionDao.setJdbcTemplate(new SimpleJdbcTemplate(new JdbcTemplate() {
+		jobExecutionDao.setJdbcTemplate(new JdbcTemplate() {
 			public int update(String sql, Object[] args, int[] argTypes) throws DataAccessException {
 				list.add(sql);
 				return 1;
 			}
-		}));
+		});
 		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "testJob"));
 
 		jobExecutionDao.saveJobExecution(jobExecution);
 		assertEquals(1, list.size());
-		String query = list.get(0);
+		String query = (String) list.get(0);
 		assertTrue("Query did not contain FOO_:" + query, query.indexOf("FOO_") >= 0);
 	}
 

@@ -16,7 +16,6 @@
 package org.springframework.batch.core.listener;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.core.Ordered;
@@ -26,16 +25,16 @@ import org.springframework.core.Ordered;
  * @author Dave Syer
  * 
  */
-public class CompositeItemReadListener<T> implements ItemReadListener<T> {
+public class CompositeItemReadListener implements ItemReadListener {
 
-	private OrderedComposite<ItemReadListener<? super T>> listeners = new OrderedComposite<ItemReadListener<? super T>>();
+	private OrderedComposite listeners = new OrderedComposite();
 
 	/**
 	 * Public setter for the listeners.
 	 * 
 	 * @param itemReadListeners
 	 */
-	public void setListeners(List<? extends ItemReadListener<? super T>> itemReadListeners) {
+	public void setListeners(ItemReadListener[] itemReadListeners) {
 		this.listeners.setItems(itemReadListeners);
 	}
 
@@ -44,7 +43,7 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 * 
 	 * @param itemReaderListener
 	 */
-	public void register(ItemReadListener<? super T> itemReaderListener) {
+	public void register(ItemReadListener itemReaderListener) {
 		listeners.add(itemReaderListener);
 	}
 
@@ -53,9 +52,9 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 * prioritising those that implement {@link Ordered}.
 	 * @see org.springframework.batch.core.ItemReadListener#afterRead(java.lang.Object)
 	 */
-	public void afterRead(T item) {
-		for (Iterator<ItemReadListener<? super T>> iterator = listeners.reverse(); iterator.hasNext();) {
-			ItemReadListener<? super T> listener = iterator.next();
+	public void afterRead(Object item) {
+		for (Iterator iterator = listeners.reverse(); iterator.hasNext();) {
+			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.afterRead(item);
 		}
 	}
@@ -66,8 +65,8 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 * @see org.springframework.batch.core.ItemReadListener#beforeRead()
 	 */
 	public void beforeRead() {
-		for (Iterator<ItemReadListener<? super T>> iterator = listeners.iterator(); iterator.hasNext();) {
-			ItemReadListener<? super T> listener = iterator.next();
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.beforeRead();
 		}
 	}
@@ -78,8 +77,8 @@ public class CompositeItemReadListener<T> implements ItemReadListener<T> {
 	 * @see org.springframework.batch.core.ItemReadListener#onReadError(java.lang.Exception)
 	 */
 	public void onReadError(Exception ex) {
-		for (Iterator<ItemReadListener<? super T>> iterator = listeners.iterator(); iterator.hasNext();) {
-			ItemReadListener<? super T> listener = iterator.next();
+		for (Iterator iterator = listeners.iterator(); iterator.hasNext();) {
+			ItemReadListener listener = (ItemReadListener) iterator.next();
 			listener.onReadError(ex);
 		}
 	}

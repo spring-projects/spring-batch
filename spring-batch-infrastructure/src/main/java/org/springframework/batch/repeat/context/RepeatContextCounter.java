@@ -16,8 +16,6 @@
 
 package org.springframework.batch.repeat.context;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.util.Assert;
 
@@ -33,15 +31,15 @@ import org.springframework.util.Assert;
  */
 public class RepeatContextCounter {
 
-	final private String countKey;
+	private String countKey;
 
 	/**
 	 * Flag to indicate whether the count is stored at the level of the parent
 	 * context, or just local to the current context. Default value is false.
 	 */
-	final private boolean useParent;
+	private boolean useParent = false;
 
-	final private RepeatContext context;
+	private RepeatContext context;
 
 	/**
 	 * Increment the counter.
@@ -49,7 +47,7 @@ public class RepeatContextCounter {
 	 * @param delta the amount by which to increment the counter.
 	 */
 	final public void increment(int delta) {
-		AtomicInteger count = getCounter();
+		AtomicCounter count = getCounter();
 		count.addAndGet(delta);
 	}
 	
@@ -82,7 +80,7 @@ public class RepeatContextCounter {
 
 		super();
 		
-		Assert.notNull(context, "The context must be provided to initialize a counter");
+		Assert.notNull(context, "The context must be provided");
 
 		this.countKey = countKey;
 		this.useParent = useParent;
@@ -96,7 +94,8 @@ public class RepeatContextCounter {
 			this.context = context;
 		}
 		if (!this.context.hasAttribute(countKey)) {
-			this.context.setAttribute(countKey, new AtomicInteger());
+			AtomicCounterFactory factory = new AtomicCounterFactory();
+			this.context.setAttribute(countKey, factory.getAtomicCounter());
 		}
 
 	}
@@ -108,8 +107,8 @@ public class RepeatContextCounter {
 		return getCounter().intValue();
 	}
 
-	private AtomicInteger getCounter() {
-		return ((AtomicInteger) context.getAttribute(countKey));
+	private AtomicCounter getCounter() {
+		return ((AtomicCounter) context.getAttribute(countKey));
 	}
 
 }

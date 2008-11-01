@@ -32,7 +32,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 
 	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
 
-	private List<String> list = new ArrayList<String>();
+	private List list = new ArrayList();
 
 	/**
 	 * Test method for
@@ -80,6 +80,21 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 			}
 		});
 		listener.beforeStep(new StepExecution("foo", null));
+		assertEquals(1, list.size());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)}.
+	 */
+	public void testOnError() {
+		listener.register(new StepExecutionListenerSupport() {
+			public ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e) {
+				list.add("foo");
+				return null;
+			}
+		});
+		listener.onErrorInStep(null, new RuntimeException());
 		assertEquals(1, list.size());
 	}
 

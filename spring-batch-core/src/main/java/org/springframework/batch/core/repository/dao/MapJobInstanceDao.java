@@ -1,12 +1,9 @@
 package org.springframework.batch.core.repository.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.Iterator;
 
-import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -17,7 +14,7 @@ import org.springframework.util.Assert;
  */
 public class MapJobInstanceDao implements JobInstanceDao {
 
-	private static Collection<JobInstance> jobInstances = TransactionAwareProxyFactory.createTransactionalSet();
+	private static Collection jobInstances = TransactionAwareProxyFactory.createTransactionalList();
 
 	private static long currentId = 0;
 
@@ -25,69 +22,27 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		jobInstances.clear();
 	}
 
-	public JobInstance createJobInstance(String jobName, JobParameters jobParameters) {
-
-		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
-
-		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, jobName);
+	public JobInstance createJobInstance(Job job, JobParameters jobParameters) {
+		
+		Assert.state(getJobInstance(job, jobParameters) == null, "JobInstance must not already exist");
+		
+		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, job.getName());
 		jobInstance.incrementVersion();
 		jobInstances.add(jobInstance);
-
+		
 		return jobInstance;
 	}
 
-	public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
-
-		for (JobInstance instance : jobInstances) {
-			if (instance.getJobName().equals(jobName) && instance.getJobParameters().equals(jobParameters)) {
+	public JobInstance getJobInstance(Job job, JobParameters jobParameters) {
+		
+		for (Iterator iterator = jobInstances.iterator(); iterator.hasNext();) {
+			JobInstance instance = (JobInstance) iterator.next();
+			if (instance.getJobName().equals(job.getName()) && instance.getJobParameters().equals(jobParameters)) {
 				return instance;
 			}
 		}
 		return null;
-
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance(java.lang.Long)
-	 */
-	public JobInstance getJobInstance(Long instanceId) {
-		for (JobInstance instance : jobInstances) {
-			if (instance.getId().equals(instanceId)) {
-				return instance;
-			}
-		}
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames()
-	 */
-	public List<String> getJobNames() {
-		List<String> result = new ArrayList<String>();
-		for (JobInstance instance : jobInstances) {
-			result.add(instance.getJobName());
-		}
-		Collections.sort(result);
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getLastJobInstances(java.lang.String, int)
-	 */
-	public List<JobInstance> getLastJobInstances(String jobName, int count) {
-		ArrayList<JobInstance> list = new ArrayList<JobInstance>(jobInstances);
-		Collections.sort(list, new Comparator<JobInstance>() {
-			// sort by ID descending
-			public int compare(JobInstance o1, JobInstance o2) {
-				return Long.signum(o1.getId()-o2.getId());
-			}
-		});
-		int length = count>list.size() ? list.size() : count;
-		return list.subList(0, length);
-	}
-
-	public JobInstance getJobInstance(JobExecution jobExecution) {
-		return jobExecution.getJobInstance();
+		
 	}
 
 }

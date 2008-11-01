@@ -16,15 +16,10 @@
 
 package org.springframework.batch.core;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Iterator;
 
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.ExitStatus;
@@ -37,9 +32,9 @@ import org.springframework.batch.repeat.ExitStatus;
  */
 public class JobExecution extends Entity {
 
-	private JobInstance jobInstance;
+	private final JobInstance jobInstance;
 
-	private volatile Collection<StepExecution> stepExecutions = new LinkedHashSet<StepExecution>();
+	private volatile transient Collection stepExecutions = new HashSet();
 
 	private volatile BatchStatus status = BatchStatus.STARTING;
 
@@ -49,13 +44,9 @@ public class JobExecution extends Entity {
 
 	private volatile Date endTime = null;
 
-	private volatile Date lastUpdated = null;
-
 	private volatile ExitStatus exitStatus = ExitStatus.UNKNOWN;
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
-
-	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
 	 * Because a JobExecution isn't valid unless the job is set, this
@@ -77,16 +68,8 @@ public class JobExecution extends Entity {
 		this(job, null);
 	}
 
-	public JobExecution(Long id) {
-		super(id);
-	}
-
 	public Date getEndTime() {
 		return endTime;
-	}
-
-	public void setJobInstance(JobInstance jobInstance) {
-		this.jobInstance = jobInstance;
 	}
 
 	public void setEndTime(Date endTime) {
@@ -105,26 +88,8 @@ public class JobExecution extends Entity {
 		return status;
 	}
 
-	/**
-	 * Set the value of the status field.
-	 * 
-	 * @param status the status to set
-	 */
 	public void setStatus(BatchStatus status) {
 		this.status = status;
-	}
-
-	/**
-	 * Upgrade the status field if the provided value is greater than the
-	 * existing one. Clients using this method to set the status can be sure
-	 * that they don't overwrite a failed status with an successful one.
-	 * 
-	 * @param status the new status value
-	 */
-	public void upgradeStatus(BatchStatus status) {
-		if (status.compareTo(this.status) > 0) {
-			this.status = status;
-		}
 	}
 
 	/**
@@ -166,18 +131,25 @@ public class JobExecution extends Entity {
 	 * 
 	 * @return the step executions that were registered
 	 */
-	public Collection<StepExecution> getStepExecutions() {
+	public Collection getStepExecutions() {
 		return stepExecutions;
 	}
 
 	/**
 	 * Register a step execution with the current job execution.
-	 * @param stepName the name of the step the new execution is associated with
 	 */
-	public StepExecution createStepExecution(String stepName) {
-		StepExecution stepExecution = new StepExecution(stepName, this);
+	public StepExecution createStepExecution(Step step) {
+		StepExecution stepExecution = new StepExecution(step.getName(), this, null);
 		this.stepExecutions.add(stepExecution);
 		return stepExecution;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.domain.Entity#toString()
+	 */
+	public String toString() {
+		return super.toString() + ", startTime=" + startTime + ", endTime=" + endTime + ", job=[" + jobInstance + "]";
 	}
 
 	/**
@@ -205,30 +177,11 @@ public class JobExecution extends Entity {
 	 * 
 	 */
 	public void stop() {
-		for (StepExecution stepExecution : stepExecutions) {
+		for (Iterator it = stepExecutions.iterator(); it.hasNext();) {
+			StepExecution stepExecution = (StepExecution) it.next();
 			stepExecution.setTerminateOnly();
 		}
 		status = BatchStatus.STOPPING;
-	}
-
-	/**
-	 * Signal that this job execution wishes to be paused. Uses
-	 * {@link #upgradeStatus(BatchStatus)} so that a failed execution stays
-	 * failed.
-	 */
-	public void pause() {
-		upgradeStatus(BatchStatus.PAUSED);
-	}
-
-	/**
-	 * Test if the {@link JobExecution} has been paused.
-	 * 
-	 * @see #pause()
-	 * 
-	 * @return true if this instance is paused
-	 */
-	public boolean isPaused() {
-		return status == BatchStatus.PAUSED;
 	}
 
 	/**
@@ -262,83 +215,4 @@ public class JobExecution extends Entity {
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
-
-	/**
-	 * Package private method for re-constituting the step executions from
-	 * existing instances.
-	 * @param stepExecution
-	 */
-	void addStepExecution(StepExecution stepExecution) {
-		stepExecutions.add(stepExecution);
-	}
-
-	/**
-	 * Get the date representing the last time this JobExecution was updated in
-	 * the JobRepository.
-	 * 
-	 * @return Date representing the last time this JobExecution was updated.
-	 */
-	public Date getLastUpdated() {
-		return lastUpdated;
-	}
-
-	/**
-	 * Set the last time this JobExecution was updated.
-	 * 
-	 * @param lastUpdated
-	 */
-	public void setLastUpdated(Date lastUpdated) {
-		this.lastUpdated = lastUpdated;
-	}
-
-	public List<Throwable> getFailureExceptions() {
-		return failureExceptions;
-	}
-
-	/**
-	 * Add the provided throwable to the failure exception list.
-	 * 
-	 * @param t
-	 */
-	public void addFailureException(Throwable t) {
-		this.failureExceptions.add(t);
-	}
-
-	/**
-	 * Return all failure causing exceptions for this JobExecution, including
-	 * step executions.
-	 * 
-	 * @return List<Throwable> containing all exceptions causing failure for
-	 * this JobExecution.
-	 */
-	public List<Throwable> getAllFailureExceptions() {
-
-		Set<Throwable> allExceptions = new HashSet<Throwable>(failureExceptions);
-		for (StepExecution stepExecution : stepExecutions) {
-			allExceptions.addAll(stepExecution.getFailureExceptions());
-		}
-
-		return new ArrayList<Throwable>(allExceptions);
-	}
-
-	/**
-	 * Deserialise and ensure transient fields are re-instantiated when read
-	 * back
-	 */
-	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-		stream.defaultReadObject();
-		failureExceptions = new ArrayList<Throwable>();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.domain.Entity#toString()
-	 */
-	public String toString() {
-		return super.toString()
-				+ String.format(", startTime=%s, endTime=%s, lastUpdated=%s, status=%s, exitStatus=%s, job=[%s]",
-						startTime, endTime, lastUpdated, status, exitStatus, jobInstance);
-	}
-
 }

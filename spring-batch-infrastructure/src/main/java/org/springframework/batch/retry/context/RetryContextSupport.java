@@ -26,7 +26,7 @@ public class RetryContextSupport extends AttributeAccessorSupport implements Ret
 
 	private int count;
 
-	private Exception lastException;
+	private Throwable lastException;
 
 	private RetryContext parent;
 
@@ -51,7 +51,7 @@ public class RetryContextSupport extends AttributeAccessorSupport implements Ret
 		return count;
 	}
 
-	public Exception getLastThrowable() {
+	public Throwable getLastThrowable() {
 		return lastException;
 	}
 
@@ -61,7 +61,7 @@ public class RetryContextSupport extends AttributeAccessorSupport implements Ret
 	 * 
 	 * All {@link RetryPolicy} implementations should use this method when they
 	 * register the throwable. It should only be called once per retry attempt
-	 * because it increments a counter.<br/>
+	 * because it increments the conter.<br/>
 	 * 
 	 * Use of this method is not enforced by the framework - it is a service
 	 * provider contract for authors of policies.
@@ -69,7 +69,7 @@ public class RetryContextSupport extends AttributeAccessorSupport implements Ret
 	 * @param throwable the exception that caused the current retry attempt to
 	 * fail.
 	 */
-	public void registerThrowable(Exception throwable) {
+	public void registerThrowable(Throwable throwable) {
 		this.lastException = throwable;
 		if (throwable != null)
 			count++;

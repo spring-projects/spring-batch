@@ -15,15 +15,19 @@
 				<bean id="staging" parent="simpleStep">
 					<property name="commitInterval" value="2" />
 					<property name="startLimit" value="100" />
-					<property name="itemReader" ref="fileItemReader" />
-					<property name="itemProcessor">
-						<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-							<constructor-arg ref="fixedValidator" />
+					<property name="streams" ref="fileItemReader" />
+					<property name="itemReader">
+						<bean
+							class="org.springframework.batch.item.validator.ValidatingItemReader">
+							<property name="itemReader"
+								ref="fileItemReader" />
+							<property name="validator"
+								ref="fixedValidator" />
 						</bean>
-					</property>	
+					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.common.StagingItemWriter">
+							class="org.springframework.batch.sample.item.writer.StagingItemWriter">
 							<property name="dataSource"
 								ref="dataSource" />
 							<property name="lobHandler"
@@ -44,7 +48,7 @@
 					</property>
 					<property name="itemReader">
 						<bean
-							class="org.springframework.batch.sample.common.StagingItemReader">
+							class="org.springframework.batch.sample.item.reader.StagingItemReader">
 							<property name="lobHandler"
 								ref="lobHandler" />
 							<property name="dataSource"
@@ -53,7 +57,7 @@
 					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+							class="org.springframework.batch.sample.item.writer.TradeWriter">
 							<property name="dao" ref="tradeDao" />
 						</bean>
 					</property>
@@ -69,12 +73,8 @@
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer" ref="fixedFileTokenizer" />
-				<property name="fieldSetMapper" ref="fieldSetMapper" />
-			</bean>
-		</property>
+		<property name="lineTokenizer" ref="fixedFileTokenizer" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
 	<bean id="fileItemReader" parent="testItemReader"
@@ -104,8 +104,8 @@
 	</bean>
 
 	<bean id="tradeDao"
-		class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
-		<property name="dataSource" ref="dataSource" />
+		class="org.springframework.batch.sample.dao.JdbcTradeDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
 				<property name="incrementerName" value="TRADE_SEQ" />
@@ -115,7 +115,7 @@
 	</bean>
 
 	<bean id="fieldSetMapper"
-		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
 	<aop:config>
 		<aop:aspect id="moduleLogging" ref="logAdvice">

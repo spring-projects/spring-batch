@@ -1,22 +1,13 @@
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.sample.dao.HibernateCreditDao;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.orm.hibernate3.HibernateJdbcException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Test for HibernateJob - checks that customer credit has been updated to
@@ -24,9 +15,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * 
  * @author Dave Syer
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
-public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIncreaseTests {
+public class HibernateFailureJobFunctionalTests extends
+		HibernateJobFunctionalTests {
 
 	private HibernateCreditDao writer;
 
@@ -36,18 +26,31 @@ public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIn
 	 * @param writer
 	 *            the writer to set
 	 */
-	@Autowired
 	public void setWriter(HibernateCreditDao writer) {
 		this.writer = writer;
 	}
 
-	@Test
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.test.AbstractSingleSpringContextTests#onTearDown()
+	 */
+	protected void onTearDown() throws Exception {
+		super.onTearDown();
+		writer.setFailOnFlush(-1);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.sample.AbstractValidatingBatchLauncherTests#testLaunchJob()
+	 */
 	public void testLaunchJob() throws Exception {
 		JobParameters params = new JobParametersBuilder().addString("key", "failureJob").toJobParameters();
 		setJobParameters(params);
 		writer.setFailOnFlush(2);
 
-		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
+		int before = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertTrue(before > 0);
 		try {
 			super.testLaunchJob();
@@ -61,7 +64,7 @@ public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIn
 			// assertEquals(1, writer.getErrors().size());
 			throw e;
 		}
-		int after = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
+		int after = jdbcTemplate.queryForInt("SELECT COUNT(*) from CUSTOMER");
 		assertEquals(before, after);
 	}
 
@@ -70,7 +73,7 @@ public class HibernateFailureJobFunctionalTests extends AbstractCustomerCreditIn
 	 * 
 	 * @see org.springframework.batch.sample.AbstractCustomerCreditIncreaseTests#checkMatches(java.util.List)
 	 */
-	protected void checkMatches(List<BigDecimal> matches) {
+	protected void checkMatches(List matches) {
 		assertFalse(matches.contains(new BigDecimal(2)));
 	}
 

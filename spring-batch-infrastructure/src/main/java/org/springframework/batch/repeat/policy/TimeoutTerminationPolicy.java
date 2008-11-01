@@ -64,7 +64,6 @@ public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext)
 	 */
-	@Override
 	public boolean isComplete(RepeatContext context) {
 		return ((TimeoutBatchContext) context).isComplete();
 	}
@@ -74,7 +73,6 @@ public class TimeoutTerminationPolicy extends CompletionPolicySupport {
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#start(RepeatContext)
 	 */
-	@Override
 	public RepeatContext start(RepeatContext context) {
 		return new TimeoutBatchContext(context);
 	}

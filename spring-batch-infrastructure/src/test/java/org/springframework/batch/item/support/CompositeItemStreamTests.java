@@ -34,7 +34,7 @@ public class CompositeItemStreamTests extends TestCase {
 
 	private CompositeItemStream manager = new CompositeItemStream();
 
-	private List<String> list = new ArrayList<String>();
+	private List list = new ArrayList();
 
 	public void testRegisterAndOpen() {
 		ItemStreamSupport stream = new ItemStreamSupport() {

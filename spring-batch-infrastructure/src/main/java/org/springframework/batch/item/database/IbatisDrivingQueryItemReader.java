@@ -27,15 +27,9 @@ import com.ibatis.sqlmap.client.SqlMapClient;
  * The writer is thread safe after its properties are set (normal singleton
  * behaviour).
  * 
- * TODO remove this class? It does not return keys so it shouldn't extend 
- * DrivingQueryItemReader
- * 
  * @author Lucas Ward
  * @see IbatisKeyCollector
- * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
- * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
-@SuppressWarnings("unchecked")
 public class IbatisDrivingQueryItemReader extends DrivingQueryItemReader {
 
 	private String detailsQueryId;

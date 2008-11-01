@@ -1,36 +1,24 @@
-/*
- * Copyright 2006-2008 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package org.springframework.batch.core.repository.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.Serializable;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.Types;
+import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 
+import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.support.AbstractLobCreatingPreparedStatementCallback;
 import org.springframework.jdbc.support.lob.DefaultLobHandler;
+import org.springframework.jdbc.support.lob.LobCreator;
 import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
@@ -42,62 +30,38 @@ import org.springframework.util.Assert;
  * 
  * @author Lucas Ward
  * @author Robert Kasanicky
- * @author Thomas Risberg
  */
-public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
+class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao {
 
-	private static final String COUNT_JOB_EXECUTION_CONTEXT = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION_CONTEXT "
-			+ "WHERE JOB_EXECUTION_ID = ?";
+	private static final String STEP_DISCRIMINATOR = "S";
 
-	private static final String FIND_JOB_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT " +
-			"FROM %PREFIX%JOB_EXECUTION_CONTEXT WHERE JOB_EXECUTION_ID = ?";
+	private static final String JOB_DISCRIMINATOR = "J";
 
-	private static final String INSERT_JOB_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%JOB_EXECUTION_CONTEXT " +
-			"(JOB_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " +
-			"VALUES(?, ?, ?)";
+	private static final String FIND_EXECUTION_CONTEXT = "SELECT TYPE_CD, KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL "
+			+ "from %PREFIX%EXECUTION_CONTEXT where EXECUTION_ID = ? and DISCRIMINATOR = ?";
 
-	private static final String UPDATE_JOB_EXECUTION_CONTEXT = "UPDATE %PREFIX%JOB_EXECUTION_CONTEXT " +
-			"SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " +
-			"WHERE JOB_EXECUTION_ID = ?";
+	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT into %PREFIX%EXECUTION_CONTEXT(EXECUTION_ID, DISCRIMINATOR, TYPE_CD,"
+			+ " KEY_NAME, STRING_VAL, DOUBLE_VAL, LONG_VAL, OBJECT_VAL) values(?,?,?,?,?,?,?,?)";
 
-	private static final String COUNT_STEP_EXECUTION_CONTEXT = "SELECT COUNT(*) FROM %PREFIX%STEP_EXECUTION_CONTEXT "
-			+ "WHERE STEP_EXECUTION_ID = ?";
-
-	private static final String FIND_STEP_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT " +
-			"FROM %PREFIX%STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = ?";
-
-
-	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%STEP_EXECUTION_CONTEXT " +
-			"(STEP_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " +
-			"VALUES(?, ?, ?)";
-
-	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT " +
-			"SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " +
-			"WHERE STEP_EXECUTION_ID = ?";
-
-	private static final int MAX_VARCHAR_LENGTH = 2500;
+	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%EXECUTION_CONTEXT set "
+			+ "TYPE_CD = ?, STRING_VAL = ?, DOUBLE_VAL = ?, LONG_VAL = ?, OBJECT_VAL = ? where EXECUTION_ID = ? and KEY_NAME = ?";
 
 	private LobHandler lobHandler = new DefaultLobHandler();
-
-	private ExecutionContextStringSerializer serializer;
 
 	/**
 	 * @param jobExecution
 	 * @return execution context associated with the given jobExecution.
 	 */
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
-		Long executionId = jobExecution.getId();
+		final Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(),
-				executionId);
-		if (results.size() > 0) {
-			return results.get(0);
-		}
-		else {
-			return new ExecutionContext();
-		}
+		final ExecutionContext executionContext = new ExecutionContext();
+
+		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, JOB_DISCRIMINATOR },
+				new ExecutionContextRowCallbackHandler(executionContext));
+
+		return executionContext;
 	}
 
 	/**
@@ -105,18 +69,15 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * @return execution context associated with the given stepExecution.
 	 */
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
-		Long executionId = stepExecution.getId();
+		final Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
-		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(),
-				executionId);
-		if (results.size() > 0) {
-			return results.get(0);
-		}
-		else {
-			return new ExecutionContext();
-		}
+		final ExecutionContext executionContext = new ExecutionContext();
+
+		getJdbcTemplate().query(getQuery(FIND_EXECUTION_CONTEXT), new Object[] { executionId, STEP_DISCRIMINATOR },
+				new ExecutionContextRowCallbackHandler(executionContext));
+
+		return executionContext;
 	}
 
 	/**
@@ -124,15 +85,13 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * jobExecution
 	 * @param jobExecution
 	 */
-	public void persistExecutionContext(final JobExecution jobExecution) {
+	public void saveOrUpdateExecutionContext(final JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		String serializedContext = serializeContext(executionContext);
-
-		persistSerializedContext(executionId, serializedContext, true);
+		saveOrUpdateExecutionContext(executionContext, executionId, JOB_DISCRIMINATOR);
 	}
 
 	/**
@@ -140,100 +99,229 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * stepExecution
 	 * @param stepExecution
 	 */
-	public void persistExecutionContext(final StepExecution stepExecution) {
+	public void saveOrUpdateExecutionContext(final StepExecution stepExecution) {
 
 		Long executionId = stepExecution.getId();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
 
-		String serializedContext = serializeContext(executionContext);
+		saveOrUpdateExecutionContext(executionContext, executionId, STEP_DISCRIMINATOR);
+	}
 
-		persistSerializedContext(executionId, serializedContext, false);
+	/**
+	 * Resolves attribute's class to corresponding {@link AttributeType} and
+	 * persists or updates the attribute.
+	 */
+	private void saveOrUpdateExecutionContext(ExecutionContext ctx, Long executionId, String discriminator) {
+
+		for (Iterator it = ctx.entrySet().iterator(); it.hasNext();) {
+			Entry entry = (Entry) it.next();
+			final String key = entry.getKey().toString();
+			final Object value = entry.getValue();
+
+			if (value instanceof String) {
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.STRING);
+			}
+			else if (value instanceof Double) {
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.DOUBLE);
+			}
+			else if (value instanceof Long) {
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.LONG);
+			}
+			else {
+				updateExecutionAttribute(executionId, discriminator, key, value, AttributeType.OBJECT);
+			}
+		}
+	}
+
+	/**
+	 * Creates {@link PreparedStatement} from the provided arguments and tries
+	 * to update the attribute - if the attribute does not exist in the database
+	 * yet it is inserted.
+	 */
+	private void updateExecutionAttribute(final Long executionId, final String discriminator, final String key,
+			final Object value, final AttributeType type) {
+
+		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
+
+			protected void setValues(PreparedStatement ps, LobCreator lobCreator) throws SQLException,
+					DataAccessException {
+
+				ps.setLong(6, executionId.longValue());
+				ps.setString(7, key);
+				if (type == AttributeType.STRING) {
+					ps.setString(1, AttributeType.STRING.toString());
+					ps.setString(2, value.toString());
+					ps.setDouble(3, 0.0);
+					ps.setLong(4, 0);
+					lobCreator.setBlobAsBytes(ps, 5, null);
+				}
+				else if (type == AttributeType.DOUBLE) {
+					ps.setString(1, AttributeType.DOUBLE.toString());
+					ps.setString(2, null);
+					ps.setDouble(3, ((Double) value).doubleValue());
+					ps.setLong(4, 0);
+					lobCreator.setBlobAsBytes(ps, 5, null);
+				}
+				else if (type == AttributeType.LONG) {
+					ps.setString(1, AttributeType.LONG.toString());
+					ps.setString(2, null);
+					ps.setDouble(3, 0.0);
+					ps.setLong(4, ((Long) value).longValue());
+					lobCreator.setBlobAsBytes(ps, 5, null);
+				}
+				else {
+					ps.setString(1, AttributeType.OBJECT.toString());
+					ps.setString(2, null);
+					ps.setDouble(3, 0.0);
+					ps.setLong(4, 0);
+					setBlob(lobCreator, ps, 5, value);
+				}
+			}
+		};
+
+		// LobCreating callbacks always return the affect row count for SQL DML
+		// statements, if less than 1 row
+		// is affected, then this row is new and should be inserted.
+		Integer affectedRows = (Integer) getJdbcTemplate().execute(getQuery(UPDATE_STEP_EXECUTION_CONTEXT), callback);
+		if (affectedRows.intValue() < 1) {
+			insertExecutionAttribute(executionId, discriminator, key, value, type);
+		}
+	}
+
+	/**
+	 * Creates {@link PreparedStatement} from provided arguments and inserts new
+	 * row for the attribute.
+	 */
+	private void insertExecutionAttribute(final Long executionId, final String discriminator, final String key,
+			final Object value, final AttributeType type) {
+		PreparedStatementCallback callback = new AbstractLobCreatingPreparedStatementCallback(lobHandler) {
+
+			protected void setValues(PreparedStatement ps, LobCreator lobCreator) throws SQLException,
+					DataAccessException {
+
+				ps.setLong(1, executionId.longValue());
+				ps.setString(2, discriminator);
+				ps.setString(4, key);
+				if (type == AttributeType.STRING) {
+					ps.setString(3, AttributeType.STRING.toString());
+					ps.setString(5, value.toString());
+					ps.setDouble(6, 0.0);
+					ps.setLong(7, 0);
+					lobCreator.setBlobAsBytes(ps, 8, null);
+				}
+				else if (type == AttributeType.DOUBLE) {
+					ps.setString(3, AttributeType.DOUBLE.toString());
+					ps.setString(5, null);
+					ps.setDouble(6, ((Double) value).doubleValue());
+					ps.setLong(7, 0);
+					lobCreator.setBlobAsBytes(ps, 8, null);
+				}
+				else if (type == AttributeType.LONG) {
+					ps.setString(3, AttributeType.LONG.toString());
+					ps.setString(5, null);
+					ps.setDouble(6, 0.0);
+					ps.setLong(7, ((Long) value).longValue());
+					lobCreator.setBlobAsBytes(ps, 8, null);
+				}
+				else {
+					ps.setString(3, AttributeType.OBJECT.toString());
+					ps.setString(5, null);
+					ps.setDouble(6, 0.0);
+					ps.setLong(7, 0);
+					setBlob(lobCreator, ps, 8, value);
+				}
+			}
+		};
+		getJdbcTemplate().execute(getQuery(INSERT_STEP_EXECUTION_CONTEXT), callback);
+	}
+
+	/**
+	 * Code used to set BLOB values.  Uses a binary stream since that seems to be the most
+	 * compatibile option across database platforms.
+	 *
+	 * @throws SQLException
+	 */
+	private void setBlob(LobCreator lobCreator, PreparedStatement ps, int index, Object value) throws SQLException {
+		byte[] b = SerializationUtils.serialize((Serializable) value);
+		lobCreator.setBlobAsBinaryStream( ps, index, new ByteArrayInputStream(b), b.length);
 	}
 
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		serializer = new XStreamExecutionContextStringSerializer();
-		((XStreamExecutionContextStringSerializer)serializer).afterPropertiesSet();
-	}
+	/**
+	 * Attribute types supported by the {@link ExecutionContext}.
+	 */
+	private static class AttributeType {
 
-	private void persistSerializedContext(final Long executionId, String serializedContext, boolean isJobExecutionContext) {
-		String countSql = isJobExecutionContext ? COUNT_JOB_EXECUTION_CONTEXT : COUNT_STEP_EXECUTION_CONTEXT;
-		String updateSql = isJobExecutionContext ? UPDATE_JOB_EXECUTION_CONTEXT : UPDATE_STEP_EXECUTION_CONTEXT;
-		String insertSql = isJobExecutionContext ? INSERT_JOB_EXECUTION_CONTEXT : INSERT_STEP_EXECUTION_CONTEXT;
+		private final String type;
 
-		int count = getJdbcTemplate().queryForInt(getQuery(countSql), executionId);
-
-		final String shortContext;
-		final String longContext;
-		if (serializedContext.length() > MAX_VARCHAR_LENGTH) {
-			shortContext = serializedContext.substring(0, MAX_VARCHAR_LENGTH - 4) + " ...";
-			longContext = serializedContext;
-		}
-		else {
-			shortContext = serializedContext;
-			longContext = null;
+		private AttributeType(String type) {
+			this.type = type;
 		}
 
-
-		if (count > 0) {
-			getJdbcTemplate().getJdbcOperations().update(getQuery(updateSql),
-					new PreparedStatementSetter() {
-						public void setValues(PreparedStatement ps) throws SQLException {
-							ps.setString(1, shortContext);
-							if (longContext != null) {
-								lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-							}
-							else {
-								ps.setNull(2, Types.CLOB);
-							}
-							ps.setLong(3, executionId);
-						}
-					});
+		public String toString() {
+			return type;
 		}
-		else {
-			getJdbcTemplate().getJdbcOperations().update(getQuery(insertSql),
-					new PreparedStatementSetter() {
-						public void setValues(PreparedStatement ps) throws SQLException {
-							ps.setLong(1, executionId);
-							ps.setString(2, shortContext);
-							if (longContext != null) {
-								lobHandler.getLobCreator().setClobAsString(ps, 3, longContext);
-							}
-							else {
-								ps.setNull(3, Types.CLOB);
-							}
-						}
-					});
-		}
-	}
 
-	private String serializeContext(ExecutionContext ctx) {
-		Map<String, Object> m = new HashMap<String, Object>();
-		for (Entry<String, Object> me : ctx.entrySet()) {
-			m.put(me.getKey(), me.getValue());
-		}
-		return serializer.serialize(m);
-	}
+		public static final AttributeType STRING = new AttributeType("STRING");
 
-	private class ExecutionContextRowMapper implements ParameterizedRowMapper<ExecutionContext> {
-		public ExecutionContext mapRow(ResultSet rs, int i) throws SQLException {
-			ExecutionContext executionContext = new ExecutionContext();
-			String serializedContext = rs.getString("SERIALIZED_CONTEXT");
-			if (serializedContext == null) {
-				serializedContext = rs.getString("SHORT_CONTEXT");
+		public static final AttributeType LONG = new AttributeType("LONG");
+
+		public static final AttributeType OBJECT = new AttributeType("OBJECT");
+
+		public static final AttributeType DOUBLE = new AttributeType("DOUBLE");
+
+		private static final AttributeType[] VALUES = { STRING, OBJECT, LONG, DOUBLE };
+
+		public static AttributeType getType(String typeAsString) {
+
+			for (int i = 0; i < VALUES.length; i++) {
+				if (VALUES[i].toString().equals(typeAsString)) {
+					return (AttributeType) VALUES[i];
+				}
 			}
-			Map<String, Object> map = serializer.deserialize(serializedContext);
-			for (Map.Entry<String, Object> entry : map.entrySet()) {
-				executionContext.put(entry.getKey(), entry.getValue());
-			}
-			return executionContext;
+
+			return null;
 		}
 	}
+
+	/**
+	 * Reads attributes from {@link ResultSet} and puts them into
+	 * {@link ExecutionContext}, resolving the attributes' types using the
+	 * 'TYPE_CD' column.
+	 */
+	private static class ExecutionContextRowCallbackHandler implements RowCallbackHandler {
+
+		private ExecutionContext executionContext;
+
+		public ExecutionContextRowCallbackHandler(ExecutionContext ctx) {
+			executionContext = ctx;
+		}
+
+		public void processRow(ResultSet rs) throws SQLException {
+
+			String typeCd = rs.getString("TYPE_CD");
+			AttributeType type = AttributeType.getType(typeCd);
+			String key = rs.getString("KEY_NAME");
+			if (type == AttributeType.STRING) {
+				executionContext.putString(key, rs.getString("STRING_VAL"));
+			}
+			else if (type == AttributeType.LONG) {
+				executionContext.putLong(key, rs.getLong("LONG_VAL"));
+			}
+			else if (type == AttributeType.DOUBLE) {
+				executionContext.putDouble(key, rs.getDouble("DOUBLE_VAL"));
+			}
+			else if (type == AttributeType.OBJECT) {
+				executionContext.put(key, SerializationUtils.deserialize(rs.getBinaryStream("OBJECT_VAL")));
+			}
+			else {
+				throw new UnexpectedJobExecutionException("Invalid type found: [" + typeCd + "]");
+			}
+		}
+	};
 }

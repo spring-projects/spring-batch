@@ -26,7 +26,7 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Dave Syer
  * 
  */
-public interface ItemPreparedStatementSetter<T> {
+public interface ItemPreparedStatementSetter {
 	/**
 	 * Set parameter values on the given PreparedStatement as determined from
 	 * the provided item.
@@ -34,6 +34,6 @@ public interface ItemPreparedStatementSetter<T> {
 	 * @throws SQLException if a SQLException is encountered (i.e. there is no
 	 * need to catch SQLException)
 	 */
-	void setValues(T item, PreparedStatement ps) throws SQLException;
+	void setValues(Object item, PreparedStatement ps) throws SQLException;
 
 }

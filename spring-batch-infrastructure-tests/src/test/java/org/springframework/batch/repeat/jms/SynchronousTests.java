@@ -16,16 +16,14 @@
 
 package org.springframework.batch.repeat.jms;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Session;
-import javax.sql.DataSource;
 
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -33,69 +31,54 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.jms.connection.SessionProxy;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.BeansException;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationContext;
-import org.junit.runner.RunWith;
-import org.junit.Test;
+import org.springframework.test.AbstractTransactionalDataSourceSpringContextTests;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.util.ClassUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class SynchronousTests implements ApplicationContextAware {
+public class SynchronousTests extends AbstractTransactionalDataSourceSpringContextTests {
 
-	@Autowired
 	private JmsTemplate jmsTemplate;
 
-	@Autowired
 	private RepeatTemplate repeatTemplate;
 
-	@Autowired
-	private PlatformTransactionManager transactionManager;
-
-	private SimpleJdbcTemplate simpleJdbcTemplate;
-
-	private ApplicationContext applicationContext;
-
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;
+	public void setJmsTemplate(JmsTemplate jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
 	}
 
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	public void setRepeatTemplate(RepeatTemplate repeatTemplate) {
+		this.repeatTemplate = repeatTemplate;
 	}
 
-	@BeforeTransaction
-	public void onSetUpBeforeTransaction() throws Exception {
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
+				"jms-context.xml") };
+	}
+
+	protected void onSetUpBeforeTransaction() throws Exception {
+		super.onSetUpBeforeTransaction();
 		String foo = "";
 		int count = 0;
 		while (foo != null && count < 100) {
 			foo = (String) jmsTemplate.receiveAndConvert("queue");
 			count++;
 		}
-		simpleJdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 	}
 
+	protected void onSetUpInTransaction() throws Exception {
+		super.onSetUpInTransaction();
+	}
+
 	private void assertInitialState() {
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 	}
 
-	List<String> list = new ArrayList<String>();
+	List list = new ArrayList();
 
-	@Transactional
-	@Test
 	public void testCommit() throws Exception {
 
 		assertInitialState();
@@ -104,49 +87,56 @@ public class SynchronousTests implements ApplicationContextAware {
 			public ExitStatus doInIteration(RepeatContext context) throws Exception {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
-				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
+				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
+						new Integer(list.size()), text });
 				return new ExitStatus(text != null);
 			}
 		});
 
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		// force commit...
+		setComplete();
+		endTransaction();
+		startNewTransaction();
+
+		System.err.println(jdbcTemplate.queryForList("select * from T_FOOS"));
+
+		// Database committed so this record should be there...
+		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(2, count);
 
+		// ... the commit should also have cleared the queue, so this should now
+		// be null
 		String text = (String) jmsTemplate.receiveAndConvert("queue");
 		assertEquals(null, text);
 
 	}
 
-	@Test
 	public void testFullRollback() throws Exception {
 
 		assertInitialState();
-
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
-				repeatTemplate.iterate(new RepeatCallback() {
-					public ExitStatus doInIteration(RepeatContext context) throws Exception {
-						String text = (String) jmsTemplate.receiveAndConvert("queue");
-						list.add(text);
-						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
-						return new ExitStatus(text != null);
-					}
-				});
-				// force rollback...
-				status.setRollbackOnly();
-				return null;
+		repeatTemplate.iterate(new RepeatCallback() {
+			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+				String text = (String) jmsTemplate.receiveAndConvert("queue");
+				list.add(text);
+				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
+						new Integer(list.size()), text });
+				return new ExitStatus(text != null);
 			}
 		});
 
+		// force rollback...
+		endTransaction();
+		startNewTransaction();
+
 		String text = "";
-		List<String> msgs = new ArrayList<String>();
+		List msgs = new ArrayList();
 		while (text != null) {
 			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
 		}
 
 		// The database portion rolled back...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(0, count);
 
 		// ... and so did the message session. The rollback should have restored
@@ -154,33 +144,31 @@ public class SynchronousTests implements ApplicationContextAware {
 		assertTrue("Foo not on queue", msgs.contains("foo"));
 	}
 
-	@Transactional @Test
 	public void testPartialRollback() throws Exception {
 
 		// The JmsTemplate is used elsewhere outside a transaction, so
 		// we need to use one here that is transaction aware.
-		final JmsTemplate txJmsTemplate = new JmsTemplate(
-				(ConnectionFactory) applicationContext.getBean("txAwareConnectionFactory"));
-		txJmsTemplate.setReceiveTimeout(100L);
-		txJmsTemplate.setSessionTransacted(true);
+		final JmsTemplate jmsTemplate = new JmsTemplate((ConnectionFactory) applicationContext
+				.getBean("txAwareConnectionFactory"));
+		jmsTemplate.setReceiveTimeout(100L);
+		jmsTemplate.setSessionTransacted(true);
 
 		assertInitialState();
+		repeatTemplate.iterate(new RepeatCallback() {
+			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+				String text = (String) jmsTemplate.receiveAndConvert("queue");
+				list.add(text);
+				jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
+						new Integer(list.size()), text });
+				return new ExitStatus(text != null);
+			}
+		});
 
-		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
-			public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
-
-				repeatTemplate.iterate(new RepeatCallback() {
-					public ExitStatus doInIteration(RepeatContext context) throws Exception {
-						String text = (String) txJmsTemplate.receiveAndConvert("queue");
-						list.add(text);
-						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
-						return new ExitStatus(text != null);
-					}
-				});
-
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+			public void beforeCommit(boolean readOnly) {
 				// Simulate a message system failure before the main transaction
 				// commits...
-				txJmsTemplate.execute(new SessionCallback() {
+				jmsTemplate.execute(new SessionCallback() {
 					public Object doInJms(Session session) throws JMSException {
 						try {
 							assertTrue("Not a SessionProxy - wrong spring version?", session instanceof SessionProxy);
@@ -196,20 +184,22 @@ public class SynchronousTests implements ApplicationContextAware {
 						return null;
 					}
 				});
-
-				return null;
 			}
 		});
+		// force commit...
+		setComplete();
+		endTransaction();
+		startNewTransaction();
 
 		String text = "";
-		List<String> msgs = new ArrayList<String>();
+		List msgs = new ArrayList();
 		while (text != null) {
-			text = (String) txJmsTemplate.receiveAndConvert("queue");
+			text = (String) jmsTemplate.receiveAndConvert("queue");
 			msgs.add(text);
 		}
 
 		// The database portion committed...
-		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
+		int count = jdbcTemplate.queryForInt("select count(*) from T_FOOS");
 		assertEquals(2, count);
 
 		// ...but the JMS session rolled back, so the message is still there
@@ -217,5 +207,4 @@ public class SynchronousTests implements ApplicationContextAware {
 		assertTrue("Bar not on queue", msgs.contains("bar"));
 
 	}
-
 }

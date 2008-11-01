@@ -15,72 +15,62 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import junit.framework.TestCase;
 
-import java.util.ArrayList;
-
-import org.junit.Before;
-import org.junit.Test;
+import org.easymock.MockControl;
 import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.listener.CompositeItemReadListener;
 
 /**
  * @author Lucas Ward
  *
  */
-public class CompositeItemReadListenerTests {
+public class CompositeItemReadListenerTests extends TestCase {
+
+	MockControl listenerControl = MockControl.createControl(ItemReadListener.class);
 	
-	ItemReadListener<Object> listener;
-	CompositeItemReadListener<Object> compositeListener;
+	ItemReadListener listener;
+	CompositeItemReadListener compositeListener;
 	
-	@SuppressWarnings("unchecked")
-	@Before
-	public void setUp() throws Exception {
-		listener = createMock(ItemReadListener.class);
-		compositeListener = new CompositeItemReadListener<Object>();
+	protected void setUp() throws Exception {
+		super.setUp();
+	
+		listener = (ItemReadListener)listenerControl.getMock();
+		compositeListener = new CompositeItemReadListener();
 		compositeListener.register(listener);
 	}
 	
-	@Test
 	public void testBeforeRead(){
 		
 		listener.beforeRead();
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.beforeRead();
-		verify(listener);
+		listenerControl.verify();
 	}
 	
-	@Test
 	public void testAfterRead(){
 		Object item = new Object();
 		listener.afterRead(item);
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.afterRead(item);
-		verify(listener);
+		listenerControl.verify();
 	}
 	
-	@Test
 	public void testOnReadError(){
 		
 		Exception ex = new Exception();
 		listener.onReadError(ex);
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.onReadError(ex);
-		verify(listener);
+		listenerControl.verify();
 	}
 
-	@Test
-	public void testSetListeners() throws Exception {
-		compositeListener.setListeners(new ArrayList<ItemReadListener<? super Object>>() {
-			{
-				add(listener);
-			}
-		});
+	public void testSetListners() throws Exception {
+		compositeListener.setListeners(new ItemReadListener[] {listener});
 		listener.beforeRead();
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.beforeRead();
-		verify(listener);
+		listenerControl.verify();
 	}
 	
 }

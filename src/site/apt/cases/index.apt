@@ -52,10 +52,6 @@ Use Cases for Spring Batch
     toprovide enough information that a scheduler can act
     appropriately.
     
-    * Non-Sequential Processing of Steps (Conditional Branching)
-
-    * {{{pause.html}Pause and Resume Job Execution}}
-
 
 * Actors
 

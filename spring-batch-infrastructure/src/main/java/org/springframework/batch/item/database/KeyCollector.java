@@ -9,10 +9,8 @@ import org.springframework.batch.item.ExecutionContext;
  * 
  * @author Lucas Ward
  * @see DrivingQueryItemReader
- * @deprecated The DrivingQueryItemReader approach is not supported going forward, use a PagingItemReader
- * implementation instead.  See {@link org.springframework.batch.item.database.AbstractPagingItemReader}
  */
-public interface KeyCollector<T> {
+public interface KeyCollector {
 
 	/**
 	 * <p>Retrieve the keys to be iterated over.  If the ExecutionContext
@@ -30,7 +28,7 @@ public interface KeyCollector<T> {
 	 * that could potentially be used to retrieve the correct keys.
 	 * @return list of keys returned by the driving query (can be empty but not null)
 	 */
-	List<T> retrieveKeys(ExecutionContext executionContext);
+	List retrieveKeys(ExecutionContext executionContext);
 	
 	/**
 	 * Given the provided key, store it in the provided ExecutionContext.  This
@@ -44,5 +42,5 @@ public interface KeyCollector<T> {
 	 * @throws IllegalArgumentException if key is null.
 	 * @throws IllegalArgumentException if key is an incompatible type.
 	 */
-	void updateContext(T key, ExecutionContext executionContext);
+	void updateContext(Object key, ExecutionContext executionContext);
 }

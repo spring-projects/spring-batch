@@ -16,24 +16,13 @@
 
 package org.springframework.batch.core.job;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import junit.framework.TestCase;
+
+import org.easymock.MockControl;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
@@ -41,15 +30,14 @@ import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -65,7 +53,7 @@ import org.springframework.batch.repeat.ExitStatus;
  * 
  * @author Lucas Ward
  */
-public class SimpleJobTests {
+public class SimpleJobTests extends TestCase {
 
 	private JobRepository jobRepository;
 
@@ -74,10 +62,8 @@ public class SimpleJobTests {
 	private JobExecutionDao jobExecutionDao;
 
 	private StepExecutionDao stepExecutionDao;
-	
-	private ExecutionContextDao ecDao;
 
-	private List<Serializable> list = new ArrayList<Serializable>();
+	private List list = new ArrayList();
 
 	private JobInstance jobInstance;
 
@@ -95,72 +81,49 @@ public class SimpleJobTests {
 
 	private SimpleJob job;
 
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
+		super.setUp();
 
 		MapJobInstanceDao.clear();
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
-		MapExecutionContextDao.clear();
 		jobInstanceDao = new MapJobInstanceDao();
 		jobExecutionDao = new MapJobExecutionDao();
 		stepExecutionDao = new MapStepExecutionDao();
-		ecDao = new MapExecutionContextDao();
-		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ecDao);
+		jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao);
 		job = new SimpleJob();
 		job.setJobRepository(jobRepository);
 
-		step1 = new StubStep("TestStep1", jobRepository);
+		step1 = new StubStep("TestStep1");
 		step1.setCallback(new Runnable() {
 			public void run() {
 				list.add("default");
 			}
 		});
-		step2 = new StubStep("TestStep2", jobRepository);
+		step2 = new StubStep("TestStep2");
 		step2.setCallback(new Runnable() {
 			public void run() {
 				list.add("default");
 			}
 		});
+		step1.setJobRepository(jobRepository);
+		step2.setJobRepository(jobRepository);
 
-		List<Step> steps = new ArrayList<Step>();
+		List steps = new ArrayList();
 		steps.add(step1);
 		steps.add(step2);
 		job.setName("testJob");
 		job.setSteps(steps);
 
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		jobExecution = jobRepository.createJobExecution(job, jobParameters);
 		jobInstance = jobExecution.getJobInstance();
 
-		stepExecution1 = new StepExecution(step1.getName(), jobExecution);
-		stepExecution2 = new StepExecution(step2.getName(), jobExecution);
+		stepExecution1 = new StepExecution(step1.getName(), jobExecution, null);
+		stepExecution2 = new StepExecution(step2.getName(), jobExecution, null);
 
-	}
-
-	/**
-	 * Test method for {@link SimpleJob#setSteps(java.util.List)}.
-	 */
-	@Test
-	public void testSetSteps() {
-		job.setSteps(Collections.singletonList((Step) new StepSupport("step")));
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getStepExecutions().size());
-	}
-
-	/**
-	 * Test method for
-	 * {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
-	 */
-	@Test
-	public void testAddStep() {
-		job.setSteps(Collections.<Step> emptyList());
-		job.addStep(new StepSupport("step"));
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getStepExecutions().size());
 	}
 
 	// Test to ensure the exit status returned by the last step is returned
-	@Test
 	public void testExitStatusReturned() throws JobExecutionException {
 
 		final ExitStatus customStatus = new ExitStatus(true, "test");
@@ -183,14 +146,17 @@ public class SimpleJobTests {
 				return false;
 			}
 		};
-		List<Step> steps = new ArrayList<Step>();
+		List steps = new ArrayList();
 		steps.add(testStep);
 		job.setSteps(steps);
 		job.execute(jobExecution);
 		assertEquals(customStatus, jobExecution.getExitStatus());
 	}
 
-	@Test
+	protected void tearDown() throws Exception {
+		super.tearDown();
+	}
+
 	public void testRunNormally() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
@@ -204,7 +170,6 @@ public class SimpleJobTests {
 		assertFalse(step2.passedInJobContext.isEmpty());
 	}
 
-	@Test
 	public void testRunNormallyWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void beforeJob(JobExecution jobExecution) {
@@ -219,7 +184,6 @@ public class SimpleJobTests {
 		assertEquals(4, list.size());
 	}
 
-	@Test
 	public void testRunWithSimpleStepExecutor() throws Exception {
 
 		job.setJobRepository(jobRepository);
@@ -232,7 +196,6 @@ public class SimpleJobTests {
 
 	}
 
-	@Test
 	public void testExecutionContextIsSet() throws Exception {
 		testRunNormally();
 		assertEquals(jobInstance, jobExecution.getJobInstance());
@@ -241,86 +204,97 @@ public class SimpleJobTests {
 		assertEquals(step2.getName(), stepExecution2.getStepName());
 	}
 
-	@Test
 	public void testInterrupted() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final JobInterruptedException exception = new JobInterruptedException("Interrupt!");
 		step1.setProcessException(exception);
-		job.execute(jobExecution);
-		assertEquals(2, jobExecution.getAllFailureExceptions().size());
-		assertEquals(exception, jobExecution.getStepExecutions().iterator().next().getFailureExceptions().get(0));
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (UnexpectedJobExecutionException e) {
+			assertEquals(exception, e.getCause());
+		}
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.STOPPED, ExitStatus.FAILED);
 	}
 
-	@Test
 	public void testFailed() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step1.setProcessException(exception);
-			
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertEquals(exception, e);
+		}
 		assertEquals(0, list.size());
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
-	@Test
 	public void testFailedWithListener() throws Exception {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
-			public void afterJob(JobExecution jobExecution) {
-				list.add("afterJob");
+			public void onError(JobExecution jobExecution, Throwable t) {
+				list.add(t);
 			}
 		} });
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step1.setProcessException(exception);
 
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertEquals(exception, e);
+		}
 		assertEquals(1, list.size());
+		assertSame(exception, list.get(0));
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
-	@Test
 	public void testFailedWithError() throws Exception {
 		step1.setStartLimit(5);
 		step2.setStartLimit(5);
 		final Error exception = new Error("Foo!");
 		step1.setProcessException(exception);
-
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (Error e) {
+			assertEquals(exception, e);
+		}
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
 	}
 
-	@Test
 	public void testStepShouldNotStart() throws Exception {
 		// Start policy will return false, keeping the step from being started.
 		step1.setStartLimit(0);
 
-		job.execute(jobExecution);
-			
-		assertEquals(1, jobExecution.getFailureExceptions().size());
-		Throwable ex = jobExecution.getFailureExceptions().get(0);
-		assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
+		try {
+			job.execute(jobExecution);
+			fail("Expected BatchCriticalException");
+		}
+		catch (StartLimitExceededException ex) {
+			// expected
+			assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
 					.indexOf("start limit exceeded") >= 0);
+		}
 	}
 
-	@Test
 	public void testNoSteps() throws Exception {
-		job.setSteps(new ArrayList<Step>());
+		job.setSteps(new ArrayList());
 
 		job.execute(jobExecution);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertTrue("Wrong message in execution: " + exitStatus, exitStatus.getExitDescription().indexOf(
-				"no steps configured") >= 0);
+				"No steps configured") >= 0);
 	}
 
 	// public void testNoStepsExecuted() throws Exception {
@@ -336,55 +310,73 @@ public class SimpleJobTests {
 	// "steps already completed"));
 	// }
 
-	@Test
 	public void testNotExecutedIfAlreadyStopped() throws Exception {
 		jobExecution.stop();
-		job.execute(jobExecution);
-		
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (UnexpectedJobExecutionException e) {
+			assertTrue(e.getCause() instanceof JobInterruptedException);
+		}
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
 	}
 
-	@Test
 	public void testRestart() throws Exception {
 		step1.setAllowStartIfComplete(true);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step2.setProcessException(exception);
 
-		job.execute(jobExecution);
-		Throwable e = jobExecution.getAllFailureExceptions().get(0);
-		assertSame(exception, e);
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertSame(exception, e);
+		}
 
-		job.execute(jobExecution);
-		e = jobExecution.getAllFailureExceptions().get(0);
-		assertSame(exception, e);
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertSame(exception, e);
+		}
 		assertTrue(step1.passedInStepContext.isEmpty());
 		assertFalse(step2.passedInStepContext.isEmpty());
+
 	}
 
-	@Test
 	public void testInterruptWithListener() throws Exception {
 		step1.setProcessException(new JobInterruptedException("job interrupted!"));
 
-		JobExecutionListener listener = createMock(JobExecutionListener.class);
+		MockControl control = MockControl.createStrictControl(JobExecutionListener.class);
+		JobExecutionListener listener = (JobExecutionListener) control.getMock();
 		listener.beforeJob(jobExecution);
-		listener.afterJob(jobExecution);
-		replay(listener);
+		control.setVoidCallable();
+		listener.onInterrupt(jobExecution);
+		control.setVoidCallable();
+		control.replay();
 
 		job.setJobExecutionListeners(new JobExecutionListener[] { listener });
 
-		job.execute(jobExecution);
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (UnexpectedJobExecutionException e) {
+			// expected
+		}
 
-		verify(listener);
+		control.verify();
 	}
 
 	/**
 	 * Execution context should be restored on restart.
 	 */
-	@Test
 	public void testRestartScenario() throws Exception {
 
 		job.setRestartable(true);
@@ -393,60 +385,68 @@ public class SimpleJobTests {
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step2.setProcessException(exception);
 
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		Throwable e = jobExecution.getAllFailureExceptions().get(0);
-		assertSame(exception, e);
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertSame(exception, e);
+		}
 
 		assertTrue(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
 
 		assertFalse(jobExecution.getExecutionContext().isEmpty());
 
-		jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		jobExecution = jobRepository.createJobExecution(job, jobParameters);
 
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		e = jobExecution.getAllFailureExceptions().get(0);
-		assertSame(exception, e);
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (RuntimeException e) {
+			assertSame(exception, e);
+		}
 		assertFalse(step1.passedInJobContext.isEmpty());
 		assertFalse(step2.passedInJobContext.isEmpty());
 	}
 
-	@Test
 	public void testInterruptJob() throws Exception {
 
-		step1 = new StubStep("interruptStep", jobRepository) {
+		step1 = new StubStep("interruptStep") {
 
 			public void execute(StepExecution stepExecution) throws JobInterruptedException,
 					UnexpectedJobExecutionException {
 				stepExecution.getJobExecution().stop();
-				super.execute(stepExecution);
 			}
 
 		};
 
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
-		job.execute(jobExecution);
-		assertEquals(1, jobExecution.getAllFailureExceptions().size());
-		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
-		assertTrue("Wrong exception "+expected, expected instanceof JobInterruptedException);
-		assertEquals("JobExecution interrupted.", expected.getMessage());
-		
-		assertNull("Second step was not supposed to be executed", step2.passedInStepContext);
+
+		try {
+			job.execute(jobExecution);
+			fail();
+		}
+		catch (UnexpectedJobExecutionException expected) {
+			assertTrue(expected.getCause() instanceof JobInterruptedException);
+			assertEquals("JobExecution interrupted.", expected.getCause().getMessage());
+		}
+
+		assertNull("Second step was not executed", step2.passedInStepContext);
 	}
 
 	/*
 	 * Check JobRepository to ensure status is being saved.
 	 */
 	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
-		assertEquals(jobInstance, jobInstanceDao.getJobInstance(job.getName(), jobParameters));
+		assertEquals(jobInstance, jobInstanceDao.getJobInstance(job, jobParameters));
 		// because map dao stores in memory, it can be checked directly
 		JobExecution jobExecution = (JobExecution) jobExecutionDao.findJobExecutions(jobInstance).get(0);
 		assertEquals(jobInstance.getId(), jobExecution.getJobId());
 		assertEquals(status, jobExecution.getStatus());
 		if (exitStatus != null) {
-			assertEquals(exitStatus.getExitCode(), jobExecution.getExitStatus().getExitCode());
+			assertEquals(jobExecution.getExitStatus().getExitCode(), exitStatus.getExitCode());
 		}
 	}
 
@@ -469,9 +469,8 @@ public class SimpleJobTests {
 		/**
 		 * @param string
 		 */
-		public StubStep(String string, JobRepository jobRepository) {
+		public StubStep(String string) {
 			super(string);
-			this.jobRepository = jobRepository;
 		}
 
 		/**
@@ -499,35 +498,41 @@ public class SimpleJobTests {
 			passedInStepContext = new ExecutionContext(stepExecution.getExecutionContext());
 			stepExecution.getExecutionContext().putString("stepKey", "stepValue");
 			stepExecution.getJobExecution().getExecutionContext().putString("jobKey", "jobValue");
-			jobRepository.update(stepExecution);
-			jobRepository.updateExecutionContext(stepExecution);
+			jobRepository.saveOrUpdate(stepExecution);
+			jobRepository.saveOrUpdateExecutionContext(stepExecution);
 
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				stepExecution.setStatus(BatchStatus.FAILED);
-				stepExecution.addFailureException(exception);
-				return;
+				throw (RuntimeException) exception;
 			}
 			if (exception instanceof Error) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				stepExecution.setStatus(BatchStatus.FAILED);
-				stepExecution.addFailureException(exception);
-				return;
+				throw (Error) exception;
 			}
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.STOPPED);
-				stepExecution.addFailureException(exception);
-				return;
+				stepExecution.setStatus(BatchStatus.FAILED);
+				throw (JobInterruptedException) exception;
 			}
 			if (runnable != null) {
 				runnable.run();
 			}
 			stepExecution.setExitStatus(ExitStatus.FINISHED);
 			stepExecution.setStatus(BatchStatus.COMPLETED);
-			jobRepository.update(stepExecution);
-			jobRepository.updateExecutionContext(stepExecution);
+			jobRepository.saveOrUpdate(stepExecution);
+			jobRepository.saveOrUpdateExecutionContext(stepExecution);
 
+		}
+
+		/**
+		 * Public setter for {@link JobRepository}.
+		 * 
+		 * @param jobRepository is a mandatory dependence (no default).
+		 */
+		public void setJobRepository(JobRepository jobRepository) {
+			this.jobRepository = jobRepository;
 		}
 
 	}

@@ -27,16 +27,19 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class TransactionAwareMapFactoryTests extends TestCase {
 
+	TransactionAwareProxyFactory factory;
+
 	TransactionTemplate transactionTemplate = new TransactionTemplate(new ResourcelessTransactionManager());
 
-	Map<String, String> map;
+	Map map;
 
 	protected void setUp() throws Exception {
-		Map<String, String> seed = new HashMap<String, String>();
+		Map seed = new HashMap();
 		seed.put("foo", "oof");
 		seed.put("bar", "bar");
 		seed.put("spam", "maps");
-		map = TransactionAwareProxyFactory.createTransactionalMap(seed);
+		factory = new TransactionAwareProxyFactory(seed);
+		map = (Map) factory.createInstance();
 	}
 
 	public void testAdd() {

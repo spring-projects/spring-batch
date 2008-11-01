@@ -31,7 +31,7 @@ import org.springframework.util.MethodInvoker;
  * 
  * @author Robert Kasanicky
  */
-public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
+public class AbstractMethodInvokingDelegator implements InitializingBean {
 	
 	private Object targetObject;
 	
@@ -44,7 +44,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return object returned by invoked method
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
 	 */
-	protected T invokeDelegateMethod() {
+	protected Object invokeDelegateMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(arguments);
 		return doInvoke(invoker);
@@ -56,7 +56,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return object returned by target method
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
 	 */
-	protected T invokeDelegateMethodWithArgument(Object object) {
+	protected Object invokeDelegateMethodWithArgument(Object object) {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(new Object[]{object});
 		return doInvoke(invoker);
@@ -68,7 +68,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @return object returned by invoked method
 	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
 	 */
-	protected T invokeDelegateMethodWithArguments(Object[] args) {
+	protected Object invokeDelegateMethodWithArguments(Object[] args) {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(args);
 		return doInvoke(invoker);
@@ -90,8 +90,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 * @param invoker configured invoker
 	 * @return return value of the invoked method
 	 */
-	@SuppressWarnings("unchecked")
-	private T doInvoke(MethodInvoker invoker) {
+	private Object doInvoke(MethodInvoker invoker) {
 		try {
 			invoker.prepare();
 		}
@@ -103,7 +102,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		}
 		
 		try {
-			return (T) invoker.invoke();
+			return invoker.invoke();
 		}
 		catch (InvocationTargetException e) {
 			throw new DynamicMethodInvocationException(e);
@@ -131,7 +130,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 
 		for (int i=0; i < methods.length; i++) {
 			if (methods[i].getName().equals(targetMethodName)) {
-				Class<?>[] params = methods[i].getParameterTypes();
+				Class[] params = methods[i].getParameterTypes();
 				if (arguments == null) {
 					return true;
 				} else if (arguments.length == params.length) {

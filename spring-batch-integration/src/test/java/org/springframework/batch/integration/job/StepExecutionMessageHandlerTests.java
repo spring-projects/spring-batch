@@ -33,8 +33,10 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.JobRepositorySupport;
+import org.springframework.batch.integration.JobSupport;
 import org.springframework.batch.integration.StepSupport;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
@@ -47,8 +49,7 @@ public class StepExecutionMessageHandlerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setStep(org.springframework.batch.core.Step)}
-	 * .
+	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setStep(org.springframework.batch.core.Step)}.
 	 */
 	@Test
 	public void testSetStep() {
@@ -62,8 +63,7 @@ public class StepExecutionMessageHandlerTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setJobRepository(org.springframework.batch.core.repository.JobRepository)}
-	 * .
+	 * {@link org.springframework.batch.integration.job.StepExecutionMessageHandler#setJobRepository(org.springframework.batch.core.repository.JobRepository)}.
 	 */
 	@Test
 	public void testSetJobRepository() {
@@ -75,35 +75,38 @@ public class StepExecutionMessageHandlerTests {
 		assertEquals(Required.class, annotations[0].annotationType());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testVanillaHandle() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobRepository.createJobExecution("job",
-				new JobParameters())));
+		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobRepository.createJobExecution(
+				new JobSupport("job"), new JobParameters())));
 		assertEquals(1, message.getJobExecution().getStepExecutions().size());
 		assertEquals(BatchStatus.COMPLETED, message.getStatus());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleWithInputs() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution("job",
-				new JobParameters()));
+		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution(
+				new JobSupport("job"), new JobParameters()));
 		jobExecutionRequest.getJobExecution().getExecutionContext().putString("foo", "bar");
 		JobExecutionRequest message = handler.handle(jobExecutionRequest);
 		assertEquals(1, message.getJobExecution().getStepExecutions().size());
 		JobExecution jobExecution = message.getJobExecution();
-		assertTrue(jobExecution.getExecutionContext().containsKey("foo"));
+		assertTrue(jobExecution .getExecutionContext().containsKey("foo"));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleWithInputsAndOutputs() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution("job",
-				new JobParameters()));
+		JobExecutionRequest jobExecutionRequest = new JobExecutionRequest(jobRepository.createJobExecution(
+				new JobSupport("job"), new JobParameters()));
 		jobExecutionRequest.getJobExecution().getExecutionContext().putString("foo", "bar");
 		// The step has to add the output attribute to the context
 		handler.setStep(new StepSupport("step") {
@@ -114,43 +117,46 @@ public class StepExecutionMessageHandlerTests {
 		});
 		JobExecutionRequest message = handler.handle(jobExecutionRequest);
 		JobExecution jobExecution = message.getJobExecution();
-		assertTrue(jobExecution.getExecutionContext().containsKey("foo"));
-		assertTrue(jobExecution.getExecutionContext().containsKey("bar"));
+		assertTrue(jobExecution .getExecutionContext().containsKey("foo"));
+		assertTrue(jobExecution .getExecutionContext().containsKey("bar"));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleFailedJob() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
 		jobExecution.setStatus(BatchStatus.FAILED);
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertEquals(0, message.getJobExecution().getStepExecutions().size());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleRestart() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport() {
 			@Override
-			public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-				StepExecution stepExecution = new StepExecution(stepName, new JobExecution(jobInstance));
+			public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
+				StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 				stepExecution.setStatus(BatchStatus.FAILED);
-				stepExecution.setExecutionContext(new ExecutionContext() {
-					{
-						put("foo", "bar");
-					}
-				});
-
+				stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter
+						.stringToProperties("foo=bar")));
 				return stepExecution;
 			}
 
+			/*
+			 * (non-Javadoc)
+			 * @see org.springframework.integration.batch.JobRepositorySupport#getStepExecutionCount(org.springframework.batch.core.JobInstance,
+			 * org.springframework.batch.core.Step)
+			 */
 			@Override
-			public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+			public int getStepExecutionCount(JobInstance jobInstance, Step step) {
 				return 1;
 			}
 		};
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -158,23 +164,21 @@ public class StepExecutionMessageHandlerTests {
 		assertTrue(stepExecution.getExecutionContext().containsKey("foo"));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleRestartAlreadyComplete() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport() {
 			@Override
-			public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-				StepExecution stepExecution = new StepExecution(stepName, new JobExecution(jobInstance));
+			public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
+				StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 				stepExecution.setStatus(BatchStatus.COMPLETED);
-				stepExecution.setExecutionContext(new ExecutionContext() {
-					{
-						put("foo", "bar");
-					}
-				});
+				stepExecution.setExecutionContext(new ExecutionContext(PropertiesConverter
+						.stringToProperties("foo=bar")));
 				return stepExecution;
 			}
 		};
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -185,22 +189,23 @@ public class StepExecutionMessageHandlerTests {
 		assertTrue(stepExecution.getExecutionContext().containsKey("foo"));
 	}
 
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleRestartStartLimitExceeded() throws Exception {
 		JobRepositorySupport jobRepository = new JobRepositorySupport() {
 			@Override
-			public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-				return new StepExecution(stepName, new JobExecution(jobInstance));
+			public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
+				return new StepExecution(step.getName(), new JobExecution(jobInstance));
 			}
 
 			@Override
-			public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+			public int getStepExecutionCount(JobInstance jobInstance, Step step) {
 				// sufficiently high restart count
 				return 100;
 			}
 		};
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
-		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		JobExecution jobExecution = jobRepository.createJobExecution(new JobSupport("job"), new JobParameters());
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());

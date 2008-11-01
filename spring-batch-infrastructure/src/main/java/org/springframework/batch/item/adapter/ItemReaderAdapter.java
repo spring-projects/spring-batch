@@ -17,6 +17,8 @@
 package org.springframework.batch.item.adapter;
 
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.MarkFailedException;
+import org.springframework.batch.item.ResetFailedException;
 
 /**
  * Invokes a custom method on a delegate plain old Java object which itself
@@ -24,13 +26,24 @@ import org.springframework.batch.item.ItemReader;
  * 
  * @author Robert Kasanicky
  */
-public class ItemReaderAdapter<T> extends AbstractMethodInvokingDelegator<T> implements ItemReader<T> {
+public class ItemReaderAdapter extends AbstractMethodInvokingDelegator implements ItemReader {
 
 	/**
 	 * @return return value of the target method.
 	 */
-	public T read() throws Exception {
+	public Object read() throws Exception {
 		return invokeDelegateMethod();
 	}
 
+	/**
+	 * No-op.
+	 */
+	public void mark() throws MarkFailedException {
+	}
+
+	/**
+	 * No-op.
+	 */
+	public void reset() throws ResetFailedException {
+	}
 }

@@ -20,6 +20,7 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.transform.ItemTransformer;
 import org.springframework.util.StringUtils;
 
 /**
@@ -30,22 +31,97 @@ public class RecursiveCollectionItemTransformerTests extends TestCase {
 
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	private RecursiveCollectionLineAggregator<String> aggregator = new RecursiveCollectionLineAggregator<String>();
+	private RecursiveCollectionItemTransformer transformer = new RecursiveCollectionItemTransformer();
 
-	public void testSetDelegateAndPassInString() throws Exception {
-		aggregator.setDelegate(new LineAggregator<String>() {
-			public String aggregate(String item) {
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer#setDelegate(org.springframework.batch.item.transform.ItemTransformer)}.
+	 * @throws Exception
+	 */
+	public void testSetDelegate() throws Exception {
+		transformer.setDelegate(new ItemTransformer() {
+			public Object transform(Object item) throws Exception {
 				return "bar";
 			}
 		});
-		assertEquals("bar", aggregator.aggregate(Collections.singleton("foo")));
+		assertEquals("bar", transformer.transform(new Object()));
 	}
 
-	public void testTransformList() throws Exception {
-		String result = aggregator.aggregate(Arrays.asList(StringUtils.commaDelimitedListToStringArray("foo,bar")));
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer#setDelegate(org.springframework.batch.item.transform.ItemTransformer)}.
+	 * @throws Exception
+	 */
+	public void testSetDelegateAndPassInString() throws Exception {
+		transformer.setDelegate(new ItemTransformer() {
+			public Object transform(Object item) throws Exception {
+				return "bar";
+			}
+		});
+		assertEquals("foo", transformer.transform("foo"));
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer#setDelegate(org.springframework.batch.item.transform.ItemTransformer)}.
+	 * @throws Exception
+	 */
+	public void testSetDelegateReturnsList() throws Exception {
+		transformer.setDelegate(new ItemTransformer() {
+			public Object transform(Object item) throws Exception {
+				return Collections.singletonList("bar");
+			}
+		});
+		// The result of the delegate is a list, which will simply be
+		// converted to a string by concatenating with "":
+		assertEquals("[bar]", transformer.transform(new Object()));
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer#transform(java.lang.Object)}.
+	 * @throws Exception
+	 */
+	public void testTransformString() throws Exception {
+		assertEquals("foo", transformer.transform("foo"));
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer#transform(java.lang.Object)}.
+	 * @throws Exception
+	 */
+	public void testTransformArray() throws Exception {
+		String result = (String) transformer.transform(StringUtils.commaDelimitedListToStringArray("foo,bar"));
 		String[] array = StringUtils.delimitedListToStringArray(result, LINE_SEPARATOR);
 		assertEquals("foo", array[0]);
 		assertEquals("bar", array[1]);
 	}
 
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer#transform(java.lang.Object)}.
+	 * @throws Exception
+	 */
+	public void testTransformList() throws Exception {
+		String result = (String) transformer.transform(Arrays.asList(StringUtils.commaDelimitedListToStringArray("foo,bar")));
+		String[] array = StringUtils.delimitedListToStringArray(result, LINE_SEPARATOR);
+		assertEquals("foo", array[0]);
+		assertEquals("bar", array[1]);
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.item.file.transform.RecursiveCollectionItemTransformer#transform(java.lang.Object)}.
+	 * @throws Exception
+	 */
+	public void testTransformArrayOfArrays() throws Exception {
+		String[][] input = new String[][] { StringUtils.commaDelimitedListToStringArray("foo,bar"),
+				StringUtils.commaDelimitedListToStringArray("spam,bucket") };
+		String result = (String) transformer.transform(input);
+		String[] array = StringUtils.delimitedListToStringArray(result, LINE_SEPARATOR);
+		assertEquals(4,array.length);
+		assertEquals("foo", array[0]);
+		assertEquals("spam", array[2]);
+	}
 }

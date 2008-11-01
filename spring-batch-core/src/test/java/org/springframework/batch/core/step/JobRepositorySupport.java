@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.core.step;
 
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 
@@ -30,14 +32,26 @@ public class JobRepositorySupport implements JobRepository {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.container.common.repository.JobRepository#findOrCreateJob(org.springframework.batch.container.common.domain.JobConfiguration)
 	 */
-	public JobExecution createJobExecution(String jobName, JobParameters jobParameters) {
+	public JobExecution createJobExecution(Job jobConfiguration, JobParameters jobParameters) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.container.common.repository.JobRepository#saveOrUpdate(org.springframework.batch.container.common.domain.JobExecution)
 	 */
-	public void update(JobExecution jobExecution) {
+	public void saveOrUpdate(JobExecution jobExecution) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.container.common.repository.JobRepository#saveOrUpdate(org.springframework.batch.container.common.domain.StepExecution)
+	 */
+	public void saveOrUpdate(StepExecution stepExecution) {
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.domain.StepExecution)
+	 */
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 	}
 
 	/* (non-Javadoc)
@@ -46,11 +60,11 @@ public class JobRepositorySupport implements JobRepository {
 	public void update(JobInstance job) {
 	}
 
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
+	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
 		return null;
 	}
 
-	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
 		return 0;
 	}
 
@@ -59,26 +73,6 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
-		return null;
-	}
-
-	public void add(StepExecution stepExecution) {
-	}
-
-	public void update(StepExecution stepExecution) {
-	}
-
-	public void updateExecutionContext(StepExecution stepExecution) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.JobRepository#isJobInstanceExists(java.lang.String, org.springframework.batch.core.JobParameters)
-	 */
-	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
-		return false;
-	}
-
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
 

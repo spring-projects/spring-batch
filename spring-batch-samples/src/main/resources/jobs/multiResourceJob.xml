@@ -12,15 +12,18 @@
 	<bean id="multiResourceJob" parent="simpleJob">
 		<property name="steps">
 			<bean id="step1" parent="simpleStep" p:commitInterval="3">
-				<property name="itemReader" ref="fileItemReader" />
-				<property name="itemProcessor">
-					<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-						<constructor-arg ref="fixedValidator" />
+				<property name="streams" ref="fileItemReader" />
+				<property name="itemReader">
+					<bean
+						class="org.springframework.batch.item.validator.ValidatingItemReader">
+						<property name="itemReader"
+							ref="fileItemReader" />
+						<property name="validator" ref="fixedValidator" />
 					</bean>
 				</property>
 				<property name="itemWriter">
 					<bean
-						class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+						class="org.springframework.batch.sample.item.writer.TradeWriter">
 						<property name="dao" ref="tradeDao" />
 					</bean>
 				</property>
@@ -45,12 +48,8 @@
 		class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer" ref="fixedFileTokenizer" />
-				<property name="fieldSetMapper" ref="fieldSetMapper" />
-			</bean>
-		</property>
+		<property name="lineTokenizer" ref="fixedFileTokenizer" />
+		<property name="fieldSetMapper" ref="fieldSetMapper" />
 	</bean>
 
 	<bean id="fixedFileTokenizer"
@@ -76,8 +75,8 @@
 	</bean>
 
 	<bean id="tradeDao"
-		class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
-		<property name="dataSource" ref="dataSource" />
+		class="org.springframework.batch.sample.dao.JdbcTradeDao">
+		<property name="jdbcTemplate" ref="jdbcTemplate" />
 		<property name="incrementer">
 			<bean parent="incrementerParent">
 				<property name="incrementerName" value="TRADE_SEQ" />
@@ -87,6 +86,6 @@
 	</bean>
 
 	<bean id="fieldSetMapper"
-		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+		class="org.springframework.batch.sample.mapping.TradeFieldSetMapper" />
 
 </beans>

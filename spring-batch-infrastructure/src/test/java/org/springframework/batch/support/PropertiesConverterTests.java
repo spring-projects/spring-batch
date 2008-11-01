@@ -18,8 +18,6 @@ package org.springframework.batch.support;
 
 import java.util.Properties;
 
-import org.springframework.util.StringUtils;
-
 import junit.framework.TestCase;
 
 /**
@@ -76,22 +74,6 @@ public class PropertiesConverterTests extends TestCase {
 	}
 
 	/**
-	 * Check that Properties can be comma delimited with extra whitespace.
-	 */
-	public void testShortConversionWithCommas() {
-		
-		Properties storedProps = new Properties();
-		storedProps.setProperty("key1", "value1");
-		storedProps.setProperty("key2", "value2");
-		
-		String value = PropertiesConverter.propertiesToString(storedProps);
-		
-		assertTrue("Wrong value: "+value, value.contains("key1=value1"));
-		assertTrue("Wrong value: "+value, value.contains("key2=value2"));
-		assertEquals(1, StringUtils.countOccurrencesOf(value, ","));
-	}
-
-	/**
 	 * Check that Properties can be newline delimited.
 	 */
 	public void testRegularConversionWithCommaAndNewline() {
@@ -105,6 +87,16 @@ public class PropertiesConverterTests extends TestCase {
 		assertEquals(storedProps, props);
 	}
 
+	/**
+	 * Converting a String to Properties and back does not return equal String!
+	 * See {@link PropertiesConverter} javadoc for more details.
+	 */
+	public void testInvalidConversion() {
+		String value = "key=value";
+		string = PropertiesConverter.propertiesToString(PropertiesConverter.stringToProperties(value));
+		assertFalse(value.equals(string));
+	}
+	
 	/**
 	 * Null String should be converted to empty Properties
 	 */

@@ -21,6 +21,8 @@ import junit.framework.TestCase;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.context.RetryContextSupport;
+import org.springframework.batch.retry.support.RetrySynchronizationManager;
+import org.springframework.batch.retry.support.RetryTemplate;
 
 /**
  * @author Dave Syer
@@ -41,7 +43,7 @@ public class RetrySynchronizationManagerTests extends TestCase {
 		RetryContext status = RetrySynchronizationManager.getContext();
 		assertNull(status);
 
-		template.execute(new RetryCallback<Object>() {
+		template.execute(new RetryCallback() {
 			public Object doWithRetry(RetryContext status) throws Exception {
 				RetryContext global = RetrySynchronizationManager.getContext();
 				assertNotNull(status);

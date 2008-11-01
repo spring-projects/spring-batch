@@ -1,11 +1,6 @@
 package org.springframework.batch.item;
 
-import static org.junit.Assert.*;
-
 import org.springframework.batch.item.sample.Foo;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
 
 /**
  * Common tests for readers implementing both {@link ItemReader} and
@@ -23,14 +18,13 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		return (ItemStream) tested;
 	}
 
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
 		super.setUp();
 		testedAsStream().open(executionContext);
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	protected void tearDown() throws Exception {
+		super.tearDown();
 		testedAsStream().close(executionContext);
 	}
 
@@ -39,15 +33,14 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 	 * reader and restore from restart data - the new input source should
 	 * continue where the old one finished.
 	 */
-	@Test
 	public void testRestart() throws Exception {
 
 		testedAsStream().update(executionContext);
 
-		Foo foo1 = tested.read();
+		Foo foo1 = (Foo) tested.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = tested.read();
+		Foo foo2 = (Foo) tested.read();
 		assertEquals(2, foo2.getValue());
 
 		testedAsStream().update(executionContext);
@@ -57,7 +50,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 		testedAsStream().open(executionContext);
 
-		Foo fooAfterRestart = tested.read();
+		Foo fooAfterRestart = (Foo) tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 
@@ -66,39 +59,41 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 	 * execution context, create new reader and restore from restart data - the
 	 * new input source should continue where the old one finished.
 	 */
-	@Test
 	public void testResetAndRestart() throws Exception {
 
 		testedAsStream().update(executionContext);
 
-		Foo foo1 = tested.read();
+		Foo foo1 = (Foo) tested.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = tested.read();
+		Foo foo2 = (Foo) tested.read();
 		assertEquals(2, foo2.getValue());
 		
-		testedAsStream().update(executionContext);
+		tested.mark();
 		
-		Foo foo3 = tested.read();
+		Foo foo3 = (Foo) tested.read();
 		assertEquals(3, foo3.getValue());
+		
+		tested.reset();
+
+		testedAsStream().update(executionContext);
 
 		// create new input source
 		tested = getItemReader();
 
 		testedAsStream().open(executionContext);
 
-		Foo fooAfterRestart = tested.read();
+		Foo fooAfterRestart = (Foo) tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 
-	@Test
 	public void testReopen() throws Exception {
 		testedAsStream().update(executionContext);
 
-		Foo foo1 = tested.read();
+		Foo foo1 = (Foo) tested.read();
 		assertEquals(1, foo1.getValue());
 
-		Foo foo2 = tested.read();
+		Foo foo2 = (Foo) tested.read();
 		assertEquals(2, foo2.getValue());
 
 		testedAsStream().update(executionContext);
@@ -108,7 +103,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 		testedAsStream().open(executionContext);
 
-		Foo fooAfterRestart = tested.read();
+		Foo fooAfterRestart = (Foo) tested.read();
 		assertEquals(3, fooAfterRestart.getValue());
 	}
 

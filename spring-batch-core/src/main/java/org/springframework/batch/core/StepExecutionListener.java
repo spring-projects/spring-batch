@@ -34,13 +34,22 @@ public interface StepExecutionListener extends StepListener {
 	void beforeStep(StepExecution stepExecution);
 
 	/**
+	 * The value returned will be combined with the normal exit status using
+	 * {@link ExitStatus#and(ExitStatus)}.
+	 * 
+	 * @param e an exception thrown by the step execution
+	 * 
+	 * @return an exit status to be combined with the normal one, or null
+	 */
+	ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e);
+
+	/**
 	 * Give a listener a chance to modify the exit status from a step. The value
 	 * returned will be combined with the normal exit status using
 	 * {@link ExitStatus#and(ExitStatus)}.
 	 * 
-	 * Called after execution of step's processing logic (both successful or
-	 * failed). Throwing exception in this method has no effect, it will only be
-	 * logged.
+	 * Called after successful execution of step's processing logic. Throwing
+	 * exception in this method will cause step to fail.
 	 * 
 	 * @return an {@link ExitStatus} to combine with the normal value. Return
 	 * null to leave the old value unchanged.

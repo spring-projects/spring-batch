@@ -50,10 +50,13 @@
     <para><classname>ItemReader</classname> is a basic interface for generic
     input operations:</para>
 
-    <programlisting>public interface ItemReader&lt;T&gt; {
+    <programlisting>public interface ItemReader {
 
-  T read() throws Exception, UnexpectedInputException, ParseException;
+  Object read() throws Exception;
 
+  void mark() throws MarkFailedException;
+
+  void reset() throws ResetFailedException;
 }
 </programlisting>
 
@@ -65,11 +68,13 @@
     (i.e. Trade, Foo, etc) but there is no requirement in the contract to do
     so.</para>
 
-    <para>It is expected that implementations of the
-    <classname>ItemReader</classname> interface will be forward only. However,
-    if the underlying resource is transactional (such as a JMS queue) thehn
-    calling read may return the same logical item on subsequent calls in a
-    rollback scenario.</para>
+    <para>The <methodname>mark</methodname> and <methodname>reset</methodname>
+    methods are important due to the transactional nature of batch processing.
+    Mark() will be called before reading begins. Calling
+    <methodname>reset</methodname> at anytime will position the
+    <classname>ItemReader</classname> to its position when
+    <methodname>mark</methodname> was last called. The semantics are very
+    similar to <classname>java.io.Reader</classname>.</para>
 
     <para>It is also worth noting that a lack of items to process by an
     <classname>ItemReader</classname> will not cause an exception to be
@@ -92,24 +97,33 @@
     <para>As with <classname>ItemReader</classname>,
     <classname>ItemWriter</classname> is a fairly generic interface:</para>
 
-    <programlisting>public interface ItemWriter&lt;T&gt; {
+    <programlisting>public interface ItemWriter {
 
-  void write(List&lt;? extends T&gt; items) throws Exception;
+  void write(Object item) throws Exception;
 
+  void flush() throws FlushFailedException;
+
+  void clear() throws ClearFailedException;
 }
 </programlisting>
 
     <para>As with <methodname>read</methodname> on
     <classname>ItemReader</classname>, <methodname>write</methodname> provides
     the basic contract of <classname>ItemWriter</classname>, it will attempt
-    to write out the list of items passed in as long as it is open. Because it
-    is generally expected that items will be 'batched' together into a chunk
-    and then output, the interface accepts a list, rather than an item by
-    itself. After writing out the list, any flushing that may be necessary can
-    be performed before returning from the write method. For example, if
-    writing to a Hibernate DAO, multiple calls to write can be made, one for
-    each item. The writer can then call close on the hibernate Session before
-    returning.</para>
+    to write out the item passed in as long as it is open. As with
+    <methodname>mark</methodname> and <methodname>reset</methodname>,
+    <methodname>flush</methodname> and <methodname>clear</methodname> are
+    necessary due to the transactional nature of batch processing. Because it
+    is generally expected that items will be 'batched' together into a chunk,
+    and then output, it is expected that an <classname>ItemWriter</classname>
+    will perform some type of buffering. <methodname>flush</methodname> will
+    empty the buffer by writing the items out, whereas
+    <methodname>clear</methodname> will simply throw the contents of the
+    buffer away. In most cases, a <classname>Step</classname> implementation
+    will call <methodname>flush</methodname> before a commit and
+    <methodname>clear</methodname> in case of rollback. It is expected that
+    implementations of the <classname>Step</classname> interface will call
+    these methods.</para>
   </section>
 
   <section>
@@ -311,18 +325,6 @@
         </table></para>
 
       <section>
-        <title>LineMapper</title>
-
-        <para>As with <classname>RowMapper</classname>, which takes a low
-        level construct such as <classname>ResultSet and returns an Object,
-        flat file procesing requires the same construct to convert a String
-        line into an Object:</classname><programlisting>public interface LineMapper&lt;T&gt; {
-
-  T mapLine(String line, int lineNumber) throws Exception;
-}</programlisting></para>
-      </section>
-
-      <section>
         <title>FieldSetMapper</title>
 
         <para>The <classname>FieldSetMapper</classname> interface defines a
@@ -334,9 +336,9 @@
         <classname>LineTokenizer</classname> to translate a line of data from
         a resource into an object of the desired type:</para>
 
-        <programlisting>  public interface FieldSetMapper&lt;T&gt; {
+        <programlisting>  public interface FieldSetMapper {
   
-    T mapFieldSet(FieldSet fieldSet);
+    public Object mapLine(FieldSet fs);
 
   }</programlisting>
 
@@ -422,7 +424,7 @@
 
   if (line != null) {
     FieldSet tokenizedLine = tokenizer.tokenize(line);
-    return fieldSetMapper.mapFieldSet(tokenizedLine);
+    return fieldSetMapper.mapLine(tokenizedLine);
   }
  
   return null;</programlisting>
@@ -469,7 +471,7 @@
         needs to be defined:</para>
 
         <para><programlisting>
-  protected static class PlayerFieldSetMapper implements FieldSetMapper&lt;Player&gt; {
+  protected static class PlayerFieldSetMapper implements FieldSetMapper {
     public Object mapLine(FieldSet fieldSet) {
       Player player = new Player();
 
@@ -489,13 +491,13 @@
         <methodname>read</methodname>:</para>
 
         <programlisting>  
-  FlatFileItemReader&lt;Player&gt; itemReader = new FlatFileItemReader&lt;Player&gt;();
+  FlatFileItemReader itemReader = new FlatFileItemReader();
   itemReader.setResource(new FileSystemResource("resources/players.csv"));
   //DelimitedLineTokenizer defaults to comma as it's delimiter
   itemReader.setLineTokenizer(new DelimitedLineTokenizer());
   itemReader.setFieldSetMapper(new PlayerFieldSetMapper());
   itemReader.open(new ExecutionContext());
-  Player player = itemReader.read();
+  Player player = (Player)itemReader.read();
 
 </programlisting>
 
@@ -523,7 +525,7 @@
         information as follows:</para>
 
         <para><programlisting>
-    public class PlayerMapper implements FieldSetMapper&lt;Player&gt; {
+    public class PlayerMapper implements FieldSetMapper {
         public Object mapLine(FieldSet fs) {
                         
            if(fs == null){
@@ -620,7 +622,7 @@
 
         <programlisting>  
   &lt;bean id="fixedLengthLineTokenizer"
-        class="org.springframework.batch.io.file.transform.FixedLengthTokenizer"&gt;
+        class="org.springframework.batch.item.file.transform.FixedLengthTokenizer"&gt;
     &lt;property name="names" value="ISIN, Quantity, Price, Customer" /&gt;
     &lt;property name="columns" value="1-12, 13-15, 16-20, 21-29" /&gt;
   &lt;/bean&gt;
@@ -631,7 +633,7 @@
         <classname>FieldSet</classname> as if a dlimiter had been used,
         allowing the same approachs above to be used such as the
         <classname>BeanWrapperFieldSetMapper</classname>, in a way that is
-        ignorant of how the actual line was parsed.</para>
+        ignorant of how the actual line was parsed. </para>
 
         <para>It should be noted that supporting the above ranges requires a
         specialized property editor be configured anywhere in the
@@ -676,7 +678,7 @@
         prefix in a line with a particular tokenizer:</para>
 
         <programlisting>  &lt;bean id="orderFileDescriptor"
-        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
+        class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
     &lt;property name="tokenizers"&gt;
      &lt;map&gt;
       &lt;entry key="HEA" value-ref="headerRecordDescriptor" /&gt;
@@ -700,108 +702,6 @@
         the record is returned, allowing them to return a complete order as
         one 'item'.</para>
       </section>
-
-      <section>
-        <title>Exception Handling in flat files</title>
-
-        <para>There are many scenarios when tokenizing a line that cause
-        exceptions to be thrown. Many flat files are imperfect and contain
-        records that aren't formatted correctly. Many users choose to skip the
-        lines causing these errors, logging out the issue, original line, and
-        line number, for manual inspection later. (or by another batch job)
-        For this reason, Spring Batch provides a hierarchy of exceptions for
-        handling parse exceptions:
-        <classname>FlatFileParseException</classname> and
-        <classname>FlatFileFormatException</classname>.
-        <classname>FlatFileParseException</classname> is thrown by the
-        <classname>FlatFileItemReader</classname> when any errors are
-        encountered while trying to read a file.
-        <classname>FlatFileFormatException</classname> is thrown by
-        implementations of the <classname>LineTokenizer</classname> interface,
-        and indicates a more specific error encountered while
-        tokenizing.</para>
-
-        <section>
-          <title>IncorrectTokenCountException</title>
-
-          <para>Both <classname>DelimitedLineTokenizer</classname> and
-          <classname>FixedLengthLineTokenizer</classname> have the ability to
-          specify column names that can be used for creating a
-          <classname>FieldSet</classname>. However, if the number of column
-          names doesn't match the number of columns found while tokenizing a
-          line the <classname>FieldSet</classname> can't be created, and a
-          IncorrectTokenCountException is thrown, which contains the number of
-          tokens encountered, and the number expected:</para>
-
-          <programlisting>  
-  tokenizer.setNames(new String[] {"A", "B", "C", "D"});
-  
-  try{
-    tokenizer.tokenize("a,b,c");
-  }
-  catch(IncorrectTokenCountException e){
-    assertEquals(4, e.getExpectedCount());
-    assertEquals(3, e.getActualCount());
-  }
-
-</programlisting>
-
-          <para>Because the tokenizer was configured with 4 columns, but only
-          3 tokens were found in the file, an IncorrectTokenCountException was
-          thrown.</para>
-        </section>
-
-        <section>
-          <title>IncorrectLineLengthException</title>
-
-          <para>Files formatted in a fixed length format have additional
-          requirements when parsing because unlike a delimited format, each
-          column must strictly adhere to the width defined for it. If the
-          total line length doesn't add up to the widest value of this column,
-          an exception is thrown: </para>
-
-          <programlisting>  
-  tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
-  try {
-    tokenizer.tokenize("12345");
-    fail("Expected IncorrectLineLengthException");
-  }
-  catch (IncorrectLineLengthException ex) {
-    assertEquals(15, ex.getExpectedLength());
-    assertEquals(5, ex.getActualLength());
-  }
-
-</programlisting>
-
-          <para>The configured ranges for the tokenizer above are: 1-5, 6-10,
-          and 11-15, thus the total length of the line expected is 15.
-          However, in this case a line of length 5 was passed in, causing an
-          <classname>IncorrectLineLengthException</classname> to be thrown.
-          Throwing an exception here rather than only mapping the first column
-          allows the processing of the line to fail earlier, and with more
-          information than it would if it failed while trying to read in
-          column 2 in a <classname>FieldSetMapper</classname>. However, there
-          are scenarios where the length of the line isn't always constant.
-          For this reason, validation of line length can be turned off via the
-          'strict' property:</para>
-
-          <programlisting>
-  tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
-  tokenizer.setStrict(false);
-  FieldSet tokens = tokenizer.tokenize("12345");
-  assertEquals("12345", tokens.readString(0));
-  assertEquals("", tokens.readString(1));
-
-</programlisting>
-
-          <para>The above example is almost identical to the one before it,
-          except the tokenizer.setStrict(false) was called. This setting tells
-          the tokenizer to not enforce line lengths when tokenizing the line.
-          A <classname>FieldSet</classname> is now correctly created and
-          returned. However, it will only contain empty tokens for the
-          remaining values.</para>
-        </section>
-      </section>
     </section>
 
     <section>
@@ -816,14 +716,14 @@
         <title>LineAggregator</title>
 
         <para>Just as the <classname>LineTokenizer</classname> interface is
-        necessary to take an item and turn it into a string, file writing must
+        necessary to take a string and split it into tokens, file writing must
         have a way to aggregate multiple fields into a single string for
         writing to a file. In Spring Batch this is the
         <classname>LineAggregator</classname>:</para>
 
-        <programlisting>  public interface LineAggregator&lt;T&gt; {
+        <programlisting>  public interface LineAggregator {
 
-    public String aggregate(T item);
+    public String aggregate(FieldSet fieldSet);
 
   }</programlisting>
 
@@ -832,24 +732,54 @@
         <classname>LineTokenizer</classname> takes a
         <classname>String</classname> and returns a
         <classname>FieldSet</classname>, whereas
-        <classname>LineAggregator</classname> takes an
-        <classname>item</classname> and returns a
+        <classname>LineAggregator</classname> takes a
+        <classname>FieldSet</classname> and returns a
         <classname>String</classname>. As with reading there are two types:
         <classname>DelimitedLineAggregator</classname> and
         <classname>FixedLengthLineAggregator</classname>.</para>
       </section>
 
       <section>
+        <title>FieldSetCreator</title>
+
+        <para>Because the LineAggregator interface uses a
+        <classname>FieldSet</classname> as it's mechanism for converting to a
+        string, there needs to be an interface that describes how to convert
+        from an object into a <classname>FieldSet</classname>:</para>
+
+        <programlisting>  public interface FieldSetCreator {
+
+    FieldSet mapItem(Object data);
+
+  }</programlisting>
+
+        <para>As with <classname>LineTokenizer</classname> and
+        <classname>LineAggregator</classname>,
+        <classname>FieldSetCreator</classname> is the polar opposite of
+        <classname>FieldSetMapper</classname>.
+        <classname>FieldSetMapper</classname> takes a
+        <classname>FieldSet</classname> and returns a mapped object, whereas a
+        <classname>FieldSetCreator</classname> takes an Object and returns a
+        <classname>FieldSet</classname>.</para>
+      </section>
+
+      <section>
         <title>Simple Delimited File Writing Example</title>
 
-        <para>Now that the <classname>LineAggregator</classname> interface has
-        been defined, the basic flow of writing can be explained:</para>
+        <para>Now that both the <classname>LineAggregator</classname> and
+        <classname>FieldSetCreator</classname> interfaces have been defined,
+        the basic flow of writing can be explained:</para>
 
         <orderedlist>
           <listitem>
             <para>The object to be written is passed to the
-            <classname>LineAggregator</classname> in order to obtain a
-            <classname>String</classname>.</para>
+            <classname>FieldSetCreator</classname> in order to obtain a
+            <classname>FieldSet</classname>.</para>
+          </listitem>
+
+          <listitem>
+            <para>The returned <classname>FieldSet</classname> is passed to
+            the <classname>LineAggregator</classname></para>
           </listitem>
 
           <listitem>
@@ -862,19 +792,20 @@
         <classname>FlatFileItemWriter</classname> expresses this in
         code:</para>
 
-        <programlisting>  public void write(T item) throws Exception {
-    getOutputState().write(lineAggregator.aggregate(item) + LINE_SEPARATOR);
+        <programlisting>  public void write(Object data) throws Exception {
+    FieldSet fieldSet = fieldSetCreator.mapItem(data);
+    getOutputState().write(lineAggregator.aggregate(fieldSet) + LINE_SEPARATOR);
   }</programlisting>
 
         <para>A simple configuration with the smallest ammount of setters
         would look like the following:</para>
 
         <programlisting>  &lt;bean id="itemWriter"
-        class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
+        class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
     &lt;property name="resource"
               value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
-    &lt;property name="lineAggregator"&gt;
-      &lt;bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/&gt;
+    &lt;property name="fieldSetCreator"&gt;
+      &lt;bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper"/&gt;
     &lt;/property&gt;
   &lt;/bean&gt;</programlisting>
       </section>
@@ -1278,7 +1209,7 @@
     should be noted that, as with any ItemReader, adding extra input (in this
     case a file) could cause potential issues when restarting. It is
     recommended that batch jobs work with their own individual directories
-    until completed successfully.</para>
+    until completed successfully. </para>
   </section>
 
   <section>
@@ -1568,120 +1499,6 @@
         but has been added here to draw attention to the ability to switch it
         on or off. It is also worth noting that the fetchSize of the
         underlying cursor can be set via the setFetchSize property.</para>
-      </section>
-    </section>
-
-    <section>
-      <title>Paging ItemReaders</title>
-
-      <para>An alternative to using a database cursor is executing multiple
-      queries where each query is bringing back a portion of the results. We
-      refer to this portion as a page. Each query that is executed must
-      specify the starting row number and the number of rows that we want
-      returned for the page.</para>
-
-      <section>
-        <title>JdbcPagingItemReader</title>
-
-        <para>One implementation of a paging <classname>ItemReader</classname>
-        is the <classname>JdbcPagingItemReader</classname>. The
-        <classname>JdbcPagingItemReader</classname> needs a
-        <classname>PagingQueryProvider</classname> responsible for providing
-        the SQL queries used to retrieve the rows making up a page. Since each
-        database has its own strategy for proviing paging support, we need to
-        use a different <classname>PagingQueryProvider</classname> for each
-        supported database type. There is also the
-        <classname>SimpleDelegatingPagingQueryProvider</classname> that will
-        auto-detect the database that is being used and use that to adjust to
-        use the appropriate <classname>PagingQueryProvider</classname>
-        implementation. This simplifies the configuration and is the
-        recommended best practice.</para>
-
-        <para>The <classname>SimpleDelegatingPagingQueryProvider</classname>
-        requires that you specify a select clause and a from clause. You can
-        also provide an optional where clause. These clauses will be used to
-        build an SQL statement combined with the required sortKey. </para>
-
-        <para>After the reader has been opened, it will pass back one item per
-        call to <methodname>read</methodname> in the same basic fashion as any
-        other <classname>ItemReader</classname>. The paging happens behind the
-        scenes when additional rows are needed. </para>
-
-        <para>Below is an example configuration using a similar 'customer
-        credit' example as the cursor based ItemReaders above:</para>
-
-        <programlisting><![CDATA[    <bean id="itemReader"
-        class="org.springframework.batch.item.database.JdbcPagingItemReader">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="queryProvider">
-            <bean class="org.springframework.batch.item.database.support.SimpleDelegatingPagingQueryProvider">
-                <property name="selectClause" value="select id, name, credit"/>
-                <property name="fromClause" value="from customer"/>
-                <property name="whereClause" value="where status=:status"/>
-                <property name="sortKey" value="id"/>
-            </bean>
-        </property>
-        <property name="parameterValues">
-            <map>
-                <entry key="status" value="NEW"/>
-            </map>
-        </property>
-        <property name="pageSize" value="10"/>
-        <property name="parameterizedRowMapper" ref="customerMapper"/>
-    </bean> 
-]]></programlisting>
-
-        <para>This configured <classname>ItemReader</classname> will return
-        <classname>CustomerCredit</classname> objects using the
-        <classname>ParameterizedRowMapper</classname> that must be specified.
-        The 'pageSize' property determines the number of entities read from
-        the database for each query execution. </para>
-
-        <para>The 'parameterValues' property can be used to specify a Map of
-        parameter values for the query. If you use named parameters in the
-        where clause the key for each entry should match the name of the named
-        parameter. If you use a traditional '?' placeholder then the key for
-        each entry should be the number of the placeholder, starting with
-        1.</para>
-      </section>
-
-      <section>
-        <title>JpaPagingItemReader</title>
-
-        <para>Another implementation of a paging
-        <classname>ItemReader</classname> is the
-        <classname>JpaPagingItemReader</classname>. JPA doesn't have a concept
-        similar to the Hibernate <classname>StatelessSession</classname> so we
-        have to use other features provided by the JPA specification. SInce
-        JPA supports paging, this is a natural choice when it comes to using
-        JPA for batch processing. After each page is read the entities will
-        become detached and the persistence context will be cleared in order
-        to allow the entities to be garbage collected once the page is
-        processed.</para>
-
-        <para>The <classname>JpaPagingItemReader</classname> allows you to
-        declare a JPQL statement and pass in a
-        <classname>EntityManagerFactory</classname>. It will then pass back
-        one item per call to <methodname>read</methodname> in the same basic
-        fashion as any other <classname>ItemReader</classname>. The paging
-        happens behind the scenes when additional entities are needed. Below
-        is an example configuration using the same 'customer credit' example
-        as the JDBC reader above:</para>
-
-        <programlisting><![CDATA[  <bean id="itemReader"
-    class="org.springframework.batch.item.database.JpaPagingItemReader">
-    <property name="entityManagerFactory" ref="entityManagerFactory"/>
-    <property name="queryString" value="select c from CustomerCredit c"/>
-    <property name="pageSize" value="1000"/>
-  </bean>
-]]></programlisting>
-
-        <para>This configured <classname>ItemReader</classname> will return
-        <classname>CustomerCredit</classname> objects in the exact same manner
-        as described by the <classname>JdbcPagingItemReader</classname> above,
-        assuming the Customer object has the correct JPA annotations or ORM
-        mapping file. The 'pageSize' property determines the number of
-        entities read from the database for each query execution.</para>
       </section>
     </section>
 
@@ -2002,7 +1819,7 @@
       won't be written out again. However, in this scenario, there's no way
       for it to know which item caused the issue, the whole buffer was being
       written out when the failure happened. The only way to solve this issue
-      is to flush after each item:</para>
+      is to flush after each item: </para>
 
       <mediaobject>
         <imageobject>
@@ -2034,24 +1851,6 @@
   &lt;bean id="customerCreditWriter"
         class="org.springframework.batch.sample.dao.HibernateCreditDao"&gt;
     &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
-
-      <para>If you are using JPA then the
-      <classname>JpaAwareItemWriter</classname> provides comparable
-      functionality. The following example illustrates how to configure the
-      <classname>JpaAwareItemWriter</classname>:</para>
-
-      <programlisting>  &lt;bean id="hibernateItemWriter"
-        class="org.springframework.batch.item.database.JpaAwareItemWriter"&gt;
-    &lt;property name="entityManagerFactory" ref="entityManagerFactory" /&gt;
-    &lt;property name="delegate" ref="customerCreditWriter" /&gt;
-  &lt;/bean&gt;
-
-  &lt;bean id="customerCreditWriter"
-        class="org.springframework.batch.sample.dao.JpaCreditDao"&gt;
-    &lt;property name="entityManagerFactory" ref="entityManagerFactory" /&gt;
   &lt;/bean&gt;
 
 </programlisting>
@@ -2116,15 +1915,15 @@
     that contains another <classname>ItemReader</classname>. For
     example:</para>
 
-    <programlisting>  public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+    <programlisting>  public class CompositeItemWriter implements ItemWriter {
 
-    ItemWriter&lt;T&gt; itemWriter;
+    ItemWriter itemWriter;
 
-    public CompositeItemWriter(ItemWriter&lt;T&gt; itemWriter) {
+    public CompositeItemWriter(ItemWriter itemWriter) {
       this.itemWriter = itemWriter;
     }
 
-    public void write(T item) throws Exception {
+    public void write(Object item) throws Exception {
 
       //Add business logic here
 
@@ -2155,10 +1954,10 @@
     just want to modify the item. For this scenario, Spring Batch provides the
     <classname>ItemTransformer</classname> interface:</para>
 
-    <programlisting>  public interface ItemProcessor&lt;I, O&gt; {
+    <programlisting>  public interface ItemTransformer {
 
-  O process(I item) throws Exception;
-}</programlisting>
+    Object transform(Object item) throws Exception;
+  }</programlisting>
 
     <para>An <classname>ItemTransformer</classname> is very simple, given one
     object, transorm it and return another. The object provided may or may not
@@ -2180,9 +1979,9 @@
     public Bar(Foo foo) {}
   }
 
-  public class FooTransformer implements ItemProcessor{
+  public class FooTransformer implements ItemTransformer{
 
-    //Perform simple transformation, convert a Foo to a Bar
+    //Preform simple transformation, convert a Foo to a Barr
     public Object transform(Object item) throws Exception {
       assertTrue(item instanceof Foo);
       Foo foo = (Foo)item;
@@ -2222,21 +2021,23 @@
     <section>
       <title>The Delegate Pattern and Registering with the Step</title>
 
-      <para>Note that the <classname>ItemTransformerItemWriter</classname> and
-      the <classname>CompositeItemWriter</classname> are examples of a
-      delegation pattern, which is common in Spring Batch. The delegates
-      themselves might implement callback interfaces like
-      <classname>ItemStream</classname> or
-      <classname>StepListener</classname>. If they do, and they are being used
-      in conjunction with Spring Batch Core as part of a
-      <classname>Step</classname> in a <classname>Job</classname>, then they
-      almost certainly need to be registered manually with the
-      <classname>Step</classname>. Registration is automatic when using the
-      factory beans (<classname>*StepFactoryBean</classname>) , but only for
-      the <classname>ItemReader</classname> and
-      <classname>ItemWriter</classname> injected directly. The delegates are
-      not known to the <classname>Step</classname>, so they need to be
-      injected as listeners or streams (or both if appropriate).</para>
+      <section>
+        <para>Note that the <classname>ItemTransformerItemWriter</classname>
+        and the <classname>CompositeItemWriter</classname> are examples of a
+        delegation pattern, which is common in Spring Batch. The delegates
+        themselves might implement callback interfaces like
+        <classname>ItemStream</classname> or
+        <classname>StepListener</classname>. If they do, and they are being
+        used in conjunction with Spring Batch Core as part of a
+        <classname>Step</classname> in a <classname>Job</classname>, then they
+        almost certainly need to be registered manually with the
+        <classname>Step</classname>. Registration is automatic when using the
+        factory beans (<classname>*StepFactoryBean</classname>) , but only for
+        the <classname>ItemReader</classname> and
+        <classname>ItemWriter</classname> injected directly. The delegates are
+        not known to the <classname>Step</classname>, so they need to be
+        injected as listeners or streams (or both if appropriate).</para>
+      </section>
     </section>
 
     <section>
@@ -2262,7 +2063,7 @@
 
   public class FooTransformer implements ItemTransformer{
 
-    //Perform simple transformation, convert a Foo to a Bar
+    //Preform simple transformation, convert a Foo to a Barr
     public Object transform(Object item) throws Exception {
       assertTrue(item instanceof Foo);
       Foo foo = (Foo)item;
@@ -2291,7 +2092,7 @@
       <classname>BarTransformer</classname> can be 'chained' together to give
       the resultant <classname>Foobar</classname>:</para>
 
-      <programlisting>  CompositeItemProcessor compositeTransformer = new CompositeItemProcessor();
+      <programlisting>  CompositeItemTransformer compositeTransformer = new CompositeItemTransformer();
   List itemTransformers = new ArrayList();
   itemTransformers.add(new FooTransformer());
   itemTransformers.add(new BarTransformer());
@@ -2378,19 +2179,21 @@
     <section>
       <title>The Delegate Pattern and Registering with the Step</title>
 
-      <para>Note that the <classname>ValidatingItemReader</classname> is
-      another example of a delegation pattern, and the delegates themselves
-      might implement callback interfaces like
-      <classname>ItemStream</classname> or
-      <classname>StepListener</classname>. If they do, and they are being used
-      in conjunction with Spring Batch Core as part of a step in a job, then
-      they almost certainly need to be registered manually with the
-      <classname>Step</classname>. Registration is automatic when using the
-      factory beans (<classname>*StepFactoryBean</classname>) , but only for
-      the <classname>ItemReader</classname> and
-      <classname>ItemWriter</classname> injected directly - the delegates are
-      not known to the step, so they need to be injected as listeners or
-      streams (or both if appropriate).</para>
+      <section>
+        <para>Note that the <classname>ValidatingItemReader</classname> is
+        another example of a delegation pattern, and the delegates themselves
+        might implement callback interfaces like
+        <classname>ItemStream</classname> or
+        <classname>StepListener</classname>. If they do, and they are being
+        used in conjunction with Spring Batch Core as part of a step in a job,
+        then they almost certainly need to be registered manually with the
+        <classname>Step</classname>. Registration is automatic when using the
+        factory beans (<classname>*StepFactoryBean</classname>) , but only for
+        the <classname>ItemReader</classname> and
+        <classname>ItemWriter</classname> injected directly - the delegates
+        are not known to the step, so they need to be injected as listeners or
+        streams (or both if appropriate).</para>
+      </section>
     </section>
   </section>
 
@@ -2464,15 +2267,15 @@
       basic contract of <classname>ItemReader</classname>,
       <methodname>read</methodname>:</para>
 
-      <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
+      <programlisting>  public class CustomItemReader implements ItemReader{
 
-    List&lt;T&gt; items;
+    List items;
 
-    public CustomItemReader(List&lt;T&gt; items) {
+    public CustomItemReader(List items) {
       this.items = items;
     }
 
-    public T read() throws Exception, UnexpectedInputException,
+    public Object read() throws Exception, UnexpectedInputException,
        NoWorkFoundException, ParseException {
 
       if (!items.isEmpty()) {
@@ -2480,6 +2283,10 @@
       }
       return null;
     }
+
+    public void mark() throws MarkFailedException { };
+
+    public void reset() throws ResetFailedException { };
   }</programlisting>
 
       <para>This very simple class takes a list of items, and returns one at a
@@ -2487,16 +2294,93 @@
       thus satisfying the most basic requirements of an
       <classname>ItemReader</classname>, as illustrated below:</para>
 
-      <programlisting>  List&lt;String&gt; items = new ArrayList&lt;String&gt;();
+      <programlisting>  List items = new ArrayList();
   items.add("1");
   items.add("2");
   items.add("3");
 
-  ItemReader itemReader = new CustomItemReader&lt;String&gt;(items);
+  ItemReader itemReader = new CustomItemReader(items);
   assertEquals("1", itemReader.read());
   assertEquals("2", itemReader.read());
   assertEquals("3", itemReader.read());
   assertNull(itemReader.read());</programlisting>
+
+      <section>
+        <title>Making the <classname>ItemReader</classname>
+        transactional</title>
+
+        <para>This most basic <classname>ItemReader</classname> will work, but
+        what happens if the transaction needs to be rolled back? This will
+        usually caused by an error in the ItemWriter, since the ItmReader
+        generally won't do anything that invalidates the transaction, but
+        without supporting it, there would be erroneous results. ItemReaders
+        are notified about rollbacks via the <methodname>mark</methodname> and
+        <methodname>reset</methodname> methods. In the example above they're
+        empty, but we'll need to add code to them in order to support the
+        rollback scenario:</para>
+
+        <programlisting>  public class CustomItemReader implements ItemReader{
+
+    List items;
+    int currentIndex = 0;
+    int lastMarkedIndex = 0;
+
+    public CustomItemReader(List items) {
+      this.items = items;
+    }
+
+    public Object read() throws Exception, UnexpectedInputException,
+       NoWorkFoundException, ParseException {
+
+      if (currentIndex &lt; items.size()) {
+        return items.get(currentIndex++);
+      }
+      return null;
+    }
+
+    public void mark() throws MarkFailedException {
+      lastMarkedIndex = currentIndex;
+    };
+
+    public void reset() throws ResetFailedException {
+      currentIndex = lastMarkedIndex;
+    };
+  }</programlisting>
+
+        <para>The <classname>CustomItemReader</classname> has now been
+        modified to keep track of where it is currently, and where it was when
+        mark() was last called. This allows the new
+        <classname>ItemReader</classname> to fulfill the basic contract that
+        calling <methodname>reset</methodname> returns the
+        <classname>ItemReader</classname> to the state it was in when
+        <methodname>mark</methodname> was last called:</para>
+
+        <programlisting>  //Assume same setup as last example, a list with "1", "2", and "3"
+  itemReader.mark();
+  assertEquals("1", itemReader.read());
+  assertEquals("2", itemReader.read());
+  itemReader.reset();
+  assertEquals("1", itemReader.read());</programlisting>
+
+        <para>In most real world scenarios, there will likely be some kind of
+        underlying resource that will require tracking. In the case of a file,
+        <methodname>mark</methodname> will hold the current location within
+        the file, and <methodname>reset</methodname> will move it back. The
+        <classname>JdbcCursorItemReader</classname>, for example, holds on to
+        the current row number, and on reset moves the cursor back by calling
+        the <classname> ResultSet</classname>
+        <methodname>absolute</methodname> method, which moves the current
+        cursor to the row number supplied. The
+        <classname>CustomItemReader</classname> now completely adheres to the
+        entire <classname>ItemReader</classname> contract.
+        <methodname>read</methodname> will return the appropriates items,
+        returning null when empty, and <methodname>reset</methodname> returns
+        the <classname>ItemReader</classname> back to it's state as of the
+        last call to <methodname>mark</methodname>, allowing for correct
+        support of a rollback. (It's assumed a <classname>Step</classname>
+        implementation will call <methodname>mark</methodname> and
+        <methodname>reset</methodname>).</para>
+      </section>
 
       <section>
         <title>Making the <classname>ItemReader</classname>
@@ -2518,40 +2402,49 @@
         implemented with the <classname>ItemStream</classname>
         interface:</para>
 
-        <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream {
+        <programlisting>  public class CustomItemReader implements ItemReader, ItemStream{
 
-    List&lt;T&gt; items;
+    List items;
     int currentIndex = 0;
-    private static final String CURRENT_INDEX = "current.index";
+    int lastMarkedIndex = 0;
+    private static String CURRENT_INDEX = "current.index";
 
-    public CustomItemReader(List&lt;T&gt; items) {
+    public CustomItemReader(List items) {
       this.items = items;
     }
 
-    public T read() throws Exception, UnexpectedInputException,
-        ParseException {
+    public Object read() throws Exception, UnexpectedInputException,
+        NoWorkFoundException, ParseException {
 
       if (currentIndex &lt; items.size()) {
         return items.get(currentIndex++);
       }
-      
-      return null;
+      return null; 
     }
 
-    public void open(ExecutionContext executionContext) throws ItemStreamException {
+    public void mark() throws MarkFailedException {
+      lastMarkedIndex = currentIndex;
+    };
+
+    public void reset() throws ResetFailedException {
+      currentIndex = lastMarkedIndex;
+    }
+
+    public void open(ExecutionContext executionContext) throws ItemStreamTException {
       if(executionContext.containsKey(CURRENT_INDEX)){
         currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
       }
       else{
         currentIndex = 0;
+        lastMarkedIndex = 0;
       }
     }
-
-    public void close(ExecutionContext executionContext) throws ItemStreamException {}
 
     public void update(ExecutionContext executionContext) throws ItemStreamException {
       executionContext.putLong(CURRENT_INDEX, new Long(currentIndex).longValue());
     };
+
+    public void close(ExecutionContext executionContext) throws ItemStreamException {}
   }</programlisting>
 
         <para>On each call to <classname>ItemStream</classname>
@@ -2569,11 +2462,11 @@
   assertEquals("1", itemReader.read());
   ((ItemStream)itemReader).update(executionContext);
 
-  List&lt;String&gt; items = new ArrayList&lt;String&gt;();
+  List items = new ArrayList();
   items.add("1");
   items.add("2");
   items.add("3");
-  itemReader = new CustomItemReader&lt;String&gt;(items);
+  itemReader = new CustomItemReader(items);
 
   ((ItemStream)itemReader).open(executionContext);
   assertEquals("2", itemReader.read());</programlisting>
@@ -2607,18 +2500,65 @@
       example. As with the <classname>ItemReader</classname> example, a List
       will be used in order to keep the example as simple as possible:</para>
 
-      <programlisting>  public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+      <programlisting>  public class CustomItemWriter implements ItemWriter{
 
-    List&lt;T&gt; output = TransactionAwareProxyFactory.createTransactionalList();
+    List output = new ArrayList();
 
-    public void write(List&lt;? extends T&gt; items) throws Exception {
-      output.addAll(items);
+    public void write(Object item) throws Exception {
+      output.add(item);
     }
 
-    public List&lt;T&gt; getOutput() {
-      return output;
+    public void clear() throws ClearFailedException { }
+
+    public void flush() throws FlushFailedException { }
+  }</programlisting>
+
+      <section>
+        <title>Making the <classname>ItemWriter</classname>
+        transactional</title>
+
+        <para>The example is extremely simple, but it's worth showing to
+        illustrate an <classname>ItemWriter</classname> that doesn't respond
+        to rollbacks and commits (i.e. <methodname>clear</methodname> and
+        <methodname>flush</methodname>). If your potential writer is such that
+        it doesn't need to care about rollback or commit, likely because it's
+        writing to a database, then there is little value to the
+        <classname>ItemWriter</classname> interface in that scenario other
+        than using it to meet another class's requirement for an
+        implementation of the <classname>ItemWriter</classname> interface. In
+        that case, the <classname>ItemWriterAdapter</classname> would be a
+        better solution. However, if it does need to be transactional, then
+        <methodname>flush</methodname> and <methodname>clear</methodname>
+        should be implemented to allow for a buffering solution:</para>
+
+        <programlisting>  public class CustomItemWriter implements ItemWriter{
+
+    List output = new ArrayList();
+    List buffer = new ArrayList();
+
+    public void write(Object item) throws Exception {
+      buffer.add(item);
+    }
+  
+    public void clear() throws ClearFailedException {
+      buffer.clear();
+    }
+
+    public void flush() throws FlushFailedException {
+      for(Iterator it = buffer.iterator(); it.hasNext();){
+        output.add(it.next());
+        it.remove();
+      }
     }
   }</programlisting>
+
+        <para>The <classname>ItemWriter</classname> buffers all output, only
+        writing to the actual output (in this case by added to a list) when
+        the <classname>ItemWriter</classname> <methodname>flush()</methodname>
+        method is called. The contents of the buffer are thrown away when
+        <classname>ItemWriter</classname> <methodname>clear</methodname>() is
+        called.</para>
+      </section>
 
       <section>
         <title>Making the <classname>ItemWriter</classname>

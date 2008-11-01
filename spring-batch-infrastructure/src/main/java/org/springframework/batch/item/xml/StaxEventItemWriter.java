@@ -3,10 +3,11 @@ package org.springframework.batch.item.xml;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,31 +18,30 @@ import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.item.xml.stax.NoStartEndDocumentStreamWriter;
-import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.oxm.Marshaller;
-import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
-import org.springframework.xml.transform.StaxResult;
 
 /**
  * An implementation of {@link ItemWriter} which uses StAX and
- * {@link Marshaller} for serializing object to XML.
+ * {@link EventWriterSerializer} for serializing object to XML.
  * 
  * This item writer also provides restart, statistics and transaction features
  * by implementing corresponding interfaces.
+ * 
+ * Output is buffered until {@link #flush()} is called - only then the actual
+ * writing to file takes place.
  * 
  * The implementation is *not* thread-safe.
  * 
@@ -49,7 +49,7 @@ import org.springframework.xml.transform.StaxResult;
  * @author Robert Kasanicky
  * 
  */
-public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream,
+public class StaxEventItemWriter extends ExecutionContextUserSupport implements ItemWriter, ItemStream,
 		InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);
@@ -72,8 +72,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	// file system resource
 	private Resource resource;
 
-	// xml marshaller
-	private Marshaller marshaller;
+	// xml serializer
+	private EventWriterSerializer serializer;
 
 	// encoding to be used while reading from the resource
 	private String encoding = DEFAULT_ENCODING;
@@ -85,7 +85,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	private String rootTagName = DEFAULT_ROOT_TAG_NAME;
 
 	// root element attributes
-	private Map<String, String> rootElementAttributes = null;
+	private Map rootElementAttributes = null;
 
 	// signalizes that marshalling was restarted
 	private boolean restarted = false;
@@ -104,14 +104,22 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	// XML event writer
 	private XMLEventWriter delegateEventWriter;
 
+	// byte offset in file channel at last commit point
+	private long lastCommitPointPosition = 0;
+
+	// processed record count at last commit point
+	private long lastCommitPointRecordCount = 0;
+
 	// current count of processed records
 	private long currentRecordCount = 0;
 
 	private boolean saveState = true;
 
-	private StaxWriterCallback headerCallback;
+	// holds the list of items for writing before they are actually written on
+	// #flush()
+	private List buffer = new ArrayList();
 
-	private StaxWriterCallback footerCallback;
+	private List headers = new ArrayList();
 
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
@@ -127,27 +135,12 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	}
 
 	/**
-	 * Set Object to XML marshaller.
+	 * Set Object to XML serializer.
 	 * 
-	 * @param marshaller the Object to XML marshaller
+	 * @param serializer the Object to XML serializer
 	 */
-	public void setMarshaller(Marshaller marshaller) {
-		this.marshaller = marshaller;
-	}
-
-	/**
-	 * headerCallback is called before writing any items.
-	 */
-	public void setHeaderCallback(StaxWriterCallback headerCallback) {
-		this.headerCallback = headerCallback;
-	}
-
-	/**
-	 * footerCallback is called after writing all items but before closing the
-	 * file
-	 */
-	public void setFooterCallback(StaxWriterCallback footerCallback) {
-		this.footerCallback = footerCallback;
+	public void setSerializer(EventWriterSerializer serializer) {
+		this.serializer = serializer;
 	}
 
 	/**
@@ -210,7 +203,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * 
 	 * @return attributes of the root element
 	 */
-	public Map<String, String> getRootElementAttributes() {
+	public Map getRootElementAttributes() {
 		return rootElementAttributes;
 	}
 
@@ -219,7 +212,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * 
 	 * @param rootElementAttributes attributes of the root element
 	 */
-	public void setRootElementAttributes(Map<String, String> rootElementAttributes) {
+	public void setRootElementAttributes(Map rootElementAttributes) {
 		this.rootElementAttributes = rootElementAttributes;
 	}
 
@@ -233,6 +226,15 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		this.overwriteOutput = overwriteOutput;
 	}
 
+	/**
+	 * Setter for the headers. This list will be marshalled and output before
+	 * any calls to {@link #write(Object)}.
+	 * @param headers
+	 */
+	public void setHeaderItems(Object[] headers) {
+		this.headers = Arrays.asList(headers);
+	}
+
 	public void setSaveState(boolean saveState) {
 		this.saveState = saveState;
 	}
@@ -242,7 +244,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(marshaller);
+		Assert.notNull(serializer);
 	}
 
 	/**
@@ -251,9 +253,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
 	 */
 	public void open(ExecutionContext executionContext) {
-
-		Assert.notNull(resource, "The resource must be set");
-
+		
+		Assert.notNull(resource);
+		
 		long startAtPosition = 0;
 
 		// if restart data is provided, restart from provided offset
@@ -266,16 +268,11 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		open(startAtPosition);
 
 		if (startAtPosition == 0) {
-			try {
-				if (headerCallback != null) {
-					headerCallback.write(delegateEventWriter);
-				}
-			}
-			catch (IOException e) {
-				throw new ItemStreamException("Failed to write headerItems", e);
+			for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
+				Object header = (Object) iterator.next();
+				write(header);
 			}
 		}
-
 	}
 
 	/**
@@ -301,8 +298,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
 		try {
-			delegateEventWriter = outputFactory.createXMLEventWriter(new TransactionAwareBufferedWriter(
-					new OutputStreamWriter(os, encoding)));
+			delegateEventWriter = outputFactory.createXMLEventWriter(os, encoding);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
@@ -310,10 +306,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		}
 		catch (XMLStreamException xse) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", xse);
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource
-					+ "] with encoding=[" + encoding + "]", e);
 		}
 
 	}
@@ -343,13 +335,12 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		// write root tag attributes
 		if (!CollectionUtils.isEmpty(getRootElementAttributes())) {
 
-			for (Map.Entry<String, String> entry : getRootElementAttributes().entrySet()) {
-				writer.add(factory.createAttribute(entry.getKey(), entry.getValue()));
+			for (Iterator i = getRootElementAttributes().entrySet().iterator(); i.hasNext();) {
+				Map.Entry entry = (Map.Entry) i.next();
+				writer.add(factory.createAttribute((String) entry.getKey(), (String) entry.getValue()));
 			}
 
 		}
-
-		writer.flush();
 
 	}
 
@@ -379,7 +370,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
 	 */
 	public void close(ExecutionContext executionContext) {
-
+		
 		// harmless event to close the root tag if there were no items
 		XMLEventFactory factory = XMLEventFactory.newInstance();
 		try {
@@ -389,66 +380,30 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			log.error(e);
 		}
 
+		flush();
 		try {
-			if (footerCallback != null) {
-				footerCallback.write(delegateEventWriter);
-			}
-			delegateEventWriter.flush();
 			endDocument(delegateEventWriter);
+			eventWriter.close();
+			channel.close();
 		}
-		catch (IOException e) {
-			throw new ItemStreamException("Failed to write footer items", e);
+		catch (XMLStreamException xse) {
+			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", xse);
 		}
-		catch (XMLStreamException e) {
-			throw new ItemStreamException("Failed to write end document tag", e);
-		}
-		finally {
-
-			try {
-				eventWriter.close();
-			}
-			catch (XMLStreamException xse) {
-				log.error("Unable to close file resource: [" + resource + "] " + xse);
-			}
-			finally {
-				try {
-					channel.close();
-				}
-				catch (IOException ioe) {
-					log.error("Unable to close file resource: [" + resource + "] " + ioe);
-				}
-
-			}
+		catch (IOException ioe) {
+			throw new DataAccessResourceFailureException("Unable to close file resource: [" + resource + "]", ioe);
 		}
 	}
 
 	/**
-	 * Write the value objects and flush them to the file.
+	 * Write the value object to internal buffer.
 	 * 
-	 * @param items the value object
-	 * @throws IOException
-	 * @throws XmlMappingException
+	 * @param item the value object
+	 * @see #flush()
 	 */
-	public void write(List<? extends T> items) throws XmlMappingException, IOException {
+	public void write(Object item) {
 
-		currentRecordCount += items.size();
-
-		doWrite(items);
-
-	}
-
-	private void doWrite(List<?> objects) throws XmlMappingException, IOException {
-		for (Object object : objects) {
-			Assert.state(marshaller.supports(object.getClass()),
-					"Marshaller must support the class of the marshalled object");
-			marshaller.marshal(object, new StaxResult(eventWriter));
-		}
-		try {
-			eventWriter.flush();
-		}
-		catch (XMLStreamException e) {
-			throw new FlushFailedException("Failed to flush the events", e);
-		}
+		currentRecordCount++;
+		buffer.add(item);
 	}
 
 	/**
@@ -494,6 +449,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	private void setPosition(long newPosition) {
 
 		try {
+			Assert.state(channel.size() >= lastCommitPointPosition,
+					"Current file size is smaller than size at last commit");
 			channel.truncate(newPosition);
 			channel.position(newPosition);
 		}
@@ -501,6 +458,35 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);
 		}
 
+	}
+
+	/**
+	 * Writes buffered items to XML stream and marks restore point.
+	 */
+	public void flush() throws FlushFailedException {
+
+		for (Iterator iterator = buffer.listIterator(); iterator.hasNext();) {
+			Object item = iterator.next();
+			serializer.serializeObject(eventWriter, item);
+		}
+		try {
+			eventWriter.flush();
+		}
+		catch (XMLStreamException e) {
+			throw new FlushFailedException("Failed to flush the events", e);
+		}
+		buffer.clear();
+
+		lastCommitPointPosition = getPosition();
+		lastCommitPointRecordCount = currentRecordCount;
+	}
+
+	/**
+	 * Clear the output buffer
+	 */
+	public void clear() throws ClearFailedException {
+		currentRecordCount = lastCommitPointRecordCount;
+		buffer.clear();
 	}
 
 }

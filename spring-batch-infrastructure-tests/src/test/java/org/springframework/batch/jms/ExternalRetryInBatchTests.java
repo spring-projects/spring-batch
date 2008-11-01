@@ -16,84 +16,91 @@
 
 package org.springframework.batch.jms;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemRecoverer;
+import org.springframework.batch.item.support.AbstractItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
+import org.springframework.batch.retry.callback.RecoveryRetryCallback;
+import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.ClassUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class ExternalRetryInBatchTests {
-
-	@Autowired
+public class ExternalRetryInBatchTests extends AbstractDependencyInjectionSpringContextTests {
 	private JmsTemplate jmsTemplate;
 
 	private RetryTemplate retryTemplate;
 
-	@Autowired
 	private RepeatTemplate repeatTemplate;
 
-	private ItemReader<String> provider;
+	private ItemReaderRecoverer provider;
 
-	private SimpleJdbcTemplate jdbcTemplate;
+	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	@Autowired
 	public void setDataSource(DataSource dataSource) {
-		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
+		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	@Before
-	public void onSetUp() throws Exception {
+	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+		this.transactionManager = transactionManager;
+	}
+
+	public void setRepeatTemplate(RepeatTemplate repeatTemplate) {
+		this.repeatTemplate = repeatTemplate;
+	}
+
+	public void setJmsTemplate(JmsTemplate jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
+	}
+
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(getClass(), "jms-context.xml" )};
+	}
+
+	protected void onSetUp() throws Exception {
+		super.onSetUp();
 		getMessages(); // drain queue
-		jdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		jdbcTemplate.execute("delete from T_FOOS");
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
-		provider = new ItemReader<String>() {
-			public String read() {
+		provider = new ItemReaderRecoverer() {
+			public Object read() {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				return text;
+			}
+
+			public Object recover(Object data, Throwable cause) {
+				recovered.add(data);
+				return data;
 			}
 		};
 		retryTemplate = new RetryTemplate();
 	}
 
-	@After
-	public void onTearDown() throws Exception {
+	protected void onTearDown() throws Exception {
 		getMessages(); // drain queue
-		jdbcTemplate.getJdbcOperations().execute("delete from T_FOOS");
+		jdbcTemplate.execute("delete from T_FOOS");
 	}
 
 	private void assertInitialState() {
@@ -101,15 +108,14 @@ public class ExternalRetryInBatchTests {
 		assertEquals(0, count);
 	}
 
-	private List<String> list = new ArrayList<String>();
+	private List list = new ArrayList();
 
-	private List<String> recovered = new ArrayList<String>();
+	private List recovered = new ArrayList();
 
-	@Test
 	public void testExternalRetryRecoveryInBatch() throws Exception {
 		assertInitialState();
 
-		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(1));
+		retryTemplate.setRetryPolicy(new RecoveryCallbackRetryPolicy(new SimpleRetryPolicy(1)));
 
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
@@ -125,34 +131,30 @@ public class ExternalRetryInBatchTests {
 
 								public ExitStatus doInIteration(RepeatContext context) throws Exception {
 
-									final String item = provider.read();
+									final Object item = provider.read();
 									
 									if (item==null) {
 										return ExitStatus.FINISHED;
 									}
 									
-									RetryCallback<String> callback = new RetryCallback<String>() {
-										public String doWithRetry(RetryContext context) throws Exception {
+									RecoveryRetryCallback callback = new RecoveryRetryCallback(item, new RetryCallback() {
+										public Object doWithRetry(RetryContext context) throws Throwable {
 											// No need for transaction here: the whole batch will roll
 											// back. When it comes back for recovery this code is not
 											// executed...
-											jdbcTemplate.update(
-													"INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", 
-													list.size(), item);
+											jdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", new Object[] {
+											        new Integer(list.size()), item });
 											throw new RuntimeException("Rollback!");
 										}
-									};
+									});
 									
-									RecoveryCallback<String> recoveryCallback = new RecoveryCallback<String>() {
-										public String recover(RetryContext context) {
-											// aggressive commit on a recovery
-											RepeatSynchronizationManager.setCompleteOnly();
-											recovered.add(item);
-											return item;
+									callback.setRecoveryCallback(new RecoveryCallback() {
+										public Object recover(RetryContext context) {
+											return provider.recover(item, context.getLastThrowable());
 										}
-									};
+									});
 
-									retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
+									retryTemplate.execute(callback);
 									
 									return ExitStatus.CONTINUABLE;
 
@@ -179,7 +181,7 @@ public class ExternalRetryInBatchTests {
 			}
 		}
 
-		List<String> msgs = getMessages();
+		List msgs = getMessages();
 
 		System.err.println(msgs);
 
@@ -196,9 +198,9 @@ public class ExternalRetryInBatchTests {
 
 	}
 
-	private List<String> getMessages() {
+	private List getMessages() {
 		String next = "";
-		List<String> msgs = new ArrayList<String>();
+		List msgs = new ArrayList();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)
@@ -207,4 +209,7 @@ public class ExternalRetryInBatchTests {
 		return msgs;
 	}
 
+	private abstract class ItemReaderRecoverer extends AbstractItemReader implements ItemRecoverer {
+
+	}
 }

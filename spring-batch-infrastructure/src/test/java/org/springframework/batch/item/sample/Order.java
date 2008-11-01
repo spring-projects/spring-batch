@@ -33,7 +33,7 @@ public class Order {
 
 	private Date date;
 
-	private List<LineItem> lineItems;
+	private List lineItems;
 
 	private Shipper shipper;
 
@@ -53,11 +53,11 @@ public class Order {
 		this.date = date == null ? null : (Date)date.clone();
 	}
 
-	public List<LineItem> getLineItems() {
+	public List getLineItems() {
 		return lineItems;
 	}
 
-	public void setLineItems(List<LineItem> lineItems) {
+	public void setLineItems(List lineItems) {
 		this.lineItems = lineItems;
 	}
 

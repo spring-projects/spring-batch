@@ -24,7 +24,7 @@ import org.springframework.batch.item.ItemWriter;
  * @author Lucas Ward
  *
  */
-public interface ItemReadListener<T> extends StepListener {
+public interface ItemReadListener extends StepListener {
 
 	/**
 	 * Called before {@link ItemReader#read()}
@@ -36,7 +36,7 @@ public interface ItemReadListener<T> extends StepListener {
 	 * 
 	 * @param item returned from read()
 	 */
-	void afterRead(T item);
+	void afterRead(Object item);
 	
 	/**
 	 * Called if an error occurs while trying to read.

@@ -20,9 +20,8 @@ import static org.junit.Assert.assertNotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
@@ -32,16 +31,19 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.integration.JobRepositorySupport;
+import org.springframework.batch.integration.file.FileToMessagesJobFactoryBean;
+import org.springframework.batch.integration.file.ResourcePayloadAsJobParameterStrategy;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
+import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.message.MessageConsumer;
+import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.channel.ThreadLocalChannel;
+import org.springframework.integration.dispatcher.DirectChannel;
+import org.springframework.integration.message.Message;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 
@@ -52,9 +54,8 @@ import org.springframework.util.ReflectionUtils;
 public class FileToMessagesJobFactoryBeanTests {
 
 	private static final String FILE_INPUT_PATH = ResourcePayloadAsJobParameterStrategy.FILE_INPUT_PATH;
-	private FileToMessagesJobFactoryBean<String> factory = new FileToMessagesJobFactoryBean<String>();
-	private DirectChannel channel = new DirectChannel();
-	private List<String> receiver = new ArrayList<String>();
+	private FileToMessagesJobFactoryBean factory = new FileToMessagesJobFactoryBean();
+	private ThreadLocalChannel receiver = new ThreadLocalChannel();
 	private JobRepositorySupport jobRepository;
 
 	@Before
@@ -62,18 +63,19 @@ public class FileToMessagesJobFactoryBeanTests {
 		jobRepository = new JobRepositorySupport();
 		factory.setJobRepository(jobRepository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
-		FlatFileItemReader<String> itemReader = new FlatFileItemReader<String>();
-		itemReader.setLineMapper(new PassThroughLineMapper());
+		FlatFileItemReader itemReader = new FlatFileItemReader();
+		itemReader.setFieldSetMapper(new PassThroughFieldSetMapper());
 		factory.setItemReader(itemReader);
+		DirectChannel channel = new DirectChannel();
 		factory.setChannel(channel);
-		channel.subscribe(new MessageConsumer() {
-			public void onMessage(Message<?> message) {
-				// TODO: Ask Mark: unsafe cast...
-				receiver.add((String) message.getPayload());
-			}
-		});
+		channel.subscribe(this.receiver);
 	}
 	
+	@After
+	public void tearDown() {
+		while(receiver.receive(10L)!=null) {}
+	}
+
 	/**
 	 * Test method for
 	 * {@link org.springframework.batch.integration.file.FileToMessagesJobFactoryBean#setBeanName(java.lang.String)}.
@@ -100,7 +102,7 @@ public class FileToMessagesJobFactoryBeanTests {
 
 	/**
 	 * Test method for
-	 * {@link FileToMessagesJobFactoryBean#setChannel(MessageChannel)}.
+	 * {@link org.springframework.batch.integration.file.FileToMessagesJobFactoryBean#setChannel(org.springframework.integration.channel.MessageChannel)}.
 	 */
 	@Test
 	public void testSetChannel() {
@@ -156,7 +158,7 @@ public class FileToMessagesJobFactoryBeanTests {
 	 */
 	@Test
 	public void testGetObjectType() {
-		FileToMessagesJobFactoryBean<?> factory = new FileToMessagesJobFactoryBean<Object>();
+		FileToMessagesJobFactoryBean factory = new FileToMessagesJobFactoryBean();
 		assertEquals(Job.class, factory.getObjectType());
 	}
 
@@ -166,28 +168,34 @@ public class FileToMessagesJobFactoryBeanTests {
 	 */
 	@Test
 	public void testIsSingleton() {
-		FileToMessagesJobFactoryBean<?> factory = new FileToMessagesJobFactoryBean<Object>();
+		FileToMessagesJobFactoryBean factory = new FileToMessagesJobFactoryBean();
 		assertEquals(true, factory.isSingleton());
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testVanillaJobExecution() throws Exception {
 
 		Job job = (Job) factory.getObject();
 		JobParameters jobParameters = new JobParametersBuilder().addString(FILE_INPUT_PATH, "classpath:/log4j.properties").toJobParameters();
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
+		JobExecution jobExecution = jobRepository.createJobExecution(job, jobParameters);
 
 		job.execute(jobExecution);
 		assertNotNull(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
-		String payload;
+		FieldSet payload;
+		Message<FieldSet> message;
 
 		// first line from properties file
-		payload = receiver.get(0);
+		message = (Message<FieldSet>) receiver.receive(100L);
+		assertNotNull(message);
+		payload = message.getPayload();
 		assertNotNull(payload);
 		// second line from properties file
-		payload = receiver.get(1);
+		message = (Message<FieldSet>) receiver.receive(100L);
+		assertNotNull(message);
+		payload = message.getPayload();
 		assertNotNull(payload);
 	}
 

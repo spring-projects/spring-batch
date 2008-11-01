@@ -1,43 +1,34 @@
 package org.springframework.batch.item.xml;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer;
+import org.springframework.core.io.DescriptiveResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.xml.transform.StaxResult;
 
 /**
  * Tests for {@link StaxEventItemWriter}.
  */
-public class StaxEventItemWriterTests {
+public class StaxEventItemWriterTests extends TestCase {
 
 	// object under test
-	private StaxEventItemWriter<Object> writer;
+	private StaxEventItemWriter writer;
 
 	// output file
 	private Resource resource;
@@ -51,92 +42,160 @@ public class StaxEventItemWriterTests {
 		}
 	};
 
-	private List<? extends Object> items = Collections.singletonList(item);
-
 	private static final String TEST_STRING = "<!--" + ClassUtils.getShortName(StaxEventItemWriter.class)
 			+ "-testString-->";
 
-	@Before
-	public void setUp() throws Exception {
-		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", ".xml"));
+	private static final int NOT_FOUND = -1;
+
+	protected void setUp() throws Exception {
+		resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"));
 		writer = createItemWriter();
 		executionContext = new ExecutionContext();
 	}
 
 	/**
+	 * Flush should pass buffered items to Serializer.
+	 */
+	public void testFlush() throws Exception {
+		writer.open(executionContext);
+		InputCheckMarshaller marshaller = new InputCheckMarshaller();
+		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
+		writer.setSerializer(serializer);
+
+		// see asserts in the marshaller
+		writer.write(item);
+		assertFalse(marshaller.wasCalled);
+
+		writer.flush();
+		assertTrue(marshaller.wasCalled);
+
+	}
+
+	public void testClear() throws Exception {
+		writer.open(executionContext);
+		writer.write(item);
+		writer.write(item);
+		writer.clear();
+		// writer.write(item);
+		writer.flush();
+		assertFalse(contains(outputFileContent(), TEST_STRING));
+	}
+
+	/**
+	 * Rolled back records should not be written to output file.
+	 */
+	public void testRollback() throws Exception {
+		writer.open(executionContext);
+		writer.write(item);
+		// rollback
+		writer.clear();
+		assertFalse(outputFileContent().contains(TEST_STRING));
+	}
+
+	/**
 	 * Item is written to the output file only after flush.
 	 */
-	@Test
 	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
-		writer.write(items);
-		writer.close(executionContext);
+		writer.write(item);
 		String content = outputFileContent();
-		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertFalse(content.contains(TEST_STRING));
+		writer.flush();
+		content = outputFileContent();
+		assertTrue("Wrong content: " + content, contains(content, TEST_STRING));
 	}
 
 	/**
 	 * Restart scenario - content is appended to the output file after restart.
 	 */
-	@Test
 	public void testRestart() throws Exception {
 		writer.open(executionContext);
 		// write item
-		writer.write(items);
+		writer.write(item);
+		writer.flush();
 		writer.update(executionContext);
 		writer.close(executionContext);
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		writer.open(executionContext);
-		writer.write(items);
+		writer.write(item);
 		writer.close(executionContext);
 
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
 		String outputFile = outputFileContent();
-		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
-		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
+		int firstRecord = outputFile.indexOf(TEST_STRING);
+		int secondRecord = outputFile.indexOf(TEST_STRING, firstRecord + TEST_STRING.length());
+		int thirdRecord = outputFile.indexOf(TEST_STRING, secondRecord + TEST_STRING.length());
+
+		// (two records should be written)
+		assertTrue(firstRecord != NOT_FOUND);
+		assertTrue(secondRecord != NOT_FOUND);
+		assertEquals(NOT_FOUND, thirdRecord);
 	}
 
 	/**
 	 * Item is written to the output file only after flush.
 	 */
-	@Test
 	public void testWriteWithHeader() throws Exception {
-		
-		writer.setHeaderCallback(new StaxWriterCallback(){
-
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-				
-			}
-			
-		});
+		Object header1 = new Object();
+		Object header2 = new Object();
+		writer.setHeaderItems(new Object[] { header1, header2 });
 		writer.open(executionContext);
-		writer.write(items);
+		writer.write(item);
+		writer.flush();
 		String content = outputFileContent();
-		assertTrue("Wrong content: " + content, content.contains(("<header></header>")));
-		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
+		assertTrue("Wrong content: " + content, contains(content, "<!--" + header1 + "-->"));
+		assertTrue("Wrong content: " + content, contains(content, "<!--" + header2 + "-->"));
+		assertTrue("Wrong content: " + content, contains(content, TEST_STRING));
+	}
+
+	/**
+	 * Item is written to the output file only after flush.
+	 */
+	public void testWriteWithHeaderAfterRollback() throws Exception {
+		Object header = new Object();
+		writer.setHeaderItems(new Object[] { header });
+		writer.open(executionContext);
+		writer.write(item);
+		writer.clear();
+		writer.open(executionContext);
+		writer.write(item);
+		writer.flush();
+		String content = outputFileContent();
+		assertEquals("Wrong content: " + content, 1, countContains(content, "<!--" + header + "-->"));
+		assertEquals("Wrong content: " + content, 1, countContains(content, TEST_STRING));
+	}
+
+	/**
+	 * Item is written to the output file only after flush.
+	 */
+	public void testWriteWithHeaderAfterFlushAndRollback() throws Exception {
+		Object header = new Object();
+		writer.setHeaderItems(new Object[] { header });
+		writer.open(executionContext);
+		writer.write(item);
+		writer.flush();
+		writer.update(executionContext);
+		writer.close(executionContext);
+		writer.open(executionContext);
+		writer.write(item);
+		writer.clear();
+		writer.flush();
+		String content = outputFileContent();
+		assertEquals("Wrong content: " + content, 1, countContains(content, "<!--" + header + "-->"));
+		assertEquals("Wrong content: " + content, 1, countContains(content, TEST_STRING));
 	}
 
 	/**
 	 * Count of 'records written so far' is returned as statistics.
 	 */
-	@Test
 	public void testStreamContext() throws Exception {
 		writer.open(executionContext);
 		final int NUMBER_OF_RECORDS = 10;
-		assertFalse(executionContext.containsKey(ClassUtils.getShortName(StaxEventItemWriter.class) + ".record.count"));
 		for (int i = 1; i <= NUMBER_OF_RECORDS; i++) {
-			writer.write(items);
+			writer.write(item);
 			writer.update(executionContext);
 			long writeStatistics = executionContext.getLong(ClassUtils.getShortName(StaxEventItemWriter.class)
 					+ ".record.count");
@@ -148,57 +207,35 @@ public class StaxEventItemWriterTests {
 	/**
 	 * Open method writes the root tag, close method adds corresponding end tag.
 	 */
-	@Test
 	public void testOpenAndClose() throws Exception {
-		writer.setHeaderCallback(new StaxWriterCallback(){
-
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "header"));
-					writer.add(factory.createEndElement("", "", "header"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-				
-			}
-			
-		});
-		writer.setFooterCallback(new StaxWriterCallback() {
-
-			public void write(XMLEventWriter writer) throws IOException {
-				XMLEventFactory factory = XMLEventFactory.newInstance();
-				try {
-					writer.add(factory.createStartElement("", "", "footer"));
-					writer.add(factory.createEndElement("", "", "footer"));
-				}
-				catch (XMLStreamException e) {
-					throw new RuntimeException(e);
-				}
-				
-			}
-			
-		});
 		writer.setRootTagName("testroot");
-		writer.setRootElementAttributes(Collections.<String, String> singletonMap("attribute", "value"));
+		writer.setRootElementAttributes(new HashMap() {
+			{
+				put("attribute", "value");
+			}
+		});
 		writer.open(executionContext);
+		writer.flush();
+
+		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\"") != NOT_FOUND);
+
 		writer.close(null);
-		String content = outputFileContent();
-		
-		assertTrue(content.contains("<testroot attribute=\"value\">"));
-		assertTrue(content.contains("<header></header>"));
-		assertTrue(content.contains("<footer></footer>"));
-		assertTrue(content.endsWith("</testroot>"));
+		assertTrue(outputFileContent().indexOf("<testroot attribute=\"value\">") != NOT_FOUND);
+		assertTrue(outputFileContent().endsWith("</testroot>"));
 	}
 
-	@Test
 	public void testNonExistantResource() throws Exception {
-		Resource doesntExist = createMock(Resource.class);
-		expect(doesntExist.getFile()).andReturn(File.createTempFile("arbitrary", null));
-		expect(doesntExist.exists()).andReturn(false);
-		replay(doesntExist);
+		Resource doesntExist = new DescriptiveResource("") {
 
+			public File getFile() throws IOException {
+				return new File("does not exist");
+			}
+
+			public boolean exists() {
+				return false;
+			}
+
+		};
 		writer.setResource(doesntExist);
 
 		try {
@@ -207,6 +244,24 @@ public class StaxEventItemWriterTests {
 		}
 		catch (IllegalStateException e) {
 			assertEquals("Output resource must exist", e.getMessage());
+		}
+	}
+
+	/**
+	 * Checks the received parameters.
+	 */
+	private class InputCheckMarshaller implements Marshaller {
+
+		boolean wasCalled = false;
+
+		public void marshal(Object graph, Result result) {
+			wasCalled = true;
+			assertTrue(result instanceof StaxResult);
+			assertSame(item, graph);
+		}
+
+		public boolean supports(Class clazz) {
+			return true;
 		}
 	}
 
@@ -226,7 +281,6 @@ public class StaxEventItemWriterTests {
 			}
 		}
 
-		@SuppressWarnings("unchecked")
 		public boolean supports(Class clazz) {
 			return true;
 		}
@@ -242,12 +296,13 @@ public class StaxEventItemWriterTests {
 	/**
 	 * @return new instance of fully configured writer
 	 */
-	private StaxEventItemWriter<Object> createItemWriter() throws Exception {
-		StaxEventItemWriter<Object> source = new StaxEventItemWriter<Object>();
+	private StaxEventItemWriter createItemWriter() throws Exception {
+		StaxEventItemWriter source = new StaxEventItemWriter();
 		source.setResource(resource);
 
 		Marshaller marshaller = new SimpleMarshaller();
-		source.setMarshaller(marshaller);
+		MarshallingEventWriterSerializer serializer = new MarshallingEventWriterSerializer(marshaller);
+		source.setSerializer(serializer);
 
 		source.setEncoding("UTF-8");
 		source.setRootTagName("root");
@@ -258,5 +313,19 @@ public class StaxEventItemWriterTests {
 		source.afterPropertiesSet();
 
 		return source;
+	}
+
+	private boolean contains(String str, String searchStr) {
+		return str.indexOf(searchStr) != -1;
+	}
+
+	private int countContains(String str, String searchStr) {
+		int begin = -1;
+		int count = 0;
+		while (str.indexOf(searchStr, begin + 1) > begin) {
+			count++;
+			begin = str.indexOf(searchStr, begin);
+		}
+		return count;
 	}
 }

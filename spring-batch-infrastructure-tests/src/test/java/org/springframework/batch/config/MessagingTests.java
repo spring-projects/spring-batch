@@ -16,45 +16,45 @@
 
 package org.springframework.batch.config;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.jms.ExternalRetryInBatchTests;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+import org.springframework.util.ClassUtils;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
-public class MessagingTests {
+public class MessagingTests extends AbstractDependencyInjectionSpringContextTests {
 
-	@Autowired
 	private JmsTemplate jmsTemplate;
 
-	@Before
-	public void onSetUp() throws Exception {
+	public void setJmsTemplate(JmsTemplate jmsTemplate) {
+		this.jmsTemplate = jmsTemplate;
+	}
+
+	protected String[] getConfigLocations() {
+		return new String[] { ClassUtils.addResourcePathToPackagePath(ExternalRetryInBatchTests.class,
+				"jms-context.xml") };
+	}
+
+	protected void onSetUp() throws Exception {
+		super.onSetUp();
 		Thread.sleep(100L);
 		getMessages(); // drain queue
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 	}
 
-	@Test
 	public void testMessaging() throws Exception {
-		List<String> list = getMessages();
+		List list = getMessages();
 		System.err.println(list);
 		assertEquals(2, list.size());
 		assertTrue(list.contains("foo"));
 	}
 
-	private List<String> getMessages() {
+	private List getMessages() {
 		String next = "";
-		List<String> msgs = new ArrayList<String>();
+		List msgs = new ArrayList();
 		while (next != null) {
 			next = (String) jmsTemplate.receiveAndConvert("queue");
 			if (next != null)

@@ -15,76 +15,62 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import junit.framework.TestCase;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
+import org.easymock.MockControl;
 import org.springframework.batch.core.ItemWriteListener;
 
 /**
  * @author Lucas Ward
- * 
+ *
  */
-public class CompositeItemWriteListenerTests {
+public class CompositeItemWriteListenerTests extends TestCase {
 
-	ItemWriteListener<Object> listener;
-
-	CompositeItemWriteListener<Object> compositeListener;
-
-	@SuppressWarnings("unchecked")
-	@Before
-	public void setUp() throws Exception {
-		listener = createMock(ItemWriteListener.class);
-		compositeListener = new CompositeItemWriteListener<Object>();
+	MockControl listenerControl = MockControl.createControl(ItemWriteListener.class);
+	
+	ItemWriteListener listener;
+	CompositeItemWriteListener compositeListener;
+	
+	protected void setUp() throws Exception {
+		super.setUp();
+	
+		listener = (ItemWriteListener)listenerControl.getMock();
+		compositeListener = new CompositeItemWriteListener();
 		compositeListener.register(listener);
 	}
-
-	@Test
-	public void testBeforeWrite() {
-		List<Object> item = Collections.singletonList(new Object());
+	
+	public void testBeforeWrite(){
+		Object item = new Object();
 		listener.beforeWrite(item);
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.beforeWrite(item);
-		verify(listener);
+		listenerControl.verify();
 	}
-
-	@Test
-	public void testAfterWrite() {
-		List<Object> item = Collections.singletonList(new Object());
+	
+	public void testAfterWrite(){
+		Object item = new Object();
 		listener.afterWrite(item);
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.afterWrite(item);
-		verify(listener);
+		listenerControl.verify();
 	}
-
-	@Test
-	public void testOnWriteError() {
-		List<Object> item = Collections.singletonList(new Object());
+	
+	public void testOnWriteError(){
+		Object item = new Object();
 		Exception ex = new Exception();
 		listener.onWriteError(ex, item);
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.onWriteError(ex, item);
-		verify(listener);
+		listenerControl.verify();
 	}
 
-	@Test
-	public void testSetListeners() throws Exception {
-		compositeListener.setListeners(new ArrayList<ItemWriteListener<? super Object>>() {
-			{
-				add(listener);
-			}
-		});
-		List<Object> item = Collections.singletonList(new Object());
+	public void testSetListners() throws Exception {
+		compositeListener.setListeners(new ItemWriteListener[] {listener});
+		Object item = new Object();
 		listener.beforeWrite(item);
-		replay(listener);
+		listenerControl.replay();
 		compositeListener.beforeWrite(item);
-		verify(listener);
+		listenerControl.verify();
 	}
 
 }

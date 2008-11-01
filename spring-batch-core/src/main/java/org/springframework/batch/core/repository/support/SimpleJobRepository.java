@@ -17,7 +17,7 @@
 package org.springframework.batch.core.repository.support;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
@@ -25,12 +25,12 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
@@ -63,31 +63,21 @@ public class SimpleJobRepository implements JobRepository {
 
 	private StepExecutionDao stepExecutionDao;
 
-	private ExecutionContextDao ecDao;
-
 	/**
 	 * Provide default constructor with low visibility in case user wants to use
-	 * use aop:proxy-target-class="true" for AOP interceptor.
+	 * use aop:proxy-target-class="true" for transaction interceptor.
 	 */
 	SimpleJobRepository() {
 	}
 
 	public SimpleJobRepository(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao,
-			StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
+			StepExecutionDao stepExecutionDao) {
 		super();
 		this.jobInstanceDao = jobInstanceDao;
 		this.jobExecutionDao = jobExecutionDao;
 		this.stepExecutionDao = stepExecutionDao;
-		this.ecDao = ecDao;
 	}
 
-	/**
-	 * @see JobRepository#isJobInstanceExists(String, JobParameters)
-	 */
-	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
-		return jobInstanceDao.getJobInstance(jobName, jobParameters)!=null;
-	}
-	
 	/**
 	 * <p>
 	 * Create a {@link JobExecution} based on the passed in {@link Job} and
@@ -116,7 +106,8 @@ public class SimpleJobRepository implements JobRepository {
 	 * <ol>
 	 * <li>First we find all jobs which match the given {@link JobParameters}
 	 * and job name</li>
-	 * <li>What happens then depends on how many existing job instances we find:
+	 * <li>What happens then depends on how many existing job instances we
+	 * find:
 	 * <ul>
 	 * <li>If there are none, or the {@link Job} is marked restartable, then we
 	 * create a new {@link JobInstance}</li>
@@ -143,13 +134,13 @@ public class SimpleJobRepository implements JobRepository {
 	 * support the higher isolation levels).
 	 * </p>
 	 * 
-	 * @see JobRepository#createJobExecution(String, JobParameters)
+	 * @see JobRepository#createJobExecution(Job, JobParameters)
 	 * 
 	 */
-	public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
+	public JobExecution createJobExecution(Job job, JobParameters jobParameters)
 			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
-		Assert.notNull(jobName, "Job name must not be null.");
+		Assert.notNull(job, "Job must not be null.");
 		Assert.notNull(jobParameters, "JobParameters must not be null.");
 
 		/*
@@ -161,16 +152,20 @@ public class SimpleJobRepository implements JobRepository {
 		 * has finished.
 		 */
 
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
+		JobInstance jobInstance = jobInstanceDao.getJobInstance(job, jobParameters);
 		ExecutionContext executionContext;
 
 		// existing job instance found
 		if (jobInstance != null) {
+			if (!job.isRestartable()) {
+				throw new JobRestartException("JobInstance already exists and is not restartable");
+			}
 
-			List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
+			List executions = jobExecutionDao.findJobExecutions(jobInstance);
 
 			// check for running executions and find the last started
-			for (JobExecution execution : executions) {
+			for (Iterator iterator = executions.iterator(); iterator.hasNext();) {
+				JobExecution execution = (JobExecution) iterator.next();
 				if (execution.isRunning()) {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
@@ -181,21 +176,20 @@ public class SimpleJobRepository implements JobRepository {
 									+ ".  If you want to run this job again, change the parameters.");
 				}
 			}
-			executionContext = ecDao.getExecutionContext(jobExecutionDao.getLastJobExecution(jobInstance));
+			executionContext = jobExecutionDao.getLastJobExecution(jobInstance).getExecutionContext();
 		}
 		else {
 			// no job found, create one
-			jobInstance = jobInstanceDao.createJobInstance(jobName, jobParameters);
+			jobInstance = jobInstanceDao.createJobInstance(job, jobParameters);
 			executionContext = new ExecutionContext();
 		}
 
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		jobExecution.setExecutionContext(executionContext);
-		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
-		jobExecutionDao.saveJobExecution(jobExecution);
+		saveOrUpdate(jobExecution);
 
 		return jobExecution;
 
@@ -205,85 +199,78 @@ public class SimpleJobRepository implements JobRepository {
 	 * Save or Update a JobExecution. A JobExecution is considered one
 	 * 'execution' of a particular job. Therefore, it must have it's jobId field
 	 * set before it is passed into this method. It also has it's own unique
-	 * identifier, because it must be updatable separately. If an id isn't
-	 * found, a new JobExecution is created, if one is found, the current row is
+	 * identifier, because it must be updatable separately. If an id isn't found,
+	 * a new JobExecution is created, if one is found, the current row is
 	 * updated.
 	 * 
 	 * @param jobExecution to be stored.
 	 * @throws IllegalArgumentException if jobExecution is null.
 	 */
-	public void update(JobExecution jobExecution) {
+	public void saveOrUpdate(JobExecution jobExecution) {
 
 		Assert.notNull(jobExecution, "JobExecution cannot be null.");
 		Assert.notNull(jobExecution.getJobId(), "JobExecution must have a Job ID set.");
-		Assert.notNull(jobExecution.getId(), "JobExecution must be already saved (have an id assigned).");
 
-		jobExecution.setLastUpdated(new Date(System.currentTimeMillis()));
-		jobExecutionDao.updateJobExecution(jobExecution);
+		if (jobExecution.getId() == null) {
+			// existing instance
+			jobExecutionDao.saveJobExecution(jobExecution);
+		}
+		else {
+			// new execution
+			jobExecutionDao.updateJobExecution(jobExecution);
+		}
 	}
 
 	/**
-	 * Save the {@link StepExecution}.
+	 * Save or Update the given StepExecution. If it's id is null, it will be
+	 * saved and an id will be set, otherwise it will be updated. It should be
+	 * noted that assigning an ID randomly will likely cause an exception
+	 * depending on the StepDao implementation.
 	 * 
-	 * Preconditions: step name must be given and associated
-	 * {@link JobExecution} must already be saved (have an id assigned).
+	 * @param stepExecution to be saved.
+	 * @throws IllegalArgumentException if stepExecution is null.
 	 */
-	public void add(StepExecution stepExecution) {
-		validateStepExecution(stepExecution);
+	public void saveOrUpdate(StepExecution stepExecution) {
 
-		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
-		stepExecutionDao.saveStepExecution(stepExecution);
-	}
-
-	/**
-	 * Update the {@link StepExecution}.
-	 * 
-	 * Preconditions: step name must be given and associated
-	 * {@link JobExecution} must already be saved (have an id assigned).
-	 */
-	public void update(StepExecution stepExecution) {
-		validateStepExecution(stepExecution);
-		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
-		
-
-		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
-		stepExecutionDao.updateStepExecution(stepExecution);
-		checkForInterruption(stepExecution);
-	}
-
-	private void validateStepExecution(StepExecution stepExecution) {
 		Assert.notNull(stepExecution, "StepExecution cannot be null.");
 		Assert.notNull(stepExecution.getStepName(), "StepExecution's step name cannot be null.");
 		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
+
+		if (stepExecution.getId() == null) {
+			stepExecutionDao.saveStepExecution(stepExecution);
+		}
+		else {
+			// existing execution, update
+			stepExecutionDao.updateStepExecution(stepExecution);
+		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.repository.JobRepository#
-	 * persistExecutionContext
-	 * (org.springframework.batch.core.domain.StepExecution)
+	 * @see org.springframework.batch.core.repository.JobRepository#saveOrUpdateExecutionContext(org.springframework.batch.core.domain.StepExecution)
 	 */
-	public void updateExecutionContext(StepExecution stepExecution) {
+	public void saveOrUpdateExecutionContext(StepExecution stepExecution) {
 		// Until there is an interface change (
-		ecDao.persistExecutionContext(stepExecution.getJobExecution());
-		ecDao.persistExecutionContext(stepExecution);
+		stepExecutionDao.saveOrUpdateExecutionContext(stepExecution);
+		jobExecutionDao.saveOrUpdateExecutionContext(stepExecution.getJobExecution());
 	}
 
 	/**
 	 * @return the last execution of the step within given job instance
 	 */
-	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
-		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
-		for (JobExecution jobExecution : jobExecutions) {
-			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, stepName);
+	public StepExecution getLastStepExecution(JobInstance jobInstance, Step step) {
+		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		List stepExecutions = new ArrayList(jobExecutions.size());
+		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
+			JobExecution jobExecution = (JobExecution) iterator.next();
+			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, step);
 			if (stepExecution != null) {
 				stepExecutions.add(stepExecution);
 			}
 		}
 		StepExecution latest = null;
-		for (StepExecution stepExecution : stepExecutions) {
+		for (Iterator iterator = stepExecutions.iterator(); iterator.hasNext();) {
+			StepExecution stepExecution = (StepExecution) iterator.next();
 			if (latest == null) {
 				latest = stepExecution;
 			}
@@ -291,49 +278,22 @@ public class SimpleJobRepository implements JobRepository {
 				latest = stepExecution;
 			}
 		}
-		if (latest != null) {
-			ExecutionContext executionContext = ecDao.getExecutionContext(latest);
-			latest.setExecutionContext(executionContext);
-		}
 		return latest;
 	}
 
 	/**
 	 * @return number of executions of the step within given job instance
 	 */
-	public int getStepExecutionCount(JobInstance jobInstance, String stepName) {
+	public int getStepExecutionCount(JobInstance jobInstance, Step step) {
 		int count = 0;
-		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
-		for (JobExecution jobExecution : jobExecutions) {
-			if (stepExecutionDao.getStepExecution(jobExecution, stepName) != null) {
+		List jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
+		for (Iterator iterator = jobExecutions.iterator(); iterator.hasNext();) {
+			JobExecution jobExecution = (JobExecution) iterator.next();
+			if (stepExecutionDao.getStepExecution(jobExecution, step) != null) {
 				count++;
 			}
 		}
 		return count;
-	}
-	
-	/* 
-	 * Check to determine whether or not the JobExecution that is the parent of the provided
-	 * StepExecution has been interrupted.  If, after synchronizing the status with the database,
-	 * the status has been updated to STOPPING, then the job has been interrupted.
-	 * 
-	 * @param stepExecution
-	 */
-	private void checkForInterruption(StepExecution stepExecution){
-		JobExecution jobExecution = stepExecution.getJobExecution();
-		jobExecutionDao.synchronizeStatus(jobExecution);
-		if(jobExecution.getStatus() == BatchStatus.STOPPING){
-			stepExecution.setTerminateOnly();
-		}
-	}
-
-	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobName, jobParameters);
-		if (jobInstance == null) {
-			return null;
-		}
-		return jobExecutionDao.getLastJobExecution(jobInstance);
-		
 	}
 
 }

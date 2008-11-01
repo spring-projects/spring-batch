@@ -19,12 +19,12 @@ import java.util.Collection;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.support.MapJobRegistry;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
 import org.springframework.batch.core.job.JobSupport;
-import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.repository.DuplicateJobException;
+import org.springframework.batch.core.repository.NoSuchJobException;
 
 /**
  * @author Dave Syer
@@ -89,7 +89,7 @@ public class MapJobRegistryTests extends TestCase {
 		JobFactory jobFactory = new ReferenceJobFactory(new JobSupport("foo"));
 		registry.register(jobFactory);
 		registry.register(new ReferenceJobFactory(new JobSupport("bar")));
-		Collection<String> configurations = registry.getJobNames();
+		Collection configurations = registry.getJobNames();
 		assertEquals(2, configurations.size());
 		assertTrue(configurations.contains(jobFactory.getJobName()));
 	}

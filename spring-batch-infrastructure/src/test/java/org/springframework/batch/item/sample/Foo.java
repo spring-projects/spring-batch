@@ -3,18 +3,11 @@ package org.springframework.batch.item.sample;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Id;
-
 /**
  * Simple domain object for testing purposes.
  */
-@Entity
-@Table(name = "T_FOOS")
 public class Foo {
 	
-	@Id
 	private int id;
 	private String name;
 	private int value;

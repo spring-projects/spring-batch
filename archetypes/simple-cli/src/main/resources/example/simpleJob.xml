@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<description>Example job to get you started. It provides a skeleton for a typical batch application.</description>
+	
+	<import resource="classpath:/simple-job-launcher-context.xml"/>
+
+	<bean id="job1" parent="simpleJob">
+		<property name="steps">
+			<list>
+				<bean id="step1" parent="simpleStep">
+					<property name="itemReader">
+						<bean class="example.ExampleItemReader" />
+					</property>
+					<property name="itemWriter">
+						<bean class="example.ExampleItemWriter" />
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+</beans>

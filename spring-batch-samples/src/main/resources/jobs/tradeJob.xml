@@ -16,15 +16,18 @@
 				<bean id="step1" parent="simpleStep">
 					<property name="transactionAttribute" value="PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED"/>
 					<property name="streams" ref="fileItemReader" />
-					<property name="itemReader" ref="fileItemReader" />
-					<property name="itemProcessor">
-						<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-							<constructor-arg ref="tradeValidator" />
+					<property name="itemReader">
+						<bean
+							class="org.springframework.batch.item.validator.ValidatingItemReader">
+							<property name="itemReader"
+								ref="fileItemReader" />
+							<property name="validator"
+								ref="tradeValidator" />
 						</bean>
 					</property>
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeWriter"
+							class="org.springframework.batch.sample.item.writer.TradeWriter"
 							p:dao-ref="tradeDao" />
 					</property>
 				</bean>
@@ -33,7 +36,7 @@
 						ref="tradeSqlItemReader" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.CustomerUpdateWriter"
+							class="org.springframework.batch.sample.item.writer.CustomerUpdateWriter"
 							p:dao-ref="customerDao" />
 					</property>
 				</bean>
@@ -42,7 +45,7 @@
 						ref="customerSqlItemReader" />
 					<property name="itemWriter">
 						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdateWriter"
+							class="org.springframework.batch.sample.item.writer.CustomerCreditUpdateWriter"
 							p:dao-ref="customerReportItemWriter" />
 					</property>
 				</bean>
@@ -57,7 +60,7 @@
 			value="SELECT id, quantity, price, customer from TRADE" />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.domain.trade.internal.TradeRowMapper" />
+				class="org.springframework.batch.sample.mapping.TradeRowMapper" />
 		</property>
 	</bean>
 
@@ -68,7 +71,7 @@
 			value="SELECT id, name, credit FROM customer " />
 		<property name="mapper">
 			<bean
-				class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
+				class="org.springframework.batch.sample.mapping.CustomerCreditRowMapper" />
 		</property>
 	</bean>
 

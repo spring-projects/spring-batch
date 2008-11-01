@@ -22,11 +22,11 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.configuration.DuplicateJobException;
 import org.springframework.batch.core.configuration.JobFactory;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.ListableJobRegistry;
-import org.springframework.batch.core.launch.NoSuchJobException;
+import org.springframework.batch.core.repository.DuplicateJobException;
+import org.springframework.batch.core.repository.NoSuchJobException;
 import org.springframework.util.Assert;
 
 /**
@@ -38,7 +38,7 @@ import org.springframework.util.Assert;
  */
 public class MapJobRegistry implements ListableJobRegistry {
 
-	private Map<String, JobFactory> map = new HashMap<String, JobFactory>();
+	private Map map = new HashMap();
 
 	/*
 	 * (non-Javadoc)
@@ -86,9 +86,9 @@ public class MapJobRegistry implements ListableJobRegistry {
 	 * (non-Javadoc)
 	 * @see org.springframework.batch.container.common.configuration.ListableJobConfigurationRegistry#getJobConfigurations()
 	 */
-	public Collection<String> getJobNames() {
+	public Collection getJobNames() {
 		synchronized (map) {
-			return Collections.unmodifiableCollection(new HashSet<String>(map.keySet()));
+			return Collections.unmodifiableCollection(new HashSet(map.keySet()));
 		}
 	}
 

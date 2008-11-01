@@ -13,33 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.core.step.tasklet;
 
-import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.ExitStatus;
-import org.springframework.core.AttributeAccessor;
 
 /**
- * Strategy for processing in a step.
+ * Interface for encapsulating processing logic that is not natural to split
+ * into read-(transform)-write phases, such as invoking a system command or a
+ * stored procedure.<br/>
  * 
+ * Since the batch framework has no visibility inside the {@link #execute()}
+ * method, developers should consider implementing {@link StepExecutionListener} and
+ * check the {@link StepExecution#isTerminateOnly()} value for long lasting
+ * processes to enable prompt termination of processing on user request.<br/>
+ * 
+ * It is expected the read-(transform)-write separation will be appropriate for
+ * most cases and developers should implement {@link ItemReader} and
+ * {@link ItemWriter} interfaces then (typically extending or composing provided
+ * implementations).<br/>
+ * 
+ * @author Lucas Ward
  * @author Dave Syer
+ * @author Robert Kasanicky
  * 
  */
 public interface Tasklet {
 
 	/**
-	 * Given the current context in the form of a step contribution, do whatever
-	 * is necessary to process this unit inside a transaction. Implementations
-	 * return {@link ExitStatus#FINISHED} if finished. If not they return
-	 * {@link ExitStatus#CONTINUABLE}. On failure throws an exception.
+	 * Encapsulates execution logic of {@link Step}, which is unnatural to
+	 * separate into read-(transform)-write phases.
 	 * 
-	 * @param contribution mutable state to be passed back to update the current
-	 * step execution
-	 * @param attributes attributes shared between invocations but not between
-	 * restarts
-	 * @return an {@link ExitStatus} indicating whether processing is
-	 * continuable.
+	 * @return ExitStatus indicating success or failure
+	 * @see org.springframework.batch.repeat.ExitStatus
 	 */
-	ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception;
+	public ExitStatus execute() throws Exception;
 
 }

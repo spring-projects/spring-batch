@@ -16,67 +16,55 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.batch.sample.domain.trade.Trade;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.sample.domain.Trade;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
+
 public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
 
 	private static final String GET_TRADES = "select ISIN, QUANTITY, PRICE, CUSTOMER from TRADE order by ISIN";
 	private static final String GET_CUSTOMERS = "select NAME, CREDIT from CUSTOMER order by NAME";
 	
-	private List<Customer> customers;
-	private List<Trade> trades;
+	private List customers;
+	private List trades;
 	private int activeRow = 0;
 	
-	private SimpleJdbcTemplate simpleJdbcTemplate;
-	private Map<String, Double> credits = new HashMap<String, Double>();
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	private JdbcOperations jdbcTemplate;
+	private Map credits = new HashMap();
+	
+	/**
+	 * @param jdbcTemplate the jdbcTemplate to set
+	 */
+	public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
 	}
 	
-	@Before
-	public void onSetUp() throws Exception {
-		simpleJdbcTemplate.update("delete from TRADE");
-		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from customer");
-		for (Map<String, Object> map : list) {
-			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
+	/* (non-Javadoc)
+	 * @see org.springframework.test.AbstractSingleSpringContextTests#onSetUp()
+	 */
+	protected void onSetUp() throws Exception {
+		super.onSetUp();
+		jdbcTemplate.update("delete from TRADE");
+		List list = jdbcTemplate.queryForList("select name, CREDIT from customer");
+		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+			Map map = (Map) iterator.next();
+			credits.put(map.get("NAME"), new Double(((Number)map.get("CREDIT")).doubleValue()));
 		}
 	}
 	
-	@After
-	public void tearDown() throws Exception {
-		simpleJdbcTemplate.update("delete from TRADE");
-	}
-
-	@Test
 	public void testLaunchJob() throws Exception{
 		super.testLaunchJob();
 	}
@@ -85,22 +73,22 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		
 		// assertTrue(((Resource)applicationContext.getBean("customerFileLocator")).exists());
 		
-		customers = Arrays.asList(new Customer("customer1", (credits.get("customer1") - 98.34)),
-				new Customer("customer2", (credits.get("customer2") - 18.12 - 12.78)),
-				new Customer("customer3", (credits.get("customer3") - 109.25)),
-				new Customer("customer4", credits.get("customer4") - 123.39));
+		customers = new ArrayList() {{add(new Customer("customer1", (((Double)credits.get("customer1")).doubleValue() - 98.34)));
+			add(new Customer("customer2", (((Double)credits.get("customer2")).doubleValue() - 18.12 - 12.78)));
+			add(new Customer("customer3", (((Double)credits.get("customer3")).doubleValue() - 109.25)));
+			add(new Customer("customer4", (((Double)credits.get("customer4")).doubleValue() - 123.39)));}}; 
 
-		trades = Arrays.asList(new Trade("UK21341EAH45", 978, new BigDecimal("98.34"), "customer1"),
-				new Trade("UK21341EAH46", 112, new BigDecimal("18.12"), "customer2"),
-				new Trade("UK21341EAH47", 245, new BigDecimal("12.78"), "customer2"),
-				new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"),
-				new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));
+		trades = new ArrayList() {{add(new Trade("UK21341EAH45", 978, new BigDecimal("98.34"), "customer1"));
+			add(new Trade("UK21341EAH46", 112, new BigDecimal("18.12"), "customer2"));
+			add(new Trade("UK21341EAH47", 245, new BigDecimal("12.78"), "customer2"));
+			add(new Trade("UK21341EAH48", 108, new BigDecimal("109.25"), "customer3"));
+			add(new Trade("UK21341EAH49", 854, new BigDecimal("123.39"), "customer4"));}};
 			
 		// check content of the trade table
-		simpleJdbcTemplate.getJdbcOperations().query(GET_TRADES, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_TRADES, new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
-				Trade trade = trades.get(activeRow++);
+				Trade trade = (Trade)trades.get(activeRow++);
 				
 				assertTrue(trade.getIsin().equals(rs.getString(1)));
 				assertTrue(trade.getQuantity() == rs.getLong(2));
@@ -113,10 +101,10 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		
 		// check content of the customer table
 		activeRow = 0;
-		simpleJdbcTemplate.getJdbcOperations().query(GET_CUSTOMERS, new RowCallbackHandler() {
+		jdbcTemplate.query(GET_CUSTOMERS, new RowCallbackHandler() {
 
 			public void processRow(ResultSet rs) throws SQLException {
-				Customer customer = customers.get(activeRow++);
+				Customer customer = (Customer)customers.get(activeRow++);
 				
 				assertEquals(customer.getName(),rs.getString(1));
 				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
@@ -134,7 +122,7 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 	protected void validatePreConditions() {
 		assertTrue(((Resource)applicationContext.getBean("fileLocator")).exists());
 	}
-
+	
 	private static class Customer {
 		private String name;
 		private double credit;

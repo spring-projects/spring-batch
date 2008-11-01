@@ -55,7 +55,7 @@ public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
 		jobInstance = new JobInstance(new Long(0), jobParameters, "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
-		stepExecution = jobExecution.createStepExecution(step.getName());
+		stepExecution = jobExecution.createStepExecution(step);
 		policy.beforeStep(stepExecution);
 
 	}

@@ -23,14 +23,23 @@ import org.springframework.util.Assert;
  */
 public class JobParametersBuilder {
 
-	private final Map<String, JobParameter> parameterMap;
+	private final Map stringMap;
+
+	private final Map longMap;
+	
+	private final Map doubleMap;
+
+	private final Map dateMap;
 
 	/**
 	 * Default constructor. Initializes the builder
 	 */
 	public JobParametersBuilder() {
 
-		this.parameterMap = new LinkedHashMap<String, JobParameter>();
+		this.stringMap = new LinkedHashMap();
+		this.longMap = new LinkedHashMap();
+		this.doubleMap = new LinkedHashMap();
+		this.dateMap = new LinkedHashMap();
 	}
 
 	/**
@@ -42,7 +51,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addString(String key, String parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		parameterMap.put(key, new JobParameter(parameter));
+		stringMap.put(key, parameter);
 		return this;
 	}
 
@@ -55,7 +64,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addDate(String key, Date parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		parameterMap.put(key, new JobParameter(parameter));
+		dateMap.put(key, new Date(parameter.getTime()));
 		return this;
 	}
 
@@ -68,7 +77,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addLong(String key, Long parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		parameterMap.put(key, new JobParameter(parameter));
+		longMap.put(key, parameter);
 		return this;
 	}
 	
@@ -81,7 +90,7 @@ public class JobParametersBuilder {
 	 */
 	public JobParametersBuilder addDouble(String key, Double parameter) {
 		Assert.notNull(parameter, "Parameter must not be null.");
-		parameterMap.put(key, new JobParameter(parameter));
+		doubleMap.put(key, parameter);
 		return this;
 	}
 
@@ -89,9 +98,9 @@ public class JobParametersBuilder {
 	 * Conversion method that takes the current state of this builder and
 	 * returns it as a JobruntimeParameters object.
 	 * 
-	 * @return a valid JobParameters object.
+	 * @return a valid JobRuntimeParameters object.
 	 */
 	public JobParameters toJobParameters() {
-		return new JobParameters(parameterMap);
+		return new JobParameters(stringMap, longMap, doubleMap, dateMap);
 	}
 }

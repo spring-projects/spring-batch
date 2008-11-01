@@ -111,8 +111,8 @@ public class FixedLengthTokenizer extends AbstractLineTokenizer {
 	 * @throws IncorrectLineLengthException if line length is greater than or
 	 * less than the max range set.
 	 */
-	protected List<String> doTokenize(String line) {
-		List<String> tokens = new ArrayList<String>(ranges.length);
+	protected List doTokenize(String line) {
+		List tokens = new ArrayList(ranges.length);
 		int lineLength;
 		String token;
 

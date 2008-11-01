@@ -21,7 +21,18 @@
 							value="trade" />
 						<property name="resource"
 							value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
-						<property name="unmarshaller" ref="tradeMarshaller"/>
+						<property name="fragmentDeserializer">
+							<bean
+								class="org.springframework.batch.item.xml.oxm.UnmarshallingEventReaderDeserializer">
+								<constructor-arg>
+									<bean
+										class="org.springframework.oxm.xstream.XStreamMarshaller">
+										<property name="aliases"
+											ref="aliases" />
+									</bean>
+								</constructor-arg>
+							</bean>
+						</property>
 					</bean>
 				</property>
 				<property name="itemWriter" ref="tradeStaxWriter" />
@@ -33,19 +44,25 @@
 		id="tradeStaxWriter">
 		<property name="resource"
 			value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
-		<property name="marshaller" ref="tradeMarshaller" />
+		<property name="serializer" ref="tradeMarshallingSerializer" />
 		<property name="rootTagName" value="trades" />
 		<property name="overwriteOutput" value="true" />
 	</bean>
-	
-	<bean id="tradeMarshaller"
-		class="org.springframework.oxm.xstream.XStreamMarshaller">
-		<property name="aliases" ref="aliases" />
+
+	<bean
+		class="org.springframework.batch.item.xml.oxm.MarshallingEventWriterSerializer"
+		id="tradeMarshallingSerializer">
+		<constructor-arg>
+			<bean
+				class="org.springframework.oxm.xstream.XStreamMarshaller">
+				<property name="aliases" ref="aliases" />
+			</bean>
+		</constructor-arg>
 	</bean>
 
 	<util:map id="aliases">
 		<entry key="trade"
-			value="org.springframework.batch.sample.domain.trade.Trade" />
+			value="org.springframework.batch.sample.domain.Trade" />
 		<entry key="isin" value="java.lang.String" />
 		<entry key="quantity" value="long" />
 		<entry key="price" value="java.math.BigDecimal" />

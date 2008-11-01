@@ -25,14 +25,12 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.integration.annotation.MessageEndpoint;
-import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.annotation.Handler;
 
 /**
  * @author Dave Syer
  * 
  */
-@MessageEndpoint
 public class StepExecutionMessageHandler {
 
 	private Step step;
@@ -60,7 +58,7 @@ public class StepExecutionMessageHandler {
 		this.jobRepository = jobRepository;
 	}
 
-	@ServiceActivator
+	@Handler
 	public JobExecutionRequest handle(JobExecutionRequest request) {
 
 		// Hand off immediately if the job has already failed
@@ -71,10 +69,10 @@ public class StepExecutionMessageHandler {
 		JobExecution jobExecution = request.getJobExecution();
 		JobInstance jobInstance = jobExecution.getJobInstance();
 
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
+		StepExecution stepExecution = jobExecution.createStepExecution(step);
 		try {
 
-			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
+			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step);
 
 			// Even if it completed successfully we want to pass on the output
 			// attributes, so set up the execution context here if it is
@@ -90,7 +88,7 @@ public class StepExecutionMessageHandler {
 				if (!isRestart(jobInstance, lastStepExecution)) {
 					stepExecution.setExecutionContext(new ExecutionContext());
 				}
-				jobRepository.add(stepExecution);
+
 				step.execute(stepExecution);
 
 			}
@@ -178,7 +176,7 @@ public class StepExecutionMessageHandler {
 			return false;
 		}
 
-		if (jobRepository.getStepExecutionCount(lastStepExecution.getJobExecution().getJobInstance(), step.getName()) < step
+		if (jobRepository.getStepExecutionCount(lastStepExecution.getJobExecution().getJobInstance(), step) < step
 				.getStartLimit()) {
 			// step start count is less than start max, return true
 			return true;

@@ -13,31 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.util.StringUtils;
+import org.springframework.batch.item.file.mapping.FieldSet;
+
 
 /**
- * @author Dave Syer
- *
+ * Class used to create string representing object. Values are separated by
+ * defined delimiter.
+ * 
+ * @author tomas.slanina
+ * 
  */
-public class DelimitedLineAggregator<T> implements LineAggregator<T[]> {
-
+public class DelimitedLineAggregator implements LineAggregator {
 	private String delimiter = ",";
-	
+
 	/**
-	 * Public setter for the delimiter.
-	 * @param delimiter the delimiter to set
+	 * Method used to create string representing object.
+	 * 
+	 * @param fieldSet arrays of strings representing data to be stored
+	 */
+	public String aggregate(FieldSet fieldSet) {
+		StringBuffer buffer = new StringBuffer();
+		String[] args = fieldSet.getValues();
+		for (int i = 0; i < args.length; i++) {
+			buffer.append(args[i]);
+
+			if (i != (args.length - 1)) {
+				buffer.append(delimiter);
+			}
+		}
+
+		return buffer.toString();
+	}
+
+	/**
+	 * Sets the character to be used as a delimiter.
 	 */
 	public void setDelimiter(String delimiter) {
 		this.delimiter = delimiter;
 	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
-	 */
-	public String aggregate(T[] item) {
-		return StringUtils.arrayToDelimitedString(item, delimiter);
-	}
-
 }

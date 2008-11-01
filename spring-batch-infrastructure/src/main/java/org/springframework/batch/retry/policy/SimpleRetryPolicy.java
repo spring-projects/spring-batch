@@ -16,11 +16,8 @@
 
 package org.springframework.batch.retry.policy;
 
-import java.util.Collection;
-import java.util.HashSet;
-
+import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
-import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.context.RetryContextSupport;
 import org.springframework.batch.support.BinaryExceptionClassifier;
 
@@ -41,7 +38,7 @@ import org.springframework.batch.support.BinaryExceptionClassifier;
  * @author Rob Harrop
  * 
  */
-public class SimpleRetryPolicy implements RetryPolicy {
+public class SimpleRetryPolicy extends AbstractStatelessRetryPolicy {
 
 	/**
 	 * The default limit to the number of attempts for a new policy.
@@ -70,12 +67,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 */
 	public SimpleRetryPolicy(int maxAttempts) {
 		super();
-		Collection<Class<? extends Throwable>> classes;
-		classes = new HashSet<Class<? extends Throwable>>();
-		classes.add(Exception.class);
-		setRetryableExceptionClasses(classes);
-		classes = new HashSet<Class<? extends Throwable>>();
-		setFatalExceptionClasses(classes);
+		setRetryableExceptionClasses(new Class[] { Exception.class });
+		setFatalExceptionClasses(new Class[] { Error.class });
 		this.maxAttempts = maxAttempts;
 	}
 
@@ -96,8 +89,12 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * attempts so far is less than the limit.
 	 */
 	public boolean canRetry(RetryContext context) {
-		Throwable t = context.getLastThrowable();
-		return (t == null || retryForException(t)) && context.getRetryCount() < maxAttempts;
+		SimpleRetryContext simpleContext = ((SimpleRetryContext) context);
+		Throwable t = simpleContext.getLastThrowable();
+		// N.B. since the contract is defined to include the initial attempt
+		// in the count, we have to subtract one from the max attempts in this
+		// test
+		return (t == null || retryForException(t)) && simpleContext.getRetryCount() < maxAttempts;
 	}
 
 	/**
@@ -106,8 +103,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * 
 	 * @param retryableExceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setRetryableExceptionClasses(Collection<Class<? extends Throwable>> retryableExceptionClasses) {
-		retryableClassifier.setTypes(retryableExceptionClasses);
+	public final void setRetryableExceptionClasses(Class[] retryableExceptionClasses) {
+		retryableClassifier.setExceptionClasses(retryableExceptionClasses);
 	}
 
 	/**
@@ -117,8 +114,8 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * 
 	 * @param fatalExceptionClasses defaults to {@link Exception}.
 	 */
-	public final void setFatalExceptionClasses(Collection<Class<? extends Throwable>> fatalExceptionClasses) {
-		fatalClassifier.setTypes(fatalExceptionClasses);
+	public final void setFatalExceptionClasses(Class[] fatalExceptionClasses) {
+		fatalClassifier.setExceptionClasses(fatalExceptionClasses);
 	}
 
 	/**
@@ -131,9 +128,9 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * Update the status with another attempted retry and the latest exception.
 	 * 
 	 * @see org.springframework.batch.retry.RetryPolicy#registerThrowable(org.springframework.batch.retry.RetryContext,
-	 * Exception)
+	 * java.lang.Throwable)
 	 */
-	public void registerThrowable(RetryContext context, Exception throwable) {
+	public void registerThrowable(RetryContext context, Throwable throwable) {
 		SimpleRetryContext simpleContext = ((SimpleRetryContext) context);
 		simpleContext.registerThrowable(throwable);
 	}
@@ -142,9 +139,10 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * Get a status object that can be used to track the current operation
 	 * according to this policy. Has to be aware of the latest exception and the
 	 * number of attempts.
-	 * @see org.springframework.batch.retry.RetryPolicy#open(RetryContext)
+	 * @see org.springframework.batch.retry.RetryPolicy#open(org.springframework.batch.retry.RetryCallback,
+	 * RetryContext)
 	 */
-	public RetryContext open(RetryContext parent) {
+	public RetryContext open(RetryCallback callback, RetryContext parent) {
 		return new SimpleRetryContext(parent);
 	}
 
@@ -162,6 +160,6 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * retryable.
 	 */
 	private boolean retryForException(Throwable ex) {
-		return !fatalClassifier.classify(ex) && retryableClassifier.classify(ex);
+		return fatalClassifier.isDefault(ex) && !retryableClassifier.isDefault(ex);
 	}
 }

@@ -33,29 +33,20 @@ import org.springframework.batch.item.ExecutionContext;
  * </p>
  * 
  * @author Lucas Ward
- * @author Dave Syer
  * 
  */
 public interface JobRepository {
 
 	/**
-	 * Check if an instance of this job already exists with the parameters provided.
-	 * 
-	 * @param jobName the name of the job
-	 * @param jobParameters the parameters to match
-	 * @return true if a {@link JobInstance} already exists for this job name and job parameters
-	 */
-	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
-
-	/**
 	 * Find or create a {@link JobExecution} for a given {@link Job} and
-	 * {@link JobParameters}. If the {@link Job} was already executed with these
-	 * {@link JobParameters}, its persisted values (including ID) will be
+	 * {@link JobParameters}. If the {@link Job} was already executed with
+	 * these {@link JobParameters}, its persisted values (including ID) will be
 	 * returned in a new {@link JobInstance}, associated with the
 	 * {@link JobExecution}. If no previous instance is found, the execution
 	 * will be associated with a new {@link JobInstance}
-	 * @param jobName TODO
+	 * 
 	 * @param jobParameters the runtime parameters for the job
+	 * @param job the job the execution should be associated with.
 	 * 
 	 * @return a valid job {@link JobExecution} for the arguments provided
 	 * @throws JobExecutionAlreadyRunningException if there is a
@@ -68,67 +59,57 @@ public interface JobRepository {
 	 * found and was already completed successfully.
 	 * 
 	 */
-	JobExecution createJobExecution(String jobName, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
+	JobExecution createJobExecution(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
 			JobRestartException, JobInstanceAlreadyCompleteException;
 
 	/**
-	 * Update the {@link JobExecution}.
+	 * Save or Update a {@link JobExecution}. If no ID is found a new instance
+	 * will be saved. If an ID does exist it will be updated. The ID should only
+	 * be assigned to a {@link JobExecution} by calling this method - it should
+	 * be left blank on the first call, and assigned by the
+	 * {@link JobRepository}.
 	 * 
 	 * Preconditions: {@link JobExecution} must contain a valid
-	 * {@link JobInstance} and be saved (have an id assigned).
+	 * {@link JobInstance}.
 	 * 
 	 * @param jobExecution
 	 */
-	void update(JobExecution jobExecution);
+	void saveOrUpdate(JobExecution jobExecution);
 
 	/**
-	 * Save the {@link StepExecution}. ID will be assigned - it is not permitted
-	 * that an ID be assigned before calling this method. Instead, it should be
-	 * left blank, to be assigned by a {@link JobRepository}. The
-	 * {@link ExecutionContext} of the {@link StepExecution} is <em>not</em>
-	 * saved: see {@link #updateExecutionContext(StepExecution)}.
+	 * Save or update a {@link StepExecution}. If no ID is found a new instance
+	 * will be created (and saved). If an ID does exist it will be updated. It
+	 * is not advisable that an ID be assigned before calling this method.
+	 * Instead, it should be left blank, to be assigned by a
+	 * {@link JobRepository}. The {@link ExecutionContext} of the
+	 * {@link StepExecution} is <em>not</em> saved: see
+	 * {@link #saveOrUpdateExecutionContext(StepExecution)}.
 	 * 
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * 
 	 * @param stepExecution
 	 */
-	void add(StepExecution stepExecution);
+	void saveOrUpdate(StepExecution stepExecution);
 
 	/**
-	 * Update the {@link StepExecution}.
-	 * 
-	 * Preconditions: {@link StepExecution} must be saved (have an id assigned).
-	 * 
-	 * @param stepExecution
-	 */
-	void update(StepExecution stepExecution);
-
-	/**
-	 * Persist the {@link ExecutionContext} of the given {@link StepExecution}
-	 * and enclosing {@link JobExecution}.
+	 * Save the {@link ExecutionContext} of the given {@link StepExecution}.
+	 * Implementations are allowed to ensure that the {@link StepExecution} is
+	 * already saved by calling {@link #saveOrUpdate(StepExecution)} before
+	 * saving the {@link ExecutionContext}.
 	 * 
 	 * @param stepExecution the {@link StepExecution} containing the
 	 * {@link ExecutionContext} to be saved.
 	 */
-	void updateExecutionContext(StepExecution stepExecution);
+	void saveOrUpdateExecutionContext(StepExecution stepExecution);
 
 	/**
-	 * @param stepName the name of the step execution that might have run.
 	 * @return the last execution of step for the given job instance.
 	 */
-	StepExecution getLastStepExecution(JobInstance jobInstance, String stepName);
+	StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
 
 	/**
-	 * @param stepName the name of the step execution that might have run.
 	 * @return the execution count of the step within the given job instance.
 	 */
-	int getStepExecutionCount(JobInstance jobInstance, String stepName);
-
-	/**
-	 * @param jobName the name of the job that might have run 
-	 * @param jobParameters parameters identifying the {@link JobInstance}
-	 * @return the last execution of job if exists, null otherwise
-	 */
-	JobExecution getLastJobExecution(String jobName, JobParameters jobParameters);
+	int getStepExecutionCount(JobInstance jobInstance, Step step);
 
 }

@@ -2,6 +2,7 @@ package org.springframework.batch.integration.chunk;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 
@@ -14,27 +15,28 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
+import org.springframework.batch.integration.chunk.AsynchronousFailureException;
+import org.springframework.batch.integration.chunk.ChunkMessageChannelItemWriter;
+import org.springframework.batch.integration.chunk.ChunkRequest;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.bus.MessageBus;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.channel.MessageChannel;
 import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.message.Message;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
@@ -43,10 +45,7 @@ import org.springframework.util.StringUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ChunkMessageItemWriterIntegrationTests {
 
-	private ChunkMessageChannelItemWriter<Object> writer = new ChunkMessageChannelItemWriter<Object>();
-
-	@Autowired
-	private MessageBus bus;
+	private ChunkMessageChannelItemWriter writer = new ChunkMessageChannelItemWriter();
 
 	@Autowired
 	@Qualifier("requests")
@@ -54,9 +53,9 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 	@Autowired
 	@Qualifier("replies")
-	private PollableChannel replies;
+	private MessageChannel replies;
 
-	private SimpleStepFactoryBean<Object, Object> factory = new SimpleStepFactoryBean<Object, Object>();
+	private SimpleStepFactoryBean factory;
 
 	private SimpleJobRepository jobRepository;
 
@@ -65,35 +64,38 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Before
 	public void setUp() {
 
-		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
-				new MapStepExecutionDao(), new MapExecutionContextDao());
+		factory = new SimpleStepFactoryBean();
+		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(),
+				new MapJobExecutionDao(), new MapStepExecutionDao());
 		factory.setJobRepository(jobRepository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setBeanName("step");
 		factory.setItemWriter(writer);
 		factory.setCommitInterval(4);
 
-		writer.setInputChannel(replies);
-		writer.setOutputChannel(requests);
+		writer.setReplyChannel(replies);
+		writer.setRequestChannel(requests);
 
 		TestItemWriter.count = 0;
-
+		
 		// Drain queues
-		Message<?> message = replies.receive(10);
-		while (message != null) {
+		Message<?> message = requests.receive(10);
+		while (message!=null) {
+			System.err.println(message);
+			message = requests.receive(10);
+		}
+		message = replies.receive(10);
+		while (message!=null) {
 			System.err.println(message);
 			message = replies.receive(10);
 		}
-		
-		bus.start();
 
 	}
 
 	@After
 	public void tearDown() {
-		while (replies.receive(10L) != null) {
-		}
-		bus.stop();
+		while(requests.receive(10L)!=null) {}
+		while(replies.receive(10L)!=null) {}
 	}
 
 	@Test
@@ -106,32 +108,34 @@ public class ChunkMessageItemWriterIntegrationTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		writer.update(executionContext);
 		writer.open(executionContext);
-		assertEquals(0, executionContext.getLong(ChunkMessageChannelItemWriter.EXPECTED));
-		assertEquals(0, executionContext.getLong(ChunkMessageChannelItemWriter.ACTUAL));
+		assertEquals(0, executionContext
+				.getLong(ChunkMessageChannelItemWriter.EXPECTED));
+		assertEquals(0, executionContext
+				.getLong(ChunkMessageChannelItemWriter.ACTUAL));
 	}
 
 	@Test
 	public void testVanillaIteration() throws Exception {
 
-		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
 		step.execute(stepExecution);
-
+		
 		waitForResults(6, 10);
 
 		assertEquals(6, TestItemWriter.count);
-		assertEquals(6, stepExecution.getReadCount());
+		assertEquals(6, stepExecution.getItemCount().intValue());
 
 	}
 
 	@Test
 	public void testSimulatedRestart() throws Exception {
 
-		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -139,8 +143,10 @@ public class ChunkMessageItemWriterIntegrationTests {
 		StepExecution stepExecution = getStepExecution(step);
 
 		// Set up context with two messages (chunks) in the backlog
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.EXPECTED, 6);
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.ACTUAL, 4);
+		stepExecution.getExecutionContext().putLong(
+				ChunkMessageChannelItemWriter.EXPECTED, 6);
+		stepExecution.getExecutionContext().putLong(
+				ChunkMessageChannelItemWriter.ACTUAL, 4);
 		// And make the back log real
 		requests.send(getSimpleMessage("foo", stepExecution.getJobExecution().getJobId()));
 		requests.send(getSimpleMessage("bar", stepExecution.getJobExecution().getJobId()));
@@ -149,14 +155,14 @@ public class ChunkMessageItemWriterIntegrationTests {
 		waitForResults(8, 10);
 
 		assertEquals(8, TestItemWriter.count);
-		assertEquals(6, stepExecution.getReadCount());
+		assertEquals(6, stepExecution.getItemCount().intValue());
 
 	}
 
 	@Test
 	public void testSimulatedRestartWithBadMessagesFromAnotherJob() throws Exception {
 
-		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -164,31 +170,36 @@ public class ChunkMessageItemWriterIntegrationTests {
 		StepExecution stepExecution = getStepExecution(step);
 
 		// Set up context with two messages (chunks) in the backlog
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.EXPECTED, 3);
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.ACTUAL, 2);
+		stepExecution.getExecutionContext().putLong(
+				ChunkMessageChannelItemWriter.EXPECTED, 3);
+		stepExecution.getExecutionContext().putLong(
+				ChunkMessageChannelItemWriter.ACTUAL, 2);
 		// And make the back log real
 		requests.send(getSimpleMessage("foo", new Long(4321)));
-		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
-		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'wrong job': " + message, message.contains("wrong job"));
+		try {
+			step.execute(stepExecution);
+			fail("Expected UnexpectedJobExecutionException");
+		} catch (UnexpectedJobExecutionException e) {
+			String message = e.getCause().getMessage();
+			assertTrue("Message does not contain 'wrong job': "+message, message.contains("wrong job"));
+		}
 
 		waitForResults(1, 10);
 
 		assertEquals(1, TestItemWriter.count);
-		assertEquals(0, stepExecution.getReadCount());
+		assertEquals(0, stepExecution.getItemCount().intValue());
 
 	}
 
 	/**
-	 * @param jobId
-	 * @param string
+	 * @param jobId 
+	 * @param string 
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
-		ChunkRequest chunk = new ChunkRequest(StringUtils.commaDelimitedListToSet(string), jobId, 0);
+		ChunkRequest chunk = new ChunkRequest(StringUtils
+				.commaDelimitedListToSet(string), jobId, 0);
 		GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(chunk);
 		return message;
 	}
@@ -196,18 +207,19 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testEarlyCompletionSignalledInHandler() throws Exception {
 
-		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,bad,3,4,5,6"))));
 		factory.setCommitInterval(2);
 
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = getStepExecution(step);
-		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
-		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'bad': " + message, message.contains("bad"));
+		try {
+			step.execute(stepExecution);
+			fail("Expected AsynchronousFailureException");
+		} catch (AsynchronousFailureException e) {
+			assertTrue(e.getMessage().contains("bad"));
+		}
 
 		waitForResults(2, 10);
 
@@ -223,7 +235,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testSimulatedRestartWithNoBacklog() throws Exception {
 
-		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,2,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -231,21 +243,26 @@ public class ChunkMessageItemWriterIntegrationTests {
 		StepExecution stepExecution = getStepExecution(step);
 
 		// Set up expectation of three messages (chunks) in the backlog
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.EXPECTED, 6);
-		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.ACTUAL, 3);
+		stepExecution.getExecutionContext().putLong(
+				ChunkMessageChannelItemWriter.EXPECTED, 6);
+		stepExecution.getExecutionContext().putLong(
+				ChunkMessageChannelItemWriter.ACTUAL, 3);
 		/*
 		 * With no backlog we process all the items, but the listener can't
 		 * reconcile the expected number of items with the actual. An infinite
 		 * loop would be bad, so the best we can do is fail as fast as possible.
 		 */
-		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
-		String message = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message did not contain 'timed out': " + message, message.toLowerCase().contains("timed out"));
+		try {
+			step.execute(stepExecution);
+			fail("Expected UnexpectedJobExecutionException");
+		} catch (UnexpectedJobExecutionException e) {
+			String message = e.getCause().getMessage();
+			assertTrue("Message did not contain 'timed out': " + message,
+					message.toLowerCase().contains("timed out"));
+		}
 
 		assertEquals(0, TestItemWriter.count);
-		assertEquals(0, stepExecution.getReadCount());
+		assertEquals(0, stepExecution.getItemCount().intValue());
 
 	}
 
@@ -258,7 +275,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	@Test
 	public void testFailureInStepListener() throws Exception {
 
-		factory.setItemReader(new ListItemReader<String>(Arrays.asList(StringUtils
+		factory.setItemReader(new ListItemReader(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("wait,bad,3,4,5,6"))));
 
 		Step step = (Step) factory.getObject();
@@ -274,10 +291,13 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertTrue(6 >= TestItemWriter.count);
 
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution
+				.getExitStatus().getExitCode());
 
-		String exitDescription = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Exit description does not contain exception type name: " + exitDescription, exitDescription
+		String exitDescription = stepExecution.getExitStatus()
+				.getExitDescription();
+		assertTrue("Exit description does not contain exception type name: "
+				+ exitDescription, exitDescription
 				.contains(AsynchronousFailureException.class.getName()));
 
 	}
@@ -288,24 +308,25 @@ public class ChunkMessageItemWriterIntegrationTests {
 	/**
 	 * @param expected
 	 * @param maxWait
-	 * @throws InterruptedException
+	 * @throws InterruptedException 
 	 */
 	private void waitForResults(int expected, int maxWait) throws InterruptedException {
 		int count = 0;
-		while (TestItemWriter.count < expected && count < maxWait) {
+		while (TestItemWriter.count<expected && count<maxWait) {
 			count++;
 			Thread.sleep(10);
 		}
 	}
 
-	private StepExecution getStepExecution(Step step) throws JobExecutionAlreadyRunningException, JobRestartException,
+	private StepExecution getStepExecution(Step step)
+			throws JobExecutionAlreadyRunningException, JobRestartException,
 			JobInstanceAlreadyCompleteException {
 		SimpleJob job = new SimpleJob();
 		job.setName("job");
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParametersBuilder().addLong(
-				"job.counter", jobCounter++).toJobParameters());
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-		jobRepository.add(stepExecution);
+		JobExecution jobExecution = jobRepository.createJobExecution(job,
+				new JobParametersBuilder().addLong("job.counter", jobCounter++)
+						.toJobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution(step);
 		return stepExecution;
 	}
 

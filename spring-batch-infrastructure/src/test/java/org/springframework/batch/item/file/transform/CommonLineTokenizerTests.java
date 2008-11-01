@@ -17,7 +17,7 @@ public class CommonLineTokenizerTests extends TestCase {
 	 */
 	public void testHasNames() {
 		AbstractLineTokenizer tokenizer = new AbstractLineTokenizer() {
-			protected List<String> doTokenize(String line) {
+			protected List doTokenize(String line) {
 				return null;
 			}
 		};

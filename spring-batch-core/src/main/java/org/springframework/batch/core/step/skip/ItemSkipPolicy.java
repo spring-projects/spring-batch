@@ -29,7 +29,7 @@ public interface ItemSkipPolicy {
 	 * 
 	 * @param t exception encountered while reading
 	 * @param skipCount currently running count of skips
-	 * @return true if processing should continue, false otherwise.
+	 * @return true if reading should continue, false otherwise.
 	 * @throws SkipLimitExceededException if a limit is breached
 	 * @throws IllegalArgumentException if the exception is null
 	 */

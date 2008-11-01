@@ -3,35 +3,30 @@ package org.springframework.batch.item.database;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.database.support.SingleColumnJdbcKeyCollector;
-import org.springframework.batch.item.sample.Foo;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
 
-@RunWith(JUnit4ClassRunner.class)
-@SuppressWarnings("deprecation")
 public class SingleColumnJdbcDrivingQueryItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
 
-	protected ItemReader<Foo> getItemReader() throws Exception {
+	protected ItemReader getItemReader() throws Exception {
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(getDataSource());
-		SingleColumnJdbcKeyCollector<Long> keyCollector = new SingleColumnJdbcKeyCollector<Long>(jdbcTemplate,
+		SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(jdbcTemplate,
 				"SELECT ID from T_FOOS order by ID");
 		keyCollector.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");
-		DrivingQueryItemReader<Long> reader = new DrivingQueryItemReader<Long>();
+		DrivingQueryItemReader reader = new DrivingQueryItemReader();
 		reader.setKeyCollector(keyCollector);
 		reader.setSaveState(true);
-		return new FooItemReader(reader, getDataSource());
+		return new FooItemReader(reader, jdbcTemplate);
 	}
 
-	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
 		FooItemReader fooReader = (FooItemReader) tested;
 		fooReader.close(new ExecutionContext());
 		
-		DrivingQueryItemReader<Long> reader = new DrivingQueryItemReader<Long>();
+		DrivingQueryItemReader reader = new DrivingQueryItemReader();
 		reader.close(new ExecutionContext());
 		
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(getDataSource());
-		SingleColumnJdbcKeyCollector<Long> keyCollector = new SingleColumnJdbcKeyCollector<Long>(jdbcTemplate,
+		SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(jdbcTemplate,
 				"SELECT ID from T_FOOS where ID < 0");
 		
 		reader.setKeyCollector(keyCollector);

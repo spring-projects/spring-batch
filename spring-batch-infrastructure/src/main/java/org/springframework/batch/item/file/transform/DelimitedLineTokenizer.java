@@ -105,9 +105,9 @@ public class DelimitedLineTokenizer extends AbstractLineTokenizer {
 	 * 
 	 * @return the resulting tokens
 	 */
-	protected List<String> doTokenize(String line) {
+	protected List doTokenize(String line) {
 
-		List<String> tokens = new ArrayList<String>();
+		List tokens = new ArrayList();
 
 		// line is never null in current implementation
 		// line is checked in parent: AbstractLineTokenizer.tokenize()

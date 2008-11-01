@@ -1,42 +1,31 @@
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
 import java.util.Comparator;
 
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
-import javax.xml.transform.Source;
 
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.runner.RunWith;
 import org.springframework.batch.item.CommonItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
+import org.springframework.batch.item.xml.EventReaderDeserializer;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.oxm.Unmarshaller;
-import org.springframework.oxm.XmlMappingException;
-import org.springframework.xml.transform.StaxSource;
 
-@RunWith(JUnit4ClassRunner.class)
 public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderTests {
 
-	protected ItemReader<Foo> getItemReader() throws Exception {
-		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();
+	protected ItemReader getItemReader() throws Exception {
+		MultiResourceItemReader multiReader = new MultiResourceItemReader();
 
-		StaxEventItemReader<Foo> reader = new StaxEventItemReader<Foo>();
+		StaxEventItemReader reader = new StaxEventItemReader();
 
 		reader.setFragmentRootElementName("foo");
-		reader.setUnmarshaller(new Unmarshaller() {
-			public Object unmarshal(Source source) throws XmlMappingException, IOException {
-				StaxSource staxSource = (StaxSource) source;
-				XMLEventReader eventReader = staxSource.getXMLEventReader();
+		reader.setFragmentDeserializer(new EventReaderDeserializer() {
+			public Object deserializeFragment(XMLEventReader eventReader) {
 				Attribute attr;
 				try {
 					assertTrue(eventReader.nextEvent().isStartDocument());
@@ -50,12 +39,6 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 				foo.setValue(Integer.parseInt(attr.getValue()));
 				return foo;
 			}
-
-			@SuppressWarnings("unchecked")
-			public boolean supports(Class clazz) {
-				return true;
-			}
-
 		});
 
 		reader.setSaveState(true);
@@ -68,8 +51,8 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 		multiReader.setDelegate(reader);
 		multiReader.setResources(new Resource[] { r1, r2, r3, r4 });
 		multiReader.setSaveState(true);
-		multiReader.setComparator(new Comparator<Resource>() {
-			public int compare(Resource arg0, Resource arg1) {
+		multiReader.setComparator(new Comparator() {
+			public int compare(Object arg0, Object arg1) {
 				return 0; // preserve original ordering
 			}
 		});
@@ -77,12 +60,13 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 		return multiReader;
 	}
 	
-	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
-		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
+	protected void pointToEmptyInput(ItemReader tested) throws Exception {
+		MultiResourceItemReader multiReader = (MultiResourceItemReader) tested;
 		multiReader.close(new ExecutionContext());
 		multiReader.setResources(new Resource[] { new ByteArrayResource("<foos />"
 				.getBytes()) });
 		multiReader.open(new ExecutionContext());
+		
 	}
 
 }

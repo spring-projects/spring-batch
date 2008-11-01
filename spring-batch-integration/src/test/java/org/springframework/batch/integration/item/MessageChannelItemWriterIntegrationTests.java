@@ -18,15 +18,12 @@ package org.springframework.batch.integration.item;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Collections;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
+import org.springframework.integration.channel.MessageChannel;
+import org.springframework.integration.message.Message;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,15 +36,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MessageChannelItemWriterIntegrationTests {
 
 	@Autowired
-	@Qualifier("requests")
-	private PollableChannel channel;
+	private MessageChannel channel;
 	
 	@Autowired
-	private ItemWriter<String> itemWriter;
+	private ItemWriter itemWriter;
 	
 	@Test
 	public void testSend() throws Exception {
-		itemWriter.write(Collections.singletonList("foo"));
+		itemWriter.write("foo");
 		Message<?> message = channel.receive(10);
 		assertNotNull(message);
 		assertEquals("foo", message.getPayload());

@@ -16,13 +16,15 @@
 
 package org.springframework.batch.item;
 
+import org.springframework.batch.item.support.AbstractItemReader;
+
 import junit.framework.TestCase;
 
 
 public class ItemProviderTests extends TestCase {
 
-	ItemReader<String> provider = new ItemReader<String>() {
-		public String read() {
+	ItemReader provider = new AbstractItemReader() {
+		public Object read() {
 			return "foo";
 		}
 	};

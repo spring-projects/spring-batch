@@ -22,32 +22,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.springframework.core.OrderComparator;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 
 /**
  * @author Dave Syer
  * 
  */
-class OrderedComposite<S> {
+class OrderedComposite {
 
-	private List<S> unordered = new ArrayList<S>();
+	private List unordered = new ArrayList();
 
-	@SuppressWarnings("unchecked")
-	private Collection<S> ordered = new TreeSet<S>(new AnnotationAwareOrderComparator());
+	private Collection ordered = new TreeSet(new OrderComparator());
 
-	private List<S> list = new ArrayList<S>();
+	private List list = new ArrayList();
 
 	/**
 	 * Public setter for the listeners.
 	 * 
 	 * @param items
 	 */
-	public void setItems(List<? extends S> items) {
+	public void setItems(Object[] items) {
 		unordered.clear();
 		ordered.clear();
-		for (S s : items) {
-			add(s);
+		for (int i = 0; i < items.length; i++) {
+			add(items[i]);
 		}
 	}
 
@@ -56,7 +55,7 @@ class OrderedComposite<S> {
 	 * 
 	 * @param item
 	 */
-	public void add(S item) {
+	public void add(Object item) {
 		if (item instanceof Ordered) {
 			if (!ordered.contains(item)) {
 				ordered.add(item);
@@ -77,8 +76,8 @@ class OrderedComposite<S> {
 	 * first, followed by any unordered ones.
 	 * @return an iterator over the list of items
 	 */
-	public Iterator<S> iterator() {
-		return new ArrayList<S>(list).iterator();
+	public Iterator iterator() {
+		return new ArrayList(list).iterator();
 	}
 
 	/**
@@ -86,8 +85,8 @@ class OrderedComposite<S> {
 	 * last, after any unordered ones.
 	 * @return an iterator over the list of items
 	 */
-	public Iterator<S> reverse() {
-		ArrayList<S> result = new ArrayList<S>(list);
+	public Iterator reverse() {
+		ArrayList result = new ArrayList(list);
 		Collections.reverse(result);
 		return result.iterator();
 	}

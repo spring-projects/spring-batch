@@ -16,28 +16,18 @@
 
 package org.springframework.batch.core.launch;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.reset;
-import static org.easymock.EasyMock.verify;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import junit.framework.TestCase;
+
+import org.easymock.MockControl;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.task.TaskExecutor;
 
@@ -45,12 +35,13 @@ import org.springframework.core.task.TaskExecutor;
  * @author Lucas Ward
  * 
  */
-public class SimpleJobLauncherTests {
+public class SimpleJobLauncherTests extends TestCase {
 
 	private SimpleJobLauncher jobLauncher;
 
+	private MockControl repositoryControl = MockControl.createControl(JobRepository.class);
+
 	private Job job = new JobSupport("foo") {
-		@Override
 		public void execute(JobExecution execution) {
 			execution.setExitStatus(ExitStatus.FINISHED);
 			return;
@@ -61,68 +52,33 @@ public class SimpleJobLauncherTests {
 
 	private JobRepository jobRepository;
 
-	@Before
-	public void setUp() throws Exception {
+	protected void setUp() throws Exception {
+		super.setUp();
 
 		jobLauncher = new SimpleJobLauncher();
-		jobRepository = createMock(JobRepository.class);
+		jobRepository = (JobRepository) repositoryControl.getMock();
 		jobLauncher.setJobRepository(jobRepository);
 
 	}
 
-	@Test
 	public void testRun() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(null, null);
+		JobExecution jobExecution = new JobExecution(null);
 
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(null);
-		expect(jobRepository.createJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
-		replay(jobRepository);
+		jobRepository.createJobExecution(job, jobParameters);
+		repositoryControl.setReturnValue(jobExecution);
+
+		repositoryControl.replay();
 
 		jobLauncher.afterPropertiesSet();
 		jobLauncher.run(job, jobParameters);
 		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
 
-		verify(jobRepository);
+		repositoryControl.verify();
 	}
 
-	/*
-	 * Non-restartable JobInstance can be run only once - attempt to run
-	 * existing non-restartable JobInstance causes error.
-	 */
-	@Test
-	public void testRunNonRestartableJobInstanceTwice() throws Exception {
-		job = new JobSupport("foo") {
-			@Override
-			public boolean isRestartable() {
-				return false;
-			}
-
-			@Override
-			public void execute(JobExecution execution) {
-				execution.setExitStatus(ExitStatus.FINISHED);
-				return;
-			}
-		};
-
-		testRun();
-		try {
-			reset(jobRepository);
-			expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(
-					new JobExecution(new JobInstance(1L, jobParameters, job.getName())));
-			replay(jobRepository);
-			jobLauncher.run(job, jobParameters);
-			fail("Expected JobRestartException");
-		}
-		catch (JobRestartException e) {
-			// expected
-		}
-		verify(jobRepository);
-	}
-
-	@Test
 	public void testTaskExecutor() throws Exception {
-		final List<String> list = new ArrayList<String>();
+		final List list = new ArrayList();
 		jobLauncher.setTaskExecutor(new TaskExecutor() {
 			public void execute(Runnable task) {
 				list.add("execute");
@@ -133,7 +89,6 @@ public class SimpleJobLauncherTests {
 		assertEquals(1, list.size());
 	}
 
-	@Test
 	public void testRunWithException() throws Exception {
 		job = new JobSupport() {
 			public void execute(JobExecution execution) {
@@ -144,13 +99,11 @@ public class SimpleJobLauncherTests {
 		try {
 			testRun();
 			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("foo", e.getMessage());
 		}
 	}
 
-	@Test
 	public void testRunWithError() throws Exception {
 		job = new JobSupport() {
 			public void execute(JobExecution execution) {
@@ -161,48 +114,26 @@ public class SimpleJobLauncherTests {
 		try {
 			testRun();
 			fail("Expected Error");
-		}
-		catch (RuntimeException e) {
+		} catch (RuntimeException e) {
 			assertEquals("foo", e.getCause().getMessage());
 		}
 	}
 
-	@Test
 	public void testInitialiseWithoutRepository() throws Exception {
 		try {
 			new SimpleJobLauncher().afterPropertiesSet();
 			fail("Expected IllegalArgumentException");
-		}
-		catch (IllegalStateException e) {
+		} catch (IllegalStateException e) {
 			// expected
 			assertTrue("Message did not contain repository: " + e.getMessage(), contains(e.getMessage().toLowerCase(),
-					"repository"));
+			        "repository"));
 		}
 	}
 
-	@Test
 	public void testInitialiseWithRepository() throws Exception {
 		jobLauncher = new SimpleJobLauncher();
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet(); // no error
-	}
-	
-	/**
-	 * Same execution is used if the last found has PAUSED status.
-	 */
-	@Test
-	public void testResumePausedInstance() throws Exception {
-		long id = 9;
-		JobExecution jobExecution = new JobExecution(null, id);
-		jobExecution.pause();
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
-		replay(jobRepository);
-	
-		jobLauncher.afterPropertiesSet();
-		JobExecution returned = jobLauncher.run(job, jobParameters);
-		assertEquals(jobExecution, returned);
-		
-		verify(jobRepository);
 	}
 
 	private boolean contains(String str, String searchStr) {

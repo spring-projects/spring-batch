@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.util.Collection;
-
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -29,10 +27,6 @@ import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
- * An {@link ExceptionHandler} that is aware of the retry context so that it can
- * distinguish between a fatal exception and one that can be retried. Delegates
- * the actual exception handling to another {@link ExceptionHandler}.
- * 
  * @author Dave Syer
  * 
  */
@@ -42,8 +36,6 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 * Attribute key, whose existence signals an exhausted retry.
 	 */
 	private static final String EXHAUSTED = SimpleRetryExceptionHandler.class.getName() + ".RETRY_EXHAUSTED";
-	
-	private static final Log logger = LogFactory.getLog(SimpleRetryExceptionHandler.class);
 
 	final private RetryPolicy retryPolicy;
 
@@ -51,49 +43,42 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 
 	final private BinaryExceptionClassifier fatalExceptionClassifier;
 
-	/**
-	 * Create an exception handler from its mandatory properties.
-	 * 
-	 * @param retryPolicy the retry policy that will be under effect when an
-	 * exception is encountered
-	 * @param exceptionHandler the delegate to use if an exception actually
-	 * needs to be handled
-	 * @param fatalExceptionClasses
-	 */
-	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Collection<Class<? extends Throwable>> fatalExceptionClasses) {
-		this.retryPolicy = retryPolicy;
-		this.exceptionHandler = exceptionHandler;
-		this.fatalExceptionClassifier = new BinaryExceptionClassifier();
-		fatalExceptionClassifier.setTypes(fatalExceptionClasses);
-	}
+	private static final Log logger = LogFactory.getLog(SimpleRetryExceptionHandler.class);
 
 	/**
-	 * Check if the exception is going to be retried, and veto the handling if
-	 * it is. If retry is exhausted or the exception is on the fatal list, then
-	 * handle using the delegate.
-	 * 
-	 * @see ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
+	 * @param retryPolicy
+	 * @param exceptionHandler
+	 * @param classes 
+	 */
+	public SimpleRetryExceptionHandler(RetryPolicy retryPolicy, ExceptionHandler exceptionHandler, Class[] classes) {
+		this.retryPolicy = retryPolicy;
+		this.exceptionHandler = exceptionHandler;
+		this.fatalExceptionClassifier =  new BinaryExceptionClassifier();
+		fatalExceptionClassifier.setExceptionClasses(classes);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.repeat.exception.handler.ExceptionHandler#handleException(org.springframework.batch.repeat.RepeatContext,
 	 * java.lang.Throwable)
 	 */
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 		// Only bother to check the delegate exception handler if we know that
 		// retry is exhausted
-		if (fatalExceptionClassifier.classify(throwable) || context.hasAttribute(EXHAUSTED)) {
+		if (!fatalExceptionClassifier.isDefault(throwable) || context.hasAttribute(EXHAUSTED)) {
 			exceptionHandler.handleException(context, throwable);
 		}
 		else {
-			logger.debug("handled non-fatal exception", throwable);
+			logger .debug("handled non-fatal exception", throwable);
 		}
 	}
 
-	/**
-	 * If retry is exhausted set up some state in the context that can be used
-	 * to signal that the exception should be handled.
-	 * 
+	/*
+	 * (non-Javadoc)
 	 * @see org.springframework.batch.retry.RetryListener#close(org.springframework.batch.retry.RetryContext,
 	 * org.springframework.batch.retry.RetryCallback, java.lang.Throwable)
 	 */
-	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
+	public void close(RetryContext context, RetryCallback callback, Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
 			getRepeatContext().setAttribute(EXHAUSTED, "true");
 		}

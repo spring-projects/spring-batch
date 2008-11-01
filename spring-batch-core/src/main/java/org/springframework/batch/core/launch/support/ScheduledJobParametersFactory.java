@@ -19,11 +19,11 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.converter.JobParametersConverter;
@@ -51,7 +51,8 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 
 		JobParametersBuilder propertiesBuilder = new JobParametersBuilder();
 
-		for (Entry<Object, Object> entry : props.entrySet()) {
+		for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
+			Entry entry = (Entry) it.next();
 			if (entry.getKey().equals(SCHEDULE_DATE_KEY)) {
 				Date scheduleDate;
 				try {
@@ -79,15 +80,15 @@ public class ScheduledJobParametersFactory implements JobParametersConverter {
 			return new Properties();
 		}
 
-		Map<String, JobParameter> parameters = params.getParameters();
+		Map parameters = params.getParameters();
 		Properties result = new Properties();
-		for (Entry<String, JobParameter> entry : parameters.entrySet()) {
-			String key = entry.getKey();
-			JobParameter jobParameter = entry.getValue();
+		for (Iterator iterator = parameters.entrySet().iterator(); iterator.hasNext();) {
+			Entry entry = (Entry) iterator.next();
+			String key = (String) entry.getKey();
 			if (key.equals(SCHEDULE_DATE_KEY)) {
-				result.setProperty(key, dateFormat.format(jobParameter.getValue()));
+				result.setProperty(key, dateFormat.format(entry.getValue()));
 			} else {
-				result.setProperty(key, "" + jobParameter.getValue());
+				result.setProperty(key, "" + entry.getValue());
 			}
 		}
 		return result;
