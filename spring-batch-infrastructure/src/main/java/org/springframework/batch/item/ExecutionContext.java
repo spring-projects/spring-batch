@@ -228,8 +228,13 @@ public class ExecutionContext implements Serializable {
 	 * @return The value represented by the given key
 	 */
 	public Object get(String key) {
-
-		return map.get(key);
+		Object value = map.get(key);
+		if (value == Constants.NULL) {
+			return null;
+		}
+		else {
+			return value;
+		}
 	}
 
 	/**

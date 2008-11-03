@@ -116,6 +116,7 @@ public class ExecutionContextTests {
 	public void testPutNull(){
 		//putting null should work
 		context.put("1", null);
+		assertNull(context.get("1"));
 	}
 	
 	@Test
