@@ -262,7 +262,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 				retryTemplate.setListeners(retryListeners);
 			}
 			retryTemplate.setRetryPolicy(recoveryCallbackRetryPolicy);
-			if (retryPolicy == null && backOffPolicy != null) {
+			if (backOffPolicy != null) {
 				retryTemplate.setBackOffPolicy(backOffPolicy);
 			}
 
