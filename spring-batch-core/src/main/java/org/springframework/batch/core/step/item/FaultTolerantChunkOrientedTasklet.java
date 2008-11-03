@@ -52,8 +52,6 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 
 	final static private String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
-	final private RepeatOperations repeatOperations;
-
 	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
@@ -61,8 +59,7 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
 
 		super(itemReader, itemProcessor, itemWriter, retryTemplate, readSkipPolicy, processSkipPolicy, writeSkipPolicy,
-				rollbackClassifier);
-		this.repeatOperations = chunkOperations;
+				rollbackClassifier, chunkOperations);
 	}
 
 	/**
@@ -85,7 +82,7 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 
 		if (inputs.isEmpty() && outputs.isEmpty()) {
 
-			result = repeatOperations.iterate(new RepeatCallback() {
+			result = getRepeatOperations().iterate(new RepeatCallback() {
 				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 					I item = read(contribution, skippedReads);
 

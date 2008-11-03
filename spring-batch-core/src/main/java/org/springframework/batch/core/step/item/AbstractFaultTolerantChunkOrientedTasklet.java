@@ -14,6 +14,7 @@ import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -36,7 +37,7 @@ import org.springframework.core.AttributeAccessor;
  * @author Robert Kasanicky
  */
 public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends AbstractItemOrientedTasklet<I, O> {
-	
+
 	final static protected String SKIPPED_INPUTS_KEY = "SKIPPED_INPUTS_KEY";
 
 	final static protected String SKIPPED_OUTPUTS_KEY = "SKIPPED_OUTPUTS_KEY";
@@ -44,6 +45,8 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 	final static protected String SKIPPED_READS_KEY = "SKIPPED_READS_KEY";
 
 	final private RetryOperations retryOperations;
+
+	final private RepeatOperations repeatOperations;
 
 	final private ItemSkipPolicy writeSkipPolicy;
 
@@ -56,7 +59,8 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 	public AbstractFaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter,
 			RetryOperations retryOperations, ItemSkipPolicy readSkipPolicy, ItemSkipPolicy processSkipPolicy,
-			ItemSkipPolicy writeSkipPolicy, Classifier<Throwable, Boolean> rollbackClassifier) {
+			ItemSkipPolicy writeSkipPolicy, Classifier<Throwable, Boolean> rollbackClassifier,
+			RepeatOperations repeatTemplate) {
 
 		super(itemReader, itemProcessor, itemWriter);
 		this.retryOperations = retryOperations;
@@ -64,10 +68,15 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 		this.processSkipPolicy = processSkipPolicy;
 		this.writeSkipPolicy = writeSkipPolicy;
 		this.rollbackClassifier = rollbackClassifier;
+		this.repeatOperations = repeatTemplate;
 	}
 
 	protected ItemSkipPolicy getReadSkipPolicy() {
 		return readSkipPolicy;
+	}
+
+	protected RepeatOperations getRepeatOperations() {
+		return repeatOperations;
 	}
 
 	/**

@@ -34,8 +34,6 @@ import org.springframework.core.AttributeAccessor;
 public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 		AbstractFaultTolerantChunkOrientedTasklet<I, O> {
 
-	final private RepeatOperations repeatOperations;
-
 	public NonbufferingFaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter,
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
@@ -43,8 +41,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
 
 		super(itemReader, itemProcessor, itemWriter, retryTemplate, readSkipPolicy, processSkipPolicy, writeSkipPolicy,
-				rollbackClassifier);
-		this.repeatOperations = chunkOperations;
+				rollbackClassifier, chunkOperations);
 	}
 
 	/**
@@ -56,7 +53,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 		final List<I> inputs = new ArrayList<I>();
 
 		final List<Exception> skippedReads = getBufferedList(attributes, SKIPPED_READS_KEY);
-		result = repeatOperations.iterate(new RepeatCallback() {
+		result = getRepeatOperations().iterate(new RepeatCallback() {
 
 			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
 				I item = read(contribution, skippedReads);
