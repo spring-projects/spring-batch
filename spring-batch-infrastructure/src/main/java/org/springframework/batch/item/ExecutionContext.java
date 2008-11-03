@@ -34,6 +34,14 @@ import org.springframework.util.Assert;
  */
 public class ExecutionContext implements Serializable {
 
+	/**
+	 * Underlying {@link ConcurrentHashMap} does not accept <code>null</code>
+	 * values, so we convert it to a private constant under the covers.
+	 */
+	private static enum Constants {
+		NULL
+	};
+
 	private volatile boolean dirty = false;
 
 	private final Map<String, Object> map;
@@ -111,6 +119,9 @@ public class ExecutionContext implements Serializable {
 	public void put(String key, Object value) {
 		if (value != null) {
 			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+		}
+		else {
+			value = Constants.NULL;
 		}
 		dirty = true;
 		map.put(key, value);
@@ -232,6 +243,10 @@ public class ExecutionContext implements Serializable {
 	private Object readAndValidate(String key, Class<?> type) {
 
 		Object value = map.get(key);
+
+		if (value == Constants.NULL) {
+			return null;
+		}
 
 		if (!type.isInstance(value)) {
 			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + type + "], it is ["
