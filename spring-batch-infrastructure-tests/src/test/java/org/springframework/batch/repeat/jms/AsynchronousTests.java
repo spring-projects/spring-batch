@@ -163,6 +163,8 @@ public class AsynchronousTests {
 		// message...
 		Thread.sleep(1000L);
 
+		container.stop();
+
 		// We rolled back so the messages might come in many times...
 		assertTrue(list.size() >= 1);
 
