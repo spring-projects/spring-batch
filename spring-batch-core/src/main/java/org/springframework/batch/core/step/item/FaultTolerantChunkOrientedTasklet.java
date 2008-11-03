@@ -42,18 +42,21 @@ import org.springframework.core.AttributeAccessor;
  * listener is invoked and the skip count incremented. A retryable exception is
  * thus also effectively also implicitly skippable.
  * 
- * <code>ItemProcessor</code> is assumed to be transactional. In case of rollback caused by
- * error on write the processing phase will be repeated.
+ * <code>ItemProcessor</code> is assumed to be transactional. In case of
+ * rollback caused by error on write the processing phase will be repeated.
+ * 
+ * @param <I> input item type
+ * @param <O> output item type
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
  */
-public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolerantChunkOrientedTasklet<I, S> {
+public class FaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolerantChunkOrientedTasklet<I, O> {
 
 	final static private String INPUT_BUFFER_KEY = "INPUT_BUFFER_KEY";
 
 	public FaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
-			ItemProcessor<? super I, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter,
+			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter,
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
 			Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
 			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
@@ -63,10 +66,9 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 	}
 
 	/**
-	 * Get the next item from {@link #read(StepContribution, List)} and if not
-	 * null pass the item to {@link #write(List, StepContribution, Map)}. If the
-	 * {@link ItemProcessor} returns null, the write is omitted and another item
-	 * taken from the reader.
+	 * Read the next chunk of items and if not empty pass the items one-by-one
+	 * to {@link #process(StepContribution, List, List, Map)} and finally write
+	 * all items by {@link #write(List, StepContribution, Map)}.
 	 * 
 	 * @see org.springframework.batch.core.step.tasklet.Tasklet#execute(org.springframework.batch.core.StepContribution,
 	 * AttributeAccessor)
@@ -74,7 +76,7 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
 		final List<I> inputs = getBufferedList(attributes, INPUT_BUFFER_KEY);
-		final List<S> outputs = new ArrayList<S>();
+		final List<O> outputs = new ArrayList<O>();
 
 		ExitStatus result = ExitStatus.CONTINUABLE;
 
@@ -108,7 +110,7 @@ public class FaultTolerantChunkOrientedTasklet<I, S> extends AbstractFaultTolera
 			process(contribution, inputs, outputs, skippedInputs);
 		}
 
-		Map<S, Exception> skippedOutputs = getBufferedSkips(attributes, SKIPPED_OUTPUTS_KEY);
+		Map<O, Exception> skippedOutputs = getBufferedSkips(attributes, SKIPPED_OUTPUTS_KEY);
 		outputs.removeAll(skippedOutputs.keySet());
 		write(outputs, contribution, skippedOutputs);
 

@@ -154,7 +154,9 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 	}
 
 	/**
-	 * Incorporate retry into the item processor stage.
+	 * Incorporate retry into the item processor stage. If item processor
+	 * returns null for an input item, it is considered filtered and is not
+	 * added to outputs.
 	 * 
 	 * @param inputs the items to process
 	 * @param outputs the items to write

@@ -26,10 +26,10 @@ import org.springframework.core.AttributeAccessor;
  * Note that the implementation relies on {@link Object#equals(Object)}
  * comparisons for recognizing items on retry/skip.
  * 
- * @author Robert Kasanicky
- * 
  * @param <I> input item type
  * @param <O> output item type
+ * 
+ * @author Robert Kasanicky
  */
 public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 		AbstractFaultTolerantChunkOrientedTasklet<I, O> {
@@ -99,7 +99,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 	 * @param contribution current StepContribution holding skipped items count
 	 * @return next item for processing
 	 */
-	private I read(StepContribution contribution, final List<Exception> skipped) throws Exception {
+	protected I read(StepContribution contribution, final List<Exception> skipped) throws Exception {
 
 		try {
 			return doRead();
