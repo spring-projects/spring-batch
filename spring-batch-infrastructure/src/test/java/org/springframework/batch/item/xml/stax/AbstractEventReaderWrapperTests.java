@@ -27,11 +27,9 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import com.sun.xml.internal.stream.events.StartDocumentEvent;
-
 /**
  * @author Lucas Ward
- *
+ * 
  */
 public class AbstractEventReaderWrapperTests extends TestCase {
 
@@ -90,7 +88,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 
 	public void testNextEvent() throws XMLStreamException {
 
-		XMLEvent event = new StartDocumentEvent();
+		XMLEvent event = createMock(XMLEvent.class);
 		expect(xmlEventReader.nextEvent()).andReturn(event);
 		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.nextEvent(), event);
@@ -99,7 +97,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 
 	public void testNextTag() throws XMLStreamException {
 
-		XMLEvent event = new StartDocumentEvent();
+		XMLEvent event = createMock(XMLEvent.class);
 		expect(xmlEventReader.nextTag()).andReturn(event);
 		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.nextTag(), event);
@@ -108,7 +106,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 
 	public void testPeek() throws XMLStreamException {
 
-		XMLEvent event = new StartDocumentEvent();
+		XMLEvent event = createMock(XMLEvent.class);
 		expect(xmlEventReader.peek()).andReturn(event);
 		replay(xmlEventReader);
 		assertEquals(eventReaderWrapper.peek(), event);
@@ -124,7 +122,7 @@ public class AbstractEventReaderWrapperTests extends TestCase {
 		verify(xmlEventReader);
 	}
 
-	private static class StubEventReader extends AbstractEventReaderWrapper{
+	private static class StubEventReader extends AbstractEventReaderWrapper {
 		public StubEventReader(XMLEventReader wrappedEventReader) {
 			super(wrappedEventReader);
 		}
