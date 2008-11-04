@@ -130,12 +130,6 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		Assert.notNull(stepExecution.getStatus(), "StepExecution status cannot be null.");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.springframework.batch.execution.repository.dao.StepExecutionDao#
-	 * updateStepExecution(org.springframework.batch.core.domain.StepExecution)
-	 */
 	public void updateStepExecution(StepExecution stepExecution) {
 
 		validateStepExecution(stepExecution);
@@ -151,7 +145,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		// someone is already trying to do it.
 		synchronized (stepExecution) {
 
-			Integer version = new Integer(stepExecution.getVersion().intValue() + 1);
+			Integer version = stepExecution.getVersion() + 1;
 			Object[] parameters = new Object[] { stepExecution.getStartTime(), stepExecution.getEndTime(),
 					stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getReadCount(),
 					stepExecution.getFilterCount(), stepExecution.getWriteCount(),

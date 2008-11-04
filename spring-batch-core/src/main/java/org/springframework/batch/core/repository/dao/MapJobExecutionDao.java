@@ -12,6 +12,7 @@ import org.apache.commons.lang.SerializationUtils;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.util.Assert;
 
 /**
@@ -68,9 +69,18 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	public void updateJobExecution(JobExecution jobExecution) {
 		Long id = jobExecution.getId();
 		Assert.notNull(id, "JobExecution is expected to have an id (should be saved already)");
-		Assert.notNull(executionsById.get(id), "JobExecution must already be saved");
-		jobExecution.incrementVersion();
-		executionsById.put(id, copy(jobExecution));
+		JobExecution persistedExecution = executionsById.get(id);
+		Assert.notNull(persistedExecution, "JobExecution must already be saved");
+
+		synchronized (jobExecution) {
+			if (!persistedExecution.getVersion().equals(jobExecution.getVersion())){
+				throw new OptimisticLockingFailureException("Attempt to update step execution id=" + id
+						+ " with wrong version (" + jobExecution.getVersion() + "), where current version is "
+						+ persistedExecution.getVersion());
+			}
+			jobExecution.incrementVersion();
+			executionsById.put(id, copy(jobExecution));
+		}
 	}
 
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {

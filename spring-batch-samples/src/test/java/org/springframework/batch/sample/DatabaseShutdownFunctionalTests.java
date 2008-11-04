@@ -16,9 +16,7 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +57,7 @@ public class DatabaseShutdownFunctionalTests extends AbstractBatchLauncherTests 
 
 		assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
 		assertTrue(jobExecution.isRunning());
+		assertNotNull(jobExecution.getVersion());
 
 		jobOperator.stop(jobExecution.getId());
 		

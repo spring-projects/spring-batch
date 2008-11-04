@@ -190,6 +190,7 @@ public abstract class AbstractJobDaoTests {
 
 		// id is invalid
 		JobExecution execution = new JobExecution(jobInstance, (long) 29432);
+		execution.incrementVersion();
 		try {
 			jobExecutionDao.updateJobExecution(execution);
 			fail("Expected NoSuchBatchDomainObjectException");

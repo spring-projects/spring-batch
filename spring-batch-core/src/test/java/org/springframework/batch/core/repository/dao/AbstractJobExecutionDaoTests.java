@@ -1,9 +1,9 @@
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,22 +11,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
 
-	JobExecutionDao dao;
+	protected JobExecutionDao dao;
 
-	JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "execTestJob");
+	protected JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "execTestJob");
 
-	JobExecution execution = new JobExecution(jobInstance);
+	protected JobExecution execution = new JobExecution(jobInstance);
 
 	/**
 	 * @return tested object ready for use
@@ -63,31 +66,30 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		assertEquals(execution, executions.get(0));
 		assertExecutionsAreEqual(execution, executions.get(0));
 	}
-	
+
 	/**
 	 * Executions should be returned in the reverse order they were saved.
 	 */
 	@Transactional
 	@Test
 	public void testFindExecutionsOrdering() {
-		
+
 		List<JobExecution> execs = new ArrayList<JobExecution>();
-		
+
 		for (int i = 0; i < 10; i++) {
 			JobExecution exec = new JobExecution(jobInstance);
 			exec.setCreateTime(new Date(i));
 			execs.add(exec);
 			dao.saveJobExecution(exec);
 		}
-		
+
 		List<JobExecution> retrieved = dao.findJobExecutions(jobInstance);
 		Collections.reverse(retrieved);
-		
-		
+
 		for (int i = 0; i < 10; i++) {
 			assertExecutionsAreEqual(execs.get(i), retrieved.get(i));
 		}
-		
+
 	}
 
 	/**
@@ -162,7 +164,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution value = dao.getLastJobExecution(jobInstance);
 		assertNull(value);
 	}
-	
+
 	/**
 	 * Check the execution is returned
 	 */
@@ -189,7 +191,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		assertEquals(1, values.size());
 		JobExecution value = values.iterator().next();
 		assertEquals(exec, value);
-		assertEquals(5L,  value.getLastUpdated().getTime());
+		assertEquals(5L, value.getLastUpdated().getTime());
 	}
 
 	/**
@@ -201,7 +203,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		Set<JobExecution> values = dao.findRunningJobExecutions("no-such-job");
 		assertEquals(0, values.size());
 	}
-	
+
 	/**
 	 * Check the execution is returned
 	 */
@@ -233,20 +235,51 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution value = dao.getJobExecution(54321L);
 		assertNull(value);
 	}
-	
-	/*
-	 * Check to make sure the executions are equal.  Normally, comparing the id's is 
-	 * sufficient.  However, for testing purposes, especially of a dao, we need to make
-	 * sure all the fields are being stored/retrieved correctly.
+
+	/**
+	 * Exception should be raised when the version of update argument doesn't
+	 * match the version of persisted entity.
 	 */
-	private void assertExecutionsAreEqual(JobExecution lhs, JobExecution rhs){
-		
+	@Transactional
+	@Test
+	public void testConcurrentModificationException() {
+
+		JobExecution exec1 = new JobExecution(jobInstance);
+		dao.saveJobExecution(exec1);
+
+		JobExecution exec2 = new JobExecution(jobInstance); 
+		exec2.setId(exec1.getId());
+
+		exec2.incrementVersion();
+		assertEquals((Integer) 0, exec1.getVersion());
+		assertEquals(exec1.getVersion(), exec2.getVersion());
+
+		dao.updateJobExecution(exec1);
+		assertEquals((Integer) 1, exec1.getVersion());
+
+		try {
+			dao.updateJobExecution(exec2);
+			fail();
+		}
+		catch (OptimisticLockingFailureException e) {
+			// expected
+		}
+
+	} /*
+	 * Check to make sure the executions are equal. Normally, comparing the id's
+	 * is sufficient. However, for testing purposes, especially of a DAO, we
+	 * need to make sure all the fields are being stored/retrieved correctly.
+	 */
+
+	private void assertExecutionsAreEqual(JobExecution lhs, JobExecution rhs) {
+
 		assertEquals(lhs.getId(), rhs.getId());
 		assertEquals(lhs.getStartTime(), rhs.getStartTime());
 		assertEquals(lhs.getStatus(), rhs.getStatus());
 		assertEquals(lhs.getEndTime(), rhs.getEndTime());
 		assertEquals(lhs.getCreateTime(), rhs.getCreateTime());
 		assertEquals(lhs.getLastUpdated(), rhs.getLastUpdated());
+		assertEquals(lhs.getVersion(), rhs.getVersion());
 	}
-	
+
 }
