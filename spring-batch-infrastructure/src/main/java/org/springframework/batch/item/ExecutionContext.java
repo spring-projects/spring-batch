@@ -29,18 +29,13 @@ import org.springframework.util.Assert;
  * for a map that allows optionally for type safety on reads. It also allows for
  * dirty checking by setting a 'dirty' flag whenever any put is called.
  * 
+ * Note that putting <code>null</code> value is equivalent to removing the entry
+ * for the given key.
+ * 
  * @author Lucas Ward
  * @author Douglas Kaminsky
  */
 public class ExecutionContext implements Serializable {
-
-	/**
-	 * Underlying {@link ConcurrentHashMap} does not accept <code>null</code>
-	 * values, so we convert it to a private constant under the covers.
-	 */
-	private static enum Constants {
-		NULL
-	};
 
 	private volatile boolean dirty = false;
 
@@ -111,7 +106,8 @@ public class ExecutionContext implements Serializable {
 	}
 
 	/**
-	 * Add an Object value to the context (must be Serializable).
+	 * Add an Object value to the context (must be Serializable). Putting
+	 * <code>null</code> value for a given key removes the key.
 	 * 
 	 * @param key Key to add to context
 	 * @param value Value to associate with key
@@ -119,12 +115,12 @@ public class ExecutionContext implements Serializable {
 	public void put(String key, Object value) {
 		if (value != null) {
 			Assert.isInstanceOf(Serializable.class, value, "Value: [ " + value + "must be serializable.");
+			map.put(key, value);
 		}
 		else {
-			value = Constants.NULL;
+			map.remove(key);
 		}
 		dirty = true;
-		map.put(key, value);
 	}
 
 	/**
@@ -228,13 +224,7 @@ public class ExecutionContext implements Serializable {
 	 * @return The value represented by the given key
 	 */
 	public Object get(String key) {
-		Object value = map.get(key);
-		if (value == Constants.NULL) {
-			return null;
-		}
-		else {
-			return value;
-		}
+		return map.get(key);
 	}
 
 	/**
@@ -248,10 +238,6 @@ public class ExecutionContext implements Serializable {
 	private Object readAndValidate(String key, Class<?> type) {
 
 		Object value = map.get(key);
-
-		if (value == Constants.NULL) {
-			return null;
-		}
 
 		if (!type.isInstance(value)) {
 			throw new ClassCastException("Value for key=[" + key + "] is not of type: [" + type + "], it is ["
