@@ -15,6 +15,12 @@
  */
 package org.springframework.batch.item.xml.stax;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -23,10 +29,8 @@ import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import static org.easymock.EasyMock.*;
+import org.easymock.EasyMock;
 
-import com.bea.xml.stream.events.StartDocumentEvent;
-import com.bea.xml.stream.util.NamespaceContextImpl;
 
 /**
  * @author Lucas Ward
@@ -47,7 +51,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 
 	public void testAdd() throws XMLStreamException {
 
-		XMLEvent event = new StartDocumentEvent();
+		XMLEvent event =  EasyMock.createMock(XMLEvent.class);
 		xmlEventWriter.add(event);
 		expectLastCall();
 		replay(xmlEventWriter);
@@ -83,7 +87,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 	}
 
 	public void testGetNamespaceContext() {
-		NamespaceContext context = new NamespaceContextImpl();
+		NamespaceContext context = EasyMock.createMock(NamespaceContext.class);
 		expect(xmlEventWriter.getNamespaceContext()).andReturn(context);
 		replay(xmlEventWriter);
 		assertEquals(eventWriterWrapper.getNamespaceContext(), context);
@@ -109,7 +113,7 @@ public class AbstractEventWriterWrapperTests extends TestCase {
 
 	public void testSetNamespaceContext() throws XMLStreamException {
 
-		NamespaceContext context = new NamespaceContextImpl();
+		NamespaceContext context = EasyMock.createMock(NamespaceContext.class);
 		xmlEventWriter.setNamespaceContext(context);
 		expectLastCall().once();
 		replay(xmlEventWriter);

@@ -1,18 +1,16 @@
 package org.springframework.batch.item.database;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import javax.sql.DataSource;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -29,42 +27,56 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = "data-source-context.xml")
 public class HibernateCursorProjectionItemReaderIntegrationTests {
 
-	protected ItemReader<?> reader;
-
 	@Autowired
-	protected DataSource dataSource;
+	private DataSource dataSource;
 
-	@Before
-	public void onSetUp() throws Exception {
-		reader = createItemReader();
-	}
+	private void initializeItemReader(HibernateCursorItemReader<?> reader,
+			String hsqlQuery) throws Exception {
 
-	
-	protected ItemReader<?> createItemReader() throws Exception {
 		LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
 		factoryBean.setDataSource(dataSource);
-		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource("Foo.hbm.xml", getClass()) });
+		factoryBean.setMappingLocations(new Resource[] { new ClassPathResource(
+				"Foo.hbm.xml", getClass()) });
 		factoryBean.afterPropertiesSet();
 
-		SessionFactory sessionFactory = (SessionFactory) factoryBean.getObject();
+		SessionFactory sessionFactory = (SessionFactory) factoryBean
+				.getObject();
 
-		String hsqlQuery = "select f.value, f.name from Foo f";
+		reader.setQueryString(hsqlQuery);
+		reader.setSessionFactory(sessionFactory);
+		reader.afterPropertiesSet();
+		reader.setSaveState(true);
+		reader.open(new ExecutionContext());
 
-		HibernateCursorItemReader<Object> inputSource = new HibernateCursorItemReader<Object>();
-		inputSource.setQueryString(hsqlQuery);
-		inputSource.setSessionFactory(sessionFactory);
-		inputSource.afterPropertiesSet();
-		inputSource.setSaveState(true);
-
-		return inputSource;
 	}
 
 	@Test
-	public void testNormalProcessing() throws Exception {
-		((InitializingBean) reader).afterPropertiesSet();
-		((ItemStream) reader).open(new ExecutionContext());
-		Object[] foo1 = (Object[]) reader.read();
+	public void testMultipleItemsInProjection() throws Exception {
+		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<Object[]>();
+		initializeItemReader(reader, "select f.value, f.name from Foo f");
+		Object[] foo1 = reader.read();
 		assertEquals(1, foo1[0]);
+	}
+
+	@Test
+	public void testSingleItemInProjection() throws Exception {
+		HibernateCursorItemReader<Object> reader = new HibernateCursorItemReader<Object>();
+		initializeItemReader(reader, "select f.value from Foo f");
+		Object foo1 = reader.read();
+		assertEquals(1, foo1);
+	}
+
+	@Test
+	public void testSingleItemInProjectionWithArrayType() throws Exception {
+		HibernateCursorItemReader<Object[]> reader = new HibernateCursorItemReader<Object[]>();
+		initializeItemReader(reader, "select f.value from Foo f");
+		try {
+			Object[] foo1 = reader.read();
+			assertNotNull(foo1);
+			fail("Expected ClassCastException");
+		} catch(ClassCastException e) {
+			// expected
+		}
 	}
 
 }

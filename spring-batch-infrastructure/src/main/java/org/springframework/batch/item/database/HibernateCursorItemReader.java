@@ -53,7 +53,8 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
+public class HibernateCursorItemReader<T> extends
+		AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
 		InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -83,15 +84,15 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
 			return statelessSession.createQuery(queryString);
-		}
-		else {
+		} else {
 			statefulSession = sessionFactory.openSession();
 			return statefulSession.createQuery(queryString);
 		}
 	}
 
 	/**
-	 * @param sessionFactory hibernate session factory
+	 * @param sessionFactory
+	 *            hibernate session factory
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
@@ -104,7 +105,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	}
 
 	/**
-	 * @param queryString HQL query string
+	 * @param queryString
+	 *            HQL query string
 	 */
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
@@ -113,9 +115,9 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	/**
 	 * Can be set only in uninitialized state.
 	 * 
-	 * @param useStatelessSession <code>true</code> to use
-	 * {@link StatelessSession} <code>false</code> to use standard hibernate
-	 * {@link Session}
+	 * @param useStatelessSession
+	 *            <code>true</code> to use {@link StatelessSession}
+	 *            <code>false</code> to use standard hibernate {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(!initialized);
@@ -126,7 +128,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * Clears the session if not stateful and delegates to super class.
 	 */
 	@Override
-	public void update(ExecutionContext executionContext) throws ItemStreamException {
+	public void update(ExecutionContext executionContext)
+			throws ItemStreamException {
 		super.update(executionContext);
 		if (!useStatelessSession) {
 			statefulSession.clear();
@@ -139,27 +142,34 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
 	 * JDBC driver ignores the value.
 	 * 
-	 * @param fetchSize the number of rows to fetch, 0 by default
+	 * @param fetchSize
+	 *            the number of rows to fetch, 0 by default
 	 * @see Query#setFetchSize(int)
 	 */
 	public void setFetchSize(int fetchSize) {
 		this.fetchSize = fetchSize;
 	}
 
-	@SuppressWarnings("unchecked")
 	protected T doRead() throws Exception {
 		if (cursor.next()) {
 			Object[] data = cursor.get();
-			Object item;
 
 			if (data.length > 1) {
-				item = data;
-			}
-			else {
-				item = data[0];
+				// If there are multiple items this must be a projection
+				// and T is an array type.
+				@SuppressWarnings("unchecked")
+				T item = (T) data;
+				return item;
+			} else {
+				// Assume if there is only one item that it is the data the user
+				// wants.
+				// If there is only one item this is going to be a nasty shock
+				// if T is an array type but there's not much else we can do...
+				@SuppressWarnings("unchecked")
+				T item = (T) data[0];
+				return item;
 			}
 
-			return (T) item;
 		}
 		return null;
 	}
@@ -169,9 +179,11 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * {@link #setQueryString(String)}.
 	 */
 	protected void doOpen() throws Exception {
-		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
+		Assert.state(!initialized,
+				"Cannot open an already opened ItemReader, call close first");
 
-		cursor = createQuery().setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
+		cursor = createQuery().setFetchSize(fetchSize).scroll(
+				ScrollMode.FORWARD_ONLY);
 
 		initialized = true;
 
@@ -190,8 +202,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 			if (statelessSession != null) {
 				statelessSession.close();
 			}
-		}
-		else {
+		} else {
 			if (statefulSession != null) {
 				statefulSession.close();
 			}

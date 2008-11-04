@@ -1,6 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>spring-batch-samples</artifactId>
+	<artifactId>org.springframework.batch.samples</artifactId>
 	<version>2.0.0.CI-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Samples</name>
@@ -10,50 +11,31 @@
 	</description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
-		<artifactId>spring-batch</artifactId>
+		<artifactId>org.springframework.batch</artifactId>
 		<version>2.0.0.CI-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<profiles>
-		<profile>
-			<id>clover</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-clover-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-			<reporting>
-				<plugins>
-					<plugin>
-						<artifactId>maven-clover-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</reporting>
-		</profile>
-	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-core</artifactId>
+			<artifactId>org.springframework.batch.core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-infrastructure</artifactId>
-			<version>${project.version}</version>
+			<groupId>org.aspectj</groupId>
+			<artifactId>com.springsource.org.aspectj.runtime</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
+			<groupId>org.aspectj</groupId>
+			<artifactId>com.springsource.org.aspectj.weaver</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.easymock</groupId>
+			<artifactId>com.springsource.org.easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.junit</groupId>
+			<artifactId>com.springsource.org.junit</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springmodules</groupId>
@@ -69,113 +51,90 @@
 					<artifactId>commons-validator</artifactId>
 				</exclusion>
 				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-beanutils</groupId>
+					<artifactId>commons-beanutils</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-digester</groupId>
+					<artifactId>commons-digester</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>antlr</groupId>
+					<artifactId>antlr</artifactId>
+				</exclusion>
+				<exclusion>
 					<groupId>org.springframework</groupId>
 					<artifactId>spring</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>quartz</groupId>
-			<artifactId>quartz</artifactId>
-			<version>1.5.1</version>
+			<groupId>com.opensymphony.quartz</groupId>
+			<artifactId>com.springsource.org.quartz</artifactId>
+			<version>1.6.2</version>
 		</dependency>
 		<dependency>
-			<groupId>asm</groupId>
-			<artifactId>asm-all</artifactId>
-			<version>2.2.3</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
+			<groupId>com.mysql.jdbc</groupId>
+			<artifactId>com.springsource.com.mysql.jdbc</artifactId>
 			<version>5.1.6</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<scope>test</scope>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>com.springsource.org.hsqldb</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.io</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>geronimo-spec</groupId>
-			<artifactId>geronimo-spec-j2ee</artifactId>
-			<version>1.4-rc4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
+			<artifactId>com.springsource.com.thoughtworks.xstream</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>com.springsource.javax.servlet</artifactId>
 		</dependency>
 		<!-- optional dependency from infrastructure -->
 		<dependency>
-			<groupId>stax</groupId>
-			<artifactId>stax</artifactId>
+			<groupId>org.custommonkey.xmlunit</groupId>
+			<artifactId>com.springsource.org.custommonkey.xmlunit</artifactId>
+			<version>1.2.0</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>xmlunit</groupId>
-			<artifactId>xmlunit</artifactId>
-			<scope>test</scope>
-			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate</artifactId>
-			<optional>true</optional>
+			<artifactId>com.springsource.org.hibernate</artifactId>
 		</dependency>
 		<dependency>
-			<!-- Needed by Hibernate if JTA is excluded -->
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-jta_1.1_spec</artifactId>
-			<version>1.1</version>
-			<scope>provided</scope>
+			<groupId>javax.transaction</groupId>
+			<artifactId>com.springsource.javax.transaction</artifactId>
 		</dependency>
 		<dependency>
-			<!-- Force Hibernate to use a particular nodep version of cglib in case of clash with Spring AOP -->
-			<groupId>cglib</groupId>
-			<artifactId>cglib-nodep</artifactId>
-			<optional>true</optional>
+			<groupId>net.sourceforge.cglib</groupId>
+			<artifactId>com.springsource.net.sf.cglib</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ibatis</groupId>
-			<artifactId>ibatis-sqlmap</artifactId>
-			<version>2.3.0</version>
-			<optional>true</optional>
+			<artifactId>com.springsource.com.ibatis</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.2.1.6</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derbyclient</artifactId>
-			<version>10.2.1.6</version>
-			<scope>test</scope>
+			<artifactId>com.springsource.org.apache.derby</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
@@ -190,59 +149,59 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>8.2-504.jdbc3</version>
+			<groupId>org.postgresql</groupId>
+			<artifactId>com.springsource.org.postgresql.jdbc3</artifactId>
+			<version>8.3.603</version>
 			<scope>test</scope>
 		</dependency>
 		<!-- db2 driver needs to be installed locally in maven first -->
 		<!--
-		<dependency>
-			<groupId>com.ibm</groupId>
-			<artifactId>db2jcc</artifactId>
-			<version>9.5.0</version>
-			<scope>test</scope>
-		</dependency>
+			<dependency> <groupId>com.ibm</groupId>
+			<artifactId>db2jcc</artifactId> <version>9.5.0</version>
+			<scope>test</scope> </dependency>
 		-->
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-aop</artifactId>
+			<artifactId>org.springframework.aop</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>org.springframework.oxm</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
+			<artifactId>org.springframework.core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
+			<artifactId>org.springframework.context.support</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-orm</artifactId>
+			<artifactId>org.springframework.jdbc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
+			<artifactId>org.springframework.orm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.transaction</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.web</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
+			<groupId>org.apache.xerces</groupId>
+			<artifactId>com.springsource.org.apache.xerces</artifactId>
 			<version>2.8.1</version>
 			<optional>true</optional>
 		</dependency>
@@ -260,8 +219,12 @@
 							<tasks>
 								<typedef resource="foundrylogic/vpp/typedef.properties" />
 								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
-								<!-- Reference script for HSQLDB - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for HSQLDB - N.B. not under source control,
+									but packagaed in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -274,8 +237,12 @@
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-hsqldb.sql" />
 								</vppcopy>
-								<!-- Reference script for DB2 - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for DB2 - N.B. not under source control, but
+									packagaed in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -288,8 +255,12 @@
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-db2.sql" />
 								</vppcopy>
-								<!-- Reference script for Derby - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for Derby - N.B. not under source control, but
+									packagaed in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -302,8 +273,12 @@
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-derby.sql" />
 								</vppcopy>
-								<!-- Reference script for Oracle - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for Oracle - N.B. not under source control,
+									but packagaed in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -316,8 +291,12 @@
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-oracle10g.sql" />
 								</vppcopy>
-								<!-- Reference script for PostgreSQL - N.B. not under source control, but packagaed in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for PostgreSQL - N.B. not under source
+									control, but packagaed in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -330,8 +309,12 @@
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-postgresql.sql" />
 								</vppcopy>
-								<!-- Reference script for MySQL - N.B. not under source control, but packaged in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for MySQL - N.B. not under source control, but
+									packaged in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -344,8 +327,12 @@
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-mysql.sql" />
 								</vppcopy>
-								<!-- Reference script for MS SQLServer - N.B. not under source control, but packaged in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for MS SQLServer - N.B. not under source
+									control, but packaged in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -358,8 +345,12 @@
 									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
 									<mapper type="glob" from="*.sql.vpp" to="*-sqlserver.sql" />
 								</vppcopy>
-								<!-- Reference script for Sybase - N.B. not under source control, but packaged in jar. -->
-								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
+								<!--
+									Reference script for Sybase - N.B. not under source control,
+									but packaged in jar.
+								-->
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />

@@ -15,15 +15,19 @@
  */
 package org.springframework.batch.item.xml.stax;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import junit.framework.TestCase;
 
-import static org.easymock.EasyMock.*;
-
-import com.bea.xml.stream.events.StartDocumentEvent;
+import com.sun.xml.internal.stream.events.StartDocumentEvent;
 
 /**
  * @author Lucas Ward

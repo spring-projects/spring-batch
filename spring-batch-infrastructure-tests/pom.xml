@@ -1,14 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>spring-batch-infrastructure-tests</artifactId>
-  <version>2.0.0.CI-SNAPSHOT</version>
+	<artifactId>org.springframework.batch.infrastructure.tests</artifactId>
+	<version>2.0.0.CI-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Infrastructure Tests</name>
 	<description> Integration tests for the Spring Batch Infrastructure </description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<version>2.0.0.CI-SNAPSHOT</version>
-		<artifactId>spring-batch</artifactId>
+		<artifactId>org.springframework.batch</artifactId>
 		<relativePath>..</relativePath>
 	</parent>
 	<profiles>
@@ -19,8 +20,10 @@
 			</activation>
 			<build>
 				<plugins>
-			<!-- run tests during the integration-test phase, not
-				the normal test phase -->
+					<!--
+						run tests during the integration-test phase, not the normal test
+						phase
+					-->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
@@ -35,8 +38,10 @@
 			<id>test</id>
 			<build>
 				<plugins>
-			<!-- run tests during the integration-test phase, not
-				the normal test phase -->
+					<!--
+						run tests during the integration-test phase, not the normal test
+						phase
+					-->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
@@ -49,158 +54,108 @@
 		</profile>
 	</profiles>
 
-	<!-- Temporary measure while we get to the bottom of the test failures on Bamboo -->
+	<!--
+		Temporary measure while we get to the bottom of the test failures on
+		Bamboo
+	-->
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-infrastructure</artifactId>
+			<artifactId>org.springframework.batch.infrastructure</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<scope>runtime</scope>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>com.springsource.org.hsqldb</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.io</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
-			<version>10.2.1.6</version>
-			<scope>test</scope>
+			<artifactId>com.springsource.org.apache.derby</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
-			<artifactId>activemq-core</artifactId>
-			<version>5.0.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>mx4j</groupId>
-					<artifactId>mx4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.geronimo.specs</groupId>
-					<artifactId> geronimo-j2ee-management_1.0_spec </artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.activemq</groupId>
-					<artifactId>activeio-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.camel</groupId>
-					<artifactId>camel-core</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>com.springsource.org.apache.activemq</artifactId>
+			<version>5.1.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit</groupId>
+			<artifactId>com.springsource.org.junit</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
+			<artifactId>com.springsource.org.easymock</artifactId>
 		</dependency>
 		<dependency>
-			<!-- This is just for the JMS spec - could use javax.jms -->
-			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-jms_1.1_spec</artifactId>
-			<version>1.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>mockobjects</groupId>
-					<artifactId>mockobjects-jdk1.4-j2ee1.3</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>mockobjects</groupId>
-					<artifactId>mockobjects-core</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>javax.jms</groupId>
+			<artifactId>com.springsource.javax.jms</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
-			<artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
+			<artifactId>com.springsource.javax.management.j2ee</artifactId>
 			<version>1.0.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>xmlunit</groupId>
-			<artifactId>xmlunit</artifactId>
-			<version>1.1</version>
-			<scope>test</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.ws</groupId>
-			<artifactId>spring-oxm</artifactId>
+			<groupId>org.custommonkey.xmlunit</groupId>
+			<artifactId>com.springsource.org.custommonkey.xmlunit</artifactId>
+			<version>1.2.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.castor</groupId>
-			<artifactId>castor</artifactId>
+			<artifactId>com.springsource.org.castor</artifactId>
 			<version>1.1.2</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xerces</artifactId>
-				</exclusion>
-			</exclusions>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.4.0</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>stax</groupId>
-			<artifactId>stax</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.2.1</version>
-			<scope>test</scope>
-		</dependency>
-<!-- Spring Dependencies -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
+			<artifactId>com.springsource.com.thoughtworks.xstream</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.xerces</groupId>
+			<artifactId>com.springsource.org.apache.xerces</artifactId>
+			<version>2.8.1</version>
+		</dependency>
+		<!-- Spring Dependencies -->
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>org.springframework.oxm</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jms</artifactId>
+			<artifactId>org.springframework.jdbc</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.jms</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
+			<artifactId>org.springframework.test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-tx</artifactId>
+			<artifactId>org.springframework.transaction</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-aop</artifactId>
+			<artifactId>org.springframework.aop</artifactId>
 		</dependency>
 	</dependencies>
 
-	<!-- Reporting: it doesn't make much sense to have clover or Jdepend reports in this project but they are included by the parent anyway. -->
+	<!--
+		Reporting: it doesn't make much sense to have clover or Jdepend
+		reports in this project but they are included by the parent anyway.
+	-->
 </project>

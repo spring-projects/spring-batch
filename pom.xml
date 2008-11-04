@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
-	<artifactId>spring-batch</artifactId>
+	<artifactId>org.springframework.batch</artifactId>
 	<name>Spring Batch</name>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
@@ -39,12 +40,6 @@
 			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
 			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
 		</mailingList>
-		<mailingList>
-			<subscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</subscribe>
-			<unsubscribe>http://lists.interface21.com/listmanager/listinfo/spring-batch-announce</unsubscribe>
-			<name>Spring Batch Announce</name>
-			<archive>http://lists.interface21.com/archives/spring-batch-announce</archive>
-		</mailingList>
 	</mailingLists>
 	<ciManagement>
 		<system>Bamboo</system>
@@ -58,7 +53,7 @@
 	</licenses>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>2.5.5</spring.framework.version>
+		<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
 		<bundlor.version>1.0.0.M1</bundlor.version>
 	</properties>
 	<profiles>
@@ -210,7 +205,8 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
+										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html"
+											style="src/main/xsl/emma2html.xsl">
 											<param name="project" expression="${project.name}" />
 											<param name="version" expression="${project.version}" />
 										</xslt>
@@ -235,12 +231,12 @@
 		<repository>
 			<id>spring-milestone</id>
 			<name>Spring Milestone Repository</name>
-			<url>s3://maven.springframework.org/milestone</url>
+			<url>s3://repository.springsource.com/maven/bundles/milestone</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
 			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
+			<url>s3://repository.springsource.com/maven/bundles/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<build>
@@ -253,22 +249,6 @@
 		</extensions>
 		<pluginManagement>
 			<plugins>
-				<plugin>
-					<groupId>com.atlassian.maven.plugins</groupId>
-					<artifactId>maven-clover-plugin</artifactId>
-					<version>2</version>
-					<configuration>
-						<licenseLocation>${clover.license.path}</licenseLocation>
-					</configuration>
-					<executions>
-						<execution>
-							<phase>pre-site</phase>
-							<goals>
-								<goal>instrument</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>emma-maven-plugin</artifactId>
@@ -293,7 +273,8 @@
 									</junitreport>
 									<echo>Creating Emma reports</echo>
 									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
+										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
 										<mapper type="glob" from="*.xml" to="*.fragment" />
 										<param name="project" expression="${project.name}" />
 									</xslt>
@@ -339,7 +320,7 @@
 					<executions>
 						<execution>
 							<id>bundlor-transform</id>
-						<!-- This isn't necessary, but Q4E barfs without it. -->
+							<!-- This isn't necessary, but Q4E barfs without it. -->
 							<phase>package</phase>
 							<goals>
 								<goal>transform</goal>
@@ -443,150 +424,124 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>aspectj</groupId>
-				<artifactId>aspectjrt</artifactId>
-				<version>1.5.3</version>
+				<groupId>org.aspectj</groupId>
+				<artifactId>com.springsource.org.aspectj.runtime</artifactId>
+				<version>1.5.4</version>
 			</dependency>
 			<dependency>
-				<groupId>aspectj</groupId>
-				<artifactId>aspectjweaver</artifactId>
-				<version>1.5.3</version>
+				<groupId>org.aspectj</groupId>
+				<artifactId>com.springsource.org.aspectj.weaver</artifactId>
+				<version>1.5.4</version>
 			</dependency>
 			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.4</version>
+				<groupId>org.junit</groupId>
+				<artifactId>com.springsource.org.junit</artifactId>
+				<version>4.4.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate</artifactId>
-				<version>3.2.6.ga</version>
-				<exclusions>
-					<exclusion>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.transaction</groupId>
-						<artifactId>jta</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>cglib</groupId>
-						<artifactId>cglib</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>net.sf.ehcache</groupId>
-						<artifactId>ehcache</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>asm</groupId>
-						<artifactId>asm-attrs</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>asm</groupId>
-						<artifactId>asm</artifactId>
-					</exclusion>
-				</exclusions>
+				<groupId>org.easymock</groupId>
+				<artifactId>com.springsource.org.easymock</artifactId>
+				<version>2.3.0</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-entitymanager</artifactId>
-				<version>3.3.2.GA</version>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.transaction</groupId>
-						<artifactId>jta</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-annotations</artifactId>
-				<version>3.3.1.GA</version>
-			</dependency>
-			<dependency>
-				<groupId>cglib</groupId>
-				<artifactId>cglib-nodep</artifactId>
-				<version>2.1_3</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>1.1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>avalon-framework</groupId>
-						<artifactId>avalon-framework</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>logkit</groupId>
-						<artifactId>logkit</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>2.1</version>
+				<groupId>javax.jms</groupId>
+				<artifactId>com.springsource.javax.jms</artifactId>
+				<version>1.1.0</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>1.2</version>
+				<groupId>javax.transaction</groupId>
+				<artifactId>com.springsource.javax.transaction</artifactId>
+				<version>1.1.0</version>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-				<version>3.1</version>
+				<groupId>org.hibernate</groupId>
+				<artifactId>com.springsource.org.hibernate</artifactId>
+				<version>3.2.6.ga</version>
+				<optional>true</optional>
+				<exclusions>
+					<exclusion>
+						<groupId>org.objectweb.asm</groupId>
+						<artifactId>com.springsource.org.objectweb.asm</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.objectweb.asm</groupId>
+						<artifactId>com.springsource.org.objectweb.asm.attrs</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>hsqldb</groupId>
-				<artifactId>hsqldb</artifactId>
-				<version>1.8.0.7</version>
+				<groupId>org.hibernate</groupId>
+				<artifactId>com.springsource.org.hibernate.ejb</artifactId>
+				<version>3.3.2.GA</version>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
-				<groupId>org.easymock</groupId>
-				<artifactId>easymock</artifactId>
-				<version>2.4</version>
+				<groupId>org.hibernate</groupId>
+				<artifactId>com.springsource.org.hibernate.annotations</artifactId>
+				<version>3.3.1.ga</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>net.sourceforge.cglib</groupId>
+				<artifactId>com.springsource.net.sf.cglib</artifactId>
+				<version>2.1.3</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>com.springsource.org.apache.commons.logging</artifactId>
+				<version>1.1.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>com.springsource.org.apache.commons.lang</artifactId>
+				<version>2.1.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>com.springsource.org.apache.commons.io</artifactId>
+				<version>1.4.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>com.springsource.org.apache.commons.collections</artifactId>
+				<version>3.2.0</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
+				<version>1.2.2.osgi</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hsqldb</groupId>
+				<artifactId>com.springsource.org.hsqldb</artifactId>
+				<version>1.8.0.9</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.derby</groupId>
+				<artifactId>com.springsource.org.apache.derby</artifactId>
+				<version>10.3.2000001.599110</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
-				<artifactId>xstream</artifactId>
-				<version>1.3</version>
+				<artifactId>com.springsource.com.thoughtworks.xstream</artifactId>
+				<version>1.3.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.jettison</groupId>
-				<artifactId>jettison</artifactId>
-				<version>1.0.1</version>
-			</dependency>
-			<dependency>
-				<groupId>stax</groupId>
-				<artifactId>stax</artifactId>
-				<version>1.2.0</version>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>commons-dbcp</groupId>
-				<artifactId>commons-dbcp</artifactId>
-				<version>1.2.1</version>
-				<exclusions>
-					<exclusion>
-						<groupId>commons-collections</groupId>
-						<artifactId>commons-collections</artifactId>
-					</exclusion>
-				</exclusions>
+				<artifactId>com.springsource.org.codehaus.jettison</artifactId>
+				<version>1.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.ibatis</groupId>
-				<artifactId>ibatis-sqlmap</artifactId>
-				<version>2.3.0</version>
+				<artifactId>com.springsource.com.ibatis</artifactId>
+				<version>2.3.0.677</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>
@@ -595,94 +550,103 @@
 				<version>1.0.0</version>
 				<optional>true</optional>
 			</dependency>
+			<dependency>
+				<groupId>org.eclipse.osgi</groupId>
+				<artifactId>org.eclipse.osgi</artifactId>
+				<version>3.4.2.R34x_v20080826-1230</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.objectweb.asm</groupId>
+				<artifactId>com.springsource.org.objectweb.asm</artifactId>
+				<version>2.2.3</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.objectweb.asm</groupId>
+				<artifactId>com.springsource.org.objectweb.asm.attrs</artifactId>
+				<version>2.2.3</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.objectweb.asm</groupId>
+				<artifactId>com.springsource.org.objectweb.asm.commons</artifactId>
+				<version>2.2.3</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>com.springsource.javax.servlet</artifactId>
+				<version>2.5.0</version>
+				<scope>provided</scope>
+			</dependency>
 			<!-- Spring Dependencies -->
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-aop</artifactId>
+				<artifactId>org.springframework.aop</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-beans</artifactId>
+				<artifactId>org.springframework.beans</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-context</artifactId>
+				<artifactId>org.springframework.context</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-context-support</artifactId>
+				<artifactId>org.springframework.context.support</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-core</artifactId>
+				<artifactId>org.springframework.core</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-jdbc</artifactId>
+				<artifactId>org.springframework.jdbc</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-jms</artifactId>
-				<version>${spring.framework.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-context-support</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework</groupId>
-				<artifactId>spring-orm</artifactId>
+				<artifactId>org.springframework.jms</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-test</artifactId>
+				<artifactId>org.springframework.orm</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-tx</artifactId>
+				<artifactId>org.springframework.test</artifactId>
+				<version>${spring.framework.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>org.springframework.transaction</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework</groupId>
-				<artifactId>spring-web</artifactId>
+				<artifactId>org.springframework.web</artifactId>
 				<version>${spring.framework.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.ws</groupId>
-				<artifactId>spring-oxm</artifactId>
-				<version>1.0.4</version>
+				<artifactId>org.springframework.oxm</artifactId>
+				<version>1.5.4.A</version>
 				<optional>true</optional>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-beans</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework</groupId>
-						<artifactId>spring-core</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.osgi</groupId>
-				<artifactId>spring-osgi-core</artifactId>
-				<version>1.1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.8.1</version>
-				<scope>optional</scope>
+				<artifactId>org.springframework.osgi.core</artifactId>
+				<version>1.1.2.A</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -754,21 +718,6 @@
 	</developers>
 	<repositories>
 		<repository>
-			<id>spring-release</id>
-			<name>Spring Portfolio Release Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/release</url>
-		</repository>
-		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Portfolio Milestone Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
-		</repository>
-		<repository>
-			<id>spring-external</id>
-			<name>Spring Portfolio External Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
-		</repository>
-		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
 			<url>http://objectstyle.org/maven2/</url>
@@ -785,14 +734,14 @@
 				External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
 		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
+		<repository>
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository -
-				SpringSource Bundle Snapshots</name>
+				Snapshot Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
-		</pluginRepository>
+		</repository>
+	</repositories>
+	<pluginRepositories>
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name>SpringSource Enterprise Bundle Repository -
