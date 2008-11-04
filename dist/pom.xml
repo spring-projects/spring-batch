@@ -2,7 +2,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
-	<artifactId>spring-batch-dist</artifactId>
+	<artifactId>org.springframework.batch.dist</artifactId>
 	<name>Distribution</name>
     <packaging>pom</packaging>
 	<description>
@@ -11,7 +11,7 @@
 	</description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
-		<artifactId>spring-batch</artifactId>
+		<artifactId>org.springframework.batch.batch</artifactId>
 		<version>2.0.0.CI-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
