@@ -54,8 +54,8 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.junit</groupId>
-			<artifactId>com.springsource.org.junit</artifactId>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
@@ -124,6 +124,11 @@
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>com.springsource.javax.persistence</artifactId>
+		</dependency>
+		<dependency>
+			<!-- TODO: remove this or find a replacement in Java 5 / BRITS -->
+			<groupId>stax</groupId>
+			<artifactId>stax</artifactId>
 		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>

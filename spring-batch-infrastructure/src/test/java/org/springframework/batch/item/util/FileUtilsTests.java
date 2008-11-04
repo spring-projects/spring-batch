@@ -152,6 +152,7 @@ public class FileUtilsTests {
 
 	@Before
 	public void setUp() throws Exception {
+		file.delete();
 		Assert.state(!file.exists());
 	}
 

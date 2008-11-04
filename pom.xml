@@ -387,7 +387,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.3</version>
 				<configuration>
 					<includes>
 						<include>**/*Tests.java</include>
@@ -434,9 +433,9 @@
 				<version>1.5.4</version>
 			</dependency>
 			<dependency>
-				<groupId>org.junit</groupId>
-				<artifactId>com.springsource.org.junit</artifactId>
-				<version>4.4.0</version>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.4</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -580,6 +579,13 @@
 				<version>2.5.0</version>
 				<scope>provided</scope>
 			</dependency>
+			<dependency>
+			<!-- TODO: remove this or find a replacement in Java 5 / BRITS -->
+				<groupId>stax</groupId>
+				<artifactId>stax</artifactId>
+				<version>1.2.0</version>
+				<optional>true</optional>
+			</dependency>
 			<!-- Spring Dependencies -->
 			<dependency>
 				<groupId>org.springframework</groupId>
@@ -656,6 +662,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
+				<version>2.3</version>
 			</plugin>
 			<plugin>
 				<groupId>com.interface21.maven</groupId>
