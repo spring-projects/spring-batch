@@ -13,7 +13,7 @@ public class TestStep implements Step {
 	public void setCollaborator(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
-
+	
 	public static StepContext getContext() {
 		return context;
 	}

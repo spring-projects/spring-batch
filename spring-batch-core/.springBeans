@@ -21,6 +21,7 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/common-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/OneStepJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/TwoStepJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/annotation/batch-component-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
