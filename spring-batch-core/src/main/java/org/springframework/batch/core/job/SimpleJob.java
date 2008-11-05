@@ -59,7 +59,14 @@ public class SimpleJob extends AbstractJob {
 	public void addStep(Step step) {
 		this.steps.add(step);
 	}
-
+	
+	/**
+	 * @return the steps currently set for this job
+	 */
+	public List<Step> getSteps(){
+		return steps;
+	}
+	
 	/**
 	 * Handler of steps sequentially as provided, checking each one for success
 	 * before moving to the next. Returns the last {@link StepExecution}
