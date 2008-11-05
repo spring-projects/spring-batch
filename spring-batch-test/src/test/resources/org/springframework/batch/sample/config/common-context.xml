@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob" abstract="true">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="restartable" value="true" />
+	</bean>
+
+	<bean id="taskletStep" class="org.springframework.batch.core.step.tasklet.TaskletStep" abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="allowStartIfComplete" value="true" />
+	</bean>
+
+	<bean id="simpleStep" class="org.springframework.batch.core.step.item.SimpleStepFactoryBean"
+		abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="startLimit" value="100" />
+		<property name="commitInterval" value="1" />
+	</bean>
+	
+	<bean id="skipLimitStep" class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean"
+		parent="simpleStep" abstract="true">
+		<property name="skipLimit" value="0" />
+	</bean>
+
+	<bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="int[]">
+					<bean class="org.springframework.batch.support.IntArrayPropertyEditor" />
+				</entry>
+				<entry key="org.springframework.batch.item.file.transform.Range[]">
+					<bean class="org.springframework.batch.item.file.transform.RangeArrayPropertyEditor" />
+				</entry>
+				<entry key="java.util.Date">
+					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
+						<constructor-arg>
+							<bean class="java.text.SimpleDateFormat">
+								<constructor-arg value="yyyyMMdd" />
+							</bean>
+						</constructor-arg>
+						<constructor-arg value="false" />
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>
