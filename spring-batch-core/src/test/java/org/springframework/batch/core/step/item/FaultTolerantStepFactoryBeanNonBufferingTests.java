@@ -2,6 +2,7 @@ package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.easymock.EasyMock.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
@@ -49,7 +51,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	private SkipWriterStub writer = new SkipWriterStub();
 
 	private JobExecution jobExecution;
-	
+
 	int count = 0;
 
 	@Before
@@ -73,12 +75,20 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 */
 	@Test
 	public void testSkip() throws Exception {
-
+		@SuppressWarnings("unchecked")
+		SkipListener<Integer, String> skipListener = createStrictMock(SkipListener.class);
+		skipListener.onSkipInWrite("4", SkipWriterStub.exception);
+		expectLastCall().once();
+		replay(skipListener);
+		
+		factory.setListeners(new SkipListener[] { skipListener });
 		factory.setSkipLimit(1);
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
+
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
@@ -88,7 +98,6 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		// has to go back and split the chunk up to isolate the failed item
 		assertEquals(2, stepExecution.getRollbackCount());
 
-		// assertTrue(reader.processed.contains("4"));
 		assertFalse(writer.written.contains("4"));
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
@@ -97,14 +106,15 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		// 5 items + 2 rollbacks re-reading 2 items each time
 		assertEquals(9, stepExecution.getReadCount());
 
+		verify(skipListener);
 	}
-	
+
 	@Test
 	public void testSkipOverLimit() throws Exception {
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("3")));
 		processor.rollback = false;
-		
+
 		factory.setItemProcessor(processor);
 
 		factory.setSkipLimit(1);
@@ -124,7 +134,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		assertEquals(expectedOutput, writer.written);
 
 	}
-	
+
 	/**
 	 * Exception in listener causes failure regardless of skip limit.
 	 * @throws Exception
@@ -154,7 +164,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		assertEquals(1, stepExecution.getWriteSkipCount());
 
 	}
-	
+
 	@Test
 	public void testSkipOnWriteNotDoubleCounted() throws Exception {
 
@@ -178,13 +188,14 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		assertEquals(expectedOutput, writer.written);
 
 	}
-	
+
 	@Test
 	public void testDefaultSkipPolicy() throws Exception {
 		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
 		factory.setSkipLimit(1);
 		List<String> items = Arrays.asList(new String[] { "a", "b", "c" });
-		ItemReader<String> provider = new ListItemReader<String>(TransactionAwareProxyFactory.createTransactionalList(items)) {
+		ItemReader<String> provider = new ListItemReader<String>(TransactionAwareProxyFactory
+				.createTransactionalList(items)) {
 			public String read() {
 				String item = super.read();
 				count++;
@@ -210,7 +221,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	 */
 	@Test
 	public void testProcessorNoRollback() throws Exception {
-		
+
 		factory.setTransactionAttribute(new DefaultTransactionAttribute());
 		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("1,3")));
@@ -281,6 +292,8 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 		protected final Log logger = LogFactory.getLog(getClass());
 
+		private static final SkippableRuntimeException exception = new SkippableRuntimeException("exception in writer");
+
 		// simulate transactional output
 		private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
 
@@ -302,7 +315,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 			for (String item : items) {
 				if (failures.contains(item)) {
 					logger.debug("Throwing write exception on [" + item + "]");
-					throw new SkippableRuntimeException("exception in writer");
+					throw exception;
 				}
 				written.add(item);
 			}
@@ -321,5 +334,5 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 			super(message);
 		}
 	}
-	
+
 }
