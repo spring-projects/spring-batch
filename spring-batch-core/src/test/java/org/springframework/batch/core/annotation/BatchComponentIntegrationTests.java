@@ -3,15 +3,13 @@
  */
 package org.springframework.batch.core.annotation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import sun.reflect.generics.scope.Scope;
 
 /**
  * @author Lucas Ward
