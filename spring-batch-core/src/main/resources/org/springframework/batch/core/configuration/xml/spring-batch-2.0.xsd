@@ -128,7 +128,7 @@
 					</xsd:annotation>
 					<xsd:complexType>
 						<xsd:complexContent>
-							<xsd:extension base="transitionWithNextType">
+							<xsd:extension base="stepType">
 								<xsd:attribute name="name" type="xsd:string" use="required" >
 									<xsd:annotation>
 										<xsd:documentation>
@@ -187,22 +187,89 @@
 		</xsd:sequence>
 	</xsd:complexType>
 	
-	<xsd:complexType name="transitionWithNextType">
+	<xsd:complexType name="stepType">
 		<xsd:complexContent>
-			<xsd:extension base="transitionType">
-				<xsd:attribute name="next" type="xsd:string" use="optional" >
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-						A shortcut for specifying the next step to execute after this one, if there is only one choice.  
-						If this attribute is specified, then there should be no other transition with a nested &lt;next on="*" .../&gt;]]>
-						</xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
+			<xsd:extension base="nextType">
+				<xsd:sequence>
+					<xsd:element name="task" minOccurs="0" maxOccurs="1">
+						<xsd:complexType>
+							<xsd:complexContent>
+								<xsd:extension base="beans:identifiedType">
+									<xsd:attribute name="tasklet" type="xsd:string" use="required">
+										<xsd:annotation>
+											<xsd:documentation><![CDATA[
+											The bean name of the tasklet that is to be used for the task.
+											]]></xsd:documentation>
+										</xsd:annotation>
+									</xsd:attribute>
+									<xsd:attribute name="job-repository" type="xsd:string"
+										default="jobRepository">
+										<xsd:annotation>
+											<xsd:documentation
+												source="java:org.springframework.batch.core.repository.JobRepository"><![CDATA[
+											The bean name of the JobRepository that is to be used. This attribute 
+											is not required, and only needs to be specified explicitly
+											if the bean name of the desired JobRepository is not 'jobRepository'.
+											]]></xsd:documentation>
+											<xsd:appinfo>
+												<tool:annotation kind="ref">
+													<tool:expected-type
+														type="org.springframework.batch.core.repository.JobRepository" />
+												</tool:annotation>
+											</xsd:appinfo>
+										</xsd:annotation>
+									</xsd:attribute>
+									<xsd:attribute name="transaction-manager" type="xsd:string"
+										default="transactionManager">
+										<xsd:annotation>
+											<xsd:documentation
+												source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+											The bean name of the TransactionManager that is to be used. This attribute 
+											is not required, and only needs to be specified explicitly
+											if the bean name of the desired TransactionManager is not 'transactionManager'.
+											]]></xsd:documentation>
+											<xsd:appinfo>
+												<tool:annotation kind="ref">
+													<tool:expected-type
+														type="org.springframework.transaction.PlatformTransactionManager" />
+												</tool:annotation>
+											</xsd:appinfo>
+										</xsd:annotation>
+									</xsd:attribute>
+								</xsd:extension>
+							</xsd:complexContent>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:group ref="transitions"/>
+				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 
+	<xsd:complexType name="transitionWithNextType">
+		<xsd:complexContent>
+			<xsd:extension base="nextType">
+				<xsd:group ref="transitions"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="nextType">
+		<xsd:attribute name="next" type="xsd:string" use="optional" >
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A shortcut for specifying the next step to execute after this one, if there is only one choice.  
+				If this attribute is specified, then there should be no other transition with a nested &lt;next on="*" .../&gt;]]>
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
 	<xsd:complexType name="transitionType">
+		<xsd:group ref="transitions"/>
+	</xsd:complexType>
+
+	<xsd:group name="transitions">
 		<xsd:sequence>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded" >
 				<xsd:element name="next">
@@ -282,6 +349,6 @@
 				</xsd:element>			
 			</xsd:choice>
 		</xsd:sequence>
-	</xsd:complexType>
+	</xsd:group>
 
 </xsd:schema>

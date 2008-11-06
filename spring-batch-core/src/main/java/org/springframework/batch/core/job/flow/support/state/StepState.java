@@ -23,6 +23,15 @@ public class StepState extends AbstractState {
 		this.step = step;
 	}
 
+	/**
+	 * @param name for the step that will be executed
+	 * @param step the step that will be executed
+	 */
+	public StepState(String name, Step step) {
+		super(name);
+		this.step = step;
+	}
+
 	@Override
 	public String handle(FlowExecutor executor) throws Exception {
 		return executor.executeStep(step);

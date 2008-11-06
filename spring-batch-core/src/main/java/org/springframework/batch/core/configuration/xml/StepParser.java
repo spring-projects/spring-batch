@@ -30,6 +30,7 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
@@ -44,6 +45,7 @@ import org.w3c.dom.Element;
  * @see JobParser
  * 
  * @author Dave Syer
+ * @author Thomas Risberg
  * 
  */
 public class StepParser {
@@ -61,9 +63,27 @@ public class StepParser {
 	 */
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
 
-		RuntimeBeanReference stateDef = new RuntimeBeanReference(element.getAttribute("name"));
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
-		stateBuilder.addConstructorArgValue(stateDef);
+		String stepRef = element.getAttribute("name");
+
+		@SuppressWarnings("unchecked")
+		List<Element> taskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "task");
+		if (taskElements.size() > 0) {
+			//TaskParser taskParser = new TaskParser();
+//			Object task = taskParser.parse(taskElements.get(0), parserContext);
+			Object task = parseTask(taskElements.get(0), parserContext);
+			stateBuilder.addConstructorArgValue(stepRef);
+			stateBuilder.addConstructorArgValue(task);
+		}
+		else {
+			if (StringUtils.hasText(stepRef)) {
+				RuntimeBeanReference stateDef = new RuntimeBeanReference(stepRef);
+				stateBuilder.addConstructorArgValue(stateDef);
+			}
+			else {
+				throw new BeanCreationException("Error creating Step for " + element);
+			}
+		}
 		return getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
@@ -164,5 +184,33 @@ public class StepParser {
 		return new RuntimeBeanReference(nextDefName);
 
 	}
+
+	/**
+	 * @param element
+	 * @param parserContext
+	 * @return the TaskletStep bean
+	 */
+	protected RootBeanDefinition parseTask(Element element, ParserContext parserContext) {
+
+    	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
+
+        String taskletBeanId = element.getAttribute("tasklet");
+        if (StringUtils.hasText(taskletBeanId)) {
+            RuntimeBeanReference taskletRef = new RuntimeBeanReference(taskletBeanId);
+            bd.getPropertyValues().addPropertyValue("tasklet", taskletRef);
+        }
+        String jobRepository = element.getAttribute("job-repository");
+        RuntimeBeanReference jobRepositoryRef = new RuntimeBeanReference(jobRepository);
+        bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryRef);
+
+        String transactionManager = element.getAttribute("transaction-manager");
+        RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
+        bd.getPropertyValues().addPropertyValue("transactionManager", tx);
+		
+        bd.setRole(BeanDefinition.ROLE_SUPPORT);
+        
+        return bd;
+
+    }
 
 }
