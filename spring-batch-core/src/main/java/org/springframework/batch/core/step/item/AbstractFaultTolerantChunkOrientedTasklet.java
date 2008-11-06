@@ -279,7 +279,7 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 
 		};
 
-		retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(skipped, rollbackClassifier));
+		retryOperations.execute(retryCallback, recoveryCallback, new DefaultRetryState(chunk, rollbackClassifier));
 
 	}
 }
