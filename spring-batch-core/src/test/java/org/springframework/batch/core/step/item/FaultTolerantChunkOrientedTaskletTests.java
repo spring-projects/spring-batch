@@ -385,9 +385,9 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		SkipListener<Integer, String> skipListener = createStrictMock(SkipListener.class);
 		tasklet.registerListener(skipListener);
 		skipListener.onSkipInProcess(1, processorException);
-		expectLastCall();
+		expectLastCall().once();
 		skipListener.onSkipInWrite("2", writerException);
-		expectLastCall();
+		expectLastCall().once();
 		replay(skipListener);
 		
 		// processor fails first
