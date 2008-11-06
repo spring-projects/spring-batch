@@ -11,11 +11,18 @@
 			<task tasklet="tasklet"/>
 			<next on="*" to="step2" />
 		</step>
-		<step name="step2">
+		<step name="step2" next="step3">
 			<task tasklet="tasklet"/>
+		</step>
+		<step name="step3">
+			<chunk-oriented reader="reader" writer="writer"/>
 		</step>
 	</job>
 
 	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
+
+	<beans:bean id="reader" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+	
+	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
 
 </beans:beans>

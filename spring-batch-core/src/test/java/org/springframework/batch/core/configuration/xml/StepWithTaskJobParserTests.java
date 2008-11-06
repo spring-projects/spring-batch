@@ -57,6 +57,6 @@ public class StepWithTaskJobParserTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(2, jobExecution.getStepExecutions().size());
+		assertEquals(3, jobExecution.getStepExecutions().size());
 	}
 }

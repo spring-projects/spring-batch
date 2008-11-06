@@ -20,12 +20,8 @@
 			<xsd:documentation>
 				Defines a job composed of a set of steps and
 				transitions between steps. The job will be exposed
-				in
-				the enclosing
-				bean factory as a component of type Job
-				that can be
-				launched using a
-				JobLauncher.
+				in the enclosing bean factory as a component of type Job
+				that can be launched using a JobLauncher.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -70,23 +66,7 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="transaction-manager" type="xsd:string"
-						default="transactionManager">
-						<xsd:annotation>
-							<xsd:documentation
-								source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
-							The bean name of the TransactionManager that is to be used. This attribute 
-							is not required, and only needs to be specified explicitly
-							if the bean name of the desired TransactionManager is not 'transactionManager'.
-							]]></xsd:documentation>
-							<xsd:appinfo>
-								<tool:annotation kind="ref">
-									<tool:expected-type
-										type="org.springframework.transaction.PlatformTransactionManager" />
-								</tool:annotation>
-							</xsd:appinfo>
-						</xsd:annotation>
-					</xsd:attribute>
+					<xsd:attributeGroup ref="transactionManager"/>
 					<xsd:attribute name="isolation-level-for-create"
 						type="xsd:string">
 						<xsd:annotation>
@@ -117,13 +97,9 @@
 				<xsd:element name="step">
 					<xsd:annotation>
 						<xsd:documentation>
-							Defines a stage in job processing backed by a
-							Step. The name
-							attribute has to match the id of a
-							bean definition
-							for
-							a Step. The
-							next attribute is a synonym for &lt;next on="*" .../&gt;
+							Defines a stage in job processing backed by a Step. The name
+							attribute has to match the id of a bean definition for a Step. 
+							The next attribute is a synonym for &lt;next on="*" .../&gt;
 						</xsd:documentation>
 					</xsd:annotation>
 					<xsd:complexType>
@@ -191,65 +167,75 @@
 		<xsd:complexContent>
 			<xsd:extension base="nextType">
 				<xsd:sequence>
-					<xsd:element name="task" minOccurs="0" maxOccurs="1">
-						<xsd:complexType>
-							<xsd:complexContent>
-								<xsd:extension base="beans:identifiedType">
-									<xsd:attribute name="tasklet" type="xsd:string" use="required">
-										<xsd:annotation>
-											<xsd:documentation><![CDATA[
-											The bean name of the tasklet that is to be used for the task.
-											]]></xsd:documentation>
-										</xsd:annotation>
-									</xsd:attribute>
-									<xsd:attribute name="job-repository" type="xsd:string"
-										default="jobRepository">
-										<xsd:annotation>
-											<xsd:documentation
-												source="java:org.springframework.batch.core.repository.JobRepository"><![CDATA[
-											The bean name of the JobRepository that is to be used. This attribute 
-											is not required, and only needs to be specified explicitly
-											if the bean name of the desired JobRepository is not 'jobRepository'.
-											]]></xsd:documentation>
-											<xsd:appinfo>
-												<tool:annotation kind="ref">
-													<tool:expected-type
-														type="org.springframework.batch.core.repository.JobRepository" />
-												</tool:annotation>
-											</xsd:appinfo>
-										</xsd:annotation>
-									</xsd:attribute>
-									<xsd:attribute name="transaction-manager" type="xsd:string"
-										default="transactionManager">
-										<xsd:annotation>
-											<xsd:documentation
-												source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
-											The bean name of the TransactionManager that is to be used. This attribute 
-											is not required, and only needs to be specified explicitly
-											if the bean name of the desired TransactionManager is not 'transactionManager'.
-											]]></xsd:documentation>
-											<xsd:appinfo>
-												<tool:annotation kind="ref">
-													<tool:expected-type
-														type="org.springframework.transaction.PlatformTransactionManager" />
-												</tool:annotation>
-											</xsd:appinfo>
-										</xsd:annotation>
-									</xsd:attribute>
-								</xsd:extension>
-							</xsd:complexContent>
-						</xsd:complexType>
-					</xsd:element>
+					<xsd:choice>
+						<xsd:element name="chunk-oriented" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:complexContent>
+									<xsd:extension base="processType"/>
+								</xsd:complexContent>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="task" minOccurs="0" maxOccurs="1">
+							<xsd:complexType>
+								<xsd:complexContent>
+									<xsd:extension base="taskType"/>
+								</xsd:complexContent>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:choice>
 					<xsd:group ref="transitions"/>
 				</xsd:sequence>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="transitionWithNextType">
+	<xsd:complexType name="stepDefType">
 		<xsd:complexContent>
-			<xsd:extension base="nextType">
-				<xsd:group ref="transitions"/>
+			<xsd:extension base="beans:identifiedType">
+				<xsd:attributeGroup ref="jobRepository"/>
+				<xsd:attributeGroup ref="transactionManager"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="taskType">
+		<xsd:complexContent>
+			<xsd:extension base="stepDefType">
+				<xsd:attribute name="tasklet" type="xsd:string" use="required">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The bean name of the tasklet that is to be used for the task.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="processType">
+		<xsd:complexContent>
+			<xsd:extension base="stepDefType">
+				<xsd:attribute name="reader" type="xsd:string" use="required">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The bean name of the item reader that is to be used for the process.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="processor" type="xsd:string" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The bean name of the item processor that is to be used for the process.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="writer" type="xsd:string" use="required">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The bean name of the item writer that is to be used for the process.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -267,6 +253,14 @@
 
 	<xsd:complexType name="transitionType">
 		<xsd:group ref="transitions"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="transitionWithNextType">
+		<xsd:complexContent>
+			<xsd:extension base="nextType">
+				<xsd:group ref="transitions"/>
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<xsd:group name="transitions">
@@ -350,5 +344,45 @@
 			</xsd:choice>
 		</xsd:sequence>
 	</xsd:group>
+	
+	<xsd:attributeGroup name="jobRepository">
+		<xsd:attribute name="job-repository" type="xsd:string"
+			default="jobRepository">
+			<xsd:annotation>
+				<xsd:documentation
+					source="java:org.springframework.batch.core.repository.JobRepository"><![CDATA[
+				The bean name of the JobRepository that is to be used. This attribute 
+				is not required, and only needs to be specified explicitly
+				if the bean name of the desired JobRepository is not 'jobRepository'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type
+							type="org.springframework.batch.core.repository.JobRepository" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="transactionManager">
+		<xsd:attribute name="transaction-manager" type="xsd:string"
+			default="transactionManager">
+			<xsd:annotation>
+				<xsd:documentation
+					source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+				The bean name of the TransactionManager that is to be used. This attribute 
+				is not required, and only needs to be specified explicitly
+				if the bean name of the desired TransactionManager is not 'transactionManager'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					`<tool:annotation kind="ref">
+						<tool:expected-type
+							type="org.springframework.transaction.PlatformTransactionManager" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
 
 </xsd:schema>
