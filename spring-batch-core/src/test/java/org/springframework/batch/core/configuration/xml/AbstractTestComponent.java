@@ -1,6 +1,6 @@
 package org.springframework.batch.core.configuration.xml;
 
-public class AbstractTestComponent {
+public abstract class AbstractTestComponent {
 
 	protected boolean executed = false;
 
