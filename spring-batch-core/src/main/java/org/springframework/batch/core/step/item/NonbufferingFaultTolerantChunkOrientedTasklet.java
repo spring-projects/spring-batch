@@ -69,21 +69,19 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 
 		// filter inputs marked for skipping
 		final Map<I, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
-		inputs.removeAll(skippedInputs.keySet());
-
-		// If there is no input we don't have to do anything more
-		if (inputs.isEmpty()) {
-			return result;
-		}
-
-		final List<O> outputs = new ArrayList<O>();
-		process(contribution, inputs, outputs, skippedInputs);
-
-		// filter outputs marked for skipping
 		final Map<O, Exception> skippedOutputs = getBufferedSkips(attributes, SKIPPED_OUTPUTS_KEY);
-		outputs.removeAll(skippedOutputs.keySet());
 
-		write(outputs, contribution, skippedOutputs);
+		if (!inputs.isEmpty()) {
+			inputs.removeAll(skippedInputs.keySet());
+
+			final List<O> outputs = new ArrayList<O>();
+			process(contribution, inputs, outputs, skippedInputs);
+
+			// filter outputs marked for skipping
+			outputs.removeAll(skippedOutputs.keySet());
+
+			write(outputs, contribution, skippedOutputs);
+		}
 
 		callSkipListeners(skippedReads, skippedInputs, skippedOutputs);
 

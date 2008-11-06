@@ -97,22 +97,18 @@ public class FaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolera
 				}
 			});
 
-			// If there is no input we don't have to do anything more
-			if (inputs.isEmpty()) {
-				return result;
-			}
-
 		}
 
-		Map<I, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
+		final Map<I, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
+		final Map<O, Exception> skippedOutputs = getBufferedSkips(attributes, SKIPPED_OUTPUTS_KEY);
+
 		if (!inputs.isEmpty()) {
 			inputs.removeAll(skippedInputs.keySet());
 			process(contribution, inputs, outputs, skippedInputs);
-		}
 
-		Map<O, Exception> skippedOutputs = getBufferedSkips(attributes, SKIPPED_OUTPUTS_KEY);
-		outputs.removeAll(skippedOutputs.keySet());
-		write(outputs, contribution, skippedOutputs);
+			outputs.removeAll(skippedOutputs.keySet());
+			write(outputs, contribution, skippedOutputs);
+		}
 
 		callSkipListeners(skippedReads, skippedInputs, skippedOutputs);
 
@@ -121,10 +117,6 @@ public class FaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolera
 		for (String key : attributes.attributeNames()) {
 			attributes.removeAttribute(key);
 		}
-
-		inputs.clear();
-		skippedInputs.clear();
-		skippedOutputs.clear();
 
 		return result;
 
