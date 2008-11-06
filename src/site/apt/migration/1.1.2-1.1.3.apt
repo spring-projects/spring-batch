@@ -1,0 +1,56 @@
+Release Notes - Spring Batch - Version 1.1.3
+
+        
+* Bug Fixes
+
+  * {{{http://jira.springframework.org/browse/BATCH-725}BATCH-725}} -         The description of DelegatingItemReader in Appendix A( List of ItemReaders)
+
+  * {{{http://jira.springframework.org/browse/BATCH-811}BATCH-811}} -         StepExecutionResourceProxy should throw an exception if a job paramter key in the path isn't found
+
+  * {{{http://jira.springframework.org/browse/BATCH-812}BATCH-812}} -         StepExecutionResourceProxy should use a different JobParametersConverter
+
+  * {{{http://jira.springframework.org/browse/BATCH-820}BATCH-820}} -         Storing a Blob with JdbcExecutionContextDao in DB2
+
+  * {{{http://jira.springframework.org/browse/BATCH-831}BATCH-831}} -         id counter in MapJobInstanceDao should be declared static
+
+  * {{{http://jira.springframework.org/browse/BATCH-832}BATCH-832}} -         DefaultTransactionAttribute is inappropriate for TaskletStep
+
+  * {{{http://jira.springframework.org/browse/BATCH-833}BATCH-833}} -         TransactionAttributes swallows Exceptions
+
+  * {{{http://jira.springframework.org/browse/BATCH-838}BATCH-838}} -         TimeoutTerminationPolicy does not terminate when eof is encountered
+
+  * {{{http://jira.springframework.org/browse/BATCH-839}BATCH-839}} -         Reference doc reference deprecated code: 'StatefulRetryStepFactoryBean' 
+
+  * {{{http://jira.springframework.org/browse/BATCH-847}BATCH-847}} -         FaultTolerantChunkOrientedTasklet loses chunks when non-skippable exceptions thrown in read phase
+
+  * {{{http://jira.springframework.org/browse/BATCH-857}BATCH-857}} -         map daos need to be truly transactional for correct restart
+
+  * {{{http://jira.springframework.org/browse/BATCH-866}BATCH-866}} -         Reference manual has invalid references to org.springframework.batch.io.file package
+
+  * {{{http://jira.springframework.org/browse/BATCH-870}BATCH-870}} -         Cannot add description to empty ExitStatus
+
+  * {{{http://jira.springframework.org/browse/BATCH-884}BATCH-884}} -         SkipLimitStep does not fail if exception occurs
+
+  * {{{http://jira.springframework.org/browse/BATCH-892}BATCH-892}} -         Thread visibility issues in repeat template
+
+    
+* Improvement
+
+  * {{{http://jira.springframework.org/browse/BATCH-802}BATCH-802}} -         Incorrect metadata in fixed-length file example
+
+  * {{{http://jira.springframework.org/browse/BATCH-809}BATCH-809}} -         fixedLenghtTokenizer problem with 1.1.2
+
+  * {{{http://jira.springframework.org/browse/BATCH-828}BATCH-828}} -         org.springframework.batch.item.file.MultiResourceItemReader should allow for no resources
+
+  * {{{http://jira.springframework.org/browse/BATCH-841}BATCH-841}} -         insufficient logging in AbstractStep
+
+  * {{{http://jira.springframework.org/browse/BATCH-844}BATCH-844}} -         Lacking of DAO's property setting in JobRepositoryFactoryBean
+
+  * {{{http://jira.springframework.org/browse/BATCH-881}BATCH-881}} -         Update meta data schema to limit primary key values to Java Long sizes
+
+  * {{{http://jira.springframework.org/browse/BATCH-885}BATCH-885}} -         Reference Doc Appendix B. Meta-Data Schema outdated
+
+        
+* Refactoring
+
+  * {{{http://jira.springframework.org/browse/BATCH-810}BATCH-810}} -         Need to add DB2MainframeSequenceMaxValueIncrementer to DefaultDataFieldMaxValueIncrementerFactory
