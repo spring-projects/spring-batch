@@ -201,14 +201,20 @@ public class StepParser {
 		
         String readerBeanId = element.getAttribute("reader");
         if (StringUtils.hasText(readerBeanId)) {
-            RuntimeBeanReference taskletRef = new RuntimeBeanReference(readerBeanId);
-            bd.getPropertyValues().addPropertyValue("itemReader", taskletRef);
+            RuntimeBeanReference readerRef = new RuntimeBeanReference(readerBeanId);
+            bd.getPropertyValues().addPropertyValue("itemReader", readerRef);
+        }
+
+        String processorBeanId = element.getAttribute("processor");
+        if (StringUtils.hasText(processorBeanId)) {
+            RuntimeBeanReference processorRef = new RuntimeBeanReference(processorBeanId);
+            bd.getPropertyValues().addPropertyValue("itemProcessor", processorRef);
         }
 
         String writerBeanId = element.getAttribute("writer");
         if (StringUtils.hasText(writerBeanId)) {
-            RuntimeBeanReference taskletRef = new RuntimeBeanReference(writerBeanId);
-            bd.getPropertyValues().addPropertyValue("itemWriter", taskletRef);
+            RuntimeBeanReference writerRef = new RuntimeBeanReference(writerBeanId);
+            bd.getPropertyValues().addPropertyValue("itemWriter", writerRef);
         }
 
         String jobRepository = element.getAttribute("job-repository");

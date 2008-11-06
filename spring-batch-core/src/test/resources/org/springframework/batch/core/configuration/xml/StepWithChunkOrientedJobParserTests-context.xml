@@ -8,14 +8,14 @@
 	
 	<job id="job">
 		<step name="step1">
-			<task tasklet="tasklet"/>
-			<next on="*" to="step2" />
-		</step>
-		<step name="step2">
-			<task tasklet="tasklet"/>
+			<chunk-oriented reader="reader" processor="processor" writer="writer"/>
 		</step>
 	</job>
 
-	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"/>
+	<beans:bean id="reader" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+	
+	<beans:bean id="processor" class="org.springframework.batch.core.configuration.xml.TestProcessor"/>
+	
+	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
 
 </beans:beans>

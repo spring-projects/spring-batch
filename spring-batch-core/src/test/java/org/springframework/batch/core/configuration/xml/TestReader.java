@@ -8,7 +8,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 
-public class TestReader implements ItemReader<String> {
+public class TestReader extends AbstractTestComponent implements ItemReader<String> {
 
 	List<String> items = null;
 	
@@ -21,6 +21,7 @@ public class TestReader implements ItemReader<String> {
 
 	public String read() throws Exception, UnexpectedInputException,
 			ParseException {
+		executed = true;
 		if (items.size() > 0) {
 			String item = items.remove(0); 
 			return item;

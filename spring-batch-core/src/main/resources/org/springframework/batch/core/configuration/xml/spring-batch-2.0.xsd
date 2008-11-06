@@ -171,7 +171,7 @@
 						<xsd:element name="chunk-oriented" minOccurs="0" maxOccurs="1">
 							<xsd:complexType>
 								<xsd:complexContent>
-									<xsd:extension base="processType"/>
+									<xsd:extension base="chunkOrientedType"/>
 								</xsd:complexContent>
 							</xsd:complexType>
 						</xsd:element>
@@ -212,7 +212,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="processType">
+	<xsd:complexType name="chunkOrientedType">
 		<xsd:complexContent>
 			<xsd:extension base="stepDefType">
 				<xsd:attribute name="reader" type="xsd:string" use="required">

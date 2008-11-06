@@ -39,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class StepWithTaskJobParserTests {
+public class StepWithChunkOrientedJobParserTests {
 	
 	@Autowired
 	private Job job;
@@ -48,7 +48,13 @@ public class StepWithTaskJobParserTests {
 	private JobRepository jobRepository;
 	
 	@Autowired
-	private AbstractTestComponent tasklet;
+	private TestReader reader;
+	
+	@Autowired
+	private TestProcessor processor;
+	
+	@Autowired
+	private TestWriter writer;
 	
 	@Before
 	public void setUp() {
@@ -61,7 +67,9 @@ public class StepWithTaskJobParserTests {
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(2, jobExecution.getStepExecutions().size());
-		assertTrue(tasklet.isExecuted());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+		assertTrue(reader.isExecuted());
+		assertTrue(processor.isExecuted());
+		assertTrue(writer.isExecuted());
 	}
 }
