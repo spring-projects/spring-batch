@@ -106,6 +106,10 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.transaction</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>org.springframework.expression</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

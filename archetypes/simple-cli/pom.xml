@@ -1,7 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
-	<artifactId>simple-cli-archetype</artifactId>
+	<artifactId>org.springframework.batch.archetype.simple.cli</artifactId>
 	<version>2.0.0.CI-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Commandline</name>
@@ -15,7 +16,7 @@
 	</description>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>2.5.5</spring.framework.version>
+		<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
 		<bundlor.version>1.0.0.M1</bundlor.version>
 	</properties>
 	<profiles>
@@ -62,40 +63,40 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
+			<artifactId>org.springframework.test</artifactId>
 			<version>${spring.framework.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
-			<artifactId>spring-batch-samples</artifactId>
+			<artifactId>org.springframework.batch.samples</artifactId>
 			<version>${pom.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.2.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-collections</groupId>
-					<artifactId>commons-collections</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
+			<version>1.2.2.osgi</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.2</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.io</artifactId>
+			<version>1.4.0</version>
 		</dependency>
 		<dependency>
-			<groupId>hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>1.8.0.7</version>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>com.springsource.org.hsqldb</artifactId>
+			<version>1.8.0.9</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>1.5.3</version>
+			<groupId>org.aspectj</groupId>
+			<artifactId>com.springsource.org.aspectj.runtime</artifactId>
+			<version>1.5.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>com.springsource.org.aspectj.weaver</artifactId>
+			<version>1.5.4</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -159,16 +160,30 @@
 			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>com.springsource.repository.bundles.release</id>
+			<name>SpringSource Enterprise Bundle Repository -
+				SpringSource Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/release</url>
+		</repository>
+		<repository>
+			<id>com.springsource.repository.bundles.external</id>
+			<name>SpringSource Enterprise Bundle Repository -
+				External Bundle Releases</name>
+			<url>http://repository.springsource.com/maven/bundles/external</url>
+		</repository>
+	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>Codehaus</id>
 			<url>http://repository.codehaus.org/</url>
 		</pluginRepository>
 		<pluginRepository>
-			<id>com.springsource.repository.bundles.snapshot</id>
+			<id>com.springsource.repository.bundles.plugins</id>
 			<name>SpringSource Enterprise Bundle Repository -
-				SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+				SpringSource Bundle Plugins</name>
+			<url>http://repository.springsource.com/maven/bundles/milestone</url>
 		</pluginRepository>
 	</pluginRepositories>
 	<distributionManagement>
