@@ -12,13 +12,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
 /**
@@ -55,10 +55,11 @@ public class AbstractStepTests {
 			events.add("open");
 		}
 
-		protected ExitStatus doExecute(StepExecution context) throws Exception {
+		@Override
+		protected void doExecute(StepExecution context) throws Exception {
 			assertSame(execution, context);
 			events.add("doExecute");
-			return ExitStatus.FINISHED;
+			context.setExitStatus(ExitStatus.FINISHED);
 		}
 
 		protected void close(ExecutionContext ctx) throws Exception {
@@ -139,8 +140,7 @@ public class AbstractStepTests {
 	public void testBeanName() throws Exception {
 		AbstractStep step = new AbstractStep() {
 			@Override
-			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
-				return null;
+			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
 		};
 		assertNull(step.getName());
@@ -152,8 +152,7 @@ public class AbstractStepTests {
 	public void testName() throws Exception {
 		AbstractStep step = new AbstractStep() {
 			@Override
-			protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
-				return null;
+			protected void doExecute(StepExecution stepExecution) throws Exception {
 			}
 		};
 		assertNull(step.getName());
@@ -196,7 +195,7 @@ public class AbstractStepTests {
 	public void testFailure() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
-			protected ExitStatus doExecute(StepExecution context) throws Exception {
+			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
 				throw new RuntimeException("crash!");
 			}
@@ -234,9 +233,9 @@ public class AbstractStepTests {
 	public void testStoppedStep() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
-			protected ExitStatus doExecute(StepExecution context) throws Exception {
+			protected void doExecute(StepExecution context) throws Exception {
 				context.setTerminateOnly();
-				return super.doExecute(context);
+				super.doExecute(context);
 			}
 		};
 		tested.setJobRepository(repository);
@@ -257,7 +256,7 @@ public class AbstractStepTests {
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
-		assertEquals("JOB_INTERRUPTED", execution.getExitStatus().getExitCode());
+		assertEquals("INTERRUPTED", execution.getExitStatus().getExitCode());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("afterStep"));
@@ -270,9 +269,8 @@ public class AbstractStepTests {
 	public void testFailureInSavingExecutionContext() throws Exception {
 		tested = new EventTrackingStep() {
 			@Override
-			protected ExitStatus doExecute(StepExecution context) throws Exception {
+			protected void doExecute(StepExecution context) throws Exception {
 				super.doExecute(context);
-				return ExitStatus.FINISHED;
 			}
 		};
 		repository = new JobRepositoryStub() {

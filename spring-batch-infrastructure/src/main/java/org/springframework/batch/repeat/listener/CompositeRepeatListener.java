@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 
@@ -54,7 +54,7 @@ public class CompositeRepeatListener implements RepeatListener {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatListener#after(org.springframework.batch.repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
 	 */
-	public void after(RepeatContext context, ExitStatus result) {
+	public void after(RepeatContext context, RepeatStatus result) {
 		for (RepeatListener listener : listeners) {
 			listener.after(context, result);
 		}

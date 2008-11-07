@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat;
 
+
 /**
  * The main interface providing access to batch operations. The batch client is
  * the {@link RepeatCallback}, where a single item or record is processed. The
@@ -41,6 +42,6 @@ public interface RepeatOperations {
 	 * indication of whether the {@link RepeatOperations} can continue
 	 * processing if this method is called again.
 	 */
-	ExitStatus iterate(RepeatCallback callback) throws RepeatException;
+	RepeatStatus iterate(RepeatCallback callback) throws RepeatException;
 
 }

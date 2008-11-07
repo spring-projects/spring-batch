@@ -16,12 +16,12 @@
 package org.springframework.batch.integration.job;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.core.Message;
@@ -97,10 +97,10 @@ public class MessageOrientedStep extends AbstractStep {
 	 * @see AbstractStep#execute(StepExecution)
 	 */
 	@Override
-	public ExitStatus doExecute(StepExecution stepExecution) throws JobInterruptedException,
+	protected void doExecute(StepExecution stepExecution) throws JobInterruptedException,
 			UnexpectedJobExecutionException {
 
-		JobExecutionRequest request = new JobExecutionRequest(stepExecution .getJobExecution());
+		JobExecutionRequest request = new JobExecutionRequest(stepExecution.getJobExecution());
 
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 
@@ -116,7 +116,7 @@ public class MessageOrientedStep extends AbstractStep {
 			waitForReply(request.getJobId());
 		}
 
-		return ExitStatus.FINISHED;
+		stepExecution.setExitStatus(ExitStatus.FINISHED);
 
 	}
 

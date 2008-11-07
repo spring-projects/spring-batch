@@ -16,10 +16,11 @@
 
 package org.springframework.batch.repeat.policy;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 public class TimeoutCompletionPolicyTests {
@@ -43,7 +44,7 @@ public class TimeoutCompletionPolicyTests {
 	@Test
 	public void testNonContinuableResult() throws Exception {
 		TimeoutTerminationPolicy policy = new TimeoutTerminationPolicy();
-		ExitStatus result = new ExitStatus(false, "non-continuable exit status");
+		RepeatStatus result = RepeatStatus.FINISHED;
 		assertTrue(policy.isComplete(policy.start(null), result));
 	}
 

@@ -16,7 +16,8 @@
 
 package org.springframework.batch.repeat.jms;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,27 +27,27 @@ import javax.jms.JMSException;
 import javax.jms.Session;
 import javax.sql.DataSource;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jms.connection.SessionProxy;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.SessionCallback;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.BeforeTransaction;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.BeansException;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ApplicationContext;
-import org.junit.runner.RunWith;
-import org.junit.Test;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/jms/jms-context.xml")
@@ -101,11 +102,11 @@ public class SynchronousTests implements ApplicationContextAware {
 		assertInitialState();
 
 		repeatTemplate.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				String text = (String) jmsTemplate.receiveAndConvert("queue");
 				list.add(text);
 				simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
-				return new ExitStatus(text != null);
+				return RepeatStatus.continueIf(text != null);
 			}
 		});
 
@@ -125,11 +126,11 @@ public class SynchronousTests implements ApplicationContextAware {
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
 				repeatTemplate.iterate(new RepeatCallback() {
-					public ExitStatus doInIteration(RepeatContext context) throws Exception {
+					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) jmsTemplate.receiveAndConvert("queue");
 						list.add(text);
 						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
-						return new ExitStatus(text != null);
+						return RepeatStatus.continueIf(text != null);
 					}
 				});
 				// force rollback...
@@ -170,11 +171,11 @@ public class SynchronousTests implements ApplicationContextAware {
 			public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
 
 				repeatTemplate.iterate(new RepeatCallback() {
-					public ExitStatus doInIteration(RepeatContext context) throws Exception {
+					public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 						String text = (String) txJmsTemplate.receiveAndConvert("queue");
 						list.add(text);
 						simpleJdbcTemplate.update("INSERT into T_FOOS (id,name,foo_date) values (?,?,null)", list.size(), text);
-						return new ExitStatus(text != null);
+						return RepeatStatus.continueIf(text != null);
 					}
 				});
 

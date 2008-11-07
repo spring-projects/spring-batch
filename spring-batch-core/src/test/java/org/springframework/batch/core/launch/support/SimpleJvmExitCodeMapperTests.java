@@ -21,9 +21,9 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.launch.support.SimpleJvmExitCodeMapper;
-import org.springframework.batch.repeat.ExitStatus;
 
 public class SimpleJvmExitCodeMapperTests extends TestCase {
 

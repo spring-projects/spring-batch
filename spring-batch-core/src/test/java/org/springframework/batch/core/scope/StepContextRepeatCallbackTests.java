@@ -20,10 +20,11 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 
 /**
  * @author Dave Syer
@@ -44,7 +45,8 @@ public class StepContextRepeatCallbackTests {
 				return ExitStatus.NOOP;
 			}
 		};
-		assertEquals(ExitStatus.NOOP, callback.doInIteration(null));
+		assertEquals(RepeatStatus.FINISHED, callback.doInIteration(null));		
+		assertEquals(ExitStatus.NOOP, stepExecution.getExitStatus());
 	}
 
 	@Test

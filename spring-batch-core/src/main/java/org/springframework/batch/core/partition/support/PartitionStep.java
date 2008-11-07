@@ -10,7 +10,6 @@ import org.springframework.batch.core.partition.PartitionHandler;
 import org.springframework.batch.core.partition.StepExecutionSplitter;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
 /**
@@ -70,7 +69,7 @@ public class PartitionStep extends AbstractStep {
 	 * @see Step#execute(StepExecution)
 	 */
 	@Override
-	protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+	protected void doExecute(StepExecution stepExecution) throws Exception {
 
 		// Wait for task completion and then aggregate the results
 		Collection<StepExecution> executions = partitionHandler.handle(stepExecutionSplitter, stepExecution);
@@ -78,8 +77,6 @@ public class PartitionStep extends AbstractStep {
 		if (stepExecution.getStatus()!=BatchStatus.COMPLETED) {
 			throw new JobExecutionException("Partition handler returned an incomplete step");
 		}
-
-		return stepExecution.getExitStatus();
 
 	}
 

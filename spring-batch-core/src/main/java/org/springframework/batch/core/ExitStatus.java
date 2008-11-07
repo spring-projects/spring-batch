@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.repeat;
+package org.springframework.batch.core;
 
 import java.io.Serializable;
 
+import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.util.StringUtils;
 
 /**
@@ -65,6 +66,11 @@ public class ExitStatus implements Serializable {
 	 * Convenient constant value representing finished processing with an error.
 	 */
 	public static final ExitStatus FAILED = new ExitStatus(false, "FAILED");
+
+	/**
+	 * Convenient constant value representing finished processing with interrupted status.
+	 */
+	public static final ExitStatus INTERRUPTED = new ExitStatus(false, "INTERRUPTED");
 
 	private final boolean continuable;
 
@@ -138,8 +144,9 @@ public class ExitStatus implements Serializable {
 	 * Severity is defined by the exit code:
 	 * <ul>
 	 * <li>Codes beginning with NOOP have severity 1</li>
-	 * <li>Codes beginning with FAILED have severity 2</li>
-	 * <li>Codes beginning with UNKNOWN have severity 3</li>
+	 * <li>Codes beginning with INTERRUPTED have severity 2</li>
+	 * <li>Codes beginning with FAILED have severity 3</li>
+	 * <li>Codes beginning with UNKNOWN have severity 4</li>
 	 * </ul>
 	 * Others have severity 0.<br/>
 	 * 
@@ -173,11 +180,14 @@ public class ExitStatus implements Serializable {
 		if (status.exitCode.startsWith(NOOP.exitCode)) {
 			return 0;
 		}
-		if (status.exitCode.startsWith(FAILED.exitCode)) {
+		if (status.exitCode.startsWith(INTERRUPTED.exitCode)) {
 			return 1;
 		}
-		if (status.exitCode.startsWith(UNKNOWN.exitCode)) {
+		if (status.exitCode.startsWith(FAILED.exitCode)) {
 			return 2;
+		}
+		if (status.exitCode.startsWith(UNKNOWN.exitCode)) {
+			return 3;
 		}
 		return 0;
 	}

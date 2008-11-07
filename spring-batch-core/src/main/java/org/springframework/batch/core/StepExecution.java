@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
 /**

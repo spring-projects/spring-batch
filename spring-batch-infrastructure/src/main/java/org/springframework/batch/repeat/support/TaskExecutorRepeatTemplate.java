@@ -16,7 +16,7 @@
 
 package org.springframework.batch.repeat.support;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
@@ -78,7 +78,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * method so there is no need to synchronize access.
 	 * 
 	 */
-	protected ExitStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
+	protected RepeatStatus getNextResult(RepeatContext context, RepeatCallback callback, RepeatInternalState state)
 			throws Throwable {
 
 		ExecutingRunnable runnable = null;
@@ -161,7 +161,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 				state.getThrowables().add(future.getError());
 			}
 			else {
-				ExitStatus status = future.getResult();
+				RepeatStatus status = future.getResult();
 				result = result && canContinue(status);
 				executeAfterInterceptors(future.getContext(), status);
 			}
@@ -192,7 +192,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		private final ResultQueue<ResultHolder> queue;
 
-		private volatile ExitStatus result;
+		private volatile RepeatStatus result;
 
 		private volatile Throwable error;
 
@@ -241,7 +241,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * Get the result - never blocks because the queue manages waiting for
 		 * the task to finish.
 		 */
-		public ExitStatus getResult() {
+		public RepeatStatus getResult() {
 			return result;
 		}
 

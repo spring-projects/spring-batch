@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -42,7 +42,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
@@ -50,7 +50,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 				if (item!=null) {
 					processor.write(Collections.singletonList(item));
 				}
-				return new ExitStatus(item!=null);
+				return RepeatStatus.continueIf(item!=null);
 			}
 		};
 
@@ -78,7 +78,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
@@ -86,9 +86,9 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 			}
 		};
 		RepeatCallback jobCallback = new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				stepTemplate.iterate(stepCallback);
-				return ExitStatus.FINISHED;
+				return RepeatStatus.FINISHED;
 			}
 		};
 

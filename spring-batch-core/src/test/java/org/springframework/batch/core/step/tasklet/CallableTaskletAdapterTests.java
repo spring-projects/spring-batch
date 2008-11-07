@@ -21,8 +21,8 @@ import static org.junit.Assert.fail;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.step.tasklet.CallableTaskletAdapter;
-import org.springframework.batch.repeat.ExitStatus;
 
 public class CallableTaskletAdapterTests {
 	

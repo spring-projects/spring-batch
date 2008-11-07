@@ -18,7 +18,7 @@ package org.springframework.batch.repeat.callback;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -29,12 +29,12 @@ public class NestedRepeatCallbackTests extends TestCase {
 
 	public void testExecute() throws Exception {
 		NestedRepeatCallback callback = new NestedRepeatCallback(new RepeatTemplate(), new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				return new ExitStatus(count <= 1);
+				return RepeatStatus.continueIf(count <= 1);
 			}
 		});
-		ExitStatus result = callback.doInIteration(null);
+		RepeatStatus result = callback.doInIteration(null);
 		assertEquals(2, count);
 		assertFalse(result.isContinuable()); // False because processing has finished
 	}

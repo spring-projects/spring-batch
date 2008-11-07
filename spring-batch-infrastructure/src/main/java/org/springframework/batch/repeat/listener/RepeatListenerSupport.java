@@ -16,7 +16,7 @@
 
 package org.springframework.batch.repeat.listener;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
 
@@ -31,7 +31,7 @@ public class RepeatListenerSupport implements RepeatListener {
 	public void before(RepeatContext context) {
 	}
 
-	public void after(RepeatContext context, ExitStatus result) {
+	public void after(RepeatContext context, RepeatStatus result) {
 	}
 
 	public void close(RepeatContext context) {

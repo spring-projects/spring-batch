@@ -18,7 +18,7 @@ package org.springframework.batch.repeat.policy;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 public class SimpleCompletionPolicyTests extends TestCase {
@@ -27,7 +27,7 @@ public class SimpleCompletionPolicyTests extends TestCase {
 
 	RepeatContext context;
 
-	ExitStatus dummy = ExitStatus.CONTINUABLE;
+	RepeatStatus dummy = RepeatStatus.CONTINUABLE;
 
 	protected void setUp() throws Exception {
 		super.setUp();

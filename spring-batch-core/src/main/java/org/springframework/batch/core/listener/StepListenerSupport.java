@@ -18,12 +18,12 @@ package org.springframework.batch.core.listener;
 import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Basic no-op implementations of all {@link StepListener} implementations.

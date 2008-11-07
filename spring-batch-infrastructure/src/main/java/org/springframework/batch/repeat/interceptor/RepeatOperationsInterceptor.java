@@ -19,7 +19,7 @@ package org.springframework.batch.repeat.interceptor;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.ProxyMethodInvocation;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
@@ -75,7 +75,7 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 		try {
 			repeatOperations.iterate(new RepeatCallback() {
 
-				public ExitStatus doInIteration(RepeatContext context) throws Exception {
+				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					try {
 
 						MethodInvocation clone = invocation;
@@ -89,16 +89,16 @@ public class RepeatOperationsInterceptor implements MethodInterceptor {
 
 						Object value = clone.proceed();
 						if (voidReturnType) {
-							return ExitStatus.CONTINUABLE;
+							return RepeatStatus.CONTINUABLE;
 						}
 						if (!isComplete(value)) {
 							// Save the last result
 							result.setValue(value);
-							return ExitStatus.CONTINUABLE;
+							return RepeatStatus.CONTINUABLE;
 						}
 						else {
 							result.setFinalValue(value);
-							return ExitStatus.FINISHED;
+							return RepeatStatus.FINISHED;
 						}
 					}
 					catch (Throwable e) {

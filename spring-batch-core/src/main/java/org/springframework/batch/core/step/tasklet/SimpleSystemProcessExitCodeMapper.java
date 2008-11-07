@@ -1,6 +1,6 @@
 package org.springframework.batch.core.step.tasklet;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.core.ExitStatus;
 
 /**
  * Simple {@link SystemProcessExitCodeMapper} implementation that performs following mapping:

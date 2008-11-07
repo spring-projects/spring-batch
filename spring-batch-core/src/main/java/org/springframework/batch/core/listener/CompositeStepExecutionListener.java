@@ -18,9 +18,9 @@ package org.springframework.batch.core.listener;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.core.Ordered;
 
 /**

@@ -2,7 +2,7 @@ package org.springframework.batch.integration.chunk;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;

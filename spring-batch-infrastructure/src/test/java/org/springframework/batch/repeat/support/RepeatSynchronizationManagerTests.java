@@ -20,7 +20,6 @@ import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 
 public class RepeatSynchronizationManagerTests extends TestCase {
 

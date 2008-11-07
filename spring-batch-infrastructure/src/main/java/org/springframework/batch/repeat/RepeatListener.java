@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat;
 
+
 /**
  * Interface for listeners to the batch process. Implementers can provide
  * enhance the behaviour of a batch in small cross-cutting modules. The
@@ -41,7 +42,7 @@ public interface RepeatListener {
 	 * @param context the current batch context
 	 * @param result the result of the callback
 	 */
-	void after(RepeatContext context, ExitStatus result);
+	void after(RepeatContext context, RepeatStatus result);
 
 	/**
 	 * Called once at the start of a complete batch, before any items are

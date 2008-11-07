@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat;
 
+
 /**
  * Interface for batch completion policies, to enable batch operations to
  * strategise normal completion conditions. Stateful implementations of batch
@@ -41,7 +42,7 @@ public interface CompletionPolicy {
 	 * 
 	 * @see #isComplete(RepeatContext)
 	 */
-	boolean isComplete(RepeatContext context, ExitStatus result);
+	boolean isComplete(RepeatContext context, RepeatStatus result);
 
 	/**
 	 * Allow policy to signal completion according to internal state, without

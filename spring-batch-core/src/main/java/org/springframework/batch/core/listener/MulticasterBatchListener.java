@@ -18,6 +18,7 @@ package org.springframework.batch.core.listener;
 import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
@@ -26,7 +27,6 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer

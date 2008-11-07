@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer

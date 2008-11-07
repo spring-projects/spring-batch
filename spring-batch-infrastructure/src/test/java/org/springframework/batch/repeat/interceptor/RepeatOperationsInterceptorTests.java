@@ -27,7 +27,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -68,7 +68,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testSetTemplate() throws Exception {
 		final List<Object> calls = new ArrayList<Object>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
-			public ExitStatus iterate(RepeatCallback callback) {
+			public RepeatStatus iterate(RepeatCallback callback) {
 				try {
 					Object result = callback.doInIteration(null);
 					calls.add(result);
@@ -76,7 +76,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 				catch (Exception e) {
 					throw new RepeatException("Encountered exception in repeat.", e);
 				}
-				return ExitStatus.CONTINUABLE;
+				return RepeatStatus.CONTINUABLE;
 			}
 		});
 		((Advised) service).addAdvice(interceptor);
@@ -87,9 +87,9 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 	public void testCallbackNotExecuted() throws Exception {
 		final List<Object> calls = new ArrayList<Object>();
 		interceptor.setRepeatOperations(new RepeatOperations() {
-			public ExitStatus iterate(RepeatCallback callback) {
+			public RepeatStatus iterate(RepeatCallback callback) {
 				calls.add(null);
-				return ExitStatus.FINISHED;
+				return RepeatStatus.FINISHED;
 			}
 		});
 		((Advised) service).addAdvice(interceptor);

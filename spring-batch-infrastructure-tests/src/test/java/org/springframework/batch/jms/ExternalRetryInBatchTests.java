@@ -28,9 +28,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -123,12 +123,12 @@ public class ExternalRetryInBatchTests {
 
 							repeatTemplate.iterate(new RepeatCallback() {
 
-								public ExitStatus doInIteration(RepeatContext context) throws Exception {
+								public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 
 									final String item = provider.read();
 									
 									if (item==null) {
-										return ExitStatus.FINISHED;
+										return RepeatStatus.FINISHED;
 									}
 									
 									RetryCallback<String> callback = new RetryCallback<String>() {
@@ -154,7 +154,7 @@ public class ExternalRetryInBatchTests {
 
 									retryTemplate.execute(callback, recoveryCallback, new DefaultRetryState(item));
 									
-									return ExitStatus.CONTINUABLE;
+									return RepeatStatus.CONTINUABLE;
 
 								}
 

@@ -19,7 +19,7 @@ import java.util.Collections;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 
@@ -44,13 +44,13 @@ public class ItemReaderRepeatCallback<T> implements RepeatCallback {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(org.springframework.batch.repeat.RepeatContext)
 	 */
-	public ExitStatus doInIteration(RepeatContext context) throws Exception {
+	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		T item = reader.read();
 		if (item==null) {
-			return ExitStatus.FINISHED;
+			return RepeatStatus.FINISHED;
 		}
 		writer.write(Collections.singletonList(item));
-		return ExitStatus.CONTINUABLE;
+		return RepeatStatus.CONTINUABLE;
 	}
 
 }

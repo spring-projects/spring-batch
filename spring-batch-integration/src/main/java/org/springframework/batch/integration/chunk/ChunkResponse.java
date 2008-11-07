@@ -2,7 +2,7 @@ package org.springframework.batch.integration.chunk;
 
 import java.io.Serializable;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.core.ExitStatus;
 
 public class ChunkResponse implements Serializable {
 

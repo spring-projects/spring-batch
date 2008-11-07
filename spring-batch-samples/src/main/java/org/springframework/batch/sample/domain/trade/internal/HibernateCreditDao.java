@@ -18,9 +18,9 @@ package org.springframework.batch.sample.domain.trade.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.batch.sample.domain.trade.CustomerCreditDao;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -89,7 +89,7 @@ public class HibernateCreditDao extends HibernateDaoSupport implements
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.repeat.RepeatInterceptor#after(org.springframework.batch.repeat.RepeatContext, org.springframework.batch.repeat.ExitStatus)
 	 */
-	public void after(RepeatContext context, ExitStatus result) {
+	public void after(RepeatContext context, RepeatStatus result) {
 	}
 
 	/* (non-Javadoc)

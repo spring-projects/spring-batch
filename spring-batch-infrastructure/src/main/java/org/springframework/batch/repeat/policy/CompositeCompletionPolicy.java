@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 
@@ -48,9 +48,9 @@ public class CompositeCompletionPolicy implements CompletionPolicy {
 	 * This policy is complete if any of the composed policies is complete.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
-	 * ExitStatus)
+	 * RepeatStatus)
 	 */
-	public boolean isComplete(RepeatContext context, ExitStatus result) {
+	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		RepeatContext[] contexts = ((CompositeBatchContext) context).contexts;
 		CompletionPolicy[] policies = ((CompositeBatchContext) context).policies;
 		for (int i = 0; i < policies.length; i++) {

@@ -18,11 +18,12 @@ package org.springframework.batch.core.scope;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 
 /**
  * Convenient base class for clients who need to do something in a repeat
@@ -52,7 +53,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 * 
 	 * @see RepeatCallback#doInIteration(RepeatContext)
 	 */
-	public ExitStatus doInIteration(RepeatContext context) throws Exception {
+	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 
 		ChunkContext chunkContext = attributeQueue.poll();
 		if (chunkContext == null) {
@@ -64,7 +65,9 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		// otherwise step-scoped beans will be re-initialised for each chunk.
 		StepSynchronizationManager.register(stepContext);
 		try {
-			return doInStepContext(context, stepContext);
+			ExitStatus exitStatus = doInStepContext(context, stepContext);
+			stepContext.getStepExecution().setExitStatus(exitStatus);
+			return RepeatStatus.continueIf(exitStatus.isContinuable());
 		}
 		finally {
 			// Still some stuff to do with the data in this chunk,

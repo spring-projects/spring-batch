@@ -19,7 +19,7 @@ package org.springframework.batch.repeat.policy;
 import junit.framework.TestCase;
 
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 public class CompositeCompletionPolicyTests extends TestCase {
@@ -59,7 +59,7 @@ public class CompositeCompletionPolicyTests extends TestCase {
 		CompositeCompletionPolicy policy = new CompositeCompletionPolicy();
 		policy.setPolicies(new CompletionPolicy[] { new MockCompletionPolicySupport(),
 				new MockCompletionPolicySupport() {
-					public boolean isComplete(RepeatContext context, ExitStatus result) {
+					public boolean isComplete(RepeatContext context, RepeatStatus result) {
 						return true;
 					}
 				} });

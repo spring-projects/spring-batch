@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Batch domain object representing the execution of a job.

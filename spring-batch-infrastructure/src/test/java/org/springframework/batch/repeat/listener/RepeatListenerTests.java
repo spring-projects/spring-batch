@@ -21,7 +21,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatListener;
@@ -46,9 +46,9 @@ public class RepeatListenerTests extends TestCase {
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				return new ExitStatus(count <= 1);
+				return RepeatStatus.continueIf(count <= 1);
 			}
 		});
 		// 2 calls: the second time there is no processing
@@ -69,9 +69,9 @@ public class RepeatListenerTests extends TestCase {
 			}
 		});
 		template.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				return ExitStatus.FINISHED;
+				return RepeatStatus.FINISHED;
 			}
 		});
 		assertEquals(0, count);
@@ -83,18 +83,18 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<Object>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
-			public void after(RepeatContext context, ExitStatus result) {
+			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatListenerSupport() {
-			public void after(RepeatContext context, ExitStatus result) {
+			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("2");
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				return new ExitStatus(count <= 1);
+				return RepeatStatus.continueIf(count <= 1);
 			}
 		});
 		// 2 calls to the callback, and the second one had no processing...
@@ -117,9 +117,9 @@ public class RepeatListenerTests extends TestCase {
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				return ExitStatus.CONTINUABLE;
+				return RepeatStatus.CONTINUABLE;
 			}
 		});
 		assertEquals(0, count);
@@ -135,10 +135,10 @@ public class RepeatListenerTests extends TestCase {
 			}
 		});
 		template.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
 				context.setCompleteOnly();
-				return ExitStatus.FINISHED;
+				return RepeatStatus.FINISHED;
 			}
 		});
 		assertEquals(1, count);
@@ -158,9 +158,9 @@ public class RepeatListenerTests extends TestCase {
 			}
 		} });
 		template.iterate(new RepeatCallback() {
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++;
-				return new ExitStatus(count < 2);
+				return RepeatStatus.continueIf(count < 2);
 			}
 		});
 		// Test that more than one call comes in to the callback...
@@ -184,7 +184,7 @@ public class RepeatListenerTests extends TestCase {
 		} });
 		try {
 			template.iterate(new RepeatCallback() {
-				public ExitStatus doInIteration(RepeatContext context) throws Exception {
+				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new IllegalStateException("Bogus");
 				}
 			});
@@ -201,7 +201,7 @@ public class RepeatListenerTests extends TestCase {
 		RepeatTemplate template = new RepeatTemplate();
 		final List<Object> calls = new ArrayList<Object>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
-			public void after(RepeatContext context, ExitStatus result) {
+			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatListenerSupport() {
@@ -211,7 +211,7 @@ public class RepeatListenerTests extends TestCase {
 		} });
 		try {
 			template.iterate(new RepeatCallback() {
-				public ExitStatus doInIteration(RepeatContext context) throws Exception {
+				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new IllegalStateException("Bogus");
 				}
 			});
@@ -231,7 +231,7 @@ public class RepeatListenerTests extends TestCase {
 		final List<Object> calls = new ArrayList<Object>();
 		final List<Object> fails = new ArrayList<Object>();
 		template.setListeners(new RepeatListener[] { new RepeatListenerSupport() {
-			public void after(RepeatContext context, ExitStatus result) {
+			public void after(RepeatContext context, RepeatStatus result) {
 				calls.add("1");
 			}
 		}, new RepeatListenerSupport() {
@@ -242,7 +242,7 @@ public class RepeatListenerTests extends TestCase {
 		} });
 		try {
 			template.iterate(new RepeatCallback() {
-				public ExitStatus doInIteration(RepeatContext context) throws Exception {
+				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					throw new IllegalStateException("Bogus");
 				}
 			});

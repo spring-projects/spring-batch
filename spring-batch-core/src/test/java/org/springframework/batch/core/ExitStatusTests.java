@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.repeat;
+package org.springframework.batch.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
 
 /**
  * @author Dave Syer
@@ -30,7 +31,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, String)}
+	 * {@link org.springframework.batch.core.ExitStatus#ExitStatus(boolean, String)}
 	 * .
 	 */
 	@Test
@@ -42,7 +43,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, String)}
+	 * {@link org.springframework.batch.core.ExitStatus#ExitStatus(boolean, String)}
 	 * .
 	 */
 	@Test
@@ -54,7 +55,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#ExitStatus(boolean, String)}
+	 * {@link org.springframework.batch.core.ExitStatus#ExitStatus(boolean, String)}
 	 * .
 	 */
 	@Test
@@ -107,7 +108,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#and(boolean)}.
+	 * {@link org.springframework.batch.core.ExitStatus#and(boolean)}.
 	 */
 	@Test
 	public void testAndBoolean() {
@@ -120,7 +121,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}
+	 * {@link org.springframework.batch.core.ExitStatus#and(org.springframework.batch.core.ExitStatus)}
 	 * .
 	 */
 	@Test
@@ -133,7 +134,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}
+	 * {@link org.springframework.batch.core.ExitStatus#and(org.springframework.batch.core.ExitStatus)}
 	 * .
 	 */
 	@Test
@@ -143,7 +144,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}
+	 * {@link org.springframework.batch.core.ExitStatus#and(org.springframework.batch.core.ExitStatus)}
 	 * .
 	 */
 	@Test
@@ -153,7 +154,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}
+	 * {@link org.springframework.batch.core.ExitStatus#and(org.springframework.batch.core.ExitStatus)}
 	 * .
 	 */
 	@Test
@@ -164,7 +165,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}
+	 * {@link org.springframework.batch.core.ExitStatus#and(org.springframework.batch.core.ExitStatus)}
 	 * .
 	 */
 	@Test
@@ -175,7 +176,7 @@ public class ExitStatusTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.repeat.ExitStatus#and(org.springframework.batch.repeat.ExitStatus)}
+	 * {@link org.springframework.batch.core.ExitStatus#and(org.springframework.batch.core.ExitStatus)}
 	 * .
 	 */
 	@Test

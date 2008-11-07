@@ -17,13 +17,13 @@
 package org.springframework.batch.repeat.policy;
 
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
  * Very simple {@link CompletionPolicy} that bases its decision on the result of
  * a batch operation. If the result is null or not continuable according to the
- * {@link ExitStatus} the batch is complete, otherwise not.
+ * {@link RepeatStatus} the batch is complete, otherwise not.
  * 
  * @author Dave Syer
  * 
@@ -31,13 +31,13 @@ import org.springframework.batch.repeat.RepeatContext;
 public class DefaultResultCompletionPolicy extends CompletionPolicySupport {
 
 	/**
-	 * True if the result is null, or a {@link ExitStatus} indicating
+	 * True if the result is null, or a {@link RepeatStatus} indicating
 	 * completion.
 	 * 
 	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
-	 *      ExitStatus)
+	 *      RepeatStatus)
 	 */
-	public boolean isComplete(RepeatContext context, ExitStatus result) {
+	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		return (result == null || !result.isContinuable());
 	}
 

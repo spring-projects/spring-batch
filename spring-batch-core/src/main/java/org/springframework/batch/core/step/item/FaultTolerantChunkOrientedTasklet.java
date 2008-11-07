@@ -19,16 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.ItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.support.Classifier;
 import org.springframework.core.AttributeAccessor;
@@ -84,18 +85,20 @@ public class FaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolera
 
 		if (inputs.isEmpty() && outputs.isEmpty()) {
 
-			result = getRepeatOperations().iterate(new RepeatCallback() {
-				public ExitStatus doInIteration(final RepeatContext context) throws Exception {
+			RepeatStatus continuable = getRepeatOperations().iterate(new RepeatCallback() {
+				public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
 					I item = read(contribution, skippedReads);
 
 					if (item == null) {
-						return ExitStatus.FINISHED;
+						return RepeatStatus.FINISHED;
 					}
 					inputs.add(item);
 					contribution.incrementReadCount();
-					return ExitStatus.CONTINUABLE;
+					return RepeatStatus.CONTINUABLE;
 				}
 			});
+			
+			result = continuable.isContinuable() ? ExitStatus.CONTINUABLE : ExitStatus.FINISHED; 
 
 		}
 

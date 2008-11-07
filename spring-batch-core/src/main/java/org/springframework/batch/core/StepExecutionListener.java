@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core;
 
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * Listener interface for the lifecycle of a {@link Step}.

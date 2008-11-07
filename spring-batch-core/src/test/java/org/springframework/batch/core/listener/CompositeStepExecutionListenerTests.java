@@ -20,9 +20,9 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer

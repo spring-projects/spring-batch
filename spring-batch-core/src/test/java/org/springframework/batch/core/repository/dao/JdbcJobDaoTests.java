@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,6 +1,6 @@
 package org.springframework.batch.repeat.support;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatContext;
 
 /**
@@ -16,7 +16,7 @@ interface ResultHolder {
 	 * @return the result, or null if there is none.
 	 * @throws IllegalStateException
 	 */
-	ExitStatus getResult();
+	RepeatStatus getResult();
 
 	/**
 	 * Get the error for client from this holder if any. Does not block if

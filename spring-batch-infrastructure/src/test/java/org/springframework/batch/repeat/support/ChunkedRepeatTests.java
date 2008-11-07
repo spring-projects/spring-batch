@@ -17,7 +17,7 @@
 package org.springframework.batch.repeat.support;
 
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
@@ -51,9 +51,9 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 		// once
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 
-		ExitStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
+		RepeatStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
 
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++; // for test assertion
 				return super.doInIteration(context);
 			}
@@ -86,9 +86,9 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 		chunkTemplate.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		chunkTemplate.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
-		ExitStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
+		RepeatStatus result = repeatTemplate.iterate(new NestedRepeatCallback(chunkTemplate, callback) {
 
-			public ExitStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				count++; // for test assertion
 				return super.doInIteration(context);
 			}
@@ -158,8 +158,8 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 			chunker.reset();
 			template.iterate(new ItemReaderRepeatCallback<Trade>(truncated, processor) {
 
-				public ExitStatus doInIteration(RepeatContext context) throws Exception {
-					ExitStatus result = super.doInIteration(context);
+				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+					RepeatStatus result = super.doInIteration(context);
 					if (!result.isContinuable() && chunker.first()) {
 						chunker.set();
 					}

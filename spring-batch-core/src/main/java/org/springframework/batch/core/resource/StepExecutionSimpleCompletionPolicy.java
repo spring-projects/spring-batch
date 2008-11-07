@@ -21,8 +21,8 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.util.Assert;
 
@@ -74,10 +74,9 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 	 * @param result
 	 * @return true if the commit interval has been reached or the result
 	 * indicates completion
-	 * @see org.springframework.batch.repeat.CompletionPolicy#isComplete(org.springframework.batch.repeat.RepeatContext,
-	 * org.springframework.batch.repeat.ExitStatus)
+	 * @see CompletionPolicy#isComplete(RepeatContext, RepeatStatus)
 	 */
-	public boolean isComplete(RepeatContext context, ExitStatus result) {
+	public boolean isComplete(RepeatContext context, RepeatStatus result) {
 		Assert.state(delegate != null, "The delegate resource has not been initialised. "
 				+ "Remember to register this object as a StepListener.");
 		return delegate.isComplete(context, result);

@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.tasklet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -35,7 +36,6 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.CompositeItemStream;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -100,30 +100,37 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public TaskletStep(String name) {
 		super(name);
-		synchronizer = new StepExecutionSynchronizerFactory().getStepExecutionSynchronizer();
+		synchronizer = new StepExecutionSynchronizerFactory()
+				.getStepExecutionSynchronizer();
 	}
 
 	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
 	 * 
-	 * @param transactionManager the transaction manager to set
+	 * @param transactionManager
+	 *            the transaction manager to set
 	 */
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+	public void setTransactionManager(
+			PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
 
 	/**
 	 * Public setter for the {@link TransactionAttribute}.
-	 * @param transactionAttribute the {@link TransactionAttribute} to set
+	 * 
+	 * @param transactionAttribute
+	 *            the {@link TransactionAttribute} to set
 	 */
-	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
+	public void setTransactionAttribute(
+			TransactionAttribute transactionAttribute) {
 		this.transactionAttribute = transactionAttribute;
 	}
 
 	/**
 	 * Public setter for the {@link Tasklet}.
 	 * 
-	 * @param tasklet the {@link Tasklet} to set
+	 * @param tasklet
+	 *            the {@link Tasklet} to set
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
@@ -139,7 +146,8 @@ public class TaskletStep extends AbstractStep {
 	 * This is a good way to get access to job parameters and execution context
 	 * if the tasklet is parameterised.
 	 * 
-	 * @param listeners an array of listener objects of known types.
+	 * @param listeners
+	 *            an array of listener objects of known types.
 	 */
 	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
@@ -156,7 +164,8 @@ public class TaskletStep extends AbstractStep {
 	 * which itself is a {@link ItemStream}, you need to register the delegate
 	 * here.
 	 * 
-	 * @param streams an array of {@link ItemStream} objects.
+	 * @param streams
+	 *            an array of {@link ItemStream} objects.
 	 */
 	public void setStreams(ItemStream[] streams) {
 		for (int i = 0; i < streams.length; i++) {
@@ -179,7 +188,8 @@ public class TaskletStep extends AbstractStep {
 	 * processing. Should be set up by the caller through a factory. Defaults to
 	 * a plain {@link RepeatTemplate}.
 	 * 
-	 * @param stepOperations a {@link RepeatOperations} instance.
+	 * @param stepOperations
+	 *            a {@link RepeatOperations} instance.
 	 */
 	public void setStepOperations(RepeatOperations stepOperations) {
 		this.stepOperations = stepOperations;
@@ -190,7 +200,8 @@ public class TaskletStep extends AbstractStep {
 	 * check whether an external request has been made to interrupt the job
 	 * execution.
 	 * 
-	 * @param interruptionPolicy a {@link StepInterruptionPolicy}
+	 * @param interruptionPolicy
+	 *            a {@link StepInterruptionPolicy}
 	 */
 	public void setInterruptionPolicy(StepInterruptionPolicy interruptionPolicy) {
 		this.interruptionPolicy = interruptionPolicy;
@@ -201,7 +212,8 @@ public class TaskletStep extends AbstractStep {
 	 * backport concurrency utilities. Public setter for the
 	 * {@link StepExecutionSynchronizer}.
 	 * 
-	 * @param synchronizer the {@link StepExecutionSynchronizer} to set
+	 * @param synchronizer
+	 *            the {@link StepExecutionSynchronizer} to set
 	 */
 	public void setSynchronizer(StepExecutionSynchronizer synchronizer) {
 		this.synchronizer = synchronizer;
@@ -216,26 +228,29 @@ public class TaskletStep extends AbstractStep {
 	 * the current context governing the step execution, which would normally be
 	 * available to the caller through the step's {@link ExecutionContext}.<br/>
 	 * 
-	 * @throws JobInterruptedException if the step or a chunk is interrupted
-	 * @throws RuntimeException if there is an exception during a chunk
-	 * execution
+	 * @throws JobInterruptedException
+	 *             if the step or a chunk is interrupted
+	 * @throws RuntimeException
+	 *             if there is an exception during a chunk execution
 	 * 
 	 */
 	@Override
-	protected ExitStatus doExecute(StepExecution stepExecution) throws Exception {
+	protected void doExecute(StepExecution stepExecution) throws Exception {
 
 		stream.update(stepExecution.getExecutionContext());
 		getJobRepository().updateExecutionContext(stepExecution);
 
-		return stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
+		stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
 
 			@Override
-			public ExitStatus doInStepContext(RepeatContext repeatContext, StepContext stepContext) throws Exception {
+			public ExitStatus doInStepContext(RepeatContext repeatContext,
+					StepContext stepContext) throws Exception {
 
 				StepExecution stepExecution = stepContext.getStepExecution();
 				ExceptionHolder fatalException = new ExceptionHolder();
 
-				StepContribution contribution = stepExecution.createStepContribution();
+				StepContribution contribution = stepExecution
+						.createStepContribution();
 				stepExecution.getExecutionContext().clearDirtyFlag();
 
 				// Before starting a new transaction, check for
@@ -244,7 +259,8 @@ public class TaskletStep extends AbstractStep {
 
 				ExitStatus exitStatus = ExitStatus.CONTINUABLE;
 
-				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
+				TransactionStatus transaction = transactionManager
+						.getTransaction(transactionAttribute);
 
 				boolean locked = false;
 
@@ -252,8 +268,7 @@ public class TaskletStep extends AbstractStep {
 
 					try {
 						exitStatus = tasklet.execute(contribution, stepContext);
-					}
-					finally {
+					} finally {
 						// Apply the contribution to the step
 						// even if unsuccessful
 						logger.debug("Applying contribution: " + contribution);
@@ -269,8 +284,7 @@ public class TaskletStep extends AbstractStep {
 					try {
 						synchronizer.lock(stepExecution);
 						locked = true;
-					}
-					catch (InterruptedException e) {
+					} catch (InterruptedException e) {
 						stepExecution.setStatus(BatchStatus.STOPPED);
 						Thread.currentThread().interrupt();
 					}
@@ -286,44 +300,45 @@ public class TaskletStep extends AbstractStep {
 					stream.update(stepExecution.getExecutionContext());
 
 					try {
-						getJobRepository().updateExecutionContext(stepExecution);
-					}
-					catch (Exception e) {
+						getJobRepository()
+								.updateExecutionContext(stepExecution);
+					} catch (Exception e) {
 						fatalException.setException(e);
 						stepExecution.setStatus(BatchStatus.UNKNOWN);
-						throw new FatalException("Fatal error detected during save of step execution context", e);
+						throw new FatalException(
+								"Fatal error detected during save of step execution context",
+								e);
 					}
 
 					try {
 						transactionManager.commit(transaction);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						fatalException.setException(e);
 						stepExecution.setStatus(BatchStatus.UNKNOWN);
 						logger.error("Fatal error detected during commit.");
-						throw new FatalException("Fatal error detected during commit", e);
+						throw new FatalException(
+								"Fatal error detected during commit", e);
 					}
 
 					try {
-						logger.debug("Saving step execution after commit: " + stepExecution);
+						logger.debug("Saving step execution after commit: "
+								+ stepExecution);
 						getJobRepository().update(stepExecution);
-					}
-					catch (Exception e) {
+					} catch (Exception e) {
 						fatalException.setException(e);
 						stepExecution.setStatus(BatchStatus.UNKNOWN);
-						throw new FatalException("Fatal error detected during update of step execution", e);
+						throw new FatalException(
+								"Fatal error detected during update of step execution",
+								e);
 					}
 
-				}
-				catch (Error e) {
+				} catch (Error e) {
 					processRollback(stepExecution, fatalException, transaction);
 					throw e;
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					processRollback(stepExecution, fatalException, transaction);
 					throw e;
-				}
-				finally {
+				} finally {
 					// only release the lock if we acquired it
 					if (locked) {
 						synchronizer.release(stepExecution);
@@ -348,8 +363,8 @@ public class TaskletStep extends AbstractStep {
 	 * @param fatalException
 	 * @param transaction
 	 */
-	private void processRollback(final StepExecution stepExecution, final ExceptionHolder fatalException,
-			TransactionStatus transaction) {
+	private void processRollback(final StepExecution stepExecution,
+			final ExceptionHolder fatalException, TransactionStatus transaction) {
 
 		/*
 		 * Any exception thrown within the transaction should automatically
@@ -359,8 +374,7 @@ public class TaskletStep extends AbstractStep {
 
 		try {
 			transactionManager.rollback(transaction);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			/*
 			 * If we already failed to commit, it doesn't help to do this again
 			 * - it's better to allow the CommitFailedException to propagate

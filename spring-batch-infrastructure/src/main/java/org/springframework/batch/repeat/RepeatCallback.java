@@ -16,6 +16,7 @@
 
 package org.springframework.batch.repeat;
 
+
 /**
  * Callback interface for batch operations. Many simple processes will be able
  * to use off-the-shelf implementations of this interface, enabling the
@@ -35,9 +36,9 @@ public interface RepeatCallback {
 	 * implementation of the caller.
 	 * 
 	 * @param context the current context passed in by the caller.
-	 * @return an {@link ExitStatus} which is continuable if there is (or may
+	 * @return an {@link RepeatStatus} which is continuable if there is (or may
 	 * be) more data to process.
 	 * @throws Exception if there is a problem with the processing.
 	 */
-	ExitStatus doInIteration(RepeatContext context) throws Exception;
+	RepeatStatus doInIteration(RepeatContext context) throws Exception;
 }

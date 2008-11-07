@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Test;
-import org.springframework.batch.repeat.ExitStatus;
 
 /**
  * @author Dave Syer

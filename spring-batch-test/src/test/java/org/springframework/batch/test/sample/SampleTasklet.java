@@ -1,8 +1,8 @@
 package org.springframework.batch.test.sample;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;

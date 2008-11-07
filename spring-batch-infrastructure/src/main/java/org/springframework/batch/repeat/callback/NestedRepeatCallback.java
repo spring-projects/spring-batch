@@ -16,7 +16,7 @@
 
 package org.springframework.batch.repeat.callback;
 
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -55,7 +55,7 @@ public class NestedRepeatCallback implements RepeatCallback {
 	 * 
 	 * @see org.springframework.batch.repeat.RepeatCallback#doInIteration(RepeatContext)
 	 */
-	public ExitStatus doInIteration(RepeatContext context) throws Exception {
+	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 		return template.iterate(callback);
 	}
 }

@@ -3,8 +3,8 @@ package org.springframework.batch.core.partition.support;
 import java.util.Collection;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.util.Assert;
 
 /**

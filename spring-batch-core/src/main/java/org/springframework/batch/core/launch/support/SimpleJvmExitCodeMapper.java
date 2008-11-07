@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.repeat.ExitStatus;
+import org.springframework.batch.core.ExitStatus;
 
 /**
  * An implementation of {@link ExitCodeMapper} that can be configured through a

@@ -3,15 +3,16 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.repeat.ExitStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -40,20 +41,22 @@ public class SimpleChunkOrientedTasklet<I, O> extends AbstractItemOrientedTaskle
 		ExitStatus result = ExitStatus.CONTINUABLE;
 		final List<I> inputs = new ArrayList<I>();
 
-		result = repeatOperations.iterate(new RepeatCallback() {
+		RepeatStatus continuable = repeatOperations.iterate(new RepeatCallback() {
 
-			public ExitStatus doInIteration(final RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
 				I item = doRead();
 
 				if (item == null) {
-					return ExitStatus.FINISHED;
+					return RepeatStatus.FINISHED;
 				}
 				inputs.add(item);
 				contribution.incrementReadCount();
-				return ExitStatus.CONTINUABLE;
+				return RepeatStatus.CONTINUABLE;
 			}
 		});
 
+		result = continuable.isContinuable() ? ExitStatus.CONTINUABLE : ExitStatus.FINISHED; 
+		
 		// If there is no input we don't have to do anything more
 		if (inputs.isEmpty()) {
 			return result;
