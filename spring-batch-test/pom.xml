@@ -7,19 +7,10 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>spring-batch-test</artifactId>
-	<name>Core</name>
+	<artifactId>org.springframework.batch.test</artifactId>
+	<name>Test</name>
 	<version>2.0.0.CI-SNAPSHOT</version>
 	<description>Domain for batch job testing</description>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.springsource.bundlor</groupId>
-				<artifactId>com.springsource.bundlor.maven
-				</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 	<profiles>
 		<profile>
 			<id>clover</id>
