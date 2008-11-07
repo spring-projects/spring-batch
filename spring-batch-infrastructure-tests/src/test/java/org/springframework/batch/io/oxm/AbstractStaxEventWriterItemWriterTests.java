@@ -1,10 +1,13 @@
 package org.springframework.batch.io.oxm;
 
 import java.io.File;
+import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.custommonkey.xmlunit.XMLAssert;
+import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +28,8 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 
 	File outputFile;
 
-	protected Resource expected = new ClassPathResource("expected-output.xml", getClass());
+	protected Resource expected = new ClassPathResource("expected-output.xml",
+			getClass());
 
 	protected List<Trade> objects = new ArrayList<Trade>() {
 		{
@@ -40,12 +44,12 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 	 */
 	@Test
 	public void testWrite() throws Exception {
-		// TODO: commented out while BRITS-214
-/*		writer.write(objects);
+		writer.write(objects);
 		writer.close(null);
 		XMLUnit.setIgnoreWhitespace(true);
-		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()), new FileReader(resource.getFile()));
-*/
+		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()),
+				new FileReader(resource.getFile()));
+
 	}
 
 	@Before
@@ -53,7 +57,8 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 		// File outputFile =
 		// File.createTempFile("AbstractStaxStreamWriterOutputSourceTests",
 		// "xml");
-		outputFile = File.createTempFile(ClassUtils.getShortName(this.getClass()), ".xml");
+		outputFile = File.createTempFile(ClassUtils.getShortName(this
+				.getClass()), ".xml");
 		resource = new FileSystemResource(outputFile);
 		writer.setResource(resource);
 
