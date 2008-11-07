@@ -29,7 +29,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Robert Kasanicky
  */
-public class MultiResourceItemWriter<T> implements ItemWriter<T>, ItemStream {
+public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream {
 
 	final static private String RESOURCE_INDEX_KEY = "resource.index";
 
@@ -44,8 +44,6 @@ public class MultiResourceItemWriter<T> implements ItemWriter<T>, ItemStream {
 	private int currentResourceItemCount = 0;
 
 	private int resourceIndex = 1;
-
-	private ExecutionContextUserSupport ecSupport = new ExecutionContextUserSupport();
 
 	public MultiResourceItemWriter() {
 		setName(ClassUtils.getShortName(MultiResourceItemWriter.class));
@@ -82,9 +80,9 @@ public class MultiResourceItemWriter<T> implements ItemWriter<T>, ItemStream {
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		resourceIndex = Long.valueOf(executionContext.getLong(ecSupport.getKey(RESOURCE_INDEX_KEY), 1L)).intValue();
+		resourceIndex = Long.valueOf(executionContext.getLong(getKey(RESOURCE_INDEX_KEY), 1L)).intValue();
 		currentResourceItemCount = Long.valueOf(
-				executionContext.getLong(ecSupport.getKey(CURRENT_RESOURCE_ITEM_COUNT), 0L)).intValue();
+				executionContext.getLong(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0L)).intValue();
 		try {
 			pointDelegateToNextResource();
 		}
@@ -96,12 +94,8 @@ public class MultiResourceItemWriter<T> implements ItemWriter<T>, ItemStream {
 
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		delegate.update(executionContext);
-		executionContext.put(ecSupport.getKey(CURRENT_RESOURCE_ITEM_COUNT), Long.valueOf(currentResourceItemCount));
-		executionContext.put(ecSupport.getKey(RESOURCE_INDEX_KEY), Long.valueOf(resourceIndex));
-	}
-
-	public void setName(String name) {
-		ecSupport.setName(name);
+		executionContext.put(getKey(CURRENT_RESOURCE_ITEM_COUNT), Long.valueOf(currentResourceItemCount));
+		executionContext.put(getKey(RESOURCE_INDEX_KEY), Long.valueOf(resourceIndex));
 	}
 
 	/**
