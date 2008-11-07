@@ -19,9 +19,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.FlushFailedException;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.ResourceAwareItemWriterItemStream;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
 import org.springframework.batch.item.xml.stax.NoStartEndDocumentStreamWriter;
@@ -49,7 +49,7 @@ import org.springframework.xml.transform.StaxResult;
  * @author Robert Kasanicky
  * 
  */
-public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream,
+public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
 		InitializingBean {
 
 	private static final Log log = LogFactory.getLog(StaxEventItemWriter.class);

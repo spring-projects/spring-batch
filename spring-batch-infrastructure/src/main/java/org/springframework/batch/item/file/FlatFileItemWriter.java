@@ -29,7 +29,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.transform.LineAggregator;
@@ -55,7 +54,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ItemWriter<T>, ItemStream,
+public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
 		InitializingBean {
 
 	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");

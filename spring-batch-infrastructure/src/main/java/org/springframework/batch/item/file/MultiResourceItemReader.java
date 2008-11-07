@@ -36,7 +36,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
 
-	private ResourceAwareItemReaderItemStream<T> delegate;
+	private ResourceAwareItemReaderItemStream<? extends T> delegate;
 
 	private Resource[] resources;
 
@@ -160,7 +160,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	/**
 	 * @param delegate reads items from single {@link Resource}.
 	 */
-	public void setDelegate(ResourceAwareItemReaderItemStream<T> delegate) {
+	public void setDelegate(ResourceAwareItemReaderItemStream<? extends T> delegate) {
 		this.delegate = delegate;
 	}
 
