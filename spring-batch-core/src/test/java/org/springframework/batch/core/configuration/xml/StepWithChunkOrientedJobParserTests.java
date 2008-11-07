@@ -51,6 +51,9 @@ public class StepWithChunkOrientedJobParserTests {
 	private TestReader reader;
 	
 	@Autowired
+	private TestListener listener;
+	
+	@Autowired
 	private TestProcessor processor;
 	
 	@Autowired
@@ -71,5 +74,6 @@ public class StepWithChunkOrientedJobParserTests {
 		assertTrue(reader.isExecuted());
 		assertTrue(processor.isExecuted());
 		assertTrue(writer.isExecuted());
+		assertTrue(listener.isExecuted());
 	}
 }

@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,10 +27,12 @@ import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
@@ -194,11 +197,17 @@ public class StepParser {
 	 * @return the TaskletStep bean
 	 */
 	protected RootBeanDefinition parseChunkOriented(Element element, ParserContext parserContext) {
-		
-		System.out.println("PARSING PROCESS!!!");
-		
-    	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.item.SimpleStepFactoryBean", null, null);
-		
+
+    	RootBeanDefinition bd;
+
+		String faultTolerant = element.getAttribute("fault-tolerant");
+        if ("true".equals(faultTolerant)) {
+        	bd = new RootBeanDefinition("org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean", null, null);
+        }
+        else {
+        	bd = new RootBeanDefinition("org.springframework.batch.core.step.item.SimpleStepFactoryBean", null, null);
+        }
+
         String readerBeanId = element.getAttribute("reader");
         if (StringUtils.hasText(readerBeanId)) {
             RuntimeBeanReference readerRef = new RuntimeBeanReference(readerBeanId);
@@ -224,11 +233,59 @@ public class StepParser {
         String transactionManager = element.getAttribute("transaction-manager");
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
         bd.getPropertyValues().addPropertyValue("transactionManager", tx);
-		
+
+        handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses");
+        
+        handleExceptionElement(element, bd, "retryable-exception-classes", "retryableExceptionClasses");
+        
+        handleExceptionElement(element, bd, "fatal-exception-classes", "fatalExceptionClasses");
+
+        handleListenersElement(element, bd, parserContext);
+        
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
         
         return bd;
 
+	}
+
+	private void handleExceptionElement(Element element, RootBeanDefinition bd, 
+			String attributeName, String propertyName) {
+		String exceptions = 
+        	DomUtils.getChildElementValueByTagName(element, attributeName);
+        if (StringUtils.hasLength(exceptions)) {
+	        String[] exceptionArray = StringUtils.tokenizeToStringArray(
+	        		StringUtils.delete(exceptions, ","), "\n");
+	        if (exceptionArray.length > 0) {
+	        	bd.getPropertyValues().addPropertyValue(propertyName, exceptionArray);
+	        }
+        }
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleListenersElement(Element element, RootBeanDefinition bd, ParserContext parserContext) {
+		Element listenersElement = 
+        	DomUtils.getChildElementByTagName(element, "listeners");
+		if (listenersElement != null) {
+			List<String> listenerRefs = new ArrayList<String>(); 
+			List<BeanReference> listenerBeans = new ArrayList<BeanReference>(); 
+			List<Element> listenerElements = 
+	        	DomUtils.getChildElementsByTagName(listenersElement, "listener");
+			if (listenerElements != null) {
+				for (Element listenerElement : listenerElements) {
+					String listenerRef = listenerElement.getAttribute("ref");
+						if (StringUtils.hasText(listenerRef)) {
+							listenerRefs.add(listenerRef);
+					        RuntimeBeanReference bean = new RuntimeBeanReference(listenerRef);
+							if (bean != null) {
+								listenerBeans.add(bean);
+							}
+						}
+				}
+			}
+	        ManagedList arguments = new ManagedList();
+	        arguments.addAll(listenerBeans);
+        	bd.getPropertyValues().addPropertyValue("listeners", arguments);
+		}
 	}
 
 	/**

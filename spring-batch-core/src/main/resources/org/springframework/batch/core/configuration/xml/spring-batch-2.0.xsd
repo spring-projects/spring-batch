@@ -215,6 +215,60 @@
 	<xsd:complexType name="chunkOrientedType">
 		<xsd:complexContent>
 			<xsd:extension base="stepDefType">
+				<xsd:sequence>
+					<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							List of all listeners for the step definition
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="listener">
+									<xsd:complexType>
+										<xsd:attribute name="ref" type="xsd:string"/>
+										<xsd:attribute name="class" type="xsd:string"/>
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The newline-separated, list of exception classes that are skippable
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string"/>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="retryable-exception-classes" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The newline-separated, list of exception classes that are skippable
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string"/>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="fatal-exception-classes" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The newline-separated, list of exception classes that are skippable
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string"/>
+						</xsd:simpleType>
+					</xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="fault-tolerant" type="xsd:boolean" default="false" use="optional"/>
 				<xsd:attribute name="reader" type="xsd:string" use="required">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[

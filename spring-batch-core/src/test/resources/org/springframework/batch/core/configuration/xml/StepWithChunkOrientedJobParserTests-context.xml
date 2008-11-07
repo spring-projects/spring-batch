@@ -8,7 +8,11 @@
 	
 	<job id="job">
 		<step name="step1">
-			<chunk-oriented reader="reader" processor="processor" writer="writer"/>
+			<chunk-oriented reader="reader" processor="processor" writer="writer">
+				<listeners>
+					<listener ref="listener"/>
+				</listeners>
+			</chunk-oriented>
 		</step>
 	</job>
 
@@ -17,5 +21,7 @@
 	<beans:bean id="processor" class="org.springframework.batch.core.configuration.xml.TestProcessor"/>
 	
 	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
+
+	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
 
 </beans:beans>
