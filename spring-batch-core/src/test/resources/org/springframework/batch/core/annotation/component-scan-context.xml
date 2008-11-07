@@ -12,7 +12,7 @@
 		
 	</context:component-scan>
 	
-	<bean id="job" class="org.springframework.batch.core.job.SimpleJob" >
+	<bean id="job-scan" class="org.springframework.batch.core.job.SimpleJob" >
 		<property name="steps">
 			<list>
 				<ref bean="step"/>
