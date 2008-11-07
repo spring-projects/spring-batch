@@ -24,13 +24,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.beans.factory.InitializingBean;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
 
 /**
  * A {@link Flow} that branches conditionally depending on the exit status of
