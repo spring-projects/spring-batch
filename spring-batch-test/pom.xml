@@ -10,6 +10,7 @@
 	<artifactId>org.springframework.batch.test</artifactId>
 	<name>Test</name>
 	<version>2.0.0.CI-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<description>Domain for batch job testing</description>
 	<profiles>
 		<profile>
