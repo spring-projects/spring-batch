@@ -29,7 +29,7 @@
 	
 	<bean id="step" class="org.springframework.batch.core.step.tasklet.TaskletStep" >
 		<property name="tasklet">
-			<bean class="org.springframework.batch.core.configuration.xml.DummyTasklet" />
+			<bean class="org.springframework.batch.core.configuration.xml.TestTasklet" />
 		</property>
 		<property name="jobRepository" ref="jobRepository" />
 		<property name="transactionManager">
