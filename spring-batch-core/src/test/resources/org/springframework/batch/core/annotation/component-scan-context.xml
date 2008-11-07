@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<context:component-scan base-package="org.springframework.batch.core.annotation"
+		scope-resolver="org.springframework.batch.core.annotation.BatchComponentScopeMetaDataResolver"
+		>
+		<context:include-filter type="annotation" expression="org.springframework.batch.core.annotation.BatchComponent"/>
+		
+	</context:component-scan>
+	
+	<bean id="job" class="org.springframework.batch.core.job.SimpleJob" >
+		<property name="steps">
+			<list>
+				<ref bean="step"/>
+			</list>
+		</property>
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+	
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" >
+		<property name="transactionManager">
+			<bean class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+		</property>
+	</bean>
+	
+	<bean id="step" class="org.springframework.batch.core.step.tasklet.TaskletStep" >
+		<property name="tasklet">
+			<bean class="org.springframework.batch.core.configuration.xml.DummyTasklet" />
+		</property>
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="transactionManager">
+			<bean class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+		</property>
+	</bean>
+	
+	<bean class="org.springframework.batch.core.annotation.StepComponentBeanPostProcessor" >
+		<constructor-arg ref="step" />
+		<constructor-arg value="org.springframework.batch.core.annotation" />
+	</bean>
+	
+	<bean class="org.springframework.batch.core.launch.support.SimpleJobLauncher" >
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+</beans>
