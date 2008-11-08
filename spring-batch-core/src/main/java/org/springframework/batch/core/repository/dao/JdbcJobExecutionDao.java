@@ -39,25 +39,25 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final Log logger = LogFactory.getLog(JdbcJobExecutionDao.class);
 
 	private static final String SAVE_JOB_EXECUTION = "INSERT into %PREFIX%JOB_EXECUTION(JOB_EXECUTION_ID, JOB_INSTANCE_ID, START_TIME, "
-			+ "END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			+ "END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, VERSION, CREATE_TIME, LAST_UPDATED) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 	private static final String CHECK_JOB_EXECUTION_EXISTS = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID = ?";
 
 	private static final String GET_STATUS = "SELECT STATUS from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
 	private static final String UPDATE_JOB_EXECUTION = "UPDATE %PREFIX%JOB_EXECUTION set START_TIME = ?, END_TIME = ?, "
-			+ " STATUS = ?, CONTINUABLE = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ?, LAST_UPDATED = ? where JOB_EXECUTION_ID = ? and VERSION = ?";
+			+ " STATUS = ?, EXIT_CODE = ?, EXIT_MESSAGE = ?, VERSION = ?, CREATE_TIME = ?, LAST_UPDATED = ? where JOB_EXECUTION_ID = ? and VERSION = ?";
 
-	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
+	private static final String FIND_JOB_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
 			+ " from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ? order by JOB_EXECUTION_ID desc";
 
-	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION "
+	private static final String GET_LAST_EXECUTION = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION "
 			+ "from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ? and CREATE_TIME = (SELECT max(CREATE_TIME) from %PREFIX%JOB_EXECUTION where JOB_INSTANCE_ID = ?)";
 
-	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
+	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
 			+ " from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
-	private static final String GET_RUNNING_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, CONTINUABLE, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION "
+	private static final String GET_RUNNING_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION "
 			+ "JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION where END_TIME is NULL order by JOB_EXECUTION_ID desc";
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
@@ -117,13 +117,12 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		jobExecution.setId(new Long(jobExecutionIncrementer.nextLongValue()));
 		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(),
 				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
-				jobExecution.getExitStatus().isContinuable() ? "Y" : "N", jobExecution.getExitStatus().getExitCode(),
-				jobExecution.getExitStatus().getExitDescription(), jobExecution.getVersion(),
-				jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
+				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
+				jobExecution.getVersion(), jobExecution.getCreateTime(), jobExecution.getLastUpdated() };
 		getJdbcTemplate().getJdbcOperations().update(
 				getQuery(SAVE_JOB_EXECUTION),
 				parameters,
-				new int[] { Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR,
+				new int[] { Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR,
 						Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP });
 	}
 
@@ -169,9 +168,9 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				logger.debug("Truncating long message before update of JobExecution: " + jobExecution);
 			}
 			Object[] parameters = new Object[] { jobExecution.getStartTime(), jobExecution.getEndTime(),
-					jobExecution.getStatus().toString(), jobExecution.getExitStatus().isContinuable() ? "Y" : "N",
-					jobExecution.getExitStatus().getExitCode(), exitDescription, version, jobExecution.getCreateTime(),
-					jobExecution.getLastUpdated(), jobExecution.getId(), jobExecution.getVersion() };
+					jobExecution.getStatus().toString(), jobExecution.getExitStatus().getExitCode(), exitDescription,
+					version, jobExecution.getCreateTime(), jobExecution.getLastUpdated(), jobExecution.getId(),
+					jobExecution.getVersion() };
 
 			// Check if given JobExecution's Id already exists, if none is found
 			// it
@@ -185,9 +184,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			int count = getJdbcTemplate().getJdbcOperations().update(
 					getQuery(UPDATE_JOB_EXECUTION),
 					parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.CHAR, Types.VARCHAR,
-							Types.VARCHAR, Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.INTEGER,
-							Types.INTEGER });
+					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
+							Types.INTEGER, Types.TIMESTAMP, Types.TIMESTAMP, Types.INTEGER, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {
@@ -293,10 +291,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			jobExecution.setStartTime(rs.getTimestamp(2));
 			jobExecution.setEndTime(rs.getTimestamp(3));
 			jobExecution.setStatus(BatchStatus.valueOf(rs.getString(4)));
-			jobExecution.setExitStatus(new ExitStatus("Y".equals(rs.getString(5)), rs.getString(6), rs.getString(7)));
-			jobExecution.setCreateTime(rs.getTimestamp(8));
-			jobExecution.setLastUpdated(rs.getTimestamp(9));
-			jobExecution.setVersion(rs.getInt(10));
+			jobExecution.setExitStatus(new ExitStatus(rs.getString(5), rs.getString(6)));
+			jobExecution.setCreateTime(rs.getTimestamp(7));
+			jobExecution.setLastUpdated(rs.getTimestamp(8));
+			jobExecution.setVersion(rs.getInt(9));
 			return jobExecution;
 		}
 

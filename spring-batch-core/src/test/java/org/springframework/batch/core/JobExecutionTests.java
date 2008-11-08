@@ -15,7 +15,11 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
@@ -29,11 +33,12 @@ import org.junit.Test;
  */
 public class JobExecutionTests {
 
-	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "foo"), new Long(12));
+	private JobExecution execution = new JobExecution(new JobInstance(new Long(11), new JobParameters(), "foo"),
+			new Long(12));
 
 	@Test
 	public void testJobExecution() {
-		assertNull(new JobExecution(new JobInstance(null,null,"foo")).getId());
+		assertNull(new JobExecution(new JobInstance(null, null, "foo")).getId());
 	}
 
 	/**
@@ -160,7 +165,7 @@ public class JobExecutionTests {
 	@Test
 	public void testGetExitCode() {
 		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
-		execution.setExitStatus(new ExitStatus(true, "23"));
+		execution.setExitStatus(new ExitStatus("23"));
 		assertEquals("23", execution.getExitStatus().getExitCode());
 	}
 
@@ -175,7 +180,7 @@ public class JobExecutionTests {
 		execution.createStepExecution("step");
 		assertEquals(1, execution.getStepExecutions().size());
 	}
-	
+
 	@Test
 	public void testStop() throws Exception {
 		StepExecution stepExecution = execution.createStepExecution("step");
@@ -192,11 +197,11 @@ public class JobExecutionTests {
 
 	@Test
 	public void testToStringWithNullJob() throws Exception {
-		execution = new JobExecution(new JobInstance(null,null,"foo"));
+		execution = new JobExecution(new JobInstance(null, null, "foo"));
 		assertTrue("JobExecution string does not contain id", execution.toString().indexOf("id=") >= 0);
 		assertTrue("JobExecution string does not contain job: " + execution, execution.toString().indexOf("job=") >= 0);
 	}
-	
+
 	@Test
 	public void testSerialization() {
 		byte[] serialized = SerializationUtils.serialize(execution);
@@ -205,9 +210,9 @@ public class JobExecutionTests {
 		assertNotNull(deserialize.createStepExecution("foo"));
 		assertNotNull(deserialize.getFailureExceptions());
 	}
-	
-	public void testFailureExceptions(){
-		
+
+	public void testFailureExceptions() {
+
 		RuntimeException exception = new RuntimeException();
 		assertEquals(0, execution.getFailureExceptions().size());
 		execution.addFailureException(exception);

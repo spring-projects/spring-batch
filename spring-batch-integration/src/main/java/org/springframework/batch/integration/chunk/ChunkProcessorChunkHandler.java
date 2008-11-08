@@ -2,7 +2,7 @@ package org.springframework.batch.integration.chunk;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -45,12 +45,11 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 		}
 		catch (Exception e) {
 			logger.debug("Failed chunk", e);
-			return new ChunkResponse(ExitStatus.FAILED.addExitDescription(e.getClass().getName() + ": "
-					+ e.getMessage()), chunkRequest.getJobId(), skipCount);
+			return new ChunkResponse(BatchStatus.FAILED, chunkRequest.getJobId(), skipCount);
 		}
 
 		logger.debug("Completed chunk handling with " + skipCount + " skips");
-		return new ChunkResponse(ExitStatus.EXECUTING, chunkRequest.getJobId(), skipCount);
+		return new ChunkResponse(BatchStatus.COMPLETED, chunkRequest.getJobId(), skipCount);
 
 	}
 }

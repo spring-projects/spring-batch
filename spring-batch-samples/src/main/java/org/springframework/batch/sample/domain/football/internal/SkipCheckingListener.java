@@ -9,7 +9,7 @@ public class SkipCheckingListener implements StepExecutionListener {
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
 				&& stepExecution.getSkipCount() > 0) {
-			return new ExitStatus(false, "COMPLETED WITH SKIPS");
+			return new ExitStatus("COMPLETED WITH SKIPS");
 		} else {
 			return null;
 		}

@@ -29,13 +29,13 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  * 
  */
-public class ExitStatus implements Serializable {
+public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 
 	/**
 	 * Convenient constant value representing unknown state - assumed not
 	 * continuable.
 	 */
-	public static final ExitStatus UNKNOWN = new ExitStatus(false, "UNKNOWN");
+	public static final ExitStatus UNKNOWN = new ExitStatus("UNKNOWN");
 
 	/**
 	 * Convenient constant value representing continuable state where processing
@@ -44,60 +44,42 @@ public class ExitStatus implements Serializable {
 	 * another thread or process and the caller is not required to wait for the
 	 * result.
 	 */
-	public static final ExitStatus EXECUTING = new ExitStatus(true, "EXECUTING");
+	public static final ExitStatus EXECUTING = new ExitStatus("EXECUTING");
 
 	/**
 	 * Convenient constant value representing finished processing.
 	 */
-	public static final ExitStatus FINISHED = new ExitStatus(false, "COMPLETED");
+	public static final ExitStatus FINISHED = new ExitStatus("COMPLETED");
 
 	/**
 	 * Convenient constant value representing job that did no processing (e.g.
 	 * because it was already complete).
 	 */
-	public static final ExitStatus NOOP = new ExitStatus(false, "NOOP");
+	public static final ExitStatus NOOP = new ExitStatus("NOOP");
 
 	/**
 	 * Convenient constant value representing finished processing with an error.
 	 */
-	public static final ExitStatus FAILED = new ExitStatus(false, "FAILED");
+	public static final ExitStatus FAILED = new ExitStatus("FAILED");
 
 	/**
-	 * Convenient constant value representing finished processing with interrupted status.
+	 * Convenient constant value representing finished processing with
+	 * interrupted status.
 	 */
-	public static final ExitStatus INTERRUPTED = new ExitStatus(false, "INTERRUPTED");
-
-	private final boolean continuable;
+	public static final ExitStatus INTERRUPTED = new ExitStatus("INTERRUPTED");
 
 	private final String exitCode;
 
 	private final String exitDescription;
 
-	public ExitStatus(boolean continuable) {
-		this(continuable, "", "");
+	public ExitStatus(String exitCode) {
+		this(exitCode, "");
 	}
 
-	public ExitStatus(boolean continuable, String exitCode) {
-		this(continuable, exitCode, "");
-	}
-
-	public ExitStatus(boolean continuable, String exitCode, String exitDescription) {
+	public ExitStatus(String exitCode, String exitDescription) {
 		super();
-		this.continuable = continuable;
 		this.exitCode = exitCode;
 		this.exitDescription = exitDescription;
-	}
-
-	/**
-	 * Flag to signal that processing can continue. This is distinct from any
-	 * flag that might indicate that a batch is complete, or terminated, since a
-	 * batch might be only a small part of a larger whole, which is still not
-	 * finished.
-	 * 
-	 * @return true if processing can continue.
-	 */
-	public boolean isContinuable() {
-		return continuable;
 	}
 
 	/**
@@ -117,54 +99,53 @@ public class ExitStatus implements Serializable {
 	}
 
 	/**
-	 * Create a new {@link ExitStatus} with a logical combination of the
-	 * continuable flag.
-	 * 
-	 * @param continuable true if the caller thinks it is safe to continue.
-	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the argument provided.
-	 */
-	public ExitStatus and(boolean continuable) {
-		return new ExitStatus(this.continuable && continuable, this.exitCode, this.exitDescription);
-	}
-
-	/**
-	 * Create a new {@link ExitStatus} with a logical combination of the
-	 * continuable flag, and a concatenation of the descriptions. If either
-	 * value has a higher severity then its exit code will be used in the
-	 * result. In the case of equal severity, the exit code is only replaced if
-	 * the result is continuable or the input is not continuable.<br/>
+	 * Create a new {@link ExitStatus} with a logical combination of the exit
+	 * code, and a concatenation of the descriptions. If either value has a
+	 * higher severity then its exit code will be used in the result. In the
+	 * case of equal severity, the exit code is replaced if the new value is
+	 * alphabetically greater.<br/>
 	 * <br/>
 	 * 
 	 * Severity is defined by the exit code:
 	 * <ul>
-	 * <li>Codes beginning with NOOP have severity 1</li>
-	 * <li>Codes beginning with INTERRUPTED have severity 2</li>
-	 * <li>Codes beginning with FAILED have severity 3</li>
-	 * <li>Codes beginning with UNKNOWN have severity 4</li>
+	 * <li>Codes beginning with EXECUTING have severity 0</li>
+	 * <li>Codes beginning with COMPLETED have severity 2</li>
+	 * <li>Codes beginning with NOOP have severity 3</li>
+	 * <li>Codes beginning with INTERRUPTED have severity 4</li>
+	 * <li>Codes beginning with FAILED have severity 5</li>
+	 * <li>Codes beginning with UNKNOWN have severity 6</li>
 	 * </ul>
-	 * Others have severity 0.<br/>
+	 * Others have severity 1.<br/>
 	 * 
 	 * If the input is null just return this.
 	 * 
 	 * @param status an {@link ExitStatus} to combine with this one.
-	 * @return a new {@link ExitStatus} with {@link #isContinuable()} the
-	 * logical and of the current value and the argument provided.
+	 * @return a new {@link ExitStatus} combining the current value and the
+	 * argument provided.
 	 */
 	public ExitStatus and(ExitStatus status) {
 		if (status == null) {
 			return this;
 		}
-		ExitStatus result = and(status.continuable).addExitDescription(status.exitDescription);
-		if (severity(status) > severity(this)) {
+		ExitStatus result = addExitDescription(status.exitDescription);
+		if (compareTo(status) < 0) {
 			result = result.replaceExitCode(status.exitCode);
 		}
-		else {
-			if (severity(this) == severity(status) && (result.continuable || !status.continuable)) {
-				result = result.replaceExitCode(status.exitCode);
-			}
-		}
 		return result;
+	}
+	
+	/**
+	 * @param status an {@link ExitStatus} to compare
+	 * @return 1,0,-1 according to the severity and exit code
+	 */
+	public int compareTo(ExitStatus status) {
+		if (severity(status) > severity(this)) {
+			return -1;
+		}
+		if (severity(status) < severity(this)) {
+			return 1;
+		}
+		return this.getExitCode().compareTo(status.getExitCode());
 	}
 
 	/**
@@ -172,17 +153,23 @@ public class ExitStatus implements Serializable {
 	 * @return
 	 */
 	private int severity(ExitStatus status) {
-		if (status.exitCode.startsWith(NOOP.exitCode)) {
-			return 0;
-		}
-		if (status.exitCode.startsWith(INTERRUPTED.exitCode)) {
-			return 1;
-		}
-		if (status.exitCode.startsWith(FAILED.exitCode)) {
+		if (status.exitCode.startsWith(FINISHED.exitCode)) {
 			return 2;
 		}
-		if (status.exitCode.startsWith(UNKNOWN.exitCode)) {
+		if (status.exitCode.startsWith(NOOP.exitCode)) {
 			return 3;
+		}
+		if (status.exitCode.startsWith(INTERRUPTED.exitCode)) {
+			return 4;
+		}
+		if (status.exitCode.startsWith(FAILED.exitCode)) {
+			return 5;
+		}
+		if (status.exitCode.startsWith(UNKNOWN.exitCode)) {
+			return 6;
+		}
+		if (!status.exitCode.startsWith(EXECUTING.exitCode)) {
+			return 1;
 		}
 		return 0;
 	}
@@ -193,7 +180,7 @@ public class ExitStatus implements Serializable {
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
-		return String.format("continuable=%s;exitCode=%s;exitDescription=%s", continuable, exitCode, exitDescription);
+		return String.format("exitCode=%s;exitDescription=%s", exitCode, exitDescription);
 	}
 
 	/**
@@ -226,7 +213,7 @@ public class ExitStatus implements Serializable {
 	 * code.
 	 */
 	public ExitStatus replaceExitCode(String code) {
-		return new ExitStatus(continuable, code, exitDescription);
+		return new ExitStatus(code, exitDescription);
 	}
 
 	/**
@@ -259,7 +246,7 @@ public class ExitStatus implements Serializable {
 		if (changed) {
 			buffer.append(description);
 		}
-		return new ExitStatus(continuable, exitCode, buffer.toString());
+		return new ExitStatus(exitCode, buffer.toString());
 	}
 
 }

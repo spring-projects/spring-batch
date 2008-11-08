@@ -74,7 +74,7 @@ public class SimpleJobTests {
 	private JobExecutionDao jobExecutionDao;
 
 	private StepExecutionDao stepExecutionDao;
-	
+
 	private ExecutionContextDao ecDao;
 
 	private List<Serializable> list = new ArrayList<Serializable>();
@@ -163,7 +163,7 @@ public class SimpleJobTests {
 	@Test
 	public void testExitStatusReturned() throws JobExecutionException {
 
-		final ExitStatus customStatus = new ExitStatus(true, "test");
+		final ExitStatus customStatus = new ExitStatus("test");
 
 		Step testStep = new Step() {
 
@@ -260,7 +260,7 @@ public class SimpleJobTests {
 		step2.setStartLimit(5);
 		final RuntimeException exception = new RuntimeException("Foo!");
 		step1.setProcessException(exception);
-			
+
 		job.execute(jobExecution);
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
@@ -306,11 +306,11 @@ public class SimpleJobTests {
 		step1.setStartLimit(0);
 
 		job.execute(jobExecution);
-			
+
 		assertEquals(1, jobExecution.getFailureExceptions().size());
 		Throwable ex = jobExecution.getFailureExceptions().get(0);
-		assertTrue("Wrong message in exception: " + ex.getMessage(), ex.getMessage()
-					.indexOf("start limit exceeded") >= 0);
+		assertTrue("Wrong message in exception: " + ex.getMessage(),
+				ex.getMessage().indexOf("start limit exceeded") >= 0);
 	}
 
 	@Test
@@ -340,7 +340,7 @@ public class SimpleJobTests {
 	public void testNotExecutedIfAlreadyStopped() throws Exception {
 		jobExecution.stop();
 		job.execute(jobExecution);
-		
+
 		assertEquals(0, list.size());
 		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
@@ -430,9 +430,9 @@ public class SimpleJobTests {
 		job.execute(jobExecution);
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
-		assertTrue("Wrong exception "+expected, expected instanceof JobInterruptedException);
+		assertTrue("Wrong exception " + expected, expected instanceof JobInterruptedException);
 		assertEquals("JobExecution interrupted.", expected.getMessage());
-		
+
 		assertNull("Second step was not supposed to be executed", step2.passedInStepContext);
 	}
 
@@ -490,7 +490,9 @@ public class SimpleJobTests {
 
 		/*
 		 * (non-Javadoc)
-		 * @see org.springframework.batch.core.step.StepSupport#execute(org.springframework.batch.core.StepExecution)
+		 * 
+		 * @seeorg.springframework.batch.core.step.StepSupport#execute(org.
+		 * springframework.batch.core.StepExecution)
 		 */
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
 				UnexpectedJobExecutionException {

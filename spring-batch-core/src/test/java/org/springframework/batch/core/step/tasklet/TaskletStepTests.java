@@ -237,7 +237,7 @@ public class TaskletStepTests {
 		}
 		catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
-			assertFalse(status.isContinuable());
+			assertEquals(ExitStatus.FINISHED, status);
 		}
 	}
 
@@ -268,7 +268,7 @@ public class TaskletStepTests {
 		}
 		catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
-			assertFalse(status.isContinuable());
+			assertEquals(ExitStatus.FAILED.getExitCode(), status.getExitCode());
 			String description = status.getExitDescription();
 			assertTrue("Description does not include 'FOO': " + description, description.indexOf("FOO") >= 0);
 		}
@@ -323,9 +323,9 @@ public class TaskletStepTests {
 				counter++;
 			}
 		});
-		
+
 		step.execute(stepExecution);
-		Throwable e = stepExecution.getFailureExceptions().get(0);	
+		Throwable e = stepExecution.getFailureExceptions().get(0);
 		assertEquals("Fatal error detected during save of step execution context", e.getMessage());
 		assertEquals("foo", e.getCause().getMessage());
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
@@ -452,7 +452,7 @@ public class TaskletStepTests {
 	@Test
 	public void testAfterStep() throws Exception {
 
-		final ExitStatus customStatus = new ExitStatus(false, "custom code");
+		final ExitStatus customStatus = new ExitStatus("COMPLETED_CUSTOM");
 
 		step.setStepExecutionListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {
@@ -520,7 +520,7 @@ public class TaskletStepTests {
 	}
 
 	@Test
-	public void testStatusForInterruptedException() throws Exception{
+	public void testStatusForInterruptedException() throws Exception {
 
 		StepInterruptionPolicy interruptionPolicy = new StepInterruptionPolicy() {
 
@@ -551,7 +551,7 @@ public class TaskletStepTests {
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg,
-					"JobInterruptedException"));
+				"JobInterruptedException"));
 	}
 
 	@Test
@@ -702,7 +702,7 @@ public class TaskletStepTests {
 		// step.setLastExecution(stepExecution);
 
 		step.execute(stepExecution);
-			// The job actually completed, but the streams couldn't be closed.
+		// The job actually completed, but the streams couldn't be closed.
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
 		assertEquals("", msg);
@@ -756,7 +756,7 @@ public class TaskletStepTests {
 	}
 
 	/**
-	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)}
+	 * Exception in {@link StepExecutionListener#afterStep(StepExecution)} 
 	 * doesn't cause step failure.
 	 * @throws JobInterruptedException
 	 */
@@ -774,19 +774,18 @@ public class TaskletStepTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 	}
-	
+
 	@Test
-	 public void testModifyingExecutionContextMidProcessCausesException() throws Exception{
+	public void testModifyingExecutionContextMidProcessCausesException() throws Exception {
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 		final ExecutionContext ec = stepExecution.getExecutionContext();
-		step.setTasklet(new Tasklet(){
-			public RepeatStatus execute(StepContribution contribution,
-					AttributeAccessor attributes) throws Exception {
+		step.setTasklet(new Tasklet() {
+			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 				ec.putString("test", "test");
 				return RepeatStatus.FINISHED;
 			}
 		});
-		
+
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(1, stepExecution.getFailureExceptions().size());
@@ -810,11 +809,11 @@ public class TaskletStepTests {
 		}
 
 	}
-	
+
 	private static class JobRepositoryFailedUpdateStub extends JobRepositorySupport {
-		
+
 		private int called = 0;
-		
+
 		public void update(StepExecution stepExecution) {
 			called++;
 			if (called == 3) {

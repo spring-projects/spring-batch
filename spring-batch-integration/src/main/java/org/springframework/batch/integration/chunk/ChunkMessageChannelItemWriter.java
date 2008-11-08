@@ -157,9 +157,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
 			localState.actual++;
 			// TODO: apply the skip count
-			ExitStatus result = payload.getExitStatus();
-			// TODO: check it can never be ExitStatus.FINISHED?
-			if (!result.isContinuable()) {
+			BatchStatus result = payload.getStatus();
+			if (BatchStatus.COMPLETED!=result) {
 				throw new AsynchronousFailureException("Failure or early completion detected in handler: " + result);
 			}
 		}

@@ -36,7 +36,8 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#setListeners(org.springframework.batch.core.StepExecutionListener[])}.
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#setListeners(org.springframework.batch.core.StepExecutionListener[])}
+	 * .
 	 */
 	public void testSetListeners() {
 		listener.setListeners(new StepExecutionListener[] { new StepExecutionListenerSupport() {
@@ -50,13 +51,14 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 				return ExitStatus.EXECUTING;
 			}
 		} });
-		assertFalse(listener.afterStep(null).isContinuable());
+		assertEquals(ExitStatus.FAILED, listener.afterStep(null));
 		assertEquals(2, list.size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#register(org.springframework.batch.core.StepExecutionListener)}.
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#register(org.springframework.batch.core.StepExecutionListener)}
+	 * .
 	 */
 	public void testSetListener() {
 		listener.register(new StepExecutionListenerSupport() {
@@ -65,13 +67,14 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 				return ExitStatus.FAILED;
 			}
 		});
-		assertFalse(listener.afterStep(null).isContinuable());
+		assertEquals(ExitStatus.FAILED, listener.afterStep(null));
 		assertEquals(1, list.size());
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)}.
+	 * {@link org.springframework.batch.core.listener.CompositeStepExecutionListener#beforeStep(StepExecution)}
+	 * .
 	 */
 	public void testOpen() {
 		listener.register(new StepExecutionListenerSupport() {

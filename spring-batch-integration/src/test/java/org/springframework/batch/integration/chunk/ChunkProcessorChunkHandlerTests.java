@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.util.StringUtils;
 
 public class ChunkProcessorChunkHandlerTests {
@@ -27,7 +27,7 @@ public class ChunkProcessorChunkHandlerTests {
 				12L, 10));
 		assertEquals(0, response.getSkipCount());
 		assertEquals(new Long(12L), response.getJobId());
-		assertEquals(ExitStatus.EXECUTING, response.getExitStatus());
+		assertEquals(BatchStatus.COMPLETED, response.getStatus());
 		assertEquals(2, count);
 	}
 

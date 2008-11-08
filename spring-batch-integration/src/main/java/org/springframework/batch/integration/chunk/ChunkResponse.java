@@ -2,16 +2,16 @@ package org.springframework.batch.integration.chunk;
 
 import java.io.Serializable;
 
-import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.BatchStatus;
 
 public class ChunkResponse implements Serializable {
 
 	private final int skipCount;
 	private final Long jobId;
-	private final ExitStatus exitStatus;
+	private final BatchStatus status;
 
-	public ChunkResponse(ExitStatus exitStatus, Long jobId, int skipCount) {
-		this.exitStatus = exitStatus;
+	public ChunkResponse(BatchStatus status, Long jobId, int skipCount) {
+		this.status = status;
 		this.jobId = jobId;
 		this.skipCount = skipCount;
 	}
@@ -24,8 +24,8 @@ public class ChunkResponse implements Serializable {
 		return jobId;
 	}
 
-	public ExitStatus getExitStatus() {
-		return exitStatus;
+	public BatchStatus getStatus() {
+		return status;
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class ChunkResponse implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": jobId="+jobId+", skipCount="+skipCount+", status="+exitStatus;
+		return getClass().getSimpleName()+": jobId="+jobId+", skipCount="+skipCount+", status="+status;
 	}
 
 }
