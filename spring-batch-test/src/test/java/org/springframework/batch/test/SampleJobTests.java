@@ -44,7 +44,7 @@ public class SampleJobTests extends AbstractSimpleJobTests {
 	}
 
 	@Test
-	public void testJob() {
+	public void testJob() throws Exception {
 		assertEquals(BatchStatus.COMPLETED,this.launchJob().getStatus());
 		this.verifyTasklet(1);
 		this.verifyTasklet(2);

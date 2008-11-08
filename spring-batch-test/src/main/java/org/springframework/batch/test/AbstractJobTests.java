@@ -6,15 +6,12 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,25 +31,25 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Dan Garrette
  * @since 2.0
  */
-public abstract class AbstractFlowJobTests {
+public abstract class AbstractJobTests {
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	@Autowired
 	private JobLauncher launcher;
-	private FlowJob job;
 
 	@Autowired
-	public void setLauncher(JobLauncher bootstrap) {
-		this.launcher = bootstrap;
-	}
-
+	private Job job;
+	
 	@Autowired
-	public void setJob(FlowJob job) {
-		this.job = job;
+	private JobRepository jobRepository;
+
+	public JobRepository getJobRepository() {
+		return jobRepository;
 	}
 
-	public FlowJob getJob() {
+	public Job getJob() {
 		return job;
 	}
 
@@ -61,7 +58,7 @@ public abstract class AbstractFlowJobTests {
 	 * 
 	 * @return the launcher
 	 */
-	protected JobLauncher getLauncher() {
+	protected JobLauncher getJobLauncher() {
 		return launcher;
 	}
 
@@ -69,8 +66,9 @@ public abstract class AbstractFlowJobTests {
 	 * Launch the entire job, including all steps, in order.
 	 * 
 	 * @return JobExecution, so that the test may validate the exit status
+	 * @throws Exception 
 	 */
-	public JobExecution launchJob() {
+	public JobExecution launchJob() throws Exception {
 		return this.launchJob(this.makeUniqueJobParameters());
 	}
 
@@ -79,22 +77,15 @@ public abstract class AbstractFlowJobTests {
 	 * 
 	 * @param jobParameters
 	 * @return JobExecution, so that the test may validate the exit status
+	 * @throws Exception 
 	 */
-	public JobExecution launchJob(JobParameters jobParameters) {
-		try {
-			return getLauncher().run(this.job, jobParameters);
-		} catch (JobExecutionAlreadyRunningException e) {
-			throw new RuntimeException(e);
-		} catch (JobRestartException e) {
-			throw new RuntimeException(e);
-		} catch (JobInstanceAlreadyCompleteException e) {
-			throw new RuntimeException(e);
-		}
+	public JobExecution launchJob(JobParameters jobParameters) throws Exception {
+		return getJobLauncher().run(this.job, jobParameters);
 	}
 
 	/**
 	 * @return a new JobParameters object containing only a parameter for the
-	 *         current timestamp, to ensure that the job instance will be unique
+	 * current timestamp, to ensure that the job instance will be unique
 	 */
 	private JobParameters makeUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();

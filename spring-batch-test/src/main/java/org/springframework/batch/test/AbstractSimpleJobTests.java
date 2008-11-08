@@ -1,24 +1,17 @@
 package org.springframework.batch.test;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Base class for testing batch jobs using the SimpleJob implementation. 
@@ -36,57 +29,30 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author Dan Garrette
  * @since 2.0
  */
-public abstract class AbstractSimpleJobTests {
+public abstract class AbstractSimpleJobTests extends AbstractJobTests {
 
-	/** Logger */
-	protected final Log logger = LogFactory.getLog(getClass());
-
-	private JobLauncher launcher;
-	private JobRepository jobRepository;
-	private SimpleJob job;
 	private StepRunner stepRunner;
 
 	private Map<String, Step> stepMap = new HashMap<String, Step>();
 	private List<Step> stepList = new ArrayList<Step>();
 
-	@Autowired
-	public void setLauncher(JobLauncher bootstrap) {
-		this.launcher = bootstrap;
-	}
-	
-	@Autowired
-	public void setJobRepository(JobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
-
-	@Autowired
-	public void setJob(SimpleJob job) {
-		this.job = job;
-
-		for (Step step : job.getSteps()) {
+	@Before
+	public void setUpSteps() {
+		for (Step step : (getSimpleJob()).getSteps()) {
 			stepMap.put(step.getName(), step);
 			stepList.add(step);
 		}
 	}
 
-	public StepRunner getStepRunner() {
+	protected StepRunner getStepRunner() {
 		if(stepRunner == null){
-			stepRunner = new StepRunner(launcher, jobRepository);
+			stepRunner = new StepRunner(getJobLauncher(), getJobRepository());
 		}
 		return stepRunner;
 	}
 	
-	public SimpleJob getJob() {
-		return job;
-	}
-
-	/**
-	 * Public getter for the launcher.
-	 * 
-	 * @return the launcher
-	 */
-	protected JobLauncher getLauncher() {
-		return launcher;
+	public SimpleJob getSimpleJob() {
+		return (SimpleJob)getJob();
 	}
 
 	public Step getStep(String stepName){
@@ -95,32 +61,6 @@ public abstract class AbstractSimpleJobTests {
 			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
 		}
 		return stepMap.get(stepName);
-	}
-	/**
-	 * Launch the entire job, including all steps, in order.
-	 * 
-	 * @return JobExecution, so that the test may validate the exit status
-	 */
-	public JobExecution launchJob() {
-		return this.launchJob(this.makeUniqueJobParameters());
-	}
-
-	/**
-	 * Launch the entire job, including all steps, in order.
-	 * 
-	 * @param jobParameters
-	 * @return JobExecution, so that the test may validate the exit status
-	 */
-	public JobExecution launchJob(JobParameters jobParameters) {
-		try {
-			return getLauncher().run(job, jobParameters);
-		} catch (JobExecutionAlreadyRunningException e) {
-			throw new RuntimeException(e);
-		} catch (JobRestartException e) {
-			throw new RuntimeException(e);
-		} catch (JobInstanceAlreadyCompleteException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	/**
@@ -142,13 +82,4 @@ public abstract class AbstractSimpleJobTests {
 		return getStepRunner().launchStep(getStep(stepName), jobParameters);
 	}
 
-	/**
-	 * @return a new JobParameters object containing only a parameter for the
-	 *         current timestamp, to ensure that the job instance will be unique
-	 */
-	private JobParameters makeUniqueJobParameters() {
-		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
-		parameters.put("timestamp", new JobParameter(new Date().getTime()));
-		return new JobParameters(parameters);
-	}
 }
