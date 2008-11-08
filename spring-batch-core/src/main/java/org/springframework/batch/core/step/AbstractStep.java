@@ -50,11 +50,6 @@ import org.springframework.util.Assert;
 public abstract class AbstractStep implements Step, InitializingBean,
 		BeanNameAware {
 
-	/**
-	 * Exit code for interrupted status.
-	 */
-	public static final String JOB_INTERRUPTED = "INTERRUPTED";
-
 	private static final Log logger = LogFactory.getLog(AbstractStep.class);
 
 	private String name;
@@ -154,7 +149,8 @@ public abstract class AbstractStep implements Step, InitializingBean,
 	 *            the current step context
 	 * @throws Exception
 	 */
-	protected abstract void doExecute(StepExecution stepExecution) throws Exception;
+	protected abstract void doExecute(StepExecution stepExecution)
+			throws Exception;
 
 	/**
 	 * Extension point for subclasses to provide callbacks to their
@@ -353,8 +349,8 @@ public abstract class AbstractStep implements Step, InitializingBean,
 		ExitStatus exitStatus;
 		if (ex instanceof JobInterruptedException
 				|| ex.getCause() instanceof JobInterruptedException) {
-			exitStatus = new ExitStatus(false, JOB_INTERRUPTED,
-					JobInterruptedException.class.getName());
+			exitStatus = ExitStatus.INTERRUPTED
+					.addExitDescription(JobInterruptedException.class.getName());
 		} else if (ex instanceof NoSuchJobException
 				|| ex.getCause() instanceof NoSuchJobException) {
 			exitStatus = new ExitStatus(false, ExitCodeMapper.NO_SUCH_JOB, ex

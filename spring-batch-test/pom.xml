@@ -1,41 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
-		<artifactId>spring-batch</artifactId>
+		<artifactId>org.springframework.batch</artifactId>
 		<groupId>org.springframework.batch</groupId>
 		<version>2.0.0.CI-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.springframework.batch.test</artifactId>
-	<name>Test</name>
 	<version>2.0.0.CI-SNAPSHOT</version>
+	<name>Test</name>
 	<packaging>jar</packaging>
 	<description>Domain for batch job testing</description>
-	<profiles>
-		<profile>
-			<id>clover</id>
-			<activation />
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-clover-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-			<reporting>
-				<plugins>
-					<plugin>
-						<artifactId>maven-clover-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</reporting>
-		</profile>
-	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
-			<artifactId>org.springframework.batch.core</artifactId>
+			<artifactId>org.springframework.batch.core
+			</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -44,27 +26,33 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
+			<artifactId>org.springframework.test
+			</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
+			<artifactId>org.springframework.jdbc
+			</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.io
+			</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.dbcp
+			</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>com.springsource.org.hsqldb
+			</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.collections
+			</artifactId>
 		</dependency>
 	</dependencies>
 	<reporting>
