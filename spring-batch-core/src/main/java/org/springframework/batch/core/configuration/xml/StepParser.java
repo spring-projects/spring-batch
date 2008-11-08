@@ -271,14 +271,30 @@ public class StepParser {
 	        	DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {
+					String id = listenerElement.getAttribute("id");
 					String listenerRef = listenerElement.getAttribute("ref");
-						if (StringUtils.hasText(listenerRef)) {
-							listenerRefs.add(listenerRef);
-					        RuntimeBeanReference bean = new RuntimeBeanReference(listenerRef);
-							if (bean != null) {
-								listenerBeans.add(bean);
-							}
+					String className = listenerElement.getAttribute("class");
+					if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
+							&& StringUtils.hasText(listenerRef)) {
+						throw new BeanCreationException("Both 'id' or 'ref' plus 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + listenerElement.getTagName() + "> element with" + (StringUtils.hasText(id) ? " id=\"" + id + "\"" : "" ) + (StringUtils.hasText(className) ? " class=\"" + className + "\"" : "") + (StringUtils.hasText(listenerRef) ? " ref=\"" + listenerRef + "\"" : ""));
+					}
+					if (StringUtils.hasText(listenerRef)) {
+						listenerRefs.add(listenerRef);
+				        BeanReference bean = new RuntimeBeanReference(listenerRef);
+						listenerBeans.add(bean);
+					}
+					else if (StringUtils.hasText(className)) {
+						RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
+						if (!StringUtils.hasText(id)) {
+							id = parserContext.getReaderContext().generateBeanName(beanDef);
 						}
+						parserContext.getRegistry().registerBeanDefinition(id, beanDef);
+				        BeanReference bean = new RuntimeBeanReference(id);
+						listenerBeans.add(bean);
+					}
+					else {
+						throw new BeanCreationException("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element");
+					}
 				}
 			}
 	        ManagedList arguments = new ManagedList();

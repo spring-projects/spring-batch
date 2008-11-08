@@ -225,8 +225,9 @@
 						</xsd:annotation>
 						<xsd:complexType>
 							<xsd:sequence>
-								<xsd:element name="listener">
+								<xsd:element name="listener" minOccurs="1" maxOccurs="unbounded">
 									<xsd:complexType>
+										<xsd:attribute name="id" type="xsd:ID"/>
 										<xsd:attribute name="ref" type="xsd:string"/>
 										<xsd:attribute name="class" type="xsd:string"/>
 									</xsd:complexType>
