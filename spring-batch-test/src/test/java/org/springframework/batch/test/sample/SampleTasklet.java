@@ -19,7 +19,6 @@ public class SampleTasklet implements Tasklet {
 	}
 
 	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		System.err.println("SampleTasklet1.execute()");
 		this.jdbcTemplate.update("insert into TESTS(ID, NAME) values (?, 'SampleTasklet" + id + "')", id);
 		return RepeatStatus.FINISHED;
 	}

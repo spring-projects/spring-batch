@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<!--  Initialise the database before every test case: -->
-	<import resource="data-source-context-init.xml" />
+	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
+		<property name="dataSource" ref="dataSource" />
+		<property name="initScripts">
+			<list>
+				<value>${batch.schema.script}</value>
+				<value>${batch.business.schema.script}
+				</value>
+			</list>
+		</property>
+	</bean>
+
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
 		<property name="driverClassName" value="${batch.jdbc.driver}" />
 		<property name="url" value="${batch.jdbc.url}" />
 		<property name="username" value="${batch.jdbc.user}" />
 		<property name="password" value="${batch.jdbc.password}" />
 	</bean>
-	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" lazy-init="true">
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		lazy-init="true">
 		<property name="dataSource" ref="dataSource" />
 	</bean>
-	<!-- Set up or detect a System property called "environment" used to construct a properties file on the classpath.  The default is "hsql".  -->
-	<bean id="environment" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+
+	<!--
+		Set up or detect a System property called "environment" used to
+		construct a properties file on the classpath. The default is "hsql".
+	-->
+	<bean id="environment"
+		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
 		<property name="targetClass" value="java.lang.System" />
 		<property name="targetMethod" value="setProperty" />
 		<property name="arguments">
@@ -36,7 +54,8 @@
 	</bean>
 
 	<!--  Use this to set additional properties on beans at run time -->
-	<bean id="overrideProperties" class="org.springframework.beans.factory.config.PropertyOverrideConfigurer"
+	<bean id="overrideProperties"
+		class="org.springframework.beans.factory.config.PropertyOverrideConfigurer"
 		depends-on="environment">
 		<property name="location" value="classpath:batch-${environment}.properties" />
 		<!-- Allow system properties (-D) to override those from file -->
@@ -47,18 +66,14 @@
 		<property name="ignoreInvalidKeys" value="true" />
 		<property name="order" value="2" />
 	</bean>
-	<bean id="placeholderProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+
+	<bean id="placeholderProperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
 		depends-on="environment">
 		<property name="location" value="classpath:batch-${environment}.properties" />
 		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="order" value="1" />
 	</bean>
-	<bean id="lobHandler" class="${batch.lob.handler.class}" />
-	<bean id="incrementerParent" class="${batch.database.incrementer.class}">
-		<property name="dataSource" ref="dataSource" />
-		<property name="incrementerName" value="ID" />
-	</bean>
 
-	<!--import resource="alt-data-source-context.xml" /-->
 </beans>

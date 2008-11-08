@@ -34,16 +34,6 @@ public class SampleJobTests extends AbstractSimpleJobTests {
 	}
 
 	@Test
-	public void test1() {
-		assertEquals(BatchStatus.COMPLETED, this.launchStep("step1").getStatus());
-		this.verifyTasklet(1);
-	}
-
-	private void verifyTasklet(int id) {
-		assertEquals(id, jdbcTemplate.queryForInt("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'"));
-	}
-
-	@Test
 	public void testJob() throws Exception {
 		assertEquals(BatchStatus.COMPLETED,this.launchJob().getStatus());
 		this.verifyTasklet(1);
@@ -56,8 +46,19 @@ public class SampleJobTests extends AbstractSimpleJobTests {
 	}
 
 	@Test
-	public void test2() {
+	public void testStep1Execution() {
+		assertEquals(BatchStatus.COMPLETED, this.launchStep("step1").getStatus());
+		this.verifyTasklet(1);
+	}
+
+	@Test
+	public void testStep2Execution() {
 		assertEquals(BatchStatus.COMPLETED, this.launchStep("step2").getStatus());
 		this.verifyTasklet(2);
 	}
+
+	private void verifyTasklet(int id) {
+		assertEquals(id, jdbcTemplate.queryForInt("SELECT ID from TESTS where NAME = 'SampleTasklet" + id + "'"));
+	}
+
 }
