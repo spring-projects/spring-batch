@@ -18,6 +18,7 @@ package org.springframework.batch.core.launch.support;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -79,7 +80,7 @@ public class JobRegistryBackgroundJobRunner {
 
 	final private String parentContextPath;
 
-	private static List<Exception> errors = new ArrayList<Exception>();
+	private static List<Exception> errors = Collections.synchronizedList(new ArrayList<Exception>());
 
 	/**
 	 * @param parentContextPath
@@ -103,7 +104,9 @@ public class JobRegistryBackgroundJobRunner {
 	 * @return the errors
 	 */
 	public static List<Exception> getErrors() {
-		return errors;
+		synchronized (errors) {
+			return new ArrayList<Exception>(errors);
+		}
 	}
 
 	private void register(String[] paths) throws DuplicateJobException, IOException {
@@ -183,11 +186,15 @@ public class JobRegistryBackgroundJobRunner {
 		while (launcher.parentContext == null && errors.isEmpty()) {
 			Thread.sleep(100L);
 		}
-		if (!errors.isEmpty()) {
-			logger.info(errors.size() + " errors detected on startup of parent context.  Rethrowing.");
-			throw errors.get(0);
-		}
 
+		synchronized (errors) {
+			if (!errors.isEmpty()) {
+				logger.info(errors.size() + " errors detected on startup of parent context.  Rethrowing.");
+				throw errors.get(0);
+			}
+		}
+		errors.clear();
+		
 		// Paths to individual job configurations.
 		final String[] paths = new String[args.length - 1];
 		System.arraycopy(args, 1, paths, 0, paths.length);
