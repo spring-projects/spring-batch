@@ -434,7 +434,10 @@
 				<version>1.5.4</version>
 			</dependency>
 			<dependency>
-				<!-- Don't use the com.springsource one - surefire is broken in some strange way -->
+				<!--
+					Don't use the com.springsource one - surefire is broken in some
+					strange way
+				-->
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.4</version>
@@ -582,7 +585,7 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
-			<!-- TODO: remove this or find a replacement in Java 5 / BRITS -->
+				<!-- TODO: remove this or find a replacement in Java 5 / BRITS -->
 				<groupId>stax</groupId>
 				<artifactId>stax</artifactId>
 				<version>1.2.0</version>
@@ -735,24 +738,36 @@
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
 			<url>http://objectstyle.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.release</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				Snapshot Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+			<snapshots>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
@@ -761,20 +776,32 @@
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Milestones</name>
 			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>
 			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>Codehaus Snapshots</id>
 			<url>http://snapshots.repository.codehaus.org/</url>
+			<snapshots>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>spring-external-svn</id>
 			<name>Spring External SVN Repository</name>
 			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 </project>
