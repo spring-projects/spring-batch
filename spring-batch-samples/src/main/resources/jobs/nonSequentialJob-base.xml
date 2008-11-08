@@ -26,14 +26,14 @@
 		</property>
 		<property name="listeners">
 			<list> 
-				<bean class="org.springframework.batch.sample.domain.nonSequential.internal.SkipCheckingListener"/>
+				<bean class="org.springframework.batch.sample.domain.football.internal.SkipCheckingListener"/>
 			</list>
 		</property>
 	</bean>
 	
 	<bean id="errorPrint" parent="taskletStep">
 		<property name="tasklet">
-			<bean class="org.springframework.batch.sample.domain.nonSequential.internal.ErrorLogWriter">
+			<bean class="org.springframework.batch.sample.domain.football.internal.ErrorLogWriter">
 				<property name="dataSource" ref="dataSource"/>
 			</bean>
 		</property>

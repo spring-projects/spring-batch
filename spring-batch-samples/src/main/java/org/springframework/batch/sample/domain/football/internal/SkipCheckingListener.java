@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.domain.nonSequential.internal;
+package org.springframework.batch.sample.domain.football.internal;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;

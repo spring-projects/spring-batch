@@ -12,7 +12,7 @@
 
 	<import resource="nonSequentialJob-base.xml" />
 
-	<bean id="skipCheckingDecider" class="org.springframework.batch.sample.domain.nonSequential.internal.SkipCheckingDecider"/>
+	<bean id="skipCheckingDecider" class="org.springframework.batch.sample.domain.football.internal.SkipCheckingDecider"/>
 
 	<batch:job id="nonSequentialDecisionJob">
 		<batch:step name="playerload">
@@ -45,4 +45,5 @@
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="order" value="1" />
 	</bean>
+
 </beans>

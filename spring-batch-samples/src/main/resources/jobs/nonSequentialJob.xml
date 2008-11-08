@@ -38,4 +38,5 @@
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
 		<property name="order" value="1" />
 	</bean>
+
 </beans>

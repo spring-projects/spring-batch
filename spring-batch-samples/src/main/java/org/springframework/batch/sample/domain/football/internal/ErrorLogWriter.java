@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.domain.nonSequential.internal;
+package org.springframework.batch.sample.domain.football.internal;
 
 import javax.sql.DataSource;
 
