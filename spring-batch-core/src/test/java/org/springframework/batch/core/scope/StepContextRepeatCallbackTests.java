@@ -40,20 +40,20 @@ public class StepContextRepeatCallbackTests {
 	public void testDoInIteration() throws Exception {
 		StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
 			@Override
-			public ExitStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
+			public RepeatStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
 				assertEquals(Long.valueOf(123), stepContext.getStepExecution().getId());
-				return ExitStatus.NOOP;
+				return RepeatStatus.FINISHED;
 			}
 		};
 		assertEquals(RepeatStatus.FINISHED, callback.doInIteration(null));		
-		assertEquals(ExitStatus.NOOP, stepExecution.getExitStatus());
+		assertEquals(ExitStatus.EXECUTING, stepExecution.getExitStatus());
 	}
 
 	@Test
 	public void testUnfinishedWork() throws Exception {
 		StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
 			@Override
-			public ExitStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
+			public RepeatStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
 				if (addedAttribute) {
 					removedAttribute = stepContext.hasAttribute("foo");
 					stepContext.removeAttribute("foo");
@@ -61,7 +61,7 @@ public class StepContextRepeatCallbackTests {
 					addedAttribute = true;
 					stepContext.setAttribute("foo", "bar");
 				}
-				return ExitStatus.NOOP;
+				return RepeatStatus.FINISHED;
 			}
 		};
 		callback.doInIteration(null);

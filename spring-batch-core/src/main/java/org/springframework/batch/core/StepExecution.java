@@ -66,7 +66,7 @@ public class StepExecution extends Entity {
 
 	private volatile ExecutionContext executionContext = new ExecutionContext();
 
-	private volatile ExitStatus exitStatus = ExitStatus.CONTINUABLE;
+	private volatile ExitStatus exitStatus = ExitStatus.EXECUTING;
 
 	private volatile boolean terminateOnly;
 
@@ -327,6 +327,7 @@ public class StepExecution extends Entity {
 		filterCount += contribution.getFilterCount();
 		readCount += contribution.getReadCount();
 		writeCount += contribution.getWriteCount();
+		exitStatus = exitStatus.and(contribution.getExitStatus());
 	}
 
 	/**

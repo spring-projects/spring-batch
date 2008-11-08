@@ -55,6 +55,7 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -779,12 +780,10 @@ public class TaskletStepTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 		final ExecutionContext ec = stepExecution.getExecutionContext();
 		step.setTasklet(new Tasklet(){
-
-			public ExitStatus execute(StepContribution contribution,
+			public RepeatStatus execute(StepContribution contribution,
 					AttributeAccessor attributes) throws Exception {
-
 				ec.putString("test", "test");
-				return ExitStatus.FINISHED;
+				return RepeatStatus.FINISHED;
 			}
 		});
 		

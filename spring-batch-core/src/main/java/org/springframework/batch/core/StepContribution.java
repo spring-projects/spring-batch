@@ -38,11 +38,31 @@ public class StepContribution {
 
 	private volatile int processSkipCount;
 
+	private ExitStatus exitStatus = ExitStatus.EXECUTING;
+
 	/**
 	 * @param execution
 	 */
 	public StepContribution(StepExecution execution) {
 		this.parentSkipCount = execution.getSkipCount();
+	}
+
+	/**
+	 * Set the {@link ExitStatus} for this contribution.
+	 * 
+	 * @param status
+	 */
+	public void setExitStatus(ExitStatus status) {
+		this.exitStatus = status;
+	}
+
+	/**
+	 * Public getter for the status.
+	 * 
+	 * @return the {@link ExitStatus} for this contribution
+	 */
+	public ExitStatus getExitStatus() {
+		return exitStatus;
 	}
 
 	/**
@@ -167,7 +187,7 @@ public class StepContribution {
 	public String toString() {
 		return "[StepContribution: read=" + readCount + ", written=" + writeCount + ", filtered=" + filterCount
 				+ ", readSkips=" + readSkipCount + ", writeSkips=" + writeSkipCount + ", processSkips="
-				+ processSkipCount + "]";
+				+ processSkipCount + ", exitStatus=" + exitStatus.getExitCode() + "]";
 	}
 
 }

@@ -18,7 +18,6 @@ package org.springframework.batch.core.scope;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -65,9 +64,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		// otherwise step-scoped beans will be re-initialised for each chunk.
 		StepSynchronizationManager.register(stepContext);
 		try {
-			ExitStatus exitStatus = doInStepContext(context, stepContext);
-			stepContext.getStepExecution().setExitStatus(exitStatus);
-			return RepeatStatus.continueIf(exitStatus.isContinuable());
+			return doInStepContext(context, stepContext);
 		}
 		finally {
 			// Still some stuff to do with the data in this chunk,
@@ -91,10 +88,10 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 * 
 	 * @param context the current {@link RepeatContext}
 	 * @param stepContext the step context in which to carry out the work
-	 * @return the exit status from the execution
+	 * @return the repeat status from the execution
 	 * @throws Exception implementations can throw an exception if anything goes
 	 * wrong
 	 */
-	public abstract ExitStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception;
+	public abstract RepeatStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception;
 
 }

@@ -54,11 +54,11 @@ public class StepExecutionAggregatorTests {
 
 	@Test
 	public void testAggregateExitStatusSunnyDay() {
-		stepExecution1.setExitStatus(ExitStatus.CONTINUABLE);
+		stepExecution1.setExitStatus(ExitStatus.EXECUTING);
 		stepExecution2.setExitStatus(ExitStatus.FAILED);
 		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
-		assertEquals(ExitStatus.FAILED.and(ExitStatus.CONTINUABLE), result.getExitStatus());
+		assertEquals(ExitStatus.FAILED.and(ExitStatus.EXECUTING), result.getExitStatus());
 	}
 
 	@Test

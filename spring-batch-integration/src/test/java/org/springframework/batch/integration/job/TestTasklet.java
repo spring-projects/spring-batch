@@ -18,6 +18,7 @@ package org.springframework.batch.integration.job;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -30,8 +31,9 @@ public class TestTasklet implements Tasklet {
 	 * (non-Javadoc)
 	 * 
 	 */
-	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		return ExitStatus.FINISHED;
+	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+		contribution.setExitStatus(ExitStatus.FINISHED);
+		return RepeatStatus.FINISHED;
 	}
 
 }

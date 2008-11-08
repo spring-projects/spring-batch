@@ -27,7 +27,7 @@ public class ChunkProcessorChunkHandlerTests {
 				12L, 10));
 		assertEquals(0, response.getSkipCount());
 		assertEquals(new Long(12L), response.getJobId());
-		assertEquals(ExitStatus.CONTINUABLE, response.getExitStatus());
+		assertEquals(ExitStatus.EXECUTING, response.getExitStatus());
 		assertEquals(2, count);
 	}
 

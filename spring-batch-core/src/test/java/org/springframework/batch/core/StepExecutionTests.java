@@ -104,7 +104,7 @@ public class StepExecutionTests {
 	 */
 	@Test
 	public void testGetExitCode() {
-		assertEquals(ExitStatus.CONTINUABLE, execution.getExitStatus());
+		assertEquals(ExitStatus.EXECUTING, execution.getExitStatus());
 		execution.setExitStatus(ExitStatus.FINISHED);
 		assertEquals(ExitStatus.FINISHED, execution.getExitStatus());
 	}

@@ -2,12 +2,12 @@ package org.springframework.batch.sample.tasklet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -25,8 +25,8 @@ public class DummyMessageReceivingTasklet extends StepExecutionListenerSupport i
 		logger.info("Got message from context: " + receivedMessage);
 	}
 
-	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		return ExitStatus.FINISHED;
+	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+		return RepeatStatus.FINISHED;
 	}
 
 	public String getReceivedMessage() {

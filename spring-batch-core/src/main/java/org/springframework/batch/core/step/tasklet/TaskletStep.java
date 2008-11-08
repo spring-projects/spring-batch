@@ -18,7 +18,6 @@ package org.springframework.batch.core.step.tasklet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -38,6 +37,7 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -243,7 +243,7 @@ public class TaskletStep extends AbstractStep {
 		stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
 
 			@Override
-			public ExitStatus doInStepContext(RepeatContext repeatContext,
+			public RepeatStatus doInStepContext(RepeatContext repeatContext,
 					StepContext stepContext) throws Exception {
 
 				StepExecution stepExecution = stepContext.getStepExecution();
@@ -257,7 +257,7 @@ public class TaskletStep extends AbstractStep {
 				// interruption.
 				interruptionPolicy.checkInterrupted(stepExecution);
 
-				ExitStatus exitStatus = ExitStatus.CONTINUABLE;
+				RepeatStatus result = RepeatStatus.CONTINUABLE;
 
 				TransactionStatus transaction = transactionManager
 						.getTransaction(transactionAttribute);
@@ -267,7 +267,7 @@ public class TaskletStep extends AbstractStep {
 				try {
 
 					try {
-						exitStatus = tasklet.execute(contribution, stepContext);
+						result = tasklet.execute(contribution, stepContext);
 					} finally {
 						// Apply the contribution to the step
 						// even if unsuccessful
@@ -351,7 +351,7 @@ public class TaskletStep extends AbstractStep {
 				// caller
 				interruptionPolicy.checkInterrupted(stepExecution);
 
-				return exitStatus;
+				return result;
 			}
 
 		});

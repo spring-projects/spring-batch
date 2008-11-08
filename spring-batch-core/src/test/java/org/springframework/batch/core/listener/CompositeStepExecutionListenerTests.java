@@ -47,7 +47,7 @@ public class CompositeStepExecutionListenerTests extends TestCase {
 		}, new StepExecutionListenerSupport() {
 			public ExitStatus afterStep(StepExecution stepExecution) {
 				list.add("continue");
-				return ExitStatus.CONTINUABLE;
+				return ExitStatus.EXECUTING;
 			}
 		} });
 		assertFalse(listener.afterStep(null).isContinuable());

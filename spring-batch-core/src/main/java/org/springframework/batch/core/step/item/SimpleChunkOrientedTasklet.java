@@ -37,8 +37,8 @@ public class SimpleChunkOrientedTasklet<I, O> extends AbstractItemOrientedTaskle
 	/**
 	 * Read-process-write a list of items.
 	 */
-	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		ExitStatus result = ExitStatus.CONTINUABLE;
+	public RepeatStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
+		ExitStatus result = ExitStatus.EXECUTING;
 		final List<I> inputs = new ArrayList<I>();
 
 		RepeatStatus continuable = repeatOperations.iterate(new RepeatCallback() {
@@ -55,11 +55,12 @@ public class SimpleChunkOrientedTasklet<I, O> extends AbstractItemOrientedTaskle
 			}
 		});
 
-		result = continuable.isContinuable() ? ExitStatus.CONTINUABLE : ExitStatus.FINISHED; 
-		
+		result = continuable.isContinuable() ? ExitStatus.EXECUTING : ExitStatus.FINISHED;
+		contribution.setExitStatus(result);
+
 		// If there is no input we don't have to do anything more
 		if (inputs.isEmpty()) {
-			return result;
+			return continuable;
 		}
 
 		List<O> outputs = new ArrayList<O>();
@@ -74,7 +75,7 @@ public class SimpleChunkOrientedTasklet<I, O> extends AbstractItemOrientedTaskle
 		doWrite(outputs);
 		contribution.incrementWriteCount(outputs.size());
 
-		return result;
+		return continuable;
 	}
 
 }

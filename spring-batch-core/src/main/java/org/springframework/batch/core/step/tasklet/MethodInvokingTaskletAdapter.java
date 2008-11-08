@@ -18,6 +18,7 @@ package org.springframework.batch.core.step.tasklet;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -41,8 +42,9 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 * 
 	 * @see Tasklet#execute(StepContribution, AttributeAccessor)
 	 */
-	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		return mapResult(invokeDelegateMethod());
+	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+		contribution.setExitStatus(mapResult(invokeDelegateMethod()));
+		return RepeatStatus.FINISHED;
 	}
 
 	/**

@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.util.Assert;
@@ -32,13 +33,13 @@ import org.springframework.util.Assert;
  */
 public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 
-	private Callable<ExitStatus> callable;
+	private Callable<RepeatStatus> callable;
 	
 	/**
 	 * Public setter for the {@link Callable}.
 	 * @param callable the {@link Callable} to set
 	 */
-	public void setCallable(Callable<ExitStatus> callable) {
+	public void setCallable(Callable<RepeatStatus> callable) {
 		this.callable = callable;
 	}
 	
@@ -56,7 +57,7 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	 * the {@link StepContribution} and the attributes.
 	 * @see Tasklet#execute(StepContribution, AttributeAccessor)
 	 */
-	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		return callable.call();
 	}
 

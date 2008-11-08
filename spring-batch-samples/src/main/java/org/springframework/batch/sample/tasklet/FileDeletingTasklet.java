@@ -1,9 +1,9 @@
 package org.springframework.batch.sample.tasklet;
 
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.core.io.Resource;
@@ -19,14 +19,14 @@ public class FileDeletingTasklet implements Tasklet, InitializingBean {
 
 	private Resource[] resources;
 
-	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		for (Resource resource : resources) {
 			boolean deleted = resource.getFile().delete();
 			if (!deleted) {
 				throw new UnexpectedJobExecutionException("Could not delete file " + resource);
 			}
 		}
-		return ExitStatus.FINISHED;
+		return RepeatStatus.FINISHED;
 	}
 
 	public void setResources(Resource[] resources) {

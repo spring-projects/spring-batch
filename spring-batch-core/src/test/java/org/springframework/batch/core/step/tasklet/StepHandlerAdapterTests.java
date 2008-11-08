@@ -20,6 +20,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter;
 
 /**
@@ -31,6 +36,9 @@ public class StepHandlerAdapterTests {
 	private MethodInvokingTaskletAdapter tasklet = new MethodInvokingTaskletAdapter();
 	private Object result = null;
 	
+	private StepExecution stepExecution = new StepExecution("systemCommandStep", new JobExecution(new JobInstance(1L,
+			new JobParameters(), "systemCommandJob")));
+
 	public ExitStatus execute() {
 		return ExitStatus.NOOP;
 	}
@@ -47,20 +55,26 @@ public class StepHandlerAdapterTests {
 	@Test
 	public void testExecuteWithExitStatus() throws Exception {
 		tasklet.setTargetMethod("execute");
-		assertEquals(ExitStatus.NOOP, tasklet.execute(null,null));
+		StepContribution contribution = stepExecution.createStepContribution();
+		tasklet.execute(contribution,null);
+		assertEquals(ExitStatus.NOOP, contribution.getExitStatus());
 	}
 
 	@Test
 	public void testMapResultWithNull() throws Exception {
 		tasklet.setTargetMethod("process");
-		assertEquals(ExitStatus.FINISHED, tasklet.execute(null,null));
+		StepContribution contribution = stepExecution.createStepContribution();
+		tasklet.execute(contribution,null);
+		assertEquals(ExitStatus.FINISHED, contribution.getExitStatus());
 	}
 
 	@Test
 	public void testMapResultWithNonNull() throws Exception {
 		tasklet.setTargetMethod("process");
 		this.result = "foo";
-		assertEquals(ExitStatus.FINISHED, tasklet.execute(null,null));
+		StepContribution contribution = stepExecution.createStepContribution();
+		tasklet.execute(contribution,null);
+		assertEquals(ExitStatus.FINISHED, contribution.getExitStatus());
 	}
 
 }

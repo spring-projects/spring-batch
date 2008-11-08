@@ -27,6 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.transaction.TransactionException;
@@ -121,8 +122,8 @@ public class TaskletStepExceptionTests {
 		} });
 		taskletStep.setTasklet(new Tasklet() {
 
-			public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-				return ExitStatus.FINISHED;
+			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+				return RepeatStatus.FINISHED;
 			}
 
 		});
@@ -183,8 +184,8 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-			public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-				return ExitStatus.FINISHED;
+			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+				return RepeatStatus.FINISHED;
 			}
 
 		});
@@ -219,8 +220,7 @@ public class TaskletStepExceptionTests {
 
 	private static class ExceptionTasklet implements Tasklet {
 
-		public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-
+		public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
 			throw taskletException;
 		}
 	}

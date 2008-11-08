@@ -50,7 +50,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 		}
 
 		logger.debug("Completed chunk handling with " + skipCount + " skips");
-		return new ChunkResponse(ExitStatus.CONTINUABLE, chunkRequest.getJobId(), skipCount);
+		return new ChunkResponse(ExitStatus.EXECUTING, chunkRequest.getJobId(), skipCount);
 
 	}
 }

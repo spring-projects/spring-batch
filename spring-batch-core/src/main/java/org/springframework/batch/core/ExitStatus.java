@@ -38,11 +38,6 @@ public class ExitStatus implements Serializable {
 	public static final ExitStatus UNKNOWN = new ExitStatus(false, "UNKNOWN");
 
 	/**
-	 * Convenient constant value representing unfinished processing.
-	 */
-	public static final ExitStatus CONTINUABLE = new ExitStatus(true, "CONTINUABLE");
-
-	/**
 	 * Convenient constant value representing continuable state where processing
 	 * is still taking place, so no further action is required. Used for
 	 * asynchronous execution scenarios where the processing is happening in

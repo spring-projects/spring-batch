@@ -2,7 +2,7 @@ package org.springframework.batch.repeat;
 
 public enum RepeatStatus {
 
-	UNKNOWN(true), CONTINUABLE(true), FINISHED(false);
+	CONTINUABLE(true), FINISHED(false);
 
 	private final boolean continuable;
 

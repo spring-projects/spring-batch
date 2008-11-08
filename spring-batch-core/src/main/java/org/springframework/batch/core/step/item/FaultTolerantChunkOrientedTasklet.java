@@ -74,18 +74,19 @@ public class FaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolera
 	 * @see org.springframework.batch.core.step.tasklet.Tasklet#execute(org.springframework.batch.core.StepContribution,
 	 * AttributeAccessor)
 	 */
-	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 
 		final List<I> inputs = getBufferedList(attributes, INPUT_BUFFER_KEY);
 		final List<O> outputs = new ArrayList<O>();
 
-		ExitStatus result = ExitStatus.CONTINUABLE;
-
 		final List<Exception> skippedReads = getBufferedList(attributes, SKIPPED_READS_KEY);
+
+		// TODO: invert logic below so that default can be FINISHED? 
+		RepeatStatus continuable = RepeatStatus.CONTINUABLE;
 
 		if (inputs.isEmpty() && outputs.isEmpty()) {
 
-			RepeatStatus continuable = getRepeatOperations().iterate(new RepeatCallback() {
+			continuable = getRepeatOperations().iterate(new RepeatCallback() {
 				public RepeatStatus doInIteration(final RepeatContext context) throws Exception {
 					I item = read(contribution, skippedReads);
 
@@ -98,7 +99,8 @@ public class FaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolera
 				}
 			});
 			
-			result = continuable.isContinuable() ? ExitStatus.CONTINUABLE : ExitStatus.FINISHED; 
+			ExitStatus status = continuable.isContinuable() ? ExitStatus.EXECUTING : ExitStatus.FINISHED; 
+			contribution.setExitStatus(status);
 
 		}
 
@@ -121,7 +123,7 @@ public class FaultTolerantChunkOrientedTasklet<I, O> extends AbstractFaultTolera
 			attributes.removeAttribute(key);
 		}
 
-		return result;
+		return continuable;
 
 	}
 

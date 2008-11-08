@@ -48,9 +48,9 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testExitStatusConstantsContinuable() {
-		ExitStatus status = ExitStatus.CONTINUABLE;
+		ExitStatus status = ExitStatus.EXECUTING;
 		assertTrue(status.isContinuable());
-		assertEquals("CONTINUABLE", status.getExitCode());
+		assertEquals("EXECUTING", status.getExitCode());
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testEqualsWithSameProperties() throws Exception {
-		assertEquals(ExitStatus.CONTINUABLE, new ExitStatus(true, "CONTINUABLE"));
+		assertEquals(ExitStatus.EXECUTING, new ExitStatus(true, "EXECUTING"));
 	}
 
 	@Test
@@ -93,7 +93,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testEqualsWithNull() throws Exception {
-		assertFalse(ExitStatus.CONTINUABLE.equals(null));
+		assertFalse(ExitStatus.EXECUTING.equals(null));
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testHashcode() throws Exception {
-		assertEquals(ExitStatus.CONTINUABLE.toString().hashCode(), ExitStatus.CONTINUABLE.hashCode());
+		assertEquals(ExitStatus.EXECUTING.toString().hashCode(), ExitStatus.EXECUTING.hashCode());
 	}
 
 	/**
@@ -112,8 +112,8 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndBoolean() {
-		assertTrue(ExitStatus.CONTINUABLE.and(true).isContinuable());
-		assertFalse(ExitStatus.CONTINUABLE.and(false).isContinuable());
+		assertTrue(ExitStatus.EXECUTING.and(true).isContinuable());
+		assertFalse(ExitStatus.EXECUTING.and(false).isContinuable());
 		ExitStatus status = new ExitStatus(false, "CUSTOM_CODE", "CUSTOM_DESCRIPTION");
 		assertTrue(status.and(true).getExitCode() == "CUSTOM_CODE");
 		assertTrue(status.and(true).getExitDescription() == "CUSTOM_DESCRIPTION");
@@ -126,10 +126,10 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusStillContinuable() {
-		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).isContinuable());
-		assertFalse(ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED).isContinuable());
-		assertTrue(ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE).getExitCode().equals(
-				ExitStatus.CONTINUABLE.getExitCode()));
+		assertTrue(ExitStatus.EXECUTING.and(ExitStatus.EXECUTING).isContinuable());
+		assertFalse(ExitStatus.EXECUTING.and(ExitStatus.FINISHED).isContinuable());
+		assertTrue(ExitStatus.EXECUTING.and(ExitStatus.EXECUTING).getExitCode().equals(
+				ExitStatus.EXECUTING.getExitCode()));
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenFinishedAddedToContinuable() {
-		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.CONTINUABLE.and(ExitStatus.FINISHED).getExitCode());
+		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.EXECUTING.and(ExitStatus.FINISHED).getExitCode());
 	}
 
 	/**
@@ -149,7 +149,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenContinuableAddedToFinished() {
-		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(ExitStatus.CONTINUABLE).getExitCode());
+		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(ExitStatus.EXECUTING).getExitCode());
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenCustomContinuableAddedToContinuable() {
-		assertEquals("CUSTOM", ExitStatus.CONTINUABLE.and(ExitStatus.CONTINUABLE.replaceExitCode("CUSTOM"))
+		assertEquals("CUSTOM", ExitStatus.EXECUTING.and(ExitStatus.EXECUTING.replaceExitCode("CUSTOM"))
 				.getExitCode());
 	}
 
@@ -182,52 +182,52 @@ public class ExitStatusTests {
 	@Test
 	public void testAndExitStatusWhenCustomContinuableAddedToFinished() {
 		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(
-				ExitStatus.CONTINUABLE.replaceExitCode("CUSTOM")).getExitCode());
+				ExitStatus.EXECUTING.replaceExitCode("CUSTOM")).getExitCode());
 	}
 
 	@Test
 	public void testAddExitCode() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO");
-		assertTrue(ExitStatus.CONTINUABLE != status);
+		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode("FOO");
+		assertTrue(ExitStatus.EXECUTING != status);
 		assertTrue(status.isContinuable());
 		assertEquals("FOO", status.getExitCode());
 	}
 
 	@Test
 	public void testAddExitCodeToExistingStatus() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO").replaceExitCode("BAR");
-		assertTrue(ExitStatus.CONTINUABLE != status);
+		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode("FOO").replaceExitCode("BAR");
+		assertTrue(ExitStatus.EXECUTING != status);
 		assertTrue(status.isContinuable());
 		assertEquals("BAR", status.getExitCode());
 	}
 
 	@Test
 	public void testAddExitCodeToSameStatus() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode(ExitStatus.CONTINUABLE.getExitCode());
-		assertTrue(ExitStatus.CONTINUABLE != status);
+		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode(ExitStatus.EXECUTING.getExitCode());
+		assertTrue(ExitStatus.EXECUTING != status);
 		assertTrue(status.isContinuable());
-		assertEquals(ExitStatus.CONTINUABLE.getExitCode(), status.getExitCode());
+		assertEquals(ExitStatus.EXECUTING.getExitCode(), status.getExitCode());
 	}
 
 	@Test
 	public void testAddExitDescription() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.addExitDescription("Foo");
-		assertTrue(ExitStatus.CONTINUABLE != status);
+		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo");
+		assertTrue(ExitStatus.EXECUTING != status);
 		assertTrue(status.isContinuable());
 		assertEquals("Foo", status.getExitDescription());
 	}
 
 	@Test
 	public void testAddExitDescriptionToSameStatus() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.addExitDescription("Foo").addExitDescription("Foo");
-		assertTrue(ExitStatus.CONTINUABLE != status);
+		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription("Foo");
+		assertTrue(ExitStatus.EXECUTING != status);
 		assertTrue(status.isContinuable());
 		assertEquals("Foo", status.getExitDescription());
 	}
 
 	@Test
 	public void testAddEmptyExitDescription() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.addExitDescription("Foo").addExitDescription(null);
+		ExitStatus status = ExitStatus.EXECUTING.addExitDescription("Foo").addExitDescription(null);
 		assertEquals("Foo", status.getExitDescription());
 	}
 
@@ -245,7 +245,7 @@ public class ExitStatusTests {
 
 	@Test
 	public void testSerializable() throws Exception {
-		ExitStatus status = ExitStatus.CONTINUABLE.replaceExitCode("FOO");
+		ExitStatus status = ExitStatus.EXECUTING.replaceExitCode("FOO");
 		byte[] bytes = SerializationUtils.serialize(status);
 		Object object = SerializationUtils.deserialize(bytes);
 		assertTrue(object instanceof ExitStatus);

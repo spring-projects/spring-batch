@@ -21,8 +21,7 @@ import static org.junit.Assert.fail;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
-import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.step.tasklet.CallableTaskletAdapter;
+import org.springframework.batch.repeat.RepeatStatus;
 
 public class CallableTaskletAdapterTests {
 	
@@ -30,12 +29,12 @@ public class CallableTaskletAdapterTests {
 
 	@Test
 	public void testHandle() throws Exception {
-		adapter.setCallable(new Callable<ExitStatus>() {
-			public ExitStatus call() throws Exception {
-				return ExitStatus.FINISHED;
+		adapter.setCallable(new Callable<RepeatStatus>() {
+			public RepeatStatus call() throws Exception {
+				return RepeatStatus.FINISHED;
 			}
 		});
-		assertEquals(ExitStatus.FINISHED, adapter.execute(null,null));
+		assertEquals(RepeatStatus.FINISHED, adapter.execute(null,null));
 	}
 
 	@Test

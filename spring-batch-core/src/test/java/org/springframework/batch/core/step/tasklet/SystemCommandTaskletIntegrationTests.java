@@ -15,10 +15,9 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.step.tasklet.SystemCommandException;
-import org.springframework.batch.core.step.tasklet.SystemCommandTasklet;
-import org.springframework.batch.core.step.tasklet.SystemProcessExitCodeMapper;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
 
@@ -59,9 +58,9 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
-		ExitStatus exitStatus = tasklet.execute(null, null);
+		RepeatStatus exitStatus = tasklet.execute(stepExecution.createStepContribution(), null);
 
-		assertEquals(ExitStatus.FINISHED, exitStatus);
+		assertEquals(RepeatStatus.FINISHED, exitStatus);
 	}
 
 	/*
@@ -75,8 +74,10 @@ public class SystemCommandTaskletIntegrationTests {
 
 		log.info("Executing command: " + command);
 		try {
-			ExitStatus exitStatus = tasklet.execute(null, null);
-			assertEquals(ExitStatus.FAILED, exitStatus);
+			StepContribution contribution = stepExecution.createStepContribution();
+			RepeatStatus exitStatus = tasklet.execute(contribution, null);
+			assertEquals(RepeatStatus.FINISHED, exitStatus);
+			assertEquals(ExitStatus.FAILED, contribution.getExitStatus());
 		}
 		catch (RuntimeException e) {
 			// on some platforms the system call does not return

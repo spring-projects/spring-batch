@@ -52,8 +52,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 	 * Read-process-write a list of items. Uses fault-tolerant read, process and
 	 * write implementations.
 	 */
-	public ExitStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		ExitStatus result = ExitStatus.CONTINUABLE;
+	public RepeatStatus execute(final StepContribution contribution, AttributeAccessor attributes) throws Exception {
 		final List<I> inputs = new ArrayList<I>();
 
 		final List<Exception> skippedReads = getBufferedList(attributes, SKIPPED_READS_KEY);
@@ -70,7 +69,8 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 			}
 		});
 		
-		result = continuable.isContinuable() ? ExitStatus.CONTINUABLE : ExitStatus.FINISHED; 
+		ExitStatus result = continuable.isContinuable() ? ExitStatus.EXECUTING : ExitStatus.FINISHED; 
+		contribution.setExitStatus(result);
 
 		// filter inputs marked for skipping
 		final Map<I, Exception> skippedInputs = getBufferedSkips(attributes, SKIPPED_INPUTS_KEY);
@@ -95,7 +95,7 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 		callSkipListenersAndCleanSkipsFromBuffer(skippedReads, skippedInputs, skippedOutputs, inputsIncludingSkips,
 				outputsIncludingSkips);
 
-		return result;
+		return continuable;
 	}
 
 	/**

@@ -8,6 +8,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -28,8 +29,8 @@ public class DummyMessageSendingTasklet extends StepExecutionListenerSupport imp
 		return null;
 	}
 	
-	public ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-		return ExitStatus.FINISHED;
+	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+		return RepeatStatus.FINISHED;
 	}
 
 	public String getMessage() {

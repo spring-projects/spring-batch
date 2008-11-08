@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.AttributeAccessor;
 
 /**
@@ -30,16 +30,16 @@ public interface Tasklet {
 	/**
 	 * Given the current context in the form of a step contribution, do whatever
 	 * is necessary to process this unit inside a transaction. Implementations
-	 * return {@link ExitStatus#FINISHED} if finished. If not they return
-	 * {@link ExitStatus#CONTINUABLE}. On failure throws an exception.
+	 * return {@link RepeatStatus#FINISHED} if finished. If not they return
+	 * {@link RepeatStatus#CONTINUABLE}. On failure throws an exception.
 	 * 
 	 * @param contribution mutable state to be passed back to update the current
 	 * step execution
 	 * @param attributes attributes shared between invocations but not between
 	 * restarts
-	 * @return an {@link ExitStatus} indicating whether processing is
+	 * @return an {@link RepeatStatus} indicating whether processing is
 	 * continuable.
 	 */
-	ExitStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception;
+	RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception;
 
 }

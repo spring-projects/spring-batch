@@ -86,7 +86,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (!(stepExecution.getStatus() == BatchStatus.COMPLETED)) {
-			return ExitStatus.CONTINUABLE;
+			return ExitStatus.EXECUTING;
 		}
 		long expecting = localState.getExpecting();
 		boolean timedOut;

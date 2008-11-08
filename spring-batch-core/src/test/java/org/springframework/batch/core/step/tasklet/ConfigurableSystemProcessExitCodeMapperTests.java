@@ -27,7 +27,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests {
 			{
 				put(0, ExitStatus.FINISHED);
 				put(1, ExitStatus.FAILED);
-				put(2, ExitStatus.CONTINUABLE);
+				put(2, ExitStatus.EXECUTING);
 				put(3, ExitStatus.NOOP);
 				put(4, ExitStatus.UNKNOWN);
 				put(ConfigurableSystemProcessExitCodeMapper.ELSE_KEY, ExitStatus.UNKNOWN);
