@@ -8,7 +8,8 @@
 	
 	<job id="job">
 		<step name="step1">
-			<chunk-oriented reader="reader" processor="processor" writer="writer">
+			<chunk-oriented reader="reader" processor="processor" writer="writer"
+					fault-tolerant="true" commit-interval="10" skip-limit="20" retry-limit="3">
 				<listeners>
 					<listener class="org.springframework.batch.core.configuration.xml.TestListener"/>
 					<listener ref="listener"/>

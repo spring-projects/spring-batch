@@ -37,6 +37,13 @@
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="restartable" type="xsd:boolean" default="false" use="optional">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							Whether the job should be retartable or not in case of failure.
+							]]></xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -194,6 +201,13 @@
 			<xsd:extension base="beans:identifiedType">
 				<xsd:attributeGroup ref="jobRepository"/>
 				<xsd:attributeGroup ref="transactionManager"/>
+				<xsd:attribute name="commit-interval" type="xsd:integer" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The number of items that will be processed before commit is called for the transaction.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -269,7 +283,14 @@
 						</xsd:simpleType>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="fault-tolerant" type="xsd:boolean" default="false" use="optional"/>
+				<xsd:attribute name="fault-tolerant" type="xsd:boolean" default="false" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						Whether the step should provide fault tolerance with skip limit and skippable
+						exception handling.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 				<xsd:attribute name="reader" type="xsd:string" use="required">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
@@ -288,6 +309,20 @@
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The bean name of the item writer that is to be used for the process.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="skip-limit" type="xsd:integer" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The maximum number of items that will be allowed to be skipped.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="retry-limit" type="xsd:integer" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The maximum number of times the processing of an item will be retried.
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>

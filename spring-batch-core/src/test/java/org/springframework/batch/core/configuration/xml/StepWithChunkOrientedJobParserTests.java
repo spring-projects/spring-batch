@@ -47,7 +47,7 @@ public class StepWithChunkOrientedJobParserTests {
 
 	@Autowired
 	private JobRepository jobRepository;
-	
+		
 	@Autowired
 	private TestReader reader;
 	

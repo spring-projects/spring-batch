@@ -37,6 +37,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
@@ -198,10 +200,13 @@ public class StepParser {
 	protected RootBeanDefinition parseChunkOriented(Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd;
+    	
+    	boolean isFaultTolerant = false;
 
 		String faultTolerant = element.getAttribute("fault-tolerant");
         if ("true".equals(faultTolerant)) {
         	bd = new RootBeanDefinition("org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean", null, null);
+        	isFaultTolerant = true;
         }
         else {
         	bd = new RootBeanDefinition("org.springframework.batch.core.step.item.SimpleStepFactoryBean", null, null);
@@ -232,6 +237,25 @@ public class StepParser {
         String transactionManager = element.getAttribute("transaction-manager");
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
         bd.getPropertyValues().addPropertyValue("transactionManager", tx);
+
+        String commitInterval = element.getAttribute("commit-interval");
+        if (StringUtils.hasText(commitInterval)) {
+            bd.getPropertyValues().addPropertyValue("commitInterval", commitInterval);
+        }
+
+        if (isFaultTolerant) {
+            String skipLimit = element.getAttribute("skip-limit");
+            if (StringUtils.hasText(skipLimit)) {
+                bd.getPropertyValues().addPropertyValue("skipLimit", skipLimit);
+            }
+        }
+
+        if (isFaultTolerant) {
+            String retryLimit = element.getAttribute("retry-limit");
+            if (StringUtils.hasText(retryLimit)) {
+                bd.getPropertyValues().addPropertyValue("retryLimit", retryLimit);
+            }
+        }
 
         handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses");
         
@@ -276,7 +300,16 @@ public class StepParser {
 					String className = listenerElement.getAttribute("class");
 					if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
 							&& StringUtils.hasText(listenerRef)) {
-						throw new BeanCreationException("Both 'id' or 'ref' plus 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + listenerElement.getTagName() + "> element with" + (StringUtils.hasText(id) ? " id=\"" + id + "\"" : "" ) + (StringUtils.hasText(className) ? " class=\"" + className + "\"" : "") + (StringUtils.hasText(listenerRef) ? " ref=\"" + listenerRef + "\"" : ""));
+						NamedNodeMap attributeNodes = listenerElement.getAttributes();
+						StringBuilder attributes = new StringBuilder();
+						for (int i = 0; i < attributeNodes.getLength(); i++) {
+							if (i > 0) {
+								attributes.append(" ");
+							}
+							attributes.append(attributeNodes.item(i));
+						}
+						throw new BeanCreationException("Both 'id' or 'ref' plus 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
+								listenerElement.getTagName() + "> element with attributes: " + attributes);
 					}
 					if (StringUtils.hasText(listenerRef)) {
 						listenerRefs.add(listenerRef);

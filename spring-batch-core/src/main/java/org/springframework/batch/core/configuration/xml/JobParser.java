@@ -55,6 +55,11 @@ public class JobParser extends AbstractBeanDefinitionParser {
 		}
 		builder.addPropertyReference("jobRepository", repositoryAttribute);
 
+		String restartableAttribute = element.getAttribute("restartable");
+		if (StringUtils.hasText(restartableAttribute)) {
+			builder.addPropertyValue("restartable", restartableAttribute);
+		}
+
 		FlowParser flowParser = new FlowParser();
 		AbstractBeanDefinition flowDef = flowParser.parse(element, parserContext, jobName);
 
