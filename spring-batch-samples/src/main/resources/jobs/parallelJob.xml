@@ -26,8 +26,6 @@
 							class="org.springframework.batch.sample.common.StagingItemWriter">
 							<property name="dataSource"
 								ref="dataSource" />
-							<property name="lobHandler"
-								ref="lobHandler" />
 							<property name="incrementer">
 								<bean parent="incrementerParent">
 									<property name="incrementerName"
@@ -45,8 +43,6 @@
 					<property name="itemReader">
 						<bean
 							class="org.springframework.batch.sample.common.StagingItemReader">
-							<property name="lobHandler"
-								ref="lobHandler" />
 							<property name="dataSource"
 								ref="dataSource" />
 						</bean>

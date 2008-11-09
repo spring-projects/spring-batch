@@ -14,8 +14,6 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
@@ -33,17 +31,6 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 	private DataFieldMaxValueIncrementer incrementer;
 
 	private StepExecution stepExecution;
-
-	private LobHandler lobHandler = new DefaultLobHandler();
-
-	/**
-	 * Public setter for the {@link LobHandler}.
-	 * @param lobHandler the {@link LobHandler} to set (defaults to
-	 * {@link DefaultLobHandler}).
-	 */
-	public void setLobHandler(LobHandler lobHandler) {
-		this.lobHandler = lobHandler;
-	}
 
 	/**
 	 * Check mandatory properties.
@@ -92,7 +79,7 @@ public class StagingItemWriter<T> extends JdbcDaoSupport implements StepExecutio
 
 						ps.setLong(1, id);
 						ps.setLong(2, jobId);
-						lobHandler.getLobCreator().setBlobAsBytes(ps, 3, blob);
+						ps.setBytes(3, blob);
 						ps.setString(4, NEW);
 					}
 				});

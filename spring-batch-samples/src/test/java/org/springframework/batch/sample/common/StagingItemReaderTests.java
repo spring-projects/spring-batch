@@ -13,7 +13,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,7 +34,7 @@ public class StagingItemReaderTests {
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
-	
+
 	@Autowired
 	private StagingItemWriter<String> writer;
 
@@ -43,7 +42,6 @@ public class StagingItemReaderTests {
 	private StagingItemReader<String> reader;
 
 	private Long jobId = 11L;
-
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
@@ -54,23 +52,22 @@ public class StagingItemReaderTests {
 	public void onSetUpBeforeTransaction() throws Exception {
 		StepExecution stepExecution = new StepExecution("stepName", new JobExecution(new JobInstance(jobId,
 				new JobParameters(), "testJob")));
-		reader.beforeStep(stepExecution);
 		writer.beforeStep(stepExecution);
-		writer.write(Arrays.asList(new String[] {"FOO","BAR","SPAM","BUCKET"}));
-		reader.open(new ExecutionContext());
+		writer.write(Arrays.asList(new String[] { "FOO", "BAR", "SPAM", "BUCKET" }));
+		reader.beforeStep(stepExecution);
 	}
 
 	@AfterTransaction
 	public void onTearDownAfterTransaction() throws Exception {
-		reader.close(null);
+		reader.destroy();
 		simpleJdbcTemplate.update("DELETE FROM BATCH_STAGING");
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testReaderUpdatesProcessIndicator() throws Exception {
 
-		long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
-				jobId);
+		long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
 		String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.NEW, before);
@@ -84,131 +81,55 @@ public class StagingItemReaderTests {
 
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testUpdateProcessIndicatorAfterCommit() throws Exception {
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		txTemplate.execute(new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus transactionStatus) {
-						try {
-							testReaderUpdatesProcessIndicator();
-						} catch (Exception e) {
-							fail("Unxpected Exception: " + e);
-						}
-						long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
-								jobId);
-						String before =
-								simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-								String.class, id);
-						assertEquals(StagingItemWriter.DONE, before);
-						return null;
-					}
-				});
+			public Object doInTransaction(TransactionStatus transactionStatus) {
+				try {
+					testReaderUpdatesProcessIndicator();
+				}
+				catch (Exception e) {
+					fail("Unxpected Exception: " + e);
+				}
+				return null;
+			}
+		});
+		long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+		String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+				String.class, id);
+		assertEquals(StagingItemWriter.DONE, before);
 	}
 
-	@Transactional @Test
-	public void testProviderRollsBackMultipleTimes() throws Exception {
+	@Transactional
+	@Test
+	public void testReaderRollsBackProcessIndicator() throws Exception {
 
 		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
 		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 
-		reader.mark();
+		final Long idToUse = (Long) txTemplate.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus transactionStatus) {
 
-		txTemplate.execute(new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus transactionStatus) {
-						int count = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from BATCH_STAGING where JOB_ID=? AND PROCESSED=?",
-								jobId, StagingItemWriter.NEW);
-						assertEquals(4, count);
+				long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
+				String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+						String.class, id);
+				assertEquals(StagingItemWriter.NEW, before);
 
-						Object item = reader.read();
-						assertEquals("FOO", item);
-						item = reader.read();
-						assertEquals("BAR", item);
+				Object item = reader.read();
+				assertEquals("FOO", item);
 
-						transactionStatus.setRollbackOnly();
+				transactionStatus.setRollbackOnly();
 
-						return null;
-					}
-				});
+				return id;
+			}
+		});
 
-		reader.reset();
-
-		txTemplate.execute(new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus transactionStatus) {
-						Object item = reader.read();
-						assertEquals("FOO", item);
-						item = reader.read();
-						assertEquals("BAR", item);
-						item = reader.read();
-						assertEquals("SPAM", item);
-
-						transactionStatus.setRollbackOnly();
-
-						return null;
-					}
-				});
-
-		reader.reset();
-
-		txTemplate.execute(new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus transactionStatus) {
-						Object item = reader.read();
-						assertEquals("FOO", item);
-
-						transactionStatus.setRollbackOnly();
-
-						return null;
-					}
-				});
-
-	}
-
-	@Transactional @Test
-	public void testProviderRollsBackProcessIndicator() throws Exception {
-
-		TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
-		txTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-
-		reader.mark();
-		// After a rollback we have to resynchronize the TX to simulate a real
-		// batch
-		final Long idToUse = (Long)txTemplate.execute(new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus transactionStatus) {
-
-						long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?",
-								jobId);
-						String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-								String.class, id);
-						assertEquals(StagingItemWriter.NEW, before);
-
-						Object item = reader.read();
-						assertEquals("FOO", item);
-
-						transactionStatus.setRollbackOnly();
-
-						return id;
-					}
-				});
-
-		reader.reset();
-
-		// After a rollback we have to resynchronize the TX to simulate a real
-		// batch
-		txTemplate.execute(new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus transactionStatus) {
-
-						String after = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
-								String.class, idToUse);
-						assertEquals(StagingItemWriter.NEW, after);
-
-						Object item = reader.read();
-						assertEquals("FOO", item);
-
-						transactionStatus.setRollbackOnly();
-
-						return null;
-					}
-				});
+		String after = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
+				String.class, idToUse);
+		assertEquals(StagingItemWriter.NEW, after);
 
 	}
 }

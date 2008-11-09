@@ -2,9 +2,10 @@ package org.springframework.batch.sample.common;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.apache.commons.logging.Log;
@@ -12,33 +13,25 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ReaderNotOpenException;
-import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.jdbc.support.lob.DefaultLobHandler;
-import org.springframework.jdbc.support.lob.LobHandler;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
  * Thread-safe database {@link ItemReader} implementing the process indicator
  * pattern.
  */
-public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, ItemReader<T>, StepExecutionListener {
-
-	// Key for buffer in transaction synchronization manager
-	private static final String BUFFER_KEY = StagingItemReader.class.getName() + ".BUFFER";
+public class StagingItemReader<T> implements ItemReader<T>, StepExecutionListener, InitializingBean, DisposableBean {
 
 	private static Log logger = LogFactory.getLog(StagingItemReader.class);
 
 	private StepExecution stepExecution;
-
-	private LobHandler lobHandler = new DefaultLobHandler();
 
 	private final Object lock = new Object();
 
@@ -46,190 +39,77 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 
 	private volatile Iterator<Long> keys;
 
-	/**
-	 * Public setter for the {@link LobHandler}.
-	 * 
-	 * @param lobHandler the {@link LobHandler} to set (defaults to
-	 * {@link DefaultLobHandler}).
-	 */
-	public void setLobHandler(LobHandler lobHandler) {
-		this.lobHandler = lobHandler;
+	private SimpleJdbcTemplate jdbcTemplate;
+
+	public void setDataSource(DataSource dataSource) {
+		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	/**
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
-	 */
-	public void close(ExecutionContext executionContext) {
+	public void destroy() throws Exception {
 		initialized = false;
 		keys = null;
-		if (TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
-			TransactionSynchronizationManager.unbindResource(BUFFER_KEY);
-		}
 	}
 
-	/**
-	 * 
-	 * @see org.springframework.batch.item.ItemStream#open(ExecutionContext)
-	 */
-	public void open(ExecutionContext executionContext) {
-		// Can be called from multiple threads because of lazy initialisation...
-		synchronized (lock) {
-			if (keys == null) {
-				keys = retrieveKeys().iterator();
-				logger.info("Keys obtained for staging.");
-				initialized = true;
-			}
-		}
+	public final void afterPropertiesSet() throws Exception {
+		Assert.notNull(jdbcTemplate, "You must provide a DataSource.");
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Long> retrieveKeys() {
 
 		synchronized (lock) {
 
-			return getJdbcTemplate().query(
+			return jdbcTemplate.query(
 
 			"SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID",
 
-			new Object[] { stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW },
-
-			new RowMapper() {
-				public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+			new ParameterizedRowMapper<Long>() {
+				public Long mapRow(ResultSet rs, int rowNum) throws SQLException {
 					return rs.getLong(1);
 				}
-			}
+			},
 
-			);
+			stepExecution.getJobExecution().getJobId(), StagingItemWriter.NEW);
 
 		}
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public T read() throws DataAccessException {
-		Long id = doRead();
 
-		if (id == null) {
-			return null;
-		}
-		T result = (T) getJdbcTemplate().queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
-				new Object[] { id }, new RowMapper() {
-					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-						byte[] blob = lobHandler.getBlobAsBytes(rs, 1);
-						return SerializationUtils.deserialize(blob);
-					}
-				});
-		// Update now - changes will rollback if there is a problem later.
-		int count = getJdbcTemplate().update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
-				new Object[] { StagingItemWriter.DONE, id, StagingItemWriter.NEW });
-		if (count != 1) {
-			throw new OptimisticLockingFailureException("The staging record with ID=" + id
-					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");
-		}
-		return result;
-	}
-
-	private Long doRead() {
 		if (!initialized) {
 			throw new ReaderNotOpenException("ItemStream must be open before it can be read.");
 		}
 
-		Long key = getBuffer().next();
-		if (key == null) {
-			synchronized (lock) {
-				if (keys.hasNext()) {
-					Assert.state(TransactionSynchronizationManager.isActualTransactionActive(),
-							"Transaction not active for this thread.");
-					Long next = keys.next();
-					getBuffer().add(next);
-					key = next;
-					logger.debug("Retrieved key from list: " + key);
-				}
+		Long id = null;
+		synchronized (lock) {
+			if (keys.hasNext()) {
+				id = keys.next();
 			}
 		}
-		else {
-			logger.debug("Retrieved key from buffer: " + key);
-		}
-		return key;
+		logger.debug("Retrieved key from list: " + id);
 
-	}
-
-	private StagingBuffer getBuffer() {
-		if (!TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
-			TransactionSynchronizationManager.bindResource(BUFFER_KEY, new StagingBuffer());
-		}
-		return (StagingBuffer) TransactionSynchronizationManager.getResource(BUFFER_KEY);
-	}
-
-	public boolean recover(Object data, Throwable cause) {
-		return false;
-	}
-
-	private static class StagingBuffer {
-
-		private List<Long> list = new ArrayList<Long>();
-
-		private Iterator<Long> iter = new ArrayList<Long>().iterator();
-
-		public Long next() {
-			if (iter.hasNext()) {
-				return iter.next();
-			}
+		if (id == null) {
 			return null;
 		}
+		@SuppressWarnings("unchecked")
+		T result = (T) jdbcTemplate.queryForObject("SELECT VALUE FROM BATCH_STAGING WHERE ID=?",
+				new ParameterizedRowMapper<Object>() {
+					public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+						byte[] blob = rs.getBytes(1);
+						return SerializationUtils.deserialize(blob);
+					}
+				}, id);
 
-		public void add(Long next) {
-			list.add(next);
+		// Update now - changes will rollback if there is a problem later.
+		int count = jdbcTemplate.update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
+				StagingItemWriter.DONE, id, StagingItemWriter.NEW);
+		if (count != 1) {
+			throw new OptimisticLockingFailureException("The staging record with ID=" + id
+					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");
 		}
 
-		public void rollback() {
-			logger.debug("Resetting buffer on rollback: " + list);
-			iter = new ArrayList<Long>(list).iterator();
-		}
+		return result;
 
-		public void commit() {
-			logger.debug("Clearing buffer on commit: " + list);
-			list.clear();
-			iter = new ArrayList<Long>().iterator();
-		}
-
-		public String toString() {
-			return "list=" + list + "; iter.hasNext()=" + iter.hasNext();
-		}
-	}
-
-	/**
-	 * Mark is supported in a multi- as well as a single-threaded environment.
-	 * The state backing the mark is a buffer, and access is synchronized, so
-	 * multiple threads can be accommodated. Buffers are stored as transaction
-	 * resources (using
-	 * {@link TransactionSynchronizationManager#bindResource(Object, Object)}),
-	 * so they are thread bound.
-	 */
-	public void mark() {
-		getBuffer().commit();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.item.ItemStream#reset(org.springframework.batch
-	 * .item.ExecutionContext)
-	 */
-	public void reset() {
-		getBuffer().rollback();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.item.ExecutionContextProvider#getExecutionContext
-	 * ()
-	 */
-	public void update(ExecutionContext executionContext) {
 	}
 
 	/*
@@ -251,6 +131,13 @@ public class StagingItemReader<T> extends JdbcDaoSupport implements ItemStream, 
 	 */
 	public void beforeStep(StepExecution stepExecution) {
 		this.stepExecution = stepExecution;
+		synchronized (lock) {
+			if (keys == null) {
+				keys = retrieveKeys().iterator();
+				logger.info("Keys obtained for staging.");
+				initialized = true;
+			}
+		}
 	}
 
 	/*
