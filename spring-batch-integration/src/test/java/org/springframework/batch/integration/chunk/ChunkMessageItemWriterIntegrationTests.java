@@ -34,6 +34,7 @@ import org.springframework.integration.bus.MessageBus;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.core.Message;
 import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.gateway.SimpleMessagingGateway;
 import org.springframework.integration.message.GenericMessage;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -72,9 +73,13 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setBeanName("step");
 		factory.setItemWriter(writer);
 		factory.setCommitInterval(4);
+		
+		SimpleMessagingGateway gateway = new SimpleMessagingGateway();
+		writer.setMessagingGateway(gateway);
 
-		writer.setInputChannel(replies);
-		writer.setOutputChannel(requests);
+		gateway.setRequestChannel(requests);
+		gateway.setReplyChannel(replies);
+		gateway.setReplyTimeout(100);
 
 		TestItemWriter.count = 0;
 

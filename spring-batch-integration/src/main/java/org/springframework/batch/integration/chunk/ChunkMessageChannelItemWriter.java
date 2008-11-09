@@ -12,10 +12,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.integration.channel.PollableChannel;
-import org.springframework.integration.core.Message;
-import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.message.GenericMessage;
+import org.springframework.integration.endpoint.MessagingGateway;
 import org.springframework.util.Assert;
 
 public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>, ItemStream {
@@ -27,10 +24,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	static final String EXPECTED = "EXPECTED";
 
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
-
-	private MessageChannel target;
-
-	private PollableChannel source;
+	
+	private MessagingGateway messagingGateway;
 
 	// TODO: abstract the state or make a factory for this writer?
 	private LocalState localState = new LocalState();
@@ -46,35 +41,25 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		this.throttleLimit = throttleLimit;
 	}
 
-	// TODO: refactor to ChannelAdapter?
-	public void setInputChannel(PollableChannel source) {
-		this.source = source;
-	}
-
-	// TODO: re-evaluate the refactor to MessageChannel
-	public void setOutputChannel(MessageChannel target) {
-		this.target = target;
+	public void setMessagingGateway(MessagingGateway messagingGateway) {
+		this.messagingGateway = messagingGateway;
 	}
 
 	public void write(List<? extends T> items) throws Exception {
 		// Block until expecting <= throttle limit - can Spring
 		// Integration do that for me?
 		while (localState.getExpecting() > throttleLimit) {
-			getNextResult(100);
+			getNextResult();
 		}
 
 		if (!items.isEmpty()) {
 
 			logger.debug("Dispatching chunk: " + items);
 			ChunkRequest<T> request = new ChunkRequest<T>(items, localState.getJobId(), localState.getSkipCount());
-			GenericMessage<ChunkRequest<T>> message = new GenericMessage<ChunkRequest<T>>(request);
-			target.send(message);
+			messagingGateway.send(request);
 			localState.expected++;
 
 		}
-
-		// Short little timeout to look for an immediate reply.
-		getNextResult(1);
 
 	}
 
@@ -137,7 +122,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		int count = 0;
 		int maxCount = 40;
 		while (localState.getExpecting() > 0 && count++ < maxCount) {
-			getNextResult(100);
+			getNextResult();
 		}
 		return count < maxCount;
 	}
@@ -146,20 +131,17 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	 * Get the next result if it is available within the timeout specified,
 	 * otherwise return null.
 	 */
-	private void getNextResult(long timeout) {
-		@SuppressWarnings("unchecked")
-		Message<ChunkResponse> message = (Message<ChunkResponse>) source.receive(timeout);
-		if (message != null) {
-			ChunkResponse payload = message.getPayload();
+	private void getNextResult() {
+		ChunkResponse payload = (ChunkResponse) messagingGateway.receive();
+		if (payload != null) {
 			Long jobInstanceId = payload.getJobId();
 			Assert.state(jobInstanceId != null, "Message did not contain job instance id.");
 			Assert.state(jobInstanceId.equals(localState.getJobId()), "Message contained wrong job instance id ["
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
 			localState.actual++;
 			// TODO: apply the skip count
-			BatchStatus result = payload.getStatus();
-			if (BatchStatus.COMPLETED!=result) {
-				throw new AsynchronousFailureException("Failure or early completion detected in handler: " + result);
+			if (! payload.isSuccessful()) {
+				throw new AsynchronousFailureException("Failure or interrupt detected in handler: "+payload.getMessage());
 			}
 		}
 	}
