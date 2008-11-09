@@ -166,24 +166,28 @@
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/release</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>Codehaus</id>
 			<url>http://repository.codehaus.org/</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.plugins</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Plugins</name>
 			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+			<snapshots><enabled>false</enabled></snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 	<distributionManagement>
