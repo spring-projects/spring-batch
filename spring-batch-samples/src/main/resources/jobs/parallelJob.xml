@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
@@ -17,19 +15,17 @@
 					<property name="startLimit" value="100" />
 					<property name="itemReader" ref="fileItemReader" />
 					<property name="itemProcessor">
-						<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+						<bean
+							class="org.springframework.batch.item.validator.ValidatingItemProcessor">
 							<constructor-arg ref="fixedValidator" />
 						</bean>
-					</property>	
+					</property>
 					<property name="itemWriter">
-						<bean
-							class="org.springframework.batch.sample.common.StagingItemWriter">
-							<property name="dataSource"
-								ref="dataSource" />
+						<bean class="org.springframework.batch.sample.common.StagingItemWriter">
+							<property name="dataSource" ref="dataSource" />
 							<property name="incrementer">
 								<bean parent="incrementerParent">
-									<property name="incrementerName"
-										value="BATCH_STAGING_SEQ" />
+									<property name="incrementerName" value="BATCH_STAGING_SEQ" />
 								</bean>
 							</property>
 						</bean>
@@ -37,14 +33,11 @@
 				</bean>
 				<bean id="loading" parent="simpleStep">
 					<property name="taskExecutor">
-						<bean
-							class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+						<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 					</property>
 					<property name="itemReader">
-						<bean
-							class="org.springframework.batch.sample.common.StagingItemReader">
-							<property name="dataSource"
-								ref="dataSource" />
+						<bean class="org.springframework.batch.sample.common.StagingItemReader">
+							<property name="dataSource" ref="dataSource" />
 						</bean>
 					</property>
 					<property name="itemWriter">
@@ -60,9 +53,11 @@
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
-	<bean id="testItemReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
+	<!--
+		This input source is injected into the test case to verify the output
+		- not used by the job at all
+	-->
+	<bean id="testItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineMapper">
@@ -86,8 +81,7 @@
 	<bean id="fixedValidator"
 		class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
-			<bean id="tradeValidator"
-				class="org.springmodules.validation.valang.ValangValidator">
+			<bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
 				<property name="valang">
 					<value>
 						<![CDATA[
