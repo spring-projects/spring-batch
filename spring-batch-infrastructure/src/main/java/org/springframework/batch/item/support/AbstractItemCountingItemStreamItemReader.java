@@ -89,7 +89,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 		}
 
 		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT))) {
-			int itemCount = new Long(executionContext.getLong(ecSupport.getKey(READ_COUNT))).intValue();
+			int itemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT));
 
 			try {
 				jumpToItem(itemCount);
@@ -106,7 +106,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
-			executionContext.putLong(ecSupport.getKey(READ_COUNT), currentItemCount);
+			executionContext.putInt(ecSupport.getKey(READ_COUNT), currentItemCount);
 		}
 
 	}

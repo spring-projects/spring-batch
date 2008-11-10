@@ -124,7 +124,7 @@ public class StaxEventItemReaderTests {
 		source.read();
 		source.update(executionContext);
 
-		assertEquals(1, executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
+		assertEquals(1, executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count"));
 		List<XMLEvent> expectedAfterRestart = source.read();
 
 		source = createNewInputSouce();
@@ -151,7 +151,7 @@ public class StaxEventItemReaderTests {
 		source.update(executionContext);
 
 		for (int i = 0; i < NUMBER_OF_RECORDS; i++) {
-			long recordCount = extractRecordCount();
+			int recordCount = extractRecordCount();
 			assertEquals(i, recordCount);
 			source.read();
 			source.update(executionContext);
@@ -162,8 +162,8 @@ public class StaxEventItemReaderTests {
 		assertEquals(NUMBER_OF_RECORDS, extractRecordCount());
 	}
 
-	private long extractRecordCount() {
-		return executionContext.getLong(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count");
+	private int extractRecordCount() {
+		return executionContext.getInt(ClassUtils.getShortName(StaxEventItemReader.class) + ".read.count");
 	}
 
 	@Test
