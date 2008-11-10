@@ -22,6 +22,7 @@ public class ParallelJobFunctionalTests extends AbstractValidatingBatchLauncherT
 		this.jdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
+	@Override
 	protected void validatePostConditions() throws Exception {
 		int count;
 		count = jdbcTemplate.queryForInt(
