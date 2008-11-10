@@ -91,7 +91,17 @@ public class ExecutionContext implements Serializable {
 	 */
 	public void putLong(String key, long value) {
 
-		put(key, new Long(value));
+		put(key, Long.valueOf(value));
+	}
+
+	/**
+	 * Adds an Integer value to the context.
+	 * 
+	 * @param key Key to add to context
+	 * @param value Value to associate with key
+	 */
+	public void putInt(String key, int value) {
+		put(key, Integer.valueOf(value));
 	}
 
 	/**
@@ -102,7 +112,7 @@ public class ExecutionContext implements Serializable {
 	 */
 	public void putDouble(String key, double value) {
 
-		put(key, new Double(value));
+		put(key, Double.valueOf(value));
 	}
 
 	/**
@@ -188,6 +198,34 @@ public class ExecutionContext implements Serializable {
 		}
 
 		return ((Long) readAndValidate(key, Long.class)).longValue();
+	}
+
+	/**
+	 * Typesafe Getter for the Integer represented by the provided key.
+	 * 
+	 * @param key The key to get a value for
+	 * @return The <code>Integer</code> value
+	 */
+	public int getInt(String key) {
+
+		return ((Integer) readAndValidate(key, Integer.class)).intValue();
+	}
+
+	/**
+	 * Typesafe Getter for the Integer represented by the provided key with
+	 * default value to return if key is not represented.
+	 * 
+	 * @param key The key to get a value for
+	 * @param defaultInt Default to return if key is not represented
+	 * @return The <code>int</code> value if key is represented, specified
+	 * default otherwise
+	 */
+	public int getInt(String key, int defaultInt) {
+		if (!map.containsKey(key)) {
+			return defaultInt;
+		}
+
+		return ((Integer) readAndValidate(key, Integer.class)).intValue();
 	}
 
 	/**

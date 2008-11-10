@@ -45,14 +45,17 @@ public class ExecutionContextTests {
 		context.putString("2", "testString2");
 		context.putLong("3", 3);
 		context.putDouble("4", 4.4);
+		context.putInt("5", 5);
 
 		assertEquals("testString1", context.getString("1"));
 		assertEquals("testString2", context.getString("2"));
-		assertEquals("defaultString", context.getString("5", "defaultString"));
+		assertEquals("defaultString", context.getString("55", "defaultString"));
 		assertEquals(4.4, context.getDouble("4"), 0);
-		assertEquals(5.5, context.getDouble("5", 5.5), 0);
+		assertEquals(5.5, context.getDouble("55", 5.5), 0);
 		assertEquals(3, context.getLong("3"));
-		assertEquals(5, context.getLong("5", 5));
+		assertEquals(5, context.getLong("55", 5));
+		assertEquals(5, context.getInt("5"));
+		assertEquals(6, context.getInt("55", 6));
 	}
 
 	@Test
@@ -138,6 +141,7 @@ public class ExecutionContextTests {
 		context.putLong("3", 3);
 		context.putDouble("4", 4.4);
 		context.put("5", s);
+		context.putInt("6", 6);
 
 		byte[] serialized = SerializationUtils.serialize(context);
 

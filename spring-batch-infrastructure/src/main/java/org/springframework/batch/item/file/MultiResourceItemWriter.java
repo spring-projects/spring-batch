@@ -101,9 +101,9 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
-		resourceIndex = Long.valueOf(executionContext.getLong(getKey(RESOURCE_INDEX_KEY), 1L)).intValue();
-		currentResourceItemCount = Long.valueOf(executionContext.getLong(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0L))
-				.intValue();
+		resourceIndex = executionContext.getInt(getKey(RESOURCE_INDEX_KEY), 1);
+		currentResourceItemCount = executionContext.getInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
+			
 		try {
 			pointDelegateToNextResource();
 		}
@@ -115,8 +115,8 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		delegate.update(executionContext);
-		executionContext.put(getKey(CURRENT_RESOURCE_ITEM_COUNT), Long.valueOf(currentResourceItemCount));
-		executionContext.put(getKey(RESOURCE_INDEX_KEY), Long.valueOf(resourceIndex));
+		executionContext.putInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
+		executionContext.putInt(getKey(RESOURCE_INDEX_KEY), resourceIndex);
 	}
 
 	/**
