@@ -16,14 +16,23 @@
 
 package org.springframework.batch.repeat.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.repeat.RepeatStatus;
+import org.junit.Test;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatException;
 import org.springframework.batch.repeat.RepeatListener;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
@@ -44,6 +53,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		return new RepeatTemplate();
 	}
 
+	@Test
 	public void testExecute() throws Exception {
 		template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
@@ -54,6 +64,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEarlyCompletionWithPolicy() throws Exception {
 
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
@@ -69,6 +80,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEarlyCompletionWithException() throws Exception {
 
 		try {
@@ -93,6 +105,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testContextClosedOnNormalCompletion() throws Exception {
 
 		final List<String> list = new ArrayList<String>();
@@ -125,6 +138,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testContextClosedOnAbnormalCompletion() throws Exception {
 
 		final List<String> list = new ArrayList<String>();
@@ -163,6 +177,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testExceptionHandlerCalledOnAbnormalCompletion() throws Exception {
 
 		final List<Throwable> list = new ArrayList<Throwable>();
@@ -196,6 +211,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEarlyCompletionWithContext() throws Exception {
 
 		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
@@ -224,6 +240,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEarlyCompletionWithContextTerminated() throws Exception {
 
 		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor) {
@@ -247,6 +264,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 
 	}
 
+	@Test
 	public void testNestedSession() throws Exception {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
@@ -268,6 +286,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		assertEquals(2, count);
 	}
 
+	@Test
 	public void testNestedSessionTerminatesBeforeIteration() throws Exception {
 		RepeatTemplate outer = getRepeatTemplate();
 		RepeatTemplate inner = getRepeatTemplate();
@@ -288,6 +307,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		assertEquals(1, count);
 	}
 
+	@Test
 	public void testOuterContextPreserved() throws Exception {
 		RepeatTemplate outer = getRepeatTemplate();
 		outer.setCompletionPolicy(new SimpleCompletionPolicy(2));
@@ -315,6 +335,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * Test that a result is returned from the batch.
 	 * @throws Exception
 	 */
+	@Test
 	public void testResult() throws Exception {
 		RepeatStatus result = template.iterate(new ItemReaderRepeatCallback<Trade>(provider, processor));
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
@@ -322,6 +343,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		assertFalse(result.isContinuable());
 	}
 
+	@Test
 	public void testExceptionThrownOnLastItem() throws Exception {
 		template.setCompletionPolicy(new SimpleCompletionPolicy(2));
 		try {
@@ -348,6 +370,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testEarlyCompletionWithSessionAndException() throws Exception {
 
 		template.setCompletionPolicy(new SimpleCompletionPolicy(4));
@@ -388,6 +411,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	 * RepeatException should be unwrapped before before it is passed to
 	 * listeners and exception handler.
 	 */
+	@Test
 	public void testExceptionUnwrapping() {
 
 		class TestException extends Exception {

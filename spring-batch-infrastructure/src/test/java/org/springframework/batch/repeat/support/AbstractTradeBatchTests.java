@@ -18,8 +18,7 @@ package org.springframework.batch.repeat.support;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -36,7 +35,7 @@ import org.springframework.core.io.Resource;
  * @author Dave Syer
  *
  */
-public abstract class AbstractTradeBatchTests extends TestCase {
+public abstract class AbstractTradeBatchTests {
 
 	public static final int NUMBER_OF_ITEMS = 5;
 
@@ -46,8 +45,8 @@ public abstract class AbstractTradeBatchTests extends TestCase {
 
 	protected TradeItemReader provider;
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 		provider = new TradeItemReader(resource);
 		provider.open(new ExecutionContext());
 	}

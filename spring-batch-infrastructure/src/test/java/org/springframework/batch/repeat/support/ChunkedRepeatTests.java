@@ -16,10 +16,15 @@
 
 package org.springframework.batch.repeat.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
@@ -41,6 +46,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testChunkedBatchWithTerminationPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
@@ -75,6 +81,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testAsynchronousChunkedBatchWithCompletionPolicy() throws Exception {
 
 		RepeatTemplate repeatTemplate = new RepeatTemplate();
@@ -107,6 +114,7 @@ public class ChunkedRepeatTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testChunksWithTruncatedItemProvider() throws Exception {
 
 		RepeatTemplate template = new RepeatTemplate();

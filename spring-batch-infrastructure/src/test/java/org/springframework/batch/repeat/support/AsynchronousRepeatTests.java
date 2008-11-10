@@ -16,25 +16,32 @@
 
 package org.springframework.batch.repeat.support;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.batch.repeat.RepeatStatus;
+import org.junit.Test;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 
 	/**
-	 * Run a batch with a single template that itself has an asynch task
+	 * Run a batch with a single template that itself has an async task
 	 * executor. The result is a batch that runs in multiple threads (up to the
 	 * throttle limit of the template).
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testMultiThreadAsynchronousExecution() throws Exception {
+
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
@@ -60,6 +67,36 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertTrue(threadNames.size() > 1);
 	}
+	
+	@Test
+	public void testThrottleLimit() throws Exception {
+		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
+		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		taskExecutor.setConcurrencyLimit(3);
+		template.setTaskExecutor(taskExecutor);
+		template.setThrottleLimit(12);
+
+		final String threadName = Thread.currentThread().getName();
+		final Set<String> threadNames = new HashSet<String>();
+
+		final RepeatCallback callback = new RepeatCallback() {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+				assertNotSame(threadName, Thread.currentThread().getName());
+				threadNames.add(Thread.currentThread().getName());
+				Trade item = provider.read();
+				if (item!=null) {
+					processor.write(Collections.singletonList(item));
+				}
+				return RepeatStatus.continueIf(item!=null);
+			}
+		};
+
+		template.iterate(callback);
+		// Shouldn't be necessary to wait:
+		// Thread.sleep(500);
+		assertEquals(NUMBER_OF_ITEMS, processor.count);
+		assertTrue(threadNames.size() > 1);
+	}
 
 	/**
 	 * Wrap an otherwise synchronous batch in a callback to an asynchronous
@@ -67,6 +104,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 	 * 
 	 * @throws Exception
 	 */
+	@Test
 	public void testSingleThreadAsynchronousExecution() throws Exception {
 		TaskExecutorRepeatTemplate jobTemplate = new TaskExecutorRepeatTemplate();
 		final RepeatTemplate stepTemplate = new RepeatTemplate();
@@ -103,6 +141,6 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		assertTrue(threadNames.size() >= 1);
 	}
 
-	// TODO: test transactional callback with asynch template.
+	// TODO: test transactional callback with async template.
 
 }
