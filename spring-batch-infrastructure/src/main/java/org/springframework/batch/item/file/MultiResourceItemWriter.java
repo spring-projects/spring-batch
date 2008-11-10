@@ -17,15 +17,14 @@ import org.springframework.util.ClassUtils;
 /**
  * Wraps a {@link ResourceAwareItemWriterItemStream} and creates a new output
  * resource when the count of items written in current resource exceeds
- * {@link #setItemCountLimitPerResource(int)}.
+ * {@link #setItemCountLimitPerResource(int)}. Suffix creation can be customized
+ * with {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
  * 
  * Note that new resources are created only at chunk boundaries i.e. the number
  * of items written into one resource is between the limit set by
  * {@link #setItemCountLimitPerResource(int)} and (limit + chunk size).
  * 
  * @param <T> item type
- * 
- * TODO strategise naming of the created resources 
  * 
  * @author Robert Kasanicky
  */
@@ -45,6 +44,8 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
 	private int resourceIndex = 1;
 
+	private ResourceSuffixCreator suffixCreator = new SimpleResourceSuffixCreator();
+
 	public MultiResourceItemWriter() {
 		setName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
@@ -61,14 +62,34 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 		currentResourceItemCount += items.size();
 	}
 
+	/**
+	 * Allows customization of the suffix of the created resources based on the
+	 * index.
+	 */
+	public void setResourceSuffixCreator(ResourceSuffixCreator suffixCreator) {
+		this.suffixCreator = suffixCreator;
+	}
+
+	/**
+	 * After this limit is exceeded the next chunk will be written into newly
+	 * created resource.
+	 */
 	public void setItemCountLimitPerResource(int itemCountLimitPerResource) {
 		this.itemCountLimitPerResource = itemCountLimitPerResource;
 	}
 
+	/**
+	 * Delegate used for actual writing of the output.
+	 */
 	public void setDelegate(ResourceAwareItemWriterItemStream<? super T> delegate) {
 		this.delegate = delegate;
 	}
 
+	/**
+	 * Prototype for output resources. Actual output files will be created in
+	 * the same directory and use the same name as this prototype with appended
+	 * suffix (according to {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
+	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -81,8 +102,8 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		resourceIndex = Long.valueOf(executionContext.getLong(getKey(RESOURCE_INDEX_KEY), 1L)).intValue();
-		currentResourceItemCount = Long.valueOf(
-				executionContext.getLong(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0L)).intValue();
+		currentResourceItemCount = Long.valueOf(executionContext.getLong(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0L))
+				.intValue();
 		try {
 			pointDelegateToNextResource();
 		}
@@ -102,7 +123,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	 * Create next output resource and point the delegate to it.
 	 */
 	private void pointDelegateToNextResource() throws IOException {
-		String path = resource.getFile().getAbsolutePath() + "." + resourceIndex;
+		String path = resource.getFile().getAbsolutePath() + suffixCreator.getSuffix(resourceIndex);
 		File file = new File(path);
 		file.createNewFile();
 		Assert.state(file.canWrite(), "Output resource " + path + " must be writable");

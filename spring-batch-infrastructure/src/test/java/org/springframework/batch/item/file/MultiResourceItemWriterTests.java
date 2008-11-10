@@ -21,6 +21,8 @@ public class MultiResourceItemWriterTests {
 	private MultiResourceItemWriter<String> tested = new MultiResourceItemWriter<String>();
 
 	private File file;
+	
+	private ResourceSuffixCreator suffixCreator = new SimpleResourceSuffixCreator();
 
 	private ResourceAwareItemWriterItemStream<String> delegate = new FlatFileItemWriter<String>() {
 		{
@@ -35,6 +37,7 @@ public class MultiResourceItemWriterTests {
 		file = File.createTempFile(MultiResourceItemWriterTests.class.getSimpleName(), null);
 		tested.setResource(new FileSystemResource(file));
 		tested.setDelegate(delegate);
+		tested.setResourceSuffixCreator(suffixCreator);
 		tested.setItemCountLimitPerResource(2);
 
 		tested.open(executionContext);
@@ -45,12 +48,12 @@ public class MultiResourceItemWriterTests {
 
 		tested.write(Arrays.asList("1", "2", "3"));
 
-		File part1 = new File(file.getAbsolutePath() + ".1");
+		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
 		tested.write(Arrays.asList("4"));
-		File part2 = new File(file.getAbsolutePath() + ".2");
+		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
 
@@ -58,7 +61,7 @@ public class MultiResourceItemWriterTests {
 		assertEquals("45", readFile(part2));
 
 		tested.write(Arrays.asList("6", "7", "8", "9"));
-		File part3 = new File(file.getAbsolutePath() + ".3");
+		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 		assertEquals("6789", readFile(part3));
 	}
@@ -67,12 +70,12 @@ public class MultiResourceItemWriterTests {
 	public void testRestart() throws Exception {
 		tested.write(Arrays.asList("1", "2", "3"));
 
-		File part1 = new File(file.getAbsolutePath() + ".1");
+		File part1 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(1));
 		assertTrue(part1.exists());
 		assertEquals("123", readFile(part1));
 
 		tested.write(Arrays.asList("4"));
-		File part2 = new File(file.getAbsolutePath() + ".2");
+		File part2 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(2));
 		assertTrue(part2.exists());
 		assertEquals("4", readFile(part2));
 
@@ -84,7 +87,7 @@ public class MultiResourceItemWriterTests {
 		assertEquals("45", readFile(part2));
 
 		tested.write(Arrays.asList("6", "7", "8", "9"));
-		File part3 = new File(file.getAbsolutePath() + ".3");
+		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 		assertEquals("6789", readFile(part3));
 	}
