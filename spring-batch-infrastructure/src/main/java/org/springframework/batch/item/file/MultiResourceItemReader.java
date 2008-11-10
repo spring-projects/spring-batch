@@ -203,9 +203,9 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		private int markedResource = 0;
 
-		private long currentItem = 0;
+		private int currentItem = 0;
 
-		private long markedItem = 0;
+		private int markedItem = 0;
 
 		public void incrementItemCount() {
 			currentItem++;
@@ -228,17 +228,17 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 		public void open(ExecutionContext ctx) {
 			if (ctx.containsKey(executionContextUserSupport.getKey(RESOURCE_KEY))) {
-				currentResource = Long.valueOf(ctx.getLong(executionContextUserSupport.getKey(RESOURCE_KEY))).intValue();
+				currentResource = ctx.getInt(executionContextUserSupport.getKey(RESOURCE_KEY));
 			}
 
 			if (ctx.containsKey(executionContextUserSupport.getKey(ITEM_KEY))) {
-				currentItem = ctx.getLong(executionContextUserSupport.getKey(ITEM_KEY));
+				currentItem = ctx.getInt(executionContextUserSupport.getKey(ITEM_KEY));
 			}
 		}
 
 		public void update(ExecutionContext ctx) {
-			ctx.putLong(executionContextUserSupport.getKey(RESOURCE_KEY), index.currentResource);
-			ctx.putLong(executionContextUserSupport.getKey(ITEM_KEY), index.currentItem);
+			ctx.putInt(executionContextUserSupport.getKey(RESOURCE_KEY), index.currentResource);
+			ctx.putInt(executionContextUserSupport.getKey(ITEM_KEY), index.currentItem);
 		}
 	}
 
