@@ -178,7 +178,7 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 				preparedStatementSetter.setValues(preparedStatement);
 			}
 			this.rs = preparedStatement.executeQuery();
-			handleWarnings(preparedStatement.getWarnings());
+			handleWarnings(preparedStatement);
 		}
 		catch (SQLException se) {
 			close(null);
@@ -237,17 +237,22 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 	 * 
 	 * @see org.springframework.jdbc.SQLWarningException
 	 */
-	private void handleWarnings(SQLWarning warnings) throws SQLWarningException {
+	private void handleWarnings(PreparedStatement pstmt) throws SQLWarningException, SQLException {
 		if (ignoreWarnings) {
-			SQLWarning warningToLog = warnings;
-			while (warningToLog != null) {
-				log.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '"
-						+ warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
-				warningToLog = warningToLog.getNextWarning();
+			if (log.isDebugEnabled()) {
+				SQLWarning warningToLog = pstmt.getWarnings();
+				while (warningToLog != null) {
+					log.debug("SQLWarning ignored: SQL state '" + warningToLog.getSQLState() + "', error code '"
+							+ warningToLog.getErrorCode() + "', message [" + warningToLog.getMessage() + "]");
+					warningToLog = warningToLog.getNextWarning();
+				}
 			}
 		}
-		else if (warnings != null) {
-			throw new SQLWarningException("Warning not ignored", warnings);
+		else {
+			SQLWarning warnings = pstmt.getWarnings();
+			if (warnings != null) {
+				throw new SQLWarningException("Warning not ignored", warnings);
+			}
 		}
 	}
 
