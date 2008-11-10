@@ -603,7 +603,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		private final Collection<String> failures;
 
-		@SuppressWarnings("unchecked")
 		public SkipWriterStub() {
 			this(StringUtils.commaDelimitedListToSet("4"));
 		}

@@ -38,7 +38,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
