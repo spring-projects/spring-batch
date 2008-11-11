@@ -294,7 +294,7 @@ public class TaskletStep extends AbstractStep {
 					// potential rollback issues.
 					if (stepExecution.getExecutionContext().isDirty()) {
 						throw new IllegalStateException(
-								"The ExecutionContext cannot be modified outside of the ItemStream#Update method");
+								"The ExecutionContext cannot be modified outside of the ItemStream.update() method");
 					}
 
 					stream.update(stepExecution.getExecutionContext());
