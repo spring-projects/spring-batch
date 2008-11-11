@@ -31,19 +31,4 @@
 		</batch:step>
 		<batch:step name="playerSummarization"/>
 	</batch:job>
-
-	<bean id="footballProperties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="properties">
-			<value>
-				games.file.name=games-small.csv
-<!--				player.file.name=player-small.csv-->
-				player.file.name=player-containsBadRecords.csv
-				job.commit.interval=2
-			</value>
-		</property>
-		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
-		<property name="ignoreUnresolvablePlaceholders" value="true" />
-		<property name="order" value="1" />
-	</bean>
-
 </beans>

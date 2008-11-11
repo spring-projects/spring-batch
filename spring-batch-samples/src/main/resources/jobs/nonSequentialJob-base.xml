@@ -25,15 +25,16 @@
 			</bean>
 		</property>
 		<property name="listeners">
-			<list> 
+			<list>
 				<bean class="org.springframework.batch.sample.domain.football.internal.SkipCheckingListener"/>
+				<ref bean="playerInputResource"/>
 			</list>
 		</property>
 	</bean>
 	
 	<bean id="errorPrint" parent="taskletStep">
 		<property name="tasklet">
-			<bean class="org.springframework.batch.sample.domain.football.internal.ErrorLogWriter">
+			<bean class="org.springframework.batch.sample.domain.football.internal.ErrorLogTasklet">
 				<property name="dataSource" ref="dataSource"/>
 			</bean>
 		</property>
@@ -59,8 +60,12 @@
 		</property>
 	</bean>
 
+	<bean id="playerInputResource" class="org.springframework.batch.core.resource.StepExecutionResourceProxy">
+		<property name="filePattern" value="classpath:data/footballJob/input/%player.file.name%"/>
+	</bean>
+
 	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="classpath:data/nonSequentialJob/input/${player.file.name}" />
+		<property name="resource" ref="playerInputResource"/>
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -76,7 +81,7 @@
 	</bean>
 
 	<bean id="gameFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="classpath:data/nonSequentialJob/input/${games.file.name}" />
+		<property name="resource" value="classpath:data/footballJob/input/${games.file.name}" />
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -112,8 +117,6 @@
 		<property name="properties">
 			<value>
 				games.file.name=games-small.csv
-<!--				player.file.name=player-small.csv-->
-				player.file.name=player-containsBadRecords.csv
 				job.commit.interval=2
 			</value>
 		</property>

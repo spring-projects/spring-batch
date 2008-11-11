@@ -10,7 +10,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
-public class ErrorLogWriter implements Tasklet {
+public class ErrorLogTasklet implements Tasklet {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 	private SimpleJdbcTemplate simpleJdbcTemplate;
