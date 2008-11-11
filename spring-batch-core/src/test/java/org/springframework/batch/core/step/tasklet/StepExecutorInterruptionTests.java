@@ -16,7 +16,9 @@
 
 package org.springframework.batch.core.step.tasklet;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import junit.framework.TestCase;
 
@@ -32,13 +34,12 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.springframework.batch.core.step.StepExecutionSynchronizer;
-import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.util.ReflectionUtils;
 
 public class StepExecutorInterruptionTests extends TestCase {
 
@@ -47,10 +48,12 @@ public class StepExecutorInterruptionTests extends TestCase {
 	private JobExecution jobExecution;
 
 	private ItemWriter<Object> itemWriter;
-	
+
 	private StepExecution stepExecution;
-	
+
 	private JobRepository jobRepository;
+	
+	private Field semaphore;
 
 	public void setUp() throws Exception {
 		MapJobInstanceDao.clear();
@@ -72,10 +75,11 @@ public class StepExecutorInterruptionTests extends TestCase {
 			}
 		};
 		stepExecution = new StepExecution(step.getName(), jobExecution);
+		semaphore = ReflectionUtils.findField(step.getClass(), "semaphore");
 	}
 
 	public void testInterruptStep() throws Exception {
-	
+
 		Thread processingThread = createThread(stepExecution);
 
 		RepeatTemplate template = new RepeatTemplate();
@@ -88,7 +92,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 				for (int i = 2; i < 250; i++) {
 					foo = foo * i;
 				}
-				
+
 				if (foo != 1) {
 					return new Double(foo);
 				}
@@ -127,15 +131,33 @@ public class StepExecutorInterruptionTests extends TestCase {
 		// This simulates the unlikely sounding, but in practice all too common
 		// in Bamboo situation where the thread is interrupted before the lock
 		// is taken.
-		step.setSynchronizer(new StepExecutionSynchronizer() {
-			public void lock(StepExecution stepExecution) throws InterruptedException {
+
+		ReflectionUtils.makeAccessible(semaphore);
+		ReflectionUtils.setField(semaphore, step, new Semaphore(1) {
+
+			@Override
+			public void acquire() throws InterruptedException {
 				Thread.currentThread().interrupt();
 				throw new InterruptedException();
 			}
 
-			public void release(StepExecution stepExecution) {
+			@Override
+			public void release() {
 			}
 		});
+
+		// step.synchronizer = new Semaphore(1) {
+		//
+		// @Override
+		// public void acquire() throws InterruptedException {
+		// Thread.currentThread().interrupt();
+		// throw new InterruptedException();
+		// }
+		//
+		// @Override
+		// public void release() {
+		// }
+		// };
 
 		processingThread.start();
 		Thread.sleep(100);
@@ -152,7 +174,6 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 	}
 
-
 	public void testLockNotReleasedIfChunkFails() throws Exception {
 
 		step.setTasklet(new TestingChunkOrientedTasklet<Object>(new ItemReader<Object>() {
@@ -161,19 +182,24 @@ public class StepExecutorInterruptionTests extends TestCase {
 			}
 		}, itemWriter));
 
-		step.setSynchronizer(new StepExecutionSynchronizer() {
+		ReflectionUtils.makeAccessible(semaphore);
+		ReflectionUtils.setField(semaphore, step, new Semaphore(1) {
 			private boolean locked = false;
-			public void lock(StepExecution stepExecution) throws InterruptedException {
+
+			@Override
+			public void acquire() throws InterruptedException {
 				locked = true;
 			}
-			public void release(StepExecution stepExecution) {
+
+			@Override
+			public void release() {
 				assertTrue("Lock released before it is acquired", locked);
 			}
 		});
-		
+
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
-		
+
 		assertEquals("Planned!", stepExecution.getFailureExceptions().get(0).getMessage());
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 	}
