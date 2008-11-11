@@ -25,7 +25,7 @@ import org.springframework.batch.core.StepExecution;
  * 
  * @author Ben Hale
  */
-class JdkConcurrentStepExecutionSynchronizer implements StepExecutionSynchronizer {
+public class JdkConcurrentStepExecutionSynchronizer implements StepExecutionSynchronizer {
 
 	private final Semaphore semaphore = new Semaphore(1);
 

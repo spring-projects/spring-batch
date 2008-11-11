@@ -26,8 +26,8 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.StepContext;
 import org.springframework.batch.core.scope.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.core.step.JdkConcurrentStepExecutionSynchronizer;
 import org.springframework.batch.core.step.StepExecutionSynchronizer;
-import org.springframework.batch.core.step.StepExecutionSynchronizerFactory;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
@@ -86,7 +86,7 @@ public class TaskletStep extends AbstractStep {
 
 	private Tasklet tasklet;
 
-	private StepExecutionSynchronizer synchronizer;
+	private StepExecutionSynchronizer synchronizer = new JdkConcurrentStepExecutionSynchronizer();
 
 	/**
 	 * Default constructor.
@@ -100,8 +100,6 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public TaskletStep(String name) {
 		super(name);
-		synchronizer = new StepExecutionSynchronizerFactory()
-				.getStepExecutionSynchronizer();
 	}
 
 	/**
