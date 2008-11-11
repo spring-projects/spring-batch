@@ -40,7 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class StepWithChunkOrientedJobParserTests {
+public class StepWithChunkJobParserTests {
 	
 	@Autowired
 	private Job job;

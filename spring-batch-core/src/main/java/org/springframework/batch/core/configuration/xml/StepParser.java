@@ -72,14 +72,14 @@ public class StepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> taskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "task");
 		@SuppressWarnings("unchecked")
-		List<Element> chunkOrientedElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "chunk-oriented");
+		List<Element> chunkElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "chunk");
 		if (taskElements.size() > 0) {
 			Object task = parseTask(taskElements.get(0), parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
-		else if (chunkOrientedElements.size() > 0) {
-			Object task = parseChunkOriented(chunkOrientedElements.get(0), parserContext);
+		else if (chunkElements.size() > 0) {
+			Object task = parseChunk(chunkElements.get(0), parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
@@ -196,7 +196,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition parseChunkOriented(Element element, ParserContext parserContext) {
+	protected RootBeanDefinition parseChunk(Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd;
     	
@@ -237,30 +237,32 @@ public class StepParser {
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
         bd.getPropertyValues().addPropertyValue("transactionManager", tx);
 
-        String commitInterval = element.getAttribute("commit-interval");
+        String commitInterval = element.getAttribute("chunk-size");
         if (StringUtils.hasText(commitInterval)) {
             bd.getPropertyValues().addPropertyValue("commitInterval", commitInterval);
         }
 
-        if (isFaultTolerant) {
-            String skipLimit = element.getAttribute("skip-limit");
-            if (StringUtils.hasText(skipLimit)) {
-                bd.getPropertyValues().addPropertyValue("skipLimit", skipLimit);
-            }
+        String skipLimit = element.getAttribute("skip-limit");
+        if (StringUtils.hasText(skipLimit)) {
+        	if (!isFaultTolerant) {
+				throw new BeanCreationException("skip-limit can only be specified if fault-tolerant is set to 'true'");
+        	}
+            bd.getPropertyValues().addPropertyValue("skipLimit", skipLimit);
         }
 
-        if (isFaultTolerant) {
-            String retryLimit = element.getAttribute("retry-limit");
-            if (StringUtils.hasText(retryLimit)) {
-                bd.getPropertyValues().addPropertyValue("retryLimit", retryLimit);
-            }
+        String retryLimit = element.getAttribute("retry-limit");
+        if (StringUtils.hasText(retryLimit)) {
+        	if (!isFaultTolerant) {
+				throw new BeanCreationException("retry-limit can only be specified if fault-tolerant is set to 'true'");
+        	}
+            bd.getPropertyValues().addPropertyValue("retryLimit", retryLimit);
         }
 
-        handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses");
+        handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses", isFaultTolerant);
         
-        handleExceptionElement(element, bd, "retryable-exception-classes", "retryableExceptionClasses");
+        handleExceptionElement(element, bd, "retryable-exception-classes", "retryableExceptionClasses",isFaultTolerant);
         
-        handleExceptionElement(element, bd, "fatal-exception-classes", "fatalExceptionClasses");
+        handleExceptionElement(element, bd, "fatal-exception-classes", "fatalExceptionClasses",isFaultTolerant);
 
         handleListenersElement(element, bd, parserContext);
         
@@ -271,10 +273,13 @@ public class StepParser {
 	}
 
 	private void handleExceptionElement(Element element, RootBeanDefinition bd, 
-			String attributeName, String propertyName) {
+			String attributeName, String propertyName, boolean isFaultTolerant) {
 		String exceptions = 
         	DomUtils.getChildElementValueByTagName(element, attributeName);
         if (StringUtils.hasLength(exceptions)) {
+        	if (!isFaultTolerant) {
+				throw new BeanCreationException(attributeName + " can only be specified if fault-tolerant is set to 'true'");
+        	}
 	        String[] exceptionArray = StringUtils.tokenizeToStringArray(
 	        		StringUtils.delete(exceptions, ","), "\n");
 	        if (exceptionArray.length > 0) {

@@ -175,10 +175,10 @@
 			<xsd:extension base="nextType">
 				<xsd:sequence>
 					<xsd:choice>
-						<xsd:element name="chunk-oriented" minOccurs="0" maxOccurs="1">
+						<xsd:element name="chunk" minOccurs="0" maxOccurs="1">
 							<xsd:complexType>
 								<xsd:complexContent>
-									<xsd:extension base="chunkOrientedType"/>
+									<xsd:extension base="chunkType"/>
 								</xsd:complexContent>
 							</xsd:complexType>
 						</xsd:element>
@@ -201,13 +201,6 @@
 			<xsd:extension base="beans:identifiedType">
 				<xsd:attributeGroup ref="jobRepository"/>
 				<xsd:attributeGroup ref="transactionManager"/>
-				<xsd:attribute name="commit-interval" type="xsd:integer" use="optional">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-						The number of items that will be processed before commit is called for the transaction.
-						]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -226,7 +219,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="chunkOrientedType">
+	<xsd:complexType name="chunkType">
 		<xsd:complexContent>
 			<xsd:extension base="stepDefType">
 				<xsd:sequence>
@@ -283,6 +276,13 @@
 						</xsd:simpleType>
 					</xsd:element>
 				</xsd:sequence>
+				<xsd:attribute name="chunk-size" type="xsd:integer" use="required">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The number of items that will be processed before commit is called for the transaction.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
 				<xsd:attribute name="fault-tolerant" type="xsd:boolean" default="false" use="optional">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
