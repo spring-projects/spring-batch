@@ -61,7 +61,7 @@
 	</bean>
 
 	<bean id="playerInputResource" class="org.springframework.batch.core.resource.StepExecutionResourceProxy">
-		<property name="filePattern" value="classpath:data/footballJob/input/%player.file.name%"/>
+		<property name="filePattern" value="classpath:data/footballjob/input/%player.file.name%"/>
 	</bean>
 
 	<bean id="playerFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
