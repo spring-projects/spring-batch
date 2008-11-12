@@ -225,7 +225,6 @@ public class TaskletStep extends AbstractStep {
 				ExceptionHolder fatalException = new ExceptionHolder();
 
 				StepContribution contribution = stepExecution.createStepContribution();
-				stepExecution.getExecutionContext().clearDirtyFlag();
 
 				// Before starting a new transaction, check for
 				// interruption.
@@ -262,14 +261,6 @@ public class TaskletStep extends AbstractStep {
 					catch (InterruptedException e) {
 						stepExecution.setStatus(BatchStatus.STOPPED);
 						Thread.currentThread().interrupt();
-					}
-
-					// Check to make sure the ExecutionContext hasn't be
-					// modified outside a chunk boundary. Doing so will cause
-					// potential rollback issues.
-					if (stepExecution.getExecutionContext().isDirty()) {
-						throw new IllegalStateException(
-								"The ExecutionContext cannot be modified outside of the ItemStream.update() method");
 					}
 
 					stream.update(stepExecution.getExecutionContext());

@@ -16,10 +16,7 @@
 
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,7 +32,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
@@ -55,12 +51,10 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.core.AttributeAccessor;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
@@ -775,22 +769,23 @@ public class TaskletStepTests {
 
 	}
 
-	@Test
-	public void testModifyingExecutionContextMidProcessCausesException() throws Exception {
-		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
-		final ExecutionContext ec = stepExecution.getExecutionContext();
-		step.setTasklet(new Tasklet() {
-			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-				ec.putString("test", "test");
-				return RepeatStatus.FINISHED;
-			}
-		});
-
-		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		assertEquals(1, stepExecution.getFailureExceptions().size());
-		assertTrue(stepExecution.getFailureExceptions().get(0) instanceof IllegalStateException);
-	}
+//	This doesn't make sense for concurrent tasklet execution scenario.
+//	@Test
+//	public void testModifyingExecutionContextMidProcessCausesException() throws Exception {
+//		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
+//		final ExecutionContext ec = stepExecution.getExecutionContext();
+//		step.setTasklet(new Tasklet() {
+//			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+//				ec.putString("test", "test");
+//				return RepeatStatus.FINISHED;
+//			}
+//		});
+//
+//		step.execute(stepExecution);
+//		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+//		assertEquals(1, stepExecution.getFailureExceptions().size());
+//		assertTrue(stepExecution.getFailureExceptions().get(0) instanceof IllegalStateException);
+//	}
 
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;

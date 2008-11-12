@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -106,9 +107,9 @@ public class AsyncTaskletStepTests {
 
 		step.execute(stepExecution);
 
-		// Fails (BATCH-917).
-//		assertEquals(20, processed.size());
-//		assertEquals(20, stepExecution.getReadCount());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(25, processed.size());
+		assertEquals(25, stepExecution.getReadCount());
 
 	}
 
