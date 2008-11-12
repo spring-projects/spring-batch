@@ -85,6 +85,7 @@
 			<id>fast</id>
 			<properties>
 				<maven.test.skip>true</maven.test.skip>
+				<maven.javadoc.skip>true</maven.javadoc.skip>
 			</properties>
 		</profile>
 		<profile>
@@ -373,7 +374,7 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!--plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<executions>
@@ -384,7 +385,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
