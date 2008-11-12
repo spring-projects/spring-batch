@@ -49,7 +49,7 @@ import org.w3c.dom.NamedNodeMap;
  * 
  * @author Dave Syer
  * @author Thomas Risberg
- * 
+ * @since 2.0
  */
 public class StepParser {
 
@@ -293,7 +293,6 @@ public class StepParser {
 		Element listenersElement = 
         	DomUtils.getChildElementByTagName(element, "listeners");
 		if (listenersElement != null) {
-			List<String> listenerRefs = new ArrayList<String>(); 
 			List<BeanReference> listenerBeans = new ArrayList<BeanReference>(); 
 			List<Element> listenerElements = 
 	        	DomUtils.getChildElementsByTagName(listenersElement, "listener");
@@ -316,7 +315,6 @@ public class StepParser {
 								listenerElement.getTagName() + "> element with attributes: " + attributes);
 					}
 					if (StringUtils.hasText(listenerRef)) {
-						listenerRefs.add(listenerRef);
 				        BeanReference bean = new RuntimeBeanReference(listenerRef);
 						listenerBeans.add(bean);
 					}
@@ -337,6 +335,32 @@ public class StepParser {
 	        ManagedList arguments = new ManagedList();
 	        arguments.addAll(listenerBeans);
         	bd.getPropertyValues().addPropertyValue("listeners", arguments);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleStreamsElement(Element element, RootBeanDefinition bd, ParserContext parserContext) {
+		Element streamsElement = 
+        	DomUtils.getChildElementByTagName(element, "streams");
+		if (streamsElement != null) {
+			List<BeanReference> listenerBeans = new ArrayList<BeanReference>(); 
+			List<Element> listenerElements = 
+	        	DomUtils.getChildElementsByTagName(streamsElement, "listener");
+			if (listenerElements != null) {
+				for (Element listenerElement : listenerElements) {
+					String listenerRef = listenerElement.getAttribute("ref");
+					if (StringUtils.hasText(listenerRef)) {
+				        BeanReference bean = new RuntimeBeanReference(listenerRef);
+						listenerBeans.add(bean);
+					}
+					else {
+						throw new BeanCreationException("ref not specified for <" + listenerElement.getTagName() + "> element");
+					}
+				}
+			}
+	        ManagedList arguments = new ManagedList();
+	        arguments.addAll(listenerBeans);
+        	bd.getPropertyValues().addPropertyValue("streams", arguments);
 		}
 	}
 
