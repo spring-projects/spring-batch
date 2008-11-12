@@ -266,7 +266,12 @@ public class StepParser {
 
         handleListenersElement(element, bd, parserContext);
         
+        handleStreamsElement(element, bd, parserContext);
+        
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
+        
+		String id = parserContext.getReaderContext().generateBeanName(bd);
+		parserContext.getRegistry().registerBeanDefinition(id, bd);
         
         return bd;
 
@@ -343,15 +348,15 @@ public class StepParser {
 		Element streamsElement = 
         	DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
-			List<BeanReference> listenerBeans = new ArrayList<BeanReference>(); 
-			List<Element> listenerElements = 
-	        	DomUtils.getChildElementsByTagName(streamsElement, "listener");
-			if (listenerElements != null) {
-				for (Element listenerElement : listenerElements) {
+			List<BeanReference> streamBeans = new ArrayList<BeanReference>(); 
+			List<Element> streamElements = 
+	        	DomUtils.getChildElementsByTagName(streamsElement, "stream");
+			if (streamElements != null) {
+				for (Element listenerElement : streamElements) {
 					String listenerRef = listenerElement.getAttribute("ref");
 					if (StringUtils.hasText(listenerRef)) {
 				        BeanReference bean = new RuntimeBeanReference(listenerRef);
-						listenerBeans.add(bean);
+						streamBeans.add(bean);
 					}
 					else {
 						throw new BeanCreationException("ref not specified for <" + listenerElement.getTagName() + "> element");
@@ -359,7 +364,7 @@ public class StepParser {
 				}
 			}
 	        ManagedList arguments = new ManagedList();
-	        arguments.addAll(listenerBeans);
+	        arguments.addAll(streamBeans);
         	bd.getPropertyValues().addPropertyValue("streams", arguments);
 		}
 	}

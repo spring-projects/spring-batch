@@ -7,9 +7,9 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step name="step1">
+		<step name="ft-step">
 			<chunk reader="reader" processor="processor" writer="writer"
-					fault-tolerant="true" chunk-size="10" skip-limit="20" retry-limit="3">
+					fault-tolerant="false" chunk-size="10">
 				<listeners>
 					<listener class="org.springframework.batch.core.configuration.xml.TestListener"/>
 					<listener ref="listener"/>
