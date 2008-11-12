@@ -20,8 +20,10 @@
 			<xsd:documentation>
 				Defines a job composed of a set of steps and
 				transitions between steps. The job will be exposed
-				in the enclosing bean factory as a component of type Job
-				that can be launched using a JobLauncher.
+				in the enclosing
+				bean factory as a component of type Job
+				that can be launched using a
+				JobLauncher.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -37,7 +39,8 @@
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="restartable" type="xsd:boolean" default="false" use="optional">
+					<xsd:attribute name="restartable" type="xsd:boolean"
+						default="false" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							Whether the job should be retartable or not in case of failure.
@@ -73,7 +76,7 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attributeGroup ref="transactionManager"/>
+					<xsd:attributeGroup ref="transactionManager" />
 					<xsd:attribute name="isolation-level-for-create"
 						type="xsd:string">
 						<xsd:annotation>
@@ -104,8 +107,10 @@
 				<xsd:element name="step">
 					<xsd:annotation>
 						<xsd:documentation>
-							Defines a stage in job processing backed by a Step. The name
-							attribute has to match the id of a bean definition for a Step. 
+							Defines a stage in job processing backed by a
+							Step. The name
+							attribute has to match the id of a bean definition
+							for a Step.
 							The next attribute is a synonym for &lt;next on="*" .../&gt;
 						</xsd:documentation>
 					</xsd:annotation>
@@ -167,6 +172,28 @@
 					</xsd:complexType>
 				</xsd:element>			
 			</xsd:choice>
+			<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							List of all listeners for the job
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="listener" minOccurs="1"
+									maxOccurs="unbounded">
+									<xsd:complexType>
+										<xsd:attribute name="id" type="xsd:ID" />
+										<xsd:attribute name="ref" type="xsd:string" />
+										<xsd:attribute name="class" type="xsd:string" />
+										<xsd:attribute name="before-method" type="xsd:string" />
+										<xsd:attribute name="after-method" type="xsd:string" />
+									</xsd:complexType>
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:complexType>
+			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
 	
@@ -492,4 +519,10 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
+
+	<xsd:complexType name="jobExecutionListenerType">
+		<xsd:attribute name="before-method" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="after-method" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="ref" type="xsd:string" use="required"></xsd:attribute>
+	</xsd:complexType>
 </xsd:schema>

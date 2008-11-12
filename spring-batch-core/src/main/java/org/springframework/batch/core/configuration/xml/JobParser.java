@@ -20,6 +20,7 @@ import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
@@ -62,9 +63,12 @@ public class JobParser extends AbstractBeanDefinitionParser {
 
 		FlowParser flowParser = new FlowParser();
 		AbstractBeanDefinition flowDef = flowParser.parse(element, parserContext, jobName);
-
 		builder.addPropertyValue("flow", flowDef);
-	
+		
+		JobExecutionListenerParser listenerParser = new JobExecutionListenerParser();
+		ManagedList managedList = listenerParser.parse(element, parserContext);
+		builder.addPropertyValue("jobExecutionListeners", managedList);
+		
 		return builder.getBeanDefinition();
 	}
 
