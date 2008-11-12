@@ -87,9 +87,6 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	// root element attributes
 	private Map<String, String> rootElementAttributes = null;
 
-	// signalizes that marshalling was restarted
-	private boolean restarted = false;
-
 	// TRUE means, that output file will be overwritten if exists - default is
 	// TRUE
 	private boolean overwriteOutput = true;
@@ -255,6 +252,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		Assert.notNull(resource, "The resource must be set");
 
 		long startAtPosition = 0;
+		boolean restarted = false;
 
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
@@ -263,7 +261,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 			restarted = true;
 		}
 
-		open(startAtPosition);
+		open(startAtPosition, restarted);
 
 		if (startAtPosition == 0) {
 			try {
@@ -281,7 +279,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	/**
 	 * Helper method for opening output source at given file position
 	 */
-	private void open(long position) {
+	private void open(long position, boolean restarted) {
 
 		File file;
 		FileOutputStream os = null;
@@ -433,12 +431,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		currentRecordCount += items.size();
 
-		doWrite(items);
-
-	}
-
-	private void doWrite(List<?> objects) throws XmlMappingException, IOException {
-		for (Object object : objects) {
+		for (Object object : items) {
 			Assert.state(marshaller.supports(object.getClass()),
 					"Marshaller must support the class of the marshalled object");
 			marshaller.marshal(object, new StaxResult(eventWriter));
@@ -449,6 +442,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		catch (XMLStreamException e) {
 			throw new FlushFailedException("Failed to flush the events", e);
 		}
+
 	}
 
 	/**

@@ -46,6 +46,8 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
 	private ResourceSuffixCreator suffixCreator = new SimpleResourceSuffixCreator();
 
+	private boolean saveState = true;
+
 	public MultiResourceItemWriter() {
 		setName(ClassUtils.getShortName(MultiResourceItemWriter.class));
 	}
@@ -55,7 +57,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 			delegate.close(new ExecutionContext());
 			resourceIndex++;
 			currentResourceItemCount = 0;
-			pointDelegateToNextResource();
+			setResourceToDelegate();
 			delegate.open(new ExecutionContext());
 		}
 		delegate.write(items);
@@ -88,10 +90,15 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	/**
 	 * Prototype for output resources. Actual output files will be created in
 	 * the same directory and use the same name as this prototype with appended
-	 * suffix (according to {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
+	 * suffix (according to
+	 * {@link #setResourceSuffixCreator(ResourceSuffixCreator)}.
 	 */
 	public void setResource(Resource resource) {
 		this.resource = resource;
+	}
+
+	public void setSaveState(boolean saveState) {
+		this.saveState = saveState;
 	}
 
 	public void close(ExecutionContext executionContext) throws ItemStreamException {
@@ -103,9 +110,9 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 		resourceIndex = executionContext.getInt(getKey(RESOURCE_INDEX_KEY), 1);
 		currentResourceItemCount = executionContext.getInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), 0);
-			
+
 		try {
-			pointDelegateToNextResource();
+			setResourceToDelegate();
 		}
 		catch (IOException e) {
 			throw new ItemStreamException("Couldn't open resource", e);
@@ -114,15 +121,17 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 	}
 
 	public void update(ExecutionContext executionContext) throws ItemStreamException {
-		delegate.update(executionContext);
-		executionContext.putInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
-		executionContext.putInt(getKey(RESOURCE_INDEX_KEY), resourceIndex);
+		if (saveState) {
+			delegate.update(executionContext);
+			executionContext.putInt(getKey(CURRENT_RESOURCE_ITEM_COUNT), currentResourceItemCount);
+			executionContext.putInt(getKey(RESOURCE_INDEX_KEY), resourceIndex);
+		}
 	}
 
 	/**
-	 * Create next output resource and point the delegate to it.
+	 * Create output resource (if necessary) and point the delegate to it.
 	 */
-	private void pointDelegateToNextResource() throws IOException {
+	private void setResourceToDelegate() throws IOException {
 		String path = resource.getFile().getAbsolutePath() + suffixCreator.getSuffix(resourceIndex);
 		File file = new File(path);
 		file.createNewFile();

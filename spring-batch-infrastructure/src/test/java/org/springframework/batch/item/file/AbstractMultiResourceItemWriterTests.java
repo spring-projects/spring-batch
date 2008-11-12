@@ -1,0 +1,52 @@
+package org.springframework.batch.item.file;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
+import org.junit.Before;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.core.io.FileSystemResource;
+
+/**
+ * Tests for {@link MultiResourceItemWriter}.
+ * 
+ * @see MultiResourceItemWriterTests
+ * @see MultiResourceItemReaderXmlTests
+ */
+public class AbstractMultiResourceItemWriterTests {
+
+	protected MultiResourceItemWriter<String> tested = new MultiResourceItemWriter<String>();
+
+	protected File file;
+
+	protected ResourceSuffixCreator suffixCreator = new SimpleResourceSuffixCreator();
+
+	protected ResourceAwareItemWriterItemStream<String> delegate; 
+
+	protected ExecutionContext executionContext = new ExecutionContext();
+
+	@Before
+	public void setUp() throws Exception {
+		file = File.createTempFile(MultiResourceItemWriterTests.class.getSimpleName(), null);
+		tested.setResource(new FileSystemResource(file));
+		tested.setDelegate(delegate);
+		tested.setResourceSuffixCreator(suffixCreator);
+		tested.setItemCountLimitPerResource(2);
+		tested.setSaveState(true);
+		tested.open(executionContext);
+	}
+
+	protected String readFile(File f) throws Exception {
+		BufferedReader reader = new BufferedReader(new FileReader(f));
+		StringBuilder result = new StringBuilder();
+		while (true) {
+			String line = reader.readLine();
+			if (line == null) {
+				break;
+			}
+			result.append(line);
+		}
+		return result.toString();
+	}
+}
