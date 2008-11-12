@@ -102,8 +102,9 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 
 	private int getSplitSize(StepExecution stepExecution, int gridSize) {
 		ExecutionContext context = stepExecution.getExecutionContext();
-		int result = (int) context.getLong("GRID_SIZE", gridSize);
-		context.putLong("GRID_SIZE", result);
+		String key = SimpleStepExecutionSplitter.class.getSimpleName() + ".GRID_SIZE";
+		int result = (int) context.getLong(key, gridSize);
+		context.putLong(key, result);
 		if (context.isDirty()) {
 			jobRepository.updateExecutionContext(stepExecution);
 		}
