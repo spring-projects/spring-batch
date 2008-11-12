@@ -35,13 +35,13 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 
 	private final Queue<ChunkContext> attributeQueue = new LinkedBlockingQueue<ChunkContext>();
 
-	private final StepContext stepContext;
+	private final StepExecution stepExecution;
 
 	/**
 	 * @param stepExecution
 	 */
 	public StepContextRepeatCallback(StepExecution stepExecution) {
-		this.stepContext = new StepContext(stepExecution);
+		this.stepExecution = stepExecution;
 	}
 
 	/**
@@ -54,15 +54,16 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	 */
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 
+		// The StepContext has to be the same for all chunks,
+		// otherwise step-scoped beans will be re-initialised for each chunk.
+		StepContext stepContext = StepSynchronizationManager.register(stepExecution);
+
 		ChunkContext chunkContext = attributeQueue.poll();
 		if (chunkContext == null) {
 			chunkContext = new ChunkContext();
 		}
-		int start = stepContext.attributeNames().length;
+		int start = chunkContext.attributeNames().length;
 
-		// The StepContext has to be the same for all chunks,
-		// otherwise step-scoped beans will be re-initialised for each chunk.
-		StepSynchronizationManager.register(stepContext);
 		try {
 			return doInStepContext(context, stepContext);
 		}

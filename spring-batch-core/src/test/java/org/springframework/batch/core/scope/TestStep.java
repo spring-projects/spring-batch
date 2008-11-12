@@ -7,13 +7,13 @@ import org.springframework.batch.core.StepExecution;
 public class TestStep implements Step {
 
 	private static StepContext context;
-	
+
 	private Collaborator collaborator;
-	
+
 	public void setCollaborator(Collaborator collaborator) {
 		this.collaborator = collaborator;
 	}
-	
+
 	public static StepContext getContext() {
 		return context;
 	}
@@ -24,7 +24,9 @@ public class TestStep implements Step {
 
 	public void execute(StepExecution stepExecution) throws JobInterruptedException {
 		context = StepSynchronizationManager.getContext();
-		context.setAttribute("collaborator", collaborator.getName());
+		if (context != null) {
+			context.setAttribute("collaborator", collaborator.getName());
+		}
 	}
 
 	public String getName() {

@@ -38,6 +38,7 @@ public class StepScopeIntegrationTests {
 	@Before
 	@After
 	public void start() {
+		StepSynchronizationManager.close();
 		TestStep.reset();
 	}
 		

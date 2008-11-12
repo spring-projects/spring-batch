@@ -18,6 +18,7 @@ package org.springframework.batch.core.scope;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -41,11 +42,13 @@ public class StepScopeTests {
 
 	private StepScope scope = new StepScope();
 
-	private StepContext context = new StepContext(new StepExecution("foo", new JobExecution(0L)));
+	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L));
+
+	private StepContext context;
 
 	@Before
 	public void setUp() throws Exception {
-		StepSynchronizationManager.register(context);
+		context = StepSynchronizationManager.register(stepExecution);
 	}
 
 	@After
@@ -98,8 +101,7 @@ public class StepScopeTests {
 	@Test
 	public void testGetWithSomethingAlreadyInParentContext() {
 		context.setAttribute("foo", "bar");
-		StepContext context = new StepContext(new StepExecution("bar", new JobExecution(0L)));
-		StepSynchronizationManager.register(context);
+		StepContext context = StepSynchronizationManager.register(new StepExecution("bar", new JobExecution(0L)));
 		Object value = scope.get("foo", new ObjectFactory() {
 			public Object getObject() throws BeansException {
 				return "spam";
@@ -109,6 +111,13 @@ public class StepScopeTests {
 		assertTrue(context.hasAttribute("foo"));
 		StepSynchronizationManager.close();
 		assertEquals("bar", scope.get("foo", null));
+	}
+
+	@Test
+	public void testParentContextWithSameStepExecution() {
+		context.setAttribute("foo", "bar");
+		StepContext other = StepSynchronizationManager.register(stepExecution);
+		assertSame(other, context);
 	}
 
 	@Test

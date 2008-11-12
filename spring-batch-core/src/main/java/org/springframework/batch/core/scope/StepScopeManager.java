@@ -20,7 +20,7 @@ public class StepScopeManager {
 
 	@Around("execution(void org.springframework.batch.core.Step+.execute(*)) && target(step) && args(stepExecution)")
 	public void execute(Step step, StepExecution stepExecution) throws JobInterruptedException {
-		StepSynchronizationManager.register(new StepContext(stepExecution));
+		StepSynchronizationManager.register(stepExecution);
 		try {
 			step.execute(stepExecution);
 		}

@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.After;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -35,6 +36,11 @@ public class StepContextRepeatCallbackTests {
 	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
 	private boolean addedAttribute = false;
 	private boolean removedAttribute = false;
+	
+	@After
+	public void cleanUpStepContext() {
+		StepSynchronizationManager.close();
+	}
 
 	@Test
 	public void testDoInIteration() throws Exception {
@@ -51,6 +57,7 @@ public class StepContextRepeatCallbackTests {
 
 	@Test
 	public void testUnfinishedWork() throws Exception {
+		StepSynchronizationManager.register(stepExecution);
 		StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
 			@Override
 			public RepeatStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {

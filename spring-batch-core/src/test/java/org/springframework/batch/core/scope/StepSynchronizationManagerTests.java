@@ -28,20 +28,19 @@ public class StepSynchronizationManagerTests {
 	@Test
 	public void testGetContext() {
 		assertNull(StepSynchronizationManager.getContext());
-		StepSynchronizationManager.register(new StepContext(stepExecution));
+		StepSynchronizationManager.register(stepExecution);
 		assertNotNull(StepSynchronizationManager.getContext());
 	}
 
 	@Test
 	public void testClose() {
-		StepContext context = new StepContext(stepExecution);
 		final List<String> list = new ArrayList<String>();
+		StepContext context = StepSynchronizationManager.register(stepExecution);
 		context.registerDestructionCallback("foo", new Runnable() {
 			public void run() {
 				list.add("foo");
 			}
 		});
-		StepSynchronizationManager.register(context);
 		StepSynchronizationManager.close();
 		assertNull(StepSynchronizationManager.getContext());
 		assertEquals(0, list.size());
@@ -49,14 +48,13 @@ public class StepSynchronizationManagerTests {
 
 	@Test
 	public void testRelease() {
-		StepContext context = new StepContext(stepExecution);
+		StepContext context = StepSynchronizationManager.register(stepExecution);
 		final List<String> list = new ArrayList<String>();
 		context.registerDestructionCallback("foo", new Runnable() {
 			public void run() {
 				list.add("foo");
 			}
 		});
-		StepSynchronizationManager.register(context);
 		// On release we expect the destruction callbacks to be called
 		StepSynchronizationManager.release();
 		assertNull(StepSynchronizationManager.getContext());
@@ -72,9 +70,8 @@ public class StepSynchronizationManagerTests {
 
 	@Test
 	public void testRegisterTwice() {
-		StepContext context = new StepContext(stepExecution);
-		StepSynchronizationManager.register(context);
-		StepSynchronizationManager.register(context);
+		StepSynchronizationManager.register(stepExecution);
+		StepSynchronizationManager.register(stepExecution);
 		StepSynchronizationManager.close();
 		// if someone registers you have to assume they are going to close, so
 		// the last thing you want is for the close to remove another context

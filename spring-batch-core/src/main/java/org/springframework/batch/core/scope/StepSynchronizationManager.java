@@ -18,6 +18,7 @@ package org.springframework.batch.core.scope;
 import java.util.Stack;
 
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 
 /**
  * Central convenience class for framework use in managing the step scope
@@ -56,20 +57,35 @@ public class StepSynchronizationManager {
 	 * matching {@link #close()} call in a finally block to ensure that the
 	 * correct context is available in the enclosing block.
 	 * 
-	 * @param context the step context to register
+	 * @param stepExecution the step context to register
+	 * @return a new {@link StepContext} or the current one if it has the same
+	 * {@link StepExecution}
 	 */
-	public static void register(StepContext context) {
-		if (context == null) {
-			return;
+	public static StepContext register(StepExecution stepExecution) {
+		if (stepExecution == null) {
+			return null;
+		}
+		StepContext current = getContext();
+		StepContext context;
+		if (current != null && current.getStepExecution().equals(stepExecution)) {
+			/*
+			 * If the new context has the same step execution we don't want a
+			 * new set of attributes, otherwise auto proxied beans get created
+			 * twice for the same execution.
+			 */
+			context = current;
+		} else {
+			context = new StepContext(stepExecution);
 		}
 		getCurrent().push(context);
+		return context;
 	}
 
 	/**
 	 * Method for de-registering the current context - should always and only be
-	 * used by in conjunction with a matching {@link #register(StepContext)} to
-	 * ensure that {@link #getContext()} always returns the correct value. Does
-	 * not call {@link StepContext#close()} - that is left up to the caller
+	 * used by in conjunction with a matching {@link #register(StepExecution)}
+	 * to ensure that {@link #getContext()} always returns the correct value.
+	 * Does not call {@link StepContext#close()} - that is left up to the caller
 	 * because he has a reference to the context (having registered it) and only
 	 * he has knowledge of when the step actually ended.
 	 */
@@ -97,10 +113,11 @@ public class StepSynchronizationManager {
 	public static void release() {
 		StepContext context = getContext();
 		try {
-			if (context!=null) {
+			if (context != null) {
 				context.close();
 			}
-		} finally {
+		}
+		finally {
 			close();
 		}
 	}
