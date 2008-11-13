@@ -14,7 +14,7 @@ import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
  * Tests for {@link MultiResourceItemWriter} delegating to
  * {@link FlatFileItemWriter}.
  */
-public class MultiResourceItemWriterTests extends AbstractMultiResourceItemWriterTests {
+public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceItemWriterTests {
 
 	@Override
 	@Before

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
@@ -14,14 +12,22 @@
 			<bean id="step1" parent="simpleStep" p:commitInterval="3">
 				<property name="itemReader" ref="fileItemReader" />
 				<property name="itemProcessor">
-					<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+					<bean
+						class="org.springframework.batch.item.validator.ValidatingItemProcessor">
 						<constructor-arg ref="fixedValidator" />
 					</bean>
 				</property>
 				<property name="itemWriter">
-					<bean
-						class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
-						<property name="dao" ref="tradeDao" />
+					<bean class="org.springframework.batch.item.file.MultiResourceItemWriter">
+						<property name="resource" ref="outputFile" />
+						<property name="itemCountLimitPerResource" value="2" />
+						<property name="delegate">
+							<bean class="org.springframework.batch.item.file.FlatFileItemWriter">
+								<property name="lineAggregator">
+									<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+								</property>
+							</bean>
+						</property>
 					</bean>
 				</property>
 			</bean>
@@ -29,20 +35,25 @@
 	</bean>
 
 	<!-- INFRASTRUCTURE SETUP -->
-
-	<!-- This input source is injected into the test case to verify the output - not used by the job at all -->
+	<bean id="outputFile" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg type="java.lang.String"
+			value="target/test-outputs/multiResourceOutput.txt" />
+	</bean>
+	<!--
+		This input source is injected into the test case to verify the output
+		- not used by the job at all
+	-->
 	<bean id="testItemReader"
 		class="org.springframework.batch.item.file.MultiResourceItemReader">
 		<property name="resources"
 			value="classpath:data/multiResourceJob/input/file-*.txt" />
 		<property name="delegate" ref="flatFileItemReader" />
 	</bean>
-	
+
 	<bean id="fileItemReader" parent="testItemReader"
 		autowire-candidate="false" />
-	
-	<bean id="flatFileItemReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
+
+	<bean id="flatFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineMapper">
@@ -62,8 +73,7 @@
 	<bean id="fixedValidator"
 		class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
-			<bean id="tradeValidator"
-				class="org.springmodules.validation.valang.ValangValidator">
+			<bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
 				<property name="valang">
 					<value>
 						<![CDATA[

@@ -53,7 +53,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	//auto-injected attributes
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 	private Resource fileLocator;
-	private FlatFileItemReader<Trade> inputSource;
+	protected FlatFileItemReader<Trade> itemReader;
 	private LineTokenizer lineTokenizer;
 
 	@Autowired
@@ -71,16 +71,17 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	public void onSetUp() throws Exception {
 		simpleJdbcTemplate.update("delete from TRADE");
 		fileLocator = new ClassPathResource("data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt");
-		inputSource = new FlatFileItemReader<Trade>();
+		itemReader = new FlatFileItemReader<Trade>();
 		
 		FieldSetMapper<Trade> mapper = new TradeFieldSetMapper();
 		DefaultLineMapper<Trade> lineMapper = new DefaultLineMapper<Trade>();
 		lineMapper.setLineTokenizer(lineTokenizer);
 		lineMapper.setFieldSetMapper(mapper);
-		inputSource.setLineMapper(lineMapper);
+		itemReader.setLineMapper(lineMapper);
 		
 		
-		inputSource.setResource(fileLocator);
+		itemReader.setResource(fileLocator);
+		itemReader.open(new ExecutionContext());
 	}
 
 	/**
@@ -89,7 +90,6 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 	 */
 	protected void validatePostConditions() throws Exception {
 		
-		inputSource.open(new ExecutionContext());
 
 		simpleJdbcTemplate.getJdbcOperations().query(
 				"SELECT ID, ISIN, QUANTITY, PRICE, CUSTOMER FROM trade ORDER BY id", 
@@ -97,7 +97,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 					public void processRow(ResultSet rs) throws SQLException {
 						Trade trade;
 						try {
-							trade = inputSource.read();
+							trade = itemReader.read();
 						}
 						catch (Exception e) {
 							throw new IllegalStateException(e.getMessage());
@@ -110,7 +110,7 @@ public class FixedLengthImportJobFunctionalTests extends AbstractValidatingBatch
 
 				});
 
-		assertNull(inputSource.read());
+		assertNull(itemReader.read());
 	}
 
 	/*

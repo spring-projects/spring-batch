@@ -11,7 +11,7 @@ import org.springframework.core.io.FileSystemResource;
 /**
  * Tests for {@link MultiResourceItemWriter}.
  * 
- * @see MultiResourceItemWriterTests
+ * @see MultiResourceItemWriterFlatFileTests
  * @see MultiResourceItemReaderXmlTests
  */
 public class AbstractMultiResourceItemWriterTests {
@@ -28,7 +28,7 @@ public class AbstractMultiResourceItemWriterTests {
 
 	@Before
 	public void setUp() throws Exception {
-		file = File.createTempFile(MultiResourceItemWriterTests.class.getSimpleName(), null);
+		file = File.createTempFile(MultiResourceItemWriterFlatFileTests.class.getSimpleName(), null);
 		tested.setResource(new FileSystemResource(file));
 		tested.setDelegate(delegate);
 		tested.setResourceSuffixCreator(suffixCreator);

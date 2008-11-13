@@ -30,7 +30,6 @@ import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriterNotOpenException;
-import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
@@ -105,7 +104,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	/**
 	 * Public setter for the {@link LineAggregator}. This will be used to
-	 * translate a {@link FieldSet} into a line for output.
+	 * translate the item into a line for output.
 	 * 
 	 * @param lineAggregator the {@link LineAggregator} to set
 	 */
