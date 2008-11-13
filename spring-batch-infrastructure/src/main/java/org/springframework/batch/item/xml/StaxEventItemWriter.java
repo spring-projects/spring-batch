@@ -87,9 +87,6 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	// root element attributes
 	private Map rootElementAttributes = null;
 
-	// signalizes that marshalling was restarted
-	private boolean restarted = false;
-
 	// TRUE means, that output file will be overwritten if exists - default is
 	// TRUE
 	private boolean overwriteOutput = true;
@@ -257,6 +254,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 		Assert.notNull(resource);
 		
 		long startAtPosition = 0;
+		boolean restarted = false;
 
 		// if restart data is provided, restart from provided offset
 		// otherwise start from beginning
@@ -265,7 +263,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 			restarted = true;
 		}
 
-		open(startAtPosition);
+		open(startAtPosition, restarted);
 
 		if (startAtPosition == 0) {
 			for (Iterator iterator = headers.iterator(); iterator.hasNext();) {
@@ -278,7 +276,7 @@ public class StaxEventItemWriter extends ExecutionContextUserSupport implements 
 	/**
 	 * Helper method for opening output source at given file position
 	 */
-	private void open(long position) {
+	private void open(long position, boolean restarted) {
 
 		File file;
 		FileOutputStream os = null;
