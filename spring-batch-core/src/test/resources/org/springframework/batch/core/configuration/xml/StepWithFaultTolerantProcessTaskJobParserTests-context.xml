@@ -14,6 +14,9 @@
 					<listener class="org.springframework.batch.core.configuration.xml.TestListener"/>
 					<listener ref="listener"/>
 				</listeners>
+				<retry-listeners>
+					<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener"/>
+				</retry-listeners>
 				<streams>
 					<stream ref="reader"/>
 				</streams>

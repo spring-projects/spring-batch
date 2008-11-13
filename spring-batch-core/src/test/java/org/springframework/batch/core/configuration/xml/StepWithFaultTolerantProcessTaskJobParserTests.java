@@ -31,6 +31,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.retry.RetryListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -60,6 +61,9 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 	private TestListener listener;
 	
 	@Autowired
+	private TestRetryListener retryListener;
+	
+	@Autowired
 	private TestProcessor processor;
 	
 	@Autowired
@@ -85,6 +89,8 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		assertEquals("wrong retry-limit:", 3, rl);
 		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
 		assertEquals("wrong number of listeners:", 2, ((StepListener[])listeners).length);
+		Object retryListeners = ReflectionTestUtils.getField(factory, "retryListeners");
+		assertEquals("wrong number of retry-listeners:", 1, ((RetryListener[])retryListeners).length);
 		Object streams = ReflectionTestUtils.getField(factory, "streams");
 		assertEquals("wrong number of streams:", 1, ((ItemStream[])streams).length);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
@@ -96,5 +102,6 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		assertTrue(processor.isExecuted());
 		assertTrue(writer.isExecuted());
 		assertTrue(listener.isExecuted());
+		assertTrue(retryListener.isExecuted());
 	}
 }

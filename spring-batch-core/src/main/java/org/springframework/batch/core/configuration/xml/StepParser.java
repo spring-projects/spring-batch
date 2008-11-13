@@ -266,6 +266,8 @@ public class StepParser {
 
         handleListenersElement(element, bd, parserContext);
         
+        handleRetryListenersElement(element, bd, parserContext);
+        
         handleStreamsElement(element, bd, parserContext);
         
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
@@ -299,47 +301,68 @@ public class StepParser {
         	DomUtils.getChildElementByTagName(element, "listeners");
 		if (listenersElement != null) {
 			List<BeanReference> listenerBeans = new ArrayList<BeanReference>(); 
-			List<Element> listenerElements = 
-	        	DomUtils.getChildElementsByTagName(listenersElement, "listener");
-			if (listenerElements != null) {
-				for (Element listenerElement : listenerElements) {
-					String id = listenerElement.getAttribute("id");
-					String listenerRef = listenerElement.getAttribute("ref");
-					String className = listenerElement.getAttribute("class");
-					if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
-							&& StringUtils.hasText(listenerRef)) {
-						NamedNodeMap attributeNodes = listenerElement.getAttributes();
-						StringBuilder attributes = new StringBuilder();
-						for (int i = 0; i < attributeNodes.getLength(); i++) {
-							if (i > 0) {
-								attributes.append(" ");
-							}
-							attributes.append(attributeNodes.item(i));
-						}
-						throw new BeanCreationException("Both 'id' or 'ref' plus 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-								listenerElement.getTagName() + "> element with attributes: " + attributes);
-					}
-					if (StringUtils.hasText(listenerRef)) {
-				        BeanReference bean = new RuntimeBeanReference(listenerRef);
-						listenerBeans.add(bean);
-					}
-					else if (StringUtils.hasText(className)) {
-						RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-						if (!StringUtils.hasText(id)) {
-							id = parserContext.getReaderContext().generateBeanName(beanDef);
-						}
-						parserContext.getRegistry().registerBeanDefinition(id, beanDef);
-				        BeanReference bean = new RuntimeBeanReference(id);
-						listenerBeans.add(bean);
-					}
-					else {
-						throw new BeanCreationException("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element");
-					}
-				}
-			}
+			handleListenerElements(parserContext, listenersElement,
+					listenerBeans);
 	        ManagedList arguments = new ManagedList();
 	        arguments.addAll(listenerBeans);
         	bd.getPropertyValues().addPropertyValue("listeners", arguments);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleRetryListenersElement(Element element, RootBeanDefinition bd, ParserContext parserContext) {
+		Element retryListenersElement = 
+        	DomUtils.getChildElementByTagName(element, "retry-listeners");
+		if (retryListenersElement != null) {
+			List<BeanReference> retryListenerBeans = new ArrayList<BeanReference>(); 
+			handleListenerElements(parserContext, retryListenersElement,
+					retryListenerBeans);
+	        ManagedList arguments = new ManagedList();
+	        arguments.addAll(retryListenerBeans);
+        	bd.getPropertyValues().addPropertyValue("retryListeners", arguments);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleListenerElements(ParserContext parserContext,
+			Element element, List<BeanReference> beans) {
+		List<Element> listenerElements = 
+			DomUtils.getChildElementsByTagName(element, "listener");
+		if (listenerElements != null) {
+			for (Element listenerElement : listenerElements) {
+				String id = listenerElement.getAttribute("id");
+				String listenerRef = listenerElement.getAttribute("ref");
+				String className = listenerElement.getAttribute("class");
+				if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
+						&& StringUtils.hasText(listenerRef)) {
+					NamedNodeMap attributeNodes = listenerElement.getAttributes();
+					StringBuilder attributes = new StringBuilder();
+					for (int i = 0; i < attributeNodes.getLength(); i++) {
+						if (i > 0) {
+							attributes.append(" ");
+						}
+						attributes.append(attributeNodes.item(i));
+					}
+					throw new BeanCreationException("Both 'id' or 'ref' plus 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
+							listenerElement.getTagName() + "> element with attributes: " + attributes);
+				}
+				if (StringUtils.hasText(listenerRef)) {
+			        BeanReference bean = new RuntimeBeanReference(listenerRef);
+					beans.add(bean);
+				}
+				else if (StringUtils.hasText(className)) {
+					RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
+					if (!StringUtils.hasText(id)) {
+						id = parserContext.getReaderContext().generateBeanName(beanDef);
+					}
+					parserContext.getRegistry().registerBeanDefinition(id, beanDef);
+			        BeanReference bean = new RuntimeBeanReference(id);
+					beans.add(bean);
+				}
+				else {
+					throw new BeanCreationException("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element");
+				}
+			}
 		}
 	}
 
