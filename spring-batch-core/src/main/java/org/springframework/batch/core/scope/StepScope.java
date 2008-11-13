@@ -152,16 +152,27 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * @throws BeansException if there is a problem.
 	 */
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+
 		beanFactory.registerScope(name, this);
+
 		Assert.state(beanFactory instanceof BeanDefinitionRegistry,
 				"BeanFactory was not a BeanDefinitionRegistry, so StepScope cannot be used.");
-		Scopifier scopifier = new Scopifier((BeanDefinitionRegistry) beanFactory, name, proxyTargetClass);
+		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
+
+		Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass);
+
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
 			// Replace this or any of its inner beans with scoped proxy if it
 			// has this scope
 			scopifier.visitBeanDefinition(definition);
+			if (name.equals(definition.getScope())) {
+				BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(new BeanDefinitionHolder(
+						definition, beanName), registry, proxyTargetClass);
+				registry.registerBeanDefinition(beanName, proxyHolder.getBeanDefinition());
+			}
 		}
+
 	}
 
 	/**

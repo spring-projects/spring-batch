@@ -6,6 +6,7 @@
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
 	<bean id="vanilla" class="org.springframework.batch.core.scope.TestStep">
 		<property name="collaborator">
 			<bean class="org.springframework.batch.core.scope.TestCollaborator">
@@ -13,6 +14,7 @@
 			</bean>
 		</property>
 	</bean>
+
 	<bean id="proxied" class="org.springframework.batch.core.scope.TestStep">
 		<property name="collaborator">
 			<bean class="org.springframework.batch.core.scope.TestCollaborator"
@@ -21,17 +23,20 @@
 			</bean>
 		</property>
 	</bean>
+
 	<bean id="enhanced" class="org.springframework.batch.core.scope.TestStep">
-		<property name="collaborator">
-			<bean class="org.springframework.batch.core.scope.TestCollaborator"
-				scope="step">
-				<property name="name" value="bar" />
-			</bean>
-		</property>
+		<property name="collaborator" ref="collaborator" />
 	</bean>
-	
-	
-	
+
+	<bean id="double" class="org.springframework.batch.core.scope.TestStep">
+		<property name="collaborator" ref="collaborator" />
+	</bean>
+
+	<bean id="collaborator" class="org.springframework.batch.core.scope.TestCollaborator"
+		scope="step">
+		<property name="name" value="bar" />
+	</bean>
+
 	<aop:aspectj-autoproxy />
 	<bean class="org.springframework.batch.core.scope.StepScopeManager" />
 	<bean class="org.springframework.batch.core.scope.StepScope" />

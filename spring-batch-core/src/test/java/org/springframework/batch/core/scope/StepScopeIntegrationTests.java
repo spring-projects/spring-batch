@@ -35,6 +35,10 @@ public class StepScopeIntegrationTests {
 	@Qualifier("enhanced")
 	private Step enhanced;
 
+	@Autowired
+	@Qualifier("double")
+	private Step doubleEnhanced;
+
 	@Before
 	@After
 	public void start() {
@@ -64,7 +68,25 @@ public class StepScopeIntegrationTests {
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("name", "spam");
 		stepExecution.setExecutionContext(executionContext);
-		enhanced.execute(stepExecution);
+		proxied.execute(stepExecution);
+		assertTrue(TestStep.getContext().attributeNames().length>0);
+		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
+		assertNotNull(collaborator);
+		assertEquals("bar", collaborator);
+	}
+
+	@Test
+	public void testScopedProxyForReference() throws Exception {
+		enhanced.execute(new StepExecution("foo",new JobExecution(11L)));
+		assertTrue(TestStep.getContext().attributeNames().length>0);
+		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
+		assertNotNull(collaborator);
+		assertEquals("bar", collaborator);
+	}
+
+	@Test
+	public void testScopedProxyForSecondReference() throws Exception {
+		doubleEnhanced.execute(new StepExecution("foo",new JobExecution(11L)));
 		assertTrue(TestStep.getContext().attributeNames().length>0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
