@@ -74,7 +74,13 @@ public class PartitionStep extends AbstractStep {
 		// Wait for task completion and then aggregate the results
 		Collection<StepExecution> executions = partitionHandler.handle(stepExecutionSplitter, stepExecution);
 		aggregator.aggregate(stepExecution, executions);
-		if (stepExecution.getStatus()!=BatchStatus.COMPLETED) {
+		
+		if (stepExecution.getJobExecution().isPaused()) {
+			return;
+		}
+
+		// If anything failed or had a problem we need to crap out
+		if (stepExecution.getStatus() != BatchStatus.COMPLETED) {
 			throw new JobExecutionException("Partition handler returned an incomplete step");
 		}
 

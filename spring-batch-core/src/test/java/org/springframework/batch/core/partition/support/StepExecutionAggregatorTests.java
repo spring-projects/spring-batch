@@ -44,6 +44,16 @@ public class StepExecutionAggregatorTests {
 	}
 
 	@Test
+	public void testAggregateStatusFromFailure() {
+		result.setStatus(BatchStatus.FAILED);
+		stepExecution1.setStatus(BatchStatus.COMPLETED);
+		stepExecution2.setStatus(BatchStatus.COMPLETED);
+		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
+		assertNotNull(result);
+		assertEquals(BatchStatus.FAILED, result.getStatus());
+	}
+
+	@Test
 	public void testAggregateStatusIncomplete() {
 		stepExecution1.setStatus(BatchStatus.COMPLETED);
 		stepExecution2.setStatus(BatchStatus.FAILED);

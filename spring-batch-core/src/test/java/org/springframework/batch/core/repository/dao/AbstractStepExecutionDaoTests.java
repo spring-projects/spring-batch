@@ -105,6 +105,8 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		
 		assertStepExecutionsAreEqual(stepExecution, retrieved);
 		assertNotNull(retrieved.getVersion());
+		assertNotNull(retrieved.getJobExecution());
+		assertNotNull(retrieved.getJobExecution().getId());
 		
 		assertNull(dao.getStepExecution(jobExecution, "not-existing step"));
 	}

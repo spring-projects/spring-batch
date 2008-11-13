@@ -33,8 +33,6 @@ public class StepExecutionAggregator {
 		if (executions == null || executions.isEmpty()) {
 			throw new IllegalArgumentException("Cannot aggregate empty or null executions: " + executions);
 		}
-		// Start with assumption that it is complete...
-		result.setStatus(BatchStatus.COMPLETED);
 		for (StepExecution stepExecution : executions) {
 			BatchStatus status = stepExecution.getStatus();
 			result.setStatus(BatchStatus.max(result.getStatus(), status));
