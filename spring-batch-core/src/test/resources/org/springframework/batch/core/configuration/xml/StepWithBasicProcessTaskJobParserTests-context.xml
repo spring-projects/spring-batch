@@ -8,8 +8,8 @@
 	
 	<job id="job">
 		<step name="ft-step">
-			<chunk reader="reader" processor="processor" writer="writer"
-					fault-tolerant="true" chunk-size="10" skip-limit="20" retry-limit="3">
+			<process-task reader="reader" processor="processor" writer="writer"
+					fault-tolerant="false" commit-interval="10">
 				<listeners>
 					<listener class="org.springframework.batch.core.configuration.xml.TestListener"/>
 					<listener ref="listener"/>
@@ -17,7 +17,7 @@
 				<streams>
 					<stream ref="reader"/>
 				</streams>
-			</chunk>
+			</process-task>
 		</step>
 	</job>
 

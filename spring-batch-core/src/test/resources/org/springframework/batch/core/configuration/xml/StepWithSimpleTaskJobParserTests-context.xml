@@ -8,11 +8,11 @@
 	
 	<job id="job">
 		<step name="step1">
-			<task tasklet="tasklet"/>
+			<simple-task tasklet="tasklet"/>
 			<next on="*" to="step2" />
 		</step>
 		<step name="step2">
-			<task tasklet="tasklet"/>
+			<simple-task tasklet="tasklet"/>
 		</step>
 	</job>
 

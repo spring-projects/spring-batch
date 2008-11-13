@@ -26,16 +26,11 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
-import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 
 
 /**
@@ -44,30 +39,16 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class StepWithSimpleChunkJobParserTests {
+public class StepWithSimpleTaskJobParserTests {
 	
 	@Autowired
 	private Job job;
 
 	@Autowired
 	private JobRepository jobRepository;
-		
-	@Autowired
-	private TestReader reader;
 	
 	@Autowired
-	@Qualifier("listener")
-	private TestListener listener;
-	
-	@Autowired
-	private TestProcessor processor;
-	
-	@Autowired
-	private TestWriter writer;
-	
-	@SuppressWarnings("unchecked")
-	@Autowired
-	private SimpleStepFactoryBean factory;
+	private AbstractTestComponent tasklet;
 	
 	@Before
 	public void setUp() {
@@ -77,20 +58,10 @@ public class StepWithSimpleChunkJobParserTests {
 	@Test
 	public void testStepWithTask() throws Exception {
 		assertNotNull(job);
-		Object ci = ReflectionTestUtils.getField(factory, "commitInterval");
-		assertEquals("wrong chunk-size:", 10, ci);
-		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
-		assertEquals("wrong number of listeners:", 2, ((StepListener[])listeners).length);
-		Object streams = ReflectionTestUtils.getField(factory, "streams");
-		assertEquals("wrong number of streams:", 1, ((ItemStream[])streams).length);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(1, jobExecution.getStepExecutions().size());
-		assertTrue(reader.isExecuted());
-		assertTrue(reader.isOpened());
-		assertTrue(processor.isExecuted());
-		assertTrue(writer.isExecuted());
-		assertTrue(listener.isExecuted());
+		assertEquals(2, jobExecution.getStepExecutions().size());
+		assertTrue(tasklet.isExecuted());
 	}
 }

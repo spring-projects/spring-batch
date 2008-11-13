@@ -70,16 +70,16 @@ public class StepParser {
 		String stepRef = element.getAttribute("name");
 
 		@SuppressWarnings("unchecked")
-		List<Element> taskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "task");
+		List<Element> simpleTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "simple-task");
 		@SuppressWarnings("unchecked")
-		List<Element> chunkElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "chunk");
-		if (taskElements.size() > 0) {
-			Object task = parseTask(taskElements.get(0), parserContext);
+		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "process-task");
+		if (simpleTaskElements.size() > 0) {
+			Object task = parseSimpleTask(simpleTaskElements.get(0), parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
-		else if (chunkElements.size() > 0) {
-			Object task = parseChunk(chunkElements.get(0), parserContext);
+		else if (processTaskElements.size() > 0) {
+			Object task = parseProcessTask(processTaskElements.get(0), parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
@@ -196,7 +196,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition parseChunk(Element element, ParserContext parserContext) {
+	protected RootBeanDefinition parseProcessTask(Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd;
     	
@@ -237,7 +237,7 @@ public class StepParser {
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
         bd.getPropertyValues().addPropertyValue("transactionManager", tx);
 
-        String commitInterval = element.getAttribute("chunk-size");
+        String commitInterval = element.getAttribute("commit-interval");
         if (StringUtils.hasText(commitInterval)) {
             bd.getPropertyValues().addPropertyValue("commitInterval", commitInterval);
         }
@@ -374,7 +374,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition parseTask(Element element, ParserContext parserContext) {
+	protected RootBeanDefinition parseSimpleTask(Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
 

@@ -8,7 +8,7 @@
 	
 	<job id="job">
 		<step name="step1">
-			<task tasklet="tasklet"/>
+			<simple-task tasklet="tasklet"/>
 		</step>
 		<listeners>
 			<listener after-method="afterJob" ref="testListener"/>

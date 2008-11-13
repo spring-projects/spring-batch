@@ -26,11 +26,10 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +44,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class StepWithFaultTolerantChunkJobParserTests {
+public class StepWithBasicProcessTaskJobParserTests {
 	
 	@Autowired
 	private Job job;
@@ -68,7 +67,7 @@ public class StepWithFaultTolerantChunkJobParserTests {
 	
 	@SuppressWarnings("unchecked")
 	@Autowired
-	private FaultTolerantStepFactoryBean factory;
+	private SimpleStepFactoryBean factory;
 	
 	@Before
 	public void setUp() {
@@ -80,10 +79,6 @@ public class StepWithFaultTolerantChunkJobParserTests {
 		assertNotNull(job);
 		Object ci = ReflectionTestUtils.getField(factory, "commitInterval");
 		assertEquals("wrong chunk-size:", 10, ci);
-		Object sl = ReflectionTestUtils.getField(factory, "skipLimit");
-		assertEquals("wrong skip-limit:", 20, sl);
-		Object rl = ReflectionTestUtils.getField(factory, "retryLimit");
-		assertEquals("wrong retry-limit:", 3, rl);
 		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
 		assertEquals("wrong number of listeners:", 2, ((StepListener[])listeners).length);
 		Object streams = ReflectionTestUtils.getField(factory, "streams");

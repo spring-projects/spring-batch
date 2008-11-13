@@ -202,20 +202,8 @@
 			<xsd:extension base="nextType">
 				<xsd:sequence>
 					<xsd:choice>
-						<xsd:element name="chunk" minOccurs="0" maxOccurs="1">
-							<xsd:complexType>
-								<xsd:complexContent>
-									<xsd:extension base="chunkType"/>
-								</xsd:complexContent>
-							</xsd:complexType>
-						</xsd:element>
-						<xsd:element name="task" minOccurs="0" maxOccurs="1">
-							<xsd:complexType>
-								<xsd:complexContent>
-									<xsd:extension base="taskType"/>
-								</xsd:complexContent>
-							</xsd:complexType>
-						</xsd:element>
+						<xsd:element name="process-task" type="processTaskType" minOccurs="0" maxOccurs="1"/>
+						<xsd:element name="simple-task" type="simpleTaskType" minOccurs="0" maxOccurs="1"/>
 					</xsd:choice>
 					<xsd:group ref="transitions"/>
 				</xsd:sequence>
@@ -232,7 +220,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="taskType">
+	<xsd:complexType name="simpleTaskType">
 		<xsd:complexContent>
 			<xsd:extension base="stepDefType">
 				<xsd:attribute name="tasklet" type="xsd:string" use="required">
@@ -246,7 +234,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="chunkType">
+	<xsd:complexType name="processTaskType">
 		<xsd:complexContent>
 			<xsd:extension base="stepDefType">
 				<xsd:sequence>
@@ -259,13 +247,20 @@
 						</xsd:annotation>
 						<xsd:complexType>
 							<xsd:sequence>
-								<xsd:element name="listener" minOccurs="1" maxOccurs="unbounded">
-									<xsd:complexType>
-										<xsd:attribute name="id" type="xsd:ID"/>
-										<xsd:attribute name="ref" type="xsd:string"/>
-										<xsd:attribute name="class" type="xsd:string"/>
-									</xsd:complexType>
-								</xsd:element>
+								<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="retryListeners" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							List of all listeners for the step definition
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded"/>
 							</xsd:sequence>
 						</xsd:complexType>
 					</xsd:element>
@@ -285,6 +280,18 @@
 								</xsd:element>
 							</xsd:sequence>
 						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="transaction-attributes" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							The transaction attributes to be used for the transaction used during the execution
+							of the task within the step.
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string"/>
+						</xsd:simpleType>
 					</xsd:element>
 					<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
@@ -320,7 +327,7 @@
 						</xsd:simpleType>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="chunk-size" type="xsd:integer" use="required">
+				<xsd:attribute name="commit-interval" type="xsd:integer" use="required">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The number of items that will be processed before commit is called for the transaction.
@@ -370,6 +377,35 @@
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
+				<xsd:attribute name="cache-capacity" type="xsd:integer" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The capacity of the cache in the retry policy.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="is-reader-transactional-queue" type="xsd:boolean" default="false" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						Whether the reader is a transactional queue. If it is then items read should not be cached 
+						in the event of a rollback since they will be returned to the queue.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="task-executor" type="xsd:string" use="optional">
+					<xsd:annotation>
+						<xsd:documentation
+							source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
+						The task executor responsible for executing the task..
+						]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref">
+								<tool:expected-type
+									type="org.springframework.core.task.TaskExecutor" />
+							</tool:annotation>
+						</xsd:appinfo>
+					</xsd:annotation>
+				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -395,6 +431,18 @@
 				<xsd:group ref="transitions"/>
 			</xsd:extension>
 		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="listenerType">
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="ref" type="xsd:string"/>
+		<xsd:attribute name="class" type="xsd:string"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="jobExecutionListenerType">
+		<xsd:attribute name="before-method" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="after-method" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="ref" type="xsd:string" use="required"></xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:group name="transitions">
@@ -510,7 +558,7 @@
 				if the bean name of the desired TransactionManager is not 'transactionManager'.
 				]]></xsd:documentation>
 				<xsd:appinfo>
-					`<tool:annotation kind="ref">
+					<tool:annotation kind="ref">
 						<tool:expected-type
 							type="org.springframework.transaction.PlatformTransactionManager" />
 					</tool:annotation>
@@ -519,10 +567,4 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
-
-	<xsd:complexType name="jobExecutionListenerType">
-		<xsd:attribute name="before-method" type="xsd:string"></xsd:attribute>
-		<xsd:attribute name="after-method" type="xsd:string"></xsd:attribute>
-		<xsd:attribute name="ref" type="xsd:string" use="required"></xsd:attribute>
-	</xsd:complexType>
 </xsd:schema>
