@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<bean id="vanilla"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="bar" />
+	</bean>
+
+	<bean id="simple"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="simpleTarget" />
+	</bean>
+
+	<bean id="compound"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="compoundTarget" />
+	</bean>
+
+	<bean id="ref"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="refTarget" />
+	</bean>
+
+	<bean id="value"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="valueTarget" />
+	</bean>
+
+	<bean id="withLong"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withLongTarget" />
+	</bean>
+
+	<bean id="withInteger"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withIntegerTarget" />
+	</bean>
+
+	<bean id="withDate"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withDateTarget" />
+	</bean>
+
+	<bean id="context"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests" />
+
+	<bean id="bar"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo">
+		<property name="name" value="foo" />
+	</bean>
+
+	<bean id="simpleTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="name" value="#{map['foo.foo']}" />
+	</bean>
+
+	<bean id="compoundTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="name" value="#{foo}-bar" />
+	</bean>
+
+	<bean id="refTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="parent" ref="#{foo}" />
+	</bean>
+
+	<bean id="valueTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="parent" value="#{parent}" />
+	</bean>
+
+	<bean id="withLongTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="name" value="bar-#{long}" />
+	</bean>
+
+	<bean id="withIntegerTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="name" value="bar-#{integer}" />
+	</bean>
+
+	<bean id="withDateTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="name" value="bar-#{date}" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="java.util.Date">
+					<bean class="org.springframework.beans.propertyeditors.CustomDateEditor">
+						<constructor-arg>
+							<bean class="java.text.SimpleDateFormat">
+								<constructor-arg value="yyyy/MM/dd" />
+							</bean>
+						</constructor-arg>
+						<constructor-arg value="false"/>
+					</bean>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

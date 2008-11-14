@@ -42,7 +42,7 @@ public class StepScopeTests {
 
 	private StepScope scope = new StepScope();
 
-	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L));
+	private StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
 
 	private StepContext context;
 
@@ -124,13 +124,6 @@ public class StepScopeTests {
 	public void testGetConversationId() {
 		String id = scope.getConversationId();
 		assertNotNull(id);
-	}
-
-	@Test
-	public void testGetConversationIdFromAttribute() {
-		context.setAttribute(StepScope.ID_KEY, "foo");
-		String id = scope.getConversationId();
-		assertEquals("foo", id);
 	}
 
 	@Test

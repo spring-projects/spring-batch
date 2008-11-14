@@ -48,14 +48,14 @@ public class StepScopeIntegrationTests {
 		
 	@Test
 	public void testScopeCreation() throws Exception {
-		vanilla.execute(new StepExecution("foo",new JobExecution(11L)));
+		vanilla.execute(new StepExecution("foo",new JobExecution(11L),12L));
 		assertNotNull(TestStep.getContext());
 		assertNull(StepSynchronizationManager.getContext());
 	}
 
 	@Test
 	public void testScopedProxy() throws Exception {
-		proxied.execute(new StepExecution("foo",new JobExecution(11L)));
+		proxied.execute(new StepExecution("foo",new JobExecution(11L),31L));
 		assertTrue(TestStep.getContext().attributeNames().length>0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -64,7 +64,7 @@ public class StepScopeIntegrationTests {
 
 	@Test
 	public void testExecutionContext() throws Exception {
-		StepExecution stepExecution = new StepExecution("foo",new JobExecution(11L));
+		StepExecution stepExecution = new StepExecution("foo",new JobExecution(11L), 1L);
 		ExecutionContext executionContext = new ExecutionContext();
 		executionContext.put("name", "spam");
 		stepExecution.setExecutionContext(executionContext);
@@ -77,7 +77,7 @@ public class StepScopeIntegrationTests {
 
 	@Test
 	public void testScopedProxyForReference() throws Exception {
-		enhanced.execute(new StepExecution("foo",new JobExecution(11L)));
+		enhanced.execute(new StepExecution("foo",new JobExecution(11L),123L));
 		assertTrue(TestStep.getContext().attributeNames().length>0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);
@@ -86,7 +86,7 @@ public class StepScopeIntegrationTests {
 
 	@Test
 	public void testScopedProxyForSecondReference() throws Exception {
-		doubleEnhanced.execute(new StepExecution("foo",new JobExecution(11L)));
+		doubleEnhanced.execute(new StepExecution("foo",new JobExecution(11L),321L));
 		assertTrue(TestStep.getContext().attributeNames().length>0);
 		String collaborator = (String) TestStep.getContext().getAttribute("collaborator");
 		assertNotNull(collaborator);

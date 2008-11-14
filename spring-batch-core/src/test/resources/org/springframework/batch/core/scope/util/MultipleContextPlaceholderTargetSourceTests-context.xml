@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<bean id="simple" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="targetSource">
+			<bean
+				class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+				<property name="contextFactory" ref="context" />
+				<property name="targetBeanName" value="simpleTarget" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="list" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="targetSource">
+			<bean
+				class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+				<property name="contextFactory" ref="context" />
+				<property name="targetBeanName" value="listTarget" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="simpleTarget" class="org.springframework.batch.core.scope.util.MultipleContextPlaceholderTargetSourceTests$TestBean">
+		<property name="name" value="#{attributes[foo]}" />
+	</bean>
+
+	<bean id="listTarget" class="org.springframework.batch.core.scope.util.MultipleContextPlaceholderTargetSourceTests$TestBean">
+		<property name="names" value="#{attributes[foo]}" />
+	</bean>
+
+	<bean id="context"
+		class="org.springframework.batch.core.scope.util.MultipleContextPlaceholderTargetSourceTests$SimpleContextFactory" />
+
+</beans>

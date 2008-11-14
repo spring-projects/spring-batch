@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<bean id="simple" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="targetSource">
+			<bean
+				class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+				<property name="contextFactory" ref="context" />
+				<property name="targetBeanName" value="simpleTarget" />
+			</bean>
+		</property>
+		<property name="interfaces" value="org.springframework.batch.core.scope.util.SimplePlaceholderTargetSourceTests$Node"/>
+	</bean>
+
+	<bean id="simpleTarget"
+		class="org.springframework.batch.core.scope.util.SimplePlaceholderTargetSourceTests$Foo"
+		lazy-init="true" autowire-candidate="false">
+		<property name="name" value="#{foo}" />
+	</bean>
+
+	<bean id="context"
+		class="org.springframework.batch.core.scope.util.SimplePlaceholderTargetSourceTests$SimpleContextFactory" />
+
+</beans>

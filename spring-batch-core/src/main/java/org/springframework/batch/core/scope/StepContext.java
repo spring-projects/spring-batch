@@ -22,9 +22,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import org.springframework.batch.core.JobParameter;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.util.Assert;
 
@@ -50,6 +54,39 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		super();
 		Assert.notNull(stepExecution, "A StepContext must have a non-null StepExecution");
 		this.stepExecution = stepExecution;
+	}
+
+	/**
+	 * @return a map containing the items from the step {@link ExecutionContext}
+	 */
+	public Map<String, Object> getStepExecutionContext() {
+		Map<String, Object> result = new HashMap<String, Object>();
+		for (Entry<String, Object> entry : stepExecution.getExecutionContext().entrySet()) {
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return Collections.unmodifiableMap(result);
+	}
+
+	/**
+	 * @return a map containing the items from the job {@link ExecutionContext}
+	 */
+	public Map<String, Object> getJobExecutionContext() {
+		Map<String, Object> result = new HashMap<String, Object>();
+		for (Entry<String, Object> entry : stepExecution.getJobExecution().getExecutionContext().entrySet()) {
+			result.put(entry.getKey(), entry.getValue());
+		}
+		return Collections.unmodifiableMap(result);
+	}
+
+	/**
+	 * @return a map containing the items from the {@link JobParameters}
+	 */
+	public Map<String, Object> getJobParameters() {
+		Map<String, Object> result = new HashMap<String, Object>();
+		for (Entry<String, JobParameter> entry : stepExecution.getJobParameters().getParameters().entrySet()) {
+			result.put(entry.getKey(), entry.getValue().getValue());
+		}
+		return Collections.unmodifiableMap(result);
 	}
 
 	/**
@@ -136,6 +173,15 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	}
 
 	/**
+	 * @return unique identifier for this context based on the step execution
+	 */
+	public String getId() {
+		Assert.state(stepExecution.getId() != null, "StepExecution has no id.  "
+				+ "It must be saved before it can be used in step scope.");
+		return "execution#" + stepExecution.getId();
+	}
+
+	/**
 	 * Extend the base class method to include the step execution itself as a
 	 * key (i.e. two contexts are only equal if their step executions are the
 	 * same).
@@ -164,6 +210,12 @@ public class StepContext extends SynchronizedAttributeAccessor {
 	@Override
 	public int hashCode() {
 		return stepExecution.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", stepExecutionContext=" + getStepExecutionContext() + ", jobExecutionContext="
+				+ getJobExecutionContext() + ", jobParameters=" + getJobParameters();
 	}
 
 }

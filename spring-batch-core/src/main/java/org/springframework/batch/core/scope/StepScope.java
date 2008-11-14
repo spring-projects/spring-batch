@@ -17,7 +17,10 @@ package org.springframework.batch.core.scope;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.aop.scope.ScopedProxyUtils;
+import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
+import org.springframework.batch.core.scope.util.PlaceholderProxyFactoryBean;
+import org.springframework.batch.core.scope.util.StepContextFactory;
+import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -28,14 +31,44 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 import org.springframework.util.StringValueResolver;
 
 /**
- * Scope for step context. Objects in this scope with &lt;aop:scoped-proxy/&gt;
- * use the Spring container as an object factory, so there is only one instance
- * of such a bean per executing step.
+ * Scope for step context. Objects in this scope use the Spring container as an
+ * object factory, so there is only one instance of such a bean per executing
+ * step. All objects in this scope are &lt;aop:scoped-proxy/&gt; (no need to
+ * decorate the bean definitions).<br/>
+ * <br/>
+ * 
+ * In addition, support is provided for late binding of references accessible
+ * from the {@link StepContext} using #{..} placeholders. Using this feature,
+ * bean properties can be pulled from the step or job execution context and the
+ * job parameters. E.g.
+ * 
+ * <pre>
+ * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
+ * 	&lt;property name=&quot;parent&quot; ref=&quot;#{stepExecutionContext[helper]}&quot; /&gt;
+ * &lt;/bean&gt;
+ * 
+ * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
+ * 	&lt;property name=&quot;name&quot; value=&quot;#{stepExecutionContext['input.name']}&quot; /&gt;
+ * &lt;/bean&gt;
+ * 
+ * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
+ * 	&lt;property name=&quot;name&quot; value=&quot;#{jobParameters[input]}&quot; /&gt;
+ * &lt;/bean&gt;
+ * 
+ * &lt;bean id=&quot;...&quot; class=&quot;...&quot; scope=&quot;step&quot;&gt;
+ * 	&lt;property name=&quot;name&quot; value=&quot;#{jobExecutionContext['input.stem']}.txt&quot; /&gt;
+ * &lt;/bean&gt;
+ * </pre>
+ * 
+ * The {@link StepContext} is referenced using standard bean property paths (as
+ * per {@link BeanWrapper}). The examples above all show the use of the Map
+ * accessors provided as a convenience for step and job attributes.
  * 
  * @author Dave Syer
  * 
@@ -106,8 +139,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 */
 	public String getConversationId() {
 		StepContext context = getContext();
-		Object id = context.getAttribute(ID_KEY);
-		return "" + id;
+		return context.getId();
 	}
 
 	/**
@@ -167,9 +199,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 			// has this scope
 			scopifier.visitBeanDefinition(definition);
 			if (name.equals(definition.getScope())) {
-				BeanDefinitionHolder proxyHolder = ScopedProxyUtils.createScopedProxy(new BeanDefinitionHolder(
-						definition, beanName), registry, proxyTargetClass);
-				registry.registerBeanDefinition(beanName, proxyHolder.getBeanDefinition());
+				createScopedProxy(beanName, definition, registry, proxyTargetClass);
 			}
 		}
 
@@ -186,9 +216,77 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	}
 
 	/**
-	 * Helper class to scan a bean definition hierarchy looking for scoped
-	 * objects and modifying their properties. In particular it forces the use
-	 * of auto-proxy for step scoped beans.
+	 * Wrap a target bean definition in a proxy that defers initialization until
+	 * after the {@link StepContext} is available. Amounts to adding
+	 * &lt;aop-auto-proxy/&gt; to a step scoped bean. Also if Spring EL is not
+	 * available will enable a weak version of late binding as described in the
+	 * class-level docs.
+	 * 
+	 * @param beanName the bean name to replace
+	 * @param definition the bean definition to replace
+	 * @param registry the enclosing {@link BeanDefinitionRegistry}
+	 * @param proxyTargetClass true if we need to force use of dynamic
+	 * subclasses
+	 * @return a {@link BeanDefinitionHolder} for the new representation of the
+	 * target. Caller should register it if needed to be visible at top level in
+	 * bean factory.
+	 */
+	private static BeanDefinitionHolder createScopedProxy(String beanName, BeanDefinition definition,
+			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
+
+		// TODO: detect presence of Spring 3.0 and use ScopedPoxyUtils instead
+
+		// Create the scoped proxy...
+		BeanDefinitionHolder proxyHolder = createScopedProxy(new BeanDefinitionHolder(definition, beanName), registry,
+				proxyTargetClass);
+		// ...and register it under the original target name
+		registry.registerBeanDefinition(beanName, proxyHolder.getBeanDefinition());
+
+		return proxyHolder;
+
+	}
+
+	private static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
+			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
+
+		String originalBeanName = definition.getBeanName();
+		BeanDefinition targetDefinition = definition.getBeanDefinition();
+
+		// Create a proxy definition for the original bean name,
+		// "hiding" the target bean in an internal target definition.
+		RootBeanDefinition proxyDefinition = new RootBeanDefinition(PlaceholderProxyFactoryBean.class);
+		proxyDefinition.getConstructorArgumentValues().addGenericArgumentValue(new StepContextFactory());
+		proxyDefinition.setOriginatingBeanDefinition(definition.getBeanDefinition());
+		proxyDefinition.setSource(definition.getSource());
+		proxyDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+
+		String targetBeanName = "lazyBindingProxy." + originalBeanName;
+		proxyDefinition.getPropertyValues().addPropertyValue("targetBeanName", targetBeanName);
+
+		if (proxyTargetClass) {
+			targetDefinition.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
+			// ProxyFactoryBean's "proxyTargetClass" default is TRUE, so we
+			// don't need to set it explicitly here.
+		}
+		else {
+			proxyDefinition.getPropertyValues().addPropertyValue("proxyTargetClass", Boolean.FALSE);
+		}
+
+		proxyDefinition.setAutowireCandidate(targetDefinition.isAutowireCandidate());
+		// The target bean should be ignored in favor of the proxy.
+		targetDefinition.setAutowireCandidate(false);
+
+		// Register the target bean as separate bean in the factory.
+		registry.registerBeanDefinition(targetBeanName, targetDefinition);
+
+		// Return the scoped proxy definition as primary bean definition
+		// (potentially an inner bean).
+		return new BeanDefinitionHolder(proxyDefinition, originalBeanName, definition.getAliases());
+	}
+
+	/**
+	 * Helper class to scan a bean definition hierarchy and force the use of
+	 * auto-proxy for step scoped beans.
 	 * 
 	 * @author Dave Syer
 	 * 
@@ -218,14 +316,14 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				BeanDefinition definition = (BeanDefinition) value;
 				if (scope.equals(definition.getScope())) {
 					String beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
-					return ScopedProxyUtils.createScopedProxy(new BeanDefinitionHolder(definition, beanName), registry,
-							proxyTargetClass);
+					return createScopedProxy(beanName, definition, registry, proxyTargetClass);
 				}
 			}
 			else if (value instanceof BeanDefinitionHolder) {
-				BeanDefinitionHolder definition = (BeanDefinitionHolder) value;
-				if (scope.equals(definition.getBeanDefinition().getScope())) {
-					return ScopedProxyUtils.createScopedProxy(definition, registry, proxyTargetClass);
+				BeanDefinitionHolder holder = (BeanDefinitionHolder) value;
+				BeanDefinition definition = holder.getBeanDefinition();
+				if (scope.equals(definition.getScope())) {
+					return createScopedProxy(holder.getBeanName(), definition, registry, proxyTargetClass);
 				}
 			}
 			return value;

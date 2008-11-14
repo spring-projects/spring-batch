@@ -26,7 +26,11 @@ import java.util.List;
 
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
@@ -36,7 +40,7 @@ public class StepContextTests {
 
 	private List<String> list = new ArrayList<String>();
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(0L));
+	private StepExecution stepExecution = new StepExecution("step", new JobExecution(0L), 1L);
 
 	private StepContext context = new StepContext(stepExecution);
 
@@ -126,6 +130,39 @@ public class StepContextTests {
 		assertEquals(2, list.size());
 		assertTrue(list.contains("bar"));
 		assertTrue(list.contains("spam"));
+	}
+
+	@Test
+	public void testStepExecutionContext() throws Exception {
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		executionContext.put("foo", "bar");
+		assertEquals("bar", context.getStepExecutionContext().get("foo"));
+	}
+
+	@Test
+	public void testJobExecutionContext() throws Exception {
+		ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
+		executionContext.put("foo", "bar");
+		assertEquals("bar", context.getJobExecutionContext().get("foo"));
+	}
+
+	@Test
+	public void testJobParameters() throws Exception {
+		JobParameters jobParameters = new JobParametersBuilder().addString("foo", "bar").toJobParameters();
+		JobInstance jobInstance = new JobInstance(0L, jobParameters, "foo");
+		stepExecution.getJobExecution().setJobInstance(jobInstance);
+		assertEquals("bar", context.getJobParameters().get("foo"));
+	}
+
+	@Test
+	public void testContextId() throws Exception {
+		assertEquals("execution#1", context.getId());
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testIllegalContextId() throws Exception {
+		context = new StepContext(new StepExecution("foo", new JobExecution(0L)));
+		context.getId();
 	}
 
 }
