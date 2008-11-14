@@ -281,18 +281,6 @@
 							</xsd:sequence>
 						</xsd:complexType>
 					</xsd:element>
-					<xsd:element name="transaction-attributes" minOccurs="0" maxOccurs="1">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-							The transaction attributes to be used for the transaction used during the execution
-							of the task within the step.
-							]]>
-							</xsd:documentation>
-						</xsd:annotation>
-						<xsd:simpleType>
-							<xsd:restriction base="xsd:string"/>
-						</xsd:simpleType>
-					</xsd:element>
 					<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
@@ -381,6 +369,14 @@
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The capacity of the cache in the retry policy.
+						]]></xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="transaction-attribute" type="xsd:string" use="optional">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						The transaction attributes to be used for the transaction used during the execution
+						of the task within the step.
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>

@@ -15,7 +15,6 @@ public class TestRetryListener extends AbstractTestComponent implements RetryLis
 	}
 
 	public <T> boolean open(RetryContext context, RetryCallback<T> callback) {
-		System.out.println("RETRY RETRY RETRY RETRY");
 		executed = true;
 		return true;
 	}

@@ -229,6 +229,12 @@ public class StepParser {
             bd.getPropertyValues().addPropertyValue("itemWriter", writerRef);
         }
 
+        String taskExecutorBeanId = element.getAttribute("task-executor");
+        if (StringUtils.hasText(taskExecutorBeanId)) {
+            RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
+            bd.getPropertyValues().addPropertyValue("taskExecutor", taskExecutorRef);
+        }
+
         String jobRepository = element.getAttribute("job-repository");
         RuntimeBeanReference jobRepositoryRef = new RuntimeBeanReference(jobRepository);
         bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryRef);
@@ -245,7 +251,7 @@ public class StepParser {
         String skipLimit = element.getAttribute("skip-limit");
         if (StringUtils.hasText(skipLimit)) {
         	if (!isFaultTolerant) {
-				throw new BeanCreationException("skip-limit can only be specified if fault-tolerant is set to 'true'");
+				throw new BeanCreationException("skip-limit can only be specified if fault-tolerant is set to \"true\"");
         	}
             bd.getPropertyValues().addPropertyValue("skipLimit", skipLimit);
         }
@@ -253,9 +259,33 @@ public class StepParser {
         String retryLimit = element.getAttribute("retry-limit");
         if (StringUtils.hasText(retryLimit)) {
         	if (!isFaultTolerant) {
-				throw new BeanCreationException("retry-limit can only be specified if fault-tolerant is set to 'true'");
+				throw new BeanCreationException("retry-limit can only be specified if fault-tolerant is set to \"true\"");
         	}
             bd.getPropertyValues().addPropertyValue("retryLimit", retryLimit);
+        }
+
+        String cacheCapacity = element.getAttribute("cache-capacity");
+        if (StringUtils.hasText(cacheCapacity)) {
+        	if (!isFaultTolerant) {
+				throw new BeanCreationException("cache-capacity can only be specified if fault-tolerant is set to \"true\"");
+        	}
+            bd.getPropertyValues().addPropertyValue("cacheCapacity", cacheCapacity);
+        }
+
+        String transactionAttribute = element.getAttribute("transaction-attribute");
+        if (StringUtils.hasText(transactionAttribute)) {
+        	handleTransactionAttributesElement(element, bd);
+            bd.getPropertyValues().addPropertyValue("transactionAttribute", transactionAttribute);
+        }
+
+        String isReaderTransactionalQueue = element.getAttribute("is-reader-transactional-queue");
+        if (StringUtils.hasText(isReaderTransactionalQueue)) {
+        	if (!isFaultTolerant && "true".equals(isReaderTransactionalQueue)) {
+				throw new BeanCreationException("is-reader-transactional-queue=\"true\" can only be specified if fault-tolerant is set to \"true\"");
+        	}
+        	if (isFaultTolerant) {
+        		bd.getPropertyValues().addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
+        	}
         }
 
         handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses", isFaultTolerant);
@@ -279,13 +309,16 @@ public class StepParser {
 
 	}
 
+	private void handleTransactionAttributesElement(Element element, RootBeanDefinition bd) {
+	}
+
 	private void handleExceptionElement(Element element, RootBeanDefinition bd, 
 			String attributeName, String propertyName, boolean isFaultTolerant) {
 		String exceptions = 
         	DomUtils.getChildElementValueByTagName(element, attributeName);
         if (StringUtils.hasLength(exceptions)) {
         	if (!isFaultTolerant) {
-				throw new BeanCreationException(attributeName + " can only be specified if fault-tolerant is set to 'true'");
+				throw new BeanCreationException(attributeName + " can only be specified if fault-tolerant is set to \"true\"");
         	}
 	        String[] exceptionArray = StringUtils.tokenizeToStringArray(
 	        		StringUtils.delete(exceptions, ","), "\n");

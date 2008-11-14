@@ -34,9 +34,13 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.interceptor.RollbackRuleAttribute;
+import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 
 
 /**
@@ -87,6 +91,23 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		assertEquals("wrong skip-limit:", 20, sl);
 		Object rl = ReflectionTestUtils.getField(factory, "retryLimit");
 		assertEquals("wrong retry-limit:", 3, rl);
+		Object cc = ReflectionTestUtils.getField(factory, "cacheCapacity");
+		assertEquals("wrong cache-capacity:", 100, cc);
+		Object txa = ReflectionTestUtils.getField(factory, "transactionAttribute");
+		assertEquals("wrong transaction-attribute:", TransactionDefinition.PROPAGATION_REQUIRED,
+				((RuleBasedTransactionAttribute)txa).getPropagationBehavior());
+		assertEquals("wrong transaction-attribute:", TransactionDefinition.ISOLATION_DEFAULT,
+				((RuleBasedTransactionAttribute)txa).getIsolationLevel());
+		assertEquals("wrong transaction-attribute:", 10,
+				((RuleBasedTransactionAttribute)txa).getTimeout());
+		RollbackRuleAttribute rra = 
+			(RollbackRuleAttribute) ((RuleBasedTransactionAttribute)txa).getRollbackRules().get(0);
+		assertEquals("wrong transaction-attribute:", 
+				"org.springframework.dao.DataIntegrityViolationException", rra.getExceptionName());
+		Object txq = ReflectionTestUtils.getField(factory, "isReaderTransactionalQueue");
+		assertEquals("wrong is-reader-transactional-queue:", true, txq);
+		Object te = ReflectionTestUtils.getField(factory, "taskExecutor");
+		assertEquals("wrong task-executor:", ConcurrentTaskExecutor.class, te.getClass());
 		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
 		assertEquals("wrong number of listeners:", 2, ((StepListener[])listeners).length);
 		Object retryListeners = ReflectionTestUtils.getField(factory, "retryListeners");

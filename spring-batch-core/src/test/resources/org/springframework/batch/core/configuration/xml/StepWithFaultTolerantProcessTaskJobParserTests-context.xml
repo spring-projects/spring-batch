@@ -7,9 +7,13 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step name="ft-step">
+		<step name="step">
 			<process-task reader="reader" processor="processor" writer="writer"
-					fault-tolerant="true" commit-interval="10" skip-limit="20" retry-limit="3">
+					fault-tolerant="true" commit-interval="10" skip-limit="20" 
+					retry-limit="3" cache-capacity="100"
+					transaction-attribute="PROPAGATION_REQUIRED,ISOLATION_DEFAULT,timeout_10,-org.springframework.dao.DataIntegrityViolationException" 
+					is-reader-transactional-queue="true"
+					task-executor="taskExecutor">
 				<listeners>
 					<listener class="org.springframework.batch.core.configuration.xml.TestListener"/>
 					<listener ref="listener"/>
@@ -31,5 +35,7 @@
 	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
 
 	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+	
+	<beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor"/>
 
 </beans:beans>
