@@ -37,10 +37,12 @@ public class EndState extends AbstractState {
 		JobExecution jobExecution = executor.getJobExecution();
 		// If there are no step executions, then we are at the beginning of a
 		// restart
-		if (!jobExecution.getStepExecutions().isEmpty()) {
-			jobExecution.upgradeStatus(status);
+		synchronized (jobExecution) {
+			if (!jobExecution.getStepExecutions().isEmpty()) {
+				jobExecution.upgradeStatus(status);
+			}
+			return FlowExecution.COMPLETED;
 		}
-		return FlowExecution.COMPLETED;
 	}
 
 }

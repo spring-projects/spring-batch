@@ -26,15 +26,16 @@ public class PauseState extends AbstractState {
 		// This state is just a toggle for the status of the job execution. If
 		// not already paused we pause it, and expect the flow to respect the
 		// status.
-		if (!jobExecution.isPaused()) {
-			jobExecution.pause();
-			return FlowExecution.PAUSED;
-		}
-		
-		// ...otherwise set the status to show that it has resumed
-		jobExecution.setStatus(BatchStatus.STARTED);
-		return FlowExecution.COMPLETED;
+		synchronized (jobExecution) {
+			if (!jobExecution.isPaused()) {
+				jobExecution.pause();
+				return FlowExecution.PAUSED;
+			}
 
+			// ...otherwise set the status to show that it has resumed
+			jobExecution.setStatus(BatchStatus.STARTED);
+			return FlowExecution.COMPLETED;
+		}
 	}
 
 }
