@@ -23,7 +23,7 @@ public abstract class NonSequentialJobFunctionalTestsBase extends AbstractJobTes
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
 	@Before
-	protected void removeOldData() throws Exception {
+	public void removeOldData() throws Exception {
 		simpleJdbcTemplate.update("DELETE FROM PLAYERS");
 		simpleJdbcTemplate.update("DELETE FROM GAMES");
 		simpleJdbcTemplate.update("DELETE FROM PLAYER_SUMMARY");
