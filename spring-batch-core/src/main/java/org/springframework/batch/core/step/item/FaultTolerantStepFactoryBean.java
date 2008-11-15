@@ -232,10 +232,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			// Co-ordinate the retry policy with the exception handler:
 			RepeatOperations stepOperations = getStepOperations();
 			if (stepOperations instanceof RepeatTemplate) {
-				SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicy,
-						getExceptionHandler(), fatalExceptionClasses);
-				((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
-				retryTemplate.registerListener(exceptionHandler);
+				((RepeatTemplate) stepOperations).setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy,
+						getExceptionHandler(), fatalExceptionClasses));
 			}
 
 			if (retryContextCache == null) {
