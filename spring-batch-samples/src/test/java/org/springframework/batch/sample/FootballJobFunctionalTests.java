@@ -32,7 +32,7 @@ public class FootballJobFunctionalTests extends AbstractValidatingBatchLauncherT
 	@Override
 	protected void validatePostConditions() throws Exception {
 		int count = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
-		assertTrue(count>0);
+		assertTrue(count > 0);
 	}
 
 }

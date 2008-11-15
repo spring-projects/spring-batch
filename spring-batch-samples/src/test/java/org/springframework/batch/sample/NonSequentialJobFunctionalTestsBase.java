@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobParameter;
@@ -20,6 +21,13 @@ import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 public abstract class NonSequentialJobFunctionalTestsBase extends AbstractJobTests {
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
+
+	@Before
+	protected void removeOldData() throws Exception {
+		simpleJdbcTemplate.update("DELETE FROM PLAYERS");
+		simpleJdbcTemplate.update("DELETE FROM GAMES");
+		simpleJdbcTemplate.update("DELETE FROM PLAYER_SUMMARY");
+	}
 
 	/**
 	 * This test processes a file that contains bad records. Those records will
