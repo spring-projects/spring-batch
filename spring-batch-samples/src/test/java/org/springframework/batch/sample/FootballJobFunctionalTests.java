@@ -21,6 +21,15 @@ public class FootballJobFunctionalTests extends AbstractValidatingBatchLauncherT
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
+	@Override
+	protected void validatePreConditions() throws Exception {
+		simpleJdbcTemplate.update("DELETE FROM PLAYERS");
+		simpleJdbcTemplate.update("DELETE FROM GAMES");
+		simpleJdbcTemplate.update("DELETE FROM PLAYER_SUMMARY");
+		super.validatePreConditions();
+	}
+
+	@Override
 	protected void validatePostConditions() throws Exception {
 		int count = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) from PLAYER_SUMMARY");
 		assertTrue(count>0);
