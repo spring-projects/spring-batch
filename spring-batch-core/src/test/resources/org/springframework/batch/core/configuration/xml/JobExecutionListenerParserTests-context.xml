@@ -6,7 +6,7 @@
 
 	<beans:import resource="common-context.xml" />
 	
-	<job id="job">
+	<job id="job" incrementer="testIncrementer">
 		<step name="step1">
 			<simple-task tasklet="tasklet"/>
 		</step>
@@ -18,4 +18,6 @@
 	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"/>
 
 	<beans:bean id="testListener" class="org.springframework.batch.core.configuration.xml.TestJobListener" />
+	
+	<beans:bean id="testIncrementer" class="org.springframework.batch.core.configuration.xml.TestIncrementer" />
 </beans:beans>

@@ -39,6 +39,15 @@
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="incrementer" type="xsd:string"
+						use="optional">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[ 
+								A reference to a JobParametersIncrementer bean definition.
+								]]>
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 					<xsd:attribute name="restartable" type="xsd:boolean"
 						default="false" use="optional">
 						<xsd:annotation>
