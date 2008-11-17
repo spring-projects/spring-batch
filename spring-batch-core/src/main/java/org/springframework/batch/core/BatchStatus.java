@@ -26,21 +26,82 @@ package org.springframework.batch.core;
 public enum BatchStatus {
 
 	/**
-	 * The order of the status values is significant. An execution is expected
-	 * to move up from lowest to highest, hopefully stopping at COMPLETED. After
-	 * COMPLETED, higher values signify more serious failure.
+	 * The order of the status values is significant because it can be used to
+	 * aggregate a set of status values - the result should be the maximum
+	 * value. Since COMPLETED is first in the order, only if all elements of an
+	 * execution are COMPLETED will the aggregate status be COMPLETED. A running
+	 * execution is expected to move from STARTING to STARTED to COMPLETED
+	 * (through the order defined by {@link #upgradeTo(BatchStatus)}). Higher
+	 * values than STARTED signify more serious failure.
 	 */
-	STARTING, STARTED, COMPLETED, PAUSED, FAILED, STOPPING, STOPPED, UNKNOWN;
+	COMPLETED, STARTING, WAITING, STARTED, FAILED, STOPPING, STOPPED, UNKNOWN;
 
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
-		if (status1.compareTo(status2) < 0) {
+		if (status1.isLessThan(status2)) {
 			return status2;
 		}
-		if (status1.compareTo(status2) > 0) {
+		if (status1.isGreaterThan(status2)) {
 			return status1;
 		}
 		else
 			return status1;
+	}
+
+	/**
+	 * Convenience method to decide if a status indicates work is in progress.
+	 * 
+	 * @return true if the status is STARTING, STARTED or WAITING
+	 */
+	public boolean isRunning() {
+		return this == STARTING || this == STARTED || this == WAITING;
+	}
+
+	/**
+	 * Convenience method to decide if a status indicates execution was unsuccessful.
+	 * 
+	 * @return true if the status is FAILED or greater
+	 */
+	public boolean isUnsuccessful() {
+		return this==FAILED || this.isGreaterThan(FAILED);
+	}
+
+	/**
+	 * Method used to move status values through their logical progression, and
+	 * override less severe failures with more severe ones. This value is
+	 * compared with the parameter and the one that has higher priority is
+	 * returned. If both are STARTED or less than the value returned is the
+	 * largest in the sequence STARTING, STARTED, COMPLETED. Otherwise the value
+	 * returned is the maximum of the two.
+	 * 
+	 * @param other another status to compare to
+	 * @return either this or the other status depending on their priority
+	 */
+	public BatchStatus upgradeTo(BatchStatus other) {
+		if (isGreaterThan(STARTED) || other.isGreaterThan(STARTED)) {
+			return max(this, other);
+		}
+		// Both less than or equal to STARTED
+		if (this == COMPLETED)
+			return COMPLETED;
+		if (other == COMPLETED)
+			return COMPLETED;
+		return max(this, other);
+	}
+
+	/**
+	 * @param other a status value to compare
+	 * @return true if this is greater than other
+	 */
+	public boolean isGreaterThan(BatchStatus other) {
+		return this.compareTo(other) > 0;
+	}
+
+	/**
+	 * @param other a status value to compare
+	 * @return true if this is less than other
+	 */
+	public boolean isLessThan(BatchStatus other) {
+		return this.compareTo(other) < 0;
 	}
 
 }

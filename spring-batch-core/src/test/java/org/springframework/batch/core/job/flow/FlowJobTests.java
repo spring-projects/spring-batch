@@ -265,7 +265,7 @@ public class FlowJobTests {
 		if (!jobExecution.getAllFailureExceptions().isEmpty()) {
 			throw jobExecution.getAllFailureExceptions().get(0);
 		}
-		assertEquals(BatchStatus.PAUSED, jobExecution.getStatus());
+		assertEquals(BatchStatus.WAITING, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 
 		job.execute(jobExecution);

@@ -40,7 +40,7 @@ public class StepExecutionAggregatorTests {
 		stepExecution2.setStatus(BatchStatus.COMPLETED);
 		aggregator.aggregate(result, Arrays.<StepExecution> asList(stepExecution1, stepExecution2));
 		assertNotNull(result);
-		assertEquals(BatchStatus.COMPLETED, result.getStatus());
+		assertEquals(BatchStatus.STARTING, result.getStatus());
 	}
 
 	@Test

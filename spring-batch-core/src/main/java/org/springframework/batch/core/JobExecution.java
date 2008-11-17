@@ -121,9 +121,7 @@ public class JobExecution extends Entity {
 	 * @param status the new status value
 	 */
 	public void upgradeStatus(BatchStatus status) {
-		if (status.compareTo(this.status) > 0) {
-			this.status = status;
-		}
+		this.status = this.status.upgradeTo(status);
 	}
 
 	/**
@@ -211,23 +209,26 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Signal that this job execution wishes to be paused. Uses
-	 * {@link #upgradeStatus(BatchStatus)} so that a failed execution stays
-	 * failed.
+	 * Signal that this job execution wishes to wait for work to complete, and
+	 * no more processing will take place on the current thread. A failed
+	 * execution stays failed.
 	 */
-	public void pause() {
-		upgradeStatus(BatchStatus.PAUSED);
+	public void pauseAndWait() {
+		if (!status.isUnsuccessful()) {
+			status = BatchStatus.WAITING;
+		}
 	}
 
 	/**
-	 * Test if the {@link JobExecution} has been paused.
+	 * Test if the {@link JobExecution} has been paused and is waiting for work
+	 * to be done.
 	 * 
-	 * @see #pause()
+	 * @see #pauseAndWait()
 	 * 
-	 * @return true if this instance is paused
+	 * @return true if this instance is waiting
 	 */
-	public boolean isPaused() {
-		return status == BatchStatus.PAUSED;
+	public boolean isWaiting() {
+		return status == BatchStatus.WAITING;
 	}
 
 	/**

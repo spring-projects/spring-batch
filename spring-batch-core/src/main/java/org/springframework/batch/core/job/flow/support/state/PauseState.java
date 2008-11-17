@@ -27,8 +27,8 @@ public class PauseState extends AbstractState {
 		// not already paused we pause it, and expect the flow to respect the
 		// status.
 		synchronized (jobExecution) {
-			if (!jobExecution.isPaused()) {
-				jobExecution.pause();
+			if (!jobExecution.isWaiting()) {
+				jobExecution.pauseAndWait();
 				return FlowExecution.PAUSED;
 			}
 

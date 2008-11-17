@@ -275,6 +275,49 @@ public class StepExecutionTests {
 		assertEquals(exception, execution.getFailureExceptions().get(0));
 	}
 
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
+	 */
+	@Test
+	public void testPauseAndWait() {
+		execution.pauseAndWait();
+		assertEquals(BatchStatus.WAITING, execution.getStatus());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
+	 */
+	@Test
+	public void testPauseAndWaitWhenFailed() {
+		execution.setStatus(BatchStatus.FAILED);
+		execution.pauseAndWait();
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
+	 */
+	@Test
+	public void testPauseAndWaitWhenStarted() {
+		execution.setStatus(BatchStatus.STARTED);
+		execution.pauseAndWait();
+		assertEquals(BatchStatus.WAITING, execution.getStatus());
+	}
+
+	/**
+	 * Test method for
+	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
+	 */
+	@Test
+	public void testDowngradeStatus() {
+		execution.setStatus(BatchStatus.FAILED);
+		execution.upgradeStatus(BatchStatus.COMPLETED);
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
+	}
+
 	private StepExecution newStepExecution(Step step, Long long2) {
 		JobInstance job = new JobInstance(new Long(3), new JobParameters(), "testJob");
 		StepExecution execution = new StepExecution(step.getName(), new JobExecution(job, long2), new Long(4));

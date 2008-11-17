@@ -402,7 +402,7 @@ public class SimpleJobOperatorTests {
 		jobOperator.pause(111L);
 		verify(jobExplorer);
 		verify(jobRepository);
-		assertEquals(BatchStatus.PAUSED, jobExecution.getStatus());
+		assertEquals(BatchStatus.WAITING, jobExecution.getStatus());
 	}
 
 }

@@ -219,7 +219,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 				execution.setStartTime(new Date());
 				// If paused we need to retain the status so that subclasses can
 				// handle the resume, otherwise we mark it as started...
-				if (!execution.isPaused()) {
+				if (!execution.isWaiting()) {
 					updateStatus(execution, BatchStatus.STARTED);
 				}			
 
@@ -228,7 +228,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 				StepExecution lastStepExecution = doExecute(execution);
 
 				if (lastStepExecution != null) {
-					if (!execution.isPaused()) {
+					if (!execution.isWaiting()) {
 						// If the subclass wants to pause don't change the
 						// status.
 						execution.setStatus(lastStepExecution.getStatus());
@@ -247,13 +247,13 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 
 		}
 		catch (JobInterruptedException e) {
-			logger.error(e);
+			logger.error("Encountered interruption executing job", e);
 			execution.setExitStatus(ExitStatus.FAILED);
 			execution.setStatus(BatchStatus.STOPPED);
 			execution.addFailureException(e);
 		}
 		catch (Throwable t) {
-			logger.error(t);
+			logger.error("Encountered error executing job", t);
 			execution.setExitStatus(ExitStatus.FAILED);
 			execution.setStatus(BatchStatus.FAILED);
 			execution.addFailureException(t);
@@ -307,13 +307,12 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 
 		JobInstance jobInstance = execution.getJobInstance();
 
-		StepExecution currentStepExecution = null;
+		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
+		StepExecution currentStepExecution = lastStepExecution;
 
-		if (shouldStart(jobInstance, step)) {
+		if (shouldStart(lastStepExecution, jobInstance, step)) {
 
 			currentStepExecution = execution.createStepExecution(step.getName());
-
-			StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
 
 			boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
 					BatchStatus.COMPLETED)) ? true : false;
@@ -343,18 +342,19 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	/**
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
+	 * @param lastStepExecution the last step execution
+	 * @param jobInstance 
+	 * @param step 
 	 * 
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step
 	 * @throws JobRestartException if the job is in an inconsistent state from
 	 * an earlier failure
 	 */
-	private boolean shouldStart(JobInstance jobInstance, Step step) throws JobRestartException,
+	private boolean shouldStart(StepExecution lastStepExecution, JobInstance jobInstance, Step step) throws JobRestartException,
 			StartLimitExceededException {
 
 		BatchStatus stepStatus;
-		// if the last execution is null, the step has never been executed.
-		StepExecution lastStepExecution = jobRepository.getLastStepExecution(jobInstance, step.getName());
 		if (lastStepExecution == null) {
 			stepStatus = BatchStatus.STARTING;
 		}

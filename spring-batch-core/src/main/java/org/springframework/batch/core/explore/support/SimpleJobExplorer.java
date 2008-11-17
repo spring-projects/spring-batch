@@ -99,7 +99,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @see org.springframework.batch.core.explore.JobExplorer#getStepExecution(java.lang.Long)
 	 */
 	public StepExecution getStepExecution(Long executionId, String stepName) {
-		JobExecution jobExecution = jobExecutionDao.getJobExecution(executionId);
+		JobExecution jobExecution = getJobExecution(executionId);
 		return stepExecutionDao.getStepExecution(jobExecution, stepName);
 	}
 

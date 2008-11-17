@@ -53,7 +53,7 @@ public class StepExecution extends Entity {
 	private volatile int rollbackCount = 0;
 
 	private volatile int readSkipCount = 0;
-	
+
 	private volatile int processSkipCount = 0;
 
 	private volatile int writeSkipCount = 0;
@@ -71,7 +71,7 @@ public class StepExecution extends Entity {
 	private volatile boolean terminateOnly;
 
 	private volatile int filterCount;
-	
+
 	private transient volatile List<Throwable> failureExceptions = new ArrayList<Throwable>();
 
 	/**
@@ -155,7 +155,7 @@ public class StepExecution extends Entity {
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 	}
-	
+
 	/**
 	 * Returns the current number of items read for this execution
 	 * 
@@ -209,10 +209,11 @@ public class StepExecution extends Entity {
 	public int getFilterCount() {
 		return filterCount;
 	}
-	
+
 	/**
 	 * Public setter for the number of items filtered out of this execution.
-	 * @param filterCount the number of items filtered out of this execution to set
+	 * @param filterCount the number of items filtered out of this execution to
+	 * set
 	 */
 	public void setFilterCount(int filterCount) {
 		this.filterCount = filterCount;
@@ -259,6 +260,40 @@ public class StepExecution extends Entity {
 	 */
 	public void setStatus(BatchStatus status) {
 		this.status = status;
+	}
+
+	/**
+	 * Upgrade the status field if the provided value is greater than the
+	 * existing one. Clients using this method to set the status can be sure
+	 * that they don't overwrite a failed status with an successful one.
+	 * 
+	 * @param status the new status value
+	 */
+	public void upgradeStatus(BatchStatus status) {
+		this.status = this.status.upgradeTo(status);
+	}
+
+	/**
+	 * Signal that this job execution wishes to wait for work to complete, and
+	 * no more processing will take place on the current thread. A failed
+	 * execution stays failed.
+	 */
+	public void pauseAndWait() {
+		if (!status.isUnsuccessful()) {
+			status = BatchStatus.WAITING;
+		}
+	}
+
+	/**
+	 * Test if the {@link JobExecution} has been paused and is waiting for work
+	 * to be done.
+	 * 
+	 * @see #pauseAndWait()
+	 * 
+	 * @return true if this instance is waiting
+	 */
+	public boolean isWaiting() {
+		return status == BatchStatus.WAITING;
 	}
 
 	/**
@@ -410,7 +445,7 @@ public class StepExecution extends Entity {
 	public void setWriteSkipCount(int writeSkipCount) {
 		this.writeSkipCount = writeSkipCount;
 	}
-	
+
 	/**
 	 * @return the number of records skipped during processing
 	 */
@@ -442,12 +477,12 @@ public class StepExecution extends Entity {
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
 	}
-	
+
 	public List<Throwable> getFailureExceptions() {
 		return failureExceptions;
 	}
-	
-	public void addFailureException(Throwable throwable){
+
+	public void addFailureException(Throwable throwable) {
 		this.failureExceptions.add(throwable);
 	}
 
@@ -470,7 +505,8 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Deserialise and ensure transient fields are re-instantiated when read back
+	 * Deserialise and ensure transient fields are re-instantiated when read
+	 * back
 	 */
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
@@ -490,9 +526,10 @@ public class StepExecution extends Entity {
 
 	public String toString() {
 		return super.toString()
-				+ String.format(", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
-						+ ", commitCount=%d, rollbackCount=%d", stepName, status, exitStatus, readCount, filterCount, writeCount, readSkipCount, writeSkipCount,
-						commitCount, rollbackCount);
+				+ String.format(
+						", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
+								+ ", commitCount=%d, rollbackCount=%d", stepName, status, exitStatus, readCount,
+						filterCount, writeCount, readSkipCount, writeSkipCount, commitCount, rollbackCount);
 	}
 
 }

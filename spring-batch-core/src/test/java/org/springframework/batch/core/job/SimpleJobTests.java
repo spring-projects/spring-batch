@@ -314,6 +314,16 @@ public class SimpleJobTests {
 	}
 
 	@Test
+	public void testStepAlreadyComplete() throws Exception {
+		stepExecution1.setStatus(BatchStatus.COMPLETED);
+		jobRepository.add(stepExecution1);
+		job.execute(jobExecution);
+		assertEquals(0, jobExecution.getFailureExceptions().size());
+		assertEquals(1, jobExecution.getStepExecutions().size());
+		assertEquals(stepExecution2.getStepName(), jobExecution.getStepExecutions().iterator().next().getStepName());
+	}
+
+	@Test
 	public void testNoSteps() throws Exception {
 		job.setSteps(new ArrayList<Step>());
 

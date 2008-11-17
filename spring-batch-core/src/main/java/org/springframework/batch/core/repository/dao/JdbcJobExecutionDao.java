@@ -191,7 +191,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 			if (count == 0) {
 				int curentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_JOB_EXECUTION),
 						new Object[] { jobExecution.getId() });
-				throw new OptimisticLockingFailureException("Attempt to update step execution id="
+				throw new OptimisticLockingFailureException("Attempt to update job execution id="
 						+ jobExecution.getId() + " with wrong version (" + jobExecution.getVersion()
 						+ "), where current version is " + curentVersion);
 			}

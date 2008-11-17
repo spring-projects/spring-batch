@@ -194,7 +194,7 @@ public class SimpleJobLauncherTests {
 	public void testResumePausedInstance() throws Exception {
 		long id = 9;
 		JobExecution jobExecution = new JobExecution(null, id);
-		jobExecution.pause();
+		jobExecution.pauseAndWait();
 		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
 		replay(jobRepository);
 	

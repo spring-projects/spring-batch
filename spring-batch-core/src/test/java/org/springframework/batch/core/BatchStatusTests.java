@@ -44,6 +44,42 @@ public class BatchStatusTests {
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED,BatchStatus.COMPLETED));
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.FAILED));
 		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.FAILED));
+		assertEquals(BatchStatus.STARTED, BatchStatus.max(BatchStatus.STARTED, BatchStatus.STARTING));
+		assertEquals(BatchStatus.STARTED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.STARTED));
+	}
+
+	@Test
+	public void testUpgradeStatusFinished() {
+		assertEquals(BatchStatus.FAILED, BatchStatus.FAILED.upgradeTo(BatchStatus.COMPLETED));
+		assertEquals(BatchStatus.FAILED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.FAILED));
+	}
+
+	@Test
+	public void testUpgradeStatusUnfinished() {
+		assertEquals(BatchStatus.COMPLETED, BatchStatus.STARTING.upgradeTo(BatchStatus.COMPLETED));
+		assertEquals(BatchStatus.COMPLETED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.STARTING));
+		assertEquals(BatchStatus.STARTED, BatchStatus.STARTING.upgradeTo(BatchStatus.STARTED));
+		assertEquals(BatchStatus.STARTED, BatchStatus.STARTED.upgradeTo(BatchStatus.STARTING));
+		assertEquals(BatchStatus.COMPLETED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.WAITING));
+		assertEquals(BatchStatus.STARTED, BatchStatus.STARTED.upgradeTo(BatchStatus.WAITING));
+	}
+
+	@Test
+	public void testIsRunning() {
+		assertFalse(BatchStatus.FAILED.isRunning());
+		assertFalse(BatchStatus.COMPLETED.isRunning());
+		assertTrue(BatchStatus.STARTED.isRunning());
+		assertTrue(BatchStatus.STARTING.isRunning());
+		assertTrue(BatchStatus.WAITING.isRunning());
+	}
+
+	@Test
+	public void testIsUnsuccessful() {
+		assertTrue(BatchStatus.FAILED.isUnsuccessful());
+		assertFalse(BatchStatus.COMPLETED.isUnsuccessful());
+		assertFalse(BatchStatus.STARTED.isUnsuccessful());
+		assertFalse(BatchStatus.STARTING.isUnsuccessful());
+		assertFalse(BatchStatus.WAITING.isUnsuccessful());
 	}
 
 	@Test

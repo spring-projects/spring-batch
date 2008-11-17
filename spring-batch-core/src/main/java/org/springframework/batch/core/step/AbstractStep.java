@@ -199,6 +199,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 
 			stepExecution.setStatus(BatchStatus.COMPLETED);
+			logger.debug("Step execution success: " + stepExecution);
 
 			try {
 				getJobRepository().update(stepExecution);
@@ -265,6 +266,9 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 						+ "This job is now in an unknown state and should not be restarted.", commitException);
 				stepExecution.addFailureException(commitException);
 			}
+
+			logger.debug("Step execution complete: " + stepExecution);
+
 		}
 	}
 

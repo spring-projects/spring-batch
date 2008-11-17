@@ -224,6 +224,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution value = dao.getJobExecution(exec.getId());
 
 		assertEquals(exec, value);
+		// N.B. the job instance is not re-hydrated in the JDBC case...
 	}
 
 	/**
