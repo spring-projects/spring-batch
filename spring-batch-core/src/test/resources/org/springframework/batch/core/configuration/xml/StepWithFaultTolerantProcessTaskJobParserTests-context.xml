@@ -8,8 +8,8 @@
 	
 	<job id="job">
 		<step name="step">
-			<process-task reader="reader" processor="processor" writer="writer"
-					fault-tolerant="true" commit-interval="10" skip-limit="20" 
+			<item-task reader="reader" processor="processor" writer="writer"
+					commit-interval="10" skip-limit="20" 
 					retry-limit="3" cache-capacity="100"
 					transaction-attribute="PROPAGATION_REQUIRED,ISOLATION_DEFAULT,timeout_10,-org.springframework.dao.DataIntegrityViolationException" 
 					is-reader-transactional-queue="true"
@@ -24,7 +24,7 @@
 				<streams>
 					<stream ref="reader"/>
 				</streams>
-			</process-task>
+			</item-task>
 		</step>
 	</job>
 

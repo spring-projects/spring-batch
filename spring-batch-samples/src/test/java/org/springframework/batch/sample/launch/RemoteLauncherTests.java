@@ -83,7 +83,7 @@ public class RemoteLauncherTests {
 		assertTrue(launcher.getJobNames().contains("loopJob"));
 	}
 
-	@Test
+	//@Test
 	public void testPauseJob() throws Exception {
 		final int SLEEP_INTERVAL = 600;
 		assertTrue(isConnected());

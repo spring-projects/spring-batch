@@ -211,7 +211,7 @@
 			<xsd:extension base="nextType">
 				<xsd:sequence>
 					<xsd:choice>
-						<xsd:element name="process-task" type="processTaskType" minOccurs="0" maxOccurs="1"/>
+						<xsd:element name="item-task" type="itemTaskType" minOccurs="0" maxOccurs="1"/>
 						<xsd:element name="simple-task" type="simpleTaskType" minOccurs="0" maxOccurs="1"/>
 					</xsd:choice>
 					<xsd:group ref="transitions"/>
@@ -243,7 +243,7 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="processTaskType">
+	<xsd:complexType name="itemTaskType">
 		<xsd:complexContent>
 			<xsd:extension base="stepDefType">
 				<xsd:sequence>
@@ -328,14 +328,6 @@
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The number of items that will be processed before commit is called for the transaction.
-						]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="fault-tolerant" type="xsd:boolean" default="false" use="optional">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-						Whether the step should provide fault tolerance with skip limit and skippable
-						exception handling.
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
