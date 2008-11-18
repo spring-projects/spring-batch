@@ -1,60 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       		http://www.springframework.org/schema/batch
+       		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
        		http://www.springframework.org/schema/aop
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<import resource="tradeJobIo.xml" />
 
-	<bean id="skipJob" parent="simpleJob">
-		<property name="steps">
+	<batch:job id="skipJob" incrementer="incrementer">
+		<batch:step name="step1">
+			<batch:end on="FAILED" status="FAILED"/>
+			<batch:next on="COMPLETED WITH SKIPS" to="errorPrint1" />
+			<batch:next on="*" to="step2" />
+		</batch:step>
+		<batch:step name="errorPrint1">
+			<batch:next on="*" to="step2" />
+		</batch:step>
+		<batch:step name="step2">
+			<batch:next on="*" to="skipCheckingDecision" />
+		</batch:step>
+		<batch:decision id="skipCheckingDecision" decider="skipCheckingDecider">
+			<batch:next on="COMPLETED WITH SKIPS" to="errorPrint2" />
+			<batch:end on="*"/>
+		</batch:decision>
+		<batch:step name="errorPrint2" />
+	</batch:job>
+
+	<bean id="step1" parent="skipLimitStep">
+		<property name="skipLimit" value="1" />
+		<property name="itemReader" ref="fileItemReader" />
+		<property name="itemProcessor">
+			<bean class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"/>
+		</property>
+		<property name="itemWriter">
+			<bean class="org.springframework.batch.sample.domain.trade.internal.TradeWriter"
+				p:dao-ref="tradeDao" />
+		</property>
+		<property name="listeners">
 			<list>
-				<bean id="step1" parent="skipLimitStep">
-					<property name="skipLimit" value="1" />
-					<property name="itemReader" ref="fileItemReader" />
-					<property name="itemProcessor">
-						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"
-							p:validationFailure="3" />
-					</property>
-					<property name="itemWriter">
-						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeWriter"
-							p:dao-ref="tradeDao" />
-					</property>
-				</bean>
-				<bean id="step2" parent="skipLimitStep">
-					<property name="commitInterval" value="2" />
-					<property name="skipLimit" value="1" />
-					<!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
-					<property name="skippableExceptionClasses">
-			            <list>
-			                <value>org.springframework.batch.item.validator.ValidationException</value>
-			            </list>
-					</property>
-					<property name="itemReader"
-						ref="tradeSqlItemReader" />
-					<property name="itemProcessor">
-						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"
-							p:validationFailure="2" />
-					</property>
-					<property name="itemWriter"
-						ref="itemTrackingWriter" />
-				</bean>
+				<bean class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+				<ref bean="fileLocator"/>
 			</list>
 		</property>
 	</bean>
 
-	<bean id="itemTrackingWriter"
-		class="org.springframework.batch.sample.support.ItemTrackingItemWriter" />
+	<bean id="step2" parent="skipLimitStep">
+		<property name="commitInterval" value="2" />
+		<property name="skipLimit" value="1" />
+		<!-- No rollback for exceptions that are marked with "+" in the tx attributes -->
+		<property name="skippableExceptionClasses">
+            <list>
+                <value>org.springframework.batch.item.validator.ValidationException</value>
+                <value>java.lang.RuntimeException</value>
+            </list>
+		</property>
+		<property name="itemReader" ref="tradeSqlItemReader" />
+		<property name="itemProcessor">
+			<bean class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"/>
+		</property>
+		<property name="itemWriter" ref="itemTrackingWriter" />
+		<property name="listeners">
+			<list>
+				<bean class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+			</list>
+		</property>
+	</bean>
 
-	<bean id="tradeSqlItemReader"
-		class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="SELECT isin, quantity, price, customer from TRADE" />
@@ -64,27 +82,35 @@
 		</property>
 	</bean>
 
-	<bean id="customerSqlItemReader"
-		class="org.springframework.batch.item.database.JdbcCursorItemReader">
+	<bean id="customerSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource" />
 		<property name="sql"
 			value="SELECT id, name, credit FROM customer " />
 		<property name="mapper">
-			<bean
-				class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
+			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
 		</property>
 	</bean>
 
-	<bean id="fileLocator"
-		class="org.springframework.core.io.ClassPathResource">
-		<constructor-arg type="java.lang.String"
-			value="data/tradeJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+	<bean id="fileLocator" class="org.springframework.batch.core.resource.StepExecutionResourceProxy">
+		<property name="filePattern" value="classpath:data/skipJob/input/input%run.id(long)%.txt"/>
 	</bean>
 
-	<bean id="customerFileLocator"
-		class="org.springframework.core.io.FileSystemResource">
+	<bean id="customerFileLocator" class="org.springframework.core.io.FileSystemResource">
 		<constructor-arg type="java.lang.String"
 			value="target/test-outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
 	</bean>
 
+	<bean id="errorPrint" parent="taskletStep">
+		<property name="tasklet">
+			<bean class="org.springframework.batch.sample.common.ErrorLogTasklet">
+				<property name="dataSource" ref="dataSource"/>
+			</bean>
+		</property>
+	</bean>
+	<bean id="errorPrint1" parent="errorPrint"/>
+	<bean id="errorPrint2" parent="errorPrint"/>
+
+	<bean id="skipCheckingDecider" class="org.springframework.batch.sample.common.SkipCheckingDecider"/>
+	
+	<bean id="incrementer" class="org.springframework.batch.sample.common.InfiniteLoopIncrementer"/>
 </beans>

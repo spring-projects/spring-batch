@@ -19,7 +19,6 @@ package org.springframework.batch.sample.domain.trade;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 
@@ -81,7 +80,18 @@ public class Trade implements Serializable {
     }
     
     public boolean equals(Object o) {
-		return EqualsBuilder.reflectionEquals(this, o);
+    	if(!(o instanceof Trade)){
+    		return false;
+    	}
+    	
+    	if(o == this){
+    		return true;
+    		
+    	}
+    	
+    	Trade t = (Trade)o;
+		return isin.equals(t.getIsin()) && quantity == t.getQuantity() && 
+			price.equals(t.getPrice()) && customer.equals(t.getCustomer())  ;
 	}
 
 	public int hashCode() {

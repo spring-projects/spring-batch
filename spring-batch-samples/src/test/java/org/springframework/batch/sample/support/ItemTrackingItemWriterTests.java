@@ -21,49 +21,53 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 
 import org.junit.Test;
+import org.springframework.batch.sample.domain.trade.Trade;
+import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class ItemTrackingItemWriterTests {
-	
-	private ItemTrackingItemWriter<String> writer = new ItemTrackingItemWriter<String>();
+
+	private ItemTrackingTradeItemWriter writer = new ItemTrackingTradeItemWriter();
 
 	/**
-	 * Test method for {@link org.springframework.batch.sample.support.ItemTrackingItemWriter#write(java.util.List)}.
-	 * @throws Exception 
+	 * Test method for
+	 * {@link org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter#write(java.util.List)}.
+	 * 
+	 * @throws Exception
 	 */
 	@Test
 	public void testWrite() throws Exception {
 		assertEquals(0, writer.getItems().size());
-		writer.write(Arrays.asList("a", "b", "c"));
+		Trade a = new Trade("a", 0, null, null);
+		Trade b = new Trade("b", 0, null, null);
+		Trade c = new Trade("c", 0, null, null);
+		writer.write(Arrays.asList(a, b, c));
 		assertEquals(3, writer.getItems().size());
 	}
 
 	@Test
 	public void testWriteFailure() throws Exception {
-		writer.setWriteFailure(2);
+		writer.setWriteFailureISIN("c");
 		try {
-			writer.write(Arrays.asList("a", "b", "c"));
+			Trade a = new Trade("a", 0, null, null);
+			Trade b = new Trade("b", 0, null, null);
+			Trade c = new Trade("c", 0, null, null);
+			writer.write(Arrays.asList(a, b, c));
 			fail("Expected Write Failure Exception");
 		}
 		catch (RuntimeException e) {
 			// expected
 		}
 		// the failed item is removed
-		assertEquals(2, writer.getItems().size());
-		writer.write(Arrays.asList("a", "e", "c"));
-		assertEquals(5, writer.getItems().size());
-		try {
-			writer.write(Arrays.asList("f", "b", "g"));
-			fail("Expected RuntimeException");
-		}
-		catch (RuntimeException e) {
-			// expected
-		}
-		// barf immediately if a failure is detected
-		assertEquals(5, writer.getItems().size());
-	}
+		assertEquals(0, writer.getItems().size());
 
+		Trade e = new Trade("e", 0, null, null);
+		Trade f = new Trade("f", 0, null, null);
+		Trade g = new Trade("g", 0, null, null);
+		writer.write(Arrays.asList(e, f, g));
+		assertEquals(3, writer.getItems().size());
+	}
 }

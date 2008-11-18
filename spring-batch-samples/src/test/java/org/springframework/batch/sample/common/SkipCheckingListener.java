@@ -1,4 +1,4 @@
-package org.springframework.batch.sample.domain.football.internal;
+package org.springframework.batch.sample.common;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
@@ -16,5 +16,6 @@ public class SkipCheckingListener implements StepExecutionListener {
 	}
 
 	public void beforeStep(StepExecution stepExecution) {
+		stepExecution.getJobExecution().getExecutionContext().put("stepName", stepExecution.getStepName());
 	}
 }
