@@ -39,11 +39,13 @@ import org.springframework.batch.item.ExecutionContext;
 public interface JobRepository {
 
 	/**
-	 * Check if an instance of this job already exists with the parameters provided.
+	 * Check if an instance of this job already exists with the parameters
+	 * provided.
 	 * 
 	 * @param jobName the name of the job
 	 * @param jobParameters the parameters to match
-	 * @return true if a {@link JobInstance} already exists for this job name and job parameters
+	 * @return true if a {@link JobInstance} already exists for this job name
+	 * and job parameters
 	 */
 	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
 
@@ -68,8 +70,8 @@ public interface JobRepository {
 	 * found and was already completed successfully.
 	 * 
 	 */
-	JobExecution createJobExecution(String jobName, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-			JobRestartException, JobInstanceAlreadyCompleteException;
+	JobExecution createJobExecution(String jobName, JobParameters jobParameters)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
 
 	/**
 	 * Update the {@link JobExecution}.
@@ -113,6 +115,22 @@ public interface JobRepository {
 	void updateExecutionContext(StepExecution stepExecution);
 
 	/**
+	 * Load the {@link ExecutionContext} of the given {@link StepExecution}.
+	 * 
+	 * @param stepExecution the {@link StepExecution} containing the
+	 * {@link ExecutionContext}.
+	 */
+	ExecutionContext getExecutionContext(StepExecution stepExecution);
+
+	/**
+	 * Load the {@link ExecutionContext} of the given {@link JobExecution}.
+	 * 
+	 * @param jobExecution the {@link JobExecution} containing the
+	 * {@link ExecutionContext}.
+	 */
+	ExecutionContext getExecutionContext(JobExecution jobExecution);
+
+	/**
 	 * @param stepName the name of the step execution that might have run.
 	 * @return the last execution of step for the given job instance.
 	 */
@@ -125,7 +143,7 @@ public interface JobRepository {
 	int getStepExecutionCount(JobInstance jobInstance, String stepName);
 
 	/**
-	 * @param jobName the name of the job that might have run 
+	 * @param jobName the name of the job that might have run
 	 * @param jobParameters parameters identifying the {@link JobInstance}
 	 * @return the last execution of job if exists, null otherwise
 	 */

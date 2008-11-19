@@ -20,6 +20,7 @@ import java.util.concurrent.Semaphore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -39,6 +40,7 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.support.Classifier;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -88,6 +90,14 @@ public class TaskletStep extends AbstractStep {
 
 	private Semaphore semaphore = new Semaphore(1);
 
+	private Classifier<Exception, Boolean> nonFatalCommitExceptions = new Classifier<Exception, Boolean>() {
+
+		public Boolean classify(Exception classifiable) {
+			return false;
+		}
+
+	};
+
 	/**
 	 * Default constructor.
 	 */
@@ -100,6 +110,14 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public TaskletStep(String name) {
 		super(name);
+	}
+
+	/**
+	 * @param nonFatalCommitExceptions classifies whether commit exception is
+	 * fatal or not.
+	 */
+	public void setNonFatalCommitExceptions(Classifier<Exception, Boolean> nonFatalCommitExceptions) {
+		this.nonFatalCommitExceptions = nonFatalCommitExceptions;
 	}
 
 	/**
@@ -278,10 +296,18 @@ public class TaskletStep extends AbstractStep {
 						transactionManager.commit(transaction);
 					}
 					catch (Exception e) {
-						fatalException.setException(e);
-						stepExecution.setStatus(BatchStatus.UNKNOWN);
-						logger.error("Fatal error detected during commit.");
-						throw new FatalException("Fatal error detected during commit", e);
+						if (nonFatalCommitExceptions.classify(e)) {
+							stepExecution.setExecutionContext(getJobRepository().getExecutionContext(stepExecution));
+							JobExecution jobExecution = stepExecution.getJobExecution();
+							jobExecution.setExecutionContext(getJobRepository().getExecutionContext(jobExecution));
+							throw new CommitException("non-fatal commit failure", e);
+						}
+						else {
+							fatalException.setException(e);
+							stepExecution.setStatus(BatchStatus.UNKNOWN);
+							logger.error("Fatal error detected during commit.");
+							throw new FatalException("Fatal error detected during commit", e);
+						}
 					}
 
 					try {
@@ -300,7 +326,10 @@ public class TaskletStep extends AbstractStep {
 					throw e;
 				}
 				catch (Exception e) {
-					processRollback(stepExecution, fatalException, transaction);
+					// if commit failed, calling rollback on tx manager would cause exception
+					if (!(e instanceof CommitException)) {
+						processRollback(stepExecution, fatalException, transaction);
+					}
 					throw e;
 				}
 				finally {
@@ -374,6 +403,15 @@ public class TaskletStep extends AbstractStep {
 			return this.exception;
 		}
 
+	}
+
+	/**
+	 * Signals non-fatal commit failure.
+	 */
+	private static class CommitException extends RuntimeException {
+		public CommitException(String msg, Throwable cause) {
+			super(msg, cause);
+		}
 	}
 
 	protected void close(ExecutionContext ctx) throws Exception {

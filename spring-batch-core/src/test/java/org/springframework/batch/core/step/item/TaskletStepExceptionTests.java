@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -28,6 +27,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.support.Classifier;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.transaction.TransactionException;
@@ -41,15 +41,13 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
  */
 public class TaskletStepExceptionTests {
 
-	TaskletStep taskletStep;
+	private TaskletStep taskletStep;
 
-	StepExecution stepExecution;
+	private StepExecution stepExecution;
 
-	UpdateCountingJobRepository jobRepository;
+	private UpdateCountingJobRepository jobRepository;
 
-	static RuntimeException taskletException = new RuntimeException();
-
-	static JobInterruptedException interruptedException = new JobInterruptedException("");
+	private static RuntimeException taskletException = new RuntimeException();
 
 	@Before
 	public void init() {
@@ -134,7 +132,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	/**
+	/*
 	 * Exception in afterStep is ignored (only logged).
 	 */
 	public void testAfterStepFAilure() throws Exception {
@@ -196,12 +194,61 @@ public class TaskletStepExceptionTests {
 		assertEquals(exception, e.getCause());
 	}
 
+	/**
+	 * If commit exception isn't fatal step shouldn't complete with UNKNOWN
+	 * status and execution context should be rolled back.
+	 */
+	@Test
+	public void testSkippableCommitError() throws Exception {
+
+		class TestItemStream extends ItemStreamSupport {
+			private boolean called = false;
+
+			@Override
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+				executionContext.put("key", "value");
+				called = true;
+			}
+
+		}
+		final TestItemStream stream = new TestItemStream();
+		taskletStep.registerStream(stream);
+
+		final RuntimeException commitException = new RuntimeException();
+		taskletStep.setNonFatalCommitExceptions(new Classifier<Exception, Boolean>() {
+
+			public Boolean classify(Exception classifiable) {
+				return true;
+			}
+		});
+		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
+			@Override
+			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
+				throw commitException;
+			}
+		});
+
+		taskletStep.setTasklet(new Tasklet() {
+
+			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+				return RepeatStatus.FINISHED;
+			}
+
+		});
+
+		taskletStep.execute(stepExecution);
+		assertEquals("step won't refuse to restart", FAILED, stepExecution.getStatus());
+		assertTrue("execution context modified", stream.called);
+		assertTrue("execution context rolled back", stepExecution.getExecutionContext().isEmpty());
+	}
+
 	@Test
 	public void testUpdateError() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setJobRepository(new UpdateCountingJobRepository() {
 			boolean firstCall = true;
+
 			@Override
 			public void update(StepExecution arg0) {
 				if (firstCall) {
@@ -211,7 +258,7 @@ public class TaskletStepExceptionTests {
 				throw exception;
 			}
 		});
-		
+
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
@@ -272,8 +319,15 @@ public class TaskletStepExceptionTests {
 		}
 
 		public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-			// TODO Auto-generated method stub
 			return null;
+		}
+
+		public ExecutionContext getExecutionContext(StepExecution stepExecution) {
+			return new ExecutionContext();
+		}
+
+		public ExecutionContext getExecutionContext(JobExecution jobExecution) {
+			return new ExecutionContext();
 		}
 	}
 
