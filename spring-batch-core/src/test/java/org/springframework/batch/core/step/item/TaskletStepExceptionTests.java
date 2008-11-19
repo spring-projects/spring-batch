@@ -199,7 +199,7 @@ public class TaskletStepExceptionTests {
 	 * status and execution context should be rolled back.
 	 */
 	@Test
-	public void testSkippableCommitError() throws Exception {
+	public void testNonFatalCommitError() throws Exception {
 
 		class TestItemStream extends ItemStreamSupport {
 			private boolean called = false;
@@ -240,6 +240,7 @@ public class TaskletStepExceptionTests {
 		assertEquals("step won't refuse to restart", FAILED, stepExecution.getStatus());
 		assertTrue("execution context modified", stream.called);
 		assertTrue("execution context rolled back", stepExecution.getExecutionContext().isEmpty());
+		assertEquals("failed commit counted as rollback", 1, stepExecution.getRollbackCount());
 	}
 
 	@Test

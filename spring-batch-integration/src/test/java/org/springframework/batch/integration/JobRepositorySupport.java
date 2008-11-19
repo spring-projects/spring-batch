@@ -23,6 +23,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
@@ -84,6 +85,14 @@ public class JobRepositorySupport implements JobRepository {
 	 * @see org.springframework.batch.core.repository.JobRepository#getLastJobExecution(java.lang.String, org.springframework.batch.core.JobParameters)
 	 */
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+		return null;
+	}
+
+	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
+		return null;
+	}
+
+	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		return null;
 	}
 

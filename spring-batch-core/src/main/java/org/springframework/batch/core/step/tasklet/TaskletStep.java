@@ -297,9 +297,7 @@ public class TaskletStep extends AbstractStep {
 					}
 					catch (Exception e) {
 						if (nonFatalCommitExceptions.classify(e)) {
-							stepExecution.setExecutionContext(getJobRepository().getExecutionContext(stepExecution));
-							JobExecution jobExecution = stepExecution.getJobExecution();
-							jobExecution.setExecutionContext(getJobRepository().getExecutionContext(jobExecution));
+							rollbackExecutionContext(stepExecution);
 							throw new CommitException("non-fatal commit failure", e);
 						}
 						else {
@@ -326,9 +324,14 @@ public class TaskletStep extends AbstractStep {
 					throw e;
 				}
 				catch (Exception e) {
-					// if commit failed, calling rollback on tx manager would cause exception
+					// if commit failed, calling rollback on tx manager would
+					// cause exception
 					if (!(e instanceof CommitException)) {
 						processRollback(stepExecution, fatalException, transaction);
+					}
+					else {
+						// assume the failed commit caused rollback
+						stepExecution.rollback();
 					}
 					throw e;
 				}
@@ -346,6 +349,15 @@ public class TaskletStep extends AbstractStep {
 				interruptionPolicy.checkInterrupted(stepExecution);
 
 				return result;
+			}
+
+			/**
+			 * Load the saved value of ExecutionContext from repository.
+			 */
+			private void rollbackExecutionContext(StepExecution stepExecution) {
+				stepExecution.setExecutionContext(getJobRepository().getExecutionContext(stepExecution));
+				JobExecution jobExecution = stepExecution.getJobExecution();
+				jobExecution.setExecutionContext(getJobRepository().getExecutionContext(jobExecution));
 			}
 
 		});
