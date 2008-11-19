@@ -21,7 +21,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
 
@@ -33,7 +32,6 @@ public class JobExecutionListenerAdapterTests {
 
 	private TestClass testClass;
 	private AnnotatedTestClass annotatedTestClass;
-	private InterfaceTestClass interfaceTestClass;
 	private JobExecution jobExecution = new JobExecution(11L);
 	
 	
@@ -41,7 +39,6 @@ public class JobExecutionListenerAdapterTests {
 	public void setUp(){
 		testClass = new TestClass();
 		annotatedTestClass = new AnnotatedTestClass();
-		interfaceTestClass = new InterfaceTestClass();
 	}
 	
 	@Test
@@ -94,16 +91,6 @@ public class JobExecutionListenerAdapterTests {
 		assertTrue(annotatedTestClass.afterJobCalled);
 	}
 	
-	@Test
-	public void testWithInterface() throws Exception{
-		JobExecutionListenerAdapter adapter = new JobExecutionListenerAdapter(interfaceTestClass);
-		adapter.afterPropertiesSet();
-		adapter.beforeJob(jobExecution);
-		adapter.afterJob(jobExecution);
-		assertTrue(annotatedTestClass.beforeJobCalled);
-		assertTrue(annotatedTestClass.afterJobCalled);
-	}
-	
 	private class TestClass{
 		
 		boolean beforeJobCalled = false;
@@ -129,10 +116,6 @@ public class JobExecutionListenerAdapterTests {
 		public void after(){
 			super.afterJobCalled = true;
 		}
-	}
-	
-	private class InterfaceTestClass extends TestClass implements JobExecutionListener {
-		
 	}
 	
 }
