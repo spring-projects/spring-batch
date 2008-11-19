@@ -525,6 +525,10 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	}
 
+	@Test
+	public void testNonFatalCommitFailure() throws Exception {
+		//TODO
+	}
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
 
 		private final Collection<String> failures;

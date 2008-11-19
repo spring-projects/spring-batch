@@ -31,6 +31,8 @@ import org.springframework.batch.core.scope.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
+import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -40,7 +42,6 @@ import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.batch.support.Classifier;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -90,13 +91,7 @@ public class TaskletStep extends AbstractStep {
 
 	private Semaphore semaphore = new Semaphore(1);
 
-	private Classifier<Exception, Boolean> nonFatalCommitExceptions = new Classifier<Exception, Boolean>() {
-
-		public Boolean classify(Exception classifiable) {
-			return false;
-		}
-
-	};
+	private ItemSkipPolicy commitSkipPolicy = new NeverSkipItemSkipPolicy();
 
 	/**
 	 * Default constructor.
@@ -113,11 +108,10 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * @param nonFatalCommitExceptions classifies whether commit exception is
-	 * fatal or not.
+	 * Skip policy applying to exception thrown on tx commit.
 	 */
-	public void setNonFatalCommitExceptions(Classifier<Exception, Boolean> nonFatalCommitExceptions) {
-		this.nonFatalCommitExceptions = nonFatalCommitExceptions;
+	public void setCommitSkipPolicy(ItemSkipPolicy commitSkipPolicy) {
+		this.commitSkipPolicy = commitSkipPolicy;
 	}
 
 	/**
@@ -296,7 +290,7 @@ public class TaskletStep extends AbstractStep {
 						transactionManager.commit(transaction);
 					}
 					catch (Exception e) {
-						if (nonFatalCommitExceptions.classify(e)) {
+						if (commitSkipPolicy.shouldSkip(e, stepExecution.getSkipCount())) {
 							rollbackExecutionContext(stepExecution);
 							throw new CommitException("non-fatal commit failure", e);
 						}

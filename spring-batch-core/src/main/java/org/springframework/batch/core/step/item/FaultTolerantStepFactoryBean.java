@@ -48,6 +48,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private int skipLimit = 0;
 
+	private Collection<Class<? extends Throwable>> nonFatalCommitExceptionClasses = new HashSet<Class<? extends Throwable>>();
+
 	private Collection<Class<? extends Throwable>> skippableExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
 	private Collection<Class<? extends Throwable>> fatalExceptionClasses = new HashSet<Class<? extends Throwable>>();
@@ -75,6 +77,17 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
 		this.isReaderTransactionalQueue = isReaderTransactionalQueue;
+	}
+
+	/**
+	 * Exceptions that will not cause UNKNOWN status of the step if they occur
+	 * on commit. The assumption is that failed commit with one of the supplied
+	 * exceptions is equivalent to rollback (and therefore need not cause
+	 * failure if skippable).
+	 * @param nonFatalCommitExceptionClasses
+	 */
+	public void setNonFatalCommitExceptionClasses(Collection<Class<? extends Throwable>> nonFatalCommitExceptionClasses) {
+		this.nonFatalCommitExceptionClasses = nonFatalCommitExceptionClasses;
 	}
 
 	/**
@@ -279,7 +292,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 				step.setTasklet(tasklet);
 			}
-
+			ItemSkipPolicy commitSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit,
+					nonFatalCommitExceptionClasses, fatalExceptionClasses);
+			step.setCommitSkipPolicy(commitSkipPolicy);
 		}
 
 	}

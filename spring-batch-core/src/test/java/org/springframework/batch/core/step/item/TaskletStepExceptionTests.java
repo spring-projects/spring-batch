@@ -3,8 +3,13 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.*;
-import static org.springframework.batch.core.BatchStatus.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.BatchStatus.COMPLETED;
+import static org.springframework.batch.core.BatchStatus.FAILED;
+import static org.springframework.batch.core.BatchStatus.STOPPED;
+import static org.springframework.batch.core.BatchStatus.UNKNOWN;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +25,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
@@ -27,7 +33,6 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.batch.support.Classifier;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.AttributeAccessor;
 import org.springframework.transaction.TransactionException;
@@ -215,12 +220,8 @@ public class TaskletStepExceptionTests {
 		taskletStep.registerStream(stream);
 
 		final RuntimeException commitException = new RuntimeException();
-		taskletStep.setNonFatalCommitExceptions(new Classifier<Exception, Boolean>() {
-
-			public Boolean classify(Exception classifiable) {
-				return true;
-			}
-		});
+		taskletStep.setCommitSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		
 		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
 			@Override
 			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
