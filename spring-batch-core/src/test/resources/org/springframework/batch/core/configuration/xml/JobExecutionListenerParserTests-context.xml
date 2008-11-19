@@ -12,6 +12,7 @@
 		</step>
 		<listeners>
 			<listener after-method="afterJob" ref="testListener"/>
+			<listener after-method="afterJob" class="org.springframework.batch.core.configuration.xml.TestJobListener"/>
 		</listeners>
 	</job>
 
