@@ -20,7 +20,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.ExecutionContext;
 
 /**
  * @author Dave Syer
@@ -80,14 +79,6 @@ public class JobRepositorySupport implements JobRepository {
 	}
 
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
-		return null;
-	}
-
-	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
-		return null;
-	}
-
-	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		return null;
 	}
 

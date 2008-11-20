@@ -3,19 +3,15 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.batch.core.BatchStatus.COMPLETED;
-import static org.springframework.batch.core.BatchStatus.FAILED;
-import static org.springframework.batch.core.BatchStatus.STOPPED;
-import static org.springframework.batch.core.BatchStatus.UNKNOWN;
+import static org.junit.Assert.*;
+import static org.springframework.batch.core.BatchStatus.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -25,7 +21,6 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
@@ -46,13 +41,15 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
  */
 public class TaskletStepExceptionTests {
 
-	private TaskletStep taskletStep;
+	TaskletStep taskletStep;
 
-	private StepExecution stepExecution;
+	StepExecution stepExecution;
 
-	private UpdateCountingJobRepository jobRepository;
+	UpdateCountingJobRepository jobRepository;
 
-	private static RuntimeException taskletException = new RuntimeException();
+	static RuntimeException taskletException = new RuntimeException();
+
+	static JobInterruptedException interruptedException = new JobInterruptedException("");
 
 	@Before
 	public void init() {
@@ -137,7 +134,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	/*
+	/**
 	 * Exception in afterStep is ignored (only logged).
 	 */
 	public void testAfterStepFAilure() throws Exception {
@@ -199,58 +196,12 @@ public class TaskletStepExceptionTests {
 		assertEquals(exception, e.getCause());
 	}
 
-	/**
-	 * If commit exception isn't fatal step shouldn't complete with UNKNOWN
-	 * status and execution context should be rolled back.
-	 */
-	@Test
-	public void testNonFatalCommitError() throws Exception {
-
-		class TestItemStream extends ItemStreamSupport {
-			private boolean called = false;
-
-			@Override
-			public void update(ExecutionContext executionContext) throws ItemStreamException {
-				executionContext.put("key", "value");
-				called = true;
-			}
-
-		}
-		final TestItemStream stream = new TestItemStream();
-		taskletStep.registerStream(stream);
-
-		final RuntimeException commitException = new RuntimeException();
-		taskletStep.setCommitSkipPolicy(new AlwaysSkipItemSkipPolicy());
-		
-		taskletStep.setTransactionManager(new ResourcelessTransactionManager() {
-			@Override
-			protected void doCommit(DefaultTransactionStatus status) throws TransactionException {
-				throw commitException;
-			}
-		});
-
-		taskletStep.setTasklet(new Tasklet() {
-
-			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-				return RepeatStatus.FINISHED;
-			}
-
-		});
-
-		taskletStep.execute(stepExecution);
-		assertEquals("step won't refuse to restart", FAILED, stepExecution.getStatus());
-		assertTrue("execution context modified", stream.called);
-		assertTrue("execution context rolled back", stepExecution.getExecutionContext().isEmpty());
-		assertEquals("failed commit counted as rollback", 1, stepExecution.getRollbackCount());
-	}
-
 	@Test
 	public void testUpdateError() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setJobRepository(new UpdateCountingJobRepository() {
 			boolean firstCall = true;
-
 			@Override
 			public void update(StepExecution arg0) {
 				if (firstCall) {
@@ -260,7 +211,7 @@ public class TaskletStepExceptionTests {
 				throw exception;
 			}
 		});
-
+		
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
@@ -321,15 +272,8 @@ public class TaskletStepExceptionTests {
 		}
 
 		public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
+			// TODO Auto-generated method stub
 			return null;
-		}
-
-		public ExecutionContext getExecutionContext(StepExecution stepExecution) {
-			return new ExecutionContext();
-		}
-
-		public ExecutionContext getExecutionContext(JobExecution jobExecution) {
-			return new ExecutionContext();
 		}
 	}
 

@@ -20,7 +20,6 @@ import java.util.concurrent.Semaphore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -31,8 +30,6 @@ import org.springframework.batch.core.scope.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
-import org.springframework.batch.core.step.skip.ItemSkipPolicy;
-import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -91,8 +88,6 @@ public class TaskletStep extends AbstractStep {
 
 	private Semaphore semaphore = new Semaphore(1);
 
-	private ItemSkipPolicy commitSkipPolicy = new NeverSkipItemSkipPolicy();
-
 	/**
 	 * Default constructor.
 	 */
@@ -105,13 +100,6 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public TaskletStep(String name) {
 		super(name);
-	}
-
-	/**
-	 * Skip policy applying to exception thrown on tx commit.
-	 */
-	public void setCommitSkipPolicy(ItemSkipPolicy commitSkipPolicy) {
-		this.commitSkipPolicy = commitSkipPolicy;
 	}
 
 	/**
@@ -290,16 +278,10 @@ public class TaskletStep extends AbstractStep {
 						transactionManager.commit(transaction);
 					}
 					catch (Exception e) {
-						if (commitSkipPolicy.shouldSkip(e, stepExecution.getSkipCount())) {
-							rollbackExecutionContext(stepExecution);
-							throw new CommitException("non-fatal commit failure", e);
-						}
-						else {
-							fatalException.setException(e);
-							stepExecution.setStatus(BatchStatus.UNKNOWN);
-							logger.error("Fatal error detected during commit.");
-							throw new FatalException("Fatal error detected during commit", e);
-						}
+						fatalException.setException(e);
+						stepExecution.setStatus(BatchStatus.UNKNOWN);
+						logger.error("Fatal error detected during commit.");
+						throw new FatalException("Fatal error detected during commit", e);
 					}
 
 					try {
@@ -318,15 +300,7 @@ public class TaskletStep extends AbstractStep {
 					throw e;
 				}
 				catch (Exception e) {
-					// if commit failed, calling rollback on tx manager would
-					// cause exception
-					if (!(e instanceof CommitException)) {
-						processRollback(stepExecution, fatalException, transaction);
-					}
-					else {
-						// assume the failed commit caused rollback
-						stepExecution.rollback();
-					}
+					processRollback(stepExecution, fatalException, transaction);
 					throw e;
 				}
 				finally {
@@ -343,15 +317,6 @@ public class TaskletStep extends AbstractStep {
 				interruptionPolicy.checkInterrupted(stepExecution);
 
 				return result;
-			}
-
-			/**
-			 * Load the saved value of ExecutionContext from repository.
-			 */
-			private void rollbackExecutionContext(StepExecution stepExecution) {
-				stepExecution.setExecutionContext(getJobRepository().getExecutionContext(stepExecution));
-				JobExecution jobExecution = stepExecution.getJobExecution();
-				jobExecution.setExecutionContext(getJobRepository().getExecutionContext(jobExecution));
 			}
 
 		});
@@ -409,15 +374,6 @@ public class TaskletStep extends AbstractStep {
 			return this.exception;
 		}
 
-	}
-
-	/**
-	 * Signals non-fatal commit failure.
-	 */
-	private static class CommitException extends RuntimeException {
-		public CommitException(String msg, Throwable cause) {
-			super(msg, cause);
-		}
 	}
 
 	protected void close(ExecutionContext ctx) throws Exception {

@@ -336,12 +336,4 @@ public class SimpleJobRepository implements JobRepository {
 		
 	}
 
-	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
-		return ecDao.getExecutionContext(stepExecution);
-	}
-
-	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
-		return ecDao.getExecutionContext(jobExecution);
-	}
-
 }
