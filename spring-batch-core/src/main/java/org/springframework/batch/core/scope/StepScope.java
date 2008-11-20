@@ -17,9 +17,7 @@ package org.springframework.batch.core.scope;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
 import org.springframework.batch.core.scope.util.PlaceholderProxyFactoryBean;
-import org.springframework.batch.core.scope.util.StepContextFactory;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectFactory;
@@ -31,7 +29,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.Scope;
 import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 import org.springframework.util.StringValueResolver;
@@ -214,7 +211,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	/**
 	 * Wrap a target bean definition in a proxy that defers initialization until
 	 * after the {@link StepContext} is available. Amounts to adding
@@ -237,51 +234,13 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		// TODO: detect presence of Spring 3.0 and use ScopedPoxyUtils instead
 
 		// Create the scoped proxy...
-		BeanDefinitionHolder proxyHolder = createScopedProxy(new BeanDefinitionHolder(definition, beanName), registry,
+		BeanDefinitionHolder proxyHolder = PlaceholderProxyFactoryBean.createScopedProxy(new BeanDefinitionHolder(definition, beanName), registry,
 				proxyTargetClass);
 		// ...and register it under the original target name
 		registry.registerBeanDefinition(beanName, proxyHolder.getBeanDefinition());
 
 		return proxyHolder;
 
-	}
-
-	private static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
-			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
-
-		String originalBeanName = definition.getBeanName();
-		BeanDefinition targetDefinition = definition.getBeanDefinition();
-
-		// Create a proxy definition for the original bean name,
-		// "hiding" the target bean in an internal target definition.
-		RootBeanDefinition proxyDefinition = new RootBeanDefinition(PlaceholderProxyFactoryBean.class);
-		proxyDefinition.getConstructorArgumentValues().addGenericArgumentValue(new StepContextFactory());
-		proxyDefinition.setOriginatingBeanDefinition(definition.getBeanDefinition());
-		proxyDefinition.setSource(definition.getSource());
-		proxyDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-
-		String targetBeanName = "lazyBindingProxy." + originalBeanName;
-		proxyDefinition.getPropertyValues().addPropertyValue("targetBeanName", targetBeanName);
-
-		if (proxyTargetClass) {
-			targetDefinition.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
-			// ProxyFactoryBean's "proxyTargetClass" default is TRUE, so we
-			// don't need to set it explicitly here.
-		}
-		else {
-			proxyDefinition.getPropertyValues().addPropertyValue("proxyTargetClass", Boolean.FALSE);
-		}
-
-		proxyDefinition.setAutowireCandidate(targetDefinition.isAutowireCandidate());
-		// The target bean should be ignored in favor of the proxy.
-		targetDefinition.setAutowireCandidate(false);
-
-		// Register the target bean as separate bean in the factory.
-		registry.registerBeanDefinition(targetBeanName, targetDefinition);
-
-		// Return the scoped proxy definition as primary bean definition
-		// (potentially an inner bean).
-		return new BeanDefinitionHolder(proxyDefinition, originalBeanName, definition.getAliases());
 	}
 
 	/**

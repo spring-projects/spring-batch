@@ -17,14 +17,15 @@ package org.springframework.batch.core.scope.util;
 
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.target.SimpleBeanTargetSource;
+import org.springframework.batch.core.scope.StepScope;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionVisitor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -57,9 +58,9 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	private static final String PLACEHOLDER_SUFFIX = "}";
 
-	private volatile boolean active = false;
-
 	private ContextFactory contextFactory;
+
+	private StepScope scope = new StepScope();
 
 	/**
 	 * Public setter for the context factory. Used to construct the context root
@@ -93,10 +94,8 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 		final TypeConverter typeConverter = listableBeanFactory.getTypeConverter();
 
-		// Try to prevent other threads from using this TypeConverter
-		active = true;
-
-		listableBeanFactory.setTypeConverter(new TypeConverter() {
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(listableBeanFactory);
+		beanFactory.setTypeConverter(new TypeConverter() {
 			@SuppressWarnings("unchecked")
 			public Object convertIfNecessary(Object value, Class requiredType, MethodParameter methodParam)
 					throws TypeMismatchException {
@@ -127,8 +126,8 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			 * come back when getBean() is called later on
 			 */
 			String targetBeanName = getTargetBeanName();
-			BeanDefinition originalDefinition = listableBeanFactory.getMergedBeanDefinition(getTargetBeanName());
-			GenericBeanDefinition beanDefinition = new GenericBeanDefinition(originalDefinition);
+			GenericBeanDefinition beanDefinition = new GenericBeanDefinition(listableBeanFactory
+					.getMergedBeanDefinition(targetBeanName));
 			logger.debug("Rehydrating scoped target: [" + targetBeanName + "]");
 
 			BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(new StringValueResolver() {
@@ -156,18 +155,27 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 			};
 
-			listableBeanFactory.registerBeanDefinition(beanName, beanDefinition);
+			String beanScope = beanDefinition.getScope();
+			/*
+			 * The scope for the bean really ought to be "step" if we get this
+			 * far, but we'll be cautious anyway and avoid a potential issue
+			 * with trying to replace the default scopes (which is not allowed)
+			 */
+			if (!beanScope.equals(ConfigurableListableBeanFactory.SCOPE_PROTOTYPE)
+					&& !beanScope.equals(ConfigurableListableBeanFactory.SCOPE_SINGLETON)) {
+				// Need this otherwise there will be no step scope available.
+				beanFactory.registerScope(beanScope, scope);
+			}
+			beanFactory.registerBeanDefinition(beanName, beanDefinition);
 			// Make the replacements before the target is hydrated
 			visitor.visitBeanDefinition(beanDefinition);
-			return listableBeanFactory.getBean(beanName);
+			return beanFactory.getBean(beanName);
 
 		}
 		finally {
-			listableBeanFactory.removeBeanDefinition(beanName);
-			// Replace the original type converter. TODO: does this cause
-			// problems if in fact it was null to start with?
-			listableBeanFactory.setTypeConverter(typeConverter);
-			active = false;
+			beanFactory.destroySingletons();
+			beanFactory = null;
+			// Anything else we can do to clean it up?
 		}
 
 	}
@@ -179,13 +187,11 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	 */
 	private Object convertFromContext(String key, Class<?> requiredType) {
 		Object result = null;
-		if (active) {
-			BeanWrapper wrapper = new BeanWrapperImpl(contextFactory.getContext());
-			if (wrapper.isReadableProperty(key)) {
-				Object property = wrapper.getPropertyValue(key);
-				if (requiredType.isAssignableFrom(property.getClass())) {
-					result = property;
-				}
+		BeanWrapper wrapper = new BeanWrapperImpl(contextFactory.getContext());
+		if (wrapper.isReadableProperty(key)) {
+			Object property = wrapper.getPropertyValue(key);
+			if (requiredType.isAssignableFrom(property.getClass())) {
+				result = property;
 			}
 		}
 		return result;

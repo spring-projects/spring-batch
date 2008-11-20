@@ -79,6 +79,10 @@ public class StepScopePlaceholderIntegrationTests implements BeanFactoryAware {
 	@Test
 	public void testSimpleProperty() throws Exception {
 		assertEquals("bar", simple.getName());
+		// Once the step context is set up it should be baked into the proxies
+		// so changing it now should have no effect
+		stepExecution.getExecutionContext().put("foo", "wrong!");
+		assertEquals("bar", simple.getName());
 	}
 
 	@Test

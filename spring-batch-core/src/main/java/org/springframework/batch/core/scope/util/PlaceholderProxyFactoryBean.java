@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.ProxyConfig;
 import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.framework.autoproxy.AutoProxyUtils;
 import org.springframework.aop.scope.DefaultScopedObject;
 import org.springframework.aop.scope.ScopedObject;
 import org.springframework.aop.scope.ScopedProxyFactoryBean;
@@ -13,7 +14,11 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.FactoryBeanNotInitializedException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -80,8 +85,8 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 		pf.addAdvice(new DelegatingIntroductionInterceptor(scopedObject));
 
 		// Add the AopInfrastructureBean marker to indicate that the scoped
-		// proxy
-		// itself is not subject to auto-proxying! Only its target bean is.
+		// proxy itself is not subject to auto-proxying! Only its target bean
+		// is.
 		pf.addInterface(AopInfrastructureBean.class);
 
 		this.proxy = pf.getProxy(cbf.getBeanClassLoader());
@@ -107,4 +112,55 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 	public boolean isSingleton() {
 		return true;
 	}
+
+	/**
+	 * Convenience method to create a {@link BeanDefinition} for a target
+	 * wrapped in a placeholder tarrget source, able to defer binding of
+	 * placeholders until the bean is used.
+	 * 
+	 * @param definition a target bean definition
+	 * @param registry a {@link BeanDefinitionRegistry}
+	 * @param proxyTargetClass true if we need to use CGlib to create the
+	 * proxies
+	 * @return a {@link BeanDefinitionHolder} for a
+	 * {@link PlaceholderProxyFactoryBean}
+	 */
+	public static BeanDefinitionHolder createScopedProxy(BeanDefinitionHolder definition,
+			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
+
+		String originalBeanName = definition.getBeanName();
+		BeanDefinition targetDefinition = definition.getBeanDefinition();
+
+		// Create a proxy definition for the original bean name,
+		// "hiding" the target bean in an internal target definition.
+		RootBeanDefinition proxyDefinition = new RootBeanDefinition(PlaceholderProxyFactoryBean.class);
+		proxyDefinition.getConstructorArgumentValues().addGenericArgumentValue(new StepContextFactory());
+		proxyDefinition.setOriginatingBeanDefinition(definition.getBeanDefinition());
+		proxyDefinition.setSource(definition.getSource());
+		proxyDefinition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+
+		String targetBeanName = "lazyBindingProxy." + originalBeanName;
+		proxyDefinition.getPropertyValues().addPropertyValue("targetBeanName", targetBeanName);
+
+		if (proxyTargetClass) {
+			targetDefinition.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
+			// ProxyFactoryBean's "proxyTargetClass" default is TRUE, so we
+			// don't need to set it explicitly here.
+		}
+		else {
+			proxyDefinition.getPropertyValues().addPropertyValue("proxyTargetClass", Boolean.FALSE);
+		}
+
+		proxyDefinition.setAutowireCandidate(targetDefinition.isAutowireCandidate());
+		// The target bean should be ignored in favor of the proxy.
+		targetDefinition.setAutowireCandidate(false);
+
+		// Register the target bean as separate bean in the factory.
+		registry.registerBeanDefinition(targetBeanName, targetDefinition);
+
+		// Return the scoped proxy definition as primary bean definition
+		// (potentially an inner bean).
+		return new BeanDefinitionHolder(proxyDefinition, originalBeanName, definition.getAliases());
+	}
+
 }

@@ -24,6 +24,12 @@ public class TestStep implements Step {
 
 	public void execute(StepExecution stepExecution) throws JobInterruptedException {
 		context = StepSynchronizationManager.getContext();
+		setContextFromCollaborator();
+		stepExecution.getExecutionContext().put("foo", "changed but it shouldn't affect the collaborator");
+		setContextFromCollaborator();
+	}
+
+	private void setContextFromCollaborator() {
 		if (context != null) {
 			context.setAttribute("collaborator", collaborator.getName());
 		}
