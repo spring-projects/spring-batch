@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -41,8 +41,8 @@ public class NonbufferingFaultTolerantChunkOrientedTasklet<I, O> extends
 	public NonbufferingFaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter,
 			RepeatOperations chunkOperations, RetryOperations retryTemplate,
-			Classifier<Throwable, Boolean> rollbackClassifier, ItemSkipPolicy readSkipPolicy,
-			ItemSkipPolicy writeSkipPolicy, ItemSkipPolicy processSkipPolicy) {
+			Classifier<Throwable, Boolean> rollbackClassifier, SkipPolicy readSkipPolicy,
+			SkipPolicy writeSkipPolicy, SkipPolicy processSkipPolicy) {
 
 		super(itemReader, itemProcessor, itemWriter, retryTemplate, readSkipPolicy, processSkipPolicy, writeSkipPolicy,
 				rollbackClassifier, chunkOperations);

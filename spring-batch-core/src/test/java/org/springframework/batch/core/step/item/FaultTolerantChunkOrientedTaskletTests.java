@@ -33,7 +33,7 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.ChunkContext;
-import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -95,7 +95,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		}
 	};
 
-	private ItemSkipPolicy readSkipPolicy = new ItemSkipPolicy() {
+	private SkipPolicy readSkipPolicy = new SkipPolicy() {
 		public boolean shouldSkip(Throwable t, int skipCount) throws SkipLimitExceededException {
 			if (skipCount < skipLimit) {
 				return true;
@@ -104,7 +104,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		}
 	};
 
-	private ItemSkipPolicy writeSkipPolicy = readSkipPolicy;
+	private SkipPolicy writeSkipPolicy = readSkipPolicy;
 
 	@Before
 	public void setUp() {

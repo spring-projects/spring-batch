@@ -21,7 +21,7 @@ package org.springframework.batch.core.step.skip;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public interface ItemSkipPolicy {
+public interface SkipPolicy {
 
 	/**
 	 * Returns true or false, indicating whether or not processing should

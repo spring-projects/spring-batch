@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -257,10 +257,10 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 			List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>(
 					skippableExceptionClasses);
-			ItemSkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+			SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
-			ItemSkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
+			SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
 
 			if (isReaderTransactionalQueue) {

@@ -26,7 +26,7 @@ import org.springframework.batch.support.Classifier;
 
 /**
  * <p>
- * {@link ItemSkipPolicy} that determines whether or not reading should continue
+ * {@link SkipPolicy} that determines whether or not reading should continue
  * based upon how many items have been skipped. This is extremely useful
  * behavior, as it allows you to skip records, but will throw a
  * {@link SkipLimitExceededException} if a set limit has been exceeded. For
@@ -52,7 +52,7 @@ import org.springframework.batch.support.Classifier;
  * @author Lucas Ward
  * @author Robert Kasanicky
  */
-public class LimitCheckingItemSkipPolicy implements ItemSkipPolicy {
+public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 
 	private final int skipLimit;
 

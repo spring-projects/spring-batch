@@ -17,12 +17,12 @@ package org.springframework.batch.core.step.skip;
 
 
 /**
- * {@link ItemSkipPolicy} implementation that always returns false,
+ * {@link SkipPolicy} implementation that always returns false,
  * indicating that an item should not be skipped.
  * 
  * @author Lucas Ward
  */
-public class NeverSkipItemSkipPolicy implements ItemSkipPolicy{
+public class NeverSkipItemSkipPolicy implements SkipPolicy{
 
 	public boolean shouldSkip(Throwable t, int skipCount) {
 		return false;

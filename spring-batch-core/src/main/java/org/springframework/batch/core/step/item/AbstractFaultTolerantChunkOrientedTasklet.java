@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.skip.ItemSkipPolicy;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -48,18 +48,18 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 
 	final private RepeatOperations repeatOperations;
 
-	final private ItemSkipPolicy writeSkipPolicy;
+	final private SkipPolicy writeSkipPolicy;
 
-	final private ItemSkipPolicy processSkipPolicy;
+	final private SkipPolicy processSkipPolicy;
 
-	final private ItemSkipPolicy readSkipPolicy;
+	final private SkipPolicy readSkipPolicy;
 
 	final private Classifier<Throwable, Boolean> rollbackClassifier;
 
 	public AbstractFaultTolerantChunkOrientedTasklet(ItemReader<? extends I> itemReader,
 			ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter,
-			RetryOperations retryOperations, ItemSkipPolicy readSkipPolicy, ItemSkipPolicy processSkipPolicy,
-			ItemSkipPolicy writeSkipPolicy, Classifier<Throwable, Boolean> rollbackClassifier,
+			RetryOperations retryOperations, SkipPolicy readSkipPolicy, SkipPolicy processSkipPolicy,
+			SkipPolicy writeSkipPolicy, Classifier<Throwable, Boolean> rollbackClassifier,
 			RepeatOperations repeatTemplate) {
 
 		super(itemReader, itemProcessor, itemWriter);
@@ -71,7 +71,7 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 		this.repeatOperations = repeatTemplate;
 	}
 
-	protected ItemSkipPolicy getReadSkipPolicy() {
+	protected SkipPolicy getReadSkipPolicy() {
 		return readSkipPolicy;
 	}
 
