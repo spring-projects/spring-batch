@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>org.springframework.batch</artifactId>
@@ -19,8 +18,8 @@
 		<module>spring-batch-samples</module>
 		<!--		<module>spring-batch-integration</module>-->
 		<module>docs</module>
-		<module>archetypes</module>
-	</modules>
+    <module>version</module>
+  </modules>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
 		<name>SpringSource</name>
@@ -54,7 +53,7 @@
 	</licenses>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
+		<spring.framework.version>2.5.6.A</spring.framework.version>
 		<bundlor.version>1.0.0.M1</bundlor.version>
 	</properties>
 	<profiles>
@@ -199,12 +198,12 @@
 								<configuration>
 									<tasks>
 										<echo>Aggregating XSL reports</echo>
-										<mkdir dir="target/emma-reports" />
+										<mkdir dir="target/emma-reports"/>
 										<concat destfile="target/site/emma-reports/emma-report.xml">
-											<fileset dir="." includes="**/coverage.fragment" />
+											<fileset dir="." includes="**/coverage.fragment"/>
 											<filterchain>
 												<linecontainsregexp>
-													<regexp pattern="[a-zA-Z]" />
+													<regexp pattern="[a-zA-Z]"/>
 												</linecontainsregexp>
 											</filterchain>
 											<header trimleading="yes">
@@ -214,10 +213,9 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html"
-											style="src/main/xsl/emma2html.xsl">
-											<param name="project" expression="${project.name}" />
-											<param name="version" expression="${project.version}" />
+										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
+											<param name="project" expression="${project.name}"/>
+											<param name="version" expression="${project.version}"/>
 										</xslt>
 									</tasks>
 								</configuration>
@@ -273,19 +271,18 @@
 							<configuration>
 								<tasks>
 									<echo>Creating JUnit reports</echo>
-									<mkdir dir="target/surefire-reports" />
+									<mkdir dir="target/surefire-reports"/>
 									<junitreport todir="target/surefire-reports">
 										<fileset dir=".">
-											<filename name="**/target/surefire-reports/TEST-*.xml" />
+											<filename name="**/target/surefire-reports/TEST-*.xml"/>
 										</fileset>
-										<report todir="target/site/junit-reports" />
+										<report todir="target/site/junit-reports"/>
 									</junitreport>
 									<echo>Creating Emma reports</echo>
-									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
-										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
-										<mapper type="glob" from="*.xml" to="*.fragment" />
-										<param name="project" expression="${project.name}" />
+									<mkdir dir="target/site/emma-reports"/>
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+										<mapper type="glob" from="*.xml" to="*.fragment"/>
+										<param name="project" expression="${project.name}"/>
 									</xslt>
 								</tasks>
 							</configuration>
@@ -440,6 +437,16 @@
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
 				<version>4.4</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<!--
+					Don't use the com.springsource one - surefire is broken in some
+					strange way
+				-->
+				<groupId>org.junit</groupId>
+				<artifactId>com.springsource.org.junit</artifactId>
+				<version>4.4.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
