@@ -234,7 +234,7 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 			public Object recover(RetryContext context) throws Exception {
 				Exception le = (Exception) context.getLastThrowable();
 				if (!writeSkipPolicy.shouldSkip(le, contribution.getSkipCount())) {
-					throw le;
+					throw new RetryException("Non-skippable exception in recoverer", le);
 				}
 				if (chunk.size() == 1) {
 					O item = chunk.get(0);

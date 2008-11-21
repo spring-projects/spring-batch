@@ -43,6 +43,7 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
+import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.batch.support.Classifier;
@@ -453,7 +454,8 @@ public class FaultTolerantChunkOrientedTaskletTests {
 			fail();
 		}
 		catch (Exception e) {
-			assertSame(ex, e);
+			assertTrue(e instanceof RetryException);
+			assertSame(ex, e.getCause());
 		}
 
 		/*
