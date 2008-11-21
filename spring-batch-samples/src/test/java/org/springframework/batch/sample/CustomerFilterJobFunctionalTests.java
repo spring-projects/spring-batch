@@ -60,6 +60,7 @@ public class CustomerFilterJobFunctionalTests extends AbstractValidatingBatchLau
 	@Before
 	public void onSetUp() throws Exception {
 		simpleJdbcTemplate.update("delete from TRADE");
+		simpleJdbcTemplate.update("delete from CUSTOMER where ID > 4");
 		List<Map<String, Object>> list = simpleJdbcTemplate.queryForList("select name, CREDIT from customer");
 		for (Map<String, Object> map : list) {
 			credits.put((String) map.get("NAME"), ((Number) map.get("CREDIT")).doubleValue());
@@ -68,8 +69,8 @@ public class CustomerFilterJobFunctionalTests extends AbstractValidatingBatchLau
 	
 	@After
 	public void tearDown() throws Exception {
-		simpleJdbcTemplate.update("delete from CUSTOMER where ID > 4");
 		simpleJdbcTemplate.update("delete from TRADE");
+		simpleJdbcTemplate.update("delete from CUSTOMER where ID > 4");
 	}
 
 	@Test
@@ -95,7 +96,6 @@ public class CustomerFilterJobFunctionalTests extends AbstractValidatingBatchLau
 
 			public void processRow(ResultSet rs) throws SQLException {
 				Customer customer = customers.get(activeRow++);
-				
 				assertEquals(customer.getName(),rs.getString(1));
 				assertEquals(customer.getCredit(), rs.getDouble(2), .01);
 			}
