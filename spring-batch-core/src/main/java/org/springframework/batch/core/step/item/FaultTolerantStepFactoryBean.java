@@ -161,7 +161,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * 
 	 * Note that if chunks are executed concurrently the number of skips can
 	 * potentially exceed the skip limit and step can still finish successfully.
-	 * This is due to the fact that overall skip count is not being synchronized
+	 * This is due to the fact that overall skip count can not be synchronized
 	 * between concurrent chunks while they processing, only on chunk
 	 * boundaries.
 	 * 
