@@ -464,6 +464,7 @@
 				<groupId>javax.annotation</groupId>
 				<artifactId>com.springsource.javax.annotation</artifactId>
 				<version>1.0.0</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
