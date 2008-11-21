@@ -232,13 +232,15 @@ public abstract class AbstractFaultTolerantChunkOrientedTasklet<I, O> extends Ab
 		RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
 			public Object recover(RetryContext context) throws Exception {
+				Exception le = (Exception) context.getLastThrowable();
+				if (!writeSkipPolicy.shouldSkip(le, contribution.getSkipCount())) {
+					throw le;
+				}
 				if (chunk.size() == 1) {
-					Exception e = (Exception) context.getLastThrowable();
 					O item = chunk.get(0);
-					checkSkipPolicy(item, e, contribution);
+					checkSkipPolicy(item, le, contribution);
 					return null;
 				}
-				Exception le = (Exception) context.getLastThrowable();
 				if (!rollbackClassifier.classify(le)) {
 					throw new RetryException(
 							"Invalid retry state during write caused by exception that does not classify for rollback: ",

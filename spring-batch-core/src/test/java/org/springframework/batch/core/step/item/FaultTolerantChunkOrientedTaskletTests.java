@@ -15,13 +15,12 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.scope.ChunkContext;
+import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.item.ItemProcessor;
@@ -285,7 +285,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 			assertTrue(attributes.hasAttribute("INPUT_BUFFER_KEY"));
 		}
 		@SuppressWarnings("unchecked")
-		Map<Integer, Exception > skips = (Map<Integer, Exception>) attributes.getAttribute("SKIPPED_INPUTS_KEY");
+		Map<Integer, Exception> skips = (Map<Integer, Exception>) attributes.getAttribute("SKIPPED_INPUTS_KEY");
 		assertEquals(1, skips.size());
 
 		// The last recovery for this chunk...
@@ -365,14 +365,14 @@ public class FaultTolerantChunkOrientedTaskletTests {
 				new ItemProcessor<Integer, String>() {
 					public String process(Integer item) throws Exception {
 						if (item == 1) {
-							throw processorException; 
+							throw processorException;
 						}
 						processed.add(item);
 						return String.valueOf(item);
 					}
 				}, new ItemWriter<String>() {
 					public void write(List<? extends String> items) throws Exception {
-						throw writerException; 
+						throw writerException;
 					}
 
 				}, chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
@@ -389,7 +389,7 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		skipListener.onSkipInWrite("2", writerException);
 		expectLastCall().once();
 		replay(skipListener);
-		
+
 		// processor fails first
 		try {
 			tasklet.execute(contribution, attributes);
@@ -422,6 +422,45 @@ public class FaultTolerantChunkOrientedTaskletTests {
 		assertEquals(1, contribution.getWriteSkipCount());
 
 		verify(skipListener);
+	}
+
+	@Test
+	public void testRethrowNonSkippableExceptionOnWriteAsap() throws Exception {
+		final List<String> chunk = Arrays.asList(new String[] { "1", "2" });
+		final Exception ex = new RuntimeException();
+		final StepContribution contribution = new StepExecution("foo", null).createStepContribution();
+		final Map<String, Exception> skipped = new HashMap<String, Exception>();
+		writeSkipPolicy = new NeverSkipItemSkipPolicy();
+
+		@SuppressWarnings("unchecked")
+		ItemWriter<String> itemWriter = createMock(ItemWriter.class);
+		itemWriter.write(chunk);
+		expectLastCall().andThrow(ex);
+		replay(itemWriter);
+		tasklet = new FaultTolerantChunkOrientedTasklet<Integer, String>(itemReader, itemProcessor, itemWriter,
+				chunkOperations, retryTemplate, rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
+
+		try {
+			tasklet.write(chunk, contribution, skipped);
+			fail();
+		}
+		catch (Exception e) {
+			assertSame(ex, e);
+		}
+
+		try {
+			tasklet.write(chunk, contribution, skipped);
+			fail();
+		}
+		catch (Exception e) {
+			assertSame(ex, e);
+		}
+
+		/*
+		 * writer was called only on first failed attempt, exception is rethrown
+		 * immediately when chunk is reprocessed because it is not skippable
+		 */
+		verify(itemWriter);
 	}
 
 }
