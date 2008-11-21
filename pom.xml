@@ -18,7 +18,6 @@
 		<module>spring-batch-samples</module>
 		<!--		<module>spring-batch-integration</module>-->
 		<module>docs</module>
-    <module>version</module>
   </modules>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
