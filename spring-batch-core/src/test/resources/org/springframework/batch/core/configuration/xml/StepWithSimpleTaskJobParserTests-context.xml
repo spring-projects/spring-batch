@@ -12,7 +12,11 @@
 			<next on="*" to="step2" />
 		</step>
 		<step name="step2">
-			<simple-task tasklet="tasklet"/>
+			<simple-task tasklet="tasklet">
+				<listeners>
+					<listener id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+				</listeners>
+			</simple-task>
 		</step>
 	</job>
 

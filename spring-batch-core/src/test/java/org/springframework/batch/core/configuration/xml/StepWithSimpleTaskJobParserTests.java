@@ -29,6 +29,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -48,7 +49,12 @@ public class StepWithSimpleTaskJobParserTests {
 	private JobRepository jobRepository;
 	
 	@Autowired
+	@Qualifier("tasklet")
 	private AbstractTestComponent tasklet;
+	
+	@Autowired
+	@Qualifier("listener")
+	private TestListener listener;
 	
 	@Before
 	public void setUp() {
@@ -63,5 +69,6 @@ public class StepWithSimpleTaskJobParserTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertTrue(tasklet.isExecuted());
+		assertTrue(listener.isExecuted());
 	}
 }

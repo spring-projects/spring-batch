@@ -232,6 +232,21 @@
 	<xsd:complexType name="simpleTaskType">
 		<xsd:complexContent>
 			<xsd:extension base="stepDefType">
+				<xsd:sequence>
+					<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
+						<xsd:annotation>
+							<xsd:documentation><![CDATA[
+							List of all listeners for the step definition
+							]]>
+							</xsd:documentation>
+						</xsd:annotation>
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded"/>
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
 				<xsd:attribute name="tasklet" type="xsd:string" use="required">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
