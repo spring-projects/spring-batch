@@ -16,6 +16,7 @@
 package org.springframework.batch.core.listener;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_CHUNK;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
 
@@ -27,6 +28,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
@@ -37,6 +39,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.annotation.AfterProcess;
 import org.springframework.batch.core.annotation.AfterRead;
+import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.annotation.BeforeProcess;
@@ -45,9 +48,6 @@ import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.annotation.OnProcessError;
 import org.springframework.batch.core.annotation.OnReadError;
-import org.springframework.batch.core.annotation.OnSkipInProcess;
-import org.springframework.batch.core.annotation.OnSkipInRead;
-import org.springframework.batch.core.annotation.OnSkipInWrite;
 import org.springframework.batch.core.annotation.OnWriteError;
 import org.springframework.util.Assert;
 
@@ -86,7 +86,7 @@ public class StepListenerFactoryBeanTests {
 		((ChunkListener)listener).beforeChunk();
 		((ChunkListener)listener).afterChunk();
 		((ItemReadListener<Object>)listener).beforeRead();
-		//((ItemReadListener<Object>)listener).afterRead(item);
+		((ItemReadListener<Object>)listener).afterRead(item);
 		((ItemReadListener)listener).onReadError(new Exception());
 		((ItemProcessListener<Object, Object>)listener).beforeProcess(item);
 		((ItemProcessListener<Object, Object>)listener).afterProcess(item, item);
@@ -101,7 +101,7 @@ public class StepListenerFactoryBeanTests {
 		assertTrue(testClass.beforeChunkCalled);
 		assertTrue(testClass.afterChunkCalled);
 		assertTrue(testClass.beforeReadCalled);
-		//assertTrue(testClass.afterReadCalled);
+		assertTrue(testClass.afterReadCalled);
 		assertTrue(testClass.onReadErrorCalled);
 		assertTrue(testClass.beforeProcessCalled);
 		assertTrue(testClass.afterProcessCalled);
@@ -114,7 +114,74 @@ public class StepListenerFactoryBeanTests {
 		assertTrue(testClass.onSkipInWriteCalled);
 	}
 	
+	@Test
+	public void testAllThreeTypes() throws Exception{
+		//Test to make sure if someone has annotated a method, implemented the interface, and given a string
+		//method name, that all three will be called
+		ThreeStepExecutionListener delegate = new ThreeStepExecutionListener();
+		factoryBean.setDelegate(delegate);
+		Map<StepListenerMetaData, String> metaDataMap = new HashMap<StepListenerMetaData, String>();;
+		metaDataMap.put(AFTER_STEP, "destroy");
+		factoryBean.setMetaDataMap(metaDataMap);
+		StepListener listener = (StepListener) factoryBean.getObject();
+		((StepExecutionListener)listener).afterStep(stepExecution);
+		assertEquals(3, delegate.callcount);
+	}
 	
+	@Test
+	public void testAnnotatingInterfaceResultsInOneCall() throws Exception{
+		MultipleAfterStep delegate = new MultipleAfterStep();
+		factoryBean.setDelegate(delegate);
+		Map<StepListenerMetaData, String> metaDataMap = new HashMap<StepListenerMetaData, String>();;
+		metaDataMap.put(AFTER_STEP, "afterStep");
+		factoryBean.setMetaDataMap(metaDataMap);
+		StepListener listener = (StepListener) factoryBean.getObject();
+		((StepExecutionListener)listener).afterStep(stepExecution);
+		assertEquals(1, delegate.callcount);
+	}
+	
+	private class MultipleAfterStep implements StepExecutionListener{
+
+		int callcount = 0;
+		
+		@AfterStep
+		public ExitStatus afterStep(StepExecution stepExecution) {
+			Assert.notNull(stepExecution);
+			callcount++;
+			return null;
+		}
+
+		public void beforeStep(StepExecution stepExecution) {
+			callcount++;
+		}
+		
+	
+	}
+	
+	private class ThreeStepExecutionListener implements StepExecutionListener{
+
+		int callcount = 0;
+		
+		public ExitStatus afterStep(StepExecution stepExecution) {
+			Assert.notNull(stepExecution);
+			callcount++;
+			return null;
+		}
+		
+		public void beforeStep(StepExecution stepExecution) {
+			callcount++;
+		}
+		
+		public void destroy(){
+			callcount++;
+		}
+		
+		@AfterStep
+		public void after(){
+			callcount++;
+		}
+
+	}
 	
 	private class TestClass implements SkipListener<Object, Object>{
 
@@ -199,17 +266,14 @@ public class StepListenerFactoryBeanTests {
 			onWriteErrorCalled = true;
 		}
 		
-		@OnSkipInProcess
 		public void onSkipInProcess(Object item, Throwable t) {
 			onSkipInProcessCalled = true;
 		}
 
-		@OnSkipInRead
 		public void onSkipInRead(Throwable t) {
 			onSkipInReadCalled = true;
 		}
 
-		@OnSkipInWrite
 		public void onSkipInWrite(Object item, Throwable t) {
 			onSkipInWriteCalled = true;
 		}

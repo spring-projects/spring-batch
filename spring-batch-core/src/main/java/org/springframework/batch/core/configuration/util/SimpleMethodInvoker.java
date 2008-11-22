@@ -50,22 +50,6 @@ public class SimpleMethodInvoker implements MethodInvoker {
 	private final Object object;
 	private Method method;
 	
-	public static MethodInvoker createMethodInvokerByName(Object object, String methodName, boolean paramsRequired, Class<?>... paramTypes){
-		Assert.notNull(object, "Object to invoke must not be null");
-		Method method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
-		//if no method was found for the given parameters, and the parameters aren't required
-		if(method == null && !paramsRequired){
-			//try with no params
-			method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, new Class[]{});
-		}
-		if(method == null){
-			return null;
-		}
-		else{
-			return new SimpleMethodInvoker(object, method);
-		}
-	}
-	
 	public SimpleMethodInvoker(Object object, Method method) {
 		Assert.notNull(object, "Object to invoke must not be null");
 		Assert.notNull(method, "Method to invoke must not be null");
@@ -100,6 +84,9 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		else if(parameterTypes.length > args.length){
 			throw new IllegalArgumentException("Wrong number of arguments, expected no more than: [" + parameterTypes.length + "]");
 		}
+		else{
+			invokeArgs = args;
+		}
 		
 		method.setAccessible(true);
 		
@@ -121,11 +108,11 @@ public class SimpleMethodInvoker implements MethodInvoker {
 			return true;
 		}
 		SimpleMethodInvoker rhs = (SimpleMethodInvoker) obj;
-		return (rhs.method == this.method) && (rhs.object == this.object);
+		return (rhs.method.equals(this.method)) && (rhs.object.equals(this.object));
 	}
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(25, 37).append(object).append(method).toHashCode();
+		return new HashCodeBuilder(25, 37).append(object.hashCode()).append(method.hashCode()).toHashCode();
 	}
 }

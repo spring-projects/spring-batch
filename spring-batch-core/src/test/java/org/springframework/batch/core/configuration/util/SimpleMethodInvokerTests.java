@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.util.Assert;
 
 /**
  * @author Lucas Ward
@@ -101,9 +102,27 @@ public class SimpleMethodInvokerTests {
 		assertFalse(testClass.beforeJobCalled);
 	}
 	
+	@Test
+	public void testMethodWithArgument() throws Exception{
+		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "argumentTest", Object.class);
+		methodInvoker.invokeMethod(new Object());
+		assertTrue(testClass.argumentTestCalled);
+	}
+	
+	@Test
+	public void testEquals() throws Exception{
+		Method method = TestClass.class.getMethod("beforeJobWithExecution", JobExecution.class);
+		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
+		
+		method = TestClass.class.getMethod("beforeJobWithExecution", JobExecution.class);
+		MethodInvoker methodInvoker2 = new SimpleMethodInvoker(testClass, method);
+		assertEquals(methodInvoker, methodInvoker2);
+	}
+	
 	private class TestClass{
 		
 		boolean beforeJobCalled = false;
+		boolean argumentTestCalled = false;
 		
 		public void beforeJob(){
 			beforeJobCalled = true;
@@ -115,6 +134,11 @@ public class SimpleMethodInvokerTests {
 		
 		public void beforeJobWithTooManyArguments(JobExecution jobExecution, int someInt){
 			beforeJobCalled = true;
+		}
+		
+		public void argumentTest(Object object){
+			Assert.notNull(object);
+			argumentTestCalled = true;
 		}
 	}
 }

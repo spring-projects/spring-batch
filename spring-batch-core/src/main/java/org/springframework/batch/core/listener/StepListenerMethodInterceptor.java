@@ -15,17 +15,26 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.util.MethodInvoker;
 
 /**
+ * {@link MethodInterceptor} that, given a map of method names and {@link MethodInvoker}s,
+ * will execute all methods tied to a particular method name, with the provided 
+ * arguments.  The only possible return value that is handled is of type ExitStatus, since
+ * the only StepListener implementation that isn't void is 
+ * {@link StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)}, which
+ * returns ExitStatus.
+ * 
  * @author Lucas Ward
- *
+ * @since 2.0
+ * @see MethodInvoker
  */
 public class StepListenerMethodInterceptor implements MethodInterceptor{
 
@@ -43,12 +52,20 @@ public class StepListenerMethodInterceptor implements MethodInterceptor{
 		if(invokers == null){
 			return null;
 		}
-		
+		ExitStatus status = null;
 		for(MethodInvoker invoker : invokers){
-			invoker.invokeMethod(invocation.getArguments());
+			Object retVal = invoker.invokeMethod(invocation.getArguments());
+			if(retVal instanceof ExitStatus){
+				if(status != null){
+					status = status.and((ExitStatus) retVal);
+				}
+				else{
+					status = (ExitStatus) retVal;
+				}
+			}
 		}
 		
-		return null;
+		return status;
 	}
 	
 	

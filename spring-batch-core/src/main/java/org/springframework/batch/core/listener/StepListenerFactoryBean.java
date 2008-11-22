@@ -15,8 +15,9 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
+import static org.springframework.batch.core.configuration.util.MethodInvokerUtils.getMethodInvokerByAnnotation;
+import static org.springframework.batch.core.configuration.util.MethodInvokerUtils.getMethodInvokerForInterface;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,18 +27,32 @@ import java.util.Map.Entry;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.configuration.util.AnnotationMethodResolver;
 import org.springframework.batch.core.configuration.util.MethodInvoker;
-import org.springframework.batch.core.configuration.util.MethodResolver;
-import org.springframework.batch.core.configuration.util.SimpleMethodInvoker;
+import org.springframework.batch.core.configuration.util.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * {@link FactoryBean} implementation that builds a {@link StepListener} based on the
- * various lifecycle methods or annotations that are provided.
+ * various lifecycle methods or annotations that are provided.  There are three possible ways of having
+ * a method called as part of a {@link StepListener} lifecyle:
+ * 
+ * <ul>
+ * 	<li>Interface implementation: By implementing any of the subclasses of StepListener, methods on said
+ * interface will be called
+ *  <li>Annotations: Annotating a method will result in registration. 
+ *  <li>String name of the method to be called, which is tied to {@link StepListenerMetaData} in the 
+ *  metaDatMap.
+ * </ul> 
+ * 
+ * It should be noted that methods obtained by name or annotation that don't match the StepListener method 
+ * signatures to which they belong, will cause errors.  However, it is acceptable to have no parameters at all.
+ * If the same method is marked in more than one way. (i.e. the method name is given and it's annotated) the
+ * method will only be called once.  However, if the same class has multiple methods tied to a particular
+ * listener, each method will be called.
  * 
  * @author Lucas Ward
- *
+ * @since 2.0
+ * @see StepListenerMetaData
  */
 public class StepListenerFactoryBean implements FactoryBean{
 
@@ -50,27 +65,32 @@ public class StepListenerFactoryBean implements FactoryBean{
 		if(metaDataMap == null){
 			metaDataMap = new HashMap<StepListenerMetaData, String>();
 		}
+		//Because all annotations and interfaces should be checked for, make sure that each meta data 
+		//entry is represented.
 		for(StepListenerMetaData metaData : StepListenerMetaData.values()){
 			if(!metaDataMap.containsKey(metaData)){
 				//put null so that the annotation and interface is checked
 				metaDataMap.put(metaData, null);
 			}
 		}
+		
 		Set<Class<? extends StepListener>> listenerInterfaces = new HashSet<Class<? extends StepListener>>();
 		
+		//For every entry in th emap, try and find a method by interface, name, or annotation.  If the same
 		for(Entry<StepListenerMetaData, String> entry : metaDataMap.entrySet()){
 			StepListenerMetaData metaData = entry.getKey();
 			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
 			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
 			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(), 
 					delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerByAnnotation(delegate, metaData.getAnnotation()));
+			invokers.add(getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate));
 			if(!invokers.isEmpty()){
 				invokerMap.put(metaData.getMethodName(), invokers);
 				listenerInterfaces.add(metaData.getListenerInterface());
 			}
 		}
 		
+		//create a proxy listener for only the interfaces that have methods to be called
 		ProxyFactory proxyFactory = new ProxyFactory();
 		proxyFactory.setInterfaces(listenerInterfaces.toArray(new Class[0]));
 		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new StepListenerMethodInterceptor(invokerMap)));
@@ -79,37 +99,12 @@ public class StepListenerFactoryBean implements FactoryBean{
 	
 	private MethodInvoker getMethodInvokerByName(String methodName, Object candidate, Class<?>... params){
 		if(methodName != null){
-			return SimpleMethodInvoker.createMethodInvokerByName(candidate, methodName, false, params);
+			return MethodInvokerUtils.createMethodInvokerByName(candidate, methodName, false, params);
 		}
 		else{
 			return null;
 		}
 	}
-	
-	private MethodInvoker getMethodInvokerForInterface(Class<? extends StepListener> iFace, String methodName, 
-			Object candidate, Class<?>... params){
-		
-		if(candidate.getClass().isAssignableFrom(iFace)){
-			return SimpleMethodInvoker.createMethodInvokerByName(candidate, methodName, true, params);
-		}
-		else{
-			return null;
-		}
-	}
-	
-	private MethodInvoker getMethodInvokerByAnnotation(Object candidate, Class<? extends Annotation> annotation){
-		
-		MethodResolver resolver = new AnnotationMethodResolver(annotation);
-		Method method = resolver.findMethod(candidate);
-		
-		if(method != null){
-			return new SimpleMethodInvoker(candidate, method);
-		}
-		else{
-			return null;
-		}
-	}
-	
 
 	@SuppressWarnings("unchecked")
 	public Class getObjectType() {

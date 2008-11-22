@@ -65,7 +65,7 @@ public enum StepListenerMetaData {
 	BEFORE_WRITE("beforeWrite", BeforeWrite.class, ItemWriteListener.class, Object.class),
 	AFTER_WRITE("afterWrite", AfterWrite.class, ItemWriteListener.class, Object.class),
 	ON_WRITE_ERROR("onWriteError", OnWriteError.class, ItemWriteListener.class, Object.class, Exception.class),
-	ON_SKIP_IN_READ("onSkipInRead", OnSkipInRead.class, SkipListener.class, Object.class, Throwable.class),
+	ON_SKIP_IN_READ("onSkipInRead", OnSkipInRead.class, SkipListener.class, Throwable.class),
 	ON_SKIP_IN_PROCESS("onSkipInProcess", OnSkipInProcess.class, SkipListener.class, Object.class, Throwable.class),
 	ON_SKIP_IN_WRITE("onSkipInWrite", OnSkipInWrite.class, SkipListener.class, Object.class, Throwable.class);
 	

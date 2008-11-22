@@ -1,0 +1,91 @@
+/*
+ * Copyright 2002-2008 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.springframework.batch.core.configuration.util;
+
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.springframework.batch.core.StepListener;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
+import org.springframework.util.ObjectUtils;
+import org.springframework.util.ReflectionUtils;
+
+/**
+ * Utility methods for create MethodInvoker instances.
+ * 
+ * @author Lucas Ward
+ * @since 2.0
+ */
+public class MethodInvokerUtils {
+
+	public static MethodInvoker createMethodInvokerByName(Object object, String methodName, boolean paramsRequired, Class<?>... paramTypes){
+		Assert.notNull(object, "Object to invoke must not be null");
+		Method method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
+		//if no method was found for the given parameters, and the parameters aren't required
+		if(method == null && !paramsRequired){
+			//try with no params
+			method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, new Class[]{});
+		}
+		if(method == null){
+			return null;
+		}
+		else{
+			return new SimpleMethodInvoker(object, method);
+		}
+	}
+	
+	public static MethodInvoker getMethodInvokerForInterface(Class<? extends StepListener> iFace, String methodName, 
+			Object candidate, Class<?>... params){
+		
+		if(iFace.isAssignableFrom(candidate.getClass())){
+			return MethodInvokerUtils.createMethodInvokerByName(candidate, methodName, true, params);
+		}
+		else{
+			return null;
+		}
+	}
+	
+	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType, final Object candidate){
+		Assert.notNull(candidate, "class must not be null");
+		Assert.notNull(annotationType, "annotationType must not be null");
+		Assert.isTrue(ObjectUtils.containsElement(
+				annotationType.getAnnotation(Target.class).value(), ElementType.METHOD),
+				"Annotation [" + annotationType + "] is not a Method-level annotation.");
+		final AtomicReference<Method> annotatedMethod = new AtomicReference<Method>();
+		ReflectionUtils.doWithMethods(candidate.getClass(), new ReflectionUtils.MethodCallback() {
+			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
+				if (annotation != null) {
+					Assert.isNull(annotatedMethod.get(), "found more than one method on target class ["
+							+ candidate + "] with the annotation type [" + candidate + "]");
+					annotatedMethod.set(method);
+				}
+			}
+		});
+		Method method = annotatedMethod.get();
+		if(method == null){
+			return null;
+		}
+		else{
+			return new SimpleMethodInvoker(candidate, annotatedMethod.get());
+		}
+	}
+}
