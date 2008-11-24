@@ -56,7 +56,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
-		stepExecution.setId(new Long(currentId++));
+		stepExecution.setId(currentId++);
 		stepExecution.incrementVersion();
 		executions.put(stepExecution.getStepName(), copy(stepExecution));
 	}

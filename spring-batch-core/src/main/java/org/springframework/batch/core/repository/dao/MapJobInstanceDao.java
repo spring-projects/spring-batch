@@ -29,7 +29,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
-		JobInstance jobInstance = new JobInstance(new Long(currentId++), jobParameters, jobName);
+		JobInstance jobInstance = new JobInstance(currentId++, jobParameters, jobName);
 		jobInstance.incrementVersion();
 		jobInstances.add(jobInstance);
 

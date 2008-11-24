@@ -61,7 +61,7 @@ public class StepExecutionResourceProxyTests extends TestCase {
 
 	protected void setUp() throws Exception {
 
-		jobInstance = new JobInstance(new Long(0), new JobParameters(), "testJob");
+		jobInstance = new JobInstance(0L, new JobParameters(), "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
 		stepExecution = jobExecution.createStepExecution(step.getName());
@@ -95,7 +95,7 @@ public class StepExecutionResourceProxyTests extends TestCase {
 
 	public void testNonStandardFilePatternWithJobParameters() throws Exception {
 		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key%-foo");
-		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addString("job.key", "spam")
+		jobInstance = new JobInstance(0L, new JobParametersBuilder().addString("job.key", "spam")
 				.toJobParameters(), "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");
@@ -122,7 +122,7 @@ public class StepExecutionResourceProxyTests extends TestCase {
 	public void testLongJobParameter() throws Exception {
 		
 		resource.setFilePattern("foo/data/%JOB_NAME%/%job.key(long)%-foo");
-		jobInstance = new JobInstance(new Long(0), new JobParametersBuilder().addLong("job.key", 123L)
+		jobInstance = new JobInstance(0L, new JobParametersBuilder().addLong("job.key", 123L)
 				.toJobParameters(), "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");

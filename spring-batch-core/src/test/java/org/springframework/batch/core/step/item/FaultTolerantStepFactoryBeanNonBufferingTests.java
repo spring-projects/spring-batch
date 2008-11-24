@@ -66,7 +66,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setSkipLimit(2);
 		factory.setIsReaderTransactionalQueue(true);
 
-		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "skipJob");
+		JobInstance jobInstance = new JobInstance(1L, new JobParameters(), "skipJob");
 		jobExecution = new JobExecution(jobInstance);
 	}
 

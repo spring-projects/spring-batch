@@ -103,7 +103,7 @@ public class SimpleJobRepositoryTests {
 
 		job.setSteps(stepConfigurations);
 
-		jobInstance = new JobInstance(new Long(1), jobParameters, job.getName());
+		jobInstance = new JobInstance(1L, jobParameters, job.getName());
 
 		databaseStep1 = "dbStep1";
 		databaseStep2 = "dbStep2";
@@ -112,7 +112,7 @@ public class SimpleJobRepositoryTests {
 		steps.add(databaseStep1);
 		steps.add(databaseStep2);
 
-		jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, job.getName()), new Long(1));
+		jobExecution = new JobExecution(new JobInstance(1L, jobParameters, job.getName()), 1L);
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class SimpleJobRepositoryTests {
 	@Test
 	public void testUpdateValidJobExecution() throws Exception {
 
-		JobExecution jobExecution = new JobExecution(new JobInstance(new Long(1), jobParameters, job.getName()), new Long(1));
+		JobExecution jobExecution = new JobExecution(new JobInstance(1L, jobParameters, job.getName()), 1L);
 		// new execution - call update on job dao
 		jobExecutionDao.updateJobExecution(jobExecution);
 		replay(jobExecutionDao);

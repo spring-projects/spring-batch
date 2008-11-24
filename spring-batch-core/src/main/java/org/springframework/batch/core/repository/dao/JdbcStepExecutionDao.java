@@ -98,7 +98,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 		String exitDescription = truncateExitDescription(stepExecution.getExitStatus().getExitDescription());
 
-		stepExecution.setId(new Long(stepExecutionIncrementer.nextLongValue()));
+		stepExecution.setId(stepExecutionIncrementer.nextLongValue());
 		stepExecution.incrementVersion(); // should be 0 now
 		Object[] parameters = new Object[] { stepExecution.getId(), stepExecution.getVersion(),
 				stepExecution.getStepName(), stepExecution.getJobExecutionId(), stepExecution.getStartTime(),

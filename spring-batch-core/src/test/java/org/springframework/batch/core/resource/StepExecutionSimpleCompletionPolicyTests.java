@@ -51,7 +51,7 @@ public class StepExecutionSimpleCompletionPolicyTests extends TestCase {
 
 	protected void setUp() throws Exception {
 
-		JobParameters jobParameters = new JobParametersBuilder().addLong("commit.interval", new Long(2L)).toJobParameters();
+		JobParameters jobParameters = new JobParametersBuilder().addLong("commit.interval", 2L).toJobParameters();
 		jobInstance = new JobInstance(new Long(0), jobParameters, "testJob");
 		JobExecution jobExecution = new JobExecution(jobInstance);
 		Step step = new StepSupport("bar");

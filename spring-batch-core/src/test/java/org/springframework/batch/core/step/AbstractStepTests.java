@@ -39,7 +39,7 @@ public class AbstractStepTests {
 	 */
 	final List<String> events = new ArrayList<String>();
 
-	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(new Long(1),
+	final StepExecution execution = new StepExecution(tested.getName(), new JobExecution(new JobInstance(1L,
 			new JobParameters(), "jobName")));
 
 	/**

@@ -35,7 +35,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 
 	public void saveJobExecution(JobExecution jobExecution) {
 		Assert.isTrue(jobExecution.getId() == null);
-		Long newId = new Long(currentId++);
+		Long newId = currentId++;
 		jobExecution.setId(newId);
 		jobExecution.incrementVersion();
 		executionsById.put(newId, copy(jobExecution));
@@ -128,6 +128,6 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	}
 
 	public void synchronizeStatus(JobExecution jobExecution) {
-		// TODO Auto-generated method stub
+		// no-op 
 	}
 }

@@ -115,7 +115,7 @@ public class TaskletStepTests {
 		step.setStepOperations(template);
 
 		job = new JobSupport("FOO");
-		jobInstance = new JobInstance(new Long(0), new JobParameters(), job.getName());
+		jobInstance = new JobInstance(0L, new JobParameters(), job.getName());
 
 		step.setTransactionManager(transactionManager);
 
