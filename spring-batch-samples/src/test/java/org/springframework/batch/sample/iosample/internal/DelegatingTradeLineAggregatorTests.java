@@ -33,7 +33,7 @@ import org.springframework.batch.sample.domain.trade.Trade;
 public class DelegatingTradeLineAggregatorTests {
 
 	@Test
-	public void testAggregate() {
+	public void testAggregateTrade() {
 		BeanWrapperFieldExtractor<Trade> tradeExtractor = new BeanWrapperFieldExtractor<Trade>();
 		tradeExtractor.setNames(new String[] { "isin", "quantity", "price", "customer" });
 
@@ -41,7 +41,7 @@ public class DelegatingTradeLineAggregatorTests {
 		tradeAggregator.setFieldExtractor(tradeExtractor);
 
 		BeanWrapperFieldExtractor<CustomerCredit> customerExtractor = new BeanWrapperFieldExtractor<CustomerCredit>();
-		tradeExtractor.setNames(new String[] { "id", "name", "credit" });
+		customerExtractor.setNames(new String[] { "id", "name", "credit" });
 
 		DelimitedLineAggregator<CustomerCredit> customerAggregator = new DelimitedLineAggregator<CustomerCredit>();
 		customerAggregator.setFieldExtractor(customerExtractor);
@@ -55,5 +55,10 @@ public class DelegatingTradeLineAggregatorTests {
 
 		CustomerCredit c = new CustomerCredit(256, "customer1", new BigDecimal("3200.00"));
 		assertEquals("256,customer1,3200.00", aggregator.aggregate(c));
+	}
+	
+	@Test
+	public void testAggregateCustomer(){
+		
 	}
 }

@@ -25,8 +25,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
-		"/jobs/ioSample/fixedLength.xml" })
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosampleJob.xml",
+		"/jobs/iosample/fixedLength.xml" })
 public class FixedLengthFunctionalTests extends AbstractJobTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/fixedLengthOutput.txt";

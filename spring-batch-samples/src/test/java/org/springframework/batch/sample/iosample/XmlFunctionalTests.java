@@ -31,8 +31,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
-		"/jobs/ioSample/xml.xml" })
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosampleJob.xml",
+		"/jobs/iosample/xml.xml" })
 public class XmlFunctionalTests extends AbstractJobTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/output.xml";
