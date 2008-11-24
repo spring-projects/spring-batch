@@ -56,7 +56,7 @@ public class SpringValidatorTests extends TestCase {
 	 */
 	public void testValidateUnsupportedType() {
 		try {
-			validator.validate(new Integer(1)); // only strings are supported
+			validator.validate(Integer.valueOf(1)); // only strings are supported
 			fail("must not validate unsupported classes");
 		}
 		catch (ValidationException expected) {

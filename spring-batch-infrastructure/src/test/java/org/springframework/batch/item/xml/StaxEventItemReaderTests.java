@@ -351,7 +351,7 @@ public class StaxEventItemReaderTests {
 		}
 	}
 
-	private class NonExistentResource extends AbstractResource {
+	private static class NonExistentResource extends AbstractResource {
 
 		public NonExistentResource() {
 		}

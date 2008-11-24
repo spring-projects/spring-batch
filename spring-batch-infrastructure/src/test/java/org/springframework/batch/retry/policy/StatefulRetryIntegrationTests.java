@@ -114,7 +114,7 @@ public class StatefulRetryIntegrationTests {
 	 * @author Dave Syer
 	 * 
 	 */
-	private final class MockRetryCallback implements RetryCallback<String> {
+	private static final class MockRetryCallback implements RetryCallback<String> {
 		int attempts = 0;
 
 		public String doWithRetry(RetryContext context) throws Exception {

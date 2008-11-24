@@ -57,8 +57,8 @@ public class FlatFileItemReaderTests {
 
 		reader.open(executionContext);
 
-		assertEquals("testLine1testLine2", reader.read().toString());
-		assertEquals("testLine3testLine4", reader.read().toString());
+		assertEquals("testLine1testLine2", reader.read());
+		assertEquals("testLine3testLine4", reader.read());
 
 		reader.update(executionContext);
 
@@ -66,7 +66,7 @@ public class FlatFileItemReaderTests {
 
 		reader.open(executionContext);
 
-		assertEquals("testLine5testLine6", reader.read().toString());
+		assertEquals("testLine5testLine6", reader.read());
 	}
 
 	@Test
@@ -95,8 +95,8 @@ public class FlatFileItemReaderTests {
 		reader.open(executionContext);
 
 		// read remaining records
-		assertEquals("testLine3", reader.read().toString());
-		assertEquals("testLine4", reader.read().toString());
+		assertEquals("testLine3", reader.read());
+		assertEquals("testLine4", reader.read());
 
 		reader.update(executionContext);
 		assertEquals(4, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));

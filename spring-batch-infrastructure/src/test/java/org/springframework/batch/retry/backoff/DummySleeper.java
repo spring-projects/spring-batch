@@ -52,7 +52,7 @@ public class DummySleeper implements Sleeper {
 	 * @see org.springframework.batch.retry.backoff.Sleeper#sleep(long)
 	 */
 	public void sleep(long backOffPeriod) throws InterruptedException {
-		this.backOffs.add(new Long(backOffPeriod));
+		this.backOffs.add(Long.valueOf(backOffPeriod));
 	}
 
 }

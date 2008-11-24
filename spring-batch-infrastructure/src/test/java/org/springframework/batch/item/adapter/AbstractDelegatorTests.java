@@ -72,7 +72,7 @@ public class AbstractDelegatorTests extends TestCase {
 		final String FOO_NAME = "fooName";
 		final int FOO_VALUE = 12345;
 
-		delegator.invokeDelegateMethodWithArguments(new Object[]{FOO_NAME, new Integer(FOO_VALUE)});
+		delegator.invokeDelegateMethodWithArguments(new Object[]{FOO_NAME, Integer.valueOf(FOO_VALUE)});
 		Foo foo = (Foo) fooService.getProcessedFooNameValuePairs().get(0);
 		assertEquals(FOO_NAME, foo.getName());
 		assertEquals(FOO_VALUE, foo.getValue());

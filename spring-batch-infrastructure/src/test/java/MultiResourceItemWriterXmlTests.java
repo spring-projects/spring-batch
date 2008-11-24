@@ -24,9 +24,9 @@ import org.springframework.xml.transform.StaxResult;
  */
 public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWriterTests {
 
-	final private String xmlDocStart = "<root>";
+	final static private String xmlDocStart = "<root>";
 
-	final private String xmlDocEnd = "</root>";
+	final static private String xmlDocEnd = "</root>";
 
 	@Override
 	@Before

@@ -17,6 +17,8 @@ package org.springframework.batch.item.database.support;
 
 import static org.springframework.batch.support.DatabaseType.*;
 
+import java.util.Arrays;
+
 import org.springframework.batch.support.DatabaseType;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
@@ -65,7 +67,7 @@ public class SimpleDelegatingPagingQueryProvider extends AbstractSqlPagingQueryP
 		else {
 			throw new InvalidDataAccessResourceUsageException(type.name() +
 					" is not a supported database.  The supported databases are " +
-					DatabaseType.values().toString());
+					Arrays.toString(DatabaseType.values()));
 		}
 		delegate.setSelectClause(this.getSelectClause());
 		delegate.setFromClause(this.getFromClause());

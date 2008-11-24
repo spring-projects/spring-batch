@@ -238,7 +238,7 @@ public class RepeatOperationsInterceptorTests extends TestCase {
 		public Object service() throws Exception {
 			count++;
 			if (count <= maxService) {
-				return new Integer(count);
+				return Integer.valueOf(count);
 			}
 			else {
 				return null;

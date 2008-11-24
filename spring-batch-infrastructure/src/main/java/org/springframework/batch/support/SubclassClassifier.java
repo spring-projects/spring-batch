@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.support;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -131,7 +132,7 @@ public class SubclassClassifier<T, C> implements Classifier<T, C> {
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class ClassComparator implements Comparator<Class<?>> {
+	private static class ClassComparator implements Comparator<Class<?>>, Serializable {
 		/**
 		 * @return 1 if arg0 is assignable from arg1, -1 otherwise
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)

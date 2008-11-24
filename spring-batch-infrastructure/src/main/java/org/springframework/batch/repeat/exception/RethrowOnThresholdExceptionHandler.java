@@ -18,6 +18,7 @@ package org.springframework.batch.repeat.exception;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,7 +44,9 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	protected final Log logger = LogFactory.getLog(RethrowOnThresholdExceptionHandler.class);
 
 	private Classifier<? super Throwable, IntegerHolder> exceptionClassifier = new Classifier<Throwable, IntegerHolder>() {
-		public RethrowOnThresholdExceptionHandler.IntegerHolder classify(Throwable classifiable) { return ZERO;}
+		public RethrowOnThresholdExceptionHandler.IntegerHolder classify(Throwable classifiable) {
+			return ZERO;
+		}
 	};
 
 	private boolean useParent = false;
@@ -75,8 +78,8 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	 */
 	public void setThresholds(Map<Class<? extends Throwable>, Integer> thresholds) {
 		Map<Class<? extends Throwable>, IntegerHolder> typeMap = new HashMap<Class<? extends Throwable>, IntegerHolder>();
-		for (Class<? extends Throwable> type : thresholds.keySet()) {
-			typeMap.put(type, new IntegerHolder(thresholds.get(type)));
+		for (Entry<Class<? extends Throwable>, Integer> entry : thresholds.entrySet()) {
+			typeMap.put(entry.getKey(), new IntegerHolder(entry.getValue()));
 		}
 		exceptionClassifier = new SubclassClassifier<Throwable, IntegerHolder>(typeMap, ZERO);
 	}
@@ -92,7 +95,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 	public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 
 		IntegerHolder key = exceptionClassifier.classify(throwable);
-		
+
 		RepeatContextCounter counter = getCounter(context, key);
 		counter.increment();
 		int count = counter.getCount();
@@ -123,7 +126,7 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 		public IntegerHolder(int value) {
 			this.value = value;
 		}
-		
+
 		/**
 		 * Public getter for the value.
 		 * @return the value
@@ -131,13 +134,15 @@ public class RethrowOnThresholdExceptionHandler implements ExceptionHandler {
 		public int getValue() {
 			return value;
 		}
-		
-		/* (non-Javadoc)
+
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
 		public String toString() {
-			return ObjectUtils.getIdentityHexString(this)+"."+value;
+			return ObjectUtils.getIdentityHexString(this) + "." + value;
 		}
 
 	}

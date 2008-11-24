@@ -30,8 +30,8 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 		mapper = new ColumnMapItemPreparedStatementSetter();
 		
 		key = new LinkedHashMap<String, Object>(2);
-		key.put("1", new Integer(1));
-		key.put("2", new Integer(2));
+		key.put("1", Integer.valueOf(1));
+		key.put("2", Integer.valueOf(2));
 	}
 	
 	public void testCreateExecutionContextFromEmptyKeys() throws Exception {
@@ -43,8 +43,8 @@ public class ColumnMapExecutionContextRowMapperTests extends TestCase {
 	
 	public void testCreateSetter() throws Exception {
 		
-		ps.setObject(1, new Integer(1));
-		ps.setObject(2, new Integer(2));
+		ps.setObject(1, Integer.valueOf(1));
+		ps.setObject(2, Integer.valueOf(2));
 		replay(ps);
 		mapper.setValues(key, ps);	
 		verify(ps);

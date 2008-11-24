@@ -56,7 +56,7 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests {
 		
 		for (int i = 0; i < keys.size(); i++) {
 			Long id = keys.get(i);
-			assertEquals(new Long(i + 1), id);
+			assertEquals(Long.valueOf(i + 1), id);
 		}
 		for (Long key : keys) {
 			System.out.println(key);
@@ -72,8 +72,8 @@ public class SingleColumnJdbcKeyGeneratorIntegrationTests {
 		List<Long> keys = keyStrategy.retrieveKeys(executionContext);
 		
 		assertEquals(2, keys.size());
-		assertEquals(new Long(4), keys.get(0));
-		assertEquals(new Long(5), keys.get(1));
+		assertEquals(Long.valueOf(4), keys.get(0));
+		assertEquals(Long.valueOf(5), keys.get(1));
 
 		for (Long key : keys) {
 			System.out.println(key);

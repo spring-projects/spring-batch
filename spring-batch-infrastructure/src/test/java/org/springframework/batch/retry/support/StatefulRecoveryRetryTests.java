@@ -308,6 +308,9 @@ public class StatefulRecoveryRetryTests {
 		}
 
 		public boolean equals(Object obj) {
+			if (obj == null || !(obj instanceof StringHolder)) {
+				return false;
+			}
 			return string.equals(((StringHolder) obj).string);
 		}
 

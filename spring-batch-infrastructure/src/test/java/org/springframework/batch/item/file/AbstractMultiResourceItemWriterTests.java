@@ -22,7 +22,7 @@ public class AbstractMultiResourceItemWriterTests {
 
 	protected ResourceSuffixCreator suffixCreator = new SimpleResourceSuffixCreator();
 
-	protected ResourceAwareItemWriterItemStream<String> delegate; 
+	protected ResourceAwareItemWriterItemStream<String> delegate;
 
 	protected ExecutionContext executionContext = new ExecutionContext();
 
@@ -40,12 +40,17 @@ public class AbstractMultiResourceItemWriterTests {
 	protected String readFile(File f) throws Exception {
 		BufferedReader reader = new BufferedReader(new FileReader(f));
 		StringBuilder result = new StringBuilder();
-		while (true) {
-			String line = reader.readLine();
-			if (line == null) {
-				break;
+		try {
+			while (true) {
+				String line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+				result.append(line);
 			}
-			result.append(line);
+		}
+		finally {
+			reader.close();
 		}
 		return result.toString();
 	}
