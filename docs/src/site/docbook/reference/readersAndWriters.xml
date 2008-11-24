@@ -50,12 +50,12 @@
     <para><classname>ItemReader</classname> is a basic interface for generic
     input operations:</para>
 
-    <programlisting>public interface ItemReader&lt;T&gt; {
+    <programlisting><![CDATA[public interface ItemReader<T> {
 
   T read() throws Exception, UnexpectedInputException, ParseException;
 
 }
-</programlisting>
+]]></programlisting>
 
     <para>The <methodname>read</methodname> method defines the most essential
     contract of the <classname>ItemReader</classname>, calling it returns one
@@ -92,12 +92,12 @@
     <para>As with <classname>ItemReader</classname>,
     <classname>ItemWriter</classname> is a fairly generic interface:</para>
 
-    <programlisting>public interface ItemWriter&lt;T&gt; {
+    <programlisting><![CDATA[public interface ItemWriter<T> {
 
-  void write(List&lt;? extends T&gt; items) throws Exception;
+  void write(List<? extends T> items) throws Exception;
 
 }
-</programlisting>
+]]></programlisting>
 
     <para>As with <methodname>read</methodname> on
     <classname>ItemReader</classname>, <methodname>write</methodname> provides
@@ -121,7 +121,7 @@
     readers and writers need to be opened, closed, and require a mechanism for
     persisting state:</para>
 
-    <programlisting>public interface ItemStream {
+    <programlisting><![CDATA[public interface ItemStream {
 
   void open(ExecutionContext executionContext) throws StreamException;
 
@@ -129,7 +129,7 @@
   
   void close(ExecutionContext executionContext) throws StreamException;
 }
-</programlisting>
+]]></programlisting>
 
     <para>Before describing each method, its worth briefly mentioning the
     <classname>ExecutionContext</classname>. Clients of an
@@ -189,11 +189,11 @@
       fields so that the fields may be accessed either by index or name as
       patterned after <classname>ResultSet</classname>:</para>
 
-      <programlisting>  String[] tokens = new String[]{"foo", "1", "true"};
+      <programlisting><![CDATA[  String[] tokens = new String[]{"foo", "1", "true"};
   FieldSet fs = new DefaultFieldSet(tokens);
   String name = fs.readString(0);
   int value = fs.readInt(1);
-  boolean booleanValue = fs.readBoolean(2);</programlisting>
+  boolean booleanValue = fs.readBoolean(2);]]></programlisting>
 
       <para>There are many more options on the <classname>FieldSet</classname>
       interface, such as <classname>Date</classname>, long,
@@ -226,9 +226,9 @@
       Framework, Chapter 4.Resources</citetitle></ulink>. Therefore, this
       guide will not go into the details of creating
       <classname>Resource</classname> objects. However, a simple example of a
-      file system resource can be found below: <programlisting>
+      file system resource can be found below: <programlisting><![CDATA[
         Resource resource = new FileSystemResource("resources/trades.csv");
-        </programlisting></para>
+        ]]></programlisting></para>
 
       <para>In complex batch environments the directory structures are often
       managed by the EAI infrastructure where drop zones for external
@@ -316,10 +316,10 @@
         <para>As with <classname>RowMapper</classname>, which takes a low
         level construct such as <classname>ResultSet and returns an Object,
         flat file procesing requires the same construct to convert a String
-        line into an Object:</classname><programlisting>public interface LineMapper&lt;T&gt; {
+        line into an Object:</classname><programlisting><![CDATA[public interface LineMapper<T> {
 
   T mapLine(String line, int lineNumber) throws Exception;
-}</programlisting></para>
+}]]></programlisting></para>
       </section>
 
       <section>
@@ -334,11 +334,11 @@
         <classname>LineTokenizer</classname> to translate a line of data from
         a resource into an object of the desired type:</para>
 
-        <programlisting>  public interface FieldSetMapper&lt;T&gt; {
+        <programlisting><![CDATA[  public interface FieldSetMapper<T> {
   
     T mapFieldSet(FieldSet fieldSet);
 
-  }</programlisting>
+  }]]></programlisting>
 
         <para>The pattern used is the same as <classname>RowMapper</classname>
         used by <classname>JdbcTemplate</classname>.</para>
@@ -354,11 +354,11 @@
         <classname>FieldSet</classname> is necessary. In Spring Batch, this is
         called a <classname>LineTokenizer</classname>:</para>
 
-        <programlisting>  public interface LineTokenizer {
+        <programlisting><![CDATA[  public interface LineTokenizer {
   
     FieldSet tokenize(String line);
 
-  }</programlisting>
+  }]]></programlisting>
 
         <para>The contract of a <classname>LineTokenizer</classname> is such
         that, given a line of input (in theory the
@@ -418,14 +418,14 @@
 
         <para>In code, the above flow looks like the following:</para>
 
-        <programlisting>  String line = readLine();
+        <programlisting><![CDATA[  String line = readLine();
 
   if (line != null) {
     FieldSet tokenizedLine = tokenizer.tokenize(line);
     return fieldSetMapper.mapFieldSet(tokenizedLine);
   }
  
-  return null;</programlisting>
+  return null;]]></programlisting>
 
         <note>
           <para>Exception handling has been removed for clarity.</para>
@@ -433,16 +433,16 @@
 
         <para>The following example will be used to illustrate this using an
         actual domain scenario. This particular batch job reads in football
-        players from the following file:<programlisting>  ID,lastName,firstName,position,birthYear,debutYear
+        players from the following file:<programlisting><![CDATA[  ID,lastName,firstName,position,birthYear,debutYear
   "AbduKa00,Abdul-Jabbar,Karim,rb,1974,1996",
   "AbduRa00,Abdullah,Rabih,rb,1975,1999",
   "AberWa00,Abercrombie,Walter,rb,1959,1982",
   "AbraDa00,Abramowicz,Danny,wr,1945,1967",
   "AdamBo00,Adams,Bob,te,1946,1969",
-  "AdamCh00,Adams,Charlie,wr,1979,2003"        </programlisting></para>
+  "AdamCh00,Adams,Charlie,wr,1979,2003"        ]]></programlisting></para>
 
         <para>The contents of this file will be mapped to the following Player
-        domain object: <programlisting>
+        domain object: <programlisting><![CDATA[
   public class Player implements Serializable {
         
   private String ID; 
@@ -462,14 +462,14 @@
    
     // setters and getters...
   }
-          </programlisting></para>
+          ]]></programlisting></para>
 
         <para>In order to map a <classname>FieldSet</classname> into a Player
         object, a <classname>FieldSetMapper</classname> that returns players
         needs to be defined:</para>
 
-        <para><programlisting>
-  protected static class PlayerFieldSetMapper implements FieldSetMapper&lt;Player&gt; {
+        <para><programlisting><![CDATA[
+  protected static class PlayerFieldSetMapper implements FieldSetMapper<Player> {
     public Object mapLine(FieldSet fieldSet) {
       Player player = new Player();
 
@@ -482,14 +482,14 @@
 
       return player;
     }
-  }    </programlisting></para>
+  }    ]]></programlisting></para>
 
         <para>The file can then be read by correctly constructing a
         <classname>FlatFileItemReader</classname> and calling
         <methodname>read</methodname>:</para>
 
-        <programlisting>  
-  FlatFileItemReader&lt;Player&gt; itemReader = new FlatFileItemReader&lt;Player&gt;();
+        <programlisting><![CDATA[  
+  FlatFileItemReader<Player> itemReader = new FlatFileItemReader<Player>();
   itemReader.setResource(new FileSystemResource("resources/players.csv"));
   //DelimitedLineTokenizer defaults to comma as it's delimiter
   itemReader.setLineTokenizer(new DelimitedLineTokenizer());
@@ -497,7 +497,7 @@
   itemReader.open(new ExecutionContext());
   Player player = itemReader.read();
 
-</programlisting>
+]]></programlisting>
 
         <para>Each call to <methodname>read</methodname> will return a new
         Player object from each line in the file. When the end of the file is
@@ -515,9 +515,9 @@
         fields in the flat file are injected into the
         <classname>LineTokenizer</classname>:</para>
 
-        <para><programlisting>
+        <para><programlisting><![CDATA[
   tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"}); 
-          </programlisting></para>
+          ]]></programlisting></para>
 
         <para>a <classname>FieldSetMapper</classname> can this use this
         information as follows:</para>
@@ -557,14 +557,14 @@
         <classname>FieldSetMapper</classname> configuration looks like the
         following:</para>
 
-        <programlisting>  &lt;bean id="fieldSetMapper"
-        class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"&gt;
-    &lt;property name="prototypeBeanName" value="player" /&gt;
-  &lt;/bean&gt;
+        <programlisting><![CDATA[  <bean id="fieldSetMapper"
+        class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+    <property name="prototypeBeanName" value="player" />
+  </bean>
 
-  &lt;bean id="player"
+  <bean id="player"
         class="org.springframework.batch.sample.domain.Player"
-        scope="prototype" /&gt;</programlisting>
+        scope="prototype" />]]></programlisting>
 
         <para>For each entry in the <classname>FieldSet</classname>, the
         mapper will look for a corresponding setter on a new instance of the
@@ -584,11 +584,11 @@
         organizations that use flat files use fixed length formats. An example
         fixed length file is below:</para>
 
-        <programlisting>  UK21341EAH4121131.11customer1
+        <programlisting><![CDATA[  UK21341EAH4121131.11customer1
   UK21341EAH4221232.11customer2
   UK21341EAH4321333.11customer3
   UK21341EAH4421434.11customer4
-  UK21341EAH4521535.11customer5</programlisting>
+  UK21341EAH4521535.11customer5]]></programlisting>
 
         <para>While this looks like one large field, it actually represent 4
         distinct fields:</para>
@@ -618,14 +618,14 @@
         <classname>FixedLengthLineTokenizer</classname>, each of these lengths
         must be provided in the form of ranges:</para>
 
-        <programlisting>  
-  &lt;bean id="fixedLengthLineTokenizer"
-        class="org.springframework.batch.io.file.transform.FixedLengthTokenizer"&gt;
-    &lt;property name="names" value="ISIN, Quantity, Price, Customer" /&gt;
-    &lt;property name="columns" value="1-12, 13-15, 16-20, 21-29" /&gt;
-  &lt;/bean&gt;
+        <programlisting><![CDATA[  
+  <bean id="fixedLengthLineTokenizer"
+        class="org.springframework.batch.io.file.transform.FixedLengthTokenizer">
+    <property name="names" value="ISIN, Quantity, Price, Customer" />
+    <property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+  </bean>
 
-</programlisting>
+]]></programlisting>
 
         <para>This <classname>LineTokenizer</classname> will return the same
         <classname>FieldSet</classname> as if a dlimiter had been used,
@@ -637,18 +637,18 @@
         specialized property editor be configured anywhere in the
         <classname>ApplicationContext</classname>:</para>
 
-        <programlisting>  
-  &lt;bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer"&gt;
-    &lt;property name="customEditors"&gt;
-      &lt;map&gt;
-        &lt;entry key="org.springframework.batch.item.file.transform.Range[]"&gt;
-          &lt;bean class="org.springframework.batch.item.file.transform.RangeArrayPropertyEditor" /&gt;
-        &lt;/entry&gt;
-      &lt;/map&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt;
+        <programlisting><![CDATA[  
+  <bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+    <property name="customEditors">
+      <map>
+        <entry key="org.springframework.batch.item.file.transform.Range[]">
+          <bean class="org.springframework.batch.item.file.transform.RangeArrayPropertyEditor" />
+        </entry>
+      </map>
+    </property>
+  </bean>
 
-</programlisting>
+]]></programlisting>
       </section>
 
       <section>
@@ -660,7 +660,7 @@
         might have records spanning multiple lines with multiple formats. The
         following excerpt from a file illustrates this:</para>
 
-        <programlisting>  HEA;0013100345;2007-02-15
+        <programlisting><![CDATA[  HEA;0013100345;2007-02-15
   NCU;Smith;Peter;;T;20014539;F
   BAD;;Oak Street 31/A;;Small Town;00235;IL;US
   SAD;Smith, Elizabeth;Elm Street 17;;Some City;30011;FL;United States
@@ -668,30 +668,30 @@
   LIT;1044391041;37.49;0;0;4.99;2.99;1;45.47
   LIT;2134776319;221.99;5;0;7.99;2.99;1;221.87
   SIN;UPS;EXP;DELIVER ONLY ON WEEKDAYS
-  FOT;2;2;267.34</programlisting>
+  FOT;2;2;267.34]]></programlisting>
 
         <para>Everything between the line starting with 'HEA' and the line
         starting with 'FOT' is considered one record. The
         PrefixMatchingCompositeLineTokenizer makes this easier by matching the
         prefix in a line with a particular tokenizer:</para>
 
-        <programlisting>  &lt;bean id="orderFileDescriptor"
-        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
-    &lt;property name="tokenizers"&gt;
-     &lt;map&gt;
-      &lt;entry key="HEA" value-ref="headerRecordDescriptor" /&gt;
-      &lt;entry key="FOT" value-ref="footerRecordDescriptor" /&gt;
-      &lt;entry key="BCU" value-ref="businessCustomerLineDescriptor" /&gt;
-      &lt;entry key="NCU" value-ref="customerLineDescriptor" /&gt;
-      &lt;entry key="BAD" value-ref="billingAddressLineDescriptor" /&gt;
-      &lt;entry key="SAD" value-ref="shippingAddressLineDescriptor" /&gt;
-      &lt;entry key="BIN" value-ref="billingLineDescriptor" /&gt;
-      &lt;entry key="SIN" value-ref="shippingLineDescriptor" /&gt;
-      &lt;entry key="LIT" value-ref="itemLineDescriptor" /&gt;
-      &lt;entry key="" value-ref="defaultLineDescriptor" /&gt;
-     &lt;/map&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+        <programlisting><![CDATA[  <bean id="orderFileDescriptor"
+        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer">
+    <property name="tokenizers">
+     <map>
+      <entry key="HEA" value-ref="headerRecordDescriptor" />
+      <entry key="FOT" value-ref="footerRecordDescriptor" />
+      <entry key="BCU" value-ref="businessCustomerLineDescriptor" />
+      <entry key="NCU" value-ref="customerLineDescriptor" />
+      <entry key="BAD" value-ref="billingAddressLineDescriptor" />
+      <entry key="SAD" value-ref="shippingAddressLineDescriptor" />
+      <entry key="BIN" value-ref="billingLineDescriptor" />
+      <entry key="SIN" value-ref="shippingLineDescriptor" />
+      <entry key="LIT" value-ref="itemLineDescriptor" />
+      <entry key="" value-ref="defaultLineDescriptor" />
+     </map>
+    </property>
+  </bean>]]></programlisting>
 
         <para>This ensures that the line will be parsed correctly, which is
         especially important for fixed length input. Any users of the
@@ -733,7 +733,7 @@
           IncorrectTokenCountException is thrown, which contains the number of
           tokens encountered, and the number expected:</para>
 
-          <programlisting>  
+          <programlisting><![CDATA[  
   tokenizer.setNames(new String[] {"A", "B", "C", "D"});
   
   try{
@@ -744,7 +744,7 @@
     assertEquals(3, e.getActualCount());
   }
 
-</programlisting>
+]]></programlisting>
 
           <para>Because the tokenizer was configured with 4 columns, but only
           3 tokens were found in the file, an IncorrectTokenCountException was
@@ -758,9 +758,9 @@
           requirements when parsing because unlike a delimited format, each
           column must strictly adhere to the width defined for it. If the
           total line length doesn't add up to the widest value of this column,
-          an exception is thrown: </para>
+          an exception is thrown:</para>
 
-          <programlisting>  
+          <programlisting><![CDATA[  
   tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10), new Range(11, 15) });
   try {
     tokenizer.tokenize("12345");
@@ -771,7 +771,7 @@
     assertEquals(5, ex.getActualLength());
   }
 
-</programlisting>
+]]></programlisting>
 
           <para>The configured ranges for the tokenizer above are: 1-5, 6-10,
           and 11-15, thus the total length of the line expected is 15.
@@ -785,14 +785,14 @@
           For this reason, validation of line length can be turned off via the
           'strict' property:</para>
 
-          <programlisting>
+          <programlisting><![CDATA[
   tokenizer.setColumns(new Range[] { new Range(1, 5), new Range(6, 10) });
   tokenizer.setStrict(false);
   FieldSet tokens = tokenizer.tokenize("12345");
   assertEquals("12345", tokens.readString(0));
   assertEquals("", tokens.readString(1));
 
-</programlisting>
+]]></programlisting>
 
           <para>The above example is almost identical to the one before it,
           except the tokenizer.setStrict(false) was called. This setting tells
@@ -821,11 +821,11 @@
         writing to a file. In Spring Batch this is the
         <classname>LineAggregator</classname>:</para>
 
-        <programlisting>  public interface LineAggregator&lt;T&gt; {
+        <programlisting><![CDATA[  public interface LineAggregator<T> {
 
     public String aggregate(T item);
 
-  }</programlisting>
+  }]]></programlisting>
 
         <para>The <classname>LineAggregator</classname> is the opposite of a
         <classname>LineTokenizer</classname>.
@@ -862,21 +862,21 @@
         <classname>FlatFileItemWriter</classname> expresses this in
         code:</para>
 
-        <programlisting>  public void write(T item) throws Exception {
+        <programlisting><![CDATA[  public void write(T item) throws Exception {
     getOutputState().write(lineAggregator.aggregate(item) + LINE_SEPARATOR);
-  }</programlisting>
+  }]]></programlisting>
 
         <para>A simple configuration with the smallest ammount of setters
         would look like the following:</para>
 
-        <programlisting>  &lt;bean id="itemWriter"
-        class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
-    &lt;property name="resource"
-              value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
-    &lt;property name="lineAggregator"&gt;
-      &lt;bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+        <programlisting><![CDATA[  <bean id="itemWriter"
+        class="org.springframework.batch.io.file.FlatFileItemWriter">
+    <property name="resource"
+              value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
+    <property name="lineAggregator">
+      <bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+    </property>
+  </bean>]]></programlisting>
       </section>
 
       <section>
@@ -980,28 +980,28 @@
       stream. First, lets examine a set of XML records that the
       <classname>StaxEventItemReader</classname> can process.</para>
 
-      <para><programlisting>
-&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;records&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0001&lt;/isin&gt;
-    &lt;quantity&gt;5&lt;/quantity&gt;
-    &lt;price&gt;11.39&lt;/price&gt;
-    &lt;customer&gt;Customer1&lt;/customer&gt;
-  &lt;/trade&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0002&lt;/isin&gt;
-    &lt;quantity&gt;2&lt;/quantity&gt;
-    &lt;price&gt;72.99&lt;/price&gt;
-    &lt;customer&gt;Customer2c&lt;/customer&gt;
-  &lt;/trade&gt;
-  &lt;trade xmlns="http://springframework.org/batch/sample/io/oxm/domain"&gt;
-    &lt;isin&gt;XYZ0003&lt;/isin&gt;
-    &lt;quantity&gt;9&lt;/quantity&gt;
-    &lt;price&gt;99.99&lt;/price&gt;
-    &lt;customer&gt;Customer3&lt;/customer&gt;
-  &lt;/trade&gt;
-&lt;/records&gt;</programlisting></para>
+      <para><programlisting><![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+  <trade xmlns="http://springframework.org/batch/sample/io/oxm/domain">
+    <isin>XYZ0001</isin>
+    <quantity>5</quantity>
+    <price>11.39</price>
+    <customer>Customer1</customer>
+  </trade>
+  <trade xmlns="http://springframework.org/batch/sample/io/oxm/domain">
+    <isin>XYZ0002</isin>
+    <quantity>2</quantity>
+    <price>72.99</price>
+    <customer>Customer2c</customer>
+  </trade>
+  <trade xmlns="http://springframework.org/batch/sample/io/oxm/domain">
+    <isin>XYZ0003</isin>
+    <quantity>9</quantity>
+    <price>99.99</price>
+    <customer>Customer3</customer>
+  </trade>
+</records>]]></programlisting></para>
 
       <para>To be able to process the XML records the following is needed:
       <itemizedlist>
@@ -1023,22 +1023,22 @@
           </listitem>
         </itemizedlist></para>
 
-      <para><programlisting>&lt;property name="itemReader"&gt;
-     &lt;bean class="org.springframework.batch.io.xml.StaxEventItemReader"&gt;
-         &lt;property name="fragmentRootElementName"  value="trade" /&gt;
-         &lt;property name="resource" value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" /&gt;
-         &lt;property name="fragmentDeserializer"&gt;
-             &lt;bean class="org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer"&gt;
-                 &lt;constructor-arg&gt;
-                     &lt;bean class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
-                         &lt;property name="aliases" ref="aliases" /&gt;
-                     &lt;/bean&gt;
-                 &lt;/constructor-arg&gt;
-             &lt;/bean&gt;
-         &lt;/property&gt;
-     &lt;/bean&gt;
-&lt;/property&gt;
-    </programlisting></para>
+      <para><programlisting><![CDATA[<property name="itemReader">
+     <bean class="org.springframework.batch.io.xml.StaxEventItemReader">
+         <property name="fragmentRootElementName"  value="trade" />
+         <property name="resource" value="data/staxJob/input/20070918.testStream.xmlFileStep.xml" />
+         <property name="fragmentDeserializer">
+             <bean class="org.springframework.batch.io.xml.oxm.UnmarshallingEventReaderDeserializer">
+                 <constructor-arg>
+                     <bean class="org.springframework.oxm.xstream.XStreamMarshaller">
+                         <property name="aliases" ref="aliases" />
+                     </bean>
+                 </constructor-arg>
+             </bean>
+         </property>
+     </bean>
+</property>
+    ]]></programlisting></para>
 
       <para>Notice that in this example we have chosen to use an
       <classname>XStreamMarshaller</classname> that requires an alias passed
@@ -1049,16 +1049,16 @@
       the map. In the configuration file we can use a spring configuration
       utility to describe the required alias as follows:</para>
 
-      <para><programlisting>
-        &lt;util:map id="aliases"&gt;
-                &lt;entry key="trade"
-                        value="org.springframework.batch.sample.domain.Trade" /&gt;
-                &lt;entry key="isin" value="java.lang.String" /&gt;
-                &lt;entry key="quantity" value="long" /&gt;
-                &lt;entry key="price" value="java.math.BigDecimal" /&gt;
-                &lt;entry key="customer" value="java.lang.String" /&gt;
-        &lt;/util:map&gt;
-        </programlisting></para>
+      <para><programlisting><![CDATA[
+        <util:map id="aliases">
+                <entry key="trade"
+                        value="org.springframework.batch.sample.domain.Trade" />
+                <entry key="isin" value="java.lang.String" />
+                <entry key="quantity" value="long" />
+                <entry key="price" value="java.math.BigDecimal" />
+                <entry key="customer" value="java.lang.String" />
+        </util:map>
+        ]]></programlisting></para>
 
       <para>On input the reader reads the XML resource until it recognizes a
       new fragment is about to start (by matching the tag name by default).
@@ -1072,7 +1072,7 @@
       injection provided by the spring configuration would look something like
       the following:</para>
 
-      <para><programlisting>
+      <para><programlisting><![CDATA[
       StaxEventItemReader xmlStaxEventItemReader = new StaxEventItemReader()
       Resource resource = new ByteArrayResource(xmlResource.getBytes()) 
 
@@ -1100,7 +1100,7 @@
         }
       }
 
-</programlisting></para>
+]]></programlisting></para>
     </section>
 
     <section>
@@ -1118,13 +1118,13 @@
       <classname>MarshallingEventWriterSerializer</classname>. The Spring
       configuration for this setup looks as follows:</para>
 
-      <programlisting>&lt;bean class="org.springframework.batch.item.xml.StaxEventItemWriter" id="tradeStaxWriter"&gt;
-  &lt;property name="resource"value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" /&gt;
-  &lt;property name="serializer" ref="tradeMarshallingSerializer" /&gt;
-  &lt;property name="rootTagName" value="trades" /&gt;
-  &lt;property name="overwriteOutput" value="true" /&gt;
-&lt;/bean&gt;
-</programlisting>
+      <programlisting><![CDATA[<bean class="org.springframework.batch.item.xml.StaxEventItemWriter" id="tradeStaxWriter">
+  <property name="resource"value="file:target/test-outputs/20070918.testStream.xmlFileStep.output.xml" />
+  <property name="serializer" ref="tradeMarshallingSerializer" />
+  <property name="rootTagName" value="trades" />
+  <property name="overwriteOutput" value="true" />
+</bean>
+]]></programlisting>
 
       <para>The configuration sets up the three required properties and
       optionally sets the overwriteOutput=true, mentioned earlier in the
@@ -1144,7 +1144,7 @@
       all of the points discussed, demonstrating the programmatic setup of the
       required properties.</para>
 
-      <programlisting>     StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
+      <programlisting><![CDATA[     StaxEventItemWriter staxItemWriter = new StaxEventItemWriter()
      FileSystemResource resource = new FileSystemResource(File.createTempFile("StaxEventWriterOutputSourceTests", "xml"))
 
      Map aliases = new HashMap();
@@ -1172,7 +1172,7 @@
      trade.customer = "Customer1"
      println trade
      staxItemWriter.write(trade)
-     staxItemWriter.flush()</programlisting>
+     staxItemWriter.flush()]]></programlisting>
 
       <para>For a complete example configuration of XML input and output and a
       corresponding Job see the sample xmlStaxJob.</para>
@@ -1189,11 +1189,11 @@
     <classname>java.io.File</classname>. Both XML and Flat File resources can
     be configured using standard Spring constructs:</para>
 
-    <programlisting>  &lt;bean id="flatFileItemReader"
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource"
-                     value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
-  &lt;/bean&gt;</programlisting>
+    <programlisting><![CDATA[  <bean id="flatFileItemReader"
+        class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource"
+                     value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
+  </bean>]]></programlisting>
 
     <para>The above <classname>Resource</classname> will load the file from
     the file system, at the location specificied. Note that absolute locations
@@ -1203,10 +1203,10 @@
     determined at runtime as a parameter to the job. This could be solved
     using '-D' parameters, i.e. a system property:</para>
 
-    <programlisting>&lt;bean id="flatFileItemReader"
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="${input.file.name}" /&gt;
-&lt;/bean&gt;</programlisting>
+    <programlisting><![CDATA[<bean id="flatFileItemReader"
+        class="org.springframework.batch.item.file.FlatFileItemReader">
+    <property name="resource" value="${input.file.name}" />
+</bean>]]></programlisting>
 
     <para>All that would be required for this solution to work would be a
     system argument (-Dinput.file.name="file://file.txt"). (Note that although
@@ -1223,10 +1223,10 @@
     either job name, step name, or any values from the
     <classname>JobParameters</classname>, by surrounding them with %:</para>
 
-    <programlisting>  &lt;bean id="inputFile"
-        class="org.springframework.batch.core.resource.StepExecutionResourceProxy" /&gt;
-    &lt;property name="filePattern" value="//%JOB_NAME%/%STEP_NAME%/%file.name%" /&gt;
-  &lt;/bean&gt;</programlisting>
+    <programlisting><![CDATA[  <bean id="inputFile"
+        class="org.springframework.batch.core.resource.StepExecutionResourceProxy" />
+    <property name="filePattern" value="//%JOB_NAME%/%STEP_NAME%/%file.name%" />
+  </bean>]]></programlisting>
 
     <para>Assuming a job name of 'fooJob', and a step name of 'fooStep', and
     the key-value pair of 'file.name="fileName.txt"' is in the
@@ -1237,11 +1237,11 @@
     <classname>StepExecution</classname>, it must be registered as a
     <classname>StepListener</classname>:</para>
 
-    <programlisting>  &lt;bean id="fooStep" parent="abstractStep"
+    <programlisting><![CDATA[  <bean id="fooStep" parent="abstractStep"
     p:itemReader-ref="itemReader"
-    p:itemWriter-ref="itemWriter"&gt;
-    &lt;property name="listeners" ref="inputFile" /&gt;
-  &lt;/bean&gt;</programlisting>
+    p:itemWriter-ref="itemWriter">
+    <property name="listeners" ref="inputFile" />
+  </bean>]]></programlisting>
 
     <para>The <classname>StepListener</classname> interface will be discussed
     in more detail in Chapter 4. For now, it is sufficient to know that the
@@ -1257,20 +1257,20 @@
     for both XML and FlatFile processing. Consider the following files in a
     directory:</para>
 
-    <programlisting>file-1.txt  file-2.txt  ignored.txt</programlisting>
+    <programlisting><![CDATA[file-1.txt  file-2.txt  ignored.txt]]></programlisting>
 
     <para>file-1.txt and file-2.txt are formatted the same and for business
     reasons should be processed together. The
     <classname>MuliResourceItemReader</classname> can be used to read in both
     files by using wildcards:</para>
 
-    <programlisting>
-  &lt;bean id="multiResourceReader" class="org.springframework.batch.item.SortedMultiResourceItemReader"&gt;
-    &lt;property name="resources" value="classpath:data/multiResourceJob/input/file-*.txt" /&gt;
-    &lt;property name="delegate" ref="flatFileItemReader" /&gt;
-  &lt;/bean&gt;
+    <programlisting><![CDATA[
+  <bean id="multiResourceReader" class="org.springframework.batch.item.SortedMultiResourceItemReader">
+    <property name="resources" value="classpath:data/multiResourceJob/input/file-*.txt" />
+    <property name="delegate" ref="flatFileItemReader" />
+  </bean>
 
-</programlisting>
+]]></programlisting>
 
     <para>The referenced delegate is a simple
     <classname>FlatFileItemReader</classname>. The above configuration will
@@ -1357,18 +1357,18 @@
         <classname>DataSource</classname>. The following database schema will
         be used as an example:</para>
 
-        <programlisting>CREATE TABLE CUSTOMER (
+        <programlisting><![CDATA[CREATE TABLE CUSTOMER (
  ID BIGINT IDENTITY PRIMARY KEY,  
  NAME VARCHAR(45),
  CREDIT FLOAT
-);</programlisting>
+);]]></programlisting>
 
         <para>Many people prefer to use a domain object for each row, so we'll
         use an implementation of the <classname>RowMapper</classname>
         interface to map a <classname>CustomerCredit</classname>
         object:</para>
 
-        <programlisting>public class CustomerCreditRowMapper implements RowMapper {
+        <programlisting><![CDATA[public class CustomerCreditRowMapper implements RowMapper {
 
  public static final String ID_COLUMN = "id";
  public static final String NAME_COLUMN = "name";
@@ -1384,7 +1384,7 @@
         return customerCredit;
  }
 
-}</programlisting>
+}]]></programlisting>
 
         <para>Because <classname>JdbcTemplate</classname> is so familiar to
         users of Spring, and the <classname>JdbcCursorItemReader</classname>
@@ -1395,12 +1395,12 @@
         CUSTOMER database. The first example will be using
         <classname>JdbcTemplate</classname>:</para>
 
-        <programlisting>  
+        <programlisting><![CDATA[  
   //For simplicity sake, assume a dataSource has already been obtained
   JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
   List customerCredits = jdbcTemplate.query("SELECT ID, NAME, CREDIT from CUSTOMER", new CustomerCreditRowMapper());
 
-</programlisting>
+]]></programlisting>
 
         <para>After running this code snippet the customerCredits list will
         contain 1,000 <classname>CustomerCredit</classname> objects. In the
@@ -1411,7 +1411,7 @@
         constrast this with the approach of the
         <classname>JdbcCursorItemReader</classname>:</para>
 
-        <programlisting>  
+        <programlisting><![CDATA[  
   JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
   itemReader.setDataSource(dataSource);
   itemReader.setSql("SELECT ID, NAME, CREDIT from CUSTOMER");
@@ -1426,7 +1426,7 @@
   }
   itemReader.close(executionContext);
 
-</programlisting>
+]]></programlisting>
 
         <para>After running this code snippet the counter will equal 1,000. If
         the code above had put the returned customerCredit into a list, the
@@ -1542,7 +1542,7 @@
         configuration using the same 'customer credit' example as the JDBC
         reader:</para>
 
-        <programlisting>  
+        <programlisting><![CDATA[  
   HibernateCursorItemReader itemReader = new HibernateCursorItemReader();
   itemReader.setQueryString("from CustomerCredit");
   //For simplicity sake, assume sessionFactory already obtained.
@@ -1558,7 +1558,7 @@
   }
   itemReader.close(executionContext);
 
-</programlisting>
+]]></programlisting>
 
         <para>This configured <classname>ItemReader</classname> will return
         <classname>CustomerCredit</classname> objects in the exact same manner
@@ -1600,12 +1600,12 @@
         <para>The <classname>SimpleDelegatingPagingQueryProvider</classname>
         requires that you specify a select clause and a from clause. You can
         also provide an optional where clause. These clauses will be used to
-        build an SQL statement combined with the required sortKey. </para>
+        build an SQL statement combined with the required sortKey.</para>
 
         <para>After the reader has been opened, it will pass back one item per
         call to <methodname>read</methodname> in the same basic fashion as any
         other <classname>ItemReader</classname>. The paging happens behind the
-        scenes when additional rows are needed. </para>
+        scenes when additional rows are needed.</para>
 
         <para>Below is an example configuration using a similar 'customer
         credit' example as the cursor based ItemReaders above:</para>
@@ -1626,7 +1626,7 @@
                 <entry key="status" value="NEW"/>
             </map>
         </property>
-        <property name="pageSize" value="10"/>
+        <property name="pageSize" value="1000"/>
         <property name="parameterizedRowMapper" ref="customerMapper"/>
     </bean> 
 ]]></programlisting>
@@ -1635,7 +1635,7 @@
         <classname>CustomerCredit</classname> objects using the
         <classname>ParameterizedRowMapper</classname> that must be specified.
         The 'pageSize' property determines the number of entities read from
-        the database for each query execution. </para>
+        the database for each query execution.</para>
 
         <para>The 'parameterValues' property can be used to specify a Map of
         parameter values for the query. If you use named parameters in the
@@ -1682,6 +1682,56 @@
         assuming the Customer object has the correct JPA annotations or ORM
         mapping file. The 'pageSize' property determines the number of
         entities read from the database for each query execution.</para>
+      </section>
+
+      <section>
+        <title>IbatisPagingItemReader</title>
+
+        <para>If you use IBATIS for your data access ten you can use the
+        <classname>IbatisPagingItemReader</classname> which, as the name
+        indicates, is an implementation of a paging
+        <classname>ItemReader</classname>. IBATIS doesn't have direct support
+        for reading rows in pages but by providing a couple of standard
+        variables you can add paging support to your IBATIS queries.</para>
+
+        <para>Here is an example of a configuration for a
+        <classname>IbatisPagingItemReader</classname> reading CustomerCredits
+        as in the examples above:</para>
+
+        <programlisting><![CDATA[  <bean id="itemReader"
+    class="org.springframework.batch.item.database.IbatisPagingItemReader">
+    <property name="sqlMapClient" ref="sqlMapClient"/>
+    <property name="queryId" value="getPagedCustomerCredits"/>
+    <property name="pageSize" value="1000"/>
+  </bean>
+]]></programlisting>
+
+        <para>The <classname>IbatisPagingItemReader</classname> configuration
+        above references an IBATIS query called "getPagedCustomerCredits".
+        Here is an example of what that query should look like for
+        MySQL.</para>
+
+        <programlisting><![CDATA[  <select id="getPagedCustomerCredits" resultMap="customerCreditResult">
+      select id, name, credit from customer order by id asc LIMIT #_skiprows#, #_pagesize#
+  </select>
+]]></programlisting>
+
+        <para>The <classname>_skiprows</classname> and
+        <classname>_pagesize</classname> variables are provided by the
+        <classname>IbatisPagingItemReader</classname> and there is also a
+        <classname>_page</classname> variable that can be used if necessary.
+        The syntax for the paging queries varies with the database used. Here
+        is an example for Oracle (unfortunatey we need to use CDATA for some
+        operators since this belongs in an XML document):</para>
+
+        <programlisting>  &lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
+    select * from (
+     select * from (
+      select t.id, t.name, t.credit, ROWNUM ROWNUM_ from customer t order by id
+     ) where ROWNUM_ &lt;![CDATA[ &gt; ]]&gt; ( #_page# * #_pagesize# )
+    ) where ROWNUM &lt;![CDATA[ &lt;= ]]&gt; #_pagesize#
+  &lt;/select&gt;
+</programlisting>
       </section>
     </section>
 
@@ -1746,12 +1796,12 @@
         real complication is how those keys are obtained. The
         <classname>KeyCollector</classname> interface abstracts this:</para>
 
-        <programlisting>  public interface KeyCollector {
+        <programlisting><![CDATA[  public interface KeyCollector {
 
     List retrieveKeys(ExecutionContext executionContext);
 
     void updateContext(Object key, ExecutionContext executionContext);
-  }</programlisting>
+  }]]></programlisting>
 
         <para>The primary method in this interface is the
         <methodname>retrieveKeys</methodname> method. It is expected that this
@@ -1766,12 +1816,12 @@
         <methodname>retrieveKeys</methodname> method can then use this value
         to retrieve a subset of the original keys:</para>
 
-        <programlisting>  ExecutionContext executionContext = new ExecutionContext();
+        <programlisting><![CDATA[  ExecutionContext executionContext = new ExecutionContext();
   List keys = keyStrategy.retrieveKeys(executionContext);
   //Assume keys contains 1 through 1,000
   keyStrategy.updateContext(new Long(500), executionContext);
   keys = keyStrategy.retrieveKeys(executionContext);
-  //keys should now contains 500 through 1,000</programlisting>
+  //keys should now contains 500 through 1,000]]></programlisting>
 
         <para>This generalization illustrates the
         <classname>KeyCollector</classname> contract. If we assume that
@@ -1834,36 +1884,36 @@
         <para>The following code helps illustrate how to setup and use a
         <classname>SingleColumnJdbcKeyCollector</classname>:</para>
 
-        <programlisting>  SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
+        <programlisting><![CDATA[  SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
   "SELECT ID from T_FOOS order by ID");
 
-  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID &gt; ? order by ID");
+  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");
 
   ExecutionContext executionContext = new ExecutionContext();
 
   List keys = keyStrategy.retrieveKeys(new ExecutionContext());
 
-  for (int i = 0; i &lt; keys.size(); i++) {
+  for (int i = 0; i < keys.size(); i++) {
     System.out.println(keys.get(i));
-  }</programlisting>
+  }]]></programlisting>
 
         <para>If this code were run in the proper environment with the correct
         database tables setup, then it would output the following:</para>
 
-        <programlisting>1
+        <programlisting><![CDATA[1
 2
 3
 4
-5</programlisting>
+5]]></programlisting>
 
         <para>Now, let's modify the code slightly to show what would happen if
         the code were started again after a restart, having failed after
         processing key 3 successfully:</para>
 
-        <programlisting>  SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
+        <programlisting><![CDATA[  SingleColumnJdbcKeyCollector keyCollector = new SingleColumnJdbcKeyCollector(getJdbcTemplate(),
   "SELECT ID from T_FOOS order by ID");
 
-  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID &gt; ? order by ID");
+  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");
 
   ExecutionContext executionContext = new ExecutionContext();  
 
@@ -1871,19 +1921,19 @@
   
   List keys = keyStrategy.retrieveKeys(executionContext);
 
-  for (int i = 0; i &lt; keys.size(); i++) {
+  for (int i = 0; i < keys.size(); i++) {
     System.out.println(keys.get(i));
-  }</programlisting>
+  }]]></programlisting>
 
         <para>Running this code snippet would result in the following:</para>
 
-        <programlisting>4
-5</programlisting>
+        <programlisting><![CDATA[4
+5]]></programlisting>
 
         <para>The key difference between the two examples is the following
         line:</para>
 
-        <programlisting>  keyStrategy.updateContext(new Long(3), executionContext);</programlisting>
+        <programlisting><![CDATA[  keyStrategy.updateContext(new Long(3), executionContext);]]></programlisting>
 
         <para>This tells the key collector to update the provided
         <classname>ExecutionContext</classname> with the key of three. This
@@ -1894,7 +1944,7 @@
         <classname>ExecutionContext</classname> that was updated to contain 3,
         the argument of 3 will be passed to the restartSql:</para>
 
-        <programlisting>  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID &gt; ? order by ID");</programlisting>
+        <programlisting><![CDATA[  keyCollector.setRestartSql("SELECT ID from T_FOOS where ID > ? order by ID");]]></programlisting>
 
         <para>This will cause only keys 4 and 5 to be returned, since they are
         the only ones with an ID greater than 3.</para>
@@ -1921,13 +1971,13 @@
         An <classname>ExecutionContextRowMapper</classname> provides
         this:</para>
 
-        <programlisting>public interface ExecutionContextRowMapper extends RowMapper {
+        <programlisting><![CDATA[public interface ExecutionContextRowMapper extends RowMapper {
 
   public void mapKeys(Object key, ExecutionContext executionContext);
 
   public PreparedStatementSetter createSetter(ExecutionContext executionContext);
 }
-</programlisting>
+]]></programlisting>
 
         <para>The <classname>ExecutionContextRowMapper</classname> interface
         extends the standard <classname>RowMapper</classname> interface to
@@ -2025,36 +2075,36 @@
       items to be skipped reliably. The following example illustrates how to
       configure the <classname>HibernateAwareItemWriter</classname>:</para>
 
-      <programlisting>  &lt;bean id="hibernateItemWriter"
-        class="org.springframework.batch.item.database.HibernateAwareItemWriter"&gt;
-    &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
-    &lt;property name="delegate" ref="customerCreditWriter" /&gt;
-  &lt;/bean&gt;
+      <programlisting><![CDATA[  <bean id="hibernateItemWriter"
+        class="org.springframework.batch.item.database.HibernateAwareItemWriter">
+    <property name="sessionFactory" ref="sessionFactory" />
+    <property name="delegate" ref="customerCreditWriter" />
+  </bean>
 
-  &lt;bean id="customerCreditWriter"
-        class="org.springframework.batch.sample.dao.HibernateCreditDao"&gt;
-    &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
-  &lt;/bean&gt;
+  <bean id="customerCreditWriter"
+        class="org.springframework.batch.sample.dao.HibernateCreditDao">
+    <property name="sessionFactory" ref="sessionFactory" />
+  </bean>
 
-</programlisting>
+]]></programlisting>
 
       <para>If you are using JPA then the
       <classname>JpaAwareItemWriter</classname> provides comparable
       functionality. The following example illustrates how to configure the
       <classname>JpaAwareItemWriter</classname>:</para>
 
-      <programlisting>  &lt;bean id="hibernateItemWriter"
-        class="org.springframework.batch.item.database.JpaAwareItemWriter"&gt;
-    &lt;property name="entityManagerFactory" ref="entityManagerFactory" /&gt;
-    &lt;property name="delegate" ref="customerCreditWriter" /&gt;
-  &lt;/bean&gt;
+      <programlisting><![CDATA[  <bean id="hibernateItemWriter"
+        class="org.springframework.batch.item.database.JpaAwareItemWriter">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+    <property name="delegate" ref="customerCreditWriter" />
+  </bean>
 
-  &lt;bean id="customerCreditWriter"
-        class="org.springframework.batch.sample.dao.JpaCreditDao"&gt;
-    &lt;property name="entityManagerFactory" ref="entityManagerFactory" /&gt;
-  &lt;/bean&gt;
+  <bean id="customerCreditWriter"
+        class="org.springframework.batch.sample.dao.JpaCreditDao">
+    <property name="entityManagerFactory" ref="entityManagerFactory" />
+  </bean>
 
-</programlisting>
+]]></programlisting>
     </section>
   </section>
 
@@ -2079,12 +2129,12 @@
     standard Spring method invoking delegator pattern and are fairly simple to
     set up. Below is an example of the reader:</para>
 
-    <programlisting>  &lt;bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter"&gt;
-    &lt;property name="targetObject" ref="fooService" /&gt;
-    &lt;property name="targetMethod" value="generateFoo" /&gt;
-  &lt;/bean&gt;
+    <programlisting><![CDATA[  <bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter">
+    <property name="targetObject" ref="fooService" />
+    <property name="targetMethod" value="generateFoo" />
+  </bean>
 
-  &lt;bean id="fooService" class="org.springframework.batch.item.sample.FooService" /&gt;</programlisting>
+  <bean id="fooService" class="org.springframework.batch.item.sample.FooService" />]]></programlisting>
 
     <para>One important point to note is that the contract of the targetMethod
     must be the same as the contract for <methodname>read</methodname>: when
@@ -2095,13 +2145,13 @@
     <classname>ItemWriter</classname>. The <classname>ItemWriter</classname>
     implementation is equally as simple:</para>
 
-    <programlisting>  &lt;bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter"&gt;
-    &lt;property name="targetObject" ref="fooService" /&gt;
-    &lt;property name="targetMethod" value="processFoo" /&gt;
-  &lt;/bean&gt;
+    <programlisting><![CDATA[  <bean id="itemWriter" class="org.springframework.batch.item.adapter.ItemWriterAdapter">
+    <property name="targetObject" ref="fooService" />
+    <property name="targetMethod" value="processFoo" />
+  </bean>
 
-  &lt;bean id="fooService" class="org.springframework.batch.item.sample.FooService" /&gt;
-</programlisting>
+  <bean id="fooService" class="org.springframework.batch.item.sample.FooService" />
+]]></programlisting>
   </section>
 
   <section>
@@ -2116,11 +2166,11 @@
     that contains another <classname>ItemReader</classname>. For
     example:</para>
 
-    <programlisting>  public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+    <programlisting><![CDATA[  public class CompositeItemWriter<T> implements ItemWriter<T> {
 
-    ItemWriter&lt;T&gt; itemWriter;
+    ItemWriter<T> itemWriter;
 
-    public CompositeItemWriter(ItemWriter&lt;T&gt; itemWriter) {
+    public CompositeItemWriter(ItemWriter<T> itemWriter) {
       this.itemWriter = itemWriter;
     }
 
@@ -2138,7 +2188,7 @@
     public void flush() throws FlushFailedException {
       itemWriter.flush();
     }
-}</programlisting>
+}]]></programlisting>
 
     <para>The class above contains another <classname>ItemWriter</classname>
     that it delgates to after having provided some business logic. It should
@@ -2155,10 +2205,10 @@
     just want to modify the item. For this scenario, Spring Batch provides the
     <classname>ItemTransformer</classname> interface:</para>
 
-    <programlisting>  public interface ItemProcessor&lt;I, O&gt; {
+    <programlisting><![CDATA[  public interface ItemProcessor<I, O> {
 
   O process(I item) throws Exception;
-}</programlisting>
+}]]></programlisting>
 
     <para>An <classname>ItemTransformer</classname> is very simple, given one
     object, transorm it and return another. The object provided may or may not
@@ -2174,7 +2224,7 @@
     <classname>ItemTransformer</classname> can be written that performs the
     conversion:</para>
 
-    <programlisting>  public class Foo {}
+    <programlisting><![CDATA[  public class Foo {}
 
   public class Bar {
     public Bar(Foo foo) {}
@@ -2197,7 +2247,7 @@
     }
 
     //rest of class ommitted for clarity
-  }</programlisting>
+  }]]></programlisting>
 
     <para>In the very simple example above, there is a class
     <classname>Foo</classname>, a class <classname>Bar</classname>, and a
@@ -2214,10 +2264,10 @@
     <classname>Bar</classname> returned. The resulting
     <classname>Bar</classname> will then be written:</para>
 
-    <programlisting>  ItemTransformerItemWriter itemTransformerItemWriter = new ItemTransformerItemWriter();
+    <programlisting><![CDATA[  ItemTransformerItemWriter itemTransformerItemWriter = new ItemTransformerItemWriter();
   itemTransformerItemWriter.setItemTransformer(new FooTransformer());
   itemTransformerItemWriter.setDelegate(new BarWriter());
-  itemTransformerItemWriter.write(new Foo());</programlisting>
+  itemTransformerItemWriter.write(new Foo());]]></programlisting>
 
     <section>
       <title>The Delegate Pattern and Registering with the Step</title>
@@ -2250,7 +2300,7 @@
       Transformed to <classname>Bar</classname>, which will be transformed to
       <classname>Foobar</classname> and written out:</para>
 
-      <programlisting>  public class Foo {}
+      <programlisting><![CDATA[  public class Foo {}
 
   public class Bar {
     public Bar(Foo foo) {}
@@ -2285,17 +2335,17 @@
     }
  
     //rest of class ommitted for clarity
-  }</programlisting>
+  }]]></programlisting>
 
       <para>A <classname>FooTransformer</classname> and
       <classname>BarTransformer</classname> can be 'chained' together to give
       the resultant <classname>Foobar</classname>:</para>
 
-      <programlisting>  CompositeItemProcessor compositeTransformer = new CompositeItemProcessor();
+      <programlisting><![CDATA[  CompositeItemProcessor compositeTransformer = new CompositeItemProcessor();
   List itemTransformers = new ArrayList();
   itemTransformers.add(new FooTransformer());
   itemTransformers.add(new BarTransformer());
-  compositeTransformer.setItemTransformers(itemTransformers);</programlisting>
+  compositeTransformer.setItemTransformers(itemTransformers);]]></programlisting>
 
       <para>The compositeTransformer could be said to accept a
       <classname>Foo</classname> and return a <classname>Foobar</classname>.
@@ -2331,11 +2381,11 @@
     rather provides a very simple interface that can be implemented by any
     number of frameworks:</para>
 
-    <programlisting>  public interface Validator {
+    <programlisting><![CDATA[  public interface Validator {
   
     void validate(Object value) throws ValidationException;
 
-  }</programlisting>
+  }]]></programlisting>
 
     <para>The contract is that the <methodname>validate</methodname> method
     will throw an exception if the object is invalid, and return normally if
@@ -2464,11 +2514,11 @@
       basic contract of <classname>ItemReader</classname>,
       <methodname>read</methodname>:</para>
 
-      <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
+      <programlisting><![CDATA[  public class CustomItemReader<T> implements ItemReader<T>{
 
-    List&lt;T&gt; items;
+    List<T> items;
 
-    public CustomItemReader(List&lt;T&gt; items) {
+    public CustomItemReader(List<T> items) {
       this.items = items;
     }
 
@@ -2480,23 +2530,23 @@
       }
       return null;
     }
-  }</programlisting>
+  }]]></programlisting>
 
       <para>This very simple class takes a list of items, and returns one at a
       time, removing it from the list. When the list empty, it returns null,
       thus satisfying the most basic requirements of an
       <classname>ItemReader</classname>, as illustrated below:</para>
 
-      <programlisting>  List&lt;String&gt; items = new ArrayList&lt;String&gt;();
+      <programlisting><![CDATA[  List<String> items = new ArrayList<String>();
   items.add("1");
   items.add("2");
   items.add("3");
 
-  ItemReader itemReader = new CustomItemReader&lt;String&gt;(items);
+  ItemReader itemReader = new CustomItemReader<String>(items);
   assertEquals("1", itemReader.read());
   assertEquals("2", itemReader.read());
   assertEquals("3", itemReader.read());
-  assertNull(itemReader.read());</programlisting>
+  assertNull(itemReader.read());]]></programlisting>
 
       <section>
         <title>Making the <classname>ItemReader</classname>
@@ -2518,20 +2568,20 @@
         implemented with the <classname>ItemStream</classname>
         interface:</para>
 
-        <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;, ItemStream {
+        <programlisting><![CDATA[  public class CustomItemReader<T> implements ItemReader<T>, ItemStream {
 
-    List&lt;T&gt; items;
+    List<T> items;
     int currentIndex = 0;
     private static final String CURRENT_INDEX = "current.index";
 
-    public CustomItemReader(List&lt;T&gt; items) {
+    public CustomItemReader(List<T> items) {
       this.items = items;
     }
 
     public T read() throws Exception, UnexpectedInputException,
         ParseException {
 
-      if (currentIndex &lt; items.size()) {
+      if (currentIndex < items.size()) {
         return items.get(currentIndex++);
       }
       
@@ -2552,7 +2602,7 @@
     public void update(ExecutionContext executionContext) throws ItemStreamException {
       executionContext.putLong(CURRENT_INDEX, new Long(currentIndex).longValue());
     };
-  }</programlisting>
+  }]]></programlisting>
 
         <para>On each call to <classname>ItemStream</classname>
         <methodname>update</methodname> method, the current index of the
@@ -2564,19 +2614,19 @@
         current index is moved to that location. This is a fairly trivial
         example, but it still meets the general contract:</para>
 
-        <programlisting>  ExecutionContext executionContext = new ExecutionContext();
+        <programlisting><![CDATA[  ExecutionContext executionContext = new ExecutionContext();
   ((ItemStream)itemReader).open(executionContext);
   assertEquals("1", itemReader.read());
   ((ItemStream)itemReader).update(executionContext);
 
-  List&lt;String&gt; items = new ArrayList&lt;String&gt;();
+  List<String> items = new ArrayList<String>();
   items.add("1");
   items.add("2");
   items.add("3");
-  itemReader = new CustomItemReader&lt;String&gt;(items);
+  itemReader = new CustomItemReader<String>(items);
 
   ((ItemStream)itemReader).open(executionContext);
-  assertEquals("2", itemReader.read());</programlisting>
+  assertEquals("2", itemReader.read());]]></programlisting>
 
         <para>Most ItemReaders have much more sophisticated restart logic. The
         <classname>DrivingQueryItemReader</classname>, for example, only loads
@@ -2607,18 +2657,18 @@
       example. As with the <classname>ItemReader</classname> example, a List
       will be used in order to keep the example as simple as possible:</para>
 
-      <programlisting>  public class CustomItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+      <programlisting><![CDATA[  public class CustomItemWriter<T> implements ItemWriter<T> {
 
-    List&lt;T&gt; output = TransactionAwareProxyFactory.createTransactionalList();
+    List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 
-    public void write(List&lt;? extends T&gt; items) throws Exception {
+    public void write(List<? extends T> items) throws Exception {
       output.addAll(items);
     }
 
-    public List&lt;T&gt; getOutput() {
+    public List<T> getOutput() {
       return output;
     }
-  }</programlisting>
+  }]]></programlisting>
 
       <section>
         <title>Making the <classname>ItemWriter</classname>
