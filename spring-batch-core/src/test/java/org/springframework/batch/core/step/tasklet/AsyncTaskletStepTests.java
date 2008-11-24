@@ -107,9 +107,9 @@ public class AsyncTaskletStepTests {
 
 		step.execute(stepExecution);
 
-		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(25, processed.size());
 		assertEquals(25, stepExecution.getReadCount());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 	}
 
