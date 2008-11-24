@@ -307,6 +307,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		// default encoding for writing to output files - set to UTF-8.
 		private static final String DEFAULT_CHARSET = "UTF-8";
 
+		private FileOutputStream os;
+		
 		// The bufferedWriter over the file channel that is actually written
 		Writer outputBufferedWriter;
 
@@ -325,6 +327,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		boolean shouldDeleteIfExists = true;
 
 		boolean initialized = false;
+		
 
 		/**
 		 * Return the byte offset position of the cursor in the output file as a
@@ -379,6 +382,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 				}
 				outputBufferedWriter.close();
 				fileChannel.close();
+				os.close();
 			}
 			catch (IOException ioe) {
 				throw new ItemStreamException("Unable to close the the ItemWriter", ioe);
@@ -419,7 +423,8 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 			FileUtils.setUpOutputFile(file, restarted, shouldDeleteIfExists);
 
-			fileChannel = (new FileOutputStream(file.getAbsolutePath(), true)).getChannel();
+			os = new FileOutputStream(file.getAbsolutePath(), true);
+			fileChannel = os.getChannel();
 
 			outputBufferedWriter = getBufferedWriter(fileChannel, encoding);
 
