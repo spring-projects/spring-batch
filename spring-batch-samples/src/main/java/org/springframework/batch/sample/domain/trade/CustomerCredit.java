@@ -23,8 +23,17 @@ public class CustomerCredit {
 	private int id;
     private String name;
     private BigDecimal credit;
+    
+    public CustomerCredit(){
+    }
+    
+    public CustomerCredit(int id, String name, BigDecimal credit){
+		this.id = id;
+		this.name = name;
+		this.credit = credit;
+	}
 
-    public String toString() {
+	public String toString() {
         return "CustomerCredit [id=" + id +",name=" + name + ", credit=" + credit + "]";
     }
 

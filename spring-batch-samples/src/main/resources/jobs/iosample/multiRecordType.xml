@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+		<property name="resource" value="data/iosample/input/multiRecordType.txt" />
+		<property name="lineMapper">
+			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<property name="lineTokenizer" ref="compositeLineTokenizer"/>
+				<property name="fieldSetMapper" ref="compositeFieldSetMapper"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="compositeLineTokenizer" class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">
+		<property name="tokenizers">
+			<map>
+				<entry key="TRAD" value-ref="tradeLineTokenizer" />
+				<entry key="CUST" value-ref="customerLineTokenizer" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="tradeLineTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="isin,quantity,price,customer,prefix"/>
+		<property name="columns" value="5-16,17-19,20-25,26-34,1-4"/>
+	</bean>
+  
+	<bean id="customerLineTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="id,name,credit,prefix"/>
+		<property name="columns" value="5-9,10-18,19-26,1-4"/>
+	</bean>
+  
+	<bean id="compositeFieldSetMapper" class="org.springframework.batch.sample.iosample.internal.PrefixMatchingCompositeFieldSetMapper">
+		<property name="mappers">
+			<map>
+				<entry key="TRAD" value-ref="tradeFieldSetMapper" />
+				<entry key="CUST" value-ref="customerFieldSetMapper" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="tradeFieldSetMapper" class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper"/>
+	<bean id="customerFieldSetMapper" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditFieldSetMapper"/>
+
+
+	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<property name="resource" value="file:target/test-outputs/multiRecordTypeOutput.txt" />
+		<property name="lineAggregator">
+			<bean class="org.springframework.batch.sample.iosample.internal.DelegatingTradeLineAggregator">
+				<property name="tradeLineAggregator" ref="tradeLineAggregator"/>
+				<property name="customerLineAggregator" ref="customerLineAggregator"/>
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="tradeLineAggregator" class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+				<property name="names" value="isin,quantity,price,customer"/>
+			</bean>
+		</property>
+		<property name="format" value="TRAD%-12s%-3d%6s%-9s"/>
+	</bean>
+
+	<bean id="customerLineAggregator" class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
+		<property name="fieldExtractor">
+			<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+				<property name="names" value="id,name,credit"/>
+			</bean>
+		</property>
+		<property name="format" value="CUST%05d%-9s%08.0f"/>
+	</bean>
+</beans>

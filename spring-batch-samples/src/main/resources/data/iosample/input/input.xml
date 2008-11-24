@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trades>
+  <trade>
+    <isin>UK21341EAH45</isin>
+    <quantity>978</quantity>
+    <price>98.34</price>
+    <customer>customer1</customer>
+  </trade>
+  <trade>
+    <isin>UK21341EAH46</isin>
+    <quantity>112</quantity>
+    <price>18.12</price>
+    <customer>customer2</customer>
+  </trade>
+  <trade>
+    <isin>UK21341EAH47</isin>
+    <quantity>245</quantity>
+    <price>12.78</price>
+    <customer>customer3</customer>
+  </trade>
+  <trade>
+    <isin>UK21341EAH48</isin>
+    <quantity>108</quantity>
+    <price>109.25</price>
+    <customer>customer4</customer>
+  </trade>
+  <trade>
+    <isin>UK21341EAH49</isin>
+    <quantity>854</quantity>
+    <price>123.39</price>
+    <customer>customer5</customer>
+  </trade>
+  <trade>
+    <isin>UK21341EAH50</isin>
+    <quantity>234</quantity>
+    <price>32.45</price>
+    <customer>customer6</customer>
+  </trade>
+</trades>

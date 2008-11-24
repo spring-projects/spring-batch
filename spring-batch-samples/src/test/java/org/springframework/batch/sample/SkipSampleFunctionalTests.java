@@ -153,9 +153,6 @@ public class SkipSampleFunctionalTests {
 		assertTrue(!execution1.get("JOB_INSTANCE_ID").equals(execution2.get("JOB_INSTANCE_ID")));
 	}
 
-	/**
-	 * 
-	 */
 	private void validateLaunchWithSkips() {
 		// Step1: 5 input records, 1 skipped => 4 written to output
 		assertEquals(4, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "TRADE"));
@@ -163,12 +160,6 @@ public class SkipSampleFunctionalTests {
 		// Step2: 4 input records, 1 skipped => 3 written to output
 		assertEquals(3, itemTrackingWriter.getItems().size());
 
-		for(Object o : simpleJdbcTemplate.queryForList(
-				"SELECT * from ERROR_LOG"))
-		{
-			System.err.println("DHG > "+o);
-		}
-		
 		// Both steps contained skips
 		assertEquals(2, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "ERROR_LOG"));
 		assertEquals(1, simpleJdbcTemplate.queryForInt(
@@ -177,9 +168,6 @@ public class SkipSampleFunctionalTests {
 				"SELECT Count(*) from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", "skipJob", "step2"));
 	}
 
-	/**
-	 * 
-	 */
 	private void validateLaunchWithoutSkips() {
 		// Step1: 5 input records => 5 written to output
 		assertEquals(5, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "TRADE"));
