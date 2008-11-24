@@ -1,9 +1,6 @@
 package org.springframework.batch.sample.domain.multiline;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.*;
 import java.util.Collection;
 
 import org.junit.Before;
