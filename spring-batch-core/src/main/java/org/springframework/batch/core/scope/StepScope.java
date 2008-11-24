@@ -285,6 +285,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 					return createScopedProxy(holder.getBeanName(), definition, registry, proxyTargetClass);
 				}
 			}
+			value = super.resolveValue(value);
 			return value;
 		}
 	}

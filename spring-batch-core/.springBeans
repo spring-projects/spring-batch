@@ -22,6 +22,32 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/OneStepJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/TwoStepJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/annotation/batch-component-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/util/AsyncPlaceholderTargetSourceTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/AsyncStepScopeIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/annotation/batch-component-context-scoped.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/annotation/batch-component-context-with-resolver-nonscanned.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/annotation/batch-component-context-with-resolver.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/annotation/component-scan-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/DecisionJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobExecutionListenerParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobRepositoryParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/partition/launch-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/util/MultipleContextPlaceholderTargetSourceTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeFailureJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/util/PlaceholderTargetSourceTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/RepositoryJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/util/SimplePlaceholderTargetSourceTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/SplitJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/StepScopeDestructionCallbackIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/StepScopeIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/StepScopeNestedIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/StepScopePlaceholderIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/scope/StepScopeStartupIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepWithBasicProcessTaskJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepWithFaultTolerantProcessTaskJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepWithSimpleTaskJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopJobParserTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

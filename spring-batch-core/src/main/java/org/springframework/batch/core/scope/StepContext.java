@@ -164,7 +164,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		}
 		else {
 			throw new UnexpectedJobExecutionException("Could not close step context, rethrowing first of "
-					+ errors.size() + " execptions.", error);
+					+ errors.size() + " exceptions.", error);
 		}
 	}
 

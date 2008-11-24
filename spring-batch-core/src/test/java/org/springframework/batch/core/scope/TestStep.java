@@ -31,7 +31,8 @@ public class TestStep implements Step {
 
 	private void setContextFromCollaborator() {
 		if (context != null) {
-			context.setAttribute("collaborator", collaborator.getName());
+			String name = collaborator.getName();
+			context.setAttribute("collaborator", name);
 		}
 	}
 

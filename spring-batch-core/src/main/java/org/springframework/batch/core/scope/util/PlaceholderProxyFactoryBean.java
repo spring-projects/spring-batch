@@ -47,7 +47,7 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 	 */
 	public PlaceholderProxyFactoryBean(ContextFactory contextFactory) {
 		this.contextFactory = contextFactory;
-		setProxyTargetClass(true);
+		// setProxyTargetClass(false);
 	}
 
 	/**

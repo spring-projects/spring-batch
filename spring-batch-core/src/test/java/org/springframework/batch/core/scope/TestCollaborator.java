@@ -17,9 +17,6 @@ public class TestCollaborator implements Collaborator, Serializable {
 		this.parent = parent;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.scope.Collaborator#getName()
-	 */
 	public String getName() {
 		return name;
 	}
