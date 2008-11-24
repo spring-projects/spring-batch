@@ -14,12 +14,16 @@
 		<step name="step2">
 			<simple-task tasklet="tasklet">
 				<listeners>
-					<listener id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+					<listener ref="listener"/>
 				</listeners>
 			</simple-task>
 		</step>
 	</job>
 
-	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"/>
+	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener" >
+		<beans:qualifier value="listener" />
+	</beans:bean> 
+
+	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"  />
 
 </beans:beans>
