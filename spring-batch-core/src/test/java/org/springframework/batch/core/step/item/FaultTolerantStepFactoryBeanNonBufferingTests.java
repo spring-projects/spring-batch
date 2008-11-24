@@ -299,6 +299,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 		private final Collection<String> failures;
 
+		@SuppressWarnings("unchecked")
 		public SkipWriterStub() {
 			this(StringUtils.commaDelimitedListToSet("4"));
 		}
