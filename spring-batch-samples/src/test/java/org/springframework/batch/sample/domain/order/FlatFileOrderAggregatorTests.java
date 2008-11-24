@@ -50,7 +50,7 @@ public class FlatFileOrderAggregatorTests {
 		order.setTotalPrice(BigDecimal.valueOf(0));
 
 		// create aggregator stub
-		LineAggregator<Object[]> aggregator = new DelimitedLineAggregator<Object>();
+		LineAggregator<Object[]> aggregator = new DelimitedLineAggregator<Object[]>();
 
 		// create map of aggregators and set it to writer
 		Map<String, LineAggregator<Object[]>> aggregators = new HashMap<String, LineAggregator<Object[]>>();

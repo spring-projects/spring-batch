@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public class DelimitedLineAggregatorTests {
 
-	private DelimitedLineAggregator<String> aggregator = new DelimitedLineAggregator<String>();
+	private DelimitedLineAggregator<String[]> aggregator = new DelimitedLineAggregator<String[]>();
 
 	@Test
 	public void testSetDelimiter() {

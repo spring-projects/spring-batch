@@ -29,11 +29,9 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class FormatterLineAggregator<T> implements LineAggregator<T> {
+public class FormatterLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	private String format;
-
-	private FieldExtractor<T> fieldExtractor = new PassThroughFieldExtractor<T>();
 
 	private Locale locale = Locale.getDefault();
 
@@ -69,16 +67,6 @@ public class FormatterLineAggregator<T> implements LineAggregator<T> {
 		this.format = format;
 	}
 
-	/**
-	 * Public setter for the field extractor responsible for splitting an input
-	 * object up into an array of objects. Defaults to
-	 * {@link PassThroughFieldExtractor}.
-	 * 
-	 * @param fieldExtractor the field extractor to set
-	 */
-	public void setFieldExtractor(FieldExtractor<T> fieldExtractor) {
-		this.fieldExtractor = fieldExtractor;
-	}
 
 	/**
 	 * Public setter for the locale.
@@ -89,19 +77,13 @@ public class FormatterLineAggregator<T> implements LineAggregator<T> {
 	}
 
 	/**
-	 * Aggregate provided item into single line using specified format.
-	 * 
-	 * @param item data to be aggregated
-	 * @return aggregated string
+	 * @see org.springframework.batch.item.file.transform.ExtractorLineAggregator#doAggregate(java.lang.Object[])
 	 */
-	public String aggregate(T item) {
+	protected String doAggregate(Object[] fields) {
 
-		Assert.notNull(item);
 		Assert.notNull(format);
 
-		Object[] args = fieldExtractor.extract(item);
-
-		String value = String.format(locale, format, args);
+		String value = String.format(locale, format, fields);
 
 		if (maximumLength > 0) {
 			Assert.state(value.length() <= maximumLength, String.format("String overflowed in formatter -"

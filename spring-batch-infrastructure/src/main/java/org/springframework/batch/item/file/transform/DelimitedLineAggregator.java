@@ -21,7 +21,7 @@ import org.springframework.util.StringUtils;
  * @author Dave Syer
  *
  */
-public class DelimitedLineAggregator<T> implements LineAggregator<T[]> {
+public class DelimitedLineAggregator<T> extends ExtractorLineAggregator<T> {
 
 	private String delimiter = ",";
 	
@@ -33,11 +33,11 @@ public class DelimitedLineAggregator<T> implements LineAggregator<T[]> {
 		this.delimiter = delimiter;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.item.file.transform.LineAggregator#aggregate(java.lang.Object)
+	/**
+	 * @see org.springframework.batch.item.file.transform.ExtractorLineAggregator#doAggregate(java.lang.Object[])
 	 */
-	public String aggregate(T[] item) {
-		return StringUtils.arrayToDelimitedString(item, delimiter);
+	public String doAggregate(Object[] item) {
+		return StringUtils.arrayToDelimitedString(item, this.delimiter);
 	}
 
 }
