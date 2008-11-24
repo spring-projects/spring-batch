@@ -671,7 +671,7 @@ public class TaskletStepTests {
 		String msg = stepExecution.getExitStatus().getExitDescription();
 		assertEquals("", msg);
 		Throwable ex = stepExecution.getFailureExceptions().get(0);
-		msg = ex.getMessage();
+
 		// The original rollback was caused by this one:
 		assertEquals("Bar", ex.getMessage());
 	}
@@ -701,7 +701,6 @@ public class TaskletStepTests {
 		String msg = stepExecution.getExitStatus().getExitDescription();
 		assertEquals("", msg);
 		Throwable ex = stepExecution.getFailureExceptions().get(0);
-		msg = ex.getMessage();
 		// The original rollback was caused by this one:
 		assertEquals("Bar", ex.getMessage());
 	}

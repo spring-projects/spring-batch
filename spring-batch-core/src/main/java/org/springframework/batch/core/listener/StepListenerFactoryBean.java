@@ -129,7 +129,7 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean{
 	 * Extension of HashSet that ignores nulls, rather than putting them into
 	 * the set.
 	 */
-	private class NullIgnoringSet<E> extends HashSet<E>{
+	private static class NullIgnoringSet<E> extends HashSet<E>{
 		
 		@Override
 		public boolean add(E e) {

@@ -210,7 +210,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		return executions;
 	}
 
-	private class StepExecutionRowMapper implements ParameterizedRowMapper<StepExecution> {
+	private static class StepExecutionRowMapper implements ParameterizedRowMapper<StepExecution> {
 
 		private final JobExecution jobExecution;
 

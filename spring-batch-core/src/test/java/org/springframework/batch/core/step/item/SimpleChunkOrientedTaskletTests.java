@@ -146,7 +146,7 @@ public class SimpleChunkOrientedTaskletTests {
 	 * @author Dave Syer
 	 * 
 	 */
-	private final class StubItemWriter implements ItemWriter<String> {
+	private static final class StubItemWriter implements ItemWriter<String> {
 		private String values = "";
 
 		public void write(List<? extends String> items) throws Exception {

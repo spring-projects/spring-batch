@@ -55,7 +55,7 @@ public class JobListenerAnnotationBeanPostProcessor implements BeanPostProcessor
 		return null;
 	}
 	
-	private class BeforeJobProxy extends JobExecutionListenerSupport{
+	private static class BeforeJobProxy extends JobExecutionListenerSupport{
 		
 		Method method;
 		Object bean;
@@ -83,7 +83,7 @@ public class JobListenerAnnotationBeanPostProcessor implements BeanPostProcessor
 		}
 	}
 	
-	private class AfterJobProxy extends JobExecutionListenerSupport{
+	private static class AfterJobProxy extends JobExecutionListenerSupport{
 		
 		Method method;
 		Object bean;
