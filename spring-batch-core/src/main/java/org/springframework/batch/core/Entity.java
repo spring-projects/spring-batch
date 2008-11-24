@@ -77,13 +77,13 @@ public class Entity implements Serializable {
 	 */
 	public void incrementVersion() {
 		if (version == null) {
-			version = new Integer(0);
+			version = 0;
 		} else {
-			version = new Integer(version.intValue() + 1);
+			version = version + 1;
 		}
 	}
 
-	// @Override
+	@Override
 	public String toString() {
 		return ClassUtils.getShortName(getClass()) + ": id=" + getId();
 	}
@@ -94,6 +94,7 @@ public class Entity implements Serializable {
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object other) {
 		if (other == this) {
 			return true;

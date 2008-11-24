@@ -114,7 +114,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 		jobExecution.incrementVersion();
 
-		jobExecution.setId(new Long(jobExecutionIncrementer.nextLongValue()));
+		jobExecution.setId(jobExecutionIncrementer.nextLongValue());
 		Object[] parameters = new Object[] { jobExecution.getId(), jobExecution.getJobId(),
 				jobExecution.getStartTime(), jobExecution.getEndTime(), jobExecution.getStatus().toString(),
 				jobExecution.getExitStatus().getExitCode(), jobExecution.getExitStatus().getExitDescription(),
@@ -278,7 +278,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		}
 
 		public JobExecution mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Long id = new Long(rs.getLong(1));
+			Long id = rs.getLong(1);
 			JobExecution jobExecution;
 
 			if (jobInstance == null) {

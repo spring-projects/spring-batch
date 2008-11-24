@@ -78,7 +78,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 	public Object invokeMethod(Object... args) {
 		
 		Class<?>[] parameterTypes = method.getParameterTypes();
-		Object[] invokeArgs = new Object[parameterTypes.length];
+		Object[] invokeArgs;
 		if(parameterTypes.length == 0){
 			invokeArgs = new Object[]{};
 		}

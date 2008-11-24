@@ -82,7 +82,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		Assert.state(getJobInstance(jobName, jobParameters) == null, "JobInstance must not already exist");
 
-		Long jobId = new Long(jobIncrementer.nextLongValue());
+		Long jobId = jobIncrementer.nextLongValue();
 
 		JobInstance jobInstance = new JobInstance(jobId, jobParameters, jobName);
 		jobInstance.incrementVersion();
@@ -131,16 +131,16 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 				Types.BIGINT, Types.DOUBLE };
 
 		if (type == ParameterType.STRING) {
-			args = new Object[] { jobId, key, type, value, new Timestamp(0L), new Long(0), new Double(0) };
+			args = new Object[] { jobId, key, type, value, new Timestamp(0L), 0L, 0D };
 		}
 		else if (type == ParameterType.LONG) {
 			args = new Object[] { jobId, key, type, "", new Timestamp(0L), value, new Double(0) };
 		}
 		else if (type == ParameterType.DOUBLE) {
-			args = new Object[] { jobId, key, type, "", new Timestamp(0L), new Long(0), value };
+			args = new Object[] { jobId, key, type, "", new Timestamp(0L), 0L, value };
 		}
 		else if (type == ParameterType.DATE) {
-			args = new Object[] { jobId, key, type, "", value, new Long(0), new Double(0) };
+			args = new Object[] { jobId, key, type, "", value, 0L, 0D };
 		}
 
 		getJdbcTemplate().getJdbcOperations().update(getQuery(CREATE_JOB_PARAMETERS), args, argTypes);
@@ -317,7 +317,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 			if(jobParameters == null){
 				jobParameters = getJobParameters(id);
 			}
-			JobInstance jobInstance = new JobInstance(new Long(rs.getLong(1)), jobParameters, rs.getString(2));
+			JobInstance jobInstance = new JobInstance(rs.getLong(1), jobParameters, rs.getString(2));
 			// should always be at version=0 because they never get updated
 			jobInstance.incrementVersion();
 			return jobInstance;
