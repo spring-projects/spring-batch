@@ -66,7 +66,7 @@ public class StepExecutionSimpleCompletionPolicy extends StepExecutionListenerSu
 		JobParameters jobParameters = stepExecution.getJobParameters();
 		Assert.state(jobParameters.getParameters().containsKey(keyName),
 				"JobParameters do not contain Long parameter with key=[" + keyName + "]");
-		delegate = new SimpleCompletionPolicy(new Long(jobParameters.getLong(keyName)).intValue());
+		delegate = new SimpleCompletionPolicy((int) jobParameters.getLong(keyName));
 	}
 
 	/**

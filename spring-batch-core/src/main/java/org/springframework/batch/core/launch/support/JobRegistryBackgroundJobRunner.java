@@ -118,7 +118,7 @@ public class JobRegistryBackgroundJobRunner {
 			for (int j = 0; j < resources.length; j++) {
 
 				Resource path = resources[j];
-				logger.info("Registering Job definitions from " + resources);
+				logger.info("Registering Job definitions from " + Arrays.toString(resources));
 
 				ConfigurableListableBeanFactory beanFactory = new XmlBeanFactory(path, parentContext
 						.getAutowireCapableBeanFactory());

@@ -107,7 +107,7 @@ public class CommandLineJobRunnerTests {
 
 	public static class StubSystemExiter implements SystemExiter {
 
-		public static int status;
+		private static int status;
 
 		public void exit(int status) {
 			StubSystemExiter.status = status;

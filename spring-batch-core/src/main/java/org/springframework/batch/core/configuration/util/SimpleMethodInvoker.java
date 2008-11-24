@@ -32,6 +32,7 @@
 package org.springframework.batch.core.configuration.util;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.util.Assert;
@@ -67,7 +68,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		}
 		if(this.method == null){
 			throw new IllegalArgumentException("No methods found for name: [" + methodName + "] in class: [" +
-					object.getClass() + "] with arguments of type: [" + paramTypes + "]");
+					object.getClass() + "] with arguments of type: [" + Arrays.toString(paramTypes) + "]");
 		}
 	}
 	
@@ -94,7 +95,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 			return method.invoke(object, invokeArgs);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Unable to invoke method: [" + method + "] on object: [" + 
-					object + "] with arguments: [" + args + "]");
+					object + "] with arguments: [" + Arrays.toString(args) + "]");
 		} 
 	}
 	

@@ -3,6 +3,7 @@ package org.springframework.batch.core.partition.support;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -80,14 +81,14 @@ public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 		Map<String, ExecutionContext> contexts = partitioner.partition(splitSize);
 		Set<StepExecution> set = new HashSet<StepExecution>(contexts.size());
 
-		for (String key : contexts.keySet()) {
+		for (Entry<String, ExecutionContext> context : contexts.entrySet()) {
 
 			// Make the step execution name unique and repeatable
-			String stepName = this.stepName + STEP_NAME_SEPARATOR + key;
+			String stepName = this.stepName + STEP_NAME_SEPARATOR + context.getKey();
 
 			StepExecution currentStepExecution = jobExecution.createStepExecution(stepName);
 
-			boolean startable = getStartable(currentStepExecution, contexts.get(key));
+			boolean startable = getStartable(currentStepExecution, context.getValue());
 
 			if (startable) {
 				jobRepository.add(currentStepExecution);

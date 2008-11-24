@@ -135,8 +135,8 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 		Map<String, Set<Runnable>> copy = Collections.unmodifiableMap(callbacks);
 
-		for (String key : copy.keySet()) {
-			Set<Runnable> set = copy.get(key);
+		for(Entry<String, Set<Runnable>> entry : copy.entrySet()) {
+			Set<Runnable> set = entry.getValue();
 			for (Runnable callback : set) {
 				if (callback != null) {
 					/*
@@ -158,7 +158,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 			return;
 		}
 
-		Exception error = (Exception) errors.get(0);
+		Exception error = errors.get(0);
 		if (error instanceof RuntimeException) {
 			throw (RuntimeException) error;
 		}

@@ -121,7 +121,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 				propertiesBuilder.addString(StringUtils.replace(key, STRING_TYPE, ""), value);
 			}
 			else {
-				propertiesBuilder.addString(key, value.toString());
+				propertiesBuilder.addString(key, value);
 			}
 		}
 
