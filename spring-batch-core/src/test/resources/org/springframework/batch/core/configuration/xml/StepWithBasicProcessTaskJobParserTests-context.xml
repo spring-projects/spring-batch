@@ -11,7 +11,8 @@
 			<item-task reader="reader" processor="processor" writer="writer"
 					commit-interval="10">
 				<listeners>
-					<listener class="org.springframework.batch.core.configuration.xml.TestListener"/>
+					 <listener class="org.springframework.batch.core.configuration.xml.TestListener"
+						after-step-method="destroy"/> 
 					<listener ref="listener"/>
 				</listeners>
 				<streams>
@@ -28,5 +29,7 @@
 	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
 
 	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+	
+	<beans:bean id="listener2" class="org.springframework.batch.core.configuration.xml.TestListener"/>
 
 </beans:beans>

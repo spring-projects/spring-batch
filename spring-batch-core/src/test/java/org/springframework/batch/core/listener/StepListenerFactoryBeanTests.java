@@ -73,9 +73,9 @@ public class StepListenerFactoryBeanTests {
 	public void testStepAndChunk() throws Exception{
 		
 		factoryBean.setDelegate(testClass);
-		Map<StepListenerMetaData, String> metaDataMap = new HashMap<StepListenerMetaData, String>();;
-		metaDataMap.put(AFTER_STEP, "destroy");
-		metaDataMap.put(AFTER_CHUNK, "afterChunk");
+		Map<String, String> metaDataMap = new HashMap<String, String>();;
+		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
+		metaDataMap.put(AFTER_CHUNK.getPropertyName(), "afterChunk");
 		factoryBean.setMetaDataMap(metaDataMap);
 		Object item = new Object();
 		List<Object> items = new ArrayList<Object>();
@@ -120,8 +120,8 @@ public class StepListenerFactoryBeanTests {
 		//method name, that all three will be called
 		ThreeStepExecutionListener delegate = new ThreeStepExecutionListener();
 		factoryBean.setDelegate(delegate);
-		Map<StepListenerMetaData, String> metaDataMap = new HashMap<StepListenerMetaData, String>();;
-		metaDataMap.put(AFTER_STEP, "destroy");
+		Map<String, String> metaDataMap = new HashMap<String, String>();;
+		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
 		factoryBean.setMetaDataMap(metaDataMap);
 		StepListener listener = (StepListener) factoryBean.getObject();
 		((StepExecutionListener)listener).afterStep(stepExecution);
@@ -132,8 +132,8 @@ public class StepListenerFactoryBeanTests {
 	public void testAnnotatingInterfaceResultsInOneCall() throws Exception{
 		MultipleAfterStep delegate = new MultipleAfterStep();
 		factoryBean.setDelegate(delegate);
-		Map<StepListenerMetaData, String> metaDataMap = new HashMap<StepListenerMetaData, String>();;
-		metaDataMap.put(AFTER_STEP, "afterStep");
+		Map<String, String> metaDataMap = new HashMap<String, String>();;
+		metaDataMap.put(AFTER_STEP.getPropertyName(), "afterStep");
 		factoryBean.setMetaDataMap(metaDataMap);
 		StepListener listener = (StepListener) factoryBean.getObject();
 		((StepExecutionListener)listener).afterStep(stepExecution);

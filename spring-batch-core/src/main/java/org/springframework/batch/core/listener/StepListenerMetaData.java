@@ -16,6 +16,8 @@
 package org.springframework.batch.core.listener;
 
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
@@ -52,33 +54,44 @@ import org.springframework.batch.core.annotation.OnWriteError;
  */
 public enum StepListenerMetaData {
 
-	BEFORE_STEP("beforeStep", BeforeStep.class, StepExecutionListener.class, StepExecution.class),
-	AFTER_STEP("afterStep", AfterStep.class, StepExecutionListener.class, StepExecution.class),
-	BEFORE_CHUNK("beforeChunk", BeforeChunk.class, ChunkListener.class),
-	AFTER_CHUNK("afterChunk", AfterChunk.class, ChunkListener.class),
-	BEFORE_READ("beforeRead", BeforeRead.class, ItemReadListener.class),
-	AFTER_READ("afterRead", AfterRead.class, ItemReadListener.class, Object.class),
-	ON_READ_ERROR("onReadError", OnReadError.class, ItemReadListener.class, Exception.class),
-	BEFORE_PROCESS("beforeProcess", BeforeProcess.class, ItemProcessListener.class, Object.class),
-	AFTER_PROCESS("afterProcess", AfterProcess.class, ItemProcessListener.class, Object.class),
-	ON_PROCESS_ERROR("onProcessError", OnProcessError.class, ItemProcessListener.class, Object.class, Exception.class),
-	BEFORE_WRITE("beforeWrite", BeforeWrite.class, ItemWriteListener.class, Object.class),
-	AFTER_WRITE("afterWrite", AfterWrite.class, ItemWriteListener.class, Object.class),
-	ON_WRITE_ERROR("onWriteError", OnWriteError.class, ItemWriteListener.class, Object.class, Exception.class),
-	ON_SKIP_IN_READ("onSkipInRead", OnSkipInRead.class, SkipListener.class, Throwable.class),
-	ON_SKIP_IN_PROCESS("onSkipInProcess", OnSkipInProcess.class, SkipListener.class, Object.class, Throwable.class),
-	ON_SKIP_IN_WRITE("onSkipInWrite", OnSkipInWrite.class, SkipListener.class, Object.class, Throwable.class);
+	BEFORE_STEP("beforeStep", "before-step-method", BeforeStep.class, StepExecutionListener.class, StepExecution.class),
+	AFTER_STEP("afterStep", "after-step-method", AfterStep.class, StepExecutionListener.class, StepExecution.class),
+	BEFORE_CHUNK("beforeChunk", "before-chunk-method", BeforeChunk.class, ChunkListener.class),
+	AFTER_CHUNK("afterChunk", "after-chunk-method", AfterChunk.class, ChunkListener.class),
+	BEFORE_READ("beforeRead", "before-read-method", BeforeRead.class, ItemReadListener.class),
+	AFTER_READ("afterRead", "after-read-method", AfterRead.class, ItemReadListener.class, Object.class),
+	ON_READ_ERROR("onReadError", "on-read-error-method", OnReadError.class, ItemReadListener.class, Exception.class),
+	BEFORE_PROCESS("beforeProcess", "before-process-method", BeforeProcess.class, ItemProcessListener.class, Object.class),
+	AFTER_PROCESS("afterProcess", "after-process-method", AfterProcess.class, ItemProcessListener.class, Object.class),
+	ON_PROCESS_ERROR("onProcessError", "on-process-error-method", OnProcessError.class, ItemProcessListener.class, Object.class, Exception.class),
+	BEFORE_WRITE("beforeWrite", "before-write-method", BeforeWrite.class, ItemWriteListener.class, Object.class),
+	AFTER_WRITE("afterWrite", "after-write-method", AfterWrite.class, ItemWriteListener.class, Object.class),
+	ON_WRITE_ERROR("onWriteError", "on-write-error-method", OnWriteError.class, ItemWriteListener.class, Object.class, Exception.class),
+	ON_SKIP_IN_READ("onSkipInRead", "on-skip-in-read-method", OnSkipInRead.class, SkipListener.class, Throwable.class),
+	ON_SKIP_IN_PROCESS("onSkipInProcess", "on-skip-in-process-method", OnSkipInProcess.class, SkipListener.class, Object.class, Throwable.class),
+	ON_SKIP_IN_WRITE("onSkipInWrite", "on-skip-in-write-method", OnSkipInWrite.class, SkipListener.class, Object.class, Throwable.class);
 	
 	private final String methodName;
+	private final String propertyName;
 	private final Class<? extends Annotation> annotation;
 	private final Class<? extends StepListener> listenerInterface;
 	private final Class<?>[] paramTypes;
+	private static final Map<String, StepListenerMetaData> propertyMap;
 	
-	StepListenerMetaData(String methodName, Class<? extends Annotation> annotation, Class<? extends StepListener> listenerInterface, Class<?>... paramTypes) {
+	StepListenerMetaData(String methodName, String propertyName, Class<? extends Annotation> annotation, 
+			Class<? extends StepListener> listenerInterface, Class<?>... paramTypes) {
 		this.methodName = methodName;
+		this.propertyName = propertyName;
 		this.annotation = annotation;
 		this.listenerInterface = listenerInterface;
 		this.paramTypes = paramTypes;
+	}
+	
+	static{
+		propertyMap = new HashMap<String, StepListenerMetaData>();
+		for(StepListenerMetaData metaData : values()){
+			propertyMap.put(metaData.getPropertyName(), metaData);
+		}
 	}
 
 	public String getMethodName() {
@@ -95,5 +108,19 @@ public enum StepListenerMetaData {
 
 	public Class<?>[] getParamTypes() {
 		return paramTypes;
+	}
+	
+	public String getPropertyName() {
+		return propertyName;
+	}
+	
+	/**
+	 * Return the relevant meta data for the provided property name.
+	 * 
+	 * @param propertyName
+	 * @return meta data with supplied property name, null if none exists.
+	 */
+	public static StepListenerMetaData fromPropertyName(String propertyName){
+		return propertyMap.get(propertyName);
 	}
 }

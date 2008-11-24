@@ -30,6 +30,8 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.configuration.util.MethodInvoker;
 import org.springframework.batch.core.configuration.util.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * {@link FactoryBean} implementation that builds a {@link StepListener} based on the
@@ -54,31 +56,31 @@ import org.springframework.beans.factory.FactoryBean;
  * @since 2.0
  * @see StepListenerMetaData
  */
-public class StepListenerFactoryBean implements FactoryBean{
+public class StepListenerFactoryBean implements FactoryBean, InitializingBean{
 
 	private Object delegate;
-	private Map<StepListenerMetaData, String> metaDataMap;
+	private Map<String, String> metaDataMap;
 	
 	public Object getObject() throws Exception {
 		
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
 		if(metaDataMap == null){
-			metaDataMap = new HashMap<StepListenerMetaData, String>();
+			metaDataMap = new HashMap<String, String>();
 		}
 		//Because all annotations and interfaces should be checked for, make sure that each meta data 
 		//entry is represented.
 		for(StepListenerMetaData metaData : StepListenerMetaData.values()){
-			if(!metaDataMap.containsKey(metaData)){
+			if(!metaDataMap.containsKey(metaData.getPropertyName())){
 				//put null so that the annotation and interface is checked
-				metaDataMap.put(metaData, null);
+				metaDataMap.put(metaData.getPropertyName(), null);
 			}
 		}
 		
 		Set<Class<? extends StepListener>> listenerInterfaces = new HashSet<Class<? extends StepListener>>();
 		
 		//For every entry in th emap, try and find a method by interface, name, or annotation.  If the same
-		for(Entry<StepListenerMetaData, String> entry : metaDataMap.entrySet()){
-			StepListenerMetaData metaData = entry.getKey();
+		for(Entry<String, String> entry : metaDataMap.entrySet()){
+			StepListenerMetaData metaData = StepListenerMetaData.fromPropertyName(entry.getKey());
 			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
 			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
 			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(), 
@@ -119,7 +121,7 @@ public class StepListenerFactoryBean implements FactoryBean{
 		this.delegate = delegate;
 	}
 	
-	public void setMetaDataMap(Map<StepListenerMetaData, String> metaDataMap) {
+	public void setMetaDataMap(Map<String, String> metaDataMap) {
 		this.metaDataMap = metaDataMap;
 	}
 	
@@ -138,5 +140,9 @@ public class StepListenerFactoryBean implements FactoryBean{
 				return super.add(e);
 			}
 		};
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(delegate, "Delegate must not be null");
 	}
 }

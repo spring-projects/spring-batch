@@ -271,7 +271,7 @@
 						</xsd:annotation>
 						<xsd:complexType>
 							<xsd:sequence>
-								<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded"/>
+								<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded"/>
 							</xsd:sequence>
 						</xsd:complexType>
 					</xsd:element>
@@ -449,6 +449,28 @@
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="ref" type="xsd:string"/>
 		<xsd:attribute name="class" type="xsd:string"/>
+	</xsd:complexType>
+	
+	<xsd:complexType name="stepListenerType">
+		<xsd:attribute name="id" type="xsd:ID"/>
+		<xsd:attribute name="ref" type="xsd:string"/>
+		<xsd:attribute name="class" type="xsd:string"/>
+		<xsd:attribute name="before-step-method" type="xsd:string"/>
+		<xsd:attribute name="after-step-method" type="xsd:string"/>
+		<xsd:attribute name="before-chunk-method" type="xsd:string"/>
+		<xsd:attribute name="after-chunk-method" type="xsd:string"/>
+		<xsd:attribute name="before-read-method" type="xsd:string"/>
+		<xsd:attribute name="after-read-method" type="xsd:string"/>
+		<xsd:attribute name="on-read-error-method" type="xsd:string"/>
+		<xsd:attribute name="before-process-method" type="xsd:string"/>
+		<xsd:attribute name="after-process-method" type="xsd:string"/>
+		<xsd:attribute name="on-process-error-method" type="xsd:string"/>
+		<xsd:attribute name="before-write-method" type="xsd:string"/>
+		<xsd:attribute name="after-write-method" type="xsd:string"/>
+		<xsd:attribute name="on-write-error-method" type="xsd:string"/>
+		<xsd:attribute name="on-skip-in-read-method" type="xsd:string"/>
+		<xsd:attribute name="on-skip-in-process-method" type="xsd:string"/>
+		<xsd:attribute name="on-skip-in-write-method" type="xsd:string"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="jobExecutionListenerType">
