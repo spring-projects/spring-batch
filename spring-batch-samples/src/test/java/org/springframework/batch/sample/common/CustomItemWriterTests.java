@@ -45,7 +45,7 @@ public class CustomItemWriterTests {
 		assertEquals(3, itemWriter.getOutput().size());
 	}
 
-	public class CustomItemWriter<T> implements ItemWriter<T> {
+	public static class CustomItemWriter<T> implements ItemWriter<T> {
 
 		List<T> output = TransactionAwareProxyFactory.createTransactionalList();
 

@@ -106,8 +106,6 @@ public class OrderItemReaderTests {
 
 		// verify result
 		assertNotNull(result);
-		// result should be Order
-		assertTrue(result instanceof Order);
 
 		// verify whether order is constructed correctly
 		// Order object should contain same instances as returned by mapper

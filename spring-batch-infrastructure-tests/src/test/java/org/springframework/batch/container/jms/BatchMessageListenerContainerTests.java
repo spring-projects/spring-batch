@@ -43,8 +43,6 @@ public class BatchMessageListenerContainerTests {
 
 	BatchMessageListenerContainer container;
 
-	int count = 0;
-
 	@Test
 	public void testReceiveAndExecuteWithCallback() throws Exception {
 		RepeatTemplate template = new RepeatTemplate();

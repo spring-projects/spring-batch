@@ -76,7 +76,7 @@ public class CustomItemReaderTests extends TestCase {
 		assertEquals("2", itemReader.read());
 	}
 
-	public class CustomItemReader<T> implements ItemReader<T>, ItemStream {
+	public static class CustomItemReader<T> implements ItemReader<T>, ItemStream {
 
 		List<T> items;
 		int currentIndex = 0;
@@ -97,7 +97,7 @@ public class CustomItemReaderTests extends TestCase {
 		
 		public void open(ExecutionContext executionContext) throws ItemStreamException {
 			if(executionContext.containsKey(CURRENT_INDEX)){
-				currentIndex = new Long(executionContext.getLong(CURRENT_INDEX)).intValue();
+				currentIndex = executionContext.getInt(CURRENT_INDEX);
 			}
 			else{
 				currentIndex = 0;
@@ -107,7 +107,7 @@ public class CustomItemReaderTests extends TestCase {
 		public void close(ExecutionContext executionContext) throws ItemStreamException {}
 
 		public void update(ExecutionContext executionContext) throws ItemStreamException {
-			executionContext.putLong(CURRENT_INDEX, new Long(currentIndex).longValue());
+			executionContext.putInt(CURRENT_INDEX, currentIndex);
 		};
 		
 	}

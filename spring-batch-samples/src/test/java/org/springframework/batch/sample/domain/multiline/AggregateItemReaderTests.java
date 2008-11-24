@@ -52,7 +52,6 @@ public class AggregateItemReaderTests {
 		Object result = provider.read();
 
 		// it should be collection of 3 strings "line"
-		assertTrue(result instanceof Collection);
 		Collection<?> lines = (Collection<?>) result;
 		assertEquals(3, lines.size());
 
