@@ -172,7 +172,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.EXPECTED, 3);
 		stepExecution.getExecutionContext().putLong(ChunkMessageChannelItemWriter.ACTUAL, 2);
 		// And make the back log real
-		requests.send(getSimpleMessage("foo", new Long(4321)));
+		requests.send(getSimpleMessage("foo", 4321L));
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());

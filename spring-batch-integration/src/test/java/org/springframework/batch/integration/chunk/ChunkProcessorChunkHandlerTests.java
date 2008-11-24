@@ -26,7 +26,7 @@ public class ChunkProcessorChunkHandlerTests {
 		ChunkResponse response = handler.handleChunk(new ChunkRequest<Object>(StringUtils
 				.commaDelimitedListToSet("foo,bar"), 12L, 10));
 		assertEquals(0, response.getSkipCount());
-		assertEquals(new Long(12L), response.getJobId());
+		assertEquals(12, response.getJobId().longValue());
 		assertTrue(response.isSuccessful());
 		assertEquals(2, count);
 	}

@@ -44,7 +44,7 @@ public class MessageOrientedStep extends AbstractStep {
 
 	private PollableChannel source;
 
-	private static int MINUTE = 1000 * 60;
+	private static long MINUTE = 1000 * 60;
 
 	private long executionTimeout = 30*MINUTE ;
 
