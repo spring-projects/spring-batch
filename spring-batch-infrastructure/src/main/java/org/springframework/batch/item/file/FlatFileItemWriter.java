@@ -74,9 +74,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 	private String encoding = OutputState.DEFAULT_CHARSET;
 
-	private FileWriterCallback headerCallback;
+	private FlatFileHeaderCallback headerCallback;
 
-	private FileWriterCallback footerCallback;
+	private FlatFileFooterCallback footerCallback;
 
 	private String lineSeparator = DEFAULT_LINE_SEPARATOR;
 
@@ -151,7 +151,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * headerCallback will be called before writing the first item to file.
 	 * Newline will be automatically appended after the header is written.
 	 */
-	public void setHeaderCallback(FileWriterCallback headerCallback) {
+	public void setHeaderCallback(FlatFileHeaderCallback headerCallback) {
 		this.headerCallback = headerCallback;
 	}
 
@@ -159,7 +159,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	 * footerCallback will be called after writing the last item to file, but
 	 * before the file is closed.
 	 */
-	public void setFooterCallback(FileWriterCallback footerCallback) {
+	public void setFooterCallback(FlatFileFooterCallback footerCallback) {
 		this.footerCallback = footerCallback;
 	}
 
@@ -206,7 +206,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		if (state != null) {
 			try {
 				if (footerCallback != null) {
-					footerCallback.write(state.outputBufferedWriter);
+					footerCallback.writeFooter(state.outputBufferedWriter);
 					state.outputBufferedWriter.flush();
 				}
 			}
@@ -249,7 +249,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		if (outputState.lastMarkedByteOffsetPosition == 0) {
 			if (headerCallback != null) {
 				try {
-					headerCallback.write(outputState.outputBufferedWriter);
+					headerCallback.writeHeader(outputState.outputBufferedWriter);
 					outputState.write("\n");
 				}
 				catch (IOException e) {

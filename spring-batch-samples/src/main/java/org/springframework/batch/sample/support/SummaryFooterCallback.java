@@ -5,16 +5,16 @@ import java.io.Writer;
 
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.item.file.FileWriterCallback;
+import org.springframework.batch.item.file.FlatFileFooterCallback;
 
 /**
  * Writes summary info in the footer of a file.
  */
-public class SummaryFooterCallback extends StepExecutionListenerSupport implements FileWriterCallback{
+public class SummaryFooterCallback extends StepExecutionListenerSupport implements FlatFileFooterCallback{
 
 	private StepExecution stepExecution;
 	
-	public void write(Writer writer) throws IOException {
+	public void writeFooter(Writer writer) throws IOException {
 		writer.write("footer - number of items written: " + stepExecution.getWriteCount());
 	}
 

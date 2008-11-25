@@ -16,7 +16,11 @@
 
 package org.springframework.batch.item.file;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -203,9 +207,9 @@ public class FlatFileItemWriterTests {
 	@Test
 	public void testRestart() throws Exception {
 
-		writer.setFooterCallback(new FileWriterCallback() {
+		writer.setFooterCallback(new FlatFileFooterCallback() {
 
-			public void write(Writer writer) throws IOException {
+			public void writeFooter(Writer writer) throws IOException {
 				writer.write("footer");
 			}
 
@@ -315,9 +319,9 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteFooter() throws Exception {
-		writer.setFooterCallback(new FileWriterCallback() {
+		writer.setFooterCallback(new FlatFileFooterCallback() {
 
-			public void write(Writer writer) throws IOException {
+			public void writeFooter(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
 
@@ -332,9 +336,9 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteHeader() throws Exception {
-		writer.setHeaderCallback(new FileWriterCallback() {
+		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-			public void write(Writer writer) throws IOException {
+			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
 
@@ -352,9 +356,9 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteHeaderAfterRestartOnFirstChunk() throws Exception {
-		writer.setHeaderCallback(new FileWriterCallback() {
+		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-			public void write(Writer writer) throws IOException {
+			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
 
@@ -377,9 +381,9 @@ public class FlatFileItemWriterTests {
 
 	@Test
 	public void testWriteHeaderAfterRestartOnSecondChunk() throws Exception {
-		writer.setHeaderCallback(new FileWriterCallback() {
+		writer.setHeaderCallback(new FlatFileHeaderCallback() {
 
-			public void write(Writer writer) throws IOException {
+			public void writeHeader(Writer writer) throws IOException {
 				writer.write("a\nb");
 			}
 

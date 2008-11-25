@@ -3,10 +3,10 @@ package org.springframework.batch.sample.support;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.springframework.batch.item.file.FileWriterCallback;
+import org.springframework.batch.item.file.FlatFileHeaderCallback;
+import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.LineCallbackHandler;
-import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.util.Assert;
 
 /**
@@ -14,7 +14,7 @@ import org.springframework.util.Assert;
  * {@link FlatFileItemWriter} and copy header line from input file to output
  * file.
  */
-public class HeaderCopyCallback implements LineCallbackHandler, FileWriterCallback {
+public class HeaderCopyCallback implements LineCallbackHandler, FlatFileHeaderCallback {
 
 	private String header = "";
 	
@@ -23,7 +23,7 @@ public class HeaderCopyCallback implements LineCallbackHandler, FileWriterCallba
 		this.header = line;
 	}
 
-	public void write(Writer writer) throws IOException {
+	public void writeHeader(Writer writer) throws IOException {
 		writer.write("header from input: " + header);
 		
 	}
