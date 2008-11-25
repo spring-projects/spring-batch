@@ -61,17 +61,34 @@ public class MethodInvokerUtils {
 		}
 	}
 	
+	/**
+	 * Create a {@link MethodInvoker} using the provided interface, and string methodname from that interface. 
+	 * 
+	 * @param object to be invoked
+	 * @param methodName of the method to be invoked
+	 * @param paramTypes - parameter types of the method to search for.
+	 * @return MethodInvoker if the method is found, null if it is not.
+	 */
 	public static MethodInvoker getMethodInvokerForInterface(Class<?> iFace, String methodName, 
-			Object candidate, Class<?>... params){
+			Object object, Class<?>... paramTypes){
 		
-		if(iFace.isAssignableFrom(candidate.getClass())){
-			return MethodInvokerUtils.createMethodInvokerByName(candidate, methodName, true, params);
+		if(iFace.isAssignableFrom(object.getClass())){
+			return MethodInvokerUtils.createMethodInvokerByName(object, methodName, true, paramTypes);
 		}
 		else{
 			return null;
 		}
 	}
 	
+	/**
+	 * Create  {@link MethodInvoker} for the method with the provided annotation on the provided object.  It
+	 * should be noted that annotations that cannot be applied to methods (i.e. that aren't annotated with an
+	 * element type of METHOD) will cause an exception to be thrown.
+	 * 
+	 * @param annotationType to be searched for
+	 * @param candidate to be invoked
+	 * @return MethodInvoker for the provided annotation, null if none is found.
+	 */
 	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType, final Object candidate){
 		Assert.notNull(candidate, "class must not be null");
 		Assert.notNull(annotationType, "annotationType must not be null");
