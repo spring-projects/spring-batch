@@ -439,16 +439,6 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
-				<!--
-					Don't use the com.springsource one - surefire is broken in some
-					strange way
-				-->
-				<groupId>org.junit</groupId>
-				<artifactId>com.springsource.org.junit</artifactId>
-				<version>4.4.0</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
 				<groupId>org.easymock</groupId>
 				<artifactId>com.springsource.org.easymock</artifactId>
 				<version>2.3.0</version>
