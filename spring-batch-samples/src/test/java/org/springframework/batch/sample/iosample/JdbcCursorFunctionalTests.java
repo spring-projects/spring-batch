@@ -34,7 +34,7 @@ import org.springframework.test.jdbc.SimpleJdbcTestUtils;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosampleJob.xml",
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
 		"/jobs/iosample/jdbcCursor.xml" })
 public class JdbcCursorFunctionalTests extends AbstractJobTests {
 
