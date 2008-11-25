@@ -41,8 +41,8 @@ public class MultiResourceFunctionalTests extends AbstractJobTests {
 		this.launchJob();
 
 		AssertFile.assertFileEquals(new FileSystemResource("target/test-outputs/multiResourceOutput.csv.1"),
-				new FileSystemResource("src/main/resources/data/ioSample/input/delimited.csv"));
+				new FileSystemResource("src/main/resources/data/iosample/input/delimited.csv"));
 		AssertFile.assertFileEquals(new FileSystemResource("target/test-outputs/multiResourceOutput.csv.2"),
-				new FileSystemResource("src/main/resources/data/ioSample/input/delimited2.csv"));
+				new FileSystemResource("src/main/resources/data/iosample/input/delimited2.csv"));
 	}
 }

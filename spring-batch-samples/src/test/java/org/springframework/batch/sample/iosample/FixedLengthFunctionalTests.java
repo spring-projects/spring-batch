@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class FixedLengthFunctionalTests extends AbstractJobTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/fixedLengthOutput.txt";
-	private static final String INPUT_FILE = "src/main/resources/data/ioSample/input/fixedLength.txt";
+	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/fixedLength.txt";
 
 	/**
 	 * Output should be the same as input

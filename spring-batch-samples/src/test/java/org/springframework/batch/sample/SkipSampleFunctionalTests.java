@@ -22,6 +22,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.SimpleJdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Error is encountered during writing - transaction is rolled back and the
@@ -120,7 +121,7 @@ public class SkipSampleFunctionalTests {
 	 * <li>This step does not occur. No error records are logged.
 	 * </ul>
 	 */
-	@Test
+	@Transactional @Test
 	public void testJobIncrementing() {
 		//
 		// Launch 1

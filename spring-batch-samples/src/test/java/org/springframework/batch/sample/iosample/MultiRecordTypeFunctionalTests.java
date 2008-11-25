@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class MultiRecordTypeFunctionalTests extends AbstractJobTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiRecordTypeOutput.txt";
-	private static final String INPUT_FILE = "src/main/resources/data/ioSample/input/multiRecordType.txt";
+	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/multiRecordType.txt";
 
 	/**
 	 * Output should be the same as input

@@ -34,7 +34,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class DelimitedFunctionalTests extends AbstractJobTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/delimitedOutput.csv";
-	private static final String INPUT_FILE = "src/main/resources/data/ioSample/input/delimited.csv";
+	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/delimited.csv";
 
 	/**
 	 * Output should be the same as input

@@ -36,7 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class XmlFunctionalTests extends AbstractJobTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/output.xml";
-	private static final String INPUT_FILE = "src/main/resources/data/ioSample/input/input.xml";
+	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/input.xml";
 
 	/**
 	 * Output should be the same as input
