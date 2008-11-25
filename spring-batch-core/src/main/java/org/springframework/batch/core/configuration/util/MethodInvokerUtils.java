@@ -21,7 +21,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.springframework.batch.core.StepListener;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -62,7 +61,7 @@ public class MethodInvokerUtils {
 		}
 	}
 	
-	public static MethodInvoker getMethodInvokerForInterface(Class<? extends StepListener> iFace, String methodName, 
+	public static MethodInvoker getMethodInvokerForInterface(Class<?> iFace, String methodName, 
 			Object candidate, Class<?>... params){
 		
 		if(iFace.isAssignableFrom(candidate.getClass())){

@@ -6,13 +6,14 @@
 
 	<beans:import resource="common-context.xml" />
 	
-	<job id="job" incrementer="testIncrementer">
+	<job id="job" incrementer="testIncrementer" repository="jobRepository">
 		<step name="step1">
 			<simple-task tasklet="tasklet"/>
 		</step>
 		<listeners>
 			<listener after-method="afterJob" ref="testListener"/>
 			<listener after-method="afterJob" class="org.springframework.batch.core.configuration.xml.TestJobListener"/>
+			<listener class="org.springframework.batch.core.configuration.xml.JobExecutionListenerParserTests$TestComponent"/>
 		</listeners>
 	</job>
 
@@ -21,4 +22,5 @@
 	<beans:bean id="testListener" class="org.springframework.batch.core.configuration.xml.TestJobListener" />
 	
 	<beans:bean id="testIncrementer" class="org.springframework.batch.core.configuration.xml.TestIncrementer" />
+	
 </beans:beans>

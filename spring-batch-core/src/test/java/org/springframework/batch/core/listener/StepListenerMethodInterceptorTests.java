@@ -19,7 +19,7 @@ import org.springframework.batch.core.configuration.util.SimpleMethodInvoker;
 
 public class StepListenerMethodInterceptorTests {
 
-	StepListenerMethodInterceptor interceptor;
+	MethodInvokerMethodInterceptor interceptor;
 	TestClass testClass;
 	
 	@Before
@@ -34,7 +34,7 @@ public class StepListenerMethodInterceptorTests {
 		for(Method method : TestClass.class.getMethods()){
 			invokerMap.put(method.getName(), asSet( new SimpleMethodInvoker(testClass, method)));
 		}
-		interceptor = new StepListenerMethodInterceptor(invokerMap);
+		interceptor = new MethodInvokerMethodInterceptor(invokerMap);
 		interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method1")));
 		assertEquals(1, testClass.method1Count);
 		interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method2")));
@@ -48,7 +48,7 @@ public class StepListenerMethodInterceptorTests {
 		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.createMethodInvokerByName(testClass, "method1", false));
 		invokers.add(MethodInvokerUtils.createMethodInvokerByName(testClass, "method2", false));
 		invokerMap.put("method1", invokers);
-		interceptor = new StepListenerMethodInterceptor(invokerMap);
+		interceptor = new MethodInvokerMethodInterceptor(invokerMap);
 		interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method1")));
 		assertEquals(1, testClass.method1Count);
 		interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method2")));
@@ -61,7 +61,7 @@ public class StepListenerMethodInterceptorTests {
 		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.createMethodInvokerByName(testClass, "method3", false));
 		invokers.add(MethodInvokerUtils.createMethodInvokerByName(testClass, "method3", false));
 		invokerMap.put("method3", invokers);
-		interceptor = new StepListenerMethodInterceptor(invokerMap);
+		interceptor = new MethodInvokerMethodInterceptor(invokerMap);
 		assertEquals(ExitStatus.FINISHED, interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method3"))));
 	}
 	

@@ -22,13 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.listener.JobExecutionListenerFactoryBean;
+import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -45,15 +46,13 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class JobExecutionListenerParser {
 
-	
+	@SuppressWarnings("unchecked")
 	public ManagedList parse(Element element,
 			ParserContext parserContext) {
 		List<BeanReference> listeners = new ArrayList<BeanReference>();
-		
-		@SuppressWarnings("unchecked")
 		List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "listener");
-		for(Element listenerElement : listenerElements){
-			BeanDefinitionBuilder listenerBuilder = BeanDefinitionBuilder.genericBeanDefinition(JobExecutionListenerFactoryBean.class);
+ 		for(Element listenerElement : listenerElements){
+			BeanDefinitionBuilder listenerBuilder = BeanDefinitionBuilder.genericBeanDefinition(JobListenerFactoryBean.class);
 			String id = listenerElement.getAttribute("id");
 			String listenerRef = listenerElement.getAttribute("ref");
 			String className = listenerElement.getAttribute("class");
@@ -76,26 +75,25 @@ public class JobExecutionListenerParser {
 			}
 			else if(hasText(className)){
 				RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-				if (!StringUtils.hasText(id)) {
-					id = parserContext.getReaderContext().generateBeanName(beanDef);
-				}
-				parserContext.getRegistry().registerBeanDefinition(id, beanDef);
-		        listenerBuilder.addPropertyReference("delegate", id);
+				String delegateId = parserContext.getReaderContext().generateBeanName(beanDef);
+				parserContext.getRegistry().registerBeanDefinition(delegateId, beanDef);
+		        listenerBuilder.addPropertyReference("delegate", delegateId);
 			}
 			else {
 				throw new BeanCreationException("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element");
 			}
 			
-			
+			ManagedMap metaDataMap = new ManagedMap();
 			String beforeMethod = listenerElement.getAttribute("before-method");
 			if(StringUtils.hasText(beforeMethod)){
-				listenerBuilder.addPropertyValue("beforeMethod", beforeMethod);
+				metaDataMap.put("beforeMethod", beforeMethod);
 			}
 			
 			String afterMethod = listenerElement.getAttribute("after-method");
 			if(StringUtils.hasText(beforeMethod)){
-				listenerBuilder.addPropertyValue("afterMethod", afterMethod);
+				metaDataMap.put("afterMethod", afterMethod);
 			}
+			listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
 			AbstractBeanDefinition beanDef = listenerBuilder.getBeanDefinition();
 			if (!StringUtils.hasText(id)) {
 				id = parserContext.getReaderContext().generateBeanName(beanDef);
@@ -106,8 +104,7 @@ public class JobExecutionListenerParser {
 		}
 		
 		ManagedList managedList = new ManagedList();
-		@SuppressWarnings( { "unchecked", "unused" })
-		boolean dummy = managedList.addAll(listeners);
+		managedList.addAll(listeners);
 		
 		return managedList;
 	}

@@ -24,7 +24,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
-import org.springframework.batch.core.listener.JobExecutionListenerFactoryBean;
 import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.listener.StepListenerMetaData;
 import org.springframework.beans.factory.BeanCreationException;

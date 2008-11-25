@@ -28,20 +28,25 @@ import org.springframework.batch.core.annotation.BeforeJob;
  * @author Lucas Ward
  *
  */
-public class JobExecutionListnerFactoryBeanTests {
+public class JobListenerFactoryBeanTests {
 
-	JobExecutionListenerFactoryBean factoryBean;
+	JobListenerFactoryBean factoryBean;
 	
 	@Before
 	public void setUp(){
-		factoryBean = new JobExecutionListenerFactoryBean();
+		factoryBean = new JobListenerFactoryBean();
 	}
 	
 	@Test
 	public void testWithInterface() throws Exception{
 		JobListenerWithInterface delegate = new JobListenerWithInterface();
 		factoryBean.setDelegate(delegate);
-		assertEquals(delegate,factoryBean.getObject());
+		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
+		JobExecution jobExecution = new JobExecution(11L);
+		listener.beforeJob(jobExecution);
+		listener.afterJob(jobExecution);
+		assertTrue(delegate.beforeJobCalled);
+		assertTrue(delegate.afterJobCalled);
 	}
 	
 	@Test
@@ -58,10 +63,15 @@ public class JobExecutionListnerFactoryBeanTests {
 	
 	private class JobListenerWithInterface implements JobExecutionListener{
 
+		boolean beforeJobCalled = false;
+		boolean afterJobCalled = false;
+		
 		public void afterJob(JobExecution jobExecution) {
+			beforeJobCalled = true;
 		}
 
 		public void beforeJob(JobExecution jobExecution) {
+			afterJobCalled = true;
 		}
 		
 	}

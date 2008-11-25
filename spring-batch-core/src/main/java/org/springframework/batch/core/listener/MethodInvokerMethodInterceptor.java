@@ -36,11 +36,11 @@ import org.springframework.batch.core.configuration.util.MethodInvoker;
  * @since 2.0
  * @see MethodInvoker
  */
-public class StepListenerMethodInterceptor implements MethodInterceptor{
+public class MethodInvokerMethodInterceptor implements MethodInterceptor{
 
 	private final Map<String, Set<MethodInvoker>> invokerMap;
 
-	public StepListenerMethodInterceptor(Map<String, Set<MethodInvoker>> invokerMap) {
+	public MethodInvokerMethodInterceptor(Map<String, Set<MethodInvoker>> invokerMap) {
 		this.invokerMap = invokerMap;
 	}
 	

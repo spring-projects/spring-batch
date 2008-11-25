@@ -24,6 +24,7 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
+import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
@@ -71,8 +72,11 @@ public class JobParser extends AbstractBeanDefinitionParser {
 		builder.addPropertyValue("flow", flowDef);
 		
 		JobExecutionListenerParser listenerParser = new JobExecutionListenerParser();
-		ManagedList managedList = listenerParser.parse(element, parserContext);
-		builder.addPropertyValue("jobExecutionListeners", managedList);
+		Element listenersElement = (Element)DomUtils.getChildElementByTagName(element, "listeners");
+		if(listenersElement != null){
+			ManagedList managedList = listenerParser.parse(listenersElement, parserContext);
+			builder.addPropertyValue("jobExecutionListeners", managedList);
+		}
 		
 		return builder.getBeanDefinition();
 	}
