@@ -36,6 +36,16 @@ import org.springframework.util.ReflectionUtils;
  */
 public class MethodInvokerUtils {
 
+	/**
+	 * Create a {@link MethodInvoker} using the provided method name to search.  
+	 * 
+	 * @param object to be invoked
+	 * @param methodName of the method to be invoked
+	 * @param paramsRequired boolean indicating whether the parameters are required, if false, a no args version of the
+	 * method will be searched for.
+	 * @param paramTypes - parameter types of the method to search for.
+	 * @return MethodInvoker if the method is found, null if it is not.
+	 */
 	public static MethodInvoker createMethodInvokerByName(Object object, String methodName, boolean paramsRequired, Class<?>... paramTypes){
 		Assert.notNull(object, "Object to invoke must not be null");
 		Method method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
