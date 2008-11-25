@@ -11,10 +11,10 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-core
+					org.springframework.batch:org.springframework.batch.core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-infrastructure
+					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
 			</includes>
 			<sources>
@@ -33,7 +33,7 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-samples
+					org.springframework.batch:org.springframework.batch.samples
 				</include>
 			</includes>
 			<sources>

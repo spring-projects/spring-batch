@@ -11,10 +11,10 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-core
+					org.springframework.batch:org.springframework.batch.core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-infrastructure
+					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
 			</includes>
 			<sources>
@@ -33,7 +33,7 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-samples
+					org.springframework.batch:org.springframework.batch.samples
 				</include>
 			</includes>
 			<sources>
@@ -53,10 +53,10 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-core
+					org.springframework.batch:org.springframework.batch.core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-infrastructure
+					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
 			</includes>
 			<sources>
@@ -76,10 +76,10 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-core
+					org.springframework.batch:org.springframework.batch.core
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-infrastructure
+					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
 			</includes>
 			<binaries>
@@ -97,10 +97,10 @@
 								org.springframework.batch:spring-batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.core
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>
@@ -116,7 +116,7 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-samples
+					org.springframework.batch:org.springframework.batch.samples
 				</include>
 			</includes>
 			<binaries>
@@ -134,10 +134,10 @@
 								org.springframework.batch:spring-batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.core
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>
@@ -151,10 +151,10 @@
 								org.springframework.batch:spring-batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.core
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>
@@ -168,10 +168,10 @@
 								org.springframework.batch:spring-batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.core
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>

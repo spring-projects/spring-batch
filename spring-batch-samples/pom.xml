@@ -1,8 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.springframework.batch.samples</artifactId>
-	<version>2.0.0.CI-SNAPSHOT</version>
+	<version>2.0.0.M3</version>
 	<packaging>jar</packaging>
 	<name>Samples</name>
 	<description>
@@ -12,7 +11,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>org.springframework.batch</artifactId>
-		<version>2.0.0.CI-SNAPSHOT</version>
+		<version>2.0.0.M3</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<dependencies>
@@ -222,8 +221,7 @@
 									Reference script for HSQLDB - N.B. not under source control,
 									but packagaed in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -240,8 +238,7 @@
 									Reference script for DB2 - N.B. not under source control, but
 									packagaed in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -258,8 +255,7 @@
 									Reference script for Derby - N.B. not under source control, but
 									packagaed in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -276,8 +272,7 @@
 									Reference script for Oracle - N.B. not under source control,
 									but packagaed in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -294,8 +289,7 @@
 									Reference script for PostgreSQL - N.B. not under source
 									control, but packagaed in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -312,8 +306,7 @@
 									Reference script for MySQL - N.B. not under source control, but
 									packaged in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -330,8 +323,7 @@
 									Reference script for MS SQLServer - N.B. not under source
 									control, but packaged in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
@@ -348,8 +340,7 @@
 									Reference script for Sybase - N.B. not under source control,
 									but packaged in jar.
 								-->
-								<vppcopy todir="${basedir}/target/generated-resources"
-									overwrite="true">
+								<vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
 									<config>
 										<context>
 											<property key="includes" value="src/main/sql" />
