@@ -16,6 +16,9 @@
 				<include>
 					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
+				<include>
+					org.springframework.batch:org.springframework.batch.test
+				</include>
 			</includes>
 			<sources>
 				<includeModuleDirectory>false</includeModuleDirectory>
@@ -39,6 +42,29 @@
 			<sources>
 				<outputDirectoryMapping>
 					samples/spring-batch-samples
+				</outputDirectoryMapping>
+				<fileSets>
+					<fileSet>
+						<excludes>
+							<exclude>bin/**</exclude>
+							<exclude>target/**</exclude>
+						</excludes>
+					</fileSet>
+				</fileSets>
+			</sources>
+		</moduleSet>
+		<moduleSet>
+			<includes>
+				<include>
+					org.springframework.batch:org.springframework.batch.core
+				</include>
+				<include>
+					org.springframework.batch:org.springframework.batch.infrastructure
+				</include>
+			</includes>
+			<sources>
+				<outputDirectoryMapping>
+					sources/${module.artifactId}
 				</outputDirectoryMapping>
 				<fileSets>
 					<fileSet>

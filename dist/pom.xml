@@ -20,6 +20,7 @@
 		<module>../spring-batch-infrastructure</module>
 		<module>../spring-batch-core</module>
 		<module>../spring-batch-samples</module>
+		<module>../spring-batch-test</module>
 	</modules>
 
 	<build>
