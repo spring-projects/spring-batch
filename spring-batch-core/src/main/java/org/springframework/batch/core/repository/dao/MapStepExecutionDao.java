@@ -92,6 +92,9 @@ public class MapStepExecutionDao implements StepExecutionDao {
 
 	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
 		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
+		if (executions == null || executions.isEmpty()) {
+			return Collections.emptyList();
+		}
 		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
 		Collections.sort(result, new Comparator<Entity>() {
 

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -224,6 +225,12 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 			// expected
 		}
 
+	}
+
+	@Test
+	public void testGetStepExecutionsWhenNoneExist() throws Exception {
+		assertEquals("empty list is returned if no stepExecutions exist for given jobExecution", Collections
+				.emptyList(), dao.getStepExecutions(jobExecution));
 	}
 
 	private void assertStepExecutionsAreEqual(StepExecution expected, StepExecution actual) {
