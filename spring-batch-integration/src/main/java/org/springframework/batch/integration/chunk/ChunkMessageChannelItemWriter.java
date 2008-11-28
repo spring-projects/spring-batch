@@ -46,8 +46,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	}
 
 	public void write(List<? extends T> items) throws Exception {
-		// Block until expecting <= throttle limit - can Spring
-		// Integration do that for me?
+
+		// Block until expecting <= throttle limit
 		while (localState.getExpecting() > throttleLimit) {
 			getNextResult();
 		}
