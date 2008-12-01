@@ -27,8 +27,8 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 	private String fooJob = "foo";
 
 	private JobParameters fooParams = new JobParametersBuilder().addString("stringKey", "stringValue").addLong(
-			"longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE).addDate(
-			"dateKey", new Date(DATE)).toJobParameters();
+			"longKey", Long.MAX_VALUE).addDouble("doubleKey", Double.MAX_VALUE).addDate("dateKey", new Date(DATE))
+			.toJobParameters();
 
 	protected abstract JobInstanceDao getJobInstanceDao();
 
@@ -40,7 +40,8 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 	/*
 	 * Create and retrieve a job instance.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreateAndRetrieve() throws Exception {
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
@@ -53,7 +54,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 		assertEquals(fooInstance, retrievedInstance);
 		assertEquals(fooJob, retrievedInstance.getJobName());
 		assertEquals(fooParams, retrievedParams);
-		
+
 		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey"));
 		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
 		assertEquals("stringValue", retrievedParams.getString("stringKey"));
@@ -63,7 +64,8 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 	/*
 	 * Create and retrieve a job instance.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreateAndGetById() throws Exception {
 
 		JobInstance fooInstance = dao.createJobInstance(fooJob, fooParams);
@@ -76,7 +78,7 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 		assertEquals(fooInstance, retrievedInstance);
 		assertEquals(fooJob, retrievedInstance.getJobName());
 		assertEquals(fooParams, retrievedParams);
-		
+
 		assertEquals(Long.MAX_VALUE, retrievedParams.getLong("longKey"));
 		assertEquals(Double.MAX_VALUE, retrievedParams.getDouble("doubleKey"), 0.001);
 		assertEquals("stringValue", retrievedParams.getString("stringKey"));
@@ -86,7 +88,8 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 	/*
 	 * Create and retrieve a job instance.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testGetMissingById() throws Exception {
 
 		JobInstance retrievedInstance = dao.getJobInstance(1111111L);
@@ -97,34 +100,41 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 	/*
 	 * Create and retrieve a job instance.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testGetJobNames() throws Exception {
-		
+
 		testCreateAndRetrieve();
 		List<String> jobNames = dao.getJobNames();
 		assertFalse(jobNames.isEmpty());
 		assertTrue(jobNames.contains(fooJob));
-		
+
 	}
 
-	/*
+	/**
 	 * Create and retrieve a job instance.
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testGetLastInstances() throws Exception {
-		
+
 		testCreateAndRetrieve();
-		List<JobInstance> jobInstances = dao.getLastJobInstances(fooJob, 1);
+
+		// unrelated job instance that should be ignored by the query
+		dao.createJobInstance("anotherJob", new JobParameters());
+
+		List<JobInstance> jobInstances = dao.getLastJobInstances(fooJob, 2);
 		assertEquals(1, jobInstances.size());
 		assertEquals(fooJob, jobInstances.get(0).getJobName());
 		assertEquals(Integer.valueOf(0), jobInstances.get(0).getVersion());
-		
+
 	}
 
 	/**
 	 * Trying to create instance twice for the same job+parameters causes error
 	 */
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreateDuplicateInstance() {
 
 		dao.createJobInstance(fooJob, fooParams);
@@ -138,7 +148,8 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 		}
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testCreationAddsVersion() {
 
 		JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "testVersionAndId");
@@ -149,10 +160,9 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 
 		assertNotNull(jobInstance.getVersion());
 	}
-	
-	
-	public void testGetJobInstanceByExecutionId(){
-		
+
+	public void testGetJobInstanceByExecutionId() {
+
 	}
 
 }

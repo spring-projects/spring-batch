@@ -47,8 +47,12 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance(java.lang.Long)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
+	 * (java.lang.Long)
 	 */
 	public JobInstance getJobInstance(Long instanceId) {
 		for (JobInstance instance : jobInstances) {
@@ -59,8 +63,12 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames
+	 * ()
 	 */
 	public List<String> getJobNames() {
 		List<String> result = new ArrayList<String>();
@@ -71,19 +79,27 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getLastJobInstances(java.lang.String, int)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seeorg.springframework.batch.core.repository.dao.JobInstanceDao#
+	 * getLastJobInstances(java.lang.String, int)
 	 */
 	public List<JobInstance> getLastJobInstances(String jobName, int count) {
-		ArrayList<JobInstance> list = new ArrayList<JobInstance>(jobInstances);
-		Collections.sort(list, new Comparator<JobInstance>() {
+		List<JobInstance> result = new ArrayList<JobInstance>();
+		for (JobInstance instance : jobInstances) {
+			if (instance.getJobName().equals(jobName)) {
+				result.add(instance);
+			}
+		}
+		Collections.sort(result, new Comparator<JobInstance>() {
 			// sort by ID descending
 			public int compare(JobInstance o1, JobInstance o2) {
-				return Long.signum(o1.getId()-o2.getId());
+				return Long.signum(o1.getId() - o2.getId());
 			}
 		});
-		int length = count>list.size() ? list.size() : count;
-		return list.subList(0, length);
+		int length = count > result.size() ? result.size() : count;
+		return result.subList(0, length);
 	}
 
 	public JobInstance getJobInstance(JobExecution jobExecution) {
