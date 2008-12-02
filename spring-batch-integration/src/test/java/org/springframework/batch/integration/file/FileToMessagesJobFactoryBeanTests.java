@@ -41,7 +41,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.Message;
 import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.message.MessageConsumer;
+import org.springframework.integration.message.MessageHandler;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.ReflectionUtils;
 
@@ -66,8 +66,8 @@ public class FileToMessagesJobFactoryBeanTests {
 		itemReader.setLineMapper(new PassThroughLineMapper());
 		factory.setItemReader(itemReader);
 		factory.setChannel(channel);
-		channel.subscribe(new MessageConsumer() {
-			public void onMessage(Message<?> message) {
+		channel.subscribe(new MessageHandler() {
+			public void handleMessage(Message<?> message) {
 				// TODO: Ask Mark: unsafe cast...
 				receiver.add((String) message.getPayload());
 			}

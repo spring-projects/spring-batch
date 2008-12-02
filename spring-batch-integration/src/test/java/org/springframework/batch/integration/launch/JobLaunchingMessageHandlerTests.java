@@ -14,8 +14,6 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.integration.JobSupport;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.bus.MessageBus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
@@ -25,9 +23,6 @@ public class JobLaunchingMessageHandlerTests extends AbstractJUnit4SpringContext
 	JobLaunchingMessageHandler messageHandler;
 
 	StubJobLauncher jobLauncher;
-
-	@Autowired
-	public MessageBus messageBus;
 
 	@Before
 	public void setUp() {

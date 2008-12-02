@@ -30,7 +30,6 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.integration.bus.MessageBus;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.core.Message;
 import org.springframework.integration.core.MessageChannel;
@@ -45,9 +44,6 @@ import org.springframework.util.StringUtils;
 public class ChunkMessageItemWriterIntegrationTests {
 
 	private ChunkMessageChannelItemWriter<Object> writer = new ChunkMessageChannelItemWriter<Object>();
-
-	@Autowired
-	private MessageBus bus;
 
 	@Autowired
 	@Qualifier("requests")
@@ -90,15 +86,12 @@ public class ChunkMessageItemWriterIntegrationTests {
 			message = replies.receive(10);
 		}
 		
-		bus.start();
-
 	}
 
 	@After
 	public void tearDown() {
 		while (replies.receive(10L) != null) {
 		}
-		bus.stop();
 	}
 
 	@Test

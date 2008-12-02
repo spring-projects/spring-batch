@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.bus.MessageBus;
 import org.springframework.integration.channel.PollableChannel;
 import org.springframework.integration.core.Message;
 import org.springframework.integration.core.MessageChannel;
@@ -30,9 +29,6 @@ public class SmokeTests {
 	@Qualifier("smokeout")
 	private PollableChannel smokeout;
 	
-	@Autowired
-	private MessageBus bus;
-
 	// This has to be static because the MessageBus registers the handler
 	// more than once (every time a test instance is created), but only one of
 	// them will get the message.
@@ -52,7 +48,6 @@ public class SmokeTests {
 
 	@Test
 	public void testVanillaSendAndReceive() throws Exception {
-		bus.start();
 		smokein.send(new GenericMessage<String>("foo"));
 		@SuppressWarnings("unchecked")
 		Message<String> message = (Message<String>) smokeout.receive(100);

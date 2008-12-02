@@ -11,12 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.Lifecycle;
 import org.springframework.integration.annotation.ChannelAdapter;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Poller;
-import org.springframework.integration.bus.MessageBus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -25,7 +27,7 @@ import org.springframework.util.StringUtils;
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 @MessageEndpoint
-public class RetryRepeatTransactionalPollingIntegrationTests {
+public class RetryRepeatTransactionalPollingIntegrationTests implements ApplicationContextAware {
 
 	private Log logger = LogFactory.getLog(getClass());
 
@@ -37,8 +39,11 @@ public class RetryRepeatTransactionalPollingIntegrationTests {
 	@Autowired
 	private SimpleService service;
 
-	@Autowired
-	private MessageBus bus;
+	private Lifecycle bus;
+
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		bus = (Lifecycle) applicationContext;
+	}
 
 	private volatile int count = 0;
 	
@@ -85,7 +90,7 @@ public class RetryRepeatTransactionalPollingIntegrationTests {
 		lifecycle.start();
 		int timeout = 0;
 		while (service.getProcessed().size() < count && timeout++ < maxTries) {
-			Thread.sleep(10);
+			Thread.sleep(5);
 		}
 		lifecycle.stop();
 	}

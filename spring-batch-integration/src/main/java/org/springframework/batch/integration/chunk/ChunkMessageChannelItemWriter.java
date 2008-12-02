@@ -12,7 +12,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.integration.endpoint.MessagingGateway;
+import org.springframework.integration.gateway.MessagingGateway;
 import org.springframework.util.Assert;
 
 public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSupport implements ItemWriter<T>, ItemStream {
@@ -27,7 +27,6 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 	
 	private MessagingGateway messagingGateway;
 
-	// TODO: abstract the state or make a factory for this writer?
 	private LocalState localState = new LocalState();
 
 	private long throttleLimit = DEFAULT_THROTTLE_LIMIT;
@@ -81,7 +80,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			logger.debug("Finished waiting for results in step listener.");
 		}
 		catch (RuntimeException e) {
-			logger.debug("Detected failure waiting for results in step listener.");
+			logger.debug("Detected failure waiting for results in step listener.", e);
 			stepExecution.setStatus(BatchStatus.FAILED);
 			return ExitStatus.FAILED.addExitDescription(e.getClass().getName() + ": " + e.getMessage());
 		}

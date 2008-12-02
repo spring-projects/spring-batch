@@ -10,10 +10,10 @@
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 	<import resource="classpath:simple-job-launcher-context.xml" />
-	<integration:message-bus auto-startup="false" enable-annotations="true"/>
+	<integration:annotation-config/>
 	<integration:channel id="requests" />
 	<integration:channel id="response">
-		<integration:queue capacity="UNBOUNDED" />
+		<integration:queue/>
 	</integration:channel>
 
 	<integration:service-activator input-channel="requests" ref="jobLaunchingHandler" method="launch" />

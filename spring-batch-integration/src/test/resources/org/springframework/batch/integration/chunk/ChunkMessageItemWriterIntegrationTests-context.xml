@@ -10,10 +10,10 @@
                                  http://www.springframework.org/schema/context/spring-context-2.5.xsd
                                  http://www.springframework.org/schema/tx
                                  http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-	<message-bus auto-startup="false" enable-annotations="true"/>
+	<annotation-config/>
 	<channel id="requests" />
 	<channel id="replies">
-		<queue capacity="UNBOUNDED" />
+		<queue/>
 	</channel>
 	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
 	<tx:annotation-driven />

@@ -30,7 +30,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.channel.ThreadLocalChannel;
 import org.springframework.integration.core.Message;
 import org.springframework.integration.core.MessageChannel;
-import org.springframework.integration.message.MessageConsumer;
+import org.springframework.integration.message.MessageHandler;
 import org.springframework.util.ReflectionUtils;
 
 /**
@@ -67,8 +67,8 @@ public class MessageChannelItemWriterTests {
 	@Test
 	public void testWriteWithRollback() throws Exception {
 		DirectChannel channel = new DirectChannel();
-		channel.subscribe(new MessageConsumer() {
-			public void onMessage(Message<?> message) {
+		channel.subscribe(new MessageHandler() {
+			public void handleMessage(Message<?> message) {
 				throw new RuntimeException("Planned failure");
 			}
 		});
@@ -86,8 +86,8 @@ public class MessageChannelItemWriterTests {
 	@Test
 	public void testWriteWithRollbackOnEndpoint() throws Exception {
 		DirectChannel channel = new DirectChannel();
-		channel.subscribe(new MessageConsumer() {
-			public void onMessage(Message<?> message) {
+		channel.subscribe(new MessageHandler() {
+			public void handleMessage(Message<?> message) {
 				throw new RuntimeException("Planned failure");
 			}
 		});
