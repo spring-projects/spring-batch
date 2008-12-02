@@ -33,6 +33,10 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 
 	private List<String> processed = new ArrayList<String>();
 	
+	private List<String> expected;
+
+	private List<String> handled = new ArrayList<String>();
+	
 	private List<String> list = new ArrayList<String>();
 
 	private Lifecycle bus;
@@ -47,7 +51,10 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 	public String process(String message) {
 		String result = message + ": " + count;
 		logger.debug("Handling: " + message);
-		processed.add(message);
+		if (count<expected.size()) {
+			processed.add(message);			
+			count++;
+		}
 		if ("fail".equals(message)) {
 			throw new RuntimeException("Planned failure");
 		}
@@ -66,7 +73,7 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 
 	@ChannelAdapter("replies")
 	public void output(String message) {	
-		count++;
+		handled.add(message);
 		logger.debug("Handled: " + message);		
 	}
 
@@ -75,9 +82,10 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 	public void testSunnyDay() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
-		waitForResults(bus, 4, 60);
-		assertEquals(4,processed.size()); // a,b,c,d
-		assertEquals(4,count);
+		expected = Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,c,d"));
+		waitForResults(bus, expected.size(), 60);
+		assertEquals(expected,processed);
 	}
 
 	@Test
@@ -85,9 +93,11 @@ public class RepeatTransactionalPollingIntegrationTests implements ApplicationCo
 	public void testRollback() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
-		waitForResults(bus, 4, 30); // (a,b), (fail), (fail)
-		assertEquals(4,processed.size()); // a,b,fail,fail
-		assertEquals(2,count); // a,b
+		expected = Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,fail,fail"));
+		waitForResults(bus, expected.size(), 60);
+		assertEquals(expected,processed);
+		assertEquals(2, handled.size()); // a,b
 	}
 
 	private void waitForResults(Lifecycle lifecycle, int count, int maxTries) throws InterruptedException {

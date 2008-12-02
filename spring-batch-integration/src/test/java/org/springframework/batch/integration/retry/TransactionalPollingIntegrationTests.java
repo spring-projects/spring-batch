@@ -33,6 +33,10 @@ public class TransactionalPollingIntegrationTests implements ApplicationContextA
 
 	private List<String> processed = new ArrayList<String>();
 	
+	private List<String> handled = new ArrayList<String>();
+	
+	private List<String> expected;
+
 	private List<String> list = new ArrayList<String>();
 
 	private Lifecycle bus;
@@ -47,7 +51,10 @@ public class TransactionalPollingIntegrationTests implements ApplicationContextA
 	public String process(String message) {
 		String result = message + ": " + count;
 		logger.debug("Handling: " + message);
-		processed.add(message);
+		if (count<expected.size()) {
+			processed.add(message);			
+			count++;
+		}
 		if ("fail".equals(message)) {
 			throw new RuntimeException("Planned failure");
 		}
@@ -66,7 +73,7 @@ public class TransactionalPollingIntegrationTests implements ApplicationContextA
 
 	@ChannelAdapter("replies")
 	public void output(String message) {	
-		count++;
+		handled.add(message);
 		logger.debug("Handled: " + message);		
 	}
 
@@ -75,19 +82,22 @@ public class TransactionalPollingIntegrationTests implements ApplicationContextA
 	public void testSunnyDay() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
+		expected = Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,c,d"));
 		waitForResults(bus, 4, 60);
-		assertEquals(4,count);
+		assertEquals(expected,processed);
 	}
 
 	@Test
 	@DirtiesContext
 	public void testRollback() throws Exception {
-		// when @Poller accepts transactional=@Transactional(propagation=Propagation.REQUIRED)...
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
+		expected = Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,fail,fail"));
 		waitForResults(bus, 4, 30);
-		System.err.println(processed);
-		assertEquals(2,count);
+		assertEquals(expected,processed);
+		assertEquals(2, handled.size()); // a,b
 	}
 
 	private void waitForResults(Lifecycle lifecycle, int count, int maxTries) throws InterruptedException {

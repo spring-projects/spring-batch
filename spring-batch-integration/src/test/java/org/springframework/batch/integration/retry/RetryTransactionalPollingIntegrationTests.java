@@ -46,7 +46,7 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 	}
 
 	private volatile int count = 0;
-	
+
 	@ChannelAdapter("requests")
 	@Poller(interval=10, transactionManager="transactionManager")
 	public String input() {
@@ -68,9 +68,12 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 	public void testSunnyDay() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
-		waitForResults(bus, 4, 60);
+		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,c,d")));
+		service.setExpected(expected);
+		waitForResults(bus, expected.size(), 60);
 		assertEquals(4,service.getProcessed().size()); // a,b,c,d
-		assertEquals(4,count);
+		assertEquals(expected, service.getProcessed());
 	}
 
 	@Test
@@ -78,12 +81,15 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 	public void testRollback() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
-		waitForResults(bus, 6, 200); // (a), (b), (fail), (fail), ...
-		System.err.println(service.getProcessed());
-		System.err.println(recoverer.getRecovered());
+
+		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,fail,fail,d,e")));
+		service.setExpected(expected);
+		waitForResults(bus, expected.size(), 60);
+		waitForResults(bus, 6, 100); // (a,b), (fail), (fail), ([fail],d), (e,f)
 		assertEquals(6,service.getProcessed().size()); // a,b,fail,fail,d,e
 		assertEquals(1,recoverer.getRecovered().size()); // fail
-		assertEquals(4,count); // a,b,d,e
+		assertEquals(expected, service.getProcessed());
 	}
 
 	private void waitForResults(Lifecycle lifecycle, int count, int maxTries) throws InterruptedException {

@@ -68,9 +68,12 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 	public void testSunnyDay() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,c,d,e,f,g,h,j,k")));
-		waitForResults(bus, 4, 60);
+		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,c,d")));
+		service.setExpected(expected);
+		waitForResults(bus, expected.size(), 60);
 		assertEquals(4,service.getProcessed().size()); // a,b,c,d
-		assertEquals(4,count);
+		assertEquals(expected, service.getProcessed());
 	}
 
 	@Test
@@ -78,12 +81,14 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 	public void testRollback() throws Exception {
 		list = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,fail,d,e,f,g,h,j,k")));
+		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
+				.commaDelimitedListToStringArray("a,b,fail,fail,d,e,f")));
+		service.setExpected(expected);
+		waitForResults(bus, expected.size(), 60);
 		waitForResults(bus, 6, 100); // (a,b), (fail), (fail), ([fail],d), (e,f)
-		System.err.println(service.getProcessed());
-		System.err.println(recoverer.getRecovered());
 		assertEquals(7,service.getProcessed().size()); // a,b,fail,fail,d,e,f
 		assertEquals(1,recoverer.getRecovered().size()); // fail
-		assertEquals(5,count); // a,b,d,e,f
+		assertEquals(expected, service.getProcessed());
 	}
 
 	private void waitForResults(Lifecycle lifecycle, int count, int maxTries) throws InterruptedException {
