@@ -76,7 +76,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
-	private Object mutex = new Object();
+	private final Object mutex = new Object();
 
 	/**
 	 * @param order the order value to set priority of callback execution for
@@ -115,11 +115,6 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 					logger.debug(String.format("Creating object in scope=%s, name=%s", this.name, name));
 
-					/**
-					 * Here is where we need to inject some context (a root
-					 * object for expressions). The ObjectFactory could take a
-					 * parameter?
-					 */
 					scopedObject = objectFactory.getObject();
 					context.setAttribute(name, scopedObject);
 
@@ -211,7 +206,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	/**
 	 * Wrap a target bean definition in a proxy that defers initialization until
 	 * after the {@link StepContext} is available. Amounts to adding
@@ -234,8 +229,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 		// TODO: detect presence of Spring 3.0 and use ScopedPoxyUtils instead
 
 		// Create the scoped proxy...
-		BeanDefinitionHolder proxyHolder = PlaceholderProxyFactoryBean.createScopedProxy(new BeanDefinitionHolder(definition, beanName), registry,
-				proxyTargetClass);
+		BeanDefinitionHolder proxyHolder = PlaceholderProxyFactoryBean.createScopedProxy(new BeanDefinitionHolder(
+				definition, beanName), registry, proxyTargetClass);
 		// ...and register it under the original target name
 		registry.registerBeanDefinition(beanName, proxyHolder.getBeanDefinition());
 
