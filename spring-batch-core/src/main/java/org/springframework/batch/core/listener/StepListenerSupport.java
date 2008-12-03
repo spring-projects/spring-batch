@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.StepExecution;
@@ -32,7 +33,7 @@ import org.springframework.batch.core.StepListener;
  *
  */
 public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkListener,
-		ItemReadListener<T>, ItemWriteListener<S> {
+		ItemReadListener<T>, ItemProcessListener<T,S>, ItemWriteListener<S> {
 
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution stepExecution)
@@ -100,6 +101,24 @@ public class StepListenerSupport<T,S> implements StepExecutionListener, ChunkLis
 	 * @see org.springframework.batch.core.ItemWriteListener#onWriteError(java.lang.Exception, java.util.List)
 	 */
 	public void onWriteError(Exception exception, List<? extends S> items) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.ItemProcessListener#afterProcess(java.lang.Object, java.lang.Object)
+	 */
+	public void afterProcess(T item, S result) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.ItemProcessListener#beforeProcess(java.lang.Object)
+	 */
+	public void beforeProcess(T item) {
+	}
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.ItemProcessListener#onProcessError(java.lang.Object, java.lang.Exception)
+	 */
+	public void onProcessError(T item, Exception e) {
 	}
 
 }
