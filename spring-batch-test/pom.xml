@@ -55,6 +55,12 @@
 			<artifactId>com.springsource.org.apache.commons.collections
 			</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>stax</groupId>
+			<artifactId>stax</artifactId>
+			<!-- optional for Java 6 -->
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 	<reporting>
 		<plugins>

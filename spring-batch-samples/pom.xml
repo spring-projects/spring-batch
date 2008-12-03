@@ -165,6 +165,12 @@
 			<artifactId>db2jcc</artifactId> <version>9.5.0</version>
 			<scope>test</scope> </dependency>
 		-->
+		<dependency>
+			<groupId>stax</groupId>
+			<artifactId>stax</artifactId>
+			<!-- optional for Java 6 -->
+			<optional>true</optional>
+		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>

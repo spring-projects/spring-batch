@@ -28,6 +28,7 @@
 		<dependency>
 			<groupId>org.objectweb.asm</groupId>
 			<artifactId>com.springsource.org.objectweb.asm.commons</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -37,6 +38,10 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>com.springsource.org.apache.commons.io</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>com.springsource.org.apache.commons.lang</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
@@ -70,6 +75,7 @@
 		<dependency>
 			<groupId>org.eclipse.osgi</groupId>
 			<artifactId>org.eclipse.osgi</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
@@ -96,6 +102,7 @@
 		<dependency>
 			<groupId>org.springframework.osgi</groupId>
 			<artifactId>org.springframework.osgi.core</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -109,6 +116,12 @@
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>com.springsource.javax.annotation</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>stax</groupId>
+			<artifactId>stax</artifactId>
+			<!-- optional for Java 6 -->
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
