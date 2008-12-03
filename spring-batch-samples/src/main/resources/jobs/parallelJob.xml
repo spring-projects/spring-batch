@@ -46,11 +46,6 @@
 							<property name="dao" ref="tradeDao" />
 						</bean>
 					</property>
-					<property name="listeners">
-						<bean class="org.springframework.batch.sample.common.StagingItemListener">
-							<property name="dataSource" ref="dataSource" />
-						</bean>
-					</property>
 				</bean>
 			</list>
 		</property>

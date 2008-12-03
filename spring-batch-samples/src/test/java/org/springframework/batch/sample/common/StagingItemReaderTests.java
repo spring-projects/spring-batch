@@ -13,7 +13,6 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -55,11 +54,12 @@ public class StagingItemReaderTests {
 				new JobParameters(), "testJob")));
 		writer.beforeStep(stepExecution);
 		writer.write(Arrays.asList(new String[] { "FOO", "BAR", "SPAM", "BUCKET" }));
-		reader.setJobId(jobId);
+		reader.beforeStep(stepExecution);
 	}
 
 	@AfterTransaction
 	public void onTearDownAfterTransaction() throws Exception {
+		reader.destroy();
 		simpleJdbcTemplate.update("DELETE FROM BATCH_STAGING");
 	}
 
@@ -118,13 +118,7 @@ public class StagingItemReaderTests {
 						String.class, id);
 				assertEquals(StagingItemWriter.NEW, before);
 
-				Object item;
-				try {
-					item = reader.read();
-				}
-				catch (Exception e) {
-					throw new UnexpectedJobExecutionException("Reader error", e);
-				}
+				Object item = reader.read();
 				assertEquals("FOO", item);
 
 				transactionStatus.setRollbackOnly();
