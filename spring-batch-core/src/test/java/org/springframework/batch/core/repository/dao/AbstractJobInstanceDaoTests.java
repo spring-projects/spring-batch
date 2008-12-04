@@ -122,11 +122,18 @@ public abstract class AbstractJobInstanceDaoTests extends AbstractTransactionalJ
 
 		// unrelated job instance that should be ignored by the query
 		dao.createJobInstance("anotherJob", new JobParameters());
+		
+		// we need two instances of the same job to check ordering
+		dao.createJobInstance(fooJob, new JobParameters());
 
 		List<JobInstance> jobInstances = dao.getLastJobInstances(fooJob, 2);
-		assertEquals(1, jobInstances.size());
+		assertEquals(2, jobInstances.size());
 		assertEquals(fooJob, jobInstances.get(0).getJobName());
+		assertEquals(fooJob, jobInstances.get(1).getJobName());
 		assertEquals(Integer.valueOf(0), jobInstances.get(0).getVersion());
+		assertEquals(Integer.valueOf(0), jobInstances.get(1).getVersion());
+		
+		assertTrue("Last instance should be first on the list", jobInstances.get(0).getId() > jobInstances.get(1).getId());
 
 	}
 

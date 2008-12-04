@@ -47,13 +47,6 @@ public class MapJobInstanceDao implements JobInstanceDao {
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
-	 * (java.lang.Long)
-	 */
 	public JobInstance getJobInstance(Long instanceId) {
 		for (JobInstance instance : jobInstances) {
 			if (instance.getId().equals(instanceId)) {
@@ -63,13 +56,6 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames
-	 * ()
-	 */
 	public List<String> getJobNames() {
 		List<String> result = new ArrayList<String>();
 		for (JobInstance instance : jobInstances) {
@@ -79,12 +65,6 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seeorg.springframework.batch.core.repository.dao.JobInstanceDao#
-	 * getLastJobInstances(java.lang.String, int)
-	 */
 	public List<JobInstance> getLastJobInstances(String jobName, int count) {
 		List<JobInstance> result = new ArrayList<JobInstance>();
 		for (JobInstance instance : jobInstances) {
@@ -95,7 +75,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		Collections.sort(result, new Comparator<JobInstance>() {
 			// sort by ID descending
 			public int compare(JobInstance o1, JobInstance o2) {
-				return Long.signum(o1.getId() - o2.getId());
+				return Long.signum(o2.getId() - o1.getId());
 			}
 		});
 		int length = count > result.size() ? result.size() : count;
