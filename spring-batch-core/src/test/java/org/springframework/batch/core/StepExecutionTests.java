@@ -15,7 +15,12 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -273,38 +278,6 @@ public class StepExecutionTests {
 		execution.addFailureException(exception);
 		assertEquals(1, execution.getFailureExceptions().size());
 		assertEquals(exception, execution.getFailureExceptions().get(0));
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
-	 */
-	@Test
-	public void testPauseAndWait() {
-		execution.pauseAndWait();
-		assertEquals(BatchStatus.WAITING, execution.getStatus());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
-	 */
-	@Test
-	public void testPauseAndWaitWhenFailed() {
-		execution.setStatus(BatchStatus.FAILED);
-		execution.pauseAndWait();
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
-	 */
-	@Test
-	public void testPauseAndWaitWhenStarted() {
-		execution.setStatus(BatchStatus.STARTED);
-		execution.pauseAndWait();
-		assertEquals(BatchStatus.WAITING, execution.getStatus());
 	}
 
 	/**

@@ -84,12 +84,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 		final JobExecution jobExecution;
 		JobExecution lastExecution = jobRepository.getLastJobExecution(job.getName(), jobParameters);
 		if (lastExecution != null) {
-			if (lastExecution.isWaiting()) {
-				jobExecution = lastExecution;
-				// this execution will be continued => delete the end time
-				jobExecution.setEndTime(null);
-			}
-			else if (!job.isRestartable()) {
+			if (!job.isRestartable()) {
 				throw new JobRestartException("JobInstance already exists and is not restartable");
 			}
 			else {

@@ -15,10 +15,13 @@
  */
 package org.springframework.batch.core.launch.support;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.easymock.EasyMock.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -388,21 +391,6 @@ public class SimpleJobOperatorTests {
 		verify(jobExplorer);
 		verify(jobRepository);
 		assertEquals(BatchStatus.STOPPING, jobExecution.getStatus());
-	}
-
-	@Test
-	public void testPause() throws Exception{
-		JobInstance jobInstance = new JobInstance(123L, jobParameters, job.getName());
-		JobExecution jobExecution = new JobExecution(jobInstance, 111L);
-		jobExplorer.getJobExecution(111L);
-		expectLastCall().andReturn(jobExecution);
-		jobRepository.update(jobExecution);
-		replay(jobExplorer);
-		replay(jobRepository);
-		jobOperator.pause(111L);
-		verify(jobExplorer);
-		verify(jobRepository);
-		assertEquals(BatchStatus.WAITING, jobExecution.getStatus());
 	}
 
 }

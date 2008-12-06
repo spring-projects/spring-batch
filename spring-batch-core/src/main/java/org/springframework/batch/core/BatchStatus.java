@@ -34,7 +34,7 @@ public enum BatchStatus {
 	 * (through the order defined by {@link #upgradeTo(BatchStatus)}). Higher
 	 * values than STARTED signify more serious failure.
 	 */
-	COMPLETED, STARTING, WAITING, STARTED, FAILED, STOPPING, STOPPED, UNKNOWN;
+	COMPLETED, STARTING, STARTED, FAILED, STOPPING, STOPPED, UNKNOWN;
 
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
 		if (status1.isLessThan(status2)) {
@@ -50,10 +50,10 @@ public enum BatchStatus {
 	/**
 	 * Convenience method to decide if a status indicates work is in progress.
 	 * 
-	 * @return true if the status is STARTING, STARTED or WAITING
+	 * @return true if the status is STARTING, STARTED
 	 */
 	public boolean isRunning() {
-		return this == STARTING || this == STARTED || this == WAITING;
+		return this == STARTING || this == STARTED;
 	}
 
 	/**

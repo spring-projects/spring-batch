@@ -75,8 +75,6 @@ public interface JobOperator {
 
 	boolean stop(long executionId) throws NoSuchJobExecutionException;
 	
-	boolean pause(long executionId) throws NoSuchJobExecutionException;
-
 	String getSummary(long executionId) throws NoSuchJobExecutionException;
 
 	Map<Long, String> getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException;

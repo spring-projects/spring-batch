@@ -217,22 +217,14 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 			if (execution.getStatus() != BatchStatus.STOPPING) {
 
 				execution.setStartTime(new Date());
-				// If paused we need to retain the status so that subclasses can
-				// handle the resume, otherwise we mark it as started...
-				if (!execution.isWaiting()) {
-					updateStatus(execution, BatchStatus.STARTED);
-				}			
+				updateStatus(execution, BatchStatus.STARTED);
 
 				listener.beforeJob(execution);
 
 				StepExecution lastStepExecution = doExecute(execution);
 
 				if (lastStepExecution != null) {
-					if (!execution.isWaiting()) {
-						// If the subclass wants to pause don't change the
-						// status.
-						execution.setStatus(lastStepExecution.getStatus());
-					}
+					execution.upgradeStatus(lastStepExecution.getStatus());
 					execution.setExitStatus(lastStepExecution.getExitStatus());
 				}
 			}
@@ -343,16 +335,16 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 * @param lastStepExecution the last step execution
-	 * @param jobInstance 
-	 * @param step 
+	 * @param jobInstance
+	 * @param step
 	 * 
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step
 	 * @throws JobRestartException if the job is in an inconsistent state from
 	 * an earlier failure
 	 */
-	private boolean shouldStart(StepExecution lastStepExecution, JobInstance jobInstance, Step step) throws JobRestartException,
-			StartLimitExceededException {
+	private boolean shouldStart(StepExecution lastStepExecution, JobInstance jobInstance, Step step)
+			throws JobRestartException, StartLimitExceededException {
 
 		BatchStatus stepStatus;
 		if (lastStepExecution == null) {

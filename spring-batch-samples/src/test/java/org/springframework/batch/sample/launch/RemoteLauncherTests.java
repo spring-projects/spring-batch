@@ -94,7 +94,7 @@ public class RemoteLauncherTests {
 		// doesn't work with HSQL)
 		Thread.sleep(SLEEP_INTERVAL);
 //		assertEquals(1, launcher.getRunningExecutions("loopJob").size());
-		launcher.pause(executionId);
+		launcher.stop(executionId);
 
 		Thread.sleep(SLEEP_INTERVAL);
 //		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
@@ -103,7 +103,7 @@ public class RemoteLauncherTests {
 		assertEquals("Picked up the same execution after pause and resume", executionId, resumedId);
 
 		Thread.sleep(SLEEP_INTERVAL);
-		launcher.pause(executionId);
+		launcher.stop(executionId);
 		Thread.sleep(SLEEP_INTERVAL);
 
 //		assertEquals(0, launcher.getRunningExecutions("loopJob").size());

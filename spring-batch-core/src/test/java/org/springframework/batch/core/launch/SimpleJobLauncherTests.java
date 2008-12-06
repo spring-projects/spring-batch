@@ -186,24 +186,6 @@ public class SimpleJobLauncherTests {
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.afterPropertiesSet(); // no error
 	}
-	
-	/**
-	 * Same execution is used if the last found has PAUSED status.
-	 */
-	@Test
-	public void testResumePausedInstance() throws Exception {
-		long id = 9;
-		JobExecution jobExecution = new JobExecution(null, id);
-		jobExecution.pauseAndWait();
-		expect(jobRepository.getLastJobExecution(job.getName(), jobParameters)).andReturn(jobExecution);
-		replay(jobRepository);
-	
-		jobLauncher.afterPropertiesSet();
-		JobExecution returned = jobLauncher.run(job, jobParameters);
-		assertEquals(jobExecution, returned);
-		
-		verify(jobRepository);
-	}
 
 	private boolean contains(String str, String searchStr) {
 		return str.indexOf(searchStr) != -1;

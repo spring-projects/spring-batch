@@ -15,7 +15,11 @@
  */
 package org.springframework.batch.core;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -60,8 +64,6 @@ public class BatchStatusTests {
 		assertEquals(BatchStatus.COMPLETED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.STARTING));
 		assertEquals(BatchStatus.STARTED, BatchStatus.STARTING.upgradeTo(BatchStatus.STARTED));
 		assertEquals(BatchStatus.STARTED, BatchStatus.STARTED.upgradeTo(BatchStatus.STARTING));
-		assertEquals(BatchStatus.COMPLETED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.WAITING));
-		assertEquals(BatchStatus.STARTED, BatchStatus.STARTED.upgradeTo(BatchStatus.WAITING));
 	}
 
 	@Test
@@ -70,7 +72,6 @@ public class BatchStatusTests {
 		assertFalse(BatchStatus.COMPLETED.isRunning());
 		assertTrue(BatchStatus.STARTED.isRunning());
 		assertTrue(BatchStatus.STARTING.isRunning());
-		assertTrue(BatchStatus.WAITING.isRunning());
 	}
 
 	@Test
@@ -79,7 +80,6 @@ public class BatchStatusTests {
 		assertFalse(BatchStatus.COMPLETED.isUnsuccessful());
 		assertFalse(BatchStatus.STARTED.isUnsuccessful());
 		assertFalse(BatchStatus.STARTING.isUnsuccessful());
-		assertFalse(BatchStatus.WAITING.isUnsuccessful());
 	}
 
 	@Test

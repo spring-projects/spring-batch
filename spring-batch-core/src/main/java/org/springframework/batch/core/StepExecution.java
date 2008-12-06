@@ -274,29 +274,6 @@ public class StepExecution extends Entity {
 	}
 
 	/**
-	 * Signal that this job execution wishes to wait for work to complete, and
-	 * no more processing will take place on the current thread. A failed
-	 * execution stays failed.
-	 */
-	public void pauseAndWait() {
-		if (!status.isUnsuccessful()) {
-			status = BatchStatus.WAITING;
-		}
-	}
-
-	/**
-	 * Test if the {@link JobExecution} has been paused and is waiting for work
-	 * to be done.
-	 * 
-	 * @see #pauseAndWait()
-	 * 
-	 * @return true if this instance is waiting
-	 */
-	public boolean isWaiting() {
-		return status == BatchStatus.WAITING;
-	}
-
-	/**
 	 * @return the name of the step
 	 */
 	public String getStepName() {

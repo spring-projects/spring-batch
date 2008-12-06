@@ -38,7 +38,6 @@ import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.DecisionState;
 import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.JobExecutionDecider;
-import org.springframework.batch.core.job.flow.support.state.PauseState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -247,33 +246,6 @@ public class FlowJobTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertEquals("step3", stepExecution.getStepName());
-
-	}
-
-	@Test
-	public void testPauseFlow() throws Throwable {
-
-		SimpleFlow flow = new SimpleFlow("job");
-		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "*", "pause"));
-		transitions.add(StateTransition.createStateTransition(new PauseState("pause"), "*", "step2"));
-		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2")), "*"));
-		flow.setStateTransitions(transitions);
-		job.setFlow(flow);
-
-		job.execute(jobExecution);
-		if (!jobExecution.getAllFailureExceptions().isEmpty()) {
-			throw jobExecution.getAllFailureExceptions().get(0);
-		}
-		assertEquals(BatchStatus.WAITING, jobExecution.getStatus());
-		assertEquals(1, jobExecution.getStepExecutions().size());
-
-		job.execute(jobExecution);
-		if (!jobExecution.getAllFailureExceptions().isEmpty()) {
-			throw jobExecution.getAllFailureExceptions().get(0);
-		}
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(2, jobExecution.getStepExecutions().size());
 
 	}
 

@@ -368,13 +368,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		return true;
 	}
 
-	public boolean pause(long executionId) throws NoSuchJobExecutionException {
-		JobExecution jobExecution = findExecutionById(executionId);
-		jobExecution.pauseAndWait();
-		jobRepository.update(jobExecution);
-		return true;
-	}
-
 	private JobExecution findExecutionById(long executionId) throws NoSuchJobExecutionException {
 		JobExecution jobExecution = jobExplorer.getJobExecution(executionId);
 

@@ -109,38 +109,6 @@ public class JobExecutionTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
-	 */
-	@Test
-	public void testPauseAndWait() {
-		execution.pauseAndWait();
-		assertEquals(BatchStatus.WAITING, execution.getStatus());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
-	 */
-	@Test
-	public void testPauseAndWaitWhenFailed() {
-		execution.setStatus(BatchStatus.FAILED);
-		execution.pauseAndWait();
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
-	}
-
-	/**
-	 * Test method for
-	 * {@link org.springframework.batch.core.JobExecution#pauseAndWait()}.
-	 */
-	@Test
-	public void testPauseAndWaitWhenStarted() {
-		execution.setStatus(BatchStatus.STARTED);
-		execution.pauseAndWait();
-		assertEquals(BatchStatus.WAITING, execution.getStatus());
-	}
-
-	/**
-	 * Test method for
 	 * {@link org.springframework.batch.core.JobExecution#getStatus()}.
 	 */
 	@Test
