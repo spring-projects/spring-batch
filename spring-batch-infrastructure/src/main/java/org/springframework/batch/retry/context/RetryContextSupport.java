@@ -74,5 +74,10 @@ public class RetryContextSupport extends AttributeAccessorSupport implements Ret
 		if (throwable != null)
 			count++;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("[RetryContext: count=%d, lastException=%s, exhausted=%b]", count, lastException, terminate);
+	}
 
 }

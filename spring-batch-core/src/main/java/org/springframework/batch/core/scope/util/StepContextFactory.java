@@ -1,7 +1,7 @@
 package org.springframework.batch.core.scope.util;
 
-import org.springframework.batch.core.scope.StepContext;
-import org.springframework.batch.core.scope.StepSynchronizationManager;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 
 /**
  * Implementation of {@link ContextFactory} that provides the current

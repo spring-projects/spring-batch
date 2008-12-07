@@ -7,8 +7,8 @@ import org.junit.After;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.StepContext;
-import org.springframework.batch.core.scope.StepSynchronizationManager;
+import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 
 public class StepContextFactoryTests {
 

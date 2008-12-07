@@ -43,7 +43,7 @@
 
 	<aop:aspectj-autoproxy />
 	<bean class="org.springframework.batch.core.scope.TestAdvice" />
-	<bean class="org.springframework.batch.core.scope.StepScopeManager" />
+	<bean class="org.springframework.batch.core.scope.context.StepScopeManager" />
 	<bean class="org.springframework.batch.core.scope.StepScope" />
 
 </beans>

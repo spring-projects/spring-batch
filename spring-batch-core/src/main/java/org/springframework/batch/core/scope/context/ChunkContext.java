@@ -1,4 +1,4 @@
-package org.springframework.batch.core.scope;
+package org.springframework.batch.core.scope.context;
 
 import org.springframework.core.AttributeAccessorSupport;
 

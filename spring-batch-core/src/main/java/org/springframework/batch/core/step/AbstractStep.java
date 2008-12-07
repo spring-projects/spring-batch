@@ -32,7 +32,7 @@ import org.springframework.batch.core.launch.NoSuchJobException;
 import org.springframework.batch.core.launch.support.ExitCodeMapper;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.StepSynchronizationManager;
+import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;

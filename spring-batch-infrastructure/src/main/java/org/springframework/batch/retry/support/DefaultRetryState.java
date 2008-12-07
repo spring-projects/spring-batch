@@ -104,4 +104,8 @@ public class DefaultRetryState implements RetryState {
 		return rollbackClassifier.classify(exception);
 	}
 
+	@Override
+	public String toString() {
+		return String.format("[%s: key=%s, forceRefresh=%b]", getClass().getSimpleName(), key, forceRefresh);
+	}
 }

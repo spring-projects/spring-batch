@@ -23,7 +23,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.retry.ExhaustedRetryException;
-import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
@@ -31,6 +30,7 @@ import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryPolicy;
+import org.springframework.batch.retry.RetryState;
 import org.springframework.batch.retry.TerminatedRetryException;
 import org.springframework.batch.retry.backoff.BackOffContext;
 import org.springframework.batch.retry.backoff.BackOffInterruptedException;
@@ -42,9 +42,10 @@ import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 
 /**
  * Template class that simplifies the execution of operations with retry
- * semantics. <br/> Retryable operations are encapsulated in implementations of
- * the {@link RetryCallback} interface and are executed using one of the
- * supplied execute methods. <br/>
+ * semantics. <br/>
+ * Retryable operations are encapsulated in implementations of the
+ * {@link RetryCallback} interface and are executed using one of the supplied
+ * execute methods. <br/>
  * 
  * By default, an operation is retried if is throws any {@link Exception} or
  * subclass of {@link Exception}. This behaviour can be changed by using the
@@ -130,7 +131,7 @@ public class RetryTemplate implements RetryOperations {
 	 * dictates that we stop, in which case the most recent exception thrown by
 	 * the callback will be rethrown.
 	 * 
-	 * @see org.springframework.batch.retry.RetryOperations#execute(org.springframework.batch.retry.RetryCallback)
+	 * @see RetryOperations#execute(RetryCallback)
 	 * 
 	 * @throws TerminatedRetryException if the retry has been manually
 	 * terminated by a listener.
@@ -144,8 +145,7 @@ public class RetryTemplate implements RetryOperations {
 	 * dictates that we stop, in which case the recovery callback will be
 	 * executed.
 	 * 
-	 * @see org.springframework.batch.retry.RetryOperations#execute(org.springframework.batch.retry.RetryCallback,
-	 * org.springframework.batch.retry.RecoveryCallback)
+	 * @see RetryOperations#execute(RetryCallback, RecoveryCallback)
 	 * 
 	 * @throws TerminatedRetryException if the retry has been manually
 	 * terminated by a listener.
@@ -156,10 +156,10 @@ public class RetryTemplate implements RetryOperations {
 
 	/**
 	 * Execute the callback once if the policy dictates that we can, re-throwing
-	 * any exception encountered.
+	 * any exception encountered so that clients can re-present the same task
+	 * later.
 	 * 
-	 * @see org.springframework.batch.retry.RetryOperations#execute(RetryCallback,
-	 * RetryState)
+	 * @see RetryOperations#execute(RetryCallback, RetryState)
 	 * 
 	 * @throws ExhaustedRetryException if the retry has been exhausted.
 	 */
@@ -170,10 +170,10 @@ public class RetryTemplate implements RetryOperations {
 
 	/**
 	 * Execute the callback once if the policy dictates that we can, re-throwing
-	 * any exception encountered.
+	 * any exception encountered so that clients can re-present the same task
+	 * later.
 	 * 
-	 * @see org.springframework.batch.retry.RetryOperations#execute(RetryCallback,
-	 * RetryState)
+	 * @see RetryOperations#execute(RetryCallback, RetryState)
 	 */
 	public final <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback,
 			RetryState retryState) throws Exception, ExhaustedRetryException {
@@ -184,8 +184,7 @@ public class RetryTemplate implements RetryOperations {
 	 * Execute the callback once if the policy dictates that we can, otherwise
 	 * execute the recovery callback.
 	 * 
-	 * @see org.springframework.batch.retry.RetryOperations#execute(RetryCallback,
-	 * RecoveryCallback, RetryState)
+	 * @see RetryOperations#execute(RetryCallback, RecoveryCallback, RetryState)
 	 * @throws ExhaustedRetryException if the retry has been exhausted.
 	 */
 	protected <T> T doExecute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback, RetryState state)
@@ -221,7 +220,7 @@ public class RetryTemplate implements RetryOperations {
 			 * external retry to allow a recovery in handleRetryExhausted
 			 * without the callback processing (which would throw an exception).
 			 */
-			while (retryPolicy.canRetry(context) && !context.isExhaustedOnly()) {
+			while (canRetry(retryPolicy, context) && !context.isExhaustedOnly()) {
 
 				try {
 					logger.debug("Retry: count=" + context.getRetryCount());
@@ -257,9 +256,9 @@ public class RetryTemplate implements RetryOperations {
 				}
 
 				/*
-				 * A stateful policy that can retry should have rethrown the
+				 * A stateful attempt that can retry should have rethrown the
 				 * exception by now - i.e. we shouldn't get this far for a
-				 * stateful policy if it can retry.
+				 * stateful attempt if it can retry.
 				 */
 			}
 
@@ -279,6 +278,19 @@ public class RetryTemplate implements RetryOperations {
 			RetrySynchronizationManager.clear();
 		}
 
+	}
+
+	/**
+	 * Decide whether to proceed with the ongoing retry attempt. This method is
+	 * called before the {@link RetryCallback} is executed, but after the
+	 * backoff and open interceptors.
+	 * 
+	 * @param retryPolicy the policy to apply
+	 * @param context the current retry context
+	 * @return true if we can continue with the attempt
+	 */
+	protected boolean canRetry(RetryPolicy retryPolicy, RetryContext context) {
+		return retryPolicy.canRetry(context);
 	}
 
 	/**

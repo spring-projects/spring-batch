@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.ChunkContext;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.skip.NeverSkipItemSkipPolicy;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;

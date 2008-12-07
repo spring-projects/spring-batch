@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.scope;
+package org.springframework.batch.core.scope.context;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +28,7 @@ import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.scope.StepScope;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.context.SynchronizedAttributeAccessor;
 import org.springframework.util.Assert;
