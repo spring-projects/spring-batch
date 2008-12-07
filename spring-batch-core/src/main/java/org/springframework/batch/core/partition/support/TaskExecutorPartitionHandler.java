@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.springframework.batch.core.BatchStatus;
@@ -49,7 +50,7 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 	public Collection<StepExecution> handle(StepExecutionSplitter stepExecutionSplitter,
 			StepExecution masterStepExecution) throws Exception {
 
-		Set<FutureTask<StepExecution>> tasks = new HashSet<FutureTask<StepExecution>>(gridSize);
+		Set<Future<StepExecution>> tasks = new HashSet<Future<StepExecution>>(gridSize);
 
 		Collection<StepExecution> result = new ArrayList<StepExecution>();
 
@@ -71,8 +72,7 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 				ExitStatus exitStatus = ExitStatus.FAILED
 						.addExitDescription("TaskExecutor rejected the task for this step.");
 				/*
-				 * This stepExecution hasn't been saved yet, but we'll set the
-				 * status anyway in case the caller is tracking it through the
+				 * Set the status in case the caller is tracking it through the
 				 * JobExecution.
 				 */
 				stepExecution.setStatus(BatchStatus.FAILED);
@@ -82,8 +82,7 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 
 		}
 
-		for (FutureTask<StepExecution> task : tasks) {
-			// TODO: timeout / heart beat
+		for (Future<StepExecution> task : tasks) {
 			result.add(task.get());
 		}
 		return result;

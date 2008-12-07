@@ -228,7 +228,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	private static BeanDefinitionHolder createScopedProxy(String beanName, BeanDefinition definition,
 			BeanDefinitionRegistry registry, boolean proxyTargetClass) {
 
-		// TODO: detect presence of Spring 3.0 and use ScopedPoxyUtils instead
+		// TODO: (for Batch 2.1) detect presence of Spring 3.0 and use
+		// ScopedPoxyUtils instead
 
 		// Create the scoped proxy...
 		BeanDefinitionHolder proxyHolder = PlaceholderProxyFactoryBean.createScopedProxy(new BeanDefinitionHolder(

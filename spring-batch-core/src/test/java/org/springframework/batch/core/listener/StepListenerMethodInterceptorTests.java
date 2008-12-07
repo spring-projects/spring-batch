@@ -106,22 +106,18 @@ public class StepListenerMethodInterceptorTests {
 		}
 
 		public Object[] getArguments() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public AccessibleObject getStaticPart() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object getThis() {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
 		public Object proceed() throws Throwable {
-			// TODO Auto-generated method stub
 			return null;
 		}
 		

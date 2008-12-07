@@ -28,7 +28,6 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean {
 	
 	@Override
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
-		// TODO Auto-generated method stub
 		return new MapStepExecutionDao();
 	}
 

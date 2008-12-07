@@ -14,7 +14,6 @@ import org.springframework.batch.core.StepExecution;
  * @author Dave Syer
  * 
  */
-// TODO: bin this?
 @Aspect
 public class StepScopeManager {
 

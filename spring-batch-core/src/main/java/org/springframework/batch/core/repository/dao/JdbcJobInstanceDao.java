@@ -53,9 +53,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private static final String FIND_JOBS_WITH_EMPTY_KEY = "SELECT JOB_INSTANCE_ID, JOB_NAME from %PREFIX%JOB_INSTANCE where JOB_NAME = ? and (JOB_KEY = ? OR JOB_KEY is NULL)";
 
 	private static final String GET_JOB_FROM_ID = "SELECT JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, VERSION from %PREFIX%JOB_INSTANCE where JOB_INSTANCE_ID = ?";
-	
-	private static final String GET_JOB_FROM_EXECUTION_ID = "SELECT ji.JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, ji.VERSION from %PREFIX%JOB_INSTANCE ji, " +
-			"%PREFIX%JOB_EXECUTION je where JOB_EXECUTION_ID = ? and ji.JOB_INSTANCE_ID = je.JOB_INSTANCE_ID";
+
+	private static final String GET_JOB_FROM_EXECUTION_ID = "SELECT ji.JOB_INSTANCE_ID, JOB_NAME, JOB_KEY, ji.VERSION from %PREFIX%JOB_INSTANCE ji, "
+			+ "%PREFIX%JOB_EXECUTION je where JOB_EXECUTION_ID = ? and ji.JOB_INSTANCE_ID = je.JOB_INSTANCE_ID";
 
 	private static final String FIND_PARAMS_FROM_ID = "SELECT JOB_INSTANCE_ID, KEY_NAME, TYPE_CD, "
 			+ "STRING_VAL, DATE_VAL, LONG_VAL, DOUBLE_VAL from %PREFIX%JOB_PARAMS where JOB_INSTANCE_ID = ?";
@@ -182,7 +182,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance(java.lang.Long)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
+	 * (java.lang.Long)
 	 */
 	public JobInstance getJobInstance(Long instanceId) {
 
@@ -217,7 +220,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 				else if (type == ParameterType.DATE) {
 					value = new JobParameter(rs.getTimestamp(5));
 				}
-				// TODO: assert that value is not null?
+				// No need to assert that value is not null because it's an enum
 				map.put(rs.getString(2), value);
 			}
 		};
@@ -228,7 +231,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames()
+	 * 
+	 * @see
+	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobNames
+	 * ()
 	 */
 	public List<String> getJobNames() {
 		return getJdbcTemplate().query(getQuery(FIND_JOB_NAMES), new ParameterizedRowMapper<String>() {
@@ -240,8 +246,9 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getLastJobInstances(java.lang.String,
-	 * int)
+	 * 
+	 * @seeorg.springframework.batch.core.repository.dao.JobInstanceDao#
+	 * getLastJobInstances(java.lang.String, int)
 	 */
 	public List<JobInstance> getLastJobInstances(String jobName, final int count) {
 
@@ -267,14 +274,19 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 		return result;
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance(org.springframework.batch.core.JobExecution)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.repository.dao.JobInstanceDao#getJobInstance
+	 * (org.springframework.batch.core.JobExecution)
 	 */
 	public JobInstance getJobInstance(JobExecution jobExecution) {
-		
+
 		try {
-			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_EXECUTION_ID), new JobInstanceRowMapper(), jobExecution.getId());
+			return getJdbcTemplate().queryForObject(getQuery(GET_JOB_FROM_EXECUTION_ID), new JobInstanceRowMapper(),
+					jobExecution.getId());
 		}
 		catch (EmptyResultDataAccessException e) {
 			return null;
@@ -303,18 +315,17 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	private final class JobInstanceRowMapper implements ParameterizedRowMapper<JobInstance> {
 
 		private JobParameters jobParameters;
-		
+
 		public JobInstanceRowMapper() {
 		}
-		
+
 		public JobInstanceRowMapper(JobParameters jobParameters) {
 			this.jobParameters = jobParameters;
 		}
-		
-		
+
 		public JobInstance mapRow(ResultSet rs, int rowNum) throws SQLException {
 			Long id = rs.getLong(1);
-			if(jobParameters == null){
+			if (jobParameters == null) {
 				jobParameters = getJobParameters(id);
 			}
 			JobInstance jobInstance = new JobInstance(rs.getLong(1), jobParameters, rs.getString(2));

@@ -54,7 +54,7 @@ public interface JobRepository {
 	 * returned in a new {@link JobInstance}, associated with the
 	 * {@link JobExecution}. If no previous instance is found, the execution
 	 * will be associated with a new {@link JobInstance}
-	 * @param jobName TODO
+	 * @param jobName the name of the job that is to be executed
 	 * @param jobParameters the runtime parameters for the job
 	 * 
 	 * @return a valid job {@link JobExecution} for the arguments provided

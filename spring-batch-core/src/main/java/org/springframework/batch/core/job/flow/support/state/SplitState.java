@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.flow.support.state;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import org.springframework.batch.core.job.flow.Flow;
@@ -69,7 +70,7 @@ public class SplitState extends AbstractState {
 	@Override
 	public String handle(final FlowExecutor executor) throws Exception {
 
-		Collection<FutureTask<FlowExecution>> tasks = new ArrayList<FutureTask<FlowExecution>>();
+		Collection<Future<FlowExecution>> tasks = new ArrayList<Future<FlowExecution>>();
 
 		for (final Flow flow : flows) {
 
@@ -92,8 +93,8 @@ public class SplitState extends AbstractState {
 
 		Collection<FlowExecution> results = new ArrayList<FlowExecution>();
 
-		// TODO: could use a CompletionSerice?
-		for (FutureTask<FlowExecution> task : tasks) {
+		// TODO: could use a CompletionService
+		for (Future<FlowExecution> task : tasks) {
 			results.add(task.get());
 		}
 
