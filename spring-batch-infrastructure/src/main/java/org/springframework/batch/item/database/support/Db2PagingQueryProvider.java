@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.database.support;
 
+import org.springframework.batch.item.database.PagingQueryProvider;
+
 /**
  * DB2 implementation of a {@link PagingQueryProvider} using
  * database specific features.

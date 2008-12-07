@@ -18,7 +18,6 @@ package org.springframework.batch.item.file.transform;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.file.mapping.FieldSet;
 
 public class DelimitedLineTokenizerTests extends TestCase {
 

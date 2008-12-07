@@ -11,9 +11,9 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.internal.OrderItemReader;
 
 public class OrderItemReaderTests {

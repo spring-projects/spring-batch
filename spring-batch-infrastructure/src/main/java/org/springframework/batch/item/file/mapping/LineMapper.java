@@ -1,12 +1,10 @@
 package org.springframework.batch.item.file.mapping;
 
-import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 
 
 /**
- * Interface for mapping lines (strings) to domain objects typically used by
- * {@link FlatFileItemReader} to map lines read from a file to domain objects
+ * Interface for mapping lines (strings) to domain objects typically used to map lines read from a file to domain objects
  * on a per line basis.  Implementations of this interface perform the actual
  * work of parsing a line without having to deal with how the line was
  * obtained.  

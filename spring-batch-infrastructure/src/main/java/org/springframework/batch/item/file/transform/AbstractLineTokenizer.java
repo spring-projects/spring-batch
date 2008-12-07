@@ -19,8 +19,6 @@ package org.springframework.batch.item.file.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
 
 
 /**

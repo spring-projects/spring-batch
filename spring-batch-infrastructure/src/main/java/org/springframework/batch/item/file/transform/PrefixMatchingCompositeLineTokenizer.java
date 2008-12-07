@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
 
 public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
 

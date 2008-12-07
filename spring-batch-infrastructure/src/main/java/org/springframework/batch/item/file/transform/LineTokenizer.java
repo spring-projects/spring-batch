@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.file.transform;
 
-import org.springframework.batch.item.file.mapping.FieldSet;
 
 /**
  * Interface that is used by framework to split string obtained typically from a

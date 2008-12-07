@@ -23,8 +23,8 @@ import java.math.BigDecimal;
 
 import org.junit.Test;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.trade.Trade;
 
 /**

@@ -17,7 +17,7 @@
 package org.springframework.batch.item.database.support;
 
 /**
- * Postgres implementation of a  {@link org.springframework.batch.item.database.support.PagingQueryProvider} using database specific features.
+ * Postgres implementation of a  {@link org.springframework.batch.item.database.PagingQueryProvider} using database specific features.
  *
  * @author Thomas Risberg
  * @since 2.0

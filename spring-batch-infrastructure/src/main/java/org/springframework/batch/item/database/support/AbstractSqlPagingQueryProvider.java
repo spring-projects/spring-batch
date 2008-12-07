@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 
 import java.util.List;

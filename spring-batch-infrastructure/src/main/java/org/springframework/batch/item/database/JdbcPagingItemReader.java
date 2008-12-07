@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.database;
 
-import org.springframework.batch.item.database.support.PagingQueryProvider;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.Assert;

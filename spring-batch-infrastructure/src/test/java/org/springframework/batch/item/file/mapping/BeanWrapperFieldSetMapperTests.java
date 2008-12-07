@@ -24,6 +24,8 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.NotWritablePropertyException;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;

@@ -19,8 +19,8 @@ package org.springframework.batch.sample.iosample.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.transform.FieldSet;
 
 /**
  * This class is used to delegate to a {@link FieldSetMapper} based on one field

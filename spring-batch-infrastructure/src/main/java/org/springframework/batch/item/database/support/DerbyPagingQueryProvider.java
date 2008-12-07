@@ -17,6 +17,7 @@
 package org.springframework.batch.item.database.support;
 
 import org.springframework.jdbc.support.JdbcUtils;
+import org.springframework.batch.item.database.PagingQueryProvider;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 
 import javax.sql.DataSource;

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.file;
+package org.springframework.batch.item.file.transform;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
 
 public class FieldSetTests extends TestCase {
 	FieldSet fieldSet;

@@ -21,7 +21,7 @@ import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.util.Assert;
 

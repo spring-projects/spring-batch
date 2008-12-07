@@ -3,8 +3,8 @@ package org.springframework.batch.sample.support;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.transform.FieldSet;
 
 /**
  * Encapsulates basic logic for testing custom {@link FieldSetMapper} implementations.

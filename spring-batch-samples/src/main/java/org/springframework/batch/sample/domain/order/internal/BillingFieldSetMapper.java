@@ -16,8 +16,8 @@
 
 package org.springframework.batch.sample.domain.order.internal;
 
-import org.springframework.batch.item.file.mapping.FieldSet;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.BillingInfo;
 
 

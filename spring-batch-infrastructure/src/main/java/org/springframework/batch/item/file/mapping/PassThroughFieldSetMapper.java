@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.file.mapping;
 
+import org.springframework.batch.item.file.transform.FieldSet;
+
 /**
  * Pass through {@link FieldSetMapper} useful for passing a {@link FieldSet}
  * back directly rather than a mapped object.

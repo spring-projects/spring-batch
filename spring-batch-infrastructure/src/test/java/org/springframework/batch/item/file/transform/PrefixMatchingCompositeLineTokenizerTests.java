@@ -23,8 +23,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.springframework.batch.item.file.mapping.DefaultFieldSet;
-import org.springframework.batch.item.file.mapping.FieldSet;
 
 public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 

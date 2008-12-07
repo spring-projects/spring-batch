@@ -4,6 +4,8 @@ import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 
 /**

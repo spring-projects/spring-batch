@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.item.file.mapping;
 
+import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
+
 import junit.framework.TestCase;
 
 /**
@@ -27,7 +30,7 @@ public class PassThroughFieldSetMapperTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapFieldSet(org.springframework.batch.item.file.mapping.FieldSet)}.
+	 * {@link org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper#mapFieldSet(org.springframework.batch.item.file.transform.FieldSet)}.
 	 */
 	public void testMapLine() {
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });

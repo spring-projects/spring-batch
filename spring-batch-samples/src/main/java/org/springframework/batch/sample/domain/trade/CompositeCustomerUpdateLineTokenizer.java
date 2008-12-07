@@ -5,7 +5,7 @@ package org.springframework.batch.sample.domain.trade;
 
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.item.file.mapping.FieldSet;
+import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 
 /**
