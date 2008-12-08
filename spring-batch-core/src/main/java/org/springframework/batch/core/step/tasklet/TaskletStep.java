@@ -296,12 +296,24 @@ public class TaskletStep extends AbstractStep {
 
 				}
 				catch (Error e) {
-					processRollback(stepExecution, fatalException, transaction);
-					throw e;
+					try {
+						processRollback(stepExecution, fatalException, transaction);
+						throw e;
+					}
+					catch (Exception rollbackException) {
+						logger.error("Rollback failed, original error that caused the rollback is", e);
+						throw rollbackException;
+					}
 				}
 				catch (Exception e) {
-					processRollback(stepExecution, fatalException, transaction);
-					throw e;
+					try {
+						processRollback(stepExecution, fatalException, transaction);
+						throw e;
+					}
+					catch (Exception rollbackException) {
+						logger.error("Rollback failed, original exception that caused the rollback is", e);
+						throw rollbackException;
+					}
 				}
 				finally {
 					// only release the lock if we acquired it
@@ -348,6 +360,9 @@ public class TaskletStep extends AbstractStep {
 			if (!fatalException.hasException()) {
 				fatalException.setException(e);
 				throw new FatalException("Failed while processing rollback", e);
+			}
+			else {
+				logger.error("Failed to rollback transaction", e);
 			}
 		}
 
