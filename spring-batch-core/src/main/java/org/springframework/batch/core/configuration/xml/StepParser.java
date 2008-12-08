@@ -237,7 +237,7 @@ public class StepParser {
     	boolean isFaultTolerant = false;
 
     	// TODO determine if step should be fault-tolerant
-		String faultTolerant = element.getAttribute("fault-tolerant");
+		// String faultTolerant = element.getAttribute("fault-tolerant");
 		
         String skipLimit = element.getAttribute("skip-limit");
         if (!isFaultTolerant) {
