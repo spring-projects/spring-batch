@@ -438,6 +438,7 @@ public class SimpleJobTests {
 
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
 		job.execute(jobExecution);
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
 		assertTrue("Wrong exception " + expected, expected instanceof JobInterruptedException);

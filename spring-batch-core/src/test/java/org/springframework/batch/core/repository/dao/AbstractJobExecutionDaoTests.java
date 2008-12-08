@@ -22,12 +22,13 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
 
 	protected JobExecutionDao dao;
 
-	protected JobInstance jobInstance = new JobInstance((long) 1, new JobParameters(), "execTestJob");
+	protected JobInstance jobInstance = new JobInstance(1L, new JobParameters(), "execTestJob");
 
 	protected JobExecution execution = new JobExecution(jobInstance);
 
@@ -248,7 +249,7 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 		JobExecution exec1 = new JobExecution(jobInstance);
 		dao.saveJobExecution(exec1);
 
-		JobExecution exec2 = new JobExecution(jobInstance); 
+		JobExecution exec2 = new JobExecution(jobInstance);
 		exec2.setId(exec1.getId());
 
 		exec2.incrementVersion();
@@ -266,7 +267,31 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 			// expected
 		}
 
-	} /*
+	}
+
+	@Transactional
+	@Test
+	public void testSynchronizeStatus() {
+
+		JobExecution exec1 = new JobExecution(jobInstance);
+		exec1.setStatus(BatchStatus.STARTED);
+		dao.saveJobExecution(exec1);
+		
+		JobExecution exec2 = new JobExecution(jobInstance);
+		Assert.state(exec1.getId() != null);
+		exec2.setId(exec1.getId());
+		
+		exec2.setVersion(7);
+		Assert.state(exec1.getVersion() != exec2.getVersion());
+		Assert.state(exec1.getStatus() != exec2.getStatus());
+		
+		dao.synchronizeStatus(exec2);
+
+		assertEquals(exec1.getVersion(), exec2.getVersion());
+		assertEquals(exec1.getStatus(), exec2.getStatus());
+	}
+
+	/*
 	 * Check to make sure the executions are equal. Normally, comparing the id's
 	 * is sufficient. However, for testing purposes, especially of a DAO, we
 	 * need to make sure all the fields are being stored/retrieved correctly.

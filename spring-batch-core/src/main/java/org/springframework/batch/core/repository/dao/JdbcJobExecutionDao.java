@@ -255,9 +255,14 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	}
 
 	public void synchronizeStatus(JobExecution jobExecution) {
+		int currentVersion = getJdbcTemplate().queryForInt(getQuery(CURRENT_VERSION_JOB_EXECUTION),
+				jobExecution.getId());
 
-		String status = getJdbcTemplate().queryForObject(getQuery(GET_STATUS), String.class, jobExecution.getId());
-		jobExecution.setStatus(BatchStatus.valueOf(status));
+		if (currentVersion != jobExecution.getVersion().intValue()) {
+			String status = getJdbcTemplate().queryForObject(getQuery(GET_STATUS), String.class, jobExecution.getId());
+			jobExecution.setStatus(BatchStatus.valueOf(status));
+			jobExecution.setVersion(currentVersion);
+		}
 	}
 
 	/**

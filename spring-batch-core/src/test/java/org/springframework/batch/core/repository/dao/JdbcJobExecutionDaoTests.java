@@ -44,6 +44,7 @@ public class JdbcJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 		
 		dao.saveJobExecution(execution);
 		execution.setStatus(BatchStatus.COMPLETED);
+		execution.incrementVersion();
 		dao.synchronizeStatus(execution);
 		assertEquals(BatchStatus.STARTING, execution.getStatus());
 	}

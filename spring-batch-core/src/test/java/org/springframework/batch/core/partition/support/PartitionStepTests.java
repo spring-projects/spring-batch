@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.partition.PartitionHandler;
@@ -34,19 +35,21 @@ import org.springframework.batch.core.repository.support.MapJobRepositoryFactory
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
-
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class PartitionStepTests {
-	
+
 	private PartitionStep step = new PartitionStep();
+
 	private Step remote = new StepSupport("remote");
+
 	private JobRepository jobRepository;
 
 	@Before
 	public void setUp() throws Exception {
+		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		jobRepository = (JobRepository) factory.getObject();
@@ -68,7 +71,8 @@ public class PartitionStepTests {
 			}
 		});
 		step.afterPropertiesSet();
-		StepExecution stepExecution = new JobExecution(0L).createStepExecution("foo");
+		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution("foo");
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		// one master and two workers
@@ -91,7 +95,8 @@ public class PartitionStepTests {
 			}
 		});
 		step.afterPropertiesSet();
-		StepExecution stepExecution = new JobExecution(0L).createStepExecution("foo");
+		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution("foo");
 		jobRepository.add(stepExecution);
 		step.execute(stepExecution);
 		// one master and two workers

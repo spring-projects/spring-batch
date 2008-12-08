@@ -361,6 +361,9 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		// Indicate the execution should be stopped by setting it's status to
 		// 'STOPPING'. It is assumed that
 		// the step implementation will check this status at chunk boundaries.
+		BatchStatus status = jobExecution.getStatus();
+		Assert.state(status == BatchStatus.STARTED || status == BatchStatus.STARTING,
+				"JobExecution must be running so that it can be stopped");
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 

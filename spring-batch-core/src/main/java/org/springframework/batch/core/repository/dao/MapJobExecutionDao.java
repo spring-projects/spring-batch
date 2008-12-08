@@ -73,7 +73,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 		Assert.notNull(persistedExecution, "JobExecution must already be saved");
 
 		synchronized (jobExecution) {
-			if (!persistedExecution.getVersion().equals(jobExecution.getVersion())){
+			if (!persistedExecution.getVersion().equals(jobExecution.getVersion())) {
 				throw new OptimisticLockingFailureException("Attempt to update step execution id=" + id
 						+ " with wrong version (" + jobExecution.getVersion() + "), where current version is "
 						+ persistedExecution.getVersion());
@@ -128,6 +128,10 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	}
 
 	public void synchronizeStatus(JobExecution jobExecution) {
-		// no-op 
+		JobExecution saved = getJobExecution(jobExecution.getId());
+		if (saved.getVersion().intValue() != jobExecution.getVersion().intValue()) {
+			jobExecution.setStatus(saved.getStatus());
+			jobExecution.setVersion(saved.getVersion());
+		}
 	}
 }
