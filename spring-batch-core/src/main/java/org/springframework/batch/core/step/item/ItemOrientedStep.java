@@ -84,7 +84,7 @@ public class ItemOrientedStep extends AbstractStep {
 		public boolean rollbackOn(Throwable ex) {
 			return true;
 		}
-		
+
 	};
 
 	private ItemHandler itemHandler;
@@ -313,12 +313,24 @@ public class ItemOrientedStep extends AbstractStep {
 
 				}
 				catch (Error e) {
-					processRollback(stepExecution, contribution, fatalException, transaction);
-					throw e;
+					try {
+						processRollback(stepExecution, contribution, fatalException, transaction);
+						throw e;
+					}
+					catch (Exception rollbackException) {
+						logger.error("Rollback failed, original exception that caused the rollback is", e);
+						throw rollbackException;
+					}
 				}
 				catch (Exception e) {
-					processRollback(stepExecution, contribution, fatalException, transaction);
-					throw e;
+					try {
+						processRollback(stepExecution, contribution, fatalException, transaction);
+						throw e;
+					}
+					catch (Exception rollbackException) {
+						logger.error("Rollback failed, original exception that caused the rollback is", e);
+						throw rollbackException;
+					}
 				}
 				finally {
 					// only release the lock if we acquired it
