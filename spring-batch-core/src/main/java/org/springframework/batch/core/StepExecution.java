@@ -345,7 +345,7 @@ public class StepExecution extends Entity {
 	/**
 	 * On unsuccessful execution after a chunk has rolled back.
 	 */
-	public synchronized void rollback() {
+	public synchronized void incrementRollbackCount() {
 		rollbackCount++;
 	}
 

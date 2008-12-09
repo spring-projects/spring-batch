@@ -222,7 +222,6 @@ public class TaskletStep extends AbstractStep {
 			public RepeatStatus doInStepContext(RepeatContext repeatContext, StepContext stepContext) throws Exception {
 
 				StepExecution stepExecution = stepContext.getStepExecution();
-				ExceptionHolder fatalException = new ExceptionHolder();
 
 				StepContribution contribution = stepExecution.createStepContribution();
 
@@ -269,8 +268,6 @@ public class TaskletStep extends AbstractStep {
 						getJobRepository().updateExecutionContext(stepExecution);
 					}
 					catch (Exception e) {
-						fatalException.setException(e);
-						stepExecution.setStatus(BatchStatus.UNKNOWN);
 						throw new FatalException("Fatal error detected during save of step execution context", e);
 					}
 
@@ -278,9 +275,6 @@ public class TaskletStep extends AbstractStep {
 						transactionManager.commit(transaction);
 					}
 					catch (Exception e) {
-						fatalException.setException(e);
-						stepExecution.setStatus(BatchStatus.UNKNOWN);
-						logger.error("Fatal error detected during commit.");
 						throw new FatalException("Fatal error detected during commit", e);
 					}
 
@@ -289,31 +283,41 @@ public class TaskletStep extends AbstractStep {
 						getJobRepository().update(stepExecution);
 					}
 					catch (Exception e) {
-						fatalException.setException(e);
-						stepExecution.setStatus(BatchStatus.UNKNOWN);
 						throw new FatalException("Fatal error detected during update of step execution", e);
 					}
 
 				}
-				catch (Error e) {
+				catch (FatalException e) {
 					try {
-						processRollback(stepExecution, fatalException, transaction);
-						throw e;
+						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {
-						logger.error("Rollback failed, original error that caused the rollback is", e);
-						throw rollbackException;
+						// propagate the original fatal failure, only log the
+						// failed rollback
+						logger.error("Rollback caused by fatal failure failed", rollbackException);
 					}
+					throw e;
+				}
+				catch (Error e) {
+					try {
+						rollback(stepExecution, transaction);
+					}
+					catch (Exception rollbackException) {
+						logger.error("Fatal rollback failure, original exception that caused the rollback is", e);
+						throw new FatalException("Failed while processing rollback", rollbackException);
+					}
+					throw e;
+
 				}
 				catch (Exception e) {
 					try {
-						processRollback(stepExecution, fatalException, transaction);
-						throw e;
+						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {
-						logger.error("Rollback failed, original exception that caused the rollback is", e);
-						throw rollbackException;
+						logger.error("Fatal rollback failure, original exception that caused the rollback is", e);
+						throw new FatalException("Failed while processing rollback", rollbackException);
 					}
+					throw e;
 				}
 				finally {
 					// only release the lock if we acquired it
@@ -335,62 +339,16 @@ public class TaskletStep extends AbstractStep {
 
 	}
 
-	/**
-	 * @param stepExecution
-	 * @param fatalException
-	 * @param transaction
-	 */
-	private void processRollback(final StepExecution stepExecution, final ExceptionHolder fatalException,
-			TransactionStatus transaction) {
-
-		/*
-		 * Any exception thrown within the transaction should automatically
-		 * cause the transaction to rollback.
-		 */
-		stepExecution.rollback();
-
-		try {
-			transactionManager.rollback(transaction);
-		}
-		catch (Exception e) {
-			/*
-			 * If we already failed to commit, it doesn't help to do this again
-			 * - it's better to allow the CommitFailedException to propagate
-			 */
-			if (!fatalException.hasException()) {
-				fatalException.setException(e);
-				throw new FatalException("Failed while processing rollback", e);
-			}
-			else {
-				logger.error("Failed to rollback transaction", e);
-			}
-		}
-
-	}
-
-	private static class ExceptionHolder {
-
-		private Exception exception;
-
-		public boolean hasException() {
-			return exception != null;
-		}
-
-		public void setException(Exception exception) {
-			this.exception = exception;
-		}
-
-		public Exception getException() {
-			return this.exception;
-		}
-
-	}
-
 	protected void close(ExecutionContext ctx) throws Exception {
 		stream.close(ctx);
 	}
 
 	protected void open(ExecutionContext ctx) throws Exception {
 		stream.open(ctx);
+	}
+
+	private void rollback(StepExecution stepExecution, TransactionStatus transaction) {
+		transactionManager.rollback(transaction);
+		stepExecution.incrementRollbackCount();
 	}
 }
