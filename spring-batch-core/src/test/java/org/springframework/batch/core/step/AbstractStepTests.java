@@ -291,7 +291,7 @@ public class AbstractStepTests {
 		assertEquals("close", events.get(i++));
 		assertEquals(3, events.size());
 
-		assertEquals(ExitStatus.UNKNOWN.getExitCode(), execution.getExitStatus().getExitCode());
+		assertEquals(ExitStatus.UNKNOWN, execution.getExitStatus());
 	}
 
 	/**

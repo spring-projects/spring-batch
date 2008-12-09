@@ -200,31 +200,12 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			logger.debug("Step execution success: " + stepExecution);
-
-			try {
-				getJobRepository().update(stepExecution);
-				getJobRepository().updateExecutionContext(stepExecution);
-			}
-			catch (Exception e) {
-				commitException = e;
-				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
-			}
-
 		}
 		catch (Throwable e) {
-
 			logger.error("Encountered an error executing the step: " + e.getClass() + ": " + e.getMessage(), e);
 			stepExecution.setStatus(determineBatchStatus(e));
 			exitStatus = getDefaultExitStatusForFailure(e);
 			stepExecution.addFailureException(e);
-
-			try {
-				getJobRepository().updateExecutionContext(stepExecution);
-			}
-			catch (Exception ex) {
-				logger.error("Encountered an error on listener error callback.", ex);
-				stepExecution.addFailureException(ex);
-			}
 		}
 		finally {
 
@@ -235,20 +216,31 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				logger.error("Exception in afterStep callback", e);
 			}
 
-			stepExecution.setExitStatus(exitStatus);
+			try {
+				getJobRepository().updateExecutionContext(stepExecution);
+			}
+			catch (Exception e) {
+				stepExecution.setStatus(BatchStatus.UNKNOWN);
+				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
+				stepExecution.addFailureException(e);
+				logger.error("Encountered an error saving batch meta data."
+						+ "This job is now in an unknown state and should not be restarted.", commitException);
+			}
+
 			stepExecution.setEndTime(new Date());
 
 			try {
 				getJobRepository().update(stepExecution);
 			}
 			catch (Exception e) {
-				if (commitException == null) {
-					commitException = e;
-				}
-				else {
-					logger.error("Exception while updating step execution after commit exception", e);
-				}
+				stepExecution.setStatus(BatchStatus.UNKNOWN);
+				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
+				stepExecution.addFailureException(e);
+				logger.error("Encountered an error saving batch meta data."
+						+ "This job is now in an unknown state and should not be restarted.", commitException);
 			}
+
+			stepExecution.setExitStatus(exitStatus);
 
 			try {
 				close(stepExecution.getExecutionContext());
@@ -259,16 +251,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 
 			StepSynchronizationManager.release();
-
-			if (commitException != null) {
-				stepExecution.setStatus(BatchStatus.UNKNOWN);
-				logger.error("Encountered an error saving batch meta data."
-						+ "This job is now in an unknown state and should not be restarted.", commitException);
-				stepExecution.addFailureException(commitException);
-			}
-
+			
 			logger.debug("Step execution complete: " + stepExecution);
-
 		}
 	}
 

@@ -298,8 +298,7 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 
 		// context saved before looping and updated once for every processing
-		// loop (once in this case) and finally in the abstract step (regardless
-		// of execution logic)
+		// loop (once in this case) 
 		assertEquals(3, list.size());
 	}
 

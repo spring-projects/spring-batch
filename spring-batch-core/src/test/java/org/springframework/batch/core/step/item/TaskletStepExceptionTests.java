@@ -130,7 +130,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.execute(stepExecution);
 		assertEquals(COMPLETED, stepExecution.getStatus());
 		assertFalse(stepExecution.getFailureExceptions().contains(exception));
-		assertEquals(4, jobRepository.getUpdateCount());
+		assertEquals(3, jobRepository.getUpdateCount());
 	}
 
 	@Test
