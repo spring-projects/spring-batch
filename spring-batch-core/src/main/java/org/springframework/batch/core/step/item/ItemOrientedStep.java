@@ -315,22 +315,22 @@ public class ItemOrientedStep extends AbstractStep {
 				catch (Error e) {
 					try {
 						processRollback(stepExecution, contribution, fatalException, transaction);
-						throw e;
 					}
 					catch (Exception rollbackException) {
 						logger.error("Rollback failed, original exception that caused the rollback is", e);
 						throw rollbackException;
 					}
+					throw e;
 				}
 				catch (Exception e) {
 					try {
 						processRollback(stepExecution, contribution, fatalException, transaction);
-						throw e;
 					}
 					catch (Exception rollbackException) {
 						logger.error("Rollback failed, original exception that caused the rollback is", e);
 						throw rollbackException;
 					}
+					throw e;
 				}
 				finally {
 					// only release the lock if we acquired it
