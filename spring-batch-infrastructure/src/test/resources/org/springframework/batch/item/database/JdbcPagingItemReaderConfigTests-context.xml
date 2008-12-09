@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+		<property name="url" value="jdbc:hsqldb:mem:testdb" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="jdbcPagingItemReader" class="org.springframework.batch.item.database.JdbcPagingItemReader">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="pageSize" value="1000"/>
+		<property name="fetchSize" value="100"/>
+        <property name="queryProvider">
+        	<bean class="org.springframework.batch.item.database.support.HsqlPagingQueryProvider">
+        		<property name="selectClause" value="select id, bar"/>
+        		<property name="fromClause" value="foo"/>
+        		<property name="sortKey" value="id"/>
+        	</bean>
+        </property>
+	</bean>		
+
+</beans>

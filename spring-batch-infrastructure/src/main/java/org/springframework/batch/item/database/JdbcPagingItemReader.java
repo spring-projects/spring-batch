@@ -57,6 +57,8 @@ import java.sql.SQLException;
  */
 public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> implements InitializingBean {
 
+	public static final int VALUE_NOT_SET = -1;
+
 	private DataSource dataSource;
 
 	private PagingQueryProvider queryProvider;
@@ -73,12 +75,27 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private Object startAfterValue;
 
+	private int fetchSize = VALUE_NOT_SET;
+
 	public JdbcPagingItemReader() {
 		setName(ClassUtils.getShortName(JdbcPagingItemReader.class));
 	}
 
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
+	}
+
+	/**
+	 * Gives the JDBC driver a hint as to the number of rows that should be
+	 * fetched from the database when more rows are needed for this
+	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
+	 * JDBC driver ignores the value.
+	 * 
+	 * @param fetchSize the number of rows to fetch
+	 * @see ResultSet#setFetchSize(int)
+	 */
+	public void setFetchSize(int fetchSize) {
+		this.fetchSize = fetchSize;
 	}
 
 	public void setQueryProvider(PagingQueryProvider queryProvider) {
@@ -114,6 +131,9 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 		super.afterPropertiesSet();
 		Assert.notNull(dataSource);
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		if (fetchSize != VALUE_NOT_SET) {
+			jdbcTemplate.setFetchSize(fetchSize);
+		}
 		jdbcTemplate.setMaxRows(pageSize);
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(jdbcTemplate);
 		Assert.notNull(queryProvider);
