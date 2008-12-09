@@ -366,11 +366,6 @@ public class TaskletStep extends AbstractStep {
 			}
 		}
 
-		if (fatalException.hasException()) {
-			// Try and give the system a chance to update the stepExecution with
-			// the failure status.
-			getJobRepository().update(stepExecution);
-		}
 	}
 
 	private static class ExceptionHolder {
