@@ -248,7 +248,6 @@ public class TaskletStep extends AbstractStep {
 
 					}
 
-					stepExecution.incrementCommitCount();
 
 					// If the step operations are asynchronous then we need
 					// to synchronize changes to the step execution (at a
@@ -266,24 +265,13 @@ public class TaskletStep extends AbstractStep {
 
 					try {
 						getJobRepository().updateExecutionContext(stepExecution);
-					}
-					catch (Exception e) {
-						throw new FatalException("Fatal error detected during save of step execution context", e);
-					}
-
-					try {
 						transactionManager.commit(transaction);
-					}
-					catch (Exception e) {
-						throw new FatalException("Fatal error detected during commit", e);
-					}
-
-					try {
+						stepExecution.incrementCommitCount();
 						logger.debug("Saving step execution after commit: " + stepExecution);
 						getJobRepository().update(stepExecution);
 					}
 					catch (Exception e) {
-						throw new FatalException("Fatal error detected during update of step execution", e);
+						throw new FatalException("Fatal failure detected", e);
 					}
 
 				}

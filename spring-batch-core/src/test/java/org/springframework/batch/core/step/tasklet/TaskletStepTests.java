@@ -319,7 +319,7 @@ public class TaskletStepTests {
 
 		step.execute(stepExecution);
 		Throwable e = stepExecution.getFailureExceptions().get(0);
-		assertEquals("Fatal error detected during save of step execution context", e.getMessage());
+		assertEquals("Fatal failure detected", e.getMessage());
 		assertEquals("foo", e.getCause().getMessage());
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 	}
@@ -643,10 +643,10 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue(msg.contains("Fatal error detected during commit"));
+		assertTrue(msg.contains("Fatal failure detected"));
 		Throwable ex = stepExecution.getFailureExceptions().get(0);
 		msg = ex.getMessage();
-		assertTrue(msg.contains("Fatal error detected during commit"));
+		assertTrue(msg.contains("Fatal failure detected"));
 		// The original rollback was caused by this one:
 		assertEquals("Bar", ex.getCause().getMessage());
 	}

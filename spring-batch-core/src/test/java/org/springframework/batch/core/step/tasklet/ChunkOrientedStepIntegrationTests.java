@@ -142,7 +142,7 @@ public class ChunkOrientedStepIntegrationTests {
 		// STARTED instead of UNKNOWN
 		assertEquals(BatchStatus.UNKNOWN, lastStepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue(msg.contains("Fatal error detected during commit"));
+		assertTrue(msg.contains("Fatal failure detected"));
 		// The original rollback was caused by this one:
 		assertEquals("Simulate commit failure", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 
