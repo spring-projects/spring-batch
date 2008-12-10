@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>org.springframework.batch</artifactId>
@@ -18,7 +19,7 @@
 		<module>spring-batch-samples</module>
 		<!--		<module>spring-batch-integration</module>-->
 		<module>docs</module>
-  </modules>
+	</modules>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
 		<name>SpringSource</name>
@@ -197,12 +198,12 @@
 								<configuration>
 									<tasks>
 										<echo>Aggregating XSL reports</echo>
-										<mkdir dir="target/emma-reports"/>
+										<mkdir dir="target/emma-reports" />
 										<concat destfile="target/site/emma-reports/emma-report.xml">
-											<fileset dir="." includes="**/coverage.fragment"/>
+											<fileset dir="." includes="**/coverage.fragment" />
 											<filterchain>
 												<linecontainsregexp>
-													<regexp pattern="[a-zA-Z]"/>
+													<regexp pattern="[a-zA-Z]" />
 												</linecontainsregexp>
 											</filterchain>
 											<header trimleading="yes">
@@ -212,9 +213,10 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
-											<param name="project" expression="${project.name}"/>
-											<param name="version" expression="${project.version}"/>
+										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html"
+											style="src/main/xsl/emma2html.xsl">
+											<param name="project" expression="${project.name}" />
+											<param name="version" expression="${project.version}" />
 										</xslt>
 									</tasks>
 								</configuration>
@@ -270,18 +272,19 @@
 							<configuration>
 								<tasks>
 									<echo>Creating JUnit reports</echo>
-									<mkdir dir="target/surefire-reports"/>
+									<mkdir dir="target/surefire-reports" />
 									<junitreport todir="target/surefire-reports">
 										<fileset dir=".">
-											<filename name="**/target/surefire-reports/TEST-*.xml"/>
+											<filename name="**/target/surefire-reports/TEST-*.xml" />
 										</fileset>
-										<report todir="target/site/junit-reports"/>
+										<report todir="target/site/junit-reports" />
 									</junitreport>
 									<echo>Creating Emma reports</echo>
-									<mkdir dir="target/site/emma-reports"/>
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
-										<mapper type="glob" from="*.xml" to="*.fragment"/>
-										<param name="project" expression="${project.name}"/>
+									<mkdir dir="target/site/emma-reports" />
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
+										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+										<mapper type="glob" from="*.xml" to="*.fragment" />
+										<param name="project" expression="${project.name}" />
 									</xslt>
 								</tasks>
 							</configuration>
@@ -505,21 +508,31 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>com.springsource.org.apache.commons.lang</artifactId>
 				<version>2.1.0</version>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>com.springsource.org.apache.commons.io</artifactId>
 				<version>1.4.0</version>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>com.springsource.org.apache.commons.collections</artifactId>
 				<version>3.2.0</version>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>com.springsource.org.apache.commons.dbcp</artifactId>
 				<version>1.2.2.osgi</version>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.log4j</groupId>
+				<artifactId>com.springsource.org.apache.log4j</artifactId>
+				<version>1.2.15</version>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.hsqldb</groupId>
@@ -566,24 +579,28 @@
 				<artifactId>com.springsource.org.objectweb.asm</artifactId>
 				<version>2.2.3</version>
 				<scope>runtime</scope>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.objectweb.asm</groupId>
 				<artifactId>com.springsource.org.objectweb.asm.attrs</artifactId>
 				<version>2.2.3</version>
 				<scope>runtime</scope>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.objectweb.asm</groupId>
 				<artifactId>com.springsource.org.objectweb.asm.commons</artifactId>
 				<version>2.2.3</version>
 				<scope>runtime</scope>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>com.springsource.javax.servlet</artifactId>
 				<version>2.5.0</version>
 				<scope>provided</scope>
+				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<!-- TODO: remove this or find a replacement in Java 5 / BRITS -->
@@ -657,13 +674,14 @@
 			<dependency>
 				<groupId>org.springframework.ws</groupId>
 				<artifactId>org.springframework.oxm</artifactId>
-				<version>1.5.4.A</version>
+				<version>1.5.5.A</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.osgi</groupId>
 				<artifactId>org.springframework.osgi.core</artifactId>
 				<version>1.1.2.A</version>
+				<optional>true</optional>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

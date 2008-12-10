@@ -1687,7 +1687,7 @@
       <section>
         <title>IbatisPagingItemReader</title>
 
-        <para>If you use IBATIS for your data access ten you can use the
+        <para>If you use IBATIS for your data access then you can use the
         <classname>IbatisPagingItemReader</classname> which, as the name
         indicates, is an implementation of a paging
         <classname>ItemReader</classname>. IBATIS doesn't have direct support
