@@ -80,10 +80,10 @@ public class CompositeItemStream implements ItemStream {
 	 * Broadcast the call to close.
 	 * @throws ItemStreamException
 	 */
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
+	public void close() throws ItemStreamException {
 		synchronized (streams) {
 			for (ItemStream itemStream : streams) {
-				itemStream.close(executionContext);
+				itemStream.close();
 			}
 		}
 	}

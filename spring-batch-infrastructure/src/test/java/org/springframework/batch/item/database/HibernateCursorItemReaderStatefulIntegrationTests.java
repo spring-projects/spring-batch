@@ -46,7 +46,7 @@ public class HibernateCursorItemReaderStatefulIntegrationTests extends Hibernate
 		replay(scrollableResults);
 		
 		itemReader.open(new ExecutionContext());
-		itemReader.close(new ExecutionContext());
+		itemReader.close();
 		
 		verify(sessionFactory);
 		verify(session);

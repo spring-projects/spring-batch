@@ -51,7 +51,7 @@ public class JdbcPagingItemReaderCommonTests extends CommonItemStreamItemReaderT
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		JdbcPagingItemReader<Foo> reader = (JdbcPagingItemReader<Foo>) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 		reader.setDataSource(dataSource);
 		HsqlPagingQueryProvider queryProvider = new HsqlPagingQueryProvider();
 		queryProvider.setSelectClause("select ID, NAME, VALUE");

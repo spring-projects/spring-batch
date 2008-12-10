@@ -200,9 +200,9 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	}
 
 	/**
-	 * @see ItemStream#close(ExecutionContext)
+	 * @see ItemStream#close()
 	 */
-	public void close(ExecutionContext executionContext) {
+	public void close() {
 		if (state != null) {
 			try {
 				if (footerCallback != null) {

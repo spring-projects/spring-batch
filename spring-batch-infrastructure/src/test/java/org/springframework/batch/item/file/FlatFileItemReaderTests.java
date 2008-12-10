@@ -62,7 +62,7 @@ public class FlatFileItemReaderTests {
 
 		reader.update(executionContext);
 
-		reader.close(executionContext);
+		reader.close();
 
 		reader.open(executionContext);
 
@@ -86,7 +86,7 @@ public class FlatFileItemReaderTests {
 
 		assertEquals(2, executionContext.getInt(ClassUtils.getShortName(FlatFileItemReader.class) + ".read.count"));
 		// close input
-		reader.close(executionContext);
+		reader.close();
 
 		reader
 				.setResource(getInputResource("header\nignoreme\ntestLine1\ntestLine2\ntestLine3\ntestLine4\ntestLine5\ntestLine6"));

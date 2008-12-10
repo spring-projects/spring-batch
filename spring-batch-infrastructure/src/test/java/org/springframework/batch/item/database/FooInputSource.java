@@ -40,7 +40,7 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 	}
 
 	public void destroy() throws Exception {
-		itemReader.close(null);
+		itemReader.close();
 	}
 
 	public void setFooDao(FooDao fooDao) {
@@ -54,8 +54,8 @@ class FooItemReader implements ItemStream, ItemReader<Foo>, DisposableBean, Init
 		itemReader.open(executionContext);
 	}
 
-	public void close(ExecutionContext executionContext) {
-		itemReader.close(executionContext);
+	public void close() {
+		itemReader.close();
 	}
 
 }

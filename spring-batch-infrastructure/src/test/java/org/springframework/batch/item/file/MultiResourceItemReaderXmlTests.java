@@ -79,7 +79,7 @@ public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderT
 	
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		MultiResourceItemReader<Foo> multiReader = (MultiResourceItemReader<Foo>) tested;
-		multiReader.close(new ExecutionContext());
+		multiReader.close();
 		multiReader.setResources(new Resource[] { new ByteArrayResource("<foos />"
 				.getBytes()) });
 		multiReader.open(new ExecutionContext());

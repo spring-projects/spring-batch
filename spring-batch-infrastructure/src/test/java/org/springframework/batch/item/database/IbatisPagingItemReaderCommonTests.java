@@ -40,7 +40,7 @@ public class IbatisPagingItemReaderCommonTests extends CommonDatabaseItemStreamI
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		IbatisPagingItemReader reader = (IbatisPagingItemReader) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 
 		reader.setQueryId("getNoFoos");
 		reader.afterPropertiesSet();

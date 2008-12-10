@@ -34,7 +34,7 @@ public class JpaPagingItemReaderCommonTests extends CommonItemStreamItemReaderTe
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		JpaPagingItemReader<Foo> reader = (JpaPagingItemReader<Foo>) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 		reader.setQueryString("select f from Foo f where f.id = -1");
 		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());

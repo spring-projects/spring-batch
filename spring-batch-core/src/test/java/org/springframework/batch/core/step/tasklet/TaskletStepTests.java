@@ -656,7 +656,7 @@ public class TaskletStepTests {
 
 		step.setJobRepository(new JobRepositorySupport());
 		step.setStreams(new ItemStream[] { new ItemStreamSupport() {
-			public void close(ExecutionContext executionContext) throws ItemStreamException {
+			public void close() throws ItemStreamException {
 				throw new RuntimeException("Bar");
 			}
 		} });
@@ -679,8 +679,8 @@ public class TaskletStepTests {
 	public void testStatusForCloseFailedException() throws Exception {
 
 		MockRestartableItemReader itemReader = new MockRestartableItemReader() {
-			public void close(ExecutionContext executionContext) throws ItemStreamException {
-				super.close(executionContext);
+			public void close() throws ItemStreamException {
+				super.close();
 				// Simulate failure on rollback when stream resets
 				throw new RuntimeException("Bar");
 			}

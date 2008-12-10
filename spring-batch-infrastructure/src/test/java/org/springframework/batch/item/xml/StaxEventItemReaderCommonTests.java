@@ -63,7 +63,7 @@ public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTe
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		StaxEventItemReader<Foo> reader = (StaxEventItemReader<Foo>) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 		
 		reader.setResource(new ByteArrayResource("<foos />".getBytes()));
 		reader.afterPropertiesSet();

@@ -69,7 +69,7 @@ public class FlatFileCustomerCreditDao implements CustomerCreditDao,
 
 	public void close() throws Exception {
 		if (itemWriter instanceof ItemStream) {
-			((ItemStream) itemWriter).close(null);
+			((ItemStream) itemWriter).close();
 		}
 	}
 

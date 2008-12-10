@@ -28,7 +28,7 @@ public abstract class AbstractPagingItemReaderParameterTests {
 
 	@After
 	public void tearDown() {
-		((ItemStream)tested).close(executionContext);
+		((ItemStream)tested).close();
 	}
 
 	@Test

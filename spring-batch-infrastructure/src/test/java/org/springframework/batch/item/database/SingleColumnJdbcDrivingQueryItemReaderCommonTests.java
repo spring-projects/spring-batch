@@ -25,10 +25,10 @@ public class SingleColumnJdbcDrivingQueryItemReaderCommonTests extends CommonDat
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		FooItemReader fooReader = (FooItemReader) tested;
-		fooReader.close(new ExecutionContext());
+		fooReader.close();
 		
 		DrivingQueryItemReader<Long> reader = new DrivingQueryItemReader<Long>();
-		reader.close(new ExecutionContext());
+		reader.close();
 		
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(getDataSource());
 		SingleColumnJdbcKeyCollector<Long> keyCollector = new SingleColumnJdbcKeyCollector<Long>(jdbcTemplate,

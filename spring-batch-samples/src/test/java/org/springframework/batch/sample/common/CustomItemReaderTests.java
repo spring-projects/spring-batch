@@ -104,7 +104,7 @@ public class CustomItemReaderTests extends TestCase {
 			}
 		}
 
-		public void close(ExecutionContext executionContext) throws ItemStreamException {}
+		public void close() throws ItemStreamException {}
 
 		public void update(ExecutionContext executionContext) throws ItemStreamException {
 			executionContext.putInt(CURRENT_INDEX, currentIndex);

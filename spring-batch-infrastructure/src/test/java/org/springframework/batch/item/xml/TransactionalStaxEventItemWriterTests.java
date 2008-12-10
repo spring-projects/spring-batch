@@ -83,7 +83,7 @@ public class TransactionalStaxEventItemWriterTests {
 				return null;
 			}
 		});
-		writer.close(executionContext);
+		writer.close();
 		String content = outputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
@@ -126,7 +126,7 @@ public class TransactionalStaxEventItemWriterTests {
 		catch (RuntimeException e) {
 			// expected
 		}
-		writer.close(executionContext);
+		writer.close();
 		writer.open(executionContext);
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
@@ -139,7 +139,7 @@ public class TransactionalStaxEventItemWriterTests {
 				return null;
 			}
 		});
-		writer.close(executionContext);
+		writer.close();
 		String content = outputFileContent();
 		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<header></header>")));
 		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, TEST_STRING));
@@ -178,7 +178,7 @@ public class TransactionalStaxEventItemWriterTests {
 			}
 		});
 		writer.update(executionContext);
-		writer.close(executionContext);
+		writer.close();
 		writer.open(executionContext);
 		try {
 			new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
@@ -197,7 +197,7 @@ public class TransactionalStaxEventItemWriterTests {
 		catch (RuntimeException e) {
 			// expected
 		}
-		writer.close(executionContext);
+		writer.close();
 		String content = outputFileContent();
 		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, ("<header></header>")));
 		assertEquals("Wrong content: " + content, 1, StringUtils.countOccurrencesOf(content, TEST_STRING));

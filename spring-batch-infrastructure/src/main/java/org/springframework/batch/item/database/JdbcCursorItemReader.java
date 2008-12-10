@@ -181,7 +181,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 			handleWarnings(preparedStatement);
 		}
 		catch (SQLException se) {
-			close(null);
+			close();
 			throw getExceptionTranslator().translate("Executing query", sql, se);
 		}
 

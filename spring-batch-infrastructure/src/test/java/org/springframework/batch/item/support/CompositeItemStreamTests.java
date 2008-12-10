@@ -71,11 +71,11 @@ public class CompositeItemStreamTests extends TestCase {
 
 	public void testClose() {
 		manager.register(new ItemStreamSupport() {
-			public void close(ExecutionContext executionContext) throws ItemStreamException {
+			public void close() throws ItemStreamException {
 				list.add("bar");
 			}
 		});
-		manager.close(null);
+		manager.close();
 		assertEquals(1, list.size());
 	}
 
@@ -86,7 +86,7 @@ public class CompositeItemStreamTests extends TestCase {
 			}
 		} });
 		manager.open(null);
-		manager.close(null);
+		manager.close();
 		manager.open(null);
 		assertEquals(2, list.size());
 	}

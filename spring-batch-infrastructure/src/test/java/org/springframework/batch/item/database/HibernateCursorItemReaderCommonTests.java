@@ -41,7 +41,7 @@ public class HibernateCursorItemReaderCommonTests extends CommonDatabaseItemStre
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		HibernateCursorItemReader<Foo> reader = (HibernateCursorItemReader<Foo>) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 		reader.setQueryString("from Foo foo where foo.id = -1");
 		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());

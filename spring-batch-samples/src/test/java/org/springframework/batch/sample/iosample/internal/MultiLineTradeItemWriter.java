@@ -49,8 +49,8 @@ public class MultiLineTradeItemWriter implements ItemWriter<Trade>, ItemStream {
 		this.delegate = delegate;
 	}
 
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
-		this.delegate.close(executionContext);
+	public void close() throws ItemStreamException {
+		this.delegate.close();
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {

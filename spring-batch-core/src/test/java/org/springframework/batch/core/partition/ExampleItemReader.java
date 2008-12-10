@@ -43,7 +43,7 @@ public class ExampleItemReader implements ItemReader<String>, ItemStream {
 		return input[index++];
 	}
 
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
+	public void close() throws ItemStreamException {
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {

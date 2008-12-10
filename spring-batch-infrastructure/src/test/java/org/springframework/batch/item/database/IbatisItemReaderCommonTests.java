@@ -45,7 +45,7 @@ public class IbatisItemReaderCommonTests extends CommonDatabaseItemStreamItemRea
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		IbatisDrivingQueryItemReader reader = (IbatisDrivingQueryItemReader) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 		
 		IbatisKeyCollector<Long> keyCollector = new IbatisKeyCollector<Long>();
 		keyCollector.setDrivingQueryId("getNoFoos");

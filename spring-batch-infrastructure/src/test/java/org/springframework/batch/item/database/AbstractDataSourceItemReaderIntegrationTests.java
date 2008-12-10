@@ -50,7 +50,7 @@ public abstract class AbstractDataSourceItemReaderIntegrationTests {
 
 	@AfterTransaction
 	public void onTearDownAfterTransaction() throws Exception {
-		getAsItemStream(reader).close(null);
+		getAsItemStream(reader).close();
 	}
 
 	/*

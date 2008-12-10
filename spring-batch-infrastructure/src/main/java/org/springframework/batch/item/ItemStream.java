@@ -47,8 +47,6 @@ public interface ItemStream {
 	/**
 	 * If any resources are needed for the stream to operate they need to be destroyed here. Once this method has been
 	 * called all other methods (except open) may throw an exception.
-	 * 
-	 * @param executionContext the current execution context in case it is needed
 	 */
-	void close(ExecutionContext executionContext) throws ItemStreamException;
+	void close() throws ItemStreamException;
 }

@@ -31,7 +31,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 
 	@After
 	public void tearDown() throws Exception {
-		testedAsStream().close(executionContext);
+		testedAsStream().close();
 	}
 
 	/**
@@ -104,7 +104,7 @@ public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTe
 		testedAsStream().update(executionContext);
 
 		// create new input source
-		testedAsStream().close(executionContext);
+		testedAsStream().close();
 
 		testedAsStream().open(executionContext);
 

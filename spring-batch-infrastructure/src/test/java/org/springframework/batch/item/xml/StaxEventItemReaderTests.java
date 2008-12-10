@@ -94,7 +94,7 @@ public class StaxEventItemReaderTests {
 		assertNotNull(source.read());
 		assertNull(source.read()); // there are only two fragments
 
-		source.close(executionContext);
+		source.close();
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testRestoreWorksFromClosedStream() throws Exception {
-		source.close(executionContext);
+		source.close();
 		source.update(executionContext);
 	}
 
@@ -168,7 +168,7 @@ public class StaxEventItemReaderTests {
 
 	@Test
 	public void testCloseWithoutOpen() throws Exception {
-		source.close(null);
+		source.close();
 		// No error!
 	}
 
@@ -187,7 +187,7 @@ public class StaxEventItemReaderTests {
 		assertNotNull(item);
 		assertTrue(newSource.isOpenCalled());
 
-		newSource.close(null);
+		newSource.close();
 		newSource.setOpenCalled(false);
 		// calling read again should require re-initialization because of close
 		try {

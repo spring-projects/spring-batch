@@ -328,7 +328,7 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	protected void close(ExecutionContext ctx) throws Exception {
-		stream.close(ctx);
+		stream.close();
 	}
 
 	protected void open(ExecutionContext ctx) throws Exception {

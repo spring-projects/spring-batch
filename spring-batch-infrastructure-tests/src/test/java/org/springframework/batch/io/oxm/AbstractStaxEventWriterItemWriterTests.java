@@ -45,7 +45,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 	@Test
 	public void testWrite() throws Exception {
 		writer.write(objects);
-		writer.close(null);
+		writer.close();
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()),
 				new FileReader(resource.getFile()));

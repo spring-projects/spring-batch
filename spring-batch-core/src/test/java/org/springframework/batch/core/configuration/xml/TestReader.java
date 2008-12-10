@@ -42,7 +42,7 @@ public class TestReader extends AbstractTestComponent implements ItemReader<Stri
 		return null;
 	}
 
-	public void close(ExecutionContext executionContext)
+	public void close()
 			throws ItemStreamException {
 	}
 

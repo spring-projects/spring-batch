@@ -54,7 +54,7 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 
 	public void write(List<? extends T> items) throws Exception {
 		if (currentResourceItemCount >= itemCountLimitPerResource) {
-			delegate.close(new ExecutionContext());
+			delegate.close();
 			resourceIndex++;
 			currentResourceItemCount = 0;
 			setResourceToDelegate();
@@ -101,10 +101,10 @@ public class MultiResourceItemWriter<T> extends ExecutionContextUserSupport impl
 		this.saveState = saveState;
 	}
 
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
+	public void close() throws ItemStreamException {
 		resourceIndex = 1;
 		currentResourceItemCount = 0;
-		delegate.close(executionContext);
+		delegate.close();
 	}
 
 	public void open(ExecutionContext executionContext) throws ItemStreamException {

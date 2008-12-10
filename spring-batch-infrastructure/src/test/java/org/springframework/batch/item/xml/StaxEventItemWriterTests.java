@@ -70,7 +70,7 @@ public class StaxEventItemWriterTests {
 	public void testWriteAndFlush() throws Exception {
 		writer.open(executionContext);
 		writer.write(items);
-		writer.close(executionContext);
+		writer.close();
 		String content = outputFileContent();
 		assertTrue("Wrong content: " + content, content.contains(TEST_STRING));
 	}
@@ -84,13 +84,13 @@ public class StaxEventItemWriterTests {
 		// write item
 		writer.write(items);
 		writer.update(executionContext);
-		writer.close(executionContext);
+		writer.close();
 
 		// create new writer from saved restart data and continue writing
 		writer = createItemWriter();
 		writer.open(executionContext);
 		writer.write(items);
-		writer.close(executionContext);
+		writer.close();
 
 		// check the output is concatenation of 'before restart' and 'after
 		// restart' writes.
@@ -183,7 +183,7 @@ public class StaxEventItemWriterTests {
 		writer.setRootTagName("testroot");
 		writer.setRootElementAttributes(Collections.<String, String> singletonMap("attribute", "value"));
 		writer.open(executionContext);
-		writer.close(null);
+		writer.close();
 		String content = outputFileContent();
 		
 		assertTrue(content.contains("<testroot attribute=\"value\">"));

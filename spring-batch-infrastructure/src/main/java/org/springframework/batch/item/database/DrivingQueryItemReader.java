@@ -126,7 +126,7 @@ public class DrivingQueryItemReader<T> implements ItemReader<T>, InitializingBea
 	 * Close the resource by setting the list of keys to null, allowing them to
 	 * be garbage collected.
 	 */
-	public void close(ExecutionContext executionContext) {
+	public void close() {
 		initialized = false;
 		currentIndex = 0;
 		keysIterator = null;

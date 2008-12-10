@@ -36,7 +36,7 @@ public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTes
 	@Override
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		FlatFileItemReader<Foo> reader = (FlatFileItemReader<Foo>) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 		
 		reader.setResource(new ByteArrayResource("".getBytes()));
 		reader.afterPropertiesSet();

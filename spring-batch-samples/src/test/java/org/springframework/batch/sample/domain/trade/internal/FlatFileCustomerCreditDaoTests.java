@@ -63,7 +63,7 @@ public class FlatFileCustomerCreditDaoTests {
 	public void testClose() throws Exception{
 		
 		//set-up outputSource mock
-		output.close(null);
+		output.close();
 		replay(output);
 
 		//call tested method

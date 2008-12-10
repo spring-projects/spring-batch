@@ -86,7 +86,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 		assertTrue(part2.exists());
 
 		tested.update(executionContext);
-		tested.close(executionContext);
+		tested.close();
 
 		assertEquals(xmlDocStart + "<prefix:4></prefix:4>" + xmlDocEnd, readFile(part2));
 		assertEquals(xmlDocStart + "<prefix:1></prefix:1><prefix:2></prefix:2><prefix:3></prefix:3>" + xmlDocEnd,
@@ -100,7 +100,7 @@ public class MultiResourceItemWriterXmlTests extends AbstractMultiResourceItemWr
 		File part3 = new File(file.getAbsolutePath() + suffixCreator.getSuffix(3));
 		assertTrue(part3.exists());
 
-		tested.close(executionContext);
+		tested.close();
 
 		assertEquals(xmlDocStart + "<prefix:4></prefix:4><prefix:5></prefix:5>" + xmlDocEnd, readFile(part2));
 		assertEquals(xmlDocStart

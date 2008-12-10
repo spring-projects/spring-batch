@@ -39,7 +39,7 @@ public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamIte
 
 	protected void pointToEmptyInput(ItemReader<Foo> tested) throws Exception {
 		JdbcCursorItemReader<Foo> reader = (JdbcCursorItemReader<Foo>) tested;
-		reader.close(new ExecutionContext());
+		reader.close();
 		reader.setSql("select ID from T_FOOS where ID < 0");
 		reader.afterPropertiesSet();
 		reader.open(new ExecutionContext());		

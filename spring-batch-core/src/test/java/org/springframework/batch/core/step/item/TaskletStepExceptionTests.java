@@ -159,7 +159,7 @@ public class TaskletStepExceptionTests {
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
 			@Override
-			public void close(ExecutionContext executionContext) throws ItemStreamException {
+			public void close() throws ItemStreamException {
 				throw exception;
 			}
 		} });

@@ -69,7 +69,7 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 		this.currentItemCount = count;
 	}
 
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
+	public void close() throws ItemStreamException {
 		currentItemCount = 0;
 		try {
 			doClose();

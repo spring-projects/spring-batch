@@ -374,9 +374,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	/**
 	 * Flush and close the output source.
 	 * 
-	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
+	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
-	public void close(ExecutionContext executionContext) {
+	public void close() {
 
 		// harmless event to close the root tag if there were no items
 		XMLEventFactory factory = XMLEventFactory.newInstance();

@@ -64,7 +64,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("8", tested.read());
 		assertEquals(null, tested.read());
 
-		tested.close(ctx);
+		tested.close();
 	}
 
 	public void testRestartWhenStateNotSaved() throws Exception {
@@ -80,7 +80,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("2", tested.read());
 		assertEquals("3", tested.read());
 
-		tested.close(ctx);
+		tested.close();
 
 		tested.open(ctx);
 
@@ -103,7 +103,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("2", tested.read());
 		assertEquals("3", tested.read());
 
-		tested.close(ctx);
+		tested.close();
 
 		tested.open(ctx);
 
@@ -111,7 +111,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("3", tested.read());
 		assertEquals("4", tested.read());
 
-		tested.close(ctx);
+		tested.close();
 
 		tested.open(ctx);
 
@@ -125,7 +125,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("6", tested.read());
 		assertEquals("7", tested.read());
 
-		tested.close(ctx);
+		tested.close();
 
 		tested.open(ctx);
 
@@ -135,7 +135,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("8", tested.read());
 		assertEquals(null, tested.read());
 
-		tested.close(ctx);
+		tested.close();
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("5", tested.read());
 		assertEquals("6", tested.read());
 
-		tested.close(ctx);
+		tested.close();
 
 		tested.open(ctx);
 

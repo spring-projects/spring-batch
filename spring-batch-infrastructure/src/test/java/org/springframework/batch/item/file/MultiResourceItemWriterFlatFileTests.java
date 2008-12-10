@@ -64,7 +64,7 @@ public class MultiResourceItemWriterFlatFileTests extends AbstractMultiResourceI
 		assertEquals("4", readFile(part2));
 
 		tested.update(executionContext);
-		tested.close(executionContext);
+		tested.close();
 		tested.open(executionContext);
 
 		tested.write(Arrays.asList("5"));

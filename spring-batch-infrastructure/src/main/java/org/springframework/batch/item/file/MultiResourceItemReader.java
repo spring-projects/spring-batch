@@ -95,7 +95,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 				return null;
 			}
 
-			delegate.close(new ExecutionContext());
+			delegate.close();
 			delegate.setResource(resources[index.currentResource]);
 			delegate.open(new ExecutionContext());
 
@@ -109,9 +109,9 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 * Close the {@link #setDelegate(ResourceAwareItemReaderItemStream)} reader
 	 * and reset instance variable values.
 	 */
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
+	public void close() throws ItemStreamException {
 		index = new MultiResourceIndex();
-		delegate.close(new ExecutionContext());
+		delegate.close();
 		noInput = false;
 	}
 

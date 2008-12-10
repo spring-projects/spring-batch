@@ -93,7 +93,7 @@ public class FlatFileItemWriterTests {
 		if (reader != null) {
 			reader.close();
 		}
-		writer.close(null);
+		writer.close();
 		outputFile.delete();
 	}
 
@@ -138,7 +138,7 @@ public class FlatFileItemWriterTests {
 	public void testWriteString() throws Exception {
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(null);
+		writer.close();
 		String lineFromFile = readLine();
 
 		assertEquals(TEST_STRING, lineFromFile);
@@ -223,7 +223,7 @@ public class FlatFileItemWriterTests {
 		// get restart data
 		writer.update(executionContext);
 		// close template
-		writer.close(executionContext);
+		writer.close();
 
 		// init with correct data
 		writer.open(executionContext);
@@ -232,7 +232,7 @@ public class FlatFileItemWriterTests {
 		// get statistics
 		writer.update(executionContext);
 		// close template
-		writer.close(executionContext);
+		writer.close();
 
 		// verify what was written to the file
 		for (int i = 1; i <= 8; i++) {
@@ -303,7 +303,7 @@ public class FlatFileItemWriterTests {
 		catch (ItemStreamException e) {
 			assertTrue(e.getCause() instanceof UnsupportedCharsetException);
 		}
-		writer.close(null);
+		writer.close();
 	}
 
 	@Test
@@ -328,7 +328,7 @@ public class FlatFileItemWriterTests {
 		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(executionContext);
+		writer.close();
 		assertEquals(TEST_STRING, readLine());
 		assertEquals("a", readLine());
 		assertEquals("b", readLine());
@@ -345,7 +345,7 @@ public class FlatFileItemWriterTests {
 		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(null);
+		writer.close();
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
 		lineFromFile = readLine();
@@ -365,10 +365,10 @@ public class FlatFileItemWriterTests {
 		});
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(executionContext);
+		writer.close();
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(executionContext);
+		writer.close();
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
 		lineFromFile = readLine();
@@ -392,7 +392,7 @@ public class FlatFileItemWriterTests {
 		writer.write(Collections.singletonList(TEST_STRING));
 		writer.update(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(executionContext);
+		writer.close();
 		String lineFromFile = readLine();
 		assertEquals("a", lineFromFile);
 		lineFromFile = readLine();
@@ -401,7 +401,7 @@ public class FlatFileItemWriterTests {
 		assertEquals(TEST_STRING, lineFromFile);
 		writer.open(executionContext);
 		writer.write(Collections.singletonList(TEST_STRING));
-		writer.close(executionContext);
+		writer.close();
 		reader = null;
 		lineFromFile = readLine();
 		assertEquals("a", lineFromFile);

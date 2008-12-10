@@ -26,9 +26,9 @@ public abstract class ItemStreamSupport implements ItemStream {
 
 	/**
 	 * No-op.
-	 * @see org.springframework.batch.item.ItemStream#close(ExecutionContext)
+	 * @see org.springframework.batch.item.ItemStream#close()
 	 */
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
+	public void close() throws ItemStreamException {
 	}
 
 	/**
