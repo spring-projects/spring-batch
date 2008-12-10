@@ -15,8 +15,9 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import org.springframework.batch.core.step.item.FaultTolerantChunkOrientedTasklet;
-import org.springframework.batch.core.step.item.SimpleChunkOrientedTasklet;
+import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
+import org.springframework.batch.core.step.item.SimpleChunkProcessor;
+import org.springframework.batch.core.step.item.SimpleChunkProvider;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassthroughItemProcessor;
@@ -31,13 +32,13 @@ import org.springframework.batch.repeat.support.RepeatTemplate;
  * 
  * @author Dave Syer
  */
-public class TestingChunkOrientedTasklet<T> extends SimpleChunkOrientedTasklet<T, T> {
+public class TestingChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T> {
 
 	/**
 	 * 
 	 */
 	private static final RepeatTemplate repeatTemplate = new RepeatTemplate();
-	
+
 	static {
 		// It's only for testing, and we don't want any infinite loops...
 		repeatTemplate.setCompletionPolicy(new SimpleCompletionPolicy(6));
@@ -45,18 +46,20 @@ public class TestingChunkOrientedTasklet<T> extends SimpleChunkOrientedTasklet<T
 
 	/**
 	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
-	 * instance of {@link FaultTolerantChunkOrientedTasklet}.
+	 * instance of {@link Tasklet}.
 	 */
 	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
-		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter, repeatTemplate);
+		this(itemReader, itemWriter, repeatTemplate);
 	}
 
 	/**
 	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
-	 * instance of {@link FaultTolerantChunkOrientedTasklet}.
+	 * instance of {@link Tasklet}.
 	 */
-	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter, RepeatOperations repeatOperations) {
-		super(itemReader, new PassthroughItemProcessor<T>(), itemWriter, repeatOperations);
+	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter,
+			RepeatOperations repeatOperations) {
+		super(new SimpleChunkProvider<T>(itemReader, repeatOperations), new SimpleChunkProcessor<T, T>(
+				new PassthroughItemProcessor<T>(), itemWriter));
 	}
 
 }

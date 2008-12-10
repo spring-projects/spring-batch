@@ -6,11 +6,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import org.springframework.batch.core.step.skip.SkipPolicy;
+import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.SkipListener;
+import org.springframework.batch.core.step.item.SimpleRetryExceptionHandler;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -22,7 +27,6 @@ import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.batch.support.Classifier;
 
 /**
@@ -159,12 +163,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * zero then all exceptions will be propagated from the chunk and cause the
 	 * step to abort.
 	 * 
-	 * Note that if chunks are executed concurrently the number of skips can
-	 * potentially exceed the skip limit and step can still finish successfully.
-	 * This is due to the fact that overall skip count can not be synchronized
-	 * between concurrent chunks while they processing, only on chunk
-	 * boundaries.
-	 * 
 	 * @param skipLimit the value to set. Default is 0 (never skip).
 	 */
 	public void setSkipLimit(int skipLimit) {
@@ -209,8 +207,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 				SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
 				if (!retryableExceptionClasses.isEmpty()) { // otherwise we
-					// retry
-					// all exceptions
+					// retry all exceptions
 					simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 				}
 				simpleRetryPolicy.setFatalExceptionClasses(fatalExceptionClasses);
@@ -224,35 +221,31 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 				retryPolicy = classifierRetryPolicy;
 
 			}
-			RetryTemplate retryTemplate = new RetryTemplate();
+			BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
 			if (backOffPolicy != null) {
-				retryTemplate.setBackOffPolicy(backOffPolicy);
+				batchRetryTemplate.setBackOffPolicy(backOffPolicy);
 			}
-			retryTemplate.setRetryPolicy(retryPolicy);
-			Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
-				public Boolean classify(Throwable classifiable) {
-					return getTransactionAttribute().rollbackOn(classifiable);
-				}
-			};
+			batchRetryTemplate.setRetryPolicy(retryPolicy);
 
 			// Co-ordinate the retry policy with the exception handler:
 			RepeatOperations stepOperations = getStepOperations();
 			if (stepOperations instanceof RepeatTemplate) {
-				((RepeatTemplate) stepOperations).setExceptionHandler(new SimpleRetryExceptionHandler(retryPolicy,
-						getExceptionHandler(), fatalExceptionClasses));
+				SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicy,
+						getExceptionHandler(), fatalExceptionClasses);
+				((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
 			}
 
 			if (retryContextCache == null) {
 				if (cacheCapacity > 0) {
-					retryTemplate.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
+					batchRetryTemplate.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
 				}
 			}
 			else {
-				retryTemplate.setRetryContextCache(retryContextCache);
+				batchRetryTemplate.setRetryContextCache(retryContextCache);
 			}
 
 			if (retryListeners != null) {
-				retryTemplate.setListeners(retryListeners);
+				batchRetryTemplate.setListeners(retryListeners);
 			}
 
 			List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>(
@@ -262,23 +255,32 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
 			SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
+			
+			Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
+				public Boolean classify(Throwable classifiable) {
+					return getTransactionAttribute().rollbackOn(classifiable);
+				}
+			};
 
-			if (isReaderTransactionalQueue) {
-				NonbufferingFaultTolerantChunkOrientedTasklet<T, S> tasklet = new NonbufferingFaultTolerantChunkOrientedTasklet<T, S>(
-						getItemReader(), getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate,
-						rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
-				tasklet.setListeners(getListeners());
+			FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
+					getChunkOperations());
+			chunkProvider.setSkipPolicy(readSkipPolicy);
+			chunkProvider.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemReadListener.class));
+			chunkProvider.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), SkipListener.class));
 
-				step.setTasklet(tasklet);
-			}
-			else {
-				FaultTolerantChunkOrientedTasklet<T, S> tasklet = new FaultTolerantChunkOrientedTasklet<T, S>(
-						getItemReader(), getItemProcessor(), getItemWriter(), getChunkOperations(), retryTemplate,
-						rollbackClassifier, readSkipPolicy, writeSkipPolicy, writeSkipPolicy);
-				tasklet.setListeners(getListeners());
+			FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(), getItemWriter(), batchRetryTemplate);
+			chunkProcessor.setBuffering(!isReaderTransactionalQueue);
+			chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
+			chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
+			chunkProcessor.setRollbackClassifier(rollbackClassifier);
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemProcessListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemWriteListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), SkipListener.class));
 
-				step.setTasklet(tasklet);
-			}
+			ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
+			tasklet.setBuffering(!isReaderTransactionalQueue);
+
+			step.setTasklet(tasklet);
 
 		}
 

@@ -15,7 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +35,6 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.job.JobSupport;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
@@ -109,11 +109,9 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		});
 		factory.setCommitInterval(1); // trivial by default
 
-		JobSupport job = new JobSupport("jobName");
-		job.setRestartable(true);
 		JobParameters jobParameters = new JobParametersBuilder().addString("statefulTest", "make_this_unique")
 				.toJobParameters();
-		jobExecution = repository.createJobExecution(job.getName(), jobParameters);
+		jobExecution = repository.createJobExecution("job", jobParameters);
 		jobExecution.setEndTime(new Date());
 
 	}

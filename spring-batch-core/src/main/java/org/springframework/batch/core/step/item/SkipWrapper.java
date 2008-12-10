@@ -6,7 +6,7 @@ package org.springframework.batch.core.step.item;
  * @author Dave Syer
  * 
  */
-public class ItemWrapper<T> {
+public class SkipWrapper<T> {
 
 	final private Exception exception;
 
@@ -15,12 +15,19 @@ public class ItemWrapper<T> {
 	/**
 	 * @param item
 	 */
-	public ItemWrapper(T item) {
+	public SkipWrapper(T item) {
 		this(item, null);
 	}
 
+	/**
+	 * @param e
+	 */
+	public SkipWrapper(Exception e) {
+		this(null, e);
+	}
 
-	public ItemWrapper(T item, Exception e) {
+
+	public SkipWrapper(T item, Exception e) {
 		this.item = item;
 		this.exception = e;
 	}

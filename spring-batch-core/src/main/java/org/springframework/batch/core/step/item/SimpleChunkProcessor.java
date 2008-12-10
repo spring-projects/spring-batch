@@ -1,0 +1,159 @@
+package org.springframework.batch.core.step.item;
+
+import java.util.List;
+
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.listener.MulticasterBatchListener;
+import org.springframework.batch.core.step.skip.SkipListenerFailedException;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
+
+public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I> {
+
+	private final ItemProcessor<? super I, ? extends O> itemProcessor;
+
+	private final ItemWriter<? super O> itemWriter;
+
+	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<I, O>();
+
+	public SimpleChunkProcessor(ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
+		this.itemProcessor = itemProcessor;
+		this.itemWriter = itemWriter;
+	}
+
+	/**
+	 * Register some {@link StepListener}s with the handler. Each will get the
+	 * callbacks in the order specified at the correct stage.
+	 * 
+	 * @param listeners
+	 */
+	public void setListeners(List<? extends StepListener> listeners) {
+		for (StepListener listener : listeners) {
+			registerListener(listener);
+		}
+	}
+
+	/**
+	 * Register a listener for callbacks at the appropriate stages in a process.
+	 * 
+	 * @param listener a {@link StepListener}
+	 */
+	public void registerListener(StepListener listener) {
+		this.listener.register(listener);
+	}
+
+	/**
+	 * @param item the input item
+	 * @return the result of the processing
+	 * @throws Exception
+	 */
+	protected final O doProcess(I item) throws Exception {
+		try {
+			listener.beforeProcess(item);
+			O result = itemProcessor.process(item);
+			listener.afterProcess(item, result);
+			return result;
+		}
+		catch (Exception e) {
+			listener.onProcessError(item, e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Surrounds the actual write call with listener callbacks.
+	 * 
+	 * @param items
+	 * @throws Exception
+	 */
+	protected final void doWrite(List<O> items) throws Exception {
+		try {
+			listener.beforeWrite(items);
+			itemWriter.write(items);
+			listener.afterWrite(items);
+		}
+		catch (Exception e) {
+			listener.onWriteError(e, items);
+			throw e;
+		}
+	}
+
+	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {
+
+		// If there is no input we don't have to do anything more
+		if (inputs.isEmpty()) {
+			return;
+		}
+
+		Chunk<O> outputs = transform(contribution, inputs);
+
+		contribution.incrementFilterCount(inputs.size() - outputs.size());
+
+		/*
+		 * Need to remember the write skips across transactions, otherwise they
+		 * keep coming back. Since we register skips with the inputs they will
+		 * not be processed again but the output skips need to be saved for
+		 * registration later with the listeners. The inputs are going to be the
+		 * same for all transactions processing the same chunk, but the outputs
+		 * are not, so we stash them in user data on the inputs.
+		 */
+
+		@SuppressWarnings("unchecked")
+		Chunk<O> skips = (Chunk<O>) inputs.getUserData();
+		if (skips == null) {
+			skips = new Chunk<O>();
+		}
+
+		outputs = new Chunk<O>(outputs.getItems(), skips.getSkips());
+		inputs.setUserData(outputs);
+
+		write(contribution, inputs, outputs);
+
+		for (SkipWrapper<I> wrapper : inputs.getSkips()) {
+			I item = wrapper.getItem();
+			if (item == null) {
+				continue;
+			}
+			Exception e = wrapper.getException();
+			try {
+				listener.onSkipInProcess(item, e);
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+			}
+		}
+
+		for (SkipWrapper<O> wrapper : outputs.getSkips()) {
+			Exception e = wrapper.getException();
+			try {
+				listener.onSkipInWrite(wrapper.getItem(), e);
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+			}
+		}
+
+	}
+
+	protected void write(StepContribution contribution, Chunk<I> inputs, Chunk<O> outputs) throws Exception {
+		doWrite(outputs.getItems());
+		contribution.incrementWriteCount(outputs.size());
+	}
+
+	protected Chunk<O> transform(StepContribution contribution, Chunk<I> inputs) throws Exception {
+		Chunk<O> outputs = new Chunk<O>();
+		for (Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
+			final I item = iterator.next();
+			O output = doProcess(item);
+			if (output != null) {
+				outputs.add(output);
+			}
+			else {
+				iterator.remove();
+			}
+		}
+		return outputs;
+	}
+
+}

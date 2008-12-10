@@ -3,8 +3,13 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.*;
-import static org.springframework.batch.core.BatchStatus.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.BatchStatus.COMPLETED;
+import static org.springframework.batch.core.BatchStatus.FAILED;
+import static org.springframework.batch.core.BatchStatus.STOPPED;
+import static org.springframework.batch.core.BatchStatus.UNKNOWN;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +52,7 @@ public class TaskletStepExceptionTests {
 
 	UpdateCountingJobRepository jobRepository;
 
-	static RuntimeException taskletException = new RuntimeException();
+	static RuntimeException taskletException = new RuntimeException("Static planned test exception.");
 
 	static JobInterruptedException interruptedException = new JobInterruptedException("");
 

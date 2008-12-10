@@ -9,8 +9,8 @@ import java.util.List;
  * Encapsulation of a list of items to be processed and possibly a list of
  * failed items to be skipped. To mark an item as skipped clients should iterate
  * over the chunk using the {@link #iterator()} method, and if there is a
- * failure call {@link ChunkIterator#remove(Exception)} on the iterator. The
- * skipped items are then available through the chunk.
+ * failure call {@link ChunkIterator#remove(Exception)} on the iterator.
+ * The skipped items are then available through the chunk.
  * 
  * @author Dave Syer
  * 
@@ -19,7 +19,27 @@ class Chunk<W> implements Iterable<W> {
 
 	private List<W> items = new ArrayList<W>();
 
-	private List<ItemWrapper<W>> skips = new ArrayList<ItemWrapper<W>>();
+	private List<SkipWrapper<W>> skips = new ArrayList<SkipWrapper<W>>();
+
+	private List<Exception> errors = new ArrayList<Exception>();
+	
+	private Object userData;
+
+	private boolean end;
+
+	public Chunk() {
+		this(null,null);
+	}
+	
+	public Chunk(List<W> items, List<SkipWrapper<W>> skips) {
+		super();
+		if (items!=null) {
+			this.items = new ArrayList<W>(items);
+		}
+		if (skips!=null) {
+			this.skips = new ArrayList<SkipWrapper<W>>(skips);
+		}
+	}
 
 	/**
 	 * Add the item to the chunk.
@@ -34,6 +54,8 @@ class Chunk<W> implements Iterable<W> {
 	 */
 	public void clear() {
 		items.clear();
+		skips.clear();
+		userData = null;
 	}
 
 	/**
@@ -46,8 +68,25 @@ class Chunk<W> implements Iterable<W> {
 	/**
 	 * @return a copy of the skips as an unmodifiable list
 	 */
-	public List<ItemWrapper<W>> getSkips() {
-		return Collections.unmodifiableList(new ArrayList<ItemWrapper<W>>(skips));
+	public List<SkipWrapper<W>> getSkips() {
+		return Collections.unmodifiableList(skips);
+	}
+
+	/**
+	 * @return a copy of the anonymous errros as an unmodifiable list
+	 */
+	public List<Exception> getErrors() {
+		return Collections.unmodifiableList(errors);
+	}
+
+	/**
+	 * Register an anonymous skip. To skip an individual item, use
+	 * {@link ChunkIterator#remove()}.
+	 * 
+	 * @param e the exception that caused the skip
+	 */
+	public void skip(Exception e) {
+		errors.add(e);
 	}
 
 	/**
@@ -72,6 +111,22 @@ class Chunk<W> implements Iterable<W> {
 		return items.size();
 	}
 
+	public boolean isEnd() {
+		return end;
+	}
+
+	public void setEnd() {
+		this.end = true;
+	}
+
+	public Object getUserData() {
+		return userData;
+	}
+
+	public void setUserData(Object userData) {
+		this.userData = userData;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -83,8 +138,9 @@ class Chunk<W> implements Iterable<W> {
 	}
 
 	/**
-	 * Special iterator for a chunk providing the {@link #remove(Exception)}
-	 * method for dynamically removing an item abd adding it to the skips.
+	 * Special iterator for a chunk providing the
+	 * {@link #remove(Exception)} method for dynamically removing an
+	 * item and adding it to the skips.
 	 * 
 	 * @author Dave Syer
 	 * 
@@ -109,6 +165,11 @@ class Chunk<W> implements Iterable<W> {
 		}
 
 		public void remove(Exception e) {
+			remove();
+			skips.add(new SkipWrapper<W>(next, e));
+		}
+
+		public void remove() {
 			if (next == null) {
 				if (iterator.hasNext()) {
 					next = iterator.next();
@@ -117,12 +178,7 @@ class Chunk<W> implements Iterable<W> {
 					return;
 				}
 			}
-			skips.add(new ItemWrapper<W>(next, e));
 			iterator.remove();
-		}
-
-		public void remove() {
-			throw new UnsupportedOperationException("To remove an item you must provide an exception.");
 		}
 
 	}

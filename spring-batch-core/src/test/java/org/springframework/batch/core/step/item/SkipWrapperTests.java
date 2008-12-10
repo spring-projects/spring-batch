@@ -15,7 +15,8 @@
  */
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -23,36 +24,36 @@ import org.junit.Test;
  * @author Dave Syer
  *
  */
-public class ItemWrapperTests {
+public class SkipWrapperTests {
 
 	private Exception exception = new RuntimeException();
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.step.item.ItemWrapper#ItemWrapper(java.lang.Object)}.
+	 * Test method for {@link SkipWrapper#SkipWrapper(java.lang.Object)}.
 	 */
 	@Test
 	public void testItemWrapperT() {
-		ItemWrapper<String> wrapper = new ItemWrapper<String>("foo");
+		SkipWrapper<String> wrapper = new SkipWrapper<String>("foo");
 		assertEquals("foo", wrapper.getItem());
 		assertEquals(null, wrapper.getException());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.step.item.ItemWrapper#ItemWrapper(java.lang.Object, java.lang.Exception)}.
+	 * Test method for {@link org.springframework.batch.core.step.item.SkipWrapper#SkipWrapper(java.lang.Object, java.lang.Exception)}.
 	 */
 	@Test
 	public void testItemWrapperTException() {
-		ItemWrapper<String> wrapper = new ItemWrapper<String>("foo",exception);
+		SkipWrapper<String> wrapper = new SkipWrapper<String>("foo",exception);
 		assertEquals("foo", wrapper.getItem());
 		assertEquals(exception, wrapper.getException());
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.step.item.ItemWrapper#toString()}.
+	 * Test method for {@link org.springframework.batch.core.step.item.SkipWrapper#toString()}.
 	 */
 	@Test
 	public void testToString() {
-		ItemWrapper<String> wrapper = new ItemWrapper<String>("foo");
+		SkipWrapper<String> wrapper = new SkipWrapper<String>("foo");
 		assertTrue("foo", wrapper.toString().contains("foo"));
 	}
 

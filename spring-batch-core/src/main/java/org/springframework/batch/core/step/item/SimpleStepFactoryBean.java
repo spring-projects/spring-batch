@@ -15,8 +15,13 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
@@ -26,7 +31,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.validator.Validator;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.exception.DefaultExceptionHandler;
@@ -43,18 +47,16 @@ import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
 
 /**
-  * Most common configuration options for simple steps should be found here. Use
+ * Most common configuration options for simple steps should be found here. Use
  * this factory bean instead of creating a {@link Step} implementation manually.
  * 
  * This factory does not support configuration of fault-tolerant behavior, use
  * appropriate subclass of this factory bean to configure skip or retry.
  * 
- * @see FaultTolerantStepFactoryBean
- * 
  * @author Dave Syer
  * 
  */
-public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
+public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	private static final int DEFAULT_COMMIT_INTERVAL = 1;
 
@@ -69,14 +71,12 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	private ItemWriter<? super S> itemWriter;
 
 	private PlatformTransactionManager transactionManager;
-	
+
 	private TransactionAttribute transactionAttribute;
 
 	private JobRepository jobRepository;
 
 	private boolean singleton = true;
-
-	private Validator jobRepositoryValidator = new TransactionInterceptorValidator(1);
 
 	private ItemStream[] streams = new ItemStream[0];
 
@@ -86,7 +86,9 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 
 	private ItemProcessor<? super T, ? extends S> itemProcessor = new ItemProcessor<T, S>() {
 		@SuppressWarnings("unchecked")
-		public S process(T item) throws Exception {return (S)item;}
+		public S process(T item) throws Exception {
+			return (S) item;
+		}
 	};
 
 	private int commitInterval = 0;
@@ -253,13 +255,13 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	 * @return the transactionAttribute
 	 */
 	protected TransactionAttribute getTransactionAttribute() {
-		return transactionAttribute!=null?transactionAttribute:new DefaultTransactionAttribute(){
+		return transactionAttribute != null ? transactionAttribute : new DefaultTransactionAttribute() {
 
 			@Override
 			public boolean rollbackOn(Throwable ex) {
 				return true;
 			}
-			
+
 		};
 	}
 
@@ -327,7 +329,7 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	protected RepeatOperations getStepOperations() {
 		return stepOperations;
 	}
-	
+
 	/**
 	 * Public setter for the stepOperations.
 	 * @param stepOperations the stepOperations to set
@@ -335,7 +337,7 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 	public void setStepOperations(RepeatOperations stepOperations) {
 		this.stepOperations = stepOperations;
 	}
-	
+
 	/**
 	 * Public setter for the chunkOperations.
 	 * @param chunkOperations the chunkOperations to set
@@ -399,10 +401,9 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 		Assert.notNull(getItemReader(), "ItemReader must be provided");
 		Assert.notNull(getItemWriter(), "ItemWriter must be provided");
 		Assert.notNull(transactionManager, "TransactionManager must be provided");
-		jobRepositoryValidator.validate(jobRepository);
 
 		step.setTransactionManager(transactionManager);
-		if (transactionAttribute!=null) {
+		if (transactionAttribute != null) {
 			step.setTransactionAttribute(transactionAttribute);
 		}
 		step.setJobRepository(jobRepository);
@@ -437,7 +438,12 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 			step.registerStepExecutionListener((StepExecutionListener) itemWriter);
 		}
 
-		StepExecutionListener[] stepListeners = BatchListenerFactoryHelper.getStepListeners(listeners);
+		List<StepExecutionListener> array = BatchListenerFactoryHelper.getListeners(listeners,
+				StepExecutionListener.class);
+		StepExecutionListener[] stepListeners = new StepExecutionListener[array.size()];
+		for (int i = 0; i < stepListeners.length; i++) {
+			stepListeners[i] = array.get(i);
+		}
 		step.setStepExecutionListeners(stepListeners);
 
 		if (chunkOperations == null) {
@@ -464,8 +470,16 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 
 		step.setStepOperations(stepOperations);
 
-		SimpleChunkOrientedTasklet<T,S> tasklet = new SimpleChunkOrientedTasklet<T,S>(itemReader, itemProcessor, itemWriter, chunkOperations);
-		tasklet.setListeners(getListeners());
+		SimpleChunkProcessor<T, S> chunkProcessor = new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemProcessListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemWriteListener.class));
+
+		SimpleChunkProvider<T> chunkProvider = new SimpleChunkProvider<T>(itemReader, chunkOperations);
+		@SuppressWarnings("unchecked")
+		List<ItemReadListener> readListeners = BatchListenerFactoryHelper.<ItemReadListener>getListeners(getListeners(), ItemReadListener.class);
+		chunkProvider.setListeners(readListeners);
+		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
+
 		step.setTasklet(tasklet);
 
 	}
@@ -478,7 +492,7 @@ public class SimpleStepFactoryBean<T,S> implements FactoryBean, BeanNameAware {
 		Assert.state(!(chunkCompletionPolicy != null && commitInterval != 0),
 				"You must specify either a chunkCompletionPolicy or a commitInterval but not both.");
 		Assert.state(commitInterval >= 0, "The commitInterval must be positive or zero (for default value).");
-	
+
 		if (chunkCompletionPolicy != null) {
 			return chunkCompletionPolicy;
 		}

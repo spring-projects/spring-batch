@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.ChunkListener;
-import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.CompositeChunkListener;
 import org.springframework.batch.repeat.RepeatContext;
@@ -79,18 +78,17 @@ abstract class BatchListenerFactoryHelper {
 
 	}
 
-	/**
-	 * @param listeners
-	 */
-	public static StepExecutionListener[] getStepListeners(StepListener[] listeners) {
-		List<StepExecutionListener> list = new ArrayList<StepExecutionListener>();
+	public static <T> List<T> getListeners(StepListener[] listeners, Class<? super T> cls) {
+		List<T> list = new ArrayList<T>();
 		for (int i = 0; i < listeners.length; i++) {
-			StepListener listener = listeners[i];
-			if (listener instanceof StepExecutionListener) {
-				list.add((StepExecutionListener) listener);
+			StepListener stepListener = listeners[i];
+			if (cls.isAssignableFrom(stepListener.getClass())) {
+				@SuppressWarnings("unchecked")
+				T listener = (T) stepListener;
+				list.add(listener);
 			}
 		}
-		return list.toArray(new StepExecutionListener[list.size()]);
+		return list;
 	}
 
 }

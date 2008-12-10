@@ -1,12 +1,14 @@
 package org.springframework.batch.core.step.item;
 
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.easymock.EasyMock.*;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -21,16 +23,11 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.step.JobRepositorySupport;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
-import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.StringUtils;
 
 public class FaultTolerantStepFactoryBeanNonBufferingTests {
@@ -66,7 +63,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		factory.setSkipLimit(2);
 		factory.setIsReaderTransactionalQueue(true);
 
-		JobInstance jobInstance = new JobInstance(1L, new JobParameters(), "skipJob");
+		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "skipJob");
 		jobExecution = new JobExecution(jobInstance);
 	}
 
@@ -77,12 +74,13 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	public void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = createStrictMock(SkipListener.class);
+		skipListener.onSkipInWrite("3", SkipWriterStub.exception);
+		expectLastCall().once();
 		skipListener.onSkipInWrite("4", SkipWriterStub.exception);
 		expectLastCall().once();
 		replay(skipListener);
-		
+
 		factory.setListeners(new SkipListener[] { skipListener });
-		factory.setSkipLimit(1);
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
@@ -90,199 +88,23 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-		assertEquals(1, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
-
-		// only one exception caused rollback, but more than once because it
-		// has to go back and split the chunk up to isolate the failed item
-		assertEquals(2, stepExecution.getRollbackCount());
-
-		assertFalse(writer.written.contains("4"));
-
-		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
-		assertEquals(expectedOutput, writer.written);
-
-		// 5 items + 2 rollbacks re-reading 2 items each time
-		assertEquals(9, stepExecution.getReadCount());
-
-		verify(skipListener);
-	}
-
-	@Test
-	public void testSkipOverLimit() throws Exception {
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("3")));
-		processor.rollback = false;
-
-		factory.setItemProcessor(processor);
-
-		factory.setSkipLimit(1);
-
-		Step step = (Step) factory.getObject();
-
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
-		step.execute(stepExecution);
-
-		assertEquals(1, stepExecution.getSkipCount());
-
-		assertFalse(writer.written.contains("4"));
-
-		// failure on "4" tripped the skip limit so only first chunk was written
-		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2"));
-		assertEquals(expectedOutput, writer.written);
-
-	}
-
-	/**
-	 * Exception in listener causes failure regardless of skip limit.
-	 * @throws Exception
-	 */
-	@Test
-	public void testSkipListenerFailsOnWrite() throws Exception {
-
-		factory.setSkipLimit(7); // some high limit
-		factory.setItemReader(reader);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
-			@Override
-			public void onSkipInWrite(String item, Throwable t) {
-				throw new RuntimeException("oops");
-			}
-		} });
-		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
-
-		Step step = (Step) factory.getObject();
-
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
-		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
-		assertEquals(1, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
-
-	}
-
-	@Test
-	public void testSkipOnWriteNotDoubleCounted() throws Exception {
-
-		writer = new SkipWriterStub(Arrays.asList(StringUtils.commaDelimitedListToStringArray("4,5")));
-
-		factory.setSkipLimit(4);
-		factory.setItemReader(reader);
-		factory.setItemWriter(writer);
-		factory.setCommitInterval(3); // includes all expected skips
-
-		Step step = (Step) factory.getObject();
-
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-
-		step.execute(stepExecution);
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
 		assertEquals(2, stepExecution.getWriteSkipCount());
 
-		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3"));
+		// only one exception caused rollback, and only once in this case
+		// because all items in that chunk were skipped immediately
+		assertEquals(1, stepExecution.getRollbackCount());
+
+		assertFalse(writer.written.contains("4"));
+
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,5"));
 		assertEquals(expectedOutput, writer.written);
 
-	}
+		// 5 items + 1 rollbacks reading 2 items each time
+		assertEquals(7, stepExecution.getReadCount());
 
-	@Test
-	public void testDefaultSkipPolicy() throws Exception {
-		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
-		factory.setSkipLimit(1);
-		List<String> items = Arrays.asList(new String[] { "a", "b", "c" });
-		ItemReader<String> provider = new ListItemReader<String>(TransactionAwareProxyFactory
-				.createTransactionalList(items)) {
-			public String read() {
-				String item = super.read();
-				count++;
-				if ("b".equals(item)) {
-					throw new RuntimeException("Read error - planned failure.");
-				}
-				return item;
-			}
-		};
-		factory.setItemReader(provider);
-		Step step = (Step) factory.getObject();
-
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		step.execute(stepExecution);
-
-		assertEquals(1, stepExecution.getSkipCount());
-		// b is processed once and skipped, plus 1, plus c, plus the null at end
-		assertEquals(4, count);
-	}
-
-	/**
-	 * Scenario: Exception in processor that shouldn't cause rollback
-	 */
-	@Test
-	public void testProcessorNoRollback() throws Exception {
-
-		factory.setTransactionAttribute(new DefaultTransactionAttribute());
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,3")));
-		factory.setItemProcessor(processor);
-
-		final Collection<String> NO_FAILURES = Collections.emptyList();
-		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
-
-		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
-		processor.rollback = false;
-		step.execute(stepExecution);
-		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getRollbackCount());
-
-	}
-
-	/**
-	 * Scenario: Exception in processor that should cause rollback
-	 */
-	@Test
-	public void testProcessorRollback() throws Exception {
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,3")));
-		factory.setItemProcessor(processor);
-
-		final Collection<String> NO_FAILURES = Collections.emptyList();
-		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
-
-		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
-		processor.rollback = true;
-		step.execute(stepExecution);
-		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getRollbackCount());
-	}
-
-	private static class SkipProcessorStub implements ItemProcessor<String, String> {
-
-		private final Collection<String> failures;
-
-		private boolean rollback = false;
-
-		public SkipProcessorStub(Collection<String> failures) {
-			this.failures = failures;
-		}
-
-		public String process(String item) throws Exception {
-			if (failures.contains(item)) {
-				if (rollback) {
-					throw new SkippableRuntimeException("should cause rollback");
-				}
-				else {
-					throw new SkippableException("shouldn't cause rollback");
-				}
-			}
-			return item;
-		}
-
+		verify(skipListener);
 	}
 
 	/**
@@ -299,9 +121,8 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 		private final Collection<String> failures;
 
-		@SuppressWarnings("unchecked")
 		public SkipWriterStub() {
-			this(StringUtils.commaDelimitedListToSet("4"));
+			this(Arrays.asList("4"));
 		}
 
 		/**
@@ -312,6 +133,7 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 		}
 
 		public void write(List<? extends String> items) throws Exception {
+			logger.debug("Writing: " + items);
 			for (String item : items) {
 				if (failures.contains(item)) {
 					logger.debug("Throwing write exception on [" + item + "]");

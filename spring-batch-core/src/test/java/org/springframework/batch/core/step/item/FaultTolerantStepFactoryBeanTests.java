@@ -59,6 +59,8 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	protected int count;
 
+	private Collection<String> NO_FAILURES = Collections.emptyList();
+
 	@Before
 	public void setUp() throws Exception {
 		factory.setBeanName("stepName");
@@ -70,7 +72,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkippableExceptionClasses(skippableExceptions);
 		factory.setSkipLimit(2);
 
-		JobInstance jobInstance = new JobInstance(1L, new JobParameters(), "skipJob");
+		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "skipJob");
 		jobExecution = new JobExecution(jobInstance);
 	}
 
@@ -131,29 +133,94 @@ public class FaultTolerantStepFactoryBeanTests {
 	 * Check items causing errors are skipped as expected.
 	 */
 	@Test
-	public void testSkip() throws Exception {
+	public void testReadSkip() throws Exception {
 
+		writer = new SkipWriterStub(NO_FAILURES);
+		factory.setItemWriter(writer);
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
-		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(1, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
+		System.err.println(writer.written);
 
-		// only write exception caused rollback, but more than once because it
-		// has to go back and split the chunk up to isolate the failed item
-		assertEquals(2, stepExecution.getRollbackCount());
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(1, stepExecution.getReadSkipCount());
+		assertEquals(4, stepExecution.getReadCount());
+		assertEquals(0, stepExecution.getWriteSkipCount());
+		assertEquals(0, stepExecution.getRollbackCount());
 
 		// writer did not skip "2" as it never made it to writer, only "4" did
 		assertTrue(reader.processed.contains("4"));
-		assertFalse(writer.written.contains("4"));
+		assertFalse(reader.processed.contains("2"));
 
-		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,5"));
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3,4,5"));
 		assertEquals(expectedOutput, writer.written);
 
-		assertEquals(4, stepExecution.getReadCount());
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
+	public void testProcessSkip() throws Exception {
+
+		reader = new SkipReaderStub(new String[] { "1", "2", "3", "4", "5" }, NO_FAILURES);
+		factory.setItemReader(reader);
+		writer = new SkipWriterStub(NO_FAILURES);
+		factory.setItemWriter(writer);
+		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(new String[] { "4" }));
+		factory.setItemProcessor(processor);
+		Step step = (Step) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		step.execute(stepExecution);
+
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(5, stepExecution.getReadCount());
+		assertEquals(1, stepExecution.getProcessSkipCount());
+		assertEquals(1, stepExecution.getRollbackCount());
+
+		// writer skips "4"
+		assertTrue(reader.processed.contains("4"));
+		assertFalse(writer.written.contains("4"));
+
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
+		assertEquals(expectedOutput, writer.written);
+
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+	}
+
+	/**
+	 * Check items causing errors are skipped as expected.
+	 */
+	@Test
+	public void testWriteSkip() throws Exception {
+
+		reader = new SkipReaderStub(new String[] { "1", "2", "3", "4", "5" }, NO_FAILURES);
+		factory.setItemReader(reader);
+		Step step = (Step) factory.getObject();
+
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		step.execute(stepExecution);
+
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(5, stepExecution.getReadCount());
+		assertEquals(1, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getRollbackCount());
+
+		// writer skips "4"
+		assertTrue(reader.processed.contains("4"));
+		assertFalse(writer.written.contains("4"));
+
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
+		assertEquals(expectedOutput, writer.written);
+
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
 	}
@@ -172,7 +239,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-		
+
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
@@ -308,8 +375,8 @@ public class FaultTolerantStepFactoryBeanTests {
 	@Test
 	public void testSkipListenerFailsOnWrite() throws Exception {
 
-		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
-				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
+		reader = new SkipReaderStub(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Collections
+				.<String> emptyList());
 
 		factory.setSkipLimit(3);
 		factory.setItemReader(reader);
@@ -328,8 +395,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
-		assertEquals(3, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getReadSkipCount());
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(0, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
 
 	}
@@ -456,8 +523,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	}
 
-	// TODO: test with transactional reader (e.g. list with tx proxy)
-
 	/**
 	 * Scenario: Exception in processor that shouldn't cause rollback
 	 */
@@ -468,7 +533,6 @@ public class FaultTolerantStepFactoryBeanTests {
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
 
-		final Collection<String> NO_FAILURES = Collections.emptyList();
 		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
@@ -491,7 +555,6 @@ public class FaultTolerantStepFactoryBeanTests {
 				.commaDelimitedListToStringArray("1,3")));
 		factory.setItemProcessor(processor);
 
-		final Collection<String> NO_FAILURES = Collections.emptyList();
 		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
@@ -512,16 +575,19 @@ public class FaultTolerantStepFactoryBeanTests {
 				return item;
 			}
 		});
-		final Collection<String> NO_FAILURES = Collections.emptyList();
 		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
 
 		Step step = (Step) factory.getObject();
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
-		// 1,2,3,4,3,4,3,4 - two re-processing attempts until the item is
+
+		assertEquals(1, stepExecution.getSkipCount());
+		assertEquals(2, stepExecution.getRollbackCount());
+
+		// 1,2,3,4,3,4,3 - two re-processing attempts until the item is
 		// identified and skipped
-		assertEquals(8, processed.size());
-		assertEquals("[1, 2, 3, 4, 3, 4, 3, 4]", processed.toString());
+		assertEquals(7, processed.size());
+		assertEquals("[1, 2, 3, 4, 3, 4, 3]", processed.toString());
 
 	}
 
@@ -603,9 +669,8 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		private final Collection<String> failures;
 
-		@SuppressWarnings("unchecked")
 		public SkipWriterStub() {
-			this(StringUtils.commaDelimitedListToSet("4"));
+			this(Arrays.asList("4"));
 		}
 
 		/**
