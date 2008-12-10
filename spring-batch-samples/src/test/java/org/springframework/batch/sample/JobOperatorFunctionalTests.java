@@ -12,9 +12,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.ListableJobRegistry;
 import org.springframework.batch.core.configuration.support.ReferenceJobFactory;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
-import org.springframework.batch.core.launch.NoSuchJobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -26,16 +24,13 @@ public class JobOperatorFunctionalTests {
 	private static final Log logger = LogFactory.getLog(JobOperatorFunctionalTests.class);
 
 	@Autowired
-	JobOperator tested;
+	private JobOperator tested;
 
 	@Autowired
-	JobLauncher launcher;
+	private Job job;
 
 	@Autowired
-	Job job;
-
-	@Autowired
-	ListableJobRegistry jobRegistry;
+	private ListableJobRegistry jobRegistry;
 
 	@Before
 	public void setUp() throws Exception {
@@ -44,7 +39,7 @@ public class JobOperatorFunctionalTests {
 
 	@Test
 	public void testStartStopResumeJob() throws Exception {
-		
+
 		String params = new JobParametersBuilder().addLong("jobOperatorTestParam", 7L).toJobParameters().toString();
 		long executionId = tested.start(job.getName(), params);
 		stopAndCheckStatus(executionId);
@@ -57,16 +52,19 @@ public class JobOperatorFunctionalTests {
 	/**
 	 * @param executionId id of running job execution
 	 */
-	private void stopAndCheckStatus(long executionId) throws InterruptedException, NoSuchJobExecutionException {
+	private void stopAndCheckStatus(long executionId) throws Exception {
+
+		// wait to the job to get up and running
 		Thread.sleep(1000);
 
+		assertTrue(tested.getRunningExecutions(job.getName()).contains(executionId));
 		assertTrue(tested.getSummary(executionId).contains(STARTED.toString()));
 
 		tested.stop(executionId);
 
 		int count = 0;
-		while (!tested.getSummary(executionId).contains(STOPPED.toString()) && count <= 10) {
-			logger.info("Checking for end time in JobExecution: count=" + count);
+		while (tested.getRunningExecutions(job.getName()).contains(executionId) && count <= 10) {
+			logger.info("Checking for running JobExecution: count=" + count);
 			Thread.sleep(100);
 			count++;
 		}
