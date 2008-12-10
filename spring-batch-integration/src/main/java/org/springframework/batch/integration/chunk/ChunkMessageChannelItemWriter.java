@@ -91,7 +91,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		return ExitStatus.FINISHED.addExitDescription("Waited for " + expecting + " results.");
 	}
 
-	public void close(ExecutionContext executionContext) throws ItemStreamException {
+	public void close() throws ItemStreamException {
 		localState.reset();
 	}
 
