@@ -2,6 +2,9 @@ package org.springframework.batch.sample;
 
 import static org.junit.Assert.*;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
@@ -41,11 +44,24 @@ public class JobOperatorFunctionalTests {
 	public void testStartStopResumeJob() throws Exception {
 
 		String params = new JobParametersBuilder().addLong("jobOperatorTestParam", 7L).toJobParameters().toString();
+
 		long executionId = tested.start(job.getName(), params);
+		assertEquals(params, tested.getParameters(executionId));
 		stopAndCheckStatus(executionId);
 
 		long resumedExecutionId = tested.resume(executionId);
+		assertEquals(params, tested.getParameters(resumedExecutionId));
 		stopAndCheckStatus(resumedExecutionId);
+
+		List<Long> instances = tested.getLastInstances(job.getName(), 1);
+		assertEquals(1, instances.size());
+		long instanceId = instances.get(0);
+
+		List<Long> executions = tested.getExecutions(instanceId);
+		assertEquals(2, executions.size());
+		// latest execution is the first in the returned list
+		assertEquals(resumedExecutionId, executions.get(0).longValue());
+		assertEquals(executionId, executions.get(1).longValue());
 
 	}
 
@@ -69,9 +85,13 @@ public class JobOperatorFunctionalTests {
 			count++;
 		}
 
-		String summary = tested.getSummary(executionId);
-		assertFalse("Timed out waiting for job to end.", summary.contains(STARTED.toString()));
-		assertTrue(summary.contains(STOPPED.toString()));
+		assertFalse(tested.getRunningExecutions(job.getName()).contains(executionId));
+		assertTrue(tested.getSummary(executionId).contains(STOPPED.toString()));
+
+		// there is just a single step in the test job
+		Map<Long, String> summaries = tested.getStepExecutionSummaries(executionId);
+		assertEquals(1, summaries.size());
+		assertTrue(summaries.values().toString().contains(STOPPED.toString()));
 	}
 
 }
