@@ -91,6 +91,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 */
 	public JobExecution getJobExecution(Long executionId) {
 		JobExecution jobExecution = jobExecutionDao.getJobExecution(executionId);
+		if (jobExecution==null) {
+			return null;
+		}
 		getJobExecutionDependencies(jobExecution);
 		return jobExecution;
 	}
@@ -100,6 +103,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 */
 	public StepExecution getStepExecution(Long executionId, String stepName) {
 		JobExecution jobExecution = getJobExecution(executionId);
+		if (jobExecution==null) {
+			return null;
+		}
 		return stepExecutionDao.getStepExecution(jobExecution, stepName);
 	}
 

@@ -21,9 +21,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
@@ -55,6 +57,40 @@ public class StepContext extends SynchronizedAttributeAccessor {
 		super();
 		Assert.notNull(stepExecution, "A StepContext must have a non-null StepExecution");
 		this.stepExecution = stepExecution;
+	}
+
+	/**
+	 * Convenient accessor for current step name identifier. Usually this is the
+	 * same as the bean name of the step that is executing (but might not be
+	 * e.g. in a partition).
+	 * 
+	 * @return the step name identifier of the current {@link StepExecution}
+	 */
+	public String getStepName() {
+		return stepExecution.getStepName();
+	}
+
+	/**
+	 * Convenient accessor for current job name identifier.
+	 * 
+	 * @return the job name identifier of the enclosing {@link JobInstance}
+	 * associated with the current {@link StepExecution}
+	 */
+	public String getJobName() {
+		Assert.state(stepExecution.getJobExecution() != null, "StepExecution does not have a JobExecution");
+		Assert.state(stepExecution.getJobExecution().getJobInstance() != null,
+				"StepExecution does not have a JobInstance");
+		return stepExecution.getJobExecution().getJobInstance().getJobName();
+	}
+
+	/**
+	 * Convenient accessor for System properties to make it easy to access them
+	 * from placeholder expressions.
+	 * 
+	 * @return the current System properties
+	 */
+	public Properties getSystemProperties() {
+		return System.getProperties();
 	}
 
 	/**
@@ -136,7 +172,7 @@ public class StepContext extends SynchronizedAttributeAccessor {
 
 		Map<String, Set<Runnable>> copy = Collections.unmodifiableMap(callbacks);
 
-		for(Entry<String, Set<Runnable>> entry : copy.entrySet()) {
+		for (Entry<String, Set<Runnable>> entry : copy.entrySet()) {
 			Set<Runnable> set = entry.getValue();
 			for (Runnable callback : set) {
 				if (callback != null) {

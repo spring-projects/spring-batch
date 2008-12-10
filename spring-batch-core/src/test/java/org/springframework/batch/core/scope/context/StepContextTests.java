@@ -41,7 +41,7 @@ public class StepContextTests {
 
 	private List<String> list = new ArrayList<String>();
 
-	private StepExecution stepExecution = new StepExecution("step", new JobExecution(0L), 1L);
+	private StepExecution stepExecution = new StepExecution("step", new JobExecution(new JobInstance(2L, null, "job"), 0L), 1L);
 
 	private StepContext context = new StepContext(stepExecution);
 
@@ -134,10 +134,26 @@ public class StepContextTests {
 	}
 
 	@Test
+	public void testStepName() throws Exception {
+		assertEquals("step", context.getStepName());
+	}
+
+	@Test
+	public void testJobName() throws Exception {
+		assertEquals("job", context.getJobName());
+	}
+
+	@Test
 	public void testStepExecutionContext() throws Exception {
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
 		executionContext.put("foo", "bar");
 		assertEquals("bar", context.getStepExecutionContext().get("foo"));
+	}
+
+	@Test
+	public void testSystemProperties() throws Exception {
+		System.setProperty("foo", "bar");
+		assertEquals("bar", context.getSystemProperties().getProperty("foo"));
 	}
 
 	@Test
