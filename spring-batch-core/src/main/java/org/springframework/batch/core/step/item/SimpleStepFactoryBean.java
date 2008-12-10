@@ -471,12 +471,11 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		step.setStepOperations(stepOperations);
 
 		SimpleChunkProcessor<T, S> chunkProcessor = new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemProcessListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemWriteListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T,S>>getListeners(getListeners(), ItemProcessListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>>getListeners(getListeners(), ItemWriteListener.class));
 
 		SimpleChunkProvider<T> chunkProvider = new SimpleChunkProvider<T>(itemReader, chunkOperations);
-		@SuppressWarnings("unchecked")
-		List<ItemReadListener> readListeners = BatchListenerFactoryHelper.<ItemReadListener>getListeners(getListeners(), ItemReadListener.class);
+		List<ItemReadListener<T>> readListeners = BatchListenerFactoryHelper.<ItemReadListener<T>>getListeners(getListeners(), ItemReadListener.class);
 		chunkProvider.setListeners(readListeners);
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 

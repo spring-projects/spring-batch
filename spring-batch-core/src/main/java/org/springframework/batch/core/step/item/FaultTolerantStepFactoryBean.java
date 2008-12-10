@@ -10,7 +10,6 @@ import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.step.item.SimpleRetryExceptionHandler;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -265,17 +264,17 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 					getChunkOperations());
 			chunkProvider.setSkipPolicy(readSkipPolicy);
-			chunkProvider.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemReadListener.class));
-			chunkProvider.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), SkipListener.class));
+			chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>>getListeners(getListeners(), ItemReadListener.class));
+			chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T,S>>getListeners(getListeners(), SkipListener.class));
 
 			FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(), getItemWriter(), batchRetryTemplate);
 			chunkProcessor.setBuffering(!isReaderTransactionalQueue);
 			chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 			chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 			chunkProcessor.setRollbackClassifier(rollbackClassifier);
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemProcessListener.class));
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), ItemWriteListener.class));
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.getListeners(getListeners(), SkipListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T,S>>getListeners(getListeners(), ItemProcessListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>>getListeners(getListeners(), ItemWriteListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T,S>>getListeners(getListeners(), SkipListener.class));
 
 			ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 			tasklet.setBuffering(!isReaderTransactionalQueue);
