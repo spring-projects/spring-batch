@@ -31,14 +31,14 @@ import org.springframework.batch.item.file.transform.FieldSet;
  */
 public class PrefixMatchingCompositeFieldSetMapper<T> implements FieldSetMapper<T> {
 
-	private Map<String, FieldSetMapper<T>> mappers = new HashMap<String, FieldSetMapper<T>>();
+	private Map<String, FieldSetMapper<? extends T>> mappers = new HashMap<String, FieldSetMapper<? extends T>>();
 
 	public T mapFieldSet(FieldSet fieldSet) {
 		String prefix = fieldSet.readString("prefix");
 		return this.mappers.get(prefix).mapFieldSet(fieldSet);
 	}
 
-	public void setMappers(Map<String, FieldSetMapper<T>> mappers) {
+	public void setMappers(Map<String, FieldSetMapper<? extends T>> mappers) {
 		this.mappers = mappers;
 	}
 }

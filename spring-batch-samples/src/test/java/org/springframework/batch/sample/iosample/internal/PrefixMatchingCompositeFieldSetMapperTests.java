@@ -39,11 +39,11 @@ public class PrefixMatchingCompositeFieldSetMapperTests {
 
 	@Test
 	public void testMapFieldSet() {
-		Map<String, FieldSetMapper> mappers = new HashMap<String, FieldSetMapper>();
+		Map<String, FieldSetMapper<? extends Object>> mappers = new HashMap<String, FieldSetMapper<? extends Object>>();
 		mappers.put("TRAD", new TradeFieldSetMapper());
 		mappers.put("CUST", new CustomerCreditFieldSetMapper());
 
-		PrefixMatchingCompositeFieldSetMapper mapper = new PrefixMatchingCompositeFieldSetMapper();
+		PrefixMatchingCompositeFieldSetMapper<Object> mapper = new PrefixMatchingCompositeFieldSetMapper<Object>();
 		mapper.setMappers(mappers);
 
 		String[] tradeNames = new String[] { "isin", "quantity", "price", "customer", "prefix" };

@@ -37,12 +37,8 @@ public class MultiLineTradeItemWriterTests {
 		FlatFileItemWriter<String> delegate = new FlatFileItemWriter<String>() {
 			List<String> allItems = new ArrayList<String>();
 
-			public void write(List items) throws Exception {
+			public void write(List<? extends String> items) throws Exception {
 				this.allItems.addAll(items);
-			}
-
-			public List<String> getAllItems() {
-				return this.allItems;
 			}
 		};
 
