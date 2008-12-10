@@ -41,6 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class GracefulShutdownFunctionalTests extends AbstractBatchLauncherTests {
 
 	@Test
+	@Override
 	public void testLaunchJob() throws Exception {
 
 		final JobParameters jobParameters = new JobParametersBuilder().addLong("timestamp", System.currentTimeMillis())
