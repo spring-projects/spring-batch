@@ -22,10 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.orm.hibernate3.HibernateOperations;
 
 /**
@@ -43,11 +41,6 @@ public class HibernateItemWriterTests {
 		writer = new HibernateItemWriter<Object>();
 		ht = createMock("ht", HibernateOperations.class);
 		writer.setHibernateTemplate(ht);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		RepeatSynchronizationManager.clear();
 	}
 
 	/**

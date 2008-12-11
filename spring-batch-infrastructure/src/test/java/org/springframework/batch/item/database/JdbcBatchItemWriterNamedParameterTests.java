@@ -69,11 +69,6 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception {
 		sjt = createMock(SimpleJdbcOperations.class);
@@ -82,16 +77,6 @@ public class JdbcBatchItemWriterNamedParameterTests {
 		writer.setItemSqlParameterSourceProvider(
 				new BeanPropertyItemSqlParameterSourceProvider<Foo>());
 		writer.afterPropertiesSet();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@After
-	public void tearDown() throws Exception {
-		RepeatSynchronizationManager.clear();
 	}
 
 	/**

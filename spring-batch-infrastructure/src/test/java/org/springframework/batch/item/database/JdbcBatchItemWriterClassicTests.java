@@ -24,10 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -49,11 +47,6 @@ public class JdbcBatchItemWriterClassicTests {
 
 	private PreparedStatement ps;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception {
 		ps = createMock(PreparedStatement.class);
@@ -78,15 +71,10 @@ public class JdbcBatchItemWriterClassicTests {
 		writer.afterPropertiesSet();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@After
-	public void tearDown() throws Exception {
-		RepeatSynchronizationManager.clear();
-	}
+//	@After
+//	public void tearDown() throws Exception {
+//		RepeatSynchronizationManager.clear();
+//	}
 
 	/**
 	 * Test method for
