@@ -134,7 +134,8 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	}
 
 	/**
-	 * Check mandatory properties - there must be a delegate.
+	 * Check mandatory properties - there must be a SimpleJdbcTemplate and an SQL statement plus a 
+	 * parameter source.
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(simpleJdbcTemplate, "A DataSource or a SimpleJdbcTemplate is required.");
@@ -166,7 +167,7 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				logger.debug("Executing batch with " + items.size() + " items.");
 			}
 
-			int[] values = null;
+			int[] updateCounts = null;
 			
 			if (usingNamedParameters) {
 				SqlParameterSource[] batchArgs = new SqlParameterSource[items.size()];
@@ -174,10 +175,10 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 				for (T item : items) {
 					batchArgs[i++] = itemSqlParameterSourceProvider.createSqlParameterSource(item);
 				}
-				values = simpleJdbcTemplate.batchUpdate(sql, batchArgs);
+				updateCounts = simpleJdbcTemplate.batchUpdate(sql, batchArgs);
 			}
 			else {
-				values = (int[]) simpleJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
+				updateCounts = (int[]) simpleJdbcTemplate.getJdbcOperations().execute(sql, new PreparedStatementCallback() {
 					public Object doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
 						for (T item : items) {
 							itemPreparedStatementSetter.setValues(item, ps);
@@ -189,10 +190,10 @@ public class JdbcBatchItemWriter<T> implements ItemWriter<T>, InitializingBean {
 			}
 
 			if (assertUpdates) {
-				for (int i = 0; i < values.length; i++) {
-					int value = values[i];
+				for (int i = 0; i < updateCounts.length; i++) {
+					int value = updateCounts[i];
 					if (value == 0) {
-						throw new EmptyResultDataAccessException("Item " + i + " of " + values.length
+						throw new EmptyResultDataAccessException("Item " + i + " of " + updateCounts.length
 								+ " did not update any rows: [" + items.get(i) + "]", 1);
 					}
 				}
