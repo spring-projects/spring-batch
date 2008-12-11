@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +38,8 @@ public class JobOperatorFunctionalTests {
 
 	@Before
 	public void setUp() throws Exception {
-		jobRegistry.register(new ReferenceJobFactory(job));
+		if (!jobRegistry.getJobNames().contains(job.getName()))
+			jobRegistry.register(new ReferenceJobFactory(job));
 	}
 
 	@Test
@@ -92,6 +94,29 @@ public class JobOperatorFunctionalTests {
 		Map<Long, String> summaries = tested.getStepExecutionSummaries(executionId);
 		assertEquals(1, summaries.size());
 		assertTrue(summaries.values().toString().contains(STOPPED.toString()));
+	}
+
+	@Test
+	public void testMultipleSimultaneousInstances() throws Exception {
+		String jobName = job.getName();
+
+		Set<String> names = tested.getJobNames();
+		assertEquals(1, names.size());
+		assertTrue(names.contains(jobName));
+
+		long exec1 = tested.startNextInstance(jobName);
+		long exec2 = tested.startNextInstance(jobName);
+
+		assertTrue(exec1 != exec2);
+		assertTrue(tested.getParameters(exec1) != tested.getParameters(exec2));
+
+		Set<Long> executions = tested.getRunningExecutions(jobName);
+		assertTrue(executions.contains(exec1));
+		assertTrue(executions.contains(exec2));
+
+		tested.stop(exec1);
+		tested.stop(exec2);
+
 	}
 
 }

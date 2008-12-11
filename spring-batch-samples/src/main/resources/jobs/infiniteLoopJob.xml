@@ -17,6 +17,9 @@
 	</bean>
 
 	<bean id="infiniteLoopJob" parent="simpleJob">
+		<property name="jobParametersIncrementer">
+			<bean class="org.springframework.batch.sample.common.InfiniteLoopIncrementer" />	
+		</property>
 		<property name="steps">
 			<!--bean id="step1" parent="taskletStep">
 				<property name="tasklet">
