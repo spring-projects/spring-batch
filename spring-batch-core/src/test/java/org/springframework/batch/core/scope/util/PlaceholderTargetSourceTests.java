@@ -39,6 +39,10 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	private PlaceholderTargetSource withDate;
 
 	@Autowired
+	@Qualifier("withNull")
+	private PlaceholderTargetSource withNull;
+
+	@Autowired
 	@Qualifier("compound")
 	private PlaceholderTargetSource compound;
 
@@ -80,6 +84,10 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 	public Date getDate() {
 		return date;
+	}
+
+	public String getGarbage() {
+		return null;
 	}
 
 	@Test
@@ -141,6 +149,13 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 		Node target = (Node) withDate.getTarget();
 		// Remains unconverted because Spring cannot convert from Date to String
 		assertEquals("bar-#{date}", target.getName());
+	}
+
+	@Test
+	public void testGetNull() {
+		Node target = (Node) withNull.getTarget();
+		// Remains unconverted because null is explicitly excluded
+		assertEquals("bar-#{garbage}", target.getName());
 	}
 
 	public static interface Node {

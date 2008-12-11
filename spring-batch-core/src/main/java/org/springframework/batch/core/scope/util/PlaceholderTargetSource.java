@@ -177,7 +177,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 		BeanWrapper wrapper = new BeanWrapperImpl(contextFactory.getContext());
 		if (wrapper.isReadableProperty(key)) {
 			Object property = wrapper.getPropertyValue(key);
-			if (requiredType.isAssignableFrom(property.getClass())) {
+			if (property==null || requiredType.isAssignableFrom(property.getClass())) {
 				result = property;
 			}
 		}
