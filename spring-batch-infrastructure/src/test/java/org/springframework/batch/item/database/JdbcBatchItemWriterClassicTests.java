@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,8 @@
  */
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.EasyMock.replay;
-import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -27,22 +24,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 /**
  * @author Dave Syer
- * 
+ * @author Thomas Risberg
  */
-public class BatchSqlUpdateItemWriterTests extends TestCase {
+public class JdbcBatchItemWriterClassicTests {
 
-	private BatchSqlUpdateItemWriter<String> writer = new BatchSqlUpdateItemWriter<String>();
+	private JdbcBatchItemWriter<String> writer = new JdbcBatchItemWriter<String>();
 
 	private JdbcTemplate jdbcTemplate;
 
@@ -55,7 +54,8 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		ps = createMock(PreparedStatement.class);
 		jdbcTemplate = new JdbcTemplate() {
 			public Object execute(String sql, PreparedStatementCallback action) throws DataAccessException {
@@ -69,12 +69,13 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 			}
 		};
 		writer.setSql("SQL");
-		writer.setJdbcTemplate(jdbcTemplate);
+		writer.setSimpleJdbcTemplate(new SimpleJdbcTemplate(jdbcTemplate));
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
 			public void setValues(String item, PreparedStatement ps) throws SQLException {
 				list.add(item);
 			}
 		});
+		writer.afterPropertiesSet();
 	}
 
 	/*
@@ -82,27 +83,60 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 	 * 
 	 * @see junit.framework.TestCase#tearDown()
 	 */
-	protected void tearDown() throws Exception {
+	@After
+	public void tearDown() throws Exception {
 		RepeatSynchronizationManager.clear();
 	}
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.item.database.BatchSqlUpdateItemWriter#afterPropertiesSet()}
+	 * {@link org.springframework.batch.item.database.JdbcBatchItemWriter#afterPropertiesSet()}
 	 * .
 	 * @throws Exception
 	 */
+	@Test
 	public void testAfterPropertiesSet() throws Exception {
+		writer = new JdbcBatchItemWriter<String>();
 		try {
 			writer.afterPropertiesSet();
+			fail("Expected IllegalArgumentException");
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Message does not contain 'SimpleJdbcTemplate'.", message.indexOf("SimpleJdbcTemplate") >= 0);
+		}
+		writer.setSimpleJdbcTemplate(new SimpleJdbcTemplate(jdbcTemplate));
+		try {
+			writer.afterPropertiesSet();
+			fail("Expected IllegalArgumentException");
 		}
 		catch (IllegalArgumentException e) {
 			// expected
 			String message = e.getMessage().toLowerCase();
-			assertTrue("Message does not contain 'query'.", message.indexOf("query") >= 0);
+			assertTrue("Message does not contain 'sql'.", message.indexOf("sql") >= 0);
 		}
+		writer.setSql("select * from foo where id = ?");
+		try {
+			writer.afterPropertiesSet();
+			fail("Expected IllegalArgumentException");
+		}
+		catch (IllegalArgumentException e) {
+			// expected
+			String message = e.getMessage();
+			assertTrue("Message does not contain 'ItemPreparedStatementSetter'.", message.indexOf("ItemPreparedStatementSetter") >= 0);
+		}
+		writer.setItemPreparedStatementSetter(
+				new ItemPreparedStatementSetter<String>() {
+					public void setValues(String item, PreparedStatement ps)
+							throws SQLException {
+					}
+					
+				});
+		writer.afterPropertiesSet();
 	}
 
+	@Test
 	public void testWriteAndFlush() throws Exception {
 		ps.addBatch();
 		expectLastCall();
@@ -113,6 +147,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		assertTrue(list.contains("SQL"));
 	}
 
+	@Test
 	public void testWriteAndFlushWithEmptyUpdate() throws Exception {
 		ps.addBatch();
 		expectLastCall();
@@ -131,6 +166,7 @@ public class BatchSqlUpdateItemWriterTests extends TestCase {
 		assertTrue(list.contains("SQL"));
 	}
 
+	@Test
 	public void testWriteAndFlushWithFailure() throws Exception {
 		final RuntimeException ex = new RuntimeException("bar");
 		writer.setItemPreparedStatementSetter(new ItemPreparedStatementSetter<String>() {
