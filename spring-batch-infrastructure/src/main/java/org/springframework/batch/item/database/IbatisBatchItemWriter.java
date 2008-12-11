@@ -25,7 +25,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.orm.ibatis.SqlMapClientCallback;
-import org.springframework.orm.ibatis.SqlMapClientOperations;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 import org.springframework.util.Assert;
 
@@ -82,9 +81,9 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	}
 
 	/**
-	 * Public setter for the {@link SqlMapClientOperations}.
+	 * Public setter for the {@link SqlMapClientTemplate}.
 	 * 
-	 * @param sqlMapClientTemplate the SqlMapClientOperations
+	 * @param sqlMapClientTemplate the SqlMapClientTemplate
 	 */
 	public void setSqlMapClientTemplate(SqlMapClientTemplate sqlMapClientTemplate) {
 		this.sqlMapClientTemplate = sqlMapClientTemplate;
@@ -101,7 +100,7 @@ public class IbatisBatchItemWriter<T> implements ItemWriter<T>, InitializingBean
 	}
 
 	/**
-	 * Check mandatory properties - there must be an SqlMapCLient and a statementId.
+	 * Check mandatory properties - there must be an SqlMapClient and a statementId.
 	 */
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(sqlMapClientTemplate, "A SqlMapClient or a SqlMapClientTemplate is required.");

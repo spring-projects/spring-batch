@@ -23,10 +23,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.orm.ibatis.SqlMapClientTemplate;
 
@@ -83,7 +81,7 @@ public class IbatisBatchItemWriterTests {
 			if (this.bar.equals(compare.getBar())) {
 				return true;
 			}
-			return super.equals(obj);
+			return false;
 		}
 
 		@Override
@@ -93,11 +91,6 @@ public class IbatisBatchItemWriterTests {
 		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception {
 		smc = createMock(SqlMapClient.class);
@@ -106,16 +99,6 @@ public class IbatisBatchItemWriterTests {
 		writer.setStatementId(statementId);
 		writer.setSqlMapClientTemplate(smct);
 		writer.afterPropertiesSet();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#tearDown()
-	 */
-	@After
-	public void tearDown() throws Exception {
-		RepeatSynchronizationManager.clear();
 	}
 
 	/**
