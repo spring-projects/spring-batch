@@ -38,7 +38,7 @@ public class SystemCommandTaskletIntegrationTests {
 		tasklet.setEnvironmentParams(null); // inherit from parent process
 		tasklet.setWorkingDirectory(null); // inherit from parent process
 		tasklet.setSystemProcessExitCodeMapper(new TestExitCodeMapper());
-		tasklet.setTimeout(2000); // long enough timeout
+		tasklet.setTimeout(5000); // long enough timeout
 		tasklet.setTerminationCheckInterval(500);
 		tasklet.setCommand("invalid command, change value for successful execution");
 		tasklet.setInterruptOnCancel(true);
