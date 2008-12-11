@@ -22,8 +22,8 @@
 		</property>
 	</bean>
 
-	<bean id="itemWriter" class="org.springframework.batch.item.database.BatchSqlUpdateItemWriter">
-		<property name="jdbcTemplate" ref="jdbcTemplate" />
+	<bean id="itemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+		<property name="dataSource" ref="dataSource" />
 		<property name="sql">
 			<util:constant static-field="org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdatePreparedStatementSetter.QUERY"/>
 		</property>

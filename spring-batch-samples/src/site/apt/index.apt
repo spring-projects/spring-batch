@@ -135,10 +135,10 @@ Spring Batch Samples
 * Batch Update ({batchUpdate})
 
   The purpose of this sample is to show to usage of the
-  <<<BatchSqlUpdateItemWriter>>> to make efficient updates to a
+  <<<JdbcBatchItemWriter>>> to make efficient updates to a
   database table.
 
-  The <<<BatchSqlUpdateItemWriter>>> accepts a special form of
+  The <<<JdbcBatchItemWriter>>> accepts a special form of
   <<<PreparedStatementSetter>>> as a (mandatory) dependency.  This is
   responsible for copying fields from the item to be written to a
   <<<PreparedStatement>>> matching the SQL query that has been
