@@ -24,6 +24,9 @@
 				<streams>
 					<stream ref="reader"/>
 				</streams>
+				<skippable-exception-classes>
+					org.springframework.dao.DataIntegrityViolationException,
+				</skippable-exception-classes>
 			</item-task>
 		</step>
 	</job>

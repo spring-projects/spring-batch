@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Step;
-import org.springframework.batch.core.job.flow.support.StateTransition;
-import org.springframework.batch.core.job.flow.support.state.EndState;
-import org.springframework.batch.core.job.flow.support.state.StepState;
-import org.springframework.batch.core.listener.StepListenerFactoryBean;
-import org.springframework.batch.core.listener.StepListenerMetaData;
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -39,12 +31,13 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
- * references a bean definition for a {@link Step} and goes on to (optionally)
+ * references a bean definition for a {@link org.springframework.batch.core.Step} and goes on to (optionally)
  * list a set of transitions from that step to others with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
@@ -64,12 +57,13 @@ public class StepParser {
 	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for {@link StateTransition}
+	 * @return a collection of bean definitions for {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
 
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
+		BeanDefinitionBuilder stateBuilder = 
+			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
 		String stepRef = element.getAttribute("name");
 
 		@SuppressWarnings("unchecked")
@@ -91,7 +85,7 @@ public class StepParser {
 				stateBuilder.addConstructorArgValue(stateDef);
 		}
 		else {
-			throw new BeanCreationException("Error creating Step for " + element);
+			parserContext.getReaderContext().error("Incomplete configuration detected while creating step with name " + stepRef, element);
 		}
 		return getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
@@ -101,7 +95,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @param stateDef
 	 * @param element
-	 * @return a collection of {@link StateTransition} references
+	 * @return a collection of {@link org.springframework.batch.core.job.flow.support.StateTransition} references
 	 */
 	public static Collection<RuntimeBeanReference> getNextElements(ParserContext parserContext,
 			BeanDefinition stateDef, Element element) {
@@ -127,19 +121,20 @@ public class StepParser {
 			String onAttribute = nextElement.getAttribute("on");
 			String nextAttribute = nextElement.getAttribute("to");
 			if (hasNextAttribute && onAttribute.equals("*")) {
-				throw new BeanCreationException("Duplicate transition pattern found for '*' "
-						+ "(only specify one of next= attribute at step level and next element with on='*')");
+				parserContext.getReaderContext().error("Duplicate transition pattern found for '*' "
+						+ "(only specify one of next= attribute at step level and next element with on='*')",
+						element);
 			}
 
 			String name = nextElement.getNodeName();
 			if ("stop".equals(name) || "end".equals(name)) {
 
 				String statusName = nextElement.getAttribute("status");
-				BatchStatus status = StringUtils.hasText(statusName) ? BatchStatus.valueOf(statusName)
-						: BatchStatus.STOPPED;
+				String status = StringUtils.hasText(statusName) ? statusName : "STOPPED";
 				String nextOnEnd = StringUtils.hasText(statusName) ? null : nextAttribute;
 
-				BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder.genericBeanDefinition(EndState.class);
+				BeanDefinitionBuilder endBuilder = 
+					BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
 				endBuilder.addConstructorArgValue(status);
 				String endName = "end" + endCounter;
 				endCounter++;
@@ -164,12 +159,13 @@ public class StepParser {
 	 * @param stateDefinition a reference to the state implementation
 	 * @param on the pattern value
 	 * @param next the next step id
-	 * @return a bean definition for a {@link StateTransition}
+	 * @return a bean definition for a {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 */
 	public static RuntimeBeanReference getStateTransitionReference(ParserContext parserContext,
 			BeanDefinition stateDefinition, String on, String next) {
 
-		BeanDefinitionBuilder nextBuilder = BeanDefinitionBuilder.genericBeanDefinition(StateTransition.class);
+		BeanDefinitionBuilder nextBuilder = 
+			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.StateTransition");
 		nextBuilder.addConstructorArgValue(stateDefinition);
 
 		if (StringUtils.hasText(on)) {
@@ -236,9 +232,6 @@ public class StepParser {
     	
     	boolean isFaultTolerant = false;
 
-    	// TODO determine if step should be fault-tolerant
-		// String faultTolerant = element.getAttribute("fault-tolerant");
-		
         String skipLimit = element.getAttribute("skip-limit");
         if (!isFaultTolerant) {
         	isFaultTolerant = checkIntValueForFaultToleranceNeeded(skipLimit);
@@ -329,11 +322,11 @@ public class StepParser {
         	}
         }
 
-        handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses", isFaultTolerant);
+        handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses", isFaultTolerant, parserContext);
         
-        handleExceptionElement(element, bd, "retryable-exception-classes", "retryableExceptionClasses", isFaultTolerant);
+        handleExceptionElement(element, bd, "retryable-exception-classes", "retryableExceptionClasses", isFaultTolerant, parserContext);
         
-        handleExceptionElement(element, bd, "fatal-exception-classes", "fatalExceptionClasses", isFaultTolerant);
+        handleExceptionElement(element, bd, "fatal-exception-classes", "fatalExceptionClasses", isFaultTolerant, parserContext);
 
         handleListenersElement(element, bd, parserContext, "listeners");
         
@@ -370,18 +363,21 @@ public class StepParser {
 	}
 
 	private void handleExceptionElement(Element element, RootBeanDefinition bd, 
-			String subElementName, String propertyName, boolean isFaultTolerant) {
+			String subElementName, String propertyName, boolean isFaultTolerant, ParserContext parserContext) {
 		String exceptions = 
         	DomUtils.getChildElementValueByTagName(element, subElementName);
         if (StringUtils.hasLength(exceptions)) {
-        	if (!isFaultTolerant) {
-				throw new BeanCreationException(subElementName + " can only be specified if fault-tolerant is set to \"true\"");
+        	if (isFaultTolerant) {
+		        String[] exceptionArray = StringUtils.tokenizeToStringArray(
+		        		StringUtils.delete(exceptions, ","), "\n");
+		        if (exceptionArray.length > 0) {
+		        	bd.getPropertyValues().addPropertyValue(propertyName, exceptionArray);
+		        }
         	}
-	        String[] exceptionArray = StringUtils.tokenizeToStringArray(
-	        		StringUtils.delete(exceptions, ","), "\n");
-	        if (exceptionArray.length > 0) {
-	        	bd.getPropertyValues().addPropertyValue(propertyName, exceptionArray);
-	        }
+        	else {
+				parserContext.getReaderContext().error(subElementName + " can only be specified for fault-tolerant " +
+						"configurations providing skip-limit, retry-limit or cache-capacity", element);
+        	}
         }
 	}
 
@@ -433,8 +429,10 @@ public class StepParser {
 						}
 						attributes.append(attributeNodes.item(i));
 					}
-					throw new BeanCreationException("Both 'id' or 'ref' plus 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-							listenerElement.getTagName() + "> element with attributes: " + attributes);
+					parserContext.getReaderContext().error("Both 'ref' and " +
+							(StringUtils.hasText(id) ? "'id'" : "'class'") +
+							" specified; use 'class' with an optional 'id' or just 'ref' for <" + 
+							listenerElement.getTagName() + "> element specified with attributes: " + attributes, element);
 				}
 				if (StringUtils.hasText(listenerRef)) {
 			        BeanReference bean = new RuntimeBeanReference(listenerRef);
@@ -450,7 +448,7 @@ public class StepParser {
 					beans.add(bean);
 				}
 				else {
-					throw new BeanCreationException("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element");
+					parserContext.getReaderContext().error("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element", element);
 				}
 			}
 		}
@@ -463,7 +461,8 @@ public class StepParser {
 			DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
 			for (Element listenerElement : listenerElements) {
-				BeanDefinitionBuilder listenerBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepListenerFactoryBean.class);
+				BeanDefinitionBuilder listenerBuilder = 
+					BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.listener.StepListenerFactoryBean");
 				String id = listenerElement.getAttribute("id");
 				String listenerRef = listenerElement.getAttribute("ref");
 				String className = listenerElement.getAttribute("class");
@@ -477,8 +476,10 @@ public class StepParser {
 						}
 						attributes.append(attributeNodes.item(i));
 					}
-					throw new BeanCreationException("Both 'id' or 'ref' plus 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-							listenerElement.getTagName() + "> element with attributes: " + attributes);
+					parserContext.getReaderContext().error("Both 'ref' and " +
+							(StringUtils.hasText(id) ? "'id'" : "'class'") +
+							" specified; use 'class' with an optional 'id' or just 'ref' for <" + 
+							listenerElement.getTagName() + "> element specified with attributes: " + attributes, element);
 				}
 				if (StringUtils.hasText(listenerRef)) {
 			        listenerBuilder.addPropertyReference("delegate", listenerRef);
@@ -490,16 +491,26 @@ public class StepParser {
 					listenerBuilder.addPropertyReference("delegate", delegateId);
 				}
 				else {
-					throw new BeanCreationException("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element");
+					parserContext.getReaderContext().error("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element", element);
 				}
 				
 				ManagedMap metaDataMap = new ManagedMap();
-				for(StepListenerMetaData metaData: StepListenerMetaData.values()){
-					String listenerMethod = listenerElement.getAttribute(metaData.getPropertyName());
-					if(StringUtils.hasText(listenerMethod)){
-						metaDataMap.put(metaData.getPropertyName(), listenerMethod);
-					}
-				}
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-step-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-step-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-chunk-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-chunk-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-read-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-read-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-read-error-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-process-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-process-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-process-error-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-write-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-write-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-write-error-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-skip-in-read-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-skip-in-process-method");
+				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-skip-in-write-method");
 				listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
 				
 				AbstractBeanDefinition beanDef = listenerBuilder.getBeanDefinition();
@@ -514,6 +525,14 @@ public class StepParser {
 	}
 
 	@SuppressWarnings("unchecked")
+	private void checkForProvidedMetaDataProperty(Element listenerElement, ManagedMap metaDataMap, String metaDataPropertyName) {
+		String listenerMethod = listenerElement.getAttribute(metaDataPropertyName);
+		if(StringUtils.hasText(listenerMethod)){
+			metaDataMap.put(metaDataPropertyName, listenerMethod);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
 	private void handleStreamsElement(Element element, RootBeanDefinition bd, ParserContext parserContext) {
 		Element streamsElement = 
         	DomUtils.getChildElementByTagName(element, "streams");
@@ -522,14 +541,14 @@ public class StepParser {
 			List<Element> streamElements = 
 	        	DomUtils.getChildElementsByTagName(streamsElement, "stream");
 			if (streamElements != null) {
-				for (Element listenerElement : streamElements) {
-					String listenerRef = listenerElement.getAttribute("ref");
-					if (StringUtils.hasText(listenerRef)) {
-				        BeanReference bean = new RuntimeBeanReference(listenerRef);
+				for (Element streamElement : streamElements) {
+					String streamRef = streamElement.getAttribute("ref");
+					if (StringUtils.hasText(streamRef)) {
+				        BeanReference bean = new RuntimeBeanReference(streamRef);
 						streamBeans.add(bean);
 					}
 					else {
-						throw new BeanCreationException("ref not specified for <" + listenerElement.getTagName() + "> element");
+						parserContext.getReaderContext().error("ref not specified for <" + streamElement.getTagName() + "> element", element);
 					}
 				}
 			}

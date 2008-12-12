@@ -73,8 +73,8 @@ public class NextAttributeJobParserTests {
 		}
 		catch (BeanDefinitionStoreException e) {
 			// expected
-			String message = e.getCause().getMessage();
-			assertTrue("Wrong message; " + message, message.startsWith("Duplicate transition pattern"));
+			String message = e.getMessage();
+			assertTrue("Wrong message; " + message, message.contains("Duplicate transition pattern"));
 		}
 	}
 
