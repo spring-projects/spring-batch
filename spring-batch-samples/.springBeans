@@ -39,6 +39,16 @@
 		<config>src/main/resources/jobs/headerFooterSample.xml</config>
 		<config>src/main/resources/jobs/customerFilterJob.xml</config>
 		<config>src/main/resources/skipSample-job-launcher-context.xml</config>
+		<config>src/main/resources/jobs/ioSampleJob.xml</config>
+		<config>src/main/resources/jobs/multiResourceJob.xml</config>
+		<config>src/main/resources/jobs/xmlStaxJob.xml</config>
+		<config>src/main/resources/jobs/iosample/delimited.xml</config>
+		<config>src/main/resources/jobs/iosample/fixedLength.xml</config>
+		<config>src/main/resources/jobs/iosample/jdbcCursor.xml</config>
+		<config>src/main/resources/jobs/iosample/multiLine.xml</config>
+		<config>src/main/resources/jobs/iosample/multiRecordType.xml</config>
+		<config>src/main/resources/jobs/iosample/multiResource.xml</config>
+		<config>src/main/resources/jobs/iosample/xml.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
