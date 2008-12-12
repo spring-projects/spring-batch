@@ -21,8 +21,6 @@ import static org.springframework.util.StringUtils.hasText;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -35,11 +33,12 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * {@link BeanDefinitionParser} for {@link JobExecutionListener}s
+ * {@link BeanDefinitionParser} for {@link org.springframework.batch.core.JobExecutionListener}s
  * 
  * @author Lucas Ward
  *
@@ -52,7 +51,8 @@ public class JobExecutionListenerParser {
 		List<BeanReference> listeners = new ArrayList<BeanReference>();
 		List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "listener");
  		for(Element listenerElement : listenerElements){
-			BeanDefinitionBuilder listenerBuilder = BeanDefinitionBuilder.genericBeanDefinition(JobListenerFactoryBean.class);
+			BeanDefinitionBuilder listenerBuilder = 
+				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.listener.JobListenerFactoryBean");
 			String id = listenerElement.getAttribute("id");
 			String listenerRef = listenerElement.getAttribute("ref");
 			String className = listenerElement.getAttribute("class");

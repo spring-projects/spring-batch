@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.batch.core.job.flow.support.StateTransition;
-import org.springframework.batch.core.job.flow.support.state.JobExecutionDecider;
-import org.springframework.batch.core.job.flow.support.state.SplitState;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
+
 import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;split/&gt; elements inside a job. A split element
- * references a bean definition for a {@link JobExecutionDecider} and goes on to
+ * references a bean definition for a 
+ * {@link org.springframework.batch.core.job.flow.support.state.JobExecutionDecider} and goes on to
  * list a set of transitions to other states with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
@@ -48,7 +47,8 @@ public class SplitParser {
 	 * 
 	 * @param element the &lt;split/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for {@link StateTransition}
+	 * @return a collection of bean definitions for 
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
@@ -58,7 +58,8 @@ public class SplitParser {
 		@SuppressWarnings("unchecked")
 		List<Element> flowElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "flow");
 
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(SplitState.class);
+		BeanDefinitionBuilder stateBuilder = 
+			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.SplitState");
 
 		Collection<BeanDefinition> flows = new ArrayList<BeanDefinition>();
 		FlowParser flowParser = new FlowParser();

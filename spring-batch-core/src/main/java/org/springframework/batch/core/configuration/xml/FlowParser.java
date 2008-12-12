@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.job.flow.Flow;
-import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
+
 import org.w3c.dom.Element;
 
 /**
@@ -38,7 +37,7 @@ public class FlowParser {
 	 * @param element the top level element containing a flow definition
 	 * @param parserContext the {@link ParserContext}
 	 * @param flowName the name of the flow
-	 * @return a bean definition for a {@link Flow}
+	 * @return a bean definition for a {@link org.springframework.batch.core.job.flow.Flow}
 	 */
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext, String flowName) {
 		List<RuntimeBeanReference> stateTransitions = new ArrayList<RuntimeBeanReference>();
@@ -64,7 +63,8 @@ public class FlowParser {
 			stateTransitions.addAll(splitParser.parse(stepElement, parserContext));
 		}
 
-		BeanDefinitionBuilder flowBuilder = BeanDefinitionBuilder.genericBeanDefinition(SimpleFlow.class);
+		BeanDefinitionBuilder flowBuilder = 
+			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.SimpleFlow");
 		flowBuilder.addConstructorArgValue(flowName );
 		ManagedList managedList = new ManagedList();
 		@SuppressWarnings( { "unchecked", "unused" })

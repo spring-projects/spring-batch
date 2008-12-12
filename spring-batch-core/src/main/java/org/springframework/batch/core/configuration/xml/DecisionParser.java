@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2008 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,17 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 
-import org.springframework.batch.core.job.flow.support.StateTransition;
-import org.springframework.batch.core.job.flow.support.state.DecisionState;
-import org.springframework.batch.core.job.flow.support.state.JobExecutionDecider;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+
 import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;decision/&gt; elements inside a job. A decision
- * element references a bean definition for a {@link JobExecutionDecider} and
- * goes on to list a set of transitions to other states with &lt;next
+ * element references a bean definition for a 
+ * {@link org.springframework.batch.core.job.flow.support.state.JobExecutionDecider} 
+ * and goes on to list a set of transitions to other states with &lt;next
  * on="pattern" to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
  * @see JobParser
@@ -43,7 +42,8 @@ public class DecisionParser {
 	 * 
 	 * @param element the &lt;decision/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for {@link StateTransition}
+	 * @return a collection of bean definitions for 
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
 	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
@@ -51,7 +51,8 @@ public class DecisionParser {
 		String refAttribute = element.getAttribute("decider");
 		String idAttribute = element.getAttribute("id");
 
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(DecisionState.class);
+		BeanDefinitionBuilder stateBuilder = 
+			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
 		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
 		stateBuilder.addConstructorArgValue(idAttribute);
 		return StepParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
