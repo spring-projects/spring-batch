@@ -322,11 +322,11 @@ public class StepParser {
         	}
         }
 
-        handleExceptionElement(element, bd, "skippable-exception-classes", "skippableExceptionClasses", isFaultTolerant, parserContext);
+        handleExceptionElement(element, parserContext, bd, "skippable-exception-classes", "skippableExceptionClasses", isFaultTolerant);
         
-        handleExceptionElement(element, bd, "retryable-exception-classes", "retryableExceptionClasses", isFaultTolerant, parserContext);
+        handleExceptionElement(element, parserContext, bd, "retryable-exception-classes", "retryableExceptionClasses", isFaultTolerant);
         
-        handleExceptionElement(element, bd, "fatal-exception-classes", "fatalExceptionClasses", isFaultTolerant, parserContext);
+        handleExceptionElement(element, parserContext, bd, "fatal-exception-classes", "fatalExceptionClasses", isFaultTolerant);
 
         handleListenersElement(element, bd, parserContext, "listeners");
         
@@ -362,8 +362,8 @@ public class StepParser {
 		return false;
 	}
 
-	private void handleExceptionElement(Element element, RootBeanDefinition bd, 
-			String subElementName, String propertyName, boolean isFaultTolerant, ParserContext parserContext) {
+	private void handleExceptionElement(Element element, ParserContext parserContext, RootBeanDefinition bd, 
+			String subElementName, String propertyName, boolean isFaultTolerant) {
 		String exceptions = 
         	DomUtils.getChildElementValueByTagName(element, subElementName);
         if (StringUtils.hasLength(exceptions)) {
@@ -495,22 +495,30 @@ public class StepParser {
 				}
 				
 				ManagedMap metaDataMap = new ManagedMap();
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-step-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-step-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-chunk-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-chunk-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-read-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-read-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-read-error-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-process-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-process-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-process-error-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "before-write-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "after-write-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-write-error-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-skip-in-read-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-skip-in-process-method");
-				checkForProvidedMetaDataProperty(listenerElement, metaDataMap, "on-skip-in-write-method");
+				String[] methodNameAttributes = new String[] {
+						"before-step-method",
+						"after-step-method",
+						"before-chunk-method",
+						"after-chunk-method",
+						"before-read-method",
+						"after-read-method",
+						"on-read-error-method",
+						"before-process-method",
+						"after-process-method",
+						"on-process-error-method",
+						"before-write-method",
+						"after-write-method",
+						"on-write-error-method",
+						"on-skip-in-read-method",
+						"on-skip-in-process-method",
+						"on-skip-in-write-method"
+				};
+				for (String metaDataPropertyName : methodNameAttributes) {
+					String listenerMethod = listenerElement.getAttribute(metaDataPropertyName);
+					if(StringUtils.hasText(listenerMethod)){
+						metaDataMap.put(metaDataPropertyName, listenerMethod);
+					}
+				}
 				listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
 				
 				AbstractBeanDefinition beanDef = listenerBuilder.getBeanDefinition();
@@ -521,14 +529,6 @@ public class StepParser {
 		        BeanReference bean = new RuntimeBeanReference(id);
 				beans.add(bean);
 			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void checkForProvidedMetaDataProperty(Element listenerElement, ManagedMap metaDataMap, String metaDataPropertyName) {
-		String listenerMethod = listenerElement.getAttribute(metaDataPropertyName);
-		if(StringUtils.hasText(listenerMethod)){
-			metaDataMap.put(metaDataPropertyName, listenerMethod);
 		}
 	}
 
