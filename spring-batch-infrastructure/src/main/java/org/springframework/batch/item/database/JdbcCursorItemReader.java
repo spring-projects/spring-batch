@@ -33,7 +33,6 @@ import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStre
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -80,7 +79,13 @@ import org.springframework.util.ClassUtils;
  * transaction is rolled back, the current row can be moved back to the same row
  * number as it was on when commit was called.
  * </p>
- * 
+ *
+ * <p>
+ * NOTE that the cursor is opened using a separate connection from the rest of the
+ * processing in the step. This means that this reader also runs within its own
+ * JDBC transaction.
+ * </p>
+ *
  * <p>
  * Calling close on this {@link ItemStream} will cause all resources it is
  * currently using to be freed. (Connection, ResultSet, etc). It is then illegal
@@ -134,9 +139,7 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 
 	private boolean driverSupportsAbsolute = false;
 
-    private boolean participateInExistingTransaction = false;
-
-    public JdbcCursorItemReader() {
+	public JdbcCursorItemReader() {
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
@@ -173,13 +176,9 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		try {
-            if (participateInExistingTransaction) {
-                this.con = DataSourceUtils.getConnection(dataSource);
-            }
-            else {
-                this.con = dataSource.getConnection();
-            }
-            preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+			// Note: this is a connection that is separate from the current transaction
+			this.con = dataSource.getConnection();
+			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(preparedStatement);
 			if (this.preparedStatementSetter != null) {
@@ -386,19 +385,6 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 	public void setDriverSupportsAbsolute(boolean driverSupportsAbsolute) {
 		this.driverSupportsAbsolute = driverSupportsAbsolute;
 	}
-
-    /**
-     * Indicate whether the cursor should be opened as part of an existing transaction or if it
-     * should be opened in its own transaction. The default is for the cursor to be opened in its
-     * own transaction. If you set this flag to true then you should wrap the DataSource in a
-     * {@link org.springframework.jdbc.datasource.SingleConnectionDataSource} to prevent the
-     * connection from being closed after each commit.
-     *
-     * @param participateInExistingTransaction <code>false</code> by default
-     */
-    public void setParticipateInExistingTransaction(boolean participateInExistingTransaction) {
-        this.participateInExistingTransaction = participateInExistingTransaction;
-    }
 
 	/**
 	 * Check the result set is in synch with the currentRow attribute. This is
