@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
+
+	<description>
+	<![CDATA[Sample showing usage of CompositeItemWriter.
+		Note that when two writers of the same class are used simultaneously 
+		they need to be distinguished using the 'name' property 
+		(see the two FlatFileItemWriters used in this example).]]>
+	</description>
 
 	<bean id="compositeItemWriterJob" parent="simpleJob">
 		<property name="steps">
@@ -15,15 +20,17 @@
 				<property name="streams">
 					<list>
 						<ref bean="fileItemReader" />
-						<ref bean="fileItemWriter" />
+						<ref bean="fileItemWriter1" />
+						<ref bean="fileItemWriter2" />
 					</list>
 				</property>
 				<property name="itemReader" ref="fileItemReader" />
 				<property name="itemProcessor">
-					<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+					<bean
+						class="org.springframework.batch.item.validator.ValidatingItemProcessor">
 						<constructor-arg ref="fixedValidator" />
 					</bean>
-				</property>	
+				</property>
 				<property name="itemWriter" ref="compositeWriter" />
 			</bean>
 		</property>
@@ -39,13 +46,13 @@
 					class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
 					<property name="dao" ref="tradeDao" />
 				</bean>
-				<ref bean="fileItemWriter" />
+				<ref bean="fileItemWriter1" />
+				<ref bean="fileItemWriter2" />
 			</list>
 		</property>
 	</bean>
 
-	<bean id="fileItemReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
+	<bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<property name="lineMapper">
@@ -65,8 +72,7 @@
 	<bean id="fixedValidator"
 		class="org.springframework.batch.item.validator.SpringValidator">
 		<property name="validator">
-			<bean id="tradeValidator"
-				class="org.springmodules.validation.valang.ValangValidator">
+			<bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
 				<property name="valang">
 					<value>
 						<![CDATA[
@@ -90,15 +96,24 @@
 	</bean>
 
 	<bean class="org.springframework.batch.item.file.FlatFileItemWriter"
-		id="fileItemWriter">
-		<property name="resource"
-			value="file:target/test-outputs/20070122.testStream.ParallelCustomerReportStep.TEMP.txt" />
+		id="fileItemWriter1">
+		<property name="name" value="fw1" />
+		<property name="resource" value="file:target/test-outputs/CustomerReport1.txt" />
 		<property name="lineAggregator">
 			<bean
 				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 		</property>
 	</bean>
 
+	<bean class="org.springframework.batch.item.file.FlatFileItemWriter"
+		id="fileItemWriter2">
+		<property name="name" value="fw2" />
+		<property name="resource" value="file:target/test-outputs/CustomerReport2.txt" />
+		<property name="lineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
+		</property>
+	</bean>
 	<bean id="fieldSetMapper"
 		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 

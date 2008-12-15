@@ -33,16 +33,21 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  */
 public class TransactionAwareBufferedWriter extends Writer {
 
-	private static final String BUFFER_KEY = TransactionAwareBufferedWriter.class.getName() + ".BUFFER_KEY";
+	private static final String BUFFER_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".BUFFER_KEY";
+
+	private String bufferKey;
 
 	private Writer writer;
 
 	/**
-	 * @param writer
+	 * @param writer actually writes to output
+	 * @param name used to identify the transactional buffer used by this
+	 * instance
 	 */
-	public TransactionAwareBufferedWriter(Writer writer) {
+	public TransactionAwareBufferedWriter(Writer writer, String name) {
 		super();
 		this.writer = writer;
+		this.bufferKey = BUFFER_KEY_PREFIX + "." + name;
 	}
 
 	/**
@@ -50,14 +55,14 @@ public class TransactionAwareBufferedWriter extends Writer {
 	 */
 	private StringBuffer getCurrentBuffer() {
 
-		if (!TransactionSynchronizationManager.hasResource(BUFFER_KEY)) {
+		if (!TransactionSynchronizationManager.hasResource(bufferKey)) {
 
-			TransactionSynchronizationManager.bindResource(BUFFER_KEY, new StringBuffer());
+			TransactionSynchronizationManager.bindResource(bufferKey, new StringBuffer());
 
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
 				@Override
 				public void afterCompletion(int status) {
-					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(BUFFER_KEY);
+					StringBuffer buffer = (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
 					if (status == STATUS_COMMITTED) {
 						try {
 							writer.write(buffer.toString());
@@ -67,14 +72,14 @@ public class TransactionAwareBufferedWriter extends Writer {
 							throw new FlushFailedException("Could not write to output buffer", e);
 						}
 					}
-					TransactionSynchronizationManager.unbindResource(BUFFER_KEY);
+					TransactionSynchronizationManager.unbindResource(bufferKey);
 				}
 			});
 
 		}
-		
-		return (StringBuffer) TransactionSynchronizationManager.getResource(BUFFER_KEY);
-		
+
+		return (StringBuffer) TransactionSynchronizationManager.getResource(bufferKey);
+
 	}
 
 	/**
@@ -84,7 +89,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 		return TransactionSynchronizationManager.isActualTransactionActive();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.Writer#close()
 	 */
 	@Override
@@ -92,7 +99,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 		writer.close();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.Writer#flush()
 	 */
 	@Override
@@ -102,7 +111,9 @@ public class TransactionAwareBufferedWriter extends Writer {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.Writer#write(char[], int, int)
 	 */
 	@Override
@@ -115,7 +126,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 		StringBuffer buffer = getCurrentBuffer();
 		buffer.append(cbuf, off, len);
-		
+
 	}
 
 }

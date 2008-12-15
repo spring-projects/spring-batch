@@ -300,7 +300,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		try {
 			delegateEventWriter = outputFactory.createXMLEventWriter(new TransactionAwareBufferedWriter(
-					new OutputStreamWriter(os, encoding)));
+					new OutputStreamWriter(os, encoding), getName()));
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);

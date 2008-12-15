@@ -37,7 +37,7 @@ public class TransactionAwareBufferedWriterTests {
 
 	private Writer stringWriter = new StringWriter();
 
-	private TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(stringWriter);
+	private TransactionAwareBufferedWriter writer = new TransactionAwareBufferedWriter(stringWriter, "someName");
 
 	private PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
 
@@ -80,7 +80,7 @@ public class TransactionAwareBufferedWriterTests {
 			public void write(char[] cbuf, int off, int len) throws IOException {
 			}
 		};
-		writer = new TransactionAwareBufferedWriter(mock);
+		writer = new TransactionAwareBufferedWriter(mock, "someName");
 		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus status) {
 				try {

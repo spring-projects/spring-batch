@@ -30,6 +30,14 @@ public class ExecutionContextUserSupport {
 	private String name;
 
 	/**
+	 * @return name used to uniquely identify this instance's entries in shared
+	 * context.
+	 */
+	protected String getName() {
+		return this.name;
+	}
+
+	/**
 	 * @param name unique name for the item stream used to create execution
 	 * context keys.
 	 */

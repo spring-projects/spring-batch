@@ -450,7 +450,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		private Writer getBufferedWriter(FileChannel fileChannel, String encoding) {
 			try {
 				TransactionAwareBufferedWriter outputBufferedWriter = new TransactionAwareBufferedWriter(Channels
-						.newWriter(fileChannel, encoding));
+						.newWriter(fileChannel, encoding), getName());
 				return outputBufferedWriter;
 			}
 			catch (UnsupportedCharsetException ucse) {
