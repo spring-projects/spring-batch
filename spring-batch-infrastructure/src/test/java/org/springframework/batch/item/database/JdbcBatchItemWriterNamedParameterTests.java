@@ -22,10 +22,8 @@ import java.util.Collections;
 
 import org.easymock.EasyMock;
 import org.easymock.IArgumentMatcher;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
