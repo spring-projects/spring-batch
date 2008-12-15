@@ -33,6 +33,7 @@ import org.springframework.batch.item.support.AbstractBufferedItemReaderItemStre
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -170,7 +171,7 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		try {
-			this.con = dataSource.getConnection();
+			this.con = DataSourceUtils.getConnection(dataSource);
 			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(preparedStatement);
