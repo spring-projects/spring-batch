@@ -35,6 +35,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
@@ -144,7 +145,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	 * not set.
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(dataSource, "DataSOurce must be provided");
+		Assert.notNull(dataSource, "DataSource must be provided");
 		Assert.notNull(sql, "The SQL query must be provided");
 		Assert.notNull(mapper, "RowMapper must be provided");
 	}
@@ -170,7 +171,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		try {
-			this.con = dataSource.getConnection();
+			this.con = DataSourceUtils.getConnection(dataSource);
 			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(preparedStatement);
