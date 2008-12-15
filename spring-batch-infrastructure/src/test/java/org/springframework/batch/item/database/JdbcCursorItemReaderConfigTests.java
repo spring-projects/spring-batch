@@ -26,6 +26,14 @@ public class JdbcCursorItemReaderConfigTests {
 	 */
 	@Test
 	public void testUsesCurrentTransaction() throws Exception {
+
+	}
+	
+	/*
+	 * Should fail if trying to call getConnection() twice
+	 */
+	@Test
+	public void testUsesItsOwnTransaction() throws Exception {
 		
 		DataSource ds = createMock(DataSource.class);
 		Connection con = createMock(Connection.class);
@@ -33,6 +41,7 @@ public class JdbcCursorItemReaderConfigTests {
 		PreparedStatement ps = createMock(PreparedStatement.class);
 		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 				ResultSet.HOLD_CURSORS_OVER_COMMIT)).andReturn(ps);
+		expect(ds.getConnection()).andReturn(con);
 		expect(ds.getConnection()).andReturn(con);
 		con.commit();
 		replay(con);
