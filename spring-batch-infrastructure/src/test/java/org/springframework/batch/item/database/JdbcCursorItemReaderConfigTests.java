@@ -18,10 +18,17 @@ import java.sql.ResultSet;
 
 public class JdbcCursorItemReaderConfigTests extends TestCase {
 
+    /*
+     * Should fail if trying to call getConnection() twice
+     */
+    public void testUsesCurrentTransaction() throws Exception {
+        //TODO:
+    }
+
 	/*
-	 * Should fail if trying to call getConnection() twice
+	 * Should not fail if trying to call getConnection() twice
 	 */
-	public void testUsesCurrentTransaction() throws Exception {
+	public void testUsesItsOwnTransaction() throws Exception {
 		MockControl ctrlDataSource;
 		DataSource mockDataSource;
 		MockControl ctrlConnection;
@@ -59,6 +66,8 @@ public class JdbcCursorItemReaderConfigTests extends TestCase {
 		mockDataSource = (DataSource) ctrlDataSource.getMock();
 		mockDataSource.getConnection();
 		ctrlDataSource.setReturnValue(mockConnection);
+        mockDataSource.getConnection();
+        ctrlDataSource.setReturnValue(mockConnection);
 
 		ctrlResultSet.replay();
 		ctrlDataSource.replay();

@@ -134,7 +134,9 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 
 	private boolean driverSupportsAbsolute = false;
 
-	public JdbcCursorItemReader() {
+    private boolean participateInExistingTransaction = false;
+
+    public JdbcCursorItemReader() {
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
 	}
 
@@ -171,8 +173,13 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		try {
-			this.con = DataSourceUtils.getConnection(dataSource);
-			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+            if (participateInExistingTransaction) {
+                this.con = DataSourceUtils.getConnection(dataSource);
+            }
+            else {
+                this.con = dataSource.getConnection();
+            }
+            preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(preparedStatement);
 			if (this.preparedStatementSetter != null) {
@@ -379,6 +386,19 @@ public class JdbcCursorItemReader extends AbstractBufferedItemReaderItemStream i
 	public void setDriverSupportsAbsolute(boolean driverSupportsAbsolute) {
 		this.driverSupportsAbsolute = driverSupportsAbsolute;
 	}
+
+    /**
+     * Indicate whether the cursor should be opened as part of an existing transaction or if it
+     * should be opened in its own transaction. The default is for the cursor to be opened in its
+     * own transaction. If you set this flag to true then you should wrap the DataSource in a
+     * {@link org.springframework.jdbc.datasource.SingleConnectionDataSource} to prevent the
+     * connection from being closed after each commit.
+     *
+     * @param participateInExistingTransaction <code>false</code> by default
+     */
+    public void setParticipateInExistingTransaction(boolean participateInExistingTransaction) {
+        this.participateInExistingTransaction = participateInExistingTransaction;
+    }
 
 	/**
 	 * Check the result set is in synch with the currentRow attribute. This is
