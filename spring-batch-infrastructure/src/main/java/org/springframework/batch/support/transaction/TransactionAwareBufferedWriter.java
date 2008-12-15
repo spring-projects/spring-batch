@@ -35,7 +35,7 @@ public class TransactionAwareBufferedWriter extends Writer {
 
 	private static final String BUFFER_KEY_PREFIX = TransactionAwareBufferedWriter.class.getName() + ".BUFFER_KEY";
 
-	private String bufferKey;
+	private final String bufferKey;
 
 	private Writer writer;
 
