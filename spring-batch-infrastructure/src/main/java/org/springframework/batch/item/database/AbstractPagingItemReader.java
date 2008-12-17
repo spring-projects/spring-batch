@@ -111,7 +111,9 @@ public abstract class AbstractPagingItemReader<T> extends AbstractItemCountingIt
 	protected void doClose() throws Exception {
 
 		initialized = false;
-
+		current = 0;
+		page = 0;
+		results = null;
 	}
 
 

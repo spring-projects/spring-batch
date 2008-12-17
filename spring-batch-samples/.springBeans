@@ -18,7 +18,6 @@
 		<config>src/main/resources/jobs/adhocLoopJob.xml</config>
 		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
 		<config>src/main/resources/data-source-context-init.xml</config>
-		<config>src/main/resources/jobs/ibatisJob.xml</config>
 		<config>src/main/resources/jobs/footballJob.xml</config>
 		<config>src/main/resources/jobs/delegatingJob.xml</config>
 		<config>src/main/resources/jobs/parallelJob.xml</config>
@@ -108,7 +107,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/jobs/ibatisJob.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>

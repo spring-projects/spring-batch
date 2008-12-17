@@ -13,6 +13,10 @@
     select ID from CUSTOMER
   </select>
   
+  <select id="getAllCustomerCredits" resultMap="result">
+ 	select ID, NAME, CREDIT from CUSTOMER 
+  </select>
+  
   <select id="getCustomerCreditById" parameterClass="int" resultMap="result">
   	select NAME, CREDIT from CUSTOMER where ID = #value#
   </select>
