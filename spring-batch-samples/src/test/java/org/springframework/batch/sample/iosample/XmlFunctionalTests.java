@@ -16,13 +16,12 @@
 
 package org.springframework.batch.sample.iosample;
 
-import java.io.FileReader;
-
-import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.AbstractJobTests;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.xml.StaxEventItemReader;
+import org.springframework.batch.sample.domain.trade.CustomerCredit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -33,18 +32,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
 		"/jobs/iosample/xml.xml" })
-public class XmlFunctionalTests extends AbstractJobTests {
+public class XmlFunctionalTests extends AbstractIoSampleTests {
 
-	private static final String OUTPUT_FILE = "target/test-outputs/output.xml";
-	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/input.xml";
-
-	/**
-	 * Output should be the same as input
-	 */
-	@Test
-	public void testJob() throws Exception {
-		this.launchJob();
-		XMLUnit.setIgnoreWhitespace(true);
-		XMLAssert.assertXMLEqual(new FileReader(INPUT_FILE), new FileReader(OUTPUT_FILE));
+	@Autowired
+	private Resource outputResource;
+	
+	@Override
+	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
+		StaxEventItemReader<?> xmlReader = (StaxEventItemReader<?>) reader;
+		xmlReader.setResource(outputResource);
 	}
+
+	
 }

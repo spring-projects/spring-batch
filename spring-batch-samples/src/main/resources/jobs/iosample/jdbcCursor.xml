@@ -19,16 +19,13 @@
 		</property>
 	</bean>
 
-	<bean id="itemWriter" class="org.springframework.batch.sample.iosample.internal.TradeCustomerItemWriter">
-		<property name="dao">
-			<bean class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao" p:dataSource-ref="dataSource">
-				<property name="incrementer">
-					<bean parent="incrementerParent">
-						<property name="incrementerName" value="TRADE_SEQ" />
-					</bean>
-				</property>
-			</bean>
+	<bean id="itemWriter" class="org.springframework.batch.item.database.JdbcBatchItemWriter">
+		<property name="assertUpdates" value="true" />
+		<property name="itemSqlParameterSourceProvider">
+			<bean class="org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider" />
 		</property>
+		<property name="sql" value="UPDATE customer set credit = :credit where id = :id" />
+		<property name="dataSource" ref="dataSource" />
 	</bean>
 
 </beans>

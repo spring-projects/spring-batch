@@ -16,18 +16,11 @@
 
 package org.springframework.batch.sample.iosample;
 
-import static org.junit.Assert.assertEquals;
-
-import javax.sql.DataSource;
-
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.AbstractJobTests;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 
 /**
  * @author Dan Garrette
@@ -36,28 +29,11 @@ import org.springframework.test.jdbc.SimpleJdbcTestUtils;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
 		"/jobs/iosample/jdbcCursor.xml" })
-public class JdbcCursorFunctionalTests extends AbstractJobTests {
+public class JdbcCursorFunctionalTests extends AbstractIoSampleTests {
 
-	private SimpleJdbcTemplate simpleJdbcTemplate;
-
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+	@Override
+	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
+		// no-op
 	}
 
-	/**
-	 * Output should be the same as input
-	 */
-	@Test
-	public void testJob() throws Exception {
-		this.simpleJdbcTemplate.update("delete from TRADE");
-
-		this.launchJob();
-
-		assertEquals(4, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "TRADE"));
-		for (int i = 1; i <= 4; i++) {
-			String sql = "select count(*) from TRADE where CUSTOMER = ?";
-			assertEquals(1, simpleJdbcTemplate.queryForInt(sql, "customer" + i));
-		}
-	}
 }

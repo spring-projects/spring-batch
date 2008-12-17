@@ -16,11 +16,12 @@
 
 package org.springframework.batch.sample.iosample;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.AbstractJobTests;
-import org.springframework.batch.test.AssertFile;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.file.MultiResourceItemReader;
+import org.springframework.batch.sample.domain.trade.CustomerCredit;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -31,18 +32,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
 		"/jobs/iosample/multiResource.xml" })
-public class MultiResourceFunctionalTests extends AbstractJobTests {
+public class MultiResourceFunctionalTests extends AbstractIoSampleTests {
 
-	/**
-	 * Output should be the same as input
-	 */
-	@Test
-	public void testJob() throws Exception {
-		this.launchJob();
+	@Override
+	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
+		MultiResourceItemReader<?> multiReader = (MultiResourceItemReader<?>) reader;
+		multiReader.setResources(new Resource[] {
+				new FileSystemResource("target/test-outputs/multiResourceOutput.csv.1"),
+				new FileSystemResource("target/test-outputs/multiResourceOutput.csv.2") });
 
-		AssertFile.assertFileEquals(new FileSystemResource("target/test-outputs/multiResourceOutput.csv.1"),
-				new FileSystemResource("src/main/resources/data/iosample/input/delimited.csv"));
-		AssertFile.assertFileEquals(new FileSystemResource("target/test-outputs/multiResourceOutput.csv.2"),
-				new FileSystemResource("src/main/resources/data/iosample/input/delimited2.csv"));
 	}
+
 }

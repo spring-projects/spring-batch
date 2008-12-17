@@ -12,7 +12,7 @@ import org.springframework.batch.sample.domain.trade.CustomerCredit;
  */
 public class CustomerCreditIncreaseProcessor implements ItemProcessor<CustomerCredit, CustomerCredit> {
 	
-	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("1000");
+	public static final BigDecimal FIXED_AMOUNT = new BigDecimal("5");
 
 	public CustomerCredit process(CustomerCredit item) throws Exception {
 		return item.increaseCreditBy(FIXED_AMOUNT);

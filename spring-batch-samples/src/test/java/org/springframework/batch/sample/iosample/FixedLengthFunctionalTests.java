@@ -16,28 +16,26 @@
 
 package org.springframework.batch.sample.iosample;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.test.AbstractJobTests;
-import org.springframework.batch.test.AssertFile;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.sample.domain.trade.CustomerCredit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
 		"/jobs/iosample/fixedLength.xml" })
-public class FixedLengthFunctionalTests extends AbstractJobTests {
+public class FixedLengthFunctionalTests extends AbstractIoSampleTests {
 
-	private static final String OUTPUT_FILE = "target/test-outputs/fixedLengthOutput.txt";
-	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/fixedLength.txt";
+	@Autowired
+	private Resource outputResource;
 
-	/**
-	 * Output should be the same as input
-	 */
-	@Test
-	public void testJob() throws Exception {
-		this.launchJob();
-		AssertFile.assertFileEquals(new FileSystemResource(OUTPUT_FILE), new FileSystemResource(INPUT_FILE));
+	@Override
+	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
+		FlatFileItemReader<?> fileReader = (FlatFileItemReader<?>) reader;
+		fileReader.setResource(outputResource);
 	}
 }

@@ -29,11 +29,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @since 2.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/ioSampleJob.xml",
-		"/jobs/iosample/multiRecordType.xml" })
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/iosample/multiRecordType.xml" })
 public class MultiRecordTypeFunctionalTests extends AbstractJobTests {
 
 	private static final String OUTPUT_FILE = "target/test-outputs/multiRecordTypeOutput.txt";
+
 	private static final String INPUT_FILE = "src/main/resources/data/iosample/input/multiRecordType.txt";
 
 	/**

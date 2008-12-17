@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -16,29 +14,41 @@
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
-					<bean class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-						<property name="columns" value="1-12,13-15,16-21,22-30"/>
+					<bean
+						class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+						<property name="names" value="name,credit" />
+						<property name="columns" value="1-9,10-11" />
 					</bean>
 				</property>
 				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper"/>
+					<bean
+						class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper">
+						<property name="targetType"
+							value="org.springframework.batch.sample.domain.trade.CustomerCredit" />
+					</bean>
 				</property>
 			</bean>
 		</property>
 	</bean>
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource" value="file:target/test-outputs/fixedLengthOutput.txt" />
+		<property name="resource" ref="outputResource" />
 		<property name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
+			<bean
+				class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
 				<property name="fieldExtractor">
-					<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
-						<property name="names" value="isin,quantity,price,customer"/>
+					<bean
+						class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+						<property name="names" value="name,credit" />
 					</bean>
 				</property>
-				<property name="format" value="%-12s%-3d%6s%-9s"/>
+				<property name="format" value="%-9s%-2.0f" />
 			</bean>
 		</property>
+	</bean>
+	
+	<bean id="outputResource" class="org.springframework.core.io.FileSystemResource">
+		<constructor-arg value="target/test-outputs/fixedLengthOutput.txt" />	
 	</bean>
 
 </beans>
