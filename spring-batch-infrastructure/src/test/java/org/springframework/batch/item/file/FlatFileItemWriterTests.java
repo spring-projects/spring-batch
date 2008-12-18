@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +42,6 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -254,8 +254,9 @@ public class FlatFileItemWriterTests {
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
-		Assert.state(file.exists(), "Test file must exist");
-		Assert.state(file.getFile().setReadOnly(), "Test file set to read-only");
+		assertTrue("Test file must exist: "+file, file.exists());
+		assertTrue("Test file set to read-only: "+file, file.getFile().setReadOnly());
+		assertFalse("Should be readonly file: "+file, file.getFile().canWrite());
 		writer.afterPropertiesSet();
 		try {
 			writer.open(executionContext);
@@ -414,7 +415,7 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
-	/**
+	/*
 	 * Nothing gets written to file if line aggregation fails.
 	 */
 	public void testLineAggregatorFailure() throws Exception {
@@ -444,7 +445,7 @@ public class FlatFileItemWriterTests {
 		catch (RuntimeException expected) {
 			assertEquals("aggregation failed on 2", expected.getMessage());
 		}
-		
+
 		// nothing was written to output
 		assertNull(readLine());
 	}
