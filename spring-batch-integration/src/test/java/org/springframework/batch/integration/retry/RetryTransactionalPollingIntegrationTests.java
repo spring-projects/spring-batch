@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -16,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.Lifecycle;
-import org.springframework.integration.annotation.ChannelAdapter;
 import org.springframework.integration.annotation.MessageEndpoint;
-import org.springframework.integration.annotation.Poller;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,7 +30,7 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private List<String> list = new ArrayList<String>();
+	private static List<String> list = new ArrayList<String>();
 
 	@Autowired
 	private SimpleRecoverer recoverer;
@@ -45,10 +44,14 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		bus = (Lifecycle) applicationContext;
 	}
 
-	private volatile int count = 0;
+	private static volatile int count = 0;
 
-	@ChannelAdapter("requests")
-	@Poller(interval=10, transactionManager="transactionManager")
+	@Before
+	public void clearLists() {
+		list.clear();
+		count = 0;
+	}
+
 	public String input() {
 		logger.debug("Polling: " + count);
 		if (list.isEmpty()) {
@@ -57,7 +60,6 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 		return list.remove(0);
 	}
 
-	@ChannelAdapter("replies")
 	public void output(String message) {	
 		count++;
 		logger.debug("Handled: " + message);		
@@ -86,7 +88,7 @@ public class RetryTransactionalPollingIntegrationTests implements ApplicationCon
 				.commaDelimitedListToStringArray("a,b,fail,fail,d,e")));
 		service.setExpected(expected);
 		waitForResults(bus, expected.size(), 60);
-		waitForResults(bus, 6, 100); // (a,b), (fail), (fail), ([fail],d), (e,f)
+		waitForResults(bus, 6, 100); // a, b, (fail, fail, [fail]), d, e
 		assertEquals(6,service.getProcessed().size()); // a,b,fail,fail,d,e
 		assertEquals(1,recoverer.getRecovered().size()); // fail
 		assertEquals(expected, service.getProcessed());

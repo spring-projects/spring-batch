@@ -63,6 +63,10 @@
 			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.log4j</groupId>
+			<artifactId>com.springsource.org.apache.log4j</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>com.springsource.org.aspectj.runtime
 			</artifactId>
@@ -126,6 +130,6 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<spring.integration.version>1.0.0.RC2</spring.integration.version>
+		<spring.integration.version>1.0.1.RELEASE</spring.integration.version>
 	</properties>
 </project>

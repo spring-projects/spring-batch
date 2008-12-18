@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
@@ -16,9 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.Lifecycle;
-import org.springframework.integration.annotation.ChannelAdapter;
 import org.springframework.integration.annotation.MessageEndpoint;
-import org.springframework.integration.annotation.Poller;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -31,7 +30,7 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private List<String> list = new ArrayList<String>();
+	private static List<String> list = new ArrayList<String>();
 
 	@Autowired
 	private SimpleRecoverer recoverer;
@@ -45,10 +44,14 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 		bus = (Lifecycle) applicationContext;
 	}
 
-	private volatile int count = 0;
+	private static volatile int count = 0;
 	
-	@ChannelAdapter("requests")
-	@Poller(interval=10,adviceChain={"txAdvice","repeatAdvice"})
+	@Before
+	public void clearLists() {
+		list.clear();
+		count = 0;
+	}
+
 	public String input() {
 		logger.debug("Polling: " + count);
 		if (list.isEmpty()) {
@@ -57,7 +60,6 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 		return list.remove(0);
 	}
 
-	@ChannelAdapter("replies")
 	public void output(String message) {	
 		count++;
 		logger.debug("Handled: " + message);		

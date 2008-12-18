@@ -10,7 +10,30 @@
                                  http://www.springframework.org/schema/integration/spring-integration-1.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-	<import resource="TransactionalPollingIntegrationTests-context.xml"/>
+	<integration:annotation-config />
+
+	<integration:channel id="requests" />
+	<integration:channel id="replies" />
+
+	<integration:inbound-channel-adapter
+		ref="testCase" method="input" channel="requests">
+		<integration:poller>
+			<integration:interval-trigger interval="10" />
+			<integration:advice-chain>
+				<ref bean="txAdvice"/>
+				<ref bean="repeatAdvice"/>
+			</integration:advice-chain>
+		</integration:poller>
+	</integration:inbound-channel-adapter>
+	<integration:outbound-channel-adapter
+		ref="testCase" method="output" channel="replies" />
+
+	<bean id="testCase"
+		class="org.springframework.batch.integration.retry.RetryRepeatTransactionalPollingIntegrationTests" />
+
+	<bean id="transactionManager"
+		class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
 	<tx:advice id="txAdvice">
 		<tx:attributes>
 			<tx:method name="*" />
