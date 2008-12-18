@@ -46,6 +46,7 @@
 		<config>src/main/resources/jobs/iosample/xml.xml</config>
 		<config>src/main/resources/jobs/iosample/hibernate.xml</config>
 		<config>src/main/resources/jobs/hibernateJob.xml</config>
+		<config>src/main/resources/jobs/iosample/jpa.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -424,6 +425,19 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/iosample/multiRecordType.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[iosample-jpa]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/iosample/jpa.xml</config>
+				<config>src/main/resources/jobs/ioSampleJob.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
