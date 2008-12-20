@@ -130,6 +130,6 @@
 		</dependency>
 	</dependencies>
 	<properties>
-		<spring.integration.version>1.0.1.RELEASE</spring.integration.version>
+		<spring.integration.version>1.0.2.BUILD-SNAPSHOT</spring.integration.version>
 	</properties>
 </project>

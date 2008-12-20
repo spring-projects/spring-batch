@@ -17,7 +17,7 @@
 
 	<integration:inbound-channel-adapter
 		ref="testCase" method="input" channel="requests">
-		<integration:poller>
+		<integration:poller max-messages-per-poll="1">
 			<integration:interval-trigger interval="10" />
 			<integration:transactional />
 		</integration:poller>
