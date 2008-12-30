@@ -12,9 +12,9 @@ import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.AttributeAccessor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
@@ -66,7 +66,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	 * Execute system command and map its exit code to {@link ExitStatus} using
 	 * {@link SystemProcessExitCodeMapper}.
 	 */
-	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		FutureTask<Integer> systemCommandTask = new FutureTask<Integer>(new Callable<Integer>() {
 

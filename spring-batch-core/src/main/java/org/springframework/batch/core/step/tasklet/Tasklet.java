@@ -16,8 +16,8 @@
 package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.AttributeAccessor;
 
 /**
  * Strategy for processing in a step.
@@ -35,11 +35,11 @@ public interface Tasklet {
 	 * 
 	 * @param contribution mutable state to be passed back to update the current
 	 * step execution
-	 * @param attributes attributes shared between invocations but not between
+	 * @param chunkContext attributes shared between invocations but not between
 	 * restarts
 	 * @return an {@link RepeatStatus} indicating whether processing is
 	 * continuable.
 	 */
-	RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception;
+	RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception;
 
 }

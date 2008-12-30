@@ -17,9 +17,9 @@ package org.springframework.batch.core.step.tasklet;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.adapter.AbstractMethodInvokingDelegator;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.AttributeAccessor;
 
 /**
  * A {@link Tasklet} that wraps a method in a POJO. By default the return
@@ -40,9 +40,9 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 	 * an {@link ExitStatus} by invoking a method in the delegate POJO. Ignores
 	 * the {@link StepContribution} and the attributes.
 	 * 
-	 * @see Tasklet#execute(StepContribution, AttributeAccessor)
+	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
-	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		contribution.setExitStatus(mapResult(invokeDelegateMethod()));
 		return RepeatStatus.FINISHED;
 	}

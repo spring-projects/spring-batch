@@ -24,8 +24,7 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.repeat.context.RepeatContextSupport;
-import org.springframework.core.AttributeAccessor;
+import org.springframework.batch.core.scope.context.ChunkContext;
 
 /**
  * @author Dave Syer
@@ -33,7 +32,7 @@ import org.springframework.core.AttributeAccessor;
  */
 public class ChunkOrientedTaskletTests {
 
-	private AttributeAccessor context = new RepeatContextSupport(null);
+	private ChunkContext context = new ChunkContext(null);
 
 	@Test
 	public void testHandle() throws Exception {

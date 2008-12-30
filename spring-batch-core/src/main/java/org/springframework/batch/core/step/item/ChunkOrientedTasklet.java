@@ -2,9 +2,9 @@ package org.springframework.batch.core.step.item;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.AttributeAccessor;
 
 /**
  * A {@link Tasklet} implementing variations on read-process-write item
@@ -41,20 +41,21 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		this.buffering = buffering;
 	}
 
-	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		@SuppressWarnings("unchecked")
-		Chunk<I> inputs = (Chunk<I>) attributes.getAttribute(INPUTS_KEY);
+		Chunk<I> inputs = (Chunk<I>) chunkContext.getAttribute(INPUTS_KEY);
 		if (inputs == null) {
 			inputs = chunkProvider.provide(contribution);
 			if (buffering) {
-				attributes.setAttribute(INPUTS_KEY, inputs);
+				chunkContext.setAttribute(INPUTS_KEY, inputs);
 			}
 		}
 
 		chunkProcessor.process(contribution, inputs);
 
-		attributes.removeAttribute(INPUTS_KEY);
+		chunkContext.removeAttribute(INPUTS_KEY);
+		chunkContext.setComplete();
 		chunkProvider.postProcess(contribution, inputs);
 		if (!inputs.isEnd()) {
 			contribution.setExitStatus(ExitStatus.FINISHED);

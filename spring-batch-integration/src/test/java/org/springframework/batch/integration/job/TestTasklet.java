@@ -17,9 +17,9 @@ package org.springframework.batch.integration.job;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.core.AttributeAccessor;
 
 /**
  * @author Dave Syer
@@ -31,7 +31,7 @@ public class TestTasklet implements Tasklet {
 	 * (non-Javadoc)
 	 * 
 	 */
-	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		contribution.setExitStatus(ExitStatus.FINISHED);
 		return RepeatStatus.FINISHED;
 	}

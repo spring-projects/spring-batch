@@ -26,6 +26,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ExecutionContext;
@@ -34,7 +35,6 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.core.AttributeAccessor;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
@@ -127,7 +127,7 @@ public class TaskletStepExceptionTests {
 		} });
 		taskletStep.setTasklet(new Tasklet() {
 
-			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
 
@@ -139,7 +139,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	/**
+	/*
 	 * Exception in afterStep is ignored (only logged).
 	 */
 	public void testAfterStepFAilure() throws Exception {
@@ -189,7 +189,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.setTasklet(new Tasklet() {
 
-			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+			public RepeatStatus execute(StepContribution contribution, ChunkContext attributes) throws Exception {
 				return RepeatStatus.FINISHED;
 			}
 
@@ -207,6 +207,7 @@ public class TaskletStepExceptionTests {
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setJobRepository(new UpdateCountingJobRepository() {
 			boolean firstCall = true;
+
 			@Override
 			public void update(StepExecution arg0) {
 				if (firstCall) {
@@ -216,7 +217,7 @@ public class TaskletStepExceptionTests {
 				throw exception;
 			}
 		});
-		
+
 		taskletStep.execute(stepExecution);
 		assertEquals(UNKNOWN, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
@@ -225,7 +226,7 @@ public class TaskletStepExceptionTests {
 
 	private static class ExceptionTasklet implements Tasklet {
 
-		public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+		public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 			throw taskletException;
 		}
 	}

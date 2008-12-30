@@ -19,9 +19,9 @@ import java.util.concurrent.Callable;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.AttributeAccessor;
 import org.springframework.util.Assert;
 
 /**
@@ -55,9 +55,9 @@ public class CallableTaskletAdapter implements Tasklet, InitializingBean {
 	/**
 	 * Execute the provided Callable and return its {@link ExitStatus}.  Ignores
 	 * the {@link StepContribution} and the attributes.
-	 * @see Tasklet#execute(StepContribution, AttributeAccessor)
+	 * @see Tasklet#execute(StepContribution, ChunkContext)
 	 */
-	public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
+	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		return callable.call();
 	}
 

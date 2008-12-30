@@ -25,7 +25,7 @@ import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.scope.context.StepContext;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
@@ -219,9 +219,9 @@ public class TaskletStep extends AbstractStep {
 		stepOperations.iterate(new StepContextRepeatCallback(stepExecution) {
 
 			@Override
-			public RepeatStatus doInStepContext(RepeatContext repeatContext, StepContext stepContext) throws Exception {
+			public RepeatStatus doInChunkContext(RepeatContext repeatContext, ChunkContext chunkContext) throws Exception {
 
-				StepExecution stepExecution = stepContext.getStepExecution();
+				StepExecution stepExecution = chunkContext.getStepContext().getStepExecution();
 
 				StepContribution contribution = stepExecution.createStepContribution();
 
@@ -238,7 +238,7 @@ public class TaskletStep extends AbstractStep {
 				try {
 
 					try {
-						result = tasklet.execute(contribution, stepContext);
+						result = tasklet.execute(contribution, chunkContext);
 					}
 					finally {
 						// Apply the contribution to the step

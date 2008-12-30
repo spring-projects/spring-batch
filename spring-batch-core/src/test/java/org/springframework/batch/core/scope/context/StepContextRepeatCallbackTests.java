@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.StepContext;
 import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.repeat.RepeatContext;
@@ -49,8 +48,8 @@ public class StepContextRepeatCallbackTests {
 	public void testDoInIteration() throws Exception {
 		StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
 			@Override
-			public RepeatStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
-				assertEquals(Long.valueOf(123), stepContext.getStepExecution().getId());
+			public RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception {
+				assertEquals(Long.valueOf(123), chunkContext.getStepContext().getStepExecution().getId());
 				return RepeatStatus.FINISHED;
 			}
 		};
@@ -63,13 +62,13 @@ public class StepContextRepeatCallbackTests {
 		StepSynchronizationManager.register(stepExecution);
 		StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
 			@Override
-			public RepeatStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception {
+			public RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception {
 				if (addedAttribute) {
-					removedAttribute = stepContext.hasAttribute("foo");
-					stepContext.removeAttribute("foo");
+					removedAttribute = chunkContext.hasAttribute("foo");
+					chunkContext.removeAttribute("foo");
 				} else {
 					addedAttribute = true;
-					stepContext.setAttribute("foo", "bar");
+					chunkContext.setAttribute("foo", "bar");
 				}
 				return RepeatStatus.FINISHED;
 			}

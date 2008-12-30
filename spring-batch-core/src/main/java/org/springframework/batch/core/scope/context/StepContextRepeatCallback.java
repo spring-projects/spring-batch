@@ -60,17 +60,16 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 
 		ChunkContext chunkContext = attributeQueue.poll();
 		if (chunkContext == null) {
-			chunkContext = new ChunkContext();
+			chunkContext = new ChunkContext(stepContext);
 		}
-		int start = chunkContext.attributeNames().length;
 
 		try {
-			return doInStepContext(context, stepContext);
+			return doInChunkContext(context, chunkContext);
 		}
 		finally {
 			// Still some stuff to do with the data in this chunk,
-			// pass it back
-			if (chunkContext.attributeNames().length > start) {
+			// pass it back.
+			if (!chunkContext.isComplete()) {
 				attributeQueue.add(chunkContext);
 			}
 			StepSynchronizationManager.close();
@@ -78,21 +77,21 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	}
 
 	/**
-	 * Do the work required for this portion of the step. The
-	 * {@link StepContext} provided is managed by the base class, so that if
+	 * Do the work required for this chunk of the step. The
+	 * {@link ChunkContext} provided is managed by the base class, so that if
 	 * there is still work to do for the task in hand state can be stored here.
 	 * In a multi-threaded client, the base class ensures that only one thread
-	 * at a time can be working on each instance of {@link StepContext}. Workers
+	 * at a time can be working on each instance of {@link ChunkContext}. Workers
 	 * should signal that they are finished with a context by removing all the
 	 * attributes they have added. If a worker does not remove them another
 	 * thread might see stale state.
 	 * 
 	 * @param context the current {@link RepeatContext}
-	 * @param stepContext the step context in which to carry out the work
+	 * @param chunkContext the chunk context in which to carry out the work
 	 * @return the repeat status from the execution
 	 * @throws Exception implementations can throw an exception if anything goes
 	 * wrong
 	 */
-	public abstract RepeatStatus doInStepContext(RepeatContext context, StepContext stepContext) throws Exception;
+	public abstract RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception;
 
 }
