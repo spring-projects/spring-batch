@@ -2,34 +2,32 @@ package org.springframework.batch.integration.chunk;
 
 import java.io.Serializable;
 
+import org.springframework.batch.core.StepContribution;
+
 public class ChunkResponse implements Serializable {
 
-	private final int skipCount;
+	private final StepContribution stepContribution;
 	private final Long jobId;
 	private final boolean status;
 	private final String message;
 
-	public ChunkResponse(Long jobId) {
-		this(true, jobId, 0, null);
+	public ChunkResponse(Long jobId, StepContribution stepContribution) {
+		this(true, jobId, stepContribution, null);
 	}
 
-	public ChunkResponse(Long jobId, int skipCount) {
-		this(true, jobId, skipCount, null);
+	public ChunkResponse(boolean status, Long jobId, StepContribution stepContribution) {
+		this(status, jobId, stepContribution, null);
 	}
 
-	public ChunkResponse(boolean status, Long jobId, int skipCount) {
-		this(status, jobId, skipCount, null);
-	}
-
-	public ChunkResponse(boolean status, Long jobId, int skipCount, String message) {
+	public ChunkResponse(boolean status, Long jobId, StepContribution stepContribution, String message) {
 		this.status = status;
 		this.jobId = jobId;
-		this.skipCount = skipCount;
+		this.stepContribution = stepContribution;
 		this.message = message;
 	}
 
-	public int getSkipCount() {
-		return skipCount;
+	public StepContribution getStepContribution() {
+		return stepContribution;
 	}
 
 	public Long getJobId() {
@@ -49,7 +47,7 @@ public class ChunkResponse implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getSimpleName()+": jobId="+jobId+", skipCount="+skipCount+", successful="+status;
+		return getClass().getSimpleName()+": jobId="+jobId+", stepContribution="+stepContribution+", successful="+status;
 	}
 
 }

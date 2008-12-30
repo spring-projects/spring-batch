@@ -1,6 +1,7 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  * @author Dave Syer
  * 
  */
-class Chunk<W> implements Iterable<W> {
+public class Chunk<W> implements Iterable<W> {
 
 	private List<W> items = new ArrayList<W>();
 
@@ -30,8 +31,12 @@ class Chunk<W> implements Iterable<W> {
 	public Chunk() {
 		this(null,null);
 	}
+
+	public Chunk(Collection<? extends W> items) {
+		this(items,null);
+	}
 	
-	public Chunk(List<W> items, List<SkipWrapper<W>> skips) {
+	public Chunk(Collection<? extends W> items, List<SkipWrapper<W>> skips) {
 		super();
 		if (items!=null) {
 			this.items = new ArrayList<W>(items);

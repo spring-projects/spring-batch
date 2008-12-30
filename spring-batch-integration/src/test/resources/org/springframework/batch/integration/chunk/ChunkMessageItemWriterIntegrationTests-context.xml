@@ -19,7 +19,7 @@
 	<tx:annotation-driven />
 	<beans:bean id="chunkHandler" class="org.springframework.batch.integration.chunk.ChunkProcessorChunkHandler">
 		<beans:property name="chunkProcessor">
-			<beans:bean class="org.springframework.batch.integration.chunk.SimpleChunkProcessor">
+			<beans:bean class="org.springframework.batch.core.step.item.SimpleChunkProcessor">
 				<beans:property name="itemWriter">
 					<beans:bean class="org.springframework.batch.integration.chunk.TestItemWriter" />
 				</beans:property>

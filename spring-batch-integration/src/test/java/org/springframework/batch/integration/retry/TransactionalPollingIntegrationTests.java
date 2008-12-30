@@ -69,7 +69,9 @@ public class TransactionalPollingIntegrationTests implements ApplicationContextA
 	}
 
 	public void output(String message) {
-		handled.add(message);
+		if (count < expected.size()) {
+			handled.add(message);
+		}
 		logger.debug("Handled: " + message);
 	}
 

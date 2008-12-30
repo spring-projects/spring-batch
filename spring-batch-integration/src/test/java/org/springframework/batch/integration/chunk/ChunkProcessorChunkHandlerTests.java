@@ -3,9 +3,13 @@ package org.springframework.batch.integration.chunk;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
-
 import org.junit.Test;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.item.Chunk;
+import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.util.StringUtils;
 
 public class ChunkProcessorChunkHandlerTests {
@@ -17,15 +21,15 @@ public class ChunkProcessorChunkHandlerTests {
 	@Test
 	public void testVanillaHandleChunk() {
 		handler.setChunkProcessor(new ChunkProcessor<Object>() {
-			public int process(Collection<? extends Object> items, int skipCount) throws Exception {
-				count += items.size();
-				return 0;
+			public void process(StepContribution contribution, Chunk<Object> chunk) throws Exception {
+				count += chunk.size();
 			}
 		});
+		StepContribution stepContribution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"), 1L).createStepExecution("step").createStepContribution();
 		@SuppressWarnings("unchecked")
-		ChunkResponse response = handler.handleChunk(new ChunkRequest<Object>(StringUtils
-				.commaDelimitedListToSet("foo,bar"), 12L, 10));
-		assertEquals(0, response.getSkipCount());
+		ChunkResponse response = handler.handleChunk(new ChunkRequest<Object>(new Chunk<Object>(StringUtils
+				.commaDelimitedListToSet("foo,bar")), 12L, stepContribution));
+		assertEquals(stepContribution, response.getStepContribution());
 		assertEquals(12, response.getJobId().longValue());
 		assertTrue(response.isSuccessful());
 		assertEquals(2, count);

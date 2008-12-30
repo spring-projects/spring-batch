@@ -6,8 +6,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -19,9 +21,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private static final Log logger = LogFactory.getLog(ChunkMessageChannelItemWriter.class);
 
-	static final String ACTUAL = "ACTUAL";
+	static final String ACTUAL = ChunkMessageChannelItemWriter.class.getName()+".ACTUAL";
 
-	static final String EXPECTED = "EXPECTED";
+	static final String EXPECTED = ChunkMessageChannelItemWriter.class.getName()+".EXPECTED";
 
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
 	
@@ -54,7 +56,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		if (!items.isEmpty()) {
 
 			logger.debug("Dispatching chunk: " + items);
-			ChunkRequest<T> request = new ChunkRequest<T>(items, localState.getJobId(), localState.getSkipCount());
+			ChunkRequest<T> request = new ChunkRequest<T>(new Chunk<T>(items), localState.getJobId(), localState.createStepContribution());
 			messagingGateway.send(request);
 			localState.expected++;
 
@@ -156,8 +158,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			return expected - actual;
 		}
 
-		public int getSkipCount() {
-			return stepExecution.getSkipCount();
+		public StepContribution createStepContribution() {
+			return stepExecution.createStepContribution();
 		}
 
 		public Long getJobId() {

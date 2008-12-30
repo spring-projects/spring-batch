@@ -30,7 +30,7 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private static List<String> list = new ArrayList<String>();
+	private volatile static List<String> list = new ArrayList<String>();
 
 	@Autowired
 	private SimpleRecoverer recoverer;
@@ -38,10 +38,10 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 	@Autowired
 	private SimpleService service;
 
-	private Lifecycle bus;
+	private Lifecycle lifecycle;
 
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		bus = (Lifecycle) applicationContext;
+		lifecycle = (Lifecycle) applicationContext;
 	}
 
 	private static volatile int count = 0;
@@ -73,7 +73,7 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,c,d")));
 		service.setExpected(expected);
-		waitForResults(bus, expected.size(), 60);
+		waitForResults(lifecycle, expected.size(), 60);
 		assertEquals(4,service.getProcessed().size()); // a,b,c,d
 		assertEquals(expected, service.getProcessed());
 	}
@@ -86,8 +86,8 @@ public class RetryRepeatTransactionalPollingIntegrationTests implements Applicat
 		List<String> expected = TransactionAwareProxyFactory.createTransactionalList(Arrays.asList(StringUtils
 				.commaDelimitedListToStringArray("a,b,fail,fail,d,e,f")));
 		service.setExpected(expected);
-		waitForResults(bus, expected.size(), 60);
-		waitForResults(bus, 6, 100); // (a,b), (fail), (fail), ([fail],d), (e,f)
+		waitForResults(lifecycle, expected.size(), 60); // (a,b), (fail), (fail), ([fail],d), (e,f)
+		System.err.println(service.getProcessed());
 		assertEquals(7,service.getProcessed().size()); // a,b,fail,fail,d,e,f
 		assertEquals(1,recoverer.getRecovered().size()); // fail
 		assertEquals(expected, service.getProcessed());

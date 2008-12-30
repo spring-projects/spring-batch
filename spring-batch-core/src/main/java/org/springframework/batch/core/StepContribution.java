@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core;
 
+import java.io.Serializable;
+
 /**
  * Represents a contribution to a {@link StepExecution}, buffering changes until
  * they can be applied at a chunk boundary.
@@ -22,7 +24,7 @@ package org.springframework.batch.core;
  * @author Dave Syer
  * 
  */
-public class StepContribution {
+public class StepContribution implements Serializable {
 
 	private volatile int readCount = 0;
 

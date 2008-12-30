@@ -12,8 +12,11 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -24,6 +27,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.ListItemReader;
@@ -69,7 +73,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		factory.setBeanName("step");
 		factory.setItemWriter(writer);
 		factory.setCommitInterval(4);
-		
+
 		SimpleMessagingGateway gateway = new SimpleMessagingGateway();
 		writer.setMessagingGateway(gateway);
 
@@ -85,7 +89,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 			System.err.println(message);
 			message = replies.receive(10);
 		}
-		
+
 	}
 
 	@After
@@ -186,7 +190,10 @@ public class ChunkMessageItemWriterIntegrationTests {
 	 */
 	@SuppressWarnings("unchecked")
 	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
-		ChunkRequest chunk = new ChunkRequest(StringUtils.commaDelimitedListToSet(string), jobId, 0);
+		StepContribution stepContribution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"), 1L)
+				.createStepExecution("step").createStepContribution();
+		ChunkRequest chunk = new ChunkRequest(new Chunk<String>(StringUtils.commaDelimitedListToSet(string)), jobId,
+				stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(chunk);
 		return message;
 	}

@@ -8,18 +8,53 @@ import org.springframework.batch.core.listener.MulticasterBatchListener;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
-public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I> {
+public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, InitializingBean {
 
-	private final ItemProcessor<? super I, ? extends O> itemProcessor;
+	private ItemProcessor<? super I, ? extends O> itemProcessor;
 
-	private final ItemWriter<? super O> itemWriter;
+	private ItemWriter<? super O> itemWriter;
 
 	private final MulticasterBatchListener<I, O> listener = new MulticasterBatchListener<I, O>();
+
+	/**
+	 * Default constructor for ease of configuration (both itemWriter and
+	 * itemProcessor are mandatory).
+	 */
+	@SuppressWarnings("unused")
+	private SimpleChunkProcessor() {
+		this(null, null);
+	}
 
 	public SimpleChunkProcessor(ItemProcessor<? super I, ? extends O> itemProcessor, ItemWriter<? super O> itemWriter) {
 		this.itemProcessor = itemProcessor;
 		this.itemWriter = itemWriter;
+	}
+
+	/**
+	 * @param itemProcessor the {@link ItemProcessor} to set
+	 */
+	public void setItemProcessor(ItemProcessor<? super I, ? extends O> itemProcessor) {
+		this.itemProcessor = itemProcessor;
+	}
+
+	/**
+	 * @param itemWriter the {@link ItemWriter} to set
+	 */
+	public void setItemWriter(ItemWriter<? super O> itemWriter) {
+		this.itemWriter = itemWriter;
+	}
+
+	/**
+	 * Check mandatory properties.
+	 * 
+	 * @see InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(itemWriter, "ItemWriter must be set");
+		Assert.notNull(itemProcessor, "ItemProcessor must be set");
 	}
 
 	/**
