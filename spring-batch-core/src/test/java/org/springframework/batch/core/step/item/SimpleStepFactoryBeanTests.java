@@ -81,6 +81,11 @@ public class SimpleStepFactoryBeanTests {
 		MapStepExecutionDao.clear();
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testMandatoryProperties() throws Exception {
+		new SimpleStepFactoryBean<String, String>().getObject();
+	}
+
 	@Test
 	public void testSimpleJob() throws Exception {
 

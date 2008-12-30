@@ -106,12 +106,12 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	private int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
 
 	/**
-	 * 
+	 * Default constructor for {@link SimpleStepFactoryBean}.
 	 */
 	public SimpleStepFactoryBean() {
 		super();
 	}
-
+	
 	/**
 	 * Set the bean name property, which will become the name of the
 	 * {@link Step} when it is created.
@@ -268,11 +268,12 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	/**
 	 * Create a {@link Step} from the configuration provided.
 	 * 
-	 * @see org.springframework.beans.factory.FactoryBean#getObject()
+	 * @see FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
 		TaskletStep step = new TaskletStep(getName());
 		applyConfiguration(step);
+		step.afterPropertiesSet();
 		return step;
 	}
 
@@ -480,7 +481,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 
 		step.setTasklet(tasklet);
-
+		
 	}
 
 	/**

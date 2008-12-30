@@ -8,12 +8,16 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
  * A {@link FactoryBean} that automates the creation of a
  * {@link SimpleJobRepository} using non-persistent in-memory DAO
- * implementations.
+ * implementations. This repository is only really intended for use in testing
+ * and rapid prototyping. In such settings you might find that
+ * {@link ResourcelessTransactionManager} is useful (as long as your business
+ * logic does not use a relational database).
  * 
  * @author Robert Kasanicky
  */
