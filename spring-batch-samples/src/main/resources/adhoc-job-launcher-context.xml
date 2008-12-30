@@ -37,7 +37,6 @@
 		<property name="jobExplorer">
 			<bean class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
 				<property name="dataSource" ref="dataSource" />
-				<property name="databaseType" value="${environment}" />
 			</bean>
 		</property>
 		<property name="jobRepository" ref="jobRepository" />

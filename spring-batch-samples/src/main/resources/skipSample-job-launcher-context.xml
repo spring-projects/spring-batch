@@ -15,7 +15,6 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 	
-	<!--  use p:databaseType="${environment}" below if auto-detection does not work -->
 	<bean id="jobRepository"
 		class="org.springframework.batch.core.repository.support.JobRepositoryFactoryBean"
 		p:dataSource-ref="dataSource" p:transactionManager-ref="transactionManager" />
@@ -29,7 +28,7 @@
 	p:jobRegistry-ref="jobRegistry" />
 		
 	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" 
-		p:databaseType="${environment}" p:dataSource-ref="dataSource" />
+		p:dataSource-ref="dataSource" />
 		
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry" >
 	 	<constructor-arg value="jobs/skipSampleJob.xml" />

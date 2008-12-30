@@ -22,6 +22,9 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+
 import javax.sql.DataSource;
 
 import org.junit.Before;
@@ -58,19 +61,44 @@ public class JobExplorerFactoryBeanTests {
 	}
 
 	@Test
+	public void testDetectDatabaseType() throws Exception {
+
+		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
+		Connection con = createMock(Connection.class);
+		expect(dataSource.getConnection()).andReturn(con);
+		expect(con.getMetaData()).andReturn(dmd);
+		expect(dmd.getDatabaseProductName()).andReturn("Oracle");
+		expect(incrementerFactory.isSupportedIncrementerType("ORACLE")).andReturn(true);
+		expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(
+				new StubIncrementer());
+		expect(incrementerFactory.getIncrementer("ORACLE", tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(
+				new StubIncrementer());
+		replay(dataSource, con, dmd, incrementerFactory);
+		factory.afterPropertiesSet();
+
+	}
+
+	@Test
 	public void testNoDatabaseType() throws Exception {
 
+		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
+		Connection con = createMock(Connection.class);
+		expect(dataSource.getConnection()).andReturn(con);
+		expect(con.getMetaData()).andReturn(dmd);
+		expect(dmd.getDatabaseProductName()).andReturn("foo");
 		try {
 			expect(incrementerFactory.isSupportedIncrementerType(null)).andReturn(false);
 			expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
-			replay(incrementerFactory);
+			replay(dataSource, con, dmd, incrementerFactory);
 			factory.afterPropertiesSet();
 			fail();
 		}
 		catch (IllegalArgumentException ex) {
 			// expected
 			String message = ex.getMessage();
-			assertTrue("Wrong message: " + message, message.indexOf("unsupported database type") >= 0);
+			assertTrue("Wrong message: " + message, message.indexOf("DatabaseType") >= 0);
 		}
 
 	}
@@ -117,9 +145,12 @@ public class JobExplorerFactoryBeanTests {
 
 		expect(incrementerFactory.isSupportedIncrementerType("foo")).andReturn(true);
 		expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
-		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
-		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());
-		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(new StubIncrementer());
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).andReturn(
+				new StubIncrementer());
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(
+				new StubIncrementer());
+		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "STEP_EXECUTION_SEQ")).andReturn(
+				new StubIncrementer());
 		replay(incrementerFactory);
 
 		factory.afterPropertiesSet();
