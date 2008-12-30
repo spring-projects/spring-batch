@@ -2,6 +2,8 @@ package org.springframework.batch.item.file.mapping;
 
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * Two-phase {@link LineMapper} implementation consisting of tokenization of the
@@ -11,7 +13,7 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
  * 
  * @param <T> type of the item
  */
-public class DefaultLineMapper<T> implements LineMapper<T> {
+public class DefaultLineMapper<T> implements LineMapper<T>, InitializingBean {
 
 	private LineTokenizer tokenizer;
 
@@ -27,6 +29,11 @@ public class DefaultLineMapper<T> implements LineMapper<T> {
 
 	public void setFieldSetMapper(FieldSetMapper<T> fieldSetMapper) {
 		this.fieldSetMapper = fieldSetMapper;
+	}
+
+	public void afterPropertiesSet() {
+		Assert.notNull(tokenizer, "The LineTokenizer must be set");
+		Assert.notNull(fieldSetMapper, "The FieldSetMapper must be set");
 	}
 
 }

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
+import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 
@@ -14,6 +15,19 @@ import org.springframework.batch.item.file.transform.LineTokenizer;
 public class DefaultLineMapperTests {
 
 	private DefaultLineMapper<String> tested = new DefaultLineMapper<String>();
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testMandatoryTokenizer() throws Exception {
+		tested.afterPropertiesSet();
+		tested.mapLine("foo", 1);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testMandatoryMapper() throws Exception {
+		tested.setLineTokenizer(new DelimitedLineTokenizer());
+		tested.afterPropertiesSet();
+		tested.mapLine("foo", 1);
+	}
 	
 	@Test
 	public void testMapping() throws Exception {
