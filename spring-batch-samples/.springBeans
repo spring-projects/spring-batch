@@ -11,7 +11,6 @@
 		<config>src/main/resources/jobs/multilineOrderIo.xml</config>
 		<config>src/main/resources/jobs/multilineOrderJob.xml</config>
 		<config>src/main/resources/jobs/tradeJob.xml</config>
-		<config>src/main/resources/jobs/tradeJobIo.xml</config>
 		<config>src/main/resources/jobs/restartSample.xml</config>
 		<config>src/main/resources/data-source-context.xml</config>
 		<config>src/main/resources/jobs/beanWrapperMapperSampleJob.xml</config>
@@ -179,7 +178,6 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
 				<config>src/main/resources/jobs/tradeJob.xml</config>
-				<config>src/main/resources/jobs/tradeJobIo.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
@@ -374,7 +372,6 @@
 				<config>src/main/resources/jobs/skipSampleJob.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/jobs/tradeJobIo.xml</config>
 				<config>src/main/resources/skipSample-job-launcher-context.xml</config>
 			</configs>
 		</configSet>

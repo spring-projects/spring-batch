@@ -36,7 +36,6 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -126,13 +125,9 @@ public class TradeJobFunctionalTests extends AbstractValidatingBatchLauncherTest
 		assertEquals(customers.size(), activeRow);
 		
 		// check content of the output file
-		
-//		 Clean up
-		((FileSystemResource)applicationContext.getBean("customerFileLocator")).getFile().delete();
 	}
 
 	protected void validatePreConditions() {
-		assertTrue(((Resource)applicationContext.getBean("fileLocator")).exists());
 	}
 
 	private static class Customer {
