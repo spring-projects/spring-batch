@@ -2,32 +2,36 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 	<description>
 		Showcases reading and writing of headers and footers. Copies header from input to output and adds a footer.
 	</description>
-	<bean id="headerFooterSample" parent="simpleJob">
-		<property name="steps">
-			<bean id="step1" parent="simpleStep" p:commitInterval="3">
-				<property name="streams">
-					<list>
-						<!--
-							explicit registration to enforce ordering (header needs to be
-							read before it can be written)
-						-->
-						<ref bean="reader" />
-						<ref bean="writer" />
-					</list>
-				</property>
-				<property name="listeners" ref="footerCallback" />
-				<property name="itemReader" ref="reader" />
-				<property name="itemWriter" ref="writer" />
-			</bean>
+
+	<batch:job id="headerFooterSample">
+		<batch:step name="step1"/>
+	</batch:job>
+
+	<bean id="step1" parent="simpleStep" p:commitInterval="3">
+		<property name="streams">
+			<list>
+				<!--
+					explicit registration to enforce ordering (header needs to be
+					read before it can be written)
+				-->
+				<ref bean="reader" />
+				<ref bean="writer" />
+			</list>
 		</property>
+		<property name="listeners" ref="footerCallback" />
+		<property name="itemReader" ref="reader" />
+		<property name="itemWriter" ref="writer" />
 	</bean>
+
 	<bean id="reader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" ref="inputResource" />
 		<property name="lineMapper">

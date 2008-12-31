@@ -1,29 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
 	<description>Example for Hibernate integration.</description>
 
-	<bean id="hibernateJob" parent="simpleJob">
-		<!--
-			set restartable=false so that this job can be used by more than one
-			test
-		-->
-		<property name="restartable" value="false" />
-		<property name="steps">
-			<bean id="step1" parent="skipLimitStep">
-				<property name="skipLimit" value="5" />
-				<property name="itemReader" ref="hibernateItemReader" />
-				<property name="itemProcessor" ref="creditIncreaseProcessor" />
-				<property name="itemWriter" ref="hibernateCreditWriter" />
-				<property name="commitInterval" value="3" />
-			</bean>
-		</property>
+	<batch:job id="hibernateJob" restartable="false">
+		<batch:step name="step1"/>
+	</batch:job>
+
+	<bean id="step1" parent="skipLimitStep">
+		<property name="skipLimit" value="5" />
+		<property name="itemReader" ref="hibernateItemReader" />
+		<property name="itemProcessor" ref="creditIncreaseProcessor" />
+		<property name="itemWriter" ref="hibernateCreditWriter" />
+		<property name="commitInterval" value="3" />
 	</bean>
 
 	<bean id="creditIncreaseProcessor" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />

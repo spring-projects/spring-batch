@@ -2,52 +2,54 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:batch="http://www.springframework.org/schema/batch"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<bean id="parallelJob" parent="simpleJob">
-		<property name="steps">
-			<list>
-				<bean id="staging" parent="simpleStep">
-					<property name="commitInterval" value="2" />
-					<property name="startLimit" value="100" />
-					<property name="itemReader" ref="fileItemReader" />
-					<property name="itemProcessor">
-						<bean
-							class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-							<constructor-arg ref="fixedValidator" />
-						</bean>
-					</property>
-					<property name="itemWriter">
-						<bean class="org.springframework.batch.sample.common.StagingItemWriter">
-							<property name="dataSource" ref="dataSource" />
-							<property name="incrementer">
-								<bean parent="incrementerParent">
-									<property name="incrementerName" value="BATCH_STAGING_SEQ" />
-								</bean>
-							</property>
-						</bean>
-					</property>
-				</bean>
-				<bean id="loading" parent="simpleStep">
-					<property name="taskExecutor">
-						<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
-					</property>
-					<property name="itemReader">
-						<bean class="org.springframework.batch.sample.common.StagingItemReader">
-							<property name="dataSource" ref="dataSource" />
-						</bean>
-					</property>
-					<property name="itemWriter">
-						<bean
-							class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
-							<property name="dao" ref="tradeDao" />
-						</bean>
-					</property>
-				</bean>
-			</list>
+	<batch:job id="parallelJob">
+		<batch:step name="staging" next="loading"/>
+		<batch:step name="loading"/>
+	</batch:job>
+
+	<bean id="staging" parent="simpleStep">
+		<property name="commitInterval" value="2" />
+		<property name="startLimit" value="100" />
+		<property name="itemReader" ref="fileItemReader" />
+		<property name="itemProcessor">
+			<bean
+				class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+				<constructor-arg ref="fixedValidator" />
+			</bean>
+		</property>
+		<property name="itemWriter">
+			<bean class="org.springframework.batch.sample.common.StagingItemWriter">
+				<property name="dataSource" ref="dataSource" />
+				<property name="incrementer">
+					<bean parent="incrementerParent">
+						<property name="incrementerName" value="BATCH_STAGING_SEQ" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+	<bean id="loading" parent="simpleStep">
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+		</property>
+		<property name="itemReader">
+			<bean class="org.springframework.batch.sample.common.StagingItemReader">
+				<property name="dataSource" ref="dataSource" />
+			</bean>
+		</property>
+		<property name="itemWriter">
+			<bean
+				class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+				<property name="dao" ref="tradeDao" />
+			</bean>
 		</property>
 	</bean>
 

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:batch="http://www.springframework.org/schema/batch"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/batch 
+		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
@@ -16,29 +18,24 @@
 		</property>
 	</bean>
 
-	<bean id="infiniteLoopJob" parent="simpleJob">
-		<property name="jobParametersIncrementer">
-			<bean class="org.springframework.batch.sample.common.InfiniteLoopIncrementer" />	
-		</property>
-		<property name="steps">
-			<!--bean id="step1" parent="taskletStep">
-				<property name="tasklet">
-					<bean id="module" class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"/>
-				</property>
-			</bean-->
-			<bean id="infiniteStep" parent="simpleStep">
-				<property name="itemReader">
-					<bean id="reader" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
-						<property name="limit" value="1000000" />
-					</bean>
-				</property>
-				<property name="itemWriter">
-					<bean id="writer" class="org.springframework.batch.sample.support.DummyItemWriter" />
-				</property>
+	<batch:job id="infiniteLoopJob" 
+			   incrementer="jobParametersIncrementer" 
+			   restartable="true">
+		<batch:step name="infiniteStep"/>
+	</batch:job>
+
+	<bean id="jobParametersIncrementer" 
+	      class="org.springframework.batch.sample.common.InfiniteLoopIncrementer" />	
+
+	<bean id="infiniteStep" parent="simpleStep">
+		<property name="itemReader">
+			<bean id="reader" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
+				<property name="limit" value="1000000" />
 			</bean>
 		</property>
+		<property name="itemWriter">
+			<bean id="writer" class="org.springframework.batch.sample.support.DummyItemWriter" />
+		</property>
 	</bean>
-	
-	
 
 </beans>

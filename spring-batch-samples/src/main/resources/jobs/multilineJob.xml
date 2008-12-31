@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/batch 
+		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<bean id="multilineJob" parent="simpleJob">
-		<property name="steps">
-			<bean id="step1" parent="simpleStep">
-				<property name="streams" ref="fileItemReader"/>
-				<property name="itemReader">
-					<bean
-						class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
-						<property name="itemReader"
-							ref="fileItemReader" />
-					</bean>
-				</property>
-				<property name="itemWriter">
-					<bean
-						class="org.springframework.batch.item.file.FlatFileItemWriter">
-						<property name="resource"
-							value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
-							<property name="lineAggregator">
-								<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
-							</property>
-					</bean>
-				</property>
+	<batch:job id="multilineJob">
+		<batch:step name="step1"/>
+	</batch:job>
+
+	<bean id="step1" parent="simpleStep">
+		<property name="streams" ref="fileItemReader"/>
+		<property name="itemReader">
+			<bean
+				class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
+				<property name="itemReader"
+					ref="fileItemReader" />
+			</bean>
+		</property>
+		<property name="itemWriter">
+			<bean
+				class="org.springframework.batch.item.file.FlatFileItemWriter">
+				<property name="resource"
+					value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
+					<property name="lineAggregator">
+						<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+					</property>
 			</bean>
 		</property>
 	</bean>

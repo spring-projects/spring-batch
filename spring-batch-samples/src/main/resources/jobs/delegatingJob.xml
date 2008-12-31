@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:batch="http://www.springframework.org/schema/batch"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
@@ -15,32 +17,26 @@
 		integrated into a batch job.
 	</description>
 
-	<bean id="delegateJob" parent="simpleJob">
-		<property name="steps">
-			<bean id="step1" parent="simpleStep">
-				<property name="itemReader">
-					<bean
-						class="org.springframework.batch.item.adapter.ItemReaderAdapter">
-						<property name="targetObject"
-							ref="delegateObject" />
-						<property name="targetMethod" value="getData" />
-					</bean>
-				</property>
-				<property name="itemWriter">
-					<bean
-						class="org.springframework.batch.item.adapter.PropertyExtractingDelegatingItemWriter">
-						<property name="targetObject"
-							ref="delegateObject" />
-						<property name="targetMethod"
-							value="processPerson" />
-						<property
-							name="fieldsUsedAsTargetMethodArguments">
-							<list>
-								<value>firstName</value>
-								<value>address.city</value>
-							</list>
-						</property>
-					</bean>
+	<batch:job id="delegateJob">
+		<batch:step name="step1"/>
+	</batch:job>
+
+	<bean id="step1" parent="simpleStep">
+		<property name="itemReader">
+			<bean class="org.springframework.batch.item.adapter.ItemReaderAdapter">
+				<property name="targetObject" ref="delegateObject" />
+				<property name="targetMethod" value="getData" />
+			</bean>
+		</property>
+		<property name="itemWriter">
+			<bean class="org.springframework.batch.item.adapter.PropertyExtractingDelegatingItemWriter">
+				<property name="targetObject" ref="delegateObject" />
+				<property name="targetMethod" value="processPerson" />
+				<property name="fieldsUsedAsTargetMethodArguments">
+					<list>
+						<value>firstName</value>
+						<value>address.city</value>
+					</list>
 				</property>
 			</bean>
 		</property>

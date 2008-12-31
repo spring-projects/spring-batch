@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:batch="http://www.springframework.org/schema/batch"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+		http://www.springframework.org/schema/batch 
+		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
@@ -10,40 +12,40 @@
 	<import resource="multilineOrderOutputAggregators.xml" />
 	<import resource="multilineOrderIo.xml" />
 
-	<bean id="multilineOrderJob" parent="simpleJob">
-		<property name="steps">
-			<bean id="step1" parent="simpleStep">
-				<property name="streams">
+	<batch:job id="multilineOrderJob">
+		<batch:step name="step1"/>
+	</batch:job>
+
+	<bean id="step1" parent="simpleStep">
+		<property name="streams">
+			<list>
+				<ref bean="fileItemWriter" />
+				<ref bean="fileItemReader" />
+			</list>
+		</property>
+		<property name="itemReader">
+			<bean class="org.springframework.batch.sample.domain.order.internal.OrderItemReader">
+				<property name="fieldSetReader" ref="fileItemReader" />
+				<property name="headerMapper" ref="headerFieldSetMapper" />
+				<property name="customerMapper" ref="customerFieldSetMapper" />
+				<property name="addressMapper" ref="addressFieldSetMapper" />
+				<property name="billingMapper" ref="billingFieldSetMapper" />
+				<property name="itemMapper" ref="orderItemFieldSetMapper" />
+				<property name="shippingMapper" ref="shippingFieldSetMapper" />
+			</bean>
+		</property>
+		<property name="itemWriter" ref="fileItemWriter" />
+		<property name="itemProcessor">
+			<bean class="org.springframework.batch.item.support.CompositeItemProcessor">
+				<property name="itemProcessors">
 					<list>
-						<ref bean="fileItemWriter" />
-						<ref bean="fileItemReader" />
+						<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+							<constructor-arg ref="validator" />
+						</bean>
+						<bean class="org.springframework.batch.sample.domain.order.internal.OrderProcessor">
+							<property name="aggregators" ref="outputAggregators" />
+						</bean>
 					</list>
-				</property>
-				<property name="itemReader">
-					<bean class="org.springframework.batch.sample.domain.order.internal.OrderItemReader">
-						<property name="fieldSetReader" ref="fileItemReader" />
-						<property name="headerMapper" ref="headerFieldSetMapper" />
-						<property name="customerMapper" ref="customerFieldSetMapper" />
-						<property name="addressMapper" ref="addressFieldSetMapper" />
-						<property name="billingMapper" ref="billingFieldSetMapper" />
-						<property name="itemMapper" ref="orderItemFieldSetMapper" />
-						<property name="shippingMapper" ref="shippingFieldSetMapper" />
-					</bean>
-				</property>
-				<property name="itemWriter" ref="fileItemWriter" />
-				<property name="itemProcessor">
-					<bean class="org.springframework.batch.item.support.CompositeItemProcessor">
-						<property name="itemProcessors">
-							<list>
-								<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-									<constructor-arg ref="validator" />
-								</bean>
-								<bean class="org.springframework.batch.sample.domain.order.internal.OrderProcessor">
-									<property name="aggregators" ref="outputAggregators" />
-								</bean>
-							</list>
-						</property>
-					</bean>
 				</property>
 			</bean>
 		</property>
