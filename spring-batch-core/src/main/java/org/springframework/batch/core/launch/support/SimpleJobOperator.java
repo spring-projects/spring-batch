@@ -50,6 +50,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.support.PropertiesConverter;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
@@ -355,6 +356,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see
 	 * org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
+	@Transactional
 	public boolean stop(long executionId) throws NoSuchJobExecutionException {
 
 		JobExecution jobExecution = findExecutionById(executionId);

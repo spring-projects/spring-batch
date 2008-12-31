@@ -1,6 +1,10 @@
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.batch.core.BatchStatus.STARTED;
+import static org.springframework.batch.core.BatchStatus.STOPPED;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.springframework.batch.core.BatchStatus.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.ListableJobRegistry;
@@ -22,7 +25,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration()
+@ContextConfiguration
 public class JobOperatorFunctionalTests {
 
 	private static final Log logger = LogFactory.getLog(JobOperatorFunctionalTests.class);

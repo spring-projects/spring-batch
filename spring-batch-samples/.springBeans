@@ -46,6 +46,8 @@
 		<config>src/main/resources/jobs/iosample/hibernate.xml</config>
 		<config>src/main/resources/jobs/hibernateJob.xml</config>
 		<config>src/main/resources/jobs/iosample/jpa.xml</config>
+		<config>src/main/resources/jobs/iosample/ibatis.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/JobOperatorFunctionalTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
