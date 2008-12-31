@@ -16,7 +16,10 @@
 
 package org.springframework.batch.core.exlore.support;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.util.Collections;
 
@@ -106,7 +109,7 @@ public class SimpleJobExplorerTests extends TestCase {
 		expect(jobInstanceDao.getJobInstance(jobExecution)).andReturn(jobInstance);
 		expect(stepExecutionDao.getStepExecutions(jobExecution)).andReturn(null);
 		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
-		jobExplorer.findJobExecutions(jobInstance);
+		jobExplorer.getJobExecutions(jobInstance);
 		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 
@@ -124,7 +127,7 @@ public class SimpleJobExplorerTests extends TestCase {
 		jobInstanceDao.getLastJobInstances("foo", 1);
 		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobInstance));
 		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
-		jobExplorer.getLastJobInstances("foo", 1);
+		jobExplorer.getJobInstances("foo", 0, 1);
 		verify(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 	}
 

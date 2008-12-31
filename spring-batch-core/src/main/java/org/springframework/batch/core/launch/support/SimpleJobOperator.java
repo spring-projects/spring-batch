@@ -37,6 +37,7 @@ import org.springframework.batch.core.configuration.ListableJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.launch.JobExecutionNotRunningException;
 import org.springframework.batch.core.launch.JobInstanceAlreadyExistsException;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
@@ -139,7 +140,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 			throw new NoSuchJobInstanceException(String.format("No job instance with id=%d", instanceId));
 		}
 		List<Long> list = new ArrayList<Long>();
-		for (JobExecution jobExecution : jobExplorer.findJobExecutions(jobInstance)) {
+		for (JobExecution jobExecution : jobExplorer.getJobExecutions(jobInstance)) {
 			list.add(jobExecution.getId());
 		}
 		return list;
@@ -157,13 +158,11 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.springframework.batch.core.launch.JobOperator#getLastInstances(java
-	 * .lang.String, int)
+	 * @see JobOperator#getLastInstances(String, int, int)
 	 */
-	public List<Long> getLastInstances(String jobName, int count) throws NoSuchJobException {
+	public List<Long> getJobInstances(String jobName, int start, int count) throws NoSuchJobException {
 		List<Long> list = new ArrayList<Long>();
-		for (JobInstance jobInstance : jobExplorer.getLastJobInstances(jobName, count)) {
+		for (JobInstance jobInstance : jobExplorer.getJobInstances(jobName, start, count)) {
 			list.add(jobInstance.getId());
 		}
 		if (list.isEmpty() && !jobRegistry.getJobNames().contains(jobName)) {
@@ -239,7 +238,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * @see
 	 * org.springframework.batch.core.launch.JobOperator#resume(java.lang.Long)
 	 */
-	public Long resume(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+	public Long restart(long executionId) throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
 			NoSuchJobException, JobRestartException {
 
 		logger.info("Checking status of job execution with id=" + executionId);
@@ -313,7 +312,7 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		logger.info("Locating parameters for next instance of job with name=" + jobName);
 
 		Job job = jobRegistry.getJob(jobName);
-		List<JobInstance> lastInstances = jobExplorer.getLastJobInstances(jobName, 1);
+		List<JobInstance> lastInstances = jobExplorer.getJobInstances(jobName, 0, 1);
 
 		JobParametersIncrementer incrementer = job.getJobParametersIncrementer();
 		if (incrementer == null) {
@@ -357,15 +356,16 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 	 * org.springframework.batch.core.launch.JobOperator#stop(java.lang.Long)
 	 */
 	@Transactional
-	public boolean stop(long executionId) throws NoSuchJobExecutionException {
+	public boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException {
 
 		JobExecution jobExecution = findExecutionById(executionId);
 		// Indicate the execution should be stopped by setting it's status to
 		// 'STOPPING'. It is assumed that
 		// the step implementation will check this status at chunk boundaries.
 		BatchStatus status = jobExecution.getStatus();
-		Assert.state(status == BatchStatus.STARTED || status == BatchStatus.STARTING,
-				"JobExecution must be running so that it can be stopped");
+		if (!(status == BatchStatus.STARTED || status == BatchStatus.STARTING)) {
+			throw new JobExecutionNotRunningException("JobExecution must be running so that it can be stopped: "+jobExecution);
+		}
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 

@@ -54,11 +54,11 @@ public class JobOperatorFunctionalTests {
 		assertEquals(params, tested.getParameters(executionId));
 		stopAndCheckStatus(executionId);
 
-		long resumedExecutionId = tested.resume(executionId);
+		long resumedExecutionId = tested.restart(executionId);
 		assertEquals(params, tested.getParameters(resumedExecutionId));
 		stopAndCheckStatus(resumedExecutionId);
 
-		List<Long> instances = tested.getLastInstances(job.getName(), 1);
+		List<Long> instances = tested.getJobInstances(job.getName(), 0, 1);
 		assertEquals(1, instances.size());
 		long instanceId = instances.get(0);
 

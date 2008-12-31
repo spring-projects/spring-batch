@@ -29,11 +29,15 @@ import org.springframework.batch.core.StepExecution;
 public interface JobExplorer {
 
 	/**
+	 * Fetch {@link JobInstance} values in descending order of creation (and
+	 * therefore usually of first execution).
+	 * 
 	 * @param jobName the name of the job to query
+	 * @param start the start index of the instances to return
 	 * @param count the maximum number of instances to return
-	 * @return the latest {@link JobInstance} values up to a maximum of count values
+	 * @return the {@link JobInstance} values up to a maximum of count values
 	 */
-	List<JobInstance> getLastJobInstances(String jobName, int count);
+	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
 	 * @param executionId the job execution id
@@ -43,7 +47,8 @@ public interface JobExplorer {
 
 	/**
 	 * @param jobExecutionId the parent job execution id
-	 * @param stepName the step name identifier for the required {@link StepExecution}
+	 * @param stepName the step name identifier for the required
+	 * {@link StepExecution}
 	 * @return the {@link StepExecution} with this id, or null if not found
 	 */
 	StepExecution getStepExecution(Long jobExecutionId, String stepName);
@@ -58,7 +63,7 @@ public interface JobExplorer {
 	 * @param jobInstance the {@link JobInstance} to query
 	 * @return the set of all executions for the specified {@link JobInstance}
 	 */
-	List<JobExecution> findJobExecutions(JobInstance jobInstance);
+	List<JobExecution> getJobExecutions(JobInstance jobInstance);
 
 	/**
 	 * @param jobName the name of the job

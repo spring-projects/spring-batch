@@ -285,13 +285,14 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	// Returns object representing state.
 	private OutputState getOutputState() {
 		if (state == null) {
+			File file;
 			try {
-				File file = resource.getFile();
-				Assert.state(!file.exists() || file.canWrite(), "Resource is not writable: [" + resource + "]");
+				file = resource.getFile();
 			}
 			catch (IOException e) {
-				throw new ItemStreamException("Could not test resource for writable status.", e);
+				throw new ItemStreamException("Could not convert resource to file: [" + resource + "]", e);
 			}
+			Assert.state(!file.exists() || file.canWrite(), "Resource is not writable: [" + resource + "]");
 			state = new OutputState();
 			state.setDeleteIfExists(shouldDeleteIfExists);
 			state.setEncoding(encoding);
@@ -308,7 +309,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		private static final String DEFAULT_CHARSET = "UTF-8";
 
 		private FileOutputStream os;
-		
+
 		// The bufferedWriter over the file channel that is actually written
 		Writer outputBufferedWriter;
 
@@ -327,7 +328,6 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 		boolean shouldDeleteIfExists = true;
 
 		boolean initialized = false;
-		
 
 		/**
 		 * Return the byte offset position of the cursor in the output file as a

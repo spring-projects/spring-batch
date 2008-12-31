@@ -99,7 +99,7 @@ public class RemoteLauncherTests {
 		Thread.sleep(SLEEP_INTERVAL);
 //		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
 		logger.debug(launcher.getSummary(executionId));
-		long resumedId = launcher.resume(executionId);
+		long resumedId = launcher.restart(executionId);
 		assertEquals("Picked up the same execution after pause and resume", executionId, resumedId);
 
 		Thread.sleep(SLEEP_INTERVAL);
@@ -108,7 +108,7 @@ public class RemoteLauncherTests {
 
 //		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
 		logger.debug(launcher.getSummary(executionId));
-		long resumeId2 = launcher.resume(executionId);
+		long resumeId2 = launcher.restart(executionId);
 		assertEquals("Picked up the same execution after pause and resume", executionId, resumeId2);
 
 		launcher.stop(executionId);

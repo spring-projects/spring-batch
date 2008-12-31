@@ -67,7 +67,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.explore.JobExplorer#findJobExecutions(org.springframework.batch.core.JobInstance)
 	 */
-	public List<JobExecution> findJobExecutions(JobInstance jobInstance) {
+	public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
 		List<JobExecution> executions = jobExecutionDao.findJobExecutions(jobInstance);
 		for(JobExecution jobExecution:executions){
 			getJobExecutionDependencies(jobExecution);
@@ -119,7 +119,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.explore.JobExplorer#getLastJobInstances(java.lang.String, int)
 	 */
-	public List<JobInstance> getLastJobInstances(String jobName, int count) {
+	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 		return jobInstanceDao.getLastJobInstances(jobName, count);
 	}
 
