@@ -26,7 +26,33 @@ public class JdbcCursorItemReaderConfigTests {
 	 */
 	@Test
 	public void testUsesCurrentTransaction() throws Exception {
-
+		DataSource ds = createMock(DataSource.class);
+		Connection con = createMock(Connection.class);
+		expect(con.getAutoCommit()).andReturn(false);
+		PreparedStatement ps = createMock(PreparedStatement.class);
+		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+				ResultSet.HOLD_CURSORS_OVER_COMMIT)).andReturn(ps);
+		expect(ds.getConnection()).andReturn(con);
+		expect(ds.getConnection()).andReturn(con);
+		con.commit();
+		replay(con);
+		replay(ds);
+		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
+		TransactionTemplate tt = new TransactionTemplate(tm);
+		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
+		reader.setDataSource(new ExtendedConnectionDataSourceProxy(ds));
+		reader.setUseSharedExtendedConnection(true);
+		reader.setSql("select foo from bar");
+		final ExecutionContext ec = new ExecutionContext();
+		tt.execute(
+				new TransactionCallback() {
+					public Object doInTransaction(TransactionStatus status) {
+						reader.open(ec);
+						reader.close();
+						return null;
+					}
+				});
+		verify(ds);
 	}
 	
 	/*
@@ -39,8 +65,7 @@ public class JdbcCursorItemReaderConfigTests {
 		Connection con = createMock(Connection.class);
 		expect(con.getAutoCommit()).andReturn(false);
 		PreparedStatement ps = createMock(PreparedStatement.class);
-		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
-				ResultSet.HOLD_CURSORS_OVER_COMMIT)).andReturn(ps);
+		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).andReturn(ps);
 		expect(ds.getConnection()).andReturn(con);
 		expect(ds.getConnection()).andReturn(con);
 		con.commit();

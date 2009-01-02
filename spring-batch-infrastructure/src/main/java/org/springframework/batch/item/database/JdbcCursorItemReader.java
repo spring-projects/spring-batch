@@ -31,6 +31,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.SQLWarningException;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -40,15 +41,38 @@ import org.springframework.jdbc.support.JdbcUtils;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
  * <p>
  * Simple item reader that opens a JDBC cursor and continually retrieves the
- * next row in the ResultSet. It is extremely important to note that the
- * JdbcDriver used must be version 3.0 or higher. This is because earlier
- * versions do not support holding a ResultSet open over commits.
+ * next row in the ResultSet. 
+ * </p>
+ * 
+ * <p>
+ * By default the cursor will be opened using a separate connection. The ResultSet for the cursor
+ * is held open regardless of commits or roll backs in a surrounding transaction. Clients of this 
+ * reader are responsible for buffering the items in the case that they need to be re-presented on a
+ * rollback. This buffering is handled by the step implementations provided and is only a concern for
+ * anyone writing their own step implementations.
+ * </p>
+ * 
+ * <p>
+ * The statement used to open the cursor is created with the 'READ_ONLY' option since a non read-only 
+ * cursor may unnecessarily lock tables or rows. It is also opened with 'TYPE_FORWARD_ONLY' option. 
+ * By default the cursor will be opened using a separate connection which means that it will not participate 
+ * in any transactions created as part of the step processing.
+ * </p>
+ *  
+ * <p>
+ * There is an option ({@link #setUseSharedExtendedConnection(boolean)} that will share the connection 
+ * used for the cursor with the rest of the step processing. If you set this flag to <code>true</code> 
+ * then you must wrap the DataSource in a {@link ExtendedConnectionDataSourceProxy} to prevent the 
+ * connection from being closed and released after each commit performed as part of the step processing. 
+ * You must also use a JDBC driver supporting JDBC 3.0 or later since the cursor will be opened with the 
+ * additional option of 'HOLD_CUSORS_OVER_COMMIT' enabled. 
  * </p>
  * 
  * <p>
@@ -56,12 +80,10 @@ import org.springframework.util.ClassUtils;
  * ResultSet. There is currently no wrapping of the ResultSet to suppress calls
  * to next(). However, if the RowMapper (mistakenly) increments the current row,
  * the next call to read will verify that the current row is at the expected
- * position and throw a DataAccessException if it is not. This means that, in
- * theory, a RowMapper could read ahead, as long as it returns the row back to
- * the correct position before returning. The reason for such strictness on the
+ * position and throw a DataAccessException if it is not. The reason for such strictness on the
  * ResultSet is due to the need to maintain control for transactions and
  * restartability. This ensures that each call to {@link #read()} returns the
- * ResultSet at the correct line, regardless of rollbacks or restarts.
+ * ResultSet at the correct row, regardless of rollbacks or restarts.
  * </p>
  * 
  * <p>
@@ -73,30 +95,22 @@ import org.springframework.util.ClassUtils;
  * </p>
  * 
  * <p>
- * Transactions: The same ResultSet is held open regardless of commits or roll
- * backs in a surrounding transaction. When a transaction is committed, the
- * reader will be notified through the {@link #update(ExecutionContext)} so that
- * it can save it's current row number. Clients of this reader are responsible
- * for buffering the items in the case that they need to be re-presented on a
- * rollback.
- * </p>
- * 
- * <p>
  * Calling close on this {@link ItemStream} will cause all resources it is
  * currently using to be freed. (Connection, ResultSet, etc). It is then illegal
- * to call {@link #read()} again until it has been opened.
+ * to call {@link #read()} again until it has been re-opened.
  * </p>
  * 
  * <p>
  * Known limitation: when used with Derby
  * {@link #setVerifyCursorPosition(boolean)} needs to be <code>false</code>
  * because {@link ResultSet#getRow()} call used for cursor position verification
- * throws an exception.
+ * is not available for 'TYPE_FORWARD_ONLY' result sets.
  * </p>
  * 
  * @author Lucas Ward
  * @author Peter Zozom
  * @author Robert Kasanicky
+ * @author Thomas Risberg
  */
 public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements InitializingBean {
 
@@ -134,7 +148,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private boolean driverSupportsAbsolute = false;
 
-	private boolean participateInExistingTransaction = false;
+	private boolean useSharedExtendedConnection = false;
 
 	public JdbcCursorItemReader() {
 		setName(ClassUtils.getShortName(JdbcCursorItemReader.class));
@@ -162,25 +176,28 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	/**
-	 * Executes the provided SQL query. The statement is created with
-	 * 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' set to true. This is extremely
-	 * important, since a non read-only cursor may lock tables that shouldn't be
-	 * locked, and not holding the cursor open over a commit would require it to
-	 * be reopened after each commit, which would destroy performance.
+	 * Executes the provided SQL query. 
 	 */
 	private void executeQuery() {
 
 		Assert.state(dataSource != null, "DataSource must not be null.");
 
 		try {
-			if (participateInExistingTransaction) {
+			if (useSharedExtendedConnection) {
+				if (!(dataSource instanceof ExtendedConnectionDataSourceProxy)) {
+					throw new InvalidDataAccessApiUsageException(
+							"You must use a ExtendedConnectionDataSourceProxy for the dataSource when " +
+							"useSharedExtendedConnection is set to true.");
+				}
 				this.con = DataSourceUtils.getConnection(dataSource);
+				((ExtendedConnectionDataSourceProxy)dataSource).startCloseSuppression(this.con);
+				preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
+						ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			}
 			else {
 				this.con = dataSource.getConnection();
+				preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 			}
-			preparedStatement = this.con.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
-					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 			applyStatementSettings(preparedStatement);
 			if (this.preparedStatementSetter != null) {
 				preparedStatementSetter.setValues(preparedStatement);
@@ -385,16 +402,23 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	}
 
 	/**
-	 * Indicate whether the cursor should be opened as part of an existing transaction or if it
-	 * should be opened in its own transaction. The default is for the cursor to be opened in its
-	 * own transaction. If you set this flag to true then you should wrap the DataSource in a
-	 * {@link org.springframework.jdbc.datasource.SingleConnectionDataSource} to prevent the
-	 * connection from being closed after each commit.
+	 * Indicate whether the connection used for the cursor should be used by all other processing
+	 * thus sharing the same transaction. If this is set to false, which is the default, then the 
+	 * cursor will be opened using in its connection and will not participate in any transactions
+	 * started for the rest of the step processing. If you set this flag to true then you must 
+	 * wrap the DataSource in a {@link ExtendedConnectionDataSourceProxy} to prevent the
+	 * connection from being closed and released after each commit.
+	 * 
+	 * When you set this option to <code>true</code> then the statement used to open the cursor 
+	 * will be created with both 'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' options. This allows 
+	 * holding the cursor open over transaction start and commits performed in the step processing. 
+	 * To use this feature you need a database that supports this and a JDBC driver supporting 
+	 * JDBC 3.0 or later.
 	 *
-	 * @param participateInExistingTransaction <code>false</code> by default
+	 * @param useSharedExtendedConnection <code>false</code> by default
 	 */
-	public void setParticipateInExistingTransaction(boolean participateInExistingTransaction) {
-		this.participateInExistingTransaction = participateInExistingTransaction;
+	public void setUseSharedExtendedConnection(boolean useSharedExtendedConnection) {
+		this.useSharedExtendedConnection = useSharedExtendedConnection;
 	}
 
 	/**
@@ -415,10 +439,17 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	protected void doClose() throws Exception {
 		initialized = false;
 		JdbcUtils.closeResultSet(this.rs);
-		JdbcUtils.closeStatement(this.preparedStatement);
-		JdbcUtils.closeConnection(this.con);
 		rs = null;
-
+		JdbcUtils.closeStatement(this.preparedStatement);
+		if (useSharedExtendedConnection && dataSource instanceof ExtendedConnectionDataSourceProxy) {
+			((ExtendedConnectionDataSourceProxy)dataSource).stopCloseSuppression(this.con);
+			if (!TransactionSynchronizationManager.isActualTransactionActive()) {
+				DataSourceUtils.releaseConnection(con, dataSource);
+			}
+		}
+		else {
+			JdbcUtils.closeConnection(this.con);
+		}
 	}
 
 	/**
