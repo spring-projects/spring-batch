@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.item.database.support;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,6 +43,19 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 	}
 
 	@Test
+	public void testQueryContainsSortKey(){
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
+		assertTrue("Wrong query: "+s, s.contains("id asc"));		
+	}
+
+	@Test
+	public void testQueryContainsSortKeyDesc(){
+		pagingQueryProvider.setAscending(false);
+		String s = pagingQueryProvider.generateFirstPageQuery(pageSize).toLowerCase();
+		assertTrue("Wrong query: "+s, s.contains("id desc"));		
+	}
+
+	@Test
 	public abstract void testGenerateFirstPageQuery();
 
 	@Test
@@ -48,5 +63,8 @@ public abstract class AbstractSqlPagingQueryProviderTests {
 
 	@Test
 	public abstract void testGenerateJumpToItemQuery();
-	
+
+	@Test
+	public abstract void testGenerateJumpToItemQueryForFirstPage();
+
 }

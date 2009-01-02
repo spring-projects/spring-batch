@@ -27,17 +27,21 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Abstract SQL Paging Query Provider to serve as a base class for all provided SQL paging query providers.
- *
- * Any implementation must provide a way to specify the select clause, from clause and optionally a where clause. 
- * In addition a way to specify a single column sort key must also be provided. This sort key will be used to 
- * provide the paging functionality. It is recommended that there should be an index for the sort key to provide 
- * better performance.
- *
- * Provides properties and preparation for the mandatory "selectClause" and "fromClause" as well as for the
- * optional "whereClause".  Also provides property for the mandatory "sortKey".
- *
+ * Abstract SQL Paging Query Provider to serve as a base class for all provided
+ * SQL paging query providers.
+ * 
+ * Any implementation must provide a way to specify the select clause, from
+ * clause and optionally a where clause. In addition a way to specify a single
+ * column sort key must also be provided. This sort key will be used to provide
+ * the paging functionality. It is recommended that there should be an index for
+ * the sort key to provide better performance.
+ * 
+ * Provides properties and preparation for the mandatory "selectClause" and
+ * "fromClause" as well as for the optional "whereClause". Also provides
+ * property for the mandatory "sortKey".
+ * 
  * @author Thomas Risberg
+ * @author Dave Syer
  * @since 2.0
  */
 public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvider {
@@ -50,10 +54,11 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 
 	private String sortKey;
 
+	private boolean ascending = true;
+
 	private int parameterCount;
 
 	private boolean usingNamedParameters;
-
 
 	/**
 	 * @param selectClause SELECT clause part of SQL query string
@@ -63,7 +68,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 *
+	 * 
 	 * @return SQL SELECT clause part of SQL query string
 	 */
 	protected String getSelectClause() {
@@ -78,7 +83,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 *
+	 * 
 	 * @return SQL FROM clause part of SQL query string
 	 */
 	protected String getFromClause() {
@@ -93,12 +98,12 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 			this.whereClause = removeKeyWord("where", whereClause);
 		}
 		else {
-			this.whereClause = null;			
+			this.whereClause = null;
 		}
 	}
 
 	/**
-	 *
+	 * 
 	 * @return SQL WHERE clause part of SQL query string
 	 */
 	protected String getWhereClause() {
@@ -113,13 +118,31 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 *
+	 * Set the flag that signals that the sort key is applied ascending (default
+	 * true).
+	 * 
+	 * @param ascending the ascending value to set
+	 */
+	public void setAscending(boolean ascending) {
+		this.ascending = ascending;
+	}
+
+	/**
+	 * Get the flag that signals that the sort key is applied ascending.
+	 * 
+	 * @return the ascending flag
+	 */
+	public boolean isAscending() {
+		return ascending;
+	}
+
+	/**
+	 * 
 	 * @return sortKey key to use to sort and limit page content
 	 */
 	protected String getSortKey() {
 		return sortKey;
 	}
-
 
 	public int getParameterCount() {
 		return parameterCount;
@@ -130,9 +153,9 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * The sort key placeholder will vary depending on whether named parameters or traditional placeholders
-	 * are used in query strings.
-	 *
+	 * The sort key placeholder will vary depending on whether named parameters
+	 * or traditional placeholders are used in query strings.
+	 * 
 	 * @return place holder for sortKey.
 	 */
 	protected String getSortKeyPlaceHolder() {
@@ -158,41 +181,42 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 		parameterCount = JdbcParameterUtils.countParameterPlaceholders(sql.toString(), namedParameters);
 		if (namedParameters.size() > 0) {
 			if (parameterCount != namedParameters.size()) {
-				throw new InvalidDataAccessApiUsageException("You can't use both named parameters and classic \"?\" placeholders: " + sql);
+				throw new InvalidDataAccessApiUsageException(
+						"You can't use both named parameters and classic \"?\" placeholders: " + sql);
 			}
 			usingNamedParameters = true;
 		}
 	}
 
 	/**
-	 * Method generating the query string to be used for retrieving the first page.
-	 * This method must be implemented in sub classes.
-	 *
+	 * Method generating the query string to be used for retrieving the first
+	 * page. This method must be implemented in sub classes.
+	 * 
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
 	public abstract String generateFirstPageQuery(int pageSize);
 
 	/**
-	 * Method generating the query string to be used for retrieving the pages following the first page.
-	 * This method must be implemented in sub classes.
-	 *
+	 * Method generating the query string to be used for retrieving the pages
+	 * following the first page. This method must be implemented in sub classes.
+	 * 
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
 	public abstract String generateRemainingPagesQuery(int pageSize);
 
 	/**
-	 * Method generating the query string to be used for jumping to a specific item position.  
-	 * This method must be implemented in sub classes.
-	 *
+	 * Method generating the query string to be used for jumping to a specific
+	 * item position. This method must be implemented in sub classes.
+	 * 
 	 * @param itemIndex the index of the item to jump to
 	 * @param pageSize number of rows to read per page
 	 * @return query string
 	 */
 	public abstract String generateJumpToItemQuery(int itemIndex, int pageSize);
 
-	private String removeKeyWord(String keyWord,  String clause) {
+	private String removeKeyWord(String keyWord, String clause) {
 		String temp = clause.trim();
 		String keyWordString = keyWord + " ";
 		if (temp.toLowerCase().startsWith(keyWordString) && temp.length() > keyWordString.length()) {

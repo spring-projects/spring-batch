@@ -30,7 +30,9 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
-		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey()).append(" ASC) AS ROW_NUMBER");
+		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey());
+		buildAscendingClause(sql);
+		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause()).append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
 		sql.append(") WHERE ROW_NUMBER <= ").append(pageSize);
 
@@ -42,14 +44,23 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT * FROM ( ");
 		sql.append("SELECT ").append(getSelectClause()).append(", ");
-		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey()).append(" ASC) AS ROW_NUMBER");
+		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey());
+		buildAscendingClause(sql);
+		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause());
 		sql.append(" WHERE ");
 		if (getWhereClause() != null) {
 			sql.append(getWhereClause());
 			sql.append(" AND ");
 		}
-		sql.append(getSortKey()).append(" > ").append(getSortKeyPlaceHolder());
+		sql.append(getSortKey());
+		if (isAscending()) {
+			sql.append(" > ");
+		}
+		else {
+			sql.append(" < ");
+		}
+		sql.append(getSortKeyPlaceHolder());
 		sql.append(") WHERE ROW_NUMBER <= ").append(pageSize);
 
 		return sql.toString();
@@ -59,15 +70,29 @@ public class SqlWindowingPagingQueryProvider extends AbstractSqlPagingQueryProvi
 	public String generateJumpToItemQuery(int itemIndex, int pageSize) {
 		int page = itemIndex / pageSize;
 		int lastRowNum = (page * pageSize);
+		if (lastRowNum<=0) {
+			lastRowNum = 1;
+		}
 
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT SORT_KEY FROM ( ");
 		sql.append("SELECT ").append(getSortKey()).append(" AS SORT_KEY, ");
-		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey()).append(" ASC) AS ROW_NUMBER");
+		sql.append("ROW_NUMBER() OVER (ORDER BY ").append(getSortKey());
+		buildAscendingClause(sql);
+		sql.append(") AS ROW_NUMBER");
 		sql.append(" FROM ").append(getFromClause()).append(getWhereClause() == null ? "" : " WHERE " + getWhereClause());
 		sql.append(") WHERE ROW_NUMBER = ").append(lastRowNum);
 
 		return sql.toString();
+	}
+
+	private void buildAscendingClause(StringBuilder sql) {
+		if (isAscending()) {
+			sql.append(" ASC");
+		}
+		else {
+			sql.append(" DESC");
+		}
 	}
 
 }

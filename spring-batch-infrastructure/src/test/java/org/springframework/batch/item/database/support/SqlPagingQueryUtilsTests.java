@@ -16,11 +16,15 @@
 
 package org.springframework.batch.item.database.support;
 
-import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Thomas Risberg
+ * @author Dave Syer
  * @since 2.0
  */
 public class SqlPagingQueryUtilsTests {
@@ -28,65 +32,118 @@ public class SqlPagingQueryUtilsTests {
 	@Test
 	public void testGenerateLimitSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
-		Assert.assertEquals("SELECT FOO FROM BAR ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils.generateLimitSqlQuery(
-				qp, false, "LIMIT 100"));
-		Assert.assertEquals("SELECT FOO FROM BAR WHERE ID > ? ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils.generateLimitSqlQuery(
-				qp, true, "LIMIT 100"));
+		assertEquals("SELECT FOO FROM BAR ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils.generateLimitSqlQuery(qp,
+				false, "LIMIT 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE ID > ? ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils
+				.generateLimitSqlQuery(qp, true, "LIMIT 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		Assert.assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils.generateLimitSqlQuery(
-				qp, false, "LIMIT 100"));
-		Assert.assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils.generateLimitSqlQuery(
-				qp, true, "LIMIT 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100", SqlPagingQueryUtils
+				.generateLimitSqlQuery(qp, false, "LIMIT 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? ORDER BY ID ASC LIMIT 100",
+				SqlPagingQueryUtils.generateLimitSqlQuery(qp, true, "LIMIT 100"));
 	}
 
 	@Test
 	public void testGenerateTopSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
-		Assert.assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID ASC", SqlPagingQueryUtils.generateTopSqlQuery(
-				qp, false, "TOP 100"));
-		Assert.assertEquals("SELECT TOP 100 FOO FROM BAR WHERE ID > ? ORDER BY ID ASC", SqlPagingQueryUtils.generateTopSqlQuery(
-				qp, true, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID ASC", SqlPagingQueryUtils.generateTopSqlQuery(qp, false,
+				"TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE ID > ? ORDER BY ID ASC", SqlPagingQueryUtils
+				.generateTopSqlQuery(qp, true, "TOP 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		Assert.assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC", SqlPagingQueryUtils.generateTopSqlQuery(
-				qp, false, "TOP 100"));
-		Assert.assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? ORDER BY ID ASC", SqlPagingQueryUtils.generateTopSqlQuery(
-				qp, true, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC", SqlPagingQueryUtils
+				.generateTopSqlQuery(qp, false, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
 	}
 
 	@Test
 	public void testGenerateRowNumSqlQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
-		Assert.assertEquals("SELECT FOO FROM BAR WHERE ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils.generateRowNumSqlQuery(
-				qp, false, "ROWNUMBER <= 100"));
-		Assert.assertEquals("SELECT FOO FROM BAR WHERE ID > ? AND ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils.generateRowNumSqlQuery(
-				qp, true, "ROWNUMBER <= 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils
+				.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE ID > ? AND ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils
+				.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		Assert.assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils.generateRowNumSqlQuery(
-				qp, false, "ROWNUMBER <= 100"));
-		Assert.assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? AND ROWNUMBER <= 100 ORDER BY ID ASC", SqlPagingQueryUtils.generateRowNumSqlQuery(
-				qp, true, "ROWNUMBER <= 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ROWNUMBER <= 100 ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID > ? AND ROWNUMBER <= 100 ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
+	}
+
+	@Test
+	public void testGenerateTopSqlQueryDescending() {
+		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
+		qp.setAscending(false);
+		assertEquals("SELECT TOP 100 FOO FROM BAR ORDER BY ID DESC", SqlPagingQueryUtils.generateTopSqlQuery(qp, false,
+				"TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE ID < ? ORDER BY ID DESC", SqlPagingQueryUtils
+				.generateTopSqlQuery(qp, true, "TOP 100"));
+		qp.setWhereClause("BAZ IS NOT NULL");
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID DESC", SqlPagingQueryUtils
+				.generateTopSqlQuery(qp, false, "TOP 100"));
+		assertEquals("SELECT TOP 100 FOO FROM BAR WHERE BAZ IS NOT NULL AND ID < ? ORDER BY ID DESC",
+				SqlPagingQueryUtils.generateTopSqlQuery(qp, true, "TOP 100"));
+	}
+
+	@Test
+	public void testGenerateRowNumSqlQueryDescending() {
+		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
+		qp.setAscending(false);
+		assertEquals("SELECT FOO FROM BAR WHERE ROWNUMBER <= 100 ORDER BY ID DESC", SqlPagingQueryUtils
+				.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE ID < ? AND ROWNUMBER <= 100 ORDER BY ID DESC", SqlPagingQueryUtils
+				.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
+		qp.setWhereClause("BAZ IS NOT NULL");
+		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ROWNUMBER <= 100 ORDER BY ID DESC",
+				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, false, "ROWNUMBER <= 100"));
+		assertEquals("SELECT FOO FROM BAR WHERE BAZ IS NOT NULL AND ID < ? AND ROWNUMBER <= 100 ORDER BY ID DESC",
+				SqlPagingQueryUtils.generateRowNumSqlQuery(qp, true, "ROWNUMBER <= 100"));
 	}
 
 	@Test
 	public void testGenerateLimitJumpToQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
-		Assert.assertEquals("SELECT ID AS SORT_KEY FROM BAR ORDER BY ID ASC LIMIT 100, 1", SqlPagingQueryUtils.generateLimitJumpToQuery(
-				qp, "LIMIT 100, 1"));
+		assertEquals("SELECT ID AS SORT_KEY FROM BAR ORDER BY ID ASC LIMIT 100, 1", SqlPagingQueryUtils
+				.generateLimitJumpToQuery(qp, "LIMIT 100, 1"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		Assert.assertEquals("SELECT ID AS SORT_KEY FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100, 1", SqlPagingQueryUtils.generateLimitJumpToQuery(
-				qp, "LIMIT 100, 1"));
+		assertEquals("SELECT ID AS SORT_KEY FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC LIMIT 100, 1",
+				SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1"));
 	}
 
 	@Test
 	public void testGenerateTopJumpToQuery() {
 		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
-		Assert.assertEquals("SELECT TOP 100, 1 ID AS SORT_KEY FROM BAR ORDER BY ID ASC", SqlPagingQueryUtils.generateTopJumpToQuery(
-				qp, "TOP 100, 1"));
+		assertEquals("SELECT TOP 100, 1 ID AS SORT_KEY FROM BAR ORDER BY ID ASC", SqlPagingQueryUtils
+				.generateTopJumpToQuery(qp, "TOP 100, 1"));
 		qp.setWhereClause("BAZ IS NOT NULL");
-		Assert.assertEquals("SELECT TOP 100, 1 ID AS SORT_KEY FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC", SqlPagingQueryUtils.generateTopJumpToQuery(
-				qp, "TOP 100, 1"));
+		assertEquals("SELECT TOP 100, 1 ID AS SORT_KEY FROM BAR WHERE BAZ IS NOT NULL ORDER BY ID ASC",
+				SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1"));
 	}
 
+	@Test
+	public void testGenerateTopJumpQueryDescending() {
+		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
+		qp.setAscending(false);
+		String query = SqlPagingQueryUtils.generateTopJumpToQuery(qp, "TOP 100, 1");
+		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
+		assertEquals("Wrong query: " + query, 0, StringUtils.countOccurrencesOf(query, "ASC"));
+		assertEquals("Wrong query: " + query, 1, StringUtils.countOccurrencesOf(query, "DESC"));
+		qp.setWhereClause("BAZ IS NOT NULL");
+		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
+	}
+
+	@Test
+	public void testGenerateLimtJumpQueryDescending() {
+		AbstractSqlPagingQueryProvider qp = new TestSqlPagingQueryProvider("FOO", "BAR", "ID");
+		qp.setAscending(false);
+		String query = SqlPagingQueryUtils.generateLimitJumpToQuery(qp, "LIMIT 100, 1");
+		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
+		assertEquals("Wrong query: " + query, 0, StringUtils.countOccurrencesOf(query, "ASC"));
+		assertEquals("Wrong query: " + query, 1, StringUtils.countOccurrencesOf(query, "DESC"));
+		qp.setWhereClause("BAZ IS NOT NULL");
+		assertTrue("Wrong query: " + query, query.contains("ID DESC"));
+	}
 
 	private static class TestSqlPagingQueryProvider extends AbstractSqlPagingQueryProvider {
 

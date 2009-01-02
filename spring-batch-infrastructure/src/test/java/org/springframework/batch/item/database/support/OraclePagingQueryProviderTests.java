@@ -37,4 +37,11 @@ public class OraclePagingQueryProviderTests extends AbstractSqlPagingQueryProvid
 		String s = pagingQueryProvider.generateJumpToItemQuery(145, pageSize);
 		Assert.assertEquals("", sql, s);
 	}
+	
+	@Test @Override
+	public void testGenerateJumpToItemQueryForFirstPage() {
+		String sql = "SELECT SORT_KEY FROM ( SELECT id AS SORT_KEY, ROW_NUMBER() OVER (ORDER BY id ASC) AS ROW_NUMBER FROM foo WHERE bar = 1) WHERE ROW_NUMBER = 1";
+		String s = pagingQueryProvider.generateJumpToItemQuery(45, pageSize);
+		Assert.assertEquals("", sql, s);
+	}
 }

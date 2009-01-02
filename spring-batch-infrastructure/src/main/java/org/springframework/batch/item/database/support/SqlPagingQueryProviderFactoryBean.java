@@ -59,6 +59,8 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	private String sortKey;
 
 	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<DatabaseType, AbstractSqlPagingQueryProvider>();
+
+	private boolean ascending;
 	{
 		providers.put(DB2, new Db2PagingQueryProvider());
 		providers.put(DB2ZOS, new Db2PagingQueryProvider());
@@ -114,6 +116,13 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	}
 
 	/**
+	 * @param ascending
+	 */
+	public void setAscending(boolean ascending) {
+		this.ascending = ascending;	
+	}
+
+	/**
 	 * Get a {@link PagingQueryProvider} instance using the provided properties
 	 * and appropriate for the given database type.
 	 * 
@@ -137,6 +146,7 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 		provider.setFromClause(fromClause);
 		provider.setWhereClause(whereClause);
 		provider.setSortKey(sortKey);
+		provider.setAscending(ascending);
 		if (StringUtils.hasText(selectClause)) {
 			provider.setSelectClause(selectClause);
 		}
@@ -163,4 +173,5 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 	public boolean isSingleton() {
 		return true;
 	}
+
 }
