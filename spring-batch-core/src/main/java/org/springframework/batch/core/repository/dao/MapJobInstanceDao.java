@@ -65,7 +65,7 @@ public class MapJobInstanceDao implements JobInstanceDao {
 		return result;
 	}
 
-	public List<JobInstance> getLastJobInstances(String jobName, int count) {
+	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
 		List<JobInstance> result = new ArrayList<JobInstance>();
 		for (JobInstance instance : jobInstances) {
 			if (instance.getJobName().equals(jobName)) {
@@ -78,8 +78,13 @@ public class MapJobInstanceDao implements JobInstanceDao {
 				return Long.signum(o2.getId() - o1.getId());
 			}
 		});
-		int length = count > result.size() ? result.size() : count;
-		return result.subList(0, length);
+		if (start>=result.size()) {
+			start = result.size();
+		}
+		if (start + count >=result.size()) {
+			count = result.size();
+		}
+		return result.subList(start, count);
 	}
 
 	public JobInstance getJobInstance(JobExecution jobExecution) {

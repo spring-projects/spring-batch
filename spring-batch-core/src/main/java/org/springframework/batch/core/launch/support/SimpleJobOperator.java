@@ -369,7 +369,6 @@ public class SimpleJobOperator implements JobOperator, InitializingBean {
 		jobExecution.setStatus(BatchStatus.STOPPING);
 		jobRepository.update(jobExecution);
 
-		// TODO: I'm not sure that we can really know if the execution stopped
 		return true;
 	}
 

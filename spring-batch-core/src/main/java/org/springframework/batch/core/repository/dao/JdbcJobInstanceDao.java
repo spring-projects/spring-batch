@@ -250,7 +250,7 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 	 * @seeorg.springframework.batch.core.repository.dao.JobInstanceDao#
 	 * getLastJobInstances(java.lang.String, int)
 	 */
-	public List<JobInstance> getLastJobInstances(String jobName, final int count) {
+	public List<JobInstance> getJobInstances(String jobName, final int start, final int count) {
 
 		ResultSetExtractor extractor = new ResultSetExtractor() {
 
@@ -258,7 +258,10 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 
 			public Object extractData(ResultSet rs) throws SQLException, DataAccessException {
 				int rowNum = 0;
-				while (rowNum < count && rs.next()) {
+				while (rowNum < start && rs.next()) {
+					rowNum++;
+				}
+				while (rowNum < start + count && rs.next()) {
 					ParameterizedRowMapper<JobInstance> rowMapper = new JobInstanceRowMapper();
 					list.add(rowMapper.mapRow(rs, rowNum));
 					rowNum++;

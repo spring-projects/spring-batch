@@ -124,7 +124,7 @@ public class SimpleJobExplorerTests extends TestCase {
 
 	@Test
 	public void testGetLastJobInstances() throws Exception {
-		jobInstanceDao.getLastJobInstances("foo", 1);
+		jobInstanceDao.getJobInstances("foo", 0, 1);
 		EasyMock.expectLastCall().andReturn(Collections.singletonList(jobInstance));
 		replay(jobExecutionDao, jobInstanceDao, stepExecutionDao);
 		jobExplorer.getJobInstances("foo", 0, 1);

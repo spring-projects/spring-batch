@@ -61,7 +61,7 @@ public interface JobExecutionDao {
 
 	/**
 	 * Because it may be possible that the status of a JobExecution is updated
-	 * while running, the following method while synchronize only the status and
+	 * while running, the following method will synchronize only the status and
 	 * version fields.
 	 * 
 	 * @param jobExecution to be updated.

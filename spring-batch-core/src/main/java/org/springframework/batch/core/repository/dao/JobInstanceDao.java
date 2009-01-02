@@ -63,10 +63,11 @@ public interface JobInstanceDao {
 	 * 
 	 * 
 	 * @param jobName the job name
-	 * @param count the number of objects to return
+	 * @param start the start index of the instances to return
+	 * @param count the maximum number of objects to return
 	 * @return the job instances with this name or empty if none
 	 */
-	List<JobInstance> getLastJobInstances(String jobName, int count);
+	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
 	 * Retrieve the names of all job instances sorted alphabetically - i.e. jobs

@@ -120,7 +120,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @see org.springframework.batch.core.explore.JobExplorer#getLastJobInstances(java.lang.String, int)
 	 */
 	public List<JobInstance> getJobInstances(String jobName, int start, int count) {
-		return jobInstanceDao.getLastJobInstances(jobName, count);
+		return jobInstanceDao.getJobInstances(jobName, start, count);
 	}
 
 	/*
