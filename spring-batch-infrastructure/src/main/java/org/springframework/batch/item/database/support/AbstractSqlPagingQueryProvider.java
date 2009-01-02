@@ -130,7 +130,7 @@ public abstract class AbstractSqlPagingQueryProvider implements PagingQueryProvi
 	}
 
 	/**
-	 * The sort key placegholder will vary depending on whether named parameters or traditional placeholders
+	 * The sort key placeholder will vary depending on whether named parameters or traditional placeholders
 	 * are used in query strings.
 	 *
 	 * @return place holder for sortKey.

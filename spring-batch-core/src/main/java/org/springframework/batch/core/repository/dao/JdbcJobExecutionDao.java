@@ -87,7 +87,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
-		Assert.notNull(jobExecutionIncrementer);
+		Assert.notNull(jobExecutionIncrementer, "The jobExecutionIncrementer must not be null.");
 	}
 
 	public List<JobExecution> findJobExecutions(final JobInstance job) {
@@ -271,7 +271,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @author Dave Syer
 	 * 
 	 */
-	private static class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
+	protected static class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
 
 		private JobInstance jobInstance;
 

@@ -25,15 +25,13 @@ import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
-import org.springframework.batch.item.database.support.DataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.item.database.support.DefaultDataFieldMaxValueIncrementerFactory;
-import org.springframework.batch.support.DatabaseType;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
+import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * A {@link FactoryBean} that automates the creation of a
@@ -48,11 +46,14 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	private SimpleJdbcOperations jdbcTemplate;
 
-	private String databaseType;
-
 	private String tablePrefix = AbstractJdbcBatchMetadataDao.DEFAULT_TABLE_PREFIX;
 
-	private DataFieldMaxValueIncrementerFactory incrementerFactory;
+	private DataFieldMaxValueIncrementer incrementer = new AbstractDataFieldMaxValueIncrementer() {
+		@Override
+		protected long getNextKey() {
+			throw new IllegalStateException("JobExplorer is read only.");
+		}
+	};
 
 	/**
 	 * Public setter for the {@link DataSource}.
@@ -63,15 +64,6 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	/**
-	 * Sets the database type.
-	 * @param dbType as specified by
-	 * {@link DefaultDataFieldMaxValueIncrementerFactory}
-	 */
-	public void setDatabaseType(String dbType) {
-		this.databaseType = dbType;
-	}
-
-	/**
 	 * Sets the table prefix for all the batch meta-data tables.
 	 * @param tablePrefix
 	 */
@@ -79,27 +71,11 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		this.tablePrefix = tablePrefix;
 	}
 
-	public void setIncrementerFactory(DataFieldMaxValueIncrementerFactory incrementerFactory) {
-		this.incrementerFactory = incrementerFactory;
-	}
-
 	public void afterPropertiesSet() throws Exception {
 
 		Assert.notNull(dataSource, "DataSource must not be null.");
 
 		jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-
-		if (incrementerFactory == null) {
-			incrementerFactory = new DefaultDataFieldMaxValueIncrementerFactory(dataSource);
-		}
-
-		if (databaseType == null) {
-			databaseType = DatabaseType.fromMetaData(dataSource).name();
-		}
-
-		Assert.isTrue(incrementerFactory.isSupportedIncrementerType(databaseType), "'" + databaseType
-				+ "' is an unsupported database type.  The supported database types are "
-				+ StringUtils.arrayToCommaDelimitedString(incrementerFactory.getSupportedIncrementerTypes()));
 
 	}
 
@@ -111,7 +87,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	protected JobInstanceDao createJobInstanceDao() throws Exception {
 		JdbcJobInstanceDao dao = new JdbcJobInstanceDao();
 		dao.setJdbcTemplate(jdbcTemplate);
-		dao.setJobIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ"));
+		dao.setJobIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
@@ -121,8 +97,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	protected JobExecutionDao createJobExecutionDao() throws Exception {
 		JdbcJobExecutionDao dao = new JdbcJobExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
-		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
-				+ "JOB_EXECUTION_SEQ"));
+		dao.setJobExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;
@@ -131,8 +106,7 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	protected StepExecutionDao createStepExecutionDao() throws Exception {
 		JdbcStepExecutionDao dao = new JdbcStepExecutionDao();
 		dao.setJdbcTemplate(jdbcTemplate);
-		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
-				+ "STEP_EXECUTION_SEQ"));
+		dao.setStepExecutionIncrementer(incrementer);
 		dao.setTablePrefix(tablePrefix);
 		dao.afterPropertiesSet();
 		return dao;

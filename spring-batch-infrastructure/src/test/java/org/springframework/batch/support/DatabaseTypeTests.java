@@ -1,25 +1,33 @@
 package org.springframework.batch.support;
 
-import static org.springframework.batch.support.DatabaseType.*;
-import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
-
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
+import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2ZOS;
+import static org.springframework.batch.support.DatabaseType.DERBY;
+import static org.springframework.batch.support.DatabaseType.HSQL;
+import static org.springframework.batch.support.DatabaseType.MYSQL;
+import static org.springframework.batch.support.DatabaseType.ORACLE;
+import static org.springframework.batch.support.DatabaseType.POSTGRES;
+import static org.springframework.batch.support.DatabaseType.SQLSERVER;
+import static org.springframework.batch.support.DatabaseType.SYBASE;
+import static org.springframework.batch.support.DatabaseType.fromProductName;
 
 import javax.sql.DataSource;
 
 import org.junit.Test;
+import org.springframework.jdbc.support.MetaDataAccessException;
 
 /**
  * 
  * @author Lucas Ward
- *
+ * 
  */
 public class DatabaseTypeTests {
 
 	@Test
-	public void testFromProductName(){
+	public void testFromProductName() {
 		assertEquals(DERBY, fromProductName("Apache Derby"));
 		assertEquals(DB2, fromProductName("DB2"));
 		assertEquals(DB2ZOS, fromProductName("DB2ZOS"));
@@ -30,157 +38,91 @@ public class DatabaseTypeTests {
 		assertEquals(POSTGRES, fromProductName("PostgreSQL"));
 		assertEquals(SYBASE, fromProductName("Sybase"));
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
-	public void testInvalidProductName(){
-		
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testInvalidProductName() {
+
 		fromProductName("bad product name");
 	}
-	
+
 	@Test
-	public void testFromMetaDataForDerby() throws Exception{
-		
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("Apache Derby");
-		replay(dmd,ds,con);
-		
+	public void testFromMetaDataForDerby() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Apache Derby");
+		replay(ds);
 		assertEquals(DERBY, DatabaseType.fromMetaData(ds));
-		
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForDB2() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("DB2/Linux");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForDB2() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2/Linux");
+		replay(ds);
 		assertEquals(DB2, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForDB2ZOS() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("DB2");
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductVersion()).andReturn("DSN08015");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForDB2ZOS() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("DB2", "DSN08015");
+		replay(ds);
 		assertEquals(DB2ZOS, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForHsql() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("HSQL Database Engine");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForHsql() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("HSQL Database Engine");
+		replay(ds);
 		assertEquals(HSQL, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForSqlServer() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("Microsoft SQL Server");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForSqlServer() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Microsoft SQL Server");
+		replay(ds);
 		assertEquals(SQLSERVER, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForMySql() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("MySQL");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForMySql() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("MySQL");
+		replay(ds);
 		assertEquals(MYSQL, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForOracle() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("Oracle");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForOracle() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Oracle");
+		replay(ds);
 		assertEquals(ORACLE, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForPostgres() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("PostgreSQL");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForPostgres() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("PostgreSQL");
+		replay(ds);
 		assertEquals(POSTGRES, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
 
 	@Test
-	public void testFromMetaDataForSybase() throws Exception{
-
-		DatabaseMetaData dmd = createMock(DatabaseMetaData.class);
-		DataSource ds = createMock(DataSource.class);
-		Connection con = createMock(Connection.class);
-		expect(ds.getConnection()).andReturn(con);
-		expect(con.getMetaData()).andReturn(dmd);
-		expect(dmd.getDatabaseProductName()).andReturn("Adaptive Server Enterprise");
-		replay(dmd,ds,con);
-
+	public void testFromMetaDataForSybase() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource("Adaptive Server Enterprise");
+		replay(ds);
 		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
-
-		verify(dmd,ds,con);
+		verify(ds);
 	}
+
+	@Test(expected=MetaDataAccessException.class)
+	public void testBadMetaData() throws Exception {
+		DataSource ds = DatabaseTypeTestUtils.getMockDataSource(new MetaDataAccessException("Bad!"));
+		replay(ds);
+		assertEquals(SYBASE, DatabaseType.fromMetaData(ds));
+		verify(ds);
+	}
+
 }

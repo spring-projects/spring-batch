@@ -15,7 +15,15 @@
  */
 package org.springframework.batch.item.database.support;
 
-import static org.springframework.batch.support.DatabaseType.*;
+import static org.springframework.batch.support.DatabaseType.DB2;
+import static org.springframework.batch.support.DatabaseType.DB2ZOS;
+import static org.springframework.batch.support.DatabaseType.DERBY;
+import static org.springframework.batch.support.DatabaseType.HSQL;
+import static org.springframework.batch.support.DatabaseType.MYSQL;
+import static org.springframework.batch.support.DatabaseType.ORACLE;
+import static org.springframework.batch.support.DatabaseType.POSTGRES;
+import static org.springframework.batch.support.DatabaseType.SQLSERVER;
+import static org.springframework.batch.support.DatabaseType.SYBASE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +31,7 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.batch.support.DatabaseType;
+import org.springframework.jdbc.support.incrementer.DB2MainframeSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DB2SequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DerbyMaxValueIncrementer;
@@ -32,25 +41,10 @@ import org.springframework.jdbc.support.incrementer.OracleSequenceMaxValueIncrem
 import org.springframework.jdbc.support.incrementer.PostgreSQLSequenceMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SqlServerMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.SybaseMaxValueIncrementer;
-import org.springframework.jdbc.support.incrementer.DB2MainframeSequenceMaxValueIncrementer;
 
 /**
  * Default implementation of the {@link DataFieldMaxValueIncrementerFactory}
- * interface. Valid types are:
- * 
- * Valid values are:
- * 
- * <ul>
- * <li>db2</li>
- * <li>db2zos</li>
- * <li>derby</li>
- * <li>hsql</li>
- * <li>mysql</li>
- * <li>oracle</li>
- * <li>postgres</li>
- * <li>sqlserver</li>
- * <li>sybase</li>
- * </ul>
+ * interface. Valid database types are given by the {@link DatabaseType} enum.
  * 
  * @author Lucas Ward
  * @see DatabaseType
@@ -64,8 +58,8 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	/**
 	 * Public setter for the column name (defaults to "ID") in the incrementer.
 	 * Only used by some platforms (Derby, HSQL, MySQL, SQL Server and Sybase),
-	 * and should be fine for use with Spring Batch meta data as long as the default
-	 * batch schema hasn't been changed.
+	 * and should be fine for use with Spring Batch meta data as long as the
+	 * default batch schema hasn't been changed.
 	 * 
 	 * @param incrementerColumnName the primary key column name to set
 	 */
@@ -79,7 +73,7 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 
 	public DataFieldMaxValueIncrementer getIncrementer(String incrementerType, String incrementerName) {
 		DatabaseType databaseType = DatabaseType.valueOf(incrementerType.toUpperCase());
-		
+
 		if (databaseType == DB2) {
 			return new DB2SequenceMaxValueIncrementer(dataSource, incrementerName);
 		}
@@ -112,20 +106,20 @@ public class DefaultDataFieldMaxValueIncrementerFactory implements DataFieldMaxV
 	}
 
 	public boolean isSupportedIncrementerType(String incrementerType) {
-		for(DatabaseType type : DatabaseType.values()){
-			if(type.name().equals(incrementerType.toUpperCase())){
+		for (DatabaseType type : DatabaseType.values()) {
+			if (type.name().equals(incrementerType.toUpperCase())) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	public String[] getSupportedIncrementerTypes() {
-		
+
 		List<String> types = new ArrayList<String>();
 
-		for(DatabaseType type : DatabaseType.values()){
+		for (DatabaseType type : DatabaseType.values()) {
 			types.add(type.name());
 		}
 

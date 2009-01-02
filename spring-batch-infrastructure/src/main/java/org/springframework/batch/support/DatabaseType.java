@@ -76,7 +76,7 @@ public enum DatabaseType {
 	 * @return DatabaseType
 	 * @throws MetaDataAccessException
 	 */
-	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException{
+	public static DatabaseType fromMetaData(DataSource dataSource) throws MetaDataAccessException {
 		String databaseProductName =
 				JdbcUtils.extractDatabaseMetaData(dataSource, "getDatabaseProductName").toString();
 		if ("DB2".equals(databaseProductName)) {
