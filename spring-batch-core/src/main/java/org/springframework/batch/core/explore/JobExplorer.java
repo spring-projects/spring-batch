@@ -47,11 +47,10 @@ public interface JobExplorer {
 
 	/**
 	 * @param jobExecutionId the parent job execution id
-	 * @param stepName the step name identifier for the required
-	 * {@link StepExecution}
+	 * @param stepExecutionId the step execution id
 	 * @return the {@link StepExecution} with this id, or null if not found
 	 */
-	StepExecution getStepExecution(Long jobExecutionId, String stepName);
+	StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
 
 	/**
 	 * @param instanceId

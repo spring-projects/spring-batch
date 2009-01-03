@@ -85,9 +85,9 @@ public class SimpleJobRepository implements JobRepository {
 	 * @see JobRepository#isJobInstanceExists(String, JobParameters)
 	 */
 	public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
-		return jobInstanceDao.getJobInstance(jobName, jobParameters)!=null;
+		return jobInstanceDao.getJobInstance(jobName, jobParameters) != null;
 	}
-	
+
 	/**
 	 * <p>
 	 * Create a {@link JobExecution} based on the passed in {@link Job} and
@@ -244,7 +244,6 @@ public class SimpleJobRepository implements JobRepository {
 	public void update(StepExecution stepExecution) {
 		validateStepExecution(stepExecution);
 		Assert.notNull(stepExecution.getId(), "StepExecution must already be saved (have an id assigned)");
-		
 
 		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		stepExecutionDao.updateStepExecution(stepExecution);
@@ -277,9 +276,11 @@ public class SimpleJobRepository implements JobRepository {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
 		for (JobExecution jobExecution : jobExecutions) {
-			StepExecution stepExecution = stepExecutionDao.getStepExecution(jobExecution, stepName);
-			if (stepExecution != null) {
-				stepExecutions.add(stepExecution);
+			List<StepExecution> allStepExecutions = stepExecutionDao.getStepExecutions(jobExecution);
+			for (StepExecution stepExecution : allStepExecutions) {
+				if (stepName.equals(stepExecution.getStepName())) {
+					stepExecutions.add(stepExecution);
+				}
 			}
 		}
 		StepExecution latest = null;
@@ -305,24 +306,28 @@ public class SimpleJobRepository implements JobRepository {
 		int count = 0;
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		for (JobExecution jobExecution : jobExecutions) {
-			if (stepExecutionDao.getStepExecution(jobExecution, stepName) != null) {
-				count++;
+			List<StepExecution> allStepExecutions = stepExecutionDao.getStepExecutions(jobExecution);
+			for (StepExecution stepExecution : allStepExecutions) {
+				if (stepName.equals(stepExecution.getStepName())) {
+					count++;
+				}
 			}
 		}
 		return count;
 	}
-	
-	/* 
-	 * Check to determine whether or not the JobExecution that is the parent of the provided
-	 * StepExecution has been interrupted.  If, after synchronizing the status with the database,
-	 * the status has been updated to STOPPING, then the job has been interrupted.
+
+	/*
+	 * Check to determine whether or not the JobExecution that is the parent of
+	 * the provided StepExecution has been interrupted. If, after synchronizing
+	 * the status with the database, the status has been updated to STOPPING,
+	 * then the job has been interrupted.
 	 * 
 	 * @param stepExecution
 	 */
-	private void checkForInterruption(StepExecution stepExecution){
+	private void checkForInterruption(StepExecution stepExecution) {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		jobExecutionDao.synchronizeStatus(jobExecution);
-		if(jobExecution.getStatus() == BatchStatus.STOPPING){
+		if (jobExecution.getStatus() == BatchStatus.STOPPING) {
 			stepExecution.setTerminateOnly();
 		}
 	}
@@ -333,7 +338,7 @@ public class SimpleJobRepository implements JobRepository {
 			return null;
 		}
 		return jobExecutionDao.getLastJobExecution(jobInstance);
-		
+
 	}
 
 }

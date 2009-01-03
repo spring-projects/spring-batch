@@ -54,7 +54,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String GET_STEP_EXECUTIONS = GET_RAW_STEP_EXECUTIONS + " order by STEP_EXECUTION_ID";
 
-	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " and STEP_NAME = ?";
+	private static final String GET_STEP_EXECUTION = GET_RAW_STEP_EXECUTIONS + " and STEP_EXECUTION_ID = ?";
 
 	private static final String CURRENT_VERSION_STEP_EXECUTION = "SELECT VERSION FROM %PREFIX%STEP_EXECUTION WHERE STEP_EXECUTION_ID=?";
 
@@ -190,9 +190,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 	}
 
-	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
+	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
 		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTION),
-				new StepExecutionRowMapper(jobExecution), jobExecution.getId(), stepName);
+				new StepExecutionRowMapper(jobExecution), jobExecution.getId(), stepExecutionId);
 
 		Assert.state(executions.size() <= 1,
 				"There can be at most one step execution with given name for single job execution");

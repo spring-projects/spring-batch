@@ -1,16 +1,16 @@
 package org.springframework.batch.core.repository.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
 
 import java.util.Date;
 
+import org.junit.Test;
+import org.junit.internal.runners.JUnit4ClassRunner;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.internal.runners.JUnit4ClassRunner;
 
 @RunWith(JUnit4ClassRunner.class)
 public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
@@ -40,14 +40,14 @@ public class MapStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		tested.saveStepExecution(stepExecution);
 		stepExecution.setEndTime(new Date());
 		
-		StepExecution retrieved = tested.getStepExecution(jobExecution, "stepName");
+		StepExecution retrieved = tested.getStepExecution(jobExecution, stepExecution.getId());
 		assertNull(retrieved.getEndTime());
 		
 		stepExecution.setEndTime(null);
 		tested.updateStepExecution(stepExecution);
 		stepExecution.setEndTime(new Date());
 		
-		StepExecution stored = tested.getStepExecution(jobExecution, "stepName");
+		StepExecution stored = tested.getStepExecution(jobExecution, stepExecution.getId());
 		assertNull(stored.getEndTime());
 	}
 

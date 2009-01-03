@@ -34,15 +34,20 @@ import org.springframework.util.Assert;
  */
 public class MapStepExecutionDao implements StepExecutionDao {
 
-	private static Map<Long, Map<String, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
-	
+	private static Map<Long, Map<Long, StepExecution>> executionsByJobExecutionId = TransactionAwareProxyFactory
+			.createTransactionalMap();
+
+	private static Map<Long, StepExecution> executionsByStepExecutionId = TransactionAwareProxyFactory
+			.createTransactionalMap();
+
 	private static long currentId = 0;
 
 	public static void clear() {
 		executionsByJobExecutionId.clear();
+		executionsByStepExecutionId.clear();
 	}
-	
-	private static StepExecution copy(StepExecution original){
+
+	private static StepExecution copy(StepExecution original) {
 		return (StepExecution) SerializationUtils.deserialize(SerializationUtils.serialize(original));
 	}
 
@@ -51,47 +56,48 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		Assert.isTrue(stepExecution.getVersion() == null);
 		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
 
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		if (executions == null) {
 			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
 		stepExecution.setId(currentId++);
 		stepExecution.incrementVersion();
-		executions.put(stepExecution.getStepName(), copy(stepExecution));
+		StepExecution copy = copy(stepExecution);
+		executions.put(stepExecution.getId(), copy);
+		executionsByStepExecutionId.put(stepExecution.getId(), copy);
 	}
 
 	public void updateStepExecution(StepExecution stepExecution) {
 
 		Assert.notNull(stepExecution.getJobExecutionId());
 
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
+		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(stepExecution.getJobExecutionId());
 		Assert.notNull(executions, "step executions for given job execution are expected to be already saved");
 
-		StepExecution persistedExecution = (StepExecution) executions.get(stepExecution.getStepName());
+		StepExecution persistedExecution = executionsByStepExecutionId.get(stepExecution.getId());
 		Assert.notNull(persistedExecution, "step execution is expected to be already saved");
 
 		synchronized (stepExecution) {
 			if (!persistedExecution.getVersion().equals(stepExecution.getVersion())) {
-				throw new OptimisticLockingFailureException("Attempt to update step execution id=" + stepExecution.getId() + " with wrong version (" + stepExecution.getVersion() + "), where current version is " + persistedExecution.getVersion());
+				throw new OptimisticLockingFailureException("Attempt to update step execution id="
+						+ stepExecution.getId() + " with wrong version (" + stepExecution.getVersion()
+						+ "), where current version is " + persistedExecution.getVersion());
 			}
 
 			stepExecution.incrementVersion();
-			executions.put(stepExecution.getStepName(), copy(stepExecution));
+			StepExecution copy = copy(stepExecution);
+			executions.put(stepExecution.getId(), copy);
+			executionsByStepExecutionId.put(stepExecution.getId(), copy);
 		}
 	}
 
-	public StepExecution getStepExecution(JobExecution jobExecution, String stepName) {
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
-		if (executions == null) {
-			return null;
-		}
-
-		return copy(executions.get(stepName));
+	public StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId) {
+		return executionsByStepExecutionId.get(stepExecutionId);
 	}
 
 	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
-		Map<String, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
+		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
 		if (executions == null || executions.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -102,9 +108,9 @@ public class MapStepExecutionDao implements StepExecutionDao {
 				return Long.signum(o2.getId() - o1.getId());
 			}
 		});
-		
+
 		List<StepExecution> copy = new ArrayList<StepExecution>(result.size());
-		for(StepExecution exec : result) {
+		for (StepExecution exec : result) {
 			copy.add(copy(exec));
 		}
 		return copy;

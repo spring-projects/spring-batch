@@ -44,14 +44,14 @@ public class JdbcStepExecutionDaoTests extends AbstractStepExecutionDaoTests {
 		((JdbcStepExecutionDao) dao).setExitMessageLength(250);
 		dao.saveStepExecution(stepExecution);
 
-		StepExecution retrievedAfterSave = dao.getStepExecution(jobExecution, step.getName());
+		StepExecution retrievedAfterSave = dao.getStepExecution(jobExecution, stepExecution.getId());
 
 		assertTrue("Exit description should be truncated", retrievedAfterSave.getExitStatus().getExitDescription()
 				.length() < stepExecution.getExitStatus().getExitDescription().length());
 
 		dao.updateStepExecution(stepExecution);
 
-		StepExecution retrievedAfterUpdate = dao.getStepExecution(jobExecution, step.getName());
+		StepExecution retrievedAfterUpdate = dao.getStepExecution(jobExecution, stepExecution.getId());
 
 		assertTrue("Exit description should be truncated", retrievedAfterUpdate.getExitStatus().getExitDescription()
 				.length() < stepExecution.getExitStatus().getExitDescription().length());

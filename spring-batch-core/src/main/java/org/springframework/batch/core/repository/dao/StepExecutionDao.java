@@ -28,14 +28,13 @@ public interface StepExecutionDao {
 	void updateStepExecution(StepExecution stepExecution);
 
 	/**
-	 * Retrieve a {@link StepExecution} from its parent {@link JobExecution} and
-	 * step name.
+	 * Retrieve a {@link StepExecution} from its id.
 	 * 
-	 * @param jobExecution the parent job execution
-	 * @param stepName the name of the step that was used to create the step execution
+	 * @param jobExecution the parent {@link JobExecution}
+	 * @param stepExecutionId the step execution id
 	 * @return a {@link StepExecution}
 	 */
-	StepExecution getStepExecution(JobExecution jobExecution, String stepName);
+	StepExecution getStepExecution(JobExecution jobExecution, Long stepExecutionId);
 	
 	/**
 	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.

@@ -86,10 +86,10 @@ public class SimpleJobExplorerTests extends TestCase {
 	@Test
 	public void testGetStepExecution() throws Exception {
 		expect(jobExecutionDao.getJobExecution(123L)).andReturn(jobExecution);
-		expect(stepExecutionDao.getStepExecution(jobExecution, "foo")).andReturn(null);
+		expect(stepExecutionDao.getStepExecution(jobExecution, 123L)).andReturn(null);
 		expect(stepExecutionDao.getStepExecutions(jobExecution)).andReturn(null);
 		replay(jobExecutionDao, stepExecutionDao);
-		jobExplorer.getStepExecution(123L,"foo");
+		jobExplorer.getStepExecution(jobExecution.getId(), 123L);
 		verify(jobExecutionDao, stepExecutionDao);
 	}
 
