@@ -3,6 +3,7 @@ package org.springframework.batch.item.database;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.SmartDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -31,24 +33,24 @@ public class ExtendedConnectionDataSourceProxyTests {
 		DataSource ds = createMock(DataSource.class);
 
 		expect(ds.getConnection()).andReturn(con); // con1
-		con.close(); 
+		con.close();
 		expect(ds.getConnection()).andReturn(con); // con2
 		con.close();
-		
-		expect(ds.getConnection()).andReturn(con); // con3		
+
+		expect(ds.getConnection()).andReturn(con); // con3
 		con.close(); // con3
-		expect(ds.getConnection()).andReturn(con); // con4		
+		expect(ds.getConnection()).andReturn(con); // con4
 		con.close(); // con4
 
 		replay(ds);
 		replay(con);
-		
+
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy(ds);
-		
+
 		Connection con1 = csds.getConnection();
 		Connection con2 = csds.getConnection();
 		assertNotSame("shouldn't be the same connection", con1, con2);
-		
+
 		assertTrue("should be able to close connection", csds.shouldClose(con1));
 		con1.close();
 		assertTrue("should be able to close connection", csds.shouldClose(con2));
@@ -71,27 +73,27 @@ public class ExtendedConnectionDataSourceProxyTests {
 		con3.close();
 		assertTrue("should be able to close connection", csds.shouldClose(con4));
 		con4.close();
-		
+
 		verify(ds);
 		verify(con);
 
 	}
-	
+
 	@Test
 	public void testOperationWithDirectCloseCall() throws SQLException {
 		Connection con = createMock(Connection.class);
 		DataSource ds = createMock(DataSource.class);
 
 		expect(ds.getConnection()).andReturn(con); // con1
-		con.close(); 
+		con.close();
 		expect(ds.getConnection()).andReturn(con); // con2
 		con.close();
-		
+
 		replay(ds);
 		replay(con);
-		
+
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy(ds);
-		
+
 		Connection con1 = csds.getConnection();
 		csds.startCloseSuppression(con1);
 		Connection con1_1 = csds.getConnection();
@@ -108,7 +110,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 		con1.close();
 		assertTrue("should be able to close connection", csds.shouldClose(con2));
 		con2.close();
-		
+
 		verify(ds);
 		verify(con);
 
@@ -116,7 +118,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 
 	@Test
 	public void testSupressOfCloseWithJdbcTemplate() throws Exception {
-		
+
 		Connection con = createMock(Connection.class);
 		DataSource ds = createMock(DataSource.class);
 		Statement stmt = createMock(Statement.class);
@@ -175,7 +177,7 @@ public class ExtendedConnectionDataSourceProxyTests {
 		replay(stmt);
 		replay(con);
 		replay(ds);
-		
+
 		final ExtendedConnectionDataSourceProxy csds = new ExtendedConnectionDataSourceProxy();
 		csds.setDataSource(ds);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(csds);
@@ -183,39 +185,35 @@ public class ExtendedConnectionDataSourceProxyTests {
 		final TransactionTemplate tt2 = new TransactionTemplate(tm);
 		tt2.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		final JdbcTemplate template = new JdbcTemplate(csds);
-		
+
 		Connection connection = DataSourceUtils.getConnection(csds);
 		csds.startCloseSuppression(connection);
-		tt.execute(
-				new TransactionCallback() {
+		tt.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				template.queryForList("select baz from bar");
+				template.queryForList("select foo from bar");
+				return null;
+			}
+		});
+		tt.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				template.queryForList("select ham from foo");
+				tt2.execute(new TransactionCallback() {
 					public Object doInTransaction(TransactionStatus status) {
-						template.queryForList("select baz from bar");
-						template.queryForList("select foo from bar");
+						template.queryForList("select 1 from eggs");
 						return null;
 					}
 				});
-		tt.execute(
-				new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus status) {
-						template.queryForList("select ham from foo");
-						tt2.execute(
-								new TransactionCallback() {
-									public Object doInTransaction(TransactionStatus status) {
-										template.queryForList("select 1 from eggs");
-										return null;
-									}
-								});
-						template.queryForList("select more, ham from foo");
-						return null;
-					}
-				});
-		tt.execute(
-				new TransactionCallback() {
-					public Object doInTransaction(TransactionStatus status) {
-						template.queryForList("select spam from ham");
-						return null;
-					}
-				});
+				template.queryForList("select more, ham from foo");
+				return null;
+			}
+		});
+		tt.execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				template.queryForList("select spam from ham");
+				return null;
+			}
+		});
 		csds.stopCloseSuppression(connection);
 		DataSourceUtils.releaseConnection(connection, csds);
 		template.queryForList("select egg from bar");
@@ -226,4 +224,112 @@ public class ExtendedConnectionDataSourceProxyTests {
 		verify(ds);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void delegateIsRequired() throws Exception {
+
+		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(null);
+		tested.afterPropertiesSet();
+	}
+
+	@Test
+	public void unwrapForUnsupportedInterface() throws Exception {
+
+		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(new DataSourceStub());
+
+		assertFalse(tested.isWrapperFor(Unsupported.class));
+
+		try {
+			tested.unwrap(Unsupported.class);
+			fail();
+		}
+		catch (SQLException expected) {
+//			this would be the correct behavior in a Java6-only recursive implementation
+//			assertEquals(DataSourceStub.UNWRAP_ERROR_MESSAGE, expected.getMessage());
+			assertEquals("Unsupported class " + Unsupported.class.getSimpleName(), expected.getMessage());
+		}
+	}
+
+	@Test
+	public void unwrapForSupportedInterface() throws Exception {
+
+		DataSourceStub ds = new DataSourceStub();
+		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(ds);
+
+		assertTrue(tested.isWrapperFor(Supported.class));
+		assertEquals(ds, tested.unwrap(Supported.class));
+	}
+
+	@Test
+	public void unwrapForSmartDataSource() throws Exception {
+
+		ExtendedConnectionDataSourceProxy tested = new ExtendedConnectionDataSourceProxy(new DataSourceStub());
+
+		assertTrue(tested.isWrapperFor(DataSource.class));
+		assertEquals(tested, tested.unwrap(DataSource.class));
+		
+		assertTrue(tested.isWrapperFor(SmartDataSource.class));
+		assertEquals(tested, tested.unwrap(SmartDataSource.class));
+	}
+
+	/**
+	 * Interface implemented by the wrapped DataSource
+	 */
+	private static interface Supported {
+	}
+
+	/**
+	 * Interface *not* implemented by the wrapped DataSource
+	 */
+	private static interface Unsupported {
+	}
+
+	/**
+	 * Stub for a wrapped DataSource that implements additional interface. Its
+	 * purpose is testing of {@link DataSource#isWrapperFor(Class)} and
+	 * {@link DataSource#unwrap(Class)} methods.
+	 */
+	private static class DataSourceStub implements DataSource, Supported {
+
+		private static final String UNWRAP_ERROR_MESSAGE = "supplied type is not implemented by this class";
+
+		public Connection getConnection() throws SQLException {
+			throw new UnsupportedOperationException();
+		}
+
+		public Connection getConnection(String username, String password) throws SQLException {
+			throw new UnsupportedOperationException();
+		}
+
+		public PrintWriter getLogWriter() throws SQLException {
+			throw new UnsupportedOperationException();
+		}
+
+		public int getLoginTimeout() throws SQLException {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setLogWriter(PrintWriter out) throws SQLException {
+			throw new UnsupportedOperationException();
+		}
+
+		public void setLoginTimeout(int seconds) throws SQLException {
+			throw new UnsupportedOperationException();
+		}
+
+		public boolean isWrapperFor(Class<?> iface) throws SQLException {
+			if (iface.equals(Supported.class) || (iface.equals(DataSource.class))) {
+				return true;
+			}
+			return false;
+		}
+
+		@SuppressWarnings("unchecked")
+		public <T> T unwrap(Class<T> iface) throws SQLException {
+			if (iface.equals(Supported.class) || iface.equals(DataSource.class)) {
+				return (T) this;
+			}
+			throw new SQLException(UNWRAP_ERROR_MESSAGE);
+		}
+
+	}
 }
