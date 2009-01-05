@@ -81,6 +81,8 @@ public class SimpleJobTests extends TestCase {
 
 	private SimpleJob job;
 
+	private static final ExitStatus customExitStatus = ExitStatus.UNKNOWN.addExitDescription("tweaked");
+
 	protected void setUp() throws Exception {
 		super.setUp();
 
@@ -178,10 +180,13 @@ public class SimpleJobTests extends TestCase {
 
 			public void afterJob(JobExecution jobExecution) {
 				list.add("after");
+				jobExecution.setExitStatus(customExitStatus);
 			}
 		} });
 		job.execute(jobExecution);
 		assertEquals(4, list.size());
+		assertEquals(customExitStatus, jobExecution.getExitStatus());
+		checkRepository(BatchStatus.COMPLETED, customExitStatus);
 	}
 
 	public void testRunWithSimpleStepExecutor() throws Exception {
@@ -240,6 +245,8 @@ public class SimpleJobTests extends TestCase {
 		job.setJobExecutionListeners(new JobExecutionListenerSupport[] { new JobExecutionListenerSupport() {
 			public void onError(JobExecution jobExecution, Throwable t) {
 				list.add(t);
+				assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
+				jobExecution.setExitStatus(customExitStatus);
 			}
 		} });
 		final RuntimeException exception = new RuntimeException("Foo!");
@@ -254,7 +261,7 @@ public class SimpleJobTests extends TestCase {
 		}
 		assertEquals(1, list.size());
 		assertSame(exception, list.get(0));
-		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
+		checkRepository(BatchStatus.FAILED, customExitStatus);
 	}
 
 	public void testFailedWithError() throws Exception {
@@ -489,7 +496,9 @@ public class SimpleJobTests extends TestCase {
 
 		/*
 		 * (non-Javadoc)
-		 * @see org.springframework.batch.core.step.StepSupport#execute(org.springframework.batch.core.StepExecution)
+		 * 
+		 * @seeorg.springframework.batch.core.step.StepSupport#execute(org.
+		 * springframework.batch.core.StepExecution)
 		 */
 		public void execute(StepExecution stepExecution) throws JobInterruptedException,
 				UnexpectedJobExecutionException {

@@ -58,6 +58,9 @@ public class SimpleJob extends AbstractJob {
 		int startedCount = 0;
 		List steps = getSteps();
 
+		// holder for potential job failure to be passed to onError listener
+		Throwable jobFailure = null;
+
 		try {
 
 			// The job was already stopped before we even got this far. Deal
@@ -109,17 +112,14 @@ public class SimpleJob extends AbstractJob {
 
 			updateStatus(execution, BatchStatus.COMPLETED);
 
-			getCompositeListener().afterJob(execution);
-
 		}
 		catch (JobInterruptedException e) {
 			execution.setStatus(BatchStatus.STOPPED);
-			getCompositeListener().onInterrupt(execution);
 			rethrow(e);
 		}
 		catch (Throwable t) {
 			execution.setStatus(BatchStatus.FAILED);
-			getCompositeListener().onError(execution, t);
+			jobFailure = t;
 			rethrow(t);
 		}
 		finally {
@@ -136,9 +136,20 @@ public class SimpleJob extends AbstractJob {
 			else if (currentStepExecution != null) {
 				status = currentStepExecution.getExitStatus();
 			}
+			execution.setExitStatus(status);
+
+			BatchStatus jobStatus = execution.getStatus();
+			if (jobStatus == BatchStatus.COMPLETED) {
+				getCompositeListener().afterJob(execution);
+			}
+			else if (jobStatus == BatchStatus.FAILED) {
+				getCompositeListener().onError(execution, jobFailure);
+			}
+			else if (jobStatus == BatchStatus.STOPPED) {
+				getCompositeListener().onInterrupt(execution);
+			}
 
 			execution.setEndTime(new Date());
-			execution.setExitStatus(status);
 			getJobRepository().saveOrUpdate(execution);
 		}
 
