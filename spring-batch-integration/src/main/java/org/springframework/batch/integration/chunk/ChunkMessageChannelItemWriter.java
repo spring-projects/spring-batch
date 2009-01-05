@@ -9,7 +9,6 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -21,12 +20,12 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 
 	private static final Log logger = LogFactory.getLog(ChunkMessageChannelItemWriter.class);
 
-	static final String ACTUAL = ChunkMessageChannelItemWriter.class.getName()+".ACTUAL";
+	static final String ACTUAL = ChunkMessageChannelItemWriter.class.getName() + ".ACTUAL";
 
-	static final String EXPECTED = ChunkMessageChannelItemWriter.class.getName()+".EXPECTED";
+	static final String EXPECTED = ChunkMessageChannelItemWriter.class.getName() + ".EXPECTED";
 
 	private static final long DEFAULT_THROTTLE_LIMIT = 6;
-	
+
 	private MessagingGateway messagingGateway;
 
 	private LocalState localState = new LocalState();
@@ -56,7 +55,8 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		if (!items.isEmpty()) {
 
 			logger.debug("Dispatching chunk: " + items);
-			ChunkRequest<T> request = new ChunkRequest<T>(new Chunk<T>(items), localState.getJobId(), localState.createStepContribution());
+			ChunkRequest<T> request = new ChunkRequest<T>(items, localState.getJobId(), localState
+					.createStepContribution());
 			messagingGateway.send(request);
 			localState.expected++;
 
@@ -141,8 +141,9 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 					+ jobInstanceId + "] should have been [" + localState.getJobId() + "].");
 			localState.actual++;
 			// TODO: apply the skip count
-			if (! payload.isSuccessful()) {
-				throw new AsynchronousFailureException("Failure or interrupt detected in handler: "+payload.getMessage());
+			if (!payload.isSuccessful()) {
+				throw new AsynchronousFailureException("Failure or interrupt detected in handler: "
+						+ payload.getMessage());
 			}
 		}
 	}

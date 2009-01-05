@@ -27,7 +27,6 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.support.ListItemReader;
@@ -192,8 +191,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 	private GenericMessage<ChunkRequest> getSimpleMessage(String string, Long jobId) {
 		StepContribution stepContribution = new JobExecution(new JobInstance(0L, new JobParameters(), "job"), 1L)
 				.createStepExecution("step").createStepContribution();
-		ChunkRequest chunk = new ChunkRequest(new Chunk<String>(StringUtils.commaDelimitedListToSet(string)), jobId,
-				stepContribution);
+		ChunkRequest chunk = new ChunkRequest(StringUtils.commaDelimitedListToSet(string), jobId, stepContribution);
 		GenericMessage<ChunkRequest> message = new GenericMessage<ChunkRequest>(chunk);
 		return message;
 	}

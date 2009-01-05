@@ -1,6 +1,7 @@
 package org.springframework.batch.integration.chunk;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.item.Chunk;
@@ -11,8 +12,8 @@ public class ChunkRequest<T> implements Serializable {
 	private final Chunk<T> items;
 	private final StepContribution stepContribution;
 
-	public ChunkRequest(Chunk<T> items, Long jobId, StepContribution stepContribution) {
-		this.items = items;
+	public ChunkRequest(Collection<? extends T> items, Long jobId, StepContribution stepContribution) {
+		this.items = new Chunk<T>(items);
 		this.jobId = jobId;
 		this.stepContribution = stepContribution;
 	}
