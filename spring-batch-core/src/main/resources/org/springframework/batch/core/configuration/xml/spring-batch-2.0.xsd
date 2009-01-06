@@ -133,6 +133,13 @@
 										</xsd:documentation>
 									</xsd:annotation>
 								</xsd:attribute>
+								<xsd:attribute name="tasklet" type="xsd:string" use="optional" >
+									<xsd:annotation>
+										<xsd:documentation>
+										The tasklet is a reference to another bean definition that defines implements the Tasklet interface.
+										</xsd:documentation>
+									</xsd:annotation>
+								</xsd:attribute>
 							</xsd:extension>
 						</xsd:complexContent>
 					</xsd:complexType>
@@ -210,29 +217,10 @@
 		<xsd:complexContent>
 			<xsd:extension base="nextType">
 				<xsd:sequence>
-					<xsd:choice>
-						<xsd:element name="item-task" type="itemTaskType" minOccurs="0" maxOccurs="1"/>
-						<xsd:element name="simple-task" type="simpleTaskType" minOccurs="0" maxOccurs="1"/>
-					</xsd:choice>
+					<xsd:sequence>
+						<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
+					</xsd:sequence>
 					<xsd:group ref="transitions"/>
-				</xsd:sequence>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-
-	<xsd:complexType name="stepDefType">
-		<xsd:complexContent>
-			<xsd:extension base="beans:identifiedType">
-				<xsd:attributeGroup ref="jobRepository"/>
-				<xsd:attributeGroup ref="transactionManager"/>
-			</xsd:extension>
-		</xsd:complexContent>
-	</xsd:complexType>
-
-	<xsd:complexType name="simpleTaskType">
-		<xsd:complexContent>
-			<xsd:extension base="stepDefType">
-				<xsd:sequence>
 					<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
@@ -242,25 +230,20 @@
 						</xsd:annotation>
 						<xsd:complexType>
 							<xsd:sequence>
-								<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded"/>
+								<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded"/>
 							</xsd:sequence>
 						</xsd:complexType>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attribute name="tasklet" type="xsd:string" use="required">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-						The bean name of the tasklet that is to be used for the task.
-						]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
+				<xsd:attributeGroup ref="jobRepository"/>
+				<xsd:attributeGroup ref="transactionManager"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="itemTaskType">
+	<xsd:complexType name="taskletType">
 		<xsd:complexContent>
-			<xsd:extension base="stepDefType">
+			<xsd:extension base="beans:identifiedType">
 				<xsd:sequence>
 					<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>

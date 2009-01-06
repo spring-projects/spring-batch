@@ -7,9 +7,7 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job" incrementer="testIncrementer" repository="jobRepository">
-		<step name="step1">
-			<simple-task tasklet="tasklet"/>
-		</step>
+		<step name="step1" tasklet="tasklet"/>
 		<listeners>
 			<listener after-method="afterJob" ref="testListener"/>
 			<listener after-method="afterJob" class="org.springframework.batch.core.configuration.xml.TestJobListener"/>

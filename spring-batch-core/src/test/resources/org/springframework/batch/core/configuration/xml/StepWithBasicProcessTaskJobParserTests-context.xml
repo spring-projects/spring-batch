@@ -8,17 +8,17 @@
 	
 	<job id="job">
 		<step name="ft-step">
-			<item-task reader="reader" processor="processor" writer="writer"
+			<tasklet reader="reader" processor="processor" writer="writer"
 					commit-interval="10">
-				<listeners>
-					 <listener class="org.springframework.batch.core.configuration.xml.TestListener"
-						after-step-method="destroy"/> 
-					<listener ref="listener"/>
-				</listeners>
 				<streams>
 					<stream ref="reader"/>
 				</streams>
-			</item-task>
+			</tasklet>
+			<listeners>
+				 <listener class="org.springframework.batch.core.configuration.xml.TestListener"
+					after-step-method="destroy"/> 
+				<listener ref="listener"/>
+			</listeners>
 		</step>
 	</job>
 

@@ -65,18 +65,17 @@ public class StepParser {
 		BeanDefinitionBuilder stateBuilder = 
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
 		String stepRef = element.getAttribute("name");
+		String taskletRef = element.getAttribute("tasklet");
 
 		@SuppressWarnings("unchecked")
-		List<Element> simpleTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "simple-task");
-		@SuppressWarnings("unchecked")
-		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "item-task");
-		if (simpleTaskElements.size() > 0) {
-			Object task = parseSimpleTask(simpleTaskElements.get(0), parserContext);
+		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
+		if (StringUtils.hasText(taskletRef)) {
+			Object task = handleTaskletStep(element, taskletRef, parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
 		else if (processTaskElements.size() > 0) {
-			Object task = parseProcessTask(processTaskElements.get(0), parserContext);
+			Object task = handleChunkOrientedTaskletStep(element, processTaskElements.get(0), parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
@@ -191,29 +190,29 @@ public class StepParser {
 	}
 
 	/**
-	 * @param element
+	 * @param stepElement
+	 * @param taskletRef
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition parseSimpleTask(Element element, ParserContext parserContext) {
+	protected RootBeanDefinition handleTaskletStep(Element stepElement, String taskletRef, ParserContext parserContext) {
 
     	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
 
-        String taskletBeanId = element.getAttribute("tasklet");
-        if (StringUtils.hasText(taskletBeanId)) {
-            RuntimeBeanReference taskletRef = new RuntimeBeanReference(taskletBeanId);
-            bd.getPropertyValues().addPropertyValue("tasklet", taskletRef);
+        if (StringUtils.hasText(taskletRef)) {
+            RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
+            bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
         }
 
-        String jobRepository = element.getAttribute("job-repository");
-        RuntimeBeanReference jobRepositoryRef = new RuntimeBeanReference(jobRepository);
-        bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryRef);
+        String jobRepositoryRef = stepElement.getAttribute("job-repository");
+        RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
+        bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
 
-        String transactionManager = element.getAttribute("transaction-manager");
-        RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
-        bd.getPropertyValues().addPropertyValue("transactionManager", tx);
+        String transactionManagerRef = stepElement.getAttribute("transaction-manager");
+        RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
+        bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
 		
-        handleListenersElement(element, bd, parserContext, "stepExecutionListeners");
+        handleListenersElement(stepElement, bd, parserContext, "stepExecutionListeners");
         
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
         
@@ -226,7 +225,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition parseProcessTask(Element element, ParserContext parserContext) {
+	protected RootBeanDefinition handleChunkOrientedTaskletStep(Element stepElement, Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd;
     	
@@ -286,11 +285,11 @@ public class StepParser {
             bd.getPropertyValues().addPropertyValue("taskExecutor", taskExecutorRef);
         }
 
-        String jobRepository = element.getAttribute("job-repository");
+        String jobRepository = stepElement.getAttribute("job-repository");
         RuntimeBeanReference jobRepositoryRef = new RuntimeBeanReference(jobRepository);
         bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryRef);
 
-        String transactionManager = element.getAttribute("transaction-manager");
+        String transactionManager = stepElement.getAttribute("transaction-manager");
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
         bd.getPropertyValues().addPropertyValue("transactionManager", tx);
 
@@ -328,7 +327,7 @@ public class StepParser {
         
         handleExceptionElement(element, parserContext, bd, "fatal-exception-classes", "fatalExceptionClasses", isFaultTolerant);
 
-        handleListenersElement(element, bd, parserContext, "listeners");
+        handleListenersElement(stepElement, bd, parserContext, "listeners");
         
         handleRetryListenersElement(element, bd, parserContext);
         
