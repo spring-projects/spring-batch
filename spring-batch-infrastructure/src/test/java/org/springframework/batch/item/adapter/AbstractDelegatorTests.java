@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 
 /**
  * Tests for {@link AbstractMethodInvokingDelegator}
- *
+ * 
  * @author Robert Kasanicky
  */
 public class AbstractDelegatorTests extends TestCase {
@@ -58,7 +58,19 @@ public class AbstractDelegatorTests extends TestCase {
 		delegator.invokeDelegateMethod();
 		assertEquals(NEW_FOO_NAME, foo.getName());
 	}
-	
+
+	/**
+	 * Null argument value doesn't cause trouble when validating method
+	 * signature.
+	 */
+	public void testDelegationWithCheckedNullArgument() throws Exception {
+		delegator.setTargetMethod("setName");
+		delegator.setArguments(new Object[] { null });
+		delegator.afterPropertiesSet();
+		delegator.invokeDelegateMethod();
+		assertNull(foo.getName());
+	}
+
 	/**
 	 * Regular use - calling methods directly and via delegator leads to same
 	 * results
@@ -68,11 +80,11 @@ public class AbstractDelegatorTests extends TestCase {
 		delegator.setTargetObject(fooService);
 		delegator.setTargetMethod("processNameValuePair");
 		delegator.afterPropertiesSet();
-		
+
 		final String FOO_NAME = "fooName";
 		final int FOO_VALUE = 12345;
 
-		delegator.invokeDelegateMethodWithArguments(new Object[]{FOO_NAME, Integer.valueOf(FOO_VALUE)});
+		delegator.invokeDelegateMethodWithArguments(new Object[] { FOO_NAME, Integer.valueOf(FOO_VALUE) });
 		Foo foo = (Foo) fooService.getProcessedFooNameValuePairs().get(0);
 		assertEquals(FOO_NAME, foo.getName());
 		assertEquals(FOO_VALUE, foo.getValue());
@@ -134,22 +146,22 @@ public class AbstractDelegatorTests extends TestCase {
 
 		try {
 			// single argument expected but two provided
-			delegator.invokeDelegateMethodWithArguments(new Object[]{"name", "anotherName"});
+			delegator.invokeDelegateMethodWithArguments(new Object[] { "name", "anotherName" });
 			fail();
 		}
 		catch (DynamicMethodInvocationException e) {
 			// expected
 		}
 	}
-	
+
 	/**
 	 * Exception scenario - incorrect static arguments set.
 	 */
 	public void testIncorrectNumberOfStaticArguments() throws Exception {
 		delegator.setTargetMethod("setName");
-		
+
 		// incorrect argument count
-		delegator.setArguments(new Object[]{"first", "second"});
+		delegator.setArguments(new Object[] { "first", "second" });
 		try {
 			delegator.afterPropertiesSet();
 			fail();
@@ -157,9 +169,9 @@ public class AbstractDelegatorTests extends TestCase {
 		catch (IllegalStateException e) {
 			// expected
 		}
-		
+
 		// correct argument count, but invalid argument type
-		delegator.setArguments(new Object[]{new Object()});
+		delegator.setArguments(new Object[] { new Object() });
 		try {
 			delegator.afterPropertiesSet();
 			fail();
@@ -168,6 +180,5 @@ public class AbstractDelegatorTests extends TestCase {
 			// expected
 		}
 	}
-	
-	
+
 }

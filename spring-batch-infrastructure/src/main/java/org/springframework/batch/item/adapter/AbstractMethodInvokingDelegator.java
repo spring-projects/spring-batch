@@ -24,56 +24,59 @@ import org.springframework.util.Assert;
 import org.springframework.util.MethodInvoker;
 
 /**
- * Superclass for delegating classes which dynamically call a 
- * custom method of injected object.
- * Provides convenient API for dynamic method invocation shielding
- * subclasses from low-level details and exception handling. 
+ * Superclass for delegating classes which dynamically call a custom method of
+ * injected object. Provides convenient API for dynamic method invocation
+ * shielding subclasses from low-level details and exception handling.
  * 
  * @author Robert Kasanicky
  */
 public abstract class AbstractMethodInvokingDelegator<T> implements InitializingBean {
-	
+
 	private Object targetObject;
-	
+
 	private String targetMethod;
-	
+
 	private Object[] arguments;
 
 	/**
-	 * Invoker the target method with no arguments.
+	 * Invoker the target method with arguments set by
+	 * {@link #setArguments(Object[])}.
 	 * @return object returned by invoked method
-	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
+	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
+	 * used throws exception
 	 */
 	protected T invokeDelegateMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(arguments);
 		return doInvoke(invoker);
 	}
-	
+
 	/**
 	 * Invokes the target method with given argument.
 	 * @param object argument for the target method
 	 * @return object returned by target method
-	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
+	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
+	 * used throws exception
 	 */
 	protected T invokeDelegateMethodWithArgument(Object object) {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
-		invoker.setArguments(new Object[]{object});
+		invoker.setArguments(new Object[] { object });
 		return doInvoke(invoker);
 	}
-	
+
 	/**
 	 * Invokes the target method with given arguments.
 	 * @param args arguments for the invoked method
 	 * @return object returned by invoked method
-	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker} used throws exception
+	 * @throws DynamicMethodInvocationException if the {@link MethodInvoker}
+	 * used throws exception
 	 */
 	protected T invokeDelegateMethodWithArguments(Object[] args) {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
 		invoker.setArguments(args);
 		return doInvoke(invoker);
 	}
-	
+
 	/**
 	 * Create a new configured instance of {@link MethodInvoker}.
 	 */
@@ -84,7 +87,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		invoker.setArguments(arguments);
 		return invoker;
 	}
-	
+
 	/**
 	 * Prepare and invoke the invoker, rethrow checked exceptions as unchecked.
 	 * @param invoker configured invoker
@@ -101,7 +104,7 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		catch (NoSuchMethodException e) {
 			throw new DynamicMethodInvocationException(e);
 		}
-		
+
 		try {
 			return (T) invoker.invoke();
 		}
@@ -110,64 +113,78 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 		}
 		catch (IllegalAccessException e) {
 			throw new DynamicMethodInvocationException(e);
-		}	
+		}
 	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(targetObject);
 		Assert.hasLength(targetMethod);
-		Assert.state(targetClassDeclaresTargetMethod(), 
-				"target class must declare a method with name matching the target method");
+		Assert.state(targetClassDeclaresTargetMethod(),
+				"target class must declare a method with matching name and parameter types");
 	}
-	
+
 	/**
-	 * @return true if target class declares a method matching target method name
-	 * with given number of arguments of appropriate type.
+	 * @return true if target class declares a method matching target method
+	 * name with given number of arguments of appropriate type.
 	 */
 	private boolean targetClassDeclaresTargetMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
-		Method[] methods = invoker.getTargetClass().getDeclaredMethods();
+		Method[] methods = invoker.getTargetClass().getMethods();
 		String targetMethodName = invoker.getTargetMethod();
 
-		for (int i=0; i < methods.length; i++) {
+		for (int i = 0; i < methods.length; i++) {
 			if (methods[i].getName().equals(targetMethodName)) {
 				Class<?>[] params = methods[i].getParameterTypes();
 				if (arguments == null) {
+					// don't check signature, assume arguments will be supplied
+					// correctly at runtime
 					return true;
-				} else if (arguments.length == params.length) {
+				}
+				if (arguments.length == params.length) {
 					boolean argumentsMatchParameters = true;
 					for (int j = 0; j < params.length; j++) {
+						if (arguments[j] == null) {
+							continue;
+						}
 						if (!(params[j].isAssignableFrom(arguments[j].getClass()))) {
 							argumentsMatchParameters = false;
 						}
 					}
-					if (argumentsMatchParameters) return true;
+					if (argumentsMatchParameters)
+						return true;
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
 	/**
-	 * @param targetObject the delegate - bean id can be used to set this value in Spring configuration
+	 * @param targetObject the delegate - bean id can be used to set this value
+	 * in Spring configuration
 	 */
 	public void setTargetObject(Object targetObject) {
 		this.targetObject = targetObject;
 	}
 
 	/**
-	 * @param targetMethod name of the method to be invoked on {@link #setTargetObject(Object)}.
+	 * @param targetMethod name of the method to be invoked on
+	 * {@link #setTargetObject(Object)}.
 	 */
 	public void setTargetMethod(String targetMethod) {
 		this.targetMethod = targetMethod;
 	}
-	
+
 	/**
-	 * @param arguments arguments values for the {{@link #setTargetMethod(String)}.
-	 * These are not expected to change during the lifetime of the delegator 
-	 * and will be used only when the subclass tries to invoke the target method
-	 * without providing explicit argument values.
+	 * @param arguments arguments values for the {
+	 * {@link #setTargetMethod(String)}. These will be used only when the
+	 * subclass tries to invoke the target method without providing explicit
+	 * argument values.
+	 * 
+	 * If arguments are set to not-null value {@link #afterPropertiesSet()} will
+	 * check the values are compatible with target method's signature. In case
+	 * arguments are null (not set) method signature will not be checked and it
+	 * is assumed correct values will be supplied at runtime.
 	 */
 	public void setArguments(Object[] arguments) {
 		this.arguments = arguments;
