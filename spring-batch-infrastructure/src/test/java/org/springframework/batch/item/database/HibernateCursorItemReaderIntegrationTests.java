@@ -32,16 +32,19 @@ public class HibernateCursorItemReaderIntegrationTests extends AbstractDataSourc
 
 		SessionFactory sessionFactory = (SessionFactory) factoryBean.getObject();
 
-		String hsqlQuery = "from Foo";
 
-		HibernateCursorItemReader<Foo> inputSource = new HibernateCursorItemReader<Foo>();
-		inputSource.setQueryString(hsqlQuery);
-		inputSource.setSessionFactory(sessionFactory);
-		inputSource.setUseStatelessSession(isUseStatelessSession());
-		inputSource.afterPropertiesSet();
-		inputSource.setSaveState(true);
+		HibernateCursorItemReader<Foo> hibernateReader = new HibernateCursorItemReader<Foo>();
+		setQuery(hibernateReader);
+		hibernateReader.setSessionFactory(sessionFactory);
+		hibernateReader.setUseStatelessSession(isUseStatelessSession());
+		hibernateReader.afterPropertiesSet();
+		hibernateReader.setSaveState(true);
 
-		return inputSource;
+		return hibernateReader;
+	}
+	
+	protected void setQuery(HibernateCursorItemReader<?> reader) {
+		reader.setQueryString("from Foo");
 	}
 
 	protected boolean isUseStatelessSession() {

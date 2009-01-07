@@ -33,9 +33,11 @@ import org.springframework.util.ClassUtils;
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
  * 
- * It executes the HQL {@link #setQueryString(String)} when initialized and
- * iterates over the result set as {@link #read()} method is called, returning
- * an object corresponding to current row.
+ * It executes the HQL query when initialized iterates over the result set as
+ * {@link #read()} method is called, returning an object corresponding to
+ * current row. The query can be set directly using
+ * {@link #setQueryString(String)} or a named query can be used by
+ * {@link #setQueryName(String)}.
  * 
  * The reader can be configured to use either {@link StatelessSession}
  * sufficient for simple mappings without the need to cascade to associated
@@ -45,16 +47,12 @@ import org.springframework.util.ClassUtils;
  * When stateful session is used it will be cleared after successful commit
  * without being flushed (no inserts or updates are expected).
  * 
- * Reset(rollback) functionality is implemented by item buffering allowing the
- * cursor used to be forward-only.
- * 
  * The implementation is *not* thread-safe.
  * 
  * @author Robert Kasanicky
  * @author Dave Syer
  */
-public class HibernateCursorItemReader<T> extends
-		AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
+public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStreamItemReader<T> implements ItemStream,
 		InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -65,7 +63,9 @@ public class HibernateCursorItemReader<T> extends
 
 	private ScrollableResults cursor;
 
-	private String queryString;
+	private String queryString = "";
+
+	private String namedQuery = "";
 
 	private boolean useStatelessSession = true;
 
@@ -83,30 +83,47 @@ public class HibernateCursorItemReader<T> extends
 	private Query createQuery() {
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
-			return statelessSession.createQuery(queryString);
-		} else {
+			if (!namedQuery.isEmpty()) {
+				return statelessSession.getNamedQuery(namedQuery);
+			}
+			else {
+				return statelessSession.createQuery(queryString);
+			}
+		}
+		else {
 			statefulSession = sessionFactory.openSession();
-			return statefulSession.createQuery(queryString);
+			if (!namedQuery.isEmpty()) {
+				return statefulSession.getNamedQuery(namedQuery);
+			}
+			else {
+				return statefulSession.createQuery(queryString);
+			}
 		}
 	}
 
 	/**
-	 * @param sessionFactory
-	 *            hibernate session factory
+	 * @param sessionFactory hibernate session factory
 	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(sessionFactory);
-		Assert.hasLength(queryString);
+		Assert.notNull(sessionFactory, "session factory must be set");
 		Assert.isTrue(fetchSize >= 0, "fetchSize must not be negative");
+		Assert.isTrue(queryString.isEmpty() ^ namedQuery.isEmpty(),
+				"exactly one of queryString or queryName must be set");
 	}
 
 	/**
-	 * @param queryString
-	 *            HQL query string
+	 * @param queryName name of a hibernate named query
+	 */
+	public void setQueryName(String queryName) {
+		this.namedQuery = queryName;
+	}
+
+	/**
+	 * @param queryString HQL query string
 	 */
 	public void setQueryString(String queryString) {
 		this.queryString = queryString;
@@ -115,9 +132,9 @@ public class HibernateCursorItemReader<T> extends
 	/**
 	 * Can be set only in uninitialized state.
 	 * 
-	 * @param useStatelessSession
-	 *            <code>true</code> to use {@link StatelessSession}
-	 *            <code>false</code> to use standard hibernate {@link Session}
+	 * @param useStatelessSession <code>true</code> to use
+	 * {@link StatelessSession} <code>false</code> to use standard hibernate
+	 * {@link Session}
 	 */
 	public void setUseStatelessSession(boolean useStatelessSession) {
 		Assert.state(!initialized);
@@ -128,8 +145,7 @@ public class HibernateCursorItemReader<T> extends
 	 * Clears the session if not stateful and delegates to super class.
 	 */
 	@Override
-	public void update(ExecutionContext executionContext)
-			throws ItemStreamException {
+	public void update(ExecutionContext executionContext) throws ItemStreamException {
 		super.update(executionContext);
 		if (!useStatelessSession) {
 			statefulSession.clear();
@@ -142,8 +158,7 @@ public class HibernateCursorItemReader<T> extends
 	 * <code>ResultSet</code> object. If the fetch size specified is zero, the
 	 * JDBC driver ignores the value.
 	 * 
-	 * @param fetchSize
-	 *            the number of rows to fetch, 0 by default
+	 * @param fetchSize the number of rows to fetch, 0 by default
 	 * @see Query#setFetchSize(int)
 	 */
 	public void setFetchSize(int fetchSize) {
@@ -160,7 +175,8 @@ public class HibernateCursorItemReader<T> extends
 				@SuppressWarnings("unchecked")
 				T item = (T) data;
 				return item;
-			} else {
+			}
+			else {
 				// Assume if there is only one item that it is the data the user
 				// wants.
 				// If there is only one item this is going to be a nasty shock
@@ -179,11 +195,9 @@ public class HibernateCursorItemReader<T> extends
 	 * {@link #setQueryString(String)}.
 	 */
 	protected void doOpen() throws Exception {
-		Assert.state(!initialized,
-				"Cannot open an already opened ItemReader, call close first");
+		Assert.state(!initialized, "Cannot open an already opened ItemReader, call close first");
 
-		cursor = createQuery().setFetchSize(fetchSize).scroll(
-				ScrollMode.FORWARD_ONLY);
+		cursor = createQuery().setFetchSize(fetchSize).scroll(ScrollMode.FORWARD_ONLY);
 
 		initialized = true;
 
@@ -202,7 +216,8 @@ public class HibernateCursorItemReader<T> extends
 			if (statelessSession != null) {
 				statelessSession.close();
 			}
-		} else {
+		}
+		else {
 			if (statefulSession != null) {
 				statefulSession.close();
 			}
