@@ -18,6 +18,9 @@ package org.springframework.batch.item.adapter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -129,12 +132,19 @@ public abstract class AbstractMethodInvokingDelegator<T> implements Initializing
 	 */
 	private boolean targetClassDeclaresTargetMethod() {
 		MethodInvoker invoker = createMethodInvoker(targetObject, targetMethod);
-		Method[] methods = invoker.getTargetClass().getMethods();
+		
+		Method[] memberMethods = invoker.getTargetClass().getMethods();
+		Method[] declaredMethods = invoker.getTargetClass().getDeclaredMethods();
+		
+		List<Method> allMethods = new ArrayList<Method>(); 
+		allMethods.addAll(Arrays.asList(memberMethods));
+		allMethods.addAll(Arrays.asList(declaredMethods));
+		
 		String targetMethodName = invoker.getTargetMethod();
 
-		for (int i = 0; i < methods.length; i++) {
-			if (methods[i].getName().equals(targetMethodName)) {
-				Class<?>[] params = methods[i].getParameterTypes();
+		for (Method method : allMethods) {
+			if (method.getName().equals(targetMethodName)) {
+				Class<?>[] params = method.getParameterTypes();
 				if (arguments == null) {
 					// don't check signature, assume arguments will be supplied
 					// correctly at runtime
