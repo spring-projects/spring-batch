@@ -29,6 +29,7 @@ import org.springframework.batch.item.support.AbstractItemCountingItemStreamItem
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
@@ -65,7 +66,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 
 	private String queryString = "";
 
-	private String namedQuery = "";
+	private String queryName = "";
 
 	private boolean useStatelessSession = true;
 
@@ -83,8 +84,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	private Query createQuery() {
 		if (useStatelessSession) {
 			statelessSession = sessionFactory.openStatelessSession();
-			if (!namedQuery.isEmpty()) {
-				return statelessSession.getNamedQuery(namedQuery);
+			if (StringUtils.hasText(queryName)) {
+				return statelessSession.getNamedQuery(queryName);
 			}
 			else {
 				return statelessSession.createQuery(queryString);
@@ -92,8 +93,8 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 		}
 		else {
 			statefulSession = sessionFactory.openSession();
-			if (!namedQuery.isEmpty()) {
-				return statefulSession.getNamedQuery(namedQuery);
+			if (StringUtils.hasText(queryName)) {
+				return statefulSession.getNamedQuery(queryName);
 			}
 			else {
 				return statefulSession.createQuery(queryString);
@@ -111,7 +112,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(sessionFactory, "session factory must be set");
 		Assert.isTrue(fetchSize >= 0, "fetchSize must not be negative");
-		Assert.isTrue(queryString.isEmpty() ^ namedQuery.isEmpty(),
+		Assert.isTrue(StringUtils.hasText(queryString) ^ StringUtils.hasText(queryName),
 				"exactly one of queryString or queryName must be set");
 	}
 
@@ -119,7 +120,7 @@ public class HibernateCursorItemReader<T> extends AbstractItemCountingItemStream
 	 * @param queryName name of a hibernate named query
 	 */
 	public void setQueryName(String queryName) {
-		this.namedQuery = queryName;
+		this.queryName = queryName;
 	}
 
 	/**
