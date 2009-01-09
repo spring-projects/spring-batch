@@ -130,7 +130,7 @@ public class MapJobExecutionDao implements JobExecutionDao {
 	public void synchronizeStatus(JobExecution jobExecution) {
 		JobExecution saved = getJobExecution(jobExecution.getId());
 		if (saved.getVersion().intValue() != jobExecution.getVersion().intValue()) {
-			jobExecution.setStatus(saved.getStatus());
+			jobExecution.upgradeStatus(saved.getStatus());
 			jobExecution.setVersion(saved.getVersion());
 		}
 	}

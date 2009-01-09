@@ -269,26 +269,57 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 
 	}
 
+	/**
+	 * Successful synchronization from STARTED to STOPPING status.
+	 */
 	@Transactional
 	@Test
-	public void testSynchronizeStatus() {
+	public void testSynchronizeStatusUpgrade() {
 
 		JobExecution exec1 = new JobExecution(jobInstance);
-		exec1.setStatus(BatchStatus.STARTED);
+		exec1.setStatus(BatchStatus.STOPPING);
 		dao.saveJobExecution(exec1);
-		
+
 		JobExecution exec2 = new JobExecution(jobInstance);
 		Assert.state(exec1.getId() != null);
 		exec2.setId(exec1.getId());
-		
+
+		exec2.setStatus(BatchStatus.STARTED);
 		exec2.setVersion(7);
 		Assert.state(exec1.getVersion() != exec2.getVersion());
 		Assert.state(exec1.getStatus() != exec2.getStatus());
-		
+
 		dao.synchronizeStatus(exec2);
 
 		assertEquals(exec1.getVersion(), exec2.getVersion());
 		assertEquals(exec1.getStatus(), exec2.getStatus());
+	}
+
+	/**
+	 * UNKNOWN status won't be changed by synchronizeStatus, because it is the
+	 * 'largest' BatchStatus (will not downgrade).
+	 */
+	@Transactional
+	@Test
+	public void testSynchronizeStatusDowngrade() {
+
+		JobExecution exec1 = new JobExecution(jobInstance);
+		exec1.setStatus(BatchStatus.STARTED);
+		dao.saveJobExecution(exec1);
+
+		JobExecution exec2 = new JobExecution(jobInstance);
+		Assert.state(exec1.getId() != null);
+		exec2.setId(exec1.getId());
+
+		exec2.setStatus(BatchStatus.UNKNOWN);
+		exec2.setVersion(7);
+		Assert.state(exec1.getVersion() != exec2.getVersion());
+		Assert.state(exec1.getStatus().isLessThan(exec2.getStatus()));
+
+		dao.synchronizeStatus(exec2);
+
+		assertEquals(exec1.getVersion(), exec2.getVersion());
+		assertEquals(BatchStatus.UNKNOWN, exec2.getStatus());
 	}
 
 	/*
