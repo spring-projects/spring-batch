@@ -20,7 +20,7 @@ import org.springframework.util.Assert;
  */
 public class FileUtilsTests {
 
-	private File file = new File("FileUtilsTests.tmp");
+	private File file = new File("target/FileUtilsTests.tmp");
 
 	/**
 	 * No restart + file should not be overwritten => file is created if it does
