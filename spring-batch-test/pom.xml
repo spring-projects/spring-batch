@@ -21,8 +21,8 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit</groupId>
+			<artifactId>com.springsource.org.junit</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>

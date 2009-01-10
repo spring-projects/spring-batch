@@ -89,8 +89,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit</groupId>
+			<artifactId>com.springsource.org.junit</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>

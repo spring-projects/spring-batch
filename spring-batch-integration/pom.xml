@@ -66,8 +66,8 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit</groupId>
+			<artifactId>com.springsource.org.junit</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.log4j</groupId>

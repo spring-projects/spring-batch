@@ -396,6 +396,7 @@
 					<excludes>
 						<exclude>**/Abstract*.java</exclude>
 					</excludes>
+					<junitArtifactName>org.junit:com.springsource.org.junit</junitArtifactName>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -432,13 +433,9 @@
 				<version>1.5.4</version>
 			</dependency>
 			<dependency>
-				<!--
-					Don't use the com.springsource one - surefire is broken in some
-					strange way
-				-->
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.4</version>
+				<groupId>org.junit</groupId>
+				<artifactId>com.springsource.org.junit</artifactId>
+				<version>4.4.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
