@@ -14,33 +14,72 @@
 		</faq>
 		<faq id="threading">
 			<question>
-				When will support for the more complex job execution
-				classes appear? Our Client has a number of
-				multi-threaded batch jobs.
+				Is it possible to execute jobs in multiple threads or
+				multiple processes?
 			</question>
 			<answer>
-				Multi-threaded execution in a single VM is perfectly
-				possible
-				with 1.x - but we recommend exercising
+				There are three ways to approach this - but we recommend
+				exercising
 				caution in the analysis of
 				such requirements (is it
-				really necessary?). Several people have
-				tried it and
-				it works as long as the step is intrinsically
-				restartable (idempotent effectively). The parallel
-				job sample shows
-				how it might work in practice - this
-				uses a "process indicator"
-				pattern to mark input
-				records as complete, inside the business
-				transaction.
+				really
+				necessary?).
+				<ul>
+					<li>Add a TaskExecutor to the repeatTemplate used to control
+						step execution (the outer step operations). The
+						FactoryBeans
+						provided for configuring Steps (e.g.
+						FaultTolerantStepFactoryBean)
+						have a "taskExecutor" property you
+						can set. This works as long as
+						the
+						step is intrinsically
+						restartable (idempotent effectively). The
+						parallel
+						job sample
+						shows
+						how it might work in practice - this
+						uses a
+						"process indicator"
+						pattern to mark input
+						records as complete,
+						inside
+						the business
+						transaction.</li>
+					<li>Use the PartitionStep to split your step execution
+						explicitly amongst several Step instances. Spring Batch
+						has a
+						local multi-threaded implementation of the main strategy
+						for this
+						(PartitionHandler),
+						which makes it a great
+						choice for IO intensive
+						jobs. Remember to use scope="step" for the stateful components in
+						a step executing in this
+						fashion, so that separate instances are
+						created per step execution, and there is no cross talk between
+						threads. See
+						below for more details.</li>
+					<li>Use the Remote Chunking approach as implemented in the
+						spring-batch-integration subproject. This requires
+						some durable
+						middleware (e.g. JMS) for reliable communication between the
+						driving step and
+						the remote workers. The
+						basic idea is to use a
+						special ItemWriter on the driving process, and a listener pattern
+						on the worker processes
+						(via a ChunkProcessor). See below for more
+						details.</li>
+				</ul>
 			</answer>
 		</faq>
 		<faq id="flexible">
 			<question>
 				What is the Spring Batch philosophy on the use of
 				flexible
-				strategies and default implementations? Can you add a public getter
+				strategies and default implementations? Can you
+				add a public getter
 				for this or that property?
 			</question>
 			<answer>
@@ -48,11 +87,13 @@
 					There are a great many extension points in Spring Batch
 					for the
 					framework developer (as opposed to the
-					implementor of business
+					implementor of
+					business
 					logic). We expect clients to
 					create their own more specific
 					strategies that can be
-					plugged in to control things like commit
+					plugged in to control
+					things like commit
 					intervals (
 					<code>CompletionPolicy</code>
 					), rules about how to deal with exceptions (
@@ -62,15 +103,21 @@
 				<p>
 					In general we try to dissuade users from extending framework
 					classes.
-					The Java language doesn't give us as much flexibility to
+					The Java language doesn't give us as much
+					flexibility to
 					mark classes and interfaces as internal. Generally you can expect
-					anything at the top level of the source tree in packages
+					anything at the top level of the
+					source tree in packages
 					<code>org.springframework.batch.*</code>
 					to be public, but not necessarily sub-classable. Extending our
 					concrete implementations of most
-					strategies is discouraged in favour
+					strategies is
+					discouraged in favour
 					of a composition or forking
-					approach.
+					approach. If your code can use only the
+					interfaces from Spring
+					Batch, that gives you the greatest possible
+					portability.
 				</p>
 			</answer>
 		</faq>
@@ -85,15 +132,18 @@
 					Spring Batch and Quartz have different goals. Spring
 					Batch provides
 					functionality for processing large
-					volumes of data and Quartz
+					volumes of data
+					and Quartz
 					provides functionality
 					for scheduling tasks. So Quartz could
 					complement
-					Spring Batch, but are not excluding technologies. A
+					Spring Batch, but are not excluding
+					technologies. A
 					common combination would be to use Quartz as a
 					trigger for a Spring
 					Batch job using a Cron
-					expression and the Spring Core convenience
+					expression
+					and the Spring Core convenience
 					<code>SchedulerFactoryBean</code>
 					.
 				</p>
@@ -108,23 +158,27 @@
 					Use a scheduling tool. There are plenty of them out
 					there.
 					Examples: Quartz, Control-M, Autosys. Quartz
-					doesn't have all the
+					doesn't have
+					all the
 					features of Control-M or
 					Autosys - it is supposed to be lightweight.
 					If you
-					want something even more lightweight you can just
+					want something even more
+					lightweight you can just
 					use the OS
 					(cron, at, etc.).
 				</p>
 				<p>
 					Simple sequential dependencies can be implemented
 					using the
-					job-steps model of Spring Batch, and the non-sequential features in
+					job-steps model of Spring Batch, and the non-sequential
+					features in
 					Spring Batch 2.0. We think
 					this is quite common. And
 					in fact it makes
 					it easier
-					to correct a common mis-use of scehdulers
+					to correct a common mis-use
+					of scehdulers
 					- having
 					hundreds
 					of jobs configured, many of which are not
@@ -135,7 +189,7 @@
 		</faq>
 		<faq id="parallel">
 			<question>
-				How will Spring Batch allow project to optimize for
+				How does Spring Batch allow project to optimize for
 				performance and scalability (through parallel processing
 				or other)?
 			</question>
@@ -147,35 +201,43 @@
 				deals with the concern of breaking apart the business
 				logic and
 				sharing it efficiently between parallel
-				processes or processors (see
+				processes or
+				processors (see
 				<code>PartitionStep</code>
 				).
 				There are a number of
 				technologies that could play a role here. The
 				essence is
-				just a set of concurrent remote calls to distributed
+				just a set of concurrent remote calls
+				to distributed
 				agents that can handle some business processing. Since
 				the business
-				processing is already typically modularised
+				processing is already typically
+				modularised
 				- e.g. input an item,
 				process it - Spring Batch can
 				strategise the distribution in a number
 				of ways. One
 				implementation that we have had some experience with
-				(and have a prototype for) is a set of remote web services
-				handling
-				the
-				business processing. We send a specific range
+				is a
+				set of remote web services
+				handling the
+				business processing.
+				We send a
+				specific range
 				of primary keys for
 				the inputs to each of
 				a number of
 				remote calls. The same basic
-				strategy would work with
+				strategy would
+				work with
 				any
-				of the Spring Remoting protocols (plain
+				of the Spring
+				Remoting protocols (plain
 				RMI,
 				HttpInvoker, JMS,
-				Hessian etc.) with little more than a
+				Hessian etc.) with
+				little more than a
 				couple of
 				lines change in the
 				execution layer
@@ -194,10 +256,12 @@
 				leading to resilience and high
 				throughput. We are often faced with
 				mission-critical
-				applications where audit trails are essential, and
+				applications
+				where audit trails are essential, and
 				guaranteed processing is demanded, but where there are
 				extremely
-				tight limits on performance under load, or
+				tight limits on
+				performance under load, or
 				where high throughput
 				gives a competitive advantage.
 				Matt Welsh's work shows that a Staged
@@ -208,17 +272,21 @@
 				AQ, MQ, Tibco etc.) gives us a lot of
 				resilience out of the box.
 				There are particular benefits
-				in a system where there is feedback
+				in a
+				system where there is feedback
 				between downstream
 				and upstream stages, so the number of consumers
 				can be
-				adjusted to account for the amount of demand. So how
+				adjusted to
+				account for the amount of demand. So how
 				does this
 				fit into Spring Batch? The
 				<tt>spring-batch-integration</tt>
 				project has this pattern implemented in Spring Integration, and can
-				be used to scale up the remote processing of any step with many
-				items to process.
+				be used to scale up the remote processing of any
+				step with many
+				items to process. See in particular the "chunk" package, and the ItemWriter and ChunkHandler
+				implementations in there.
 			</answer>
 		</faq>
 		<faq id="contributions">
@@ -231,18 +299,22 @@
 				eventually becoming a committer. The
 				process is pretty standard for
 				all Apache-licensed
-				projects. You make contributions through JIRA (so
+				projects. You
+				make contributions through JIRA (so
 				sign
 				up now); you assign the copyright of any contributions
 				using a
-				standard Apache-like CLA (see the Apache one for
+				standard
+				Apache-like CLA (see the Apache one for
 				example - ours might
 				be slightly different); when the
-				contributions reach a certain level,
+				contributions reach a
+				certain level,
 				or you convince us
 				otherwise that you are going to be committed long
 				term,
-				even if part time, then you can become a committer.
+				even if part time, then you
+				can become a committer.
 			</answer>
 		</faq>
 	</part>
