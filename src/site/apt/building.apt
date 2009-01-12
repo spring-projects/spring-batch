@@ -299,13 +299,13 @@ mvn -N -o site:run -P fast
 
 +---
 $ mvn install -P fast
-$ mvn clean site site:deploy
+$ mvn -P staging clean site site:deploy
 +---
 
-  Add "-P deployment" to deploy to the real website (requires ssh
+  Remove "-P staging" to deploy to the real website (requires ssh
   access to static.springframework.org).
 
-  The default without -P is to deploy to <<<target/staging>>>, so we
+  The "-P staging" is to deploy to <<<target/staging>>>, so we
   don't get accidental updates to the site.  To test the site contents
   navigate with your browser to that directory.  The site:stage goal
   deos not work properly for this build: all the subprojects are not
