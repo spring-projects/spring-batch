@@ -102,7 +102,12 @@
 			<artifactId>com.springsource.org.aspectj.weaver</artifactId>
 			<version>1.5.4</version>
 		</dependency>
-		<dependency>  <groupId>javax.xml.stream</groupId>  <artifactId>com.springsource.javax.xml.stream</artifactId>  <version>1.0.1</version><optional>true</optional> </dependency>
+		<dependency>
+			<groupId>javax.xml.stream</groupId>
+			<artifactId>com.springsource.javax.xml.stream</artifactId>
+			<version>1.0.1</version>
+			<optional>true</optional>
+		</dependency>
 	</dependencies>
 	<build>
 		<extensions>
@@ -172,28 +177,36 @@
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/release</url>
-			<snapshots><enabled>false</enabled></snapshots>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>com.springsource.repository.bundles.external</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				External Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/external</url>
-			<snapshots><enabled>false</enabled></snapshots>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>Codehaus</id>
 			<url>http://repository.codehaus.org/</url>
-			<snapshots><enabled>false</enabled></snapshots>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.plugins</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Plugins</name>
 			<url>http://repository.springsource.com/maven/bundles/milestone</url>
-			<snapshots><enabled>false</enabled></snapshots>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 	<distributionManagement>
