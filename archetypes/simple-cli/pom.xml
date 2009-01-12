@@ -102,6 +102,7 @@
 			<artifactId>com.springsource.org.aspectj.weaver</artifactId>
 			<version>1.5.4</version>
 		</dependency>
+		<dependency>  <groupId>javax.xml.stream</groupId>  <artifactId>com.springsource.javax.xml.stream</artifactId>  <version>1.0.1</version><optional>true</optional> </dependency>
 	</dependencies>
 	<build>
 		<extensions>
