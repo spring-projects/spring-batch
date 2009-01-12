@@ -12,6 +12,8 @@
   You can also browse the upcoming releases and look at the {{{http://opensource.atlassian.com/projects/spring/browse/BATCH?report=com.atlassian.jira.plugin.system.project:roadmap-panel}Road Map}} query.
 
   Links:
+
+    * {{{2.0-highlights.html}Highlights of changes between 1.x and 2.0}}
   
     * {{{2.0-m2-m3.html}2.0.0.M2 to 2.0.0.M3}}
 

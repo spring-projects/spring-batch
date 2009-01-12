@@ -3,13 +3,15 @@
                                     ------
                                     Dave Syer
                                     ------
-                                    July 2007, February 2008
+                                    July 2007, February 2008, January 2009
 
 Spring Batch Features and Roadmap
 
-* 1.0 Features
+  See also {{{migration/2.0-highlights.html}details of main themes of 2.0}}.
 
-  The following features are supported by Spring Batch 1.0:
+* 2.0 Features
+
+  The following features are supported by Spring Batch 2.0:
 
 ** Optimisation and Infrastructure
 
@@ -35,15 +37,13 @@ Spring Batch Features and Roadmap
   * ItemWriter abstraction and implementations for flat files and xml
   (the Sql case is just a regular Jdbc Dao).
 
-  * ItemReader and ItenWriter implementations are generally
-  ItemStreams.  An ItemStream encapsulates stream-like behaviour that
-  is needed for transaction synchronization (mark/reset). It also
-  provides the facility to be restored from a persistent
-  ExecutionContext so that jobs can fail and be restarted in
-  another process.
+  * ItemReader and ItemWriter implementations are generally
+  ItemStreams.  An ItemStream provides the facility to be restored
+  from a persistent ExecutionContext so that jobs can fail and be
+  restarted in another process.
 
   * For modifying an item before it is written, there is the
-  ItemTransformer abstraction.  ItemTransformer and ItemWriter are the
+  ItemProcessor abstraction.  ItemProcessor and ItemWriter are the
   two most common application developer touch points.
 
 ** Core Domain
@@ -58,13 +58,24 @@ Spring Batch Features and Roadmap
 
   * Step is the corresponding point for a StepExecution.  Step is the
   main strategy for different scaling, distribution and processing
-  approaches.  The 1.0 release contains implementations for in-process
-  execution (single VM).  See below (under Execution).
+  approaches.  The 2.0 release contains implementations for in-process
+  execution (single VM), and a PartitionStep as part of an SPI for
+  remote execution of steps.  See below (under Execution).
 
   * The most commonly used implementation of Step is a wrapper for an
   ItemReader and an ItemWriter.  There is also a special
   implementation that wraps a Tasklet, which can be used to execute a
   single action like a stored procedure call.
+
+  * FactoryBeans are provided for creating Step instances with the
+  most common features.  See in particular
+  FaultTolerantStepFactoryBean for a factory that provides convenient
+  configuration points for skips and retries.
+
+  * Late binding of environment properties, job parameters and
+  execution context values into a Step when it starts.  A custom
+  Spring Scope takes care of deferring the initialization of
+  components until a step is executing.
 
 ** Job Execution and Management
 
@@ -79,10 +90,6 @@ Spring Batch Features and Roadmap
   rollback counts.  Execution attributes (a human readable
   represenation of the state of the job - can be augmented by
   developers).
-
-  * StepHandlerStep - uses an ItemReader to obtain the next record to
-  process, and hands it to an ItemWriter if it is not null.  It can
-  run a StepExecution in the same process (VM).
 
   * Adjustiable exception handling strategies allowing fault
   tolerance through skipping bad records.
@@ -100,22 +107,35 @@ Spring Batch Features and Roadmap
   * A set of listener callbacks that users can implement and register
   with a Step to add custom behaviour like footer records.
 
+  * Remote chunking of steps.  The step proceeds as in the single JVM
+  case, but each chunk is passed on to the remote processes.  The
+  remote execution is an asynchronous listener of some sort
+  (e.g. message-driven component or web service).  Implemented using
+  {{{http://www.springsource.org/spring-integration}Spring
+  Integration}} in a Batch sub-project (spring-batch-integration).
+
+  * Partitioning - steps execute concurrently and optionally in
+  separate processes.  Feedback loop between consumers and producers
+  to prevent overflows.  Spring Batch provides an SPI for Partitioning
+  and an implementation for local (multi-threaded, single JVM)
+  execution.
+
+  * OSGi support.  Deploy the Spring Batch framework as a set of OSGi
+  services.  Deploy individual jobs or groups of jobs as additional
+  bundles that depend on the core.  Spring Batch JAR files are also
+  OSGi bundles, and can be deployed easily in
+  {{{http://www.springsource.com/dmserver}SpringSource dm Server}}.
+
+  * Non-sequential models for Job configuration (branching and
+  descision support).
+
 ** Samples
 
   * A range of samples is available as a separate module.  They all
   use a common simple configuration and extend in various ways to show
   the different features of the Execution module.
 
-* Roadmap (Beyond 1.0).
-
-  * Remote or distributed execution of steps.  The step proceeds as in
-  the single JVM case, but each chunk is passed on to the remote
-  processes.  The remote execution is an asynchronous listener of some
-  sort (e.g. message-driven component or web service).
-
-  * Asynchronous pipeline processing - steps execute concurrently and
-  optionally in separate processes.  Feedback loop between consumers
-  and producers to prevent overflows.
+* Roadmap (Beyond 2.0).
 
   * Issue tracking - a job is not finished until all issues with its
   executions are resolved.  Spring Batch can provide hooks to
@@ -127,13 +147,11 @@ Spring Batch Features and Roadmap
   richer options for detailed outcome reports), but also who has
   executed the job, what changes they made to runtime parameters.
 
-  * OSGi support.  Deploy the Spring Batch framework as a set of OSGi
-  services.  Deploy individual jobs or groups of jobs as additional
-  bundles that depend on the core.
+* SpringSource Enterprise Batch
 
-  * Non-sequential models for Job configuration (branching and
-  descision support).
+  * The plan is for {{{http://www.springsource.com}SpringSource}} to
+  provide an enterprise product that deals with runtime concerns, as
+  opposed to programming and configuration.
 
-* No Plans Yet to Support
-
-  * Triggering.
+  * Triggering.  Other runtime concerns, like monitoring and managemtn
+  of jobs and historical executions.
