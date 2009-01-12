@@ -12,13 +12,7 @@
 	<version>2.0.0.CI-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
-		<module>spring-batch-infrastructure</module>
-		<module>spring-batch-infrastructure-tests</module>
-		<module>spring-batch-core</module>
-		<module>spring-batch-test</module>
-		<module>spring-batch-samples</module>
-		<!--		<module>spring-batch-integration</module>-->
-		<module>docs</module>
+		<module>build-maven</module>
 	</modules>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
@@ -763,6 +757,15 @@
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>com.springsource.repository.bundles.milestone</id>
+			<name>SpringSource Enterprise Bundle Repository -
+				SpringSource Bundle Milestoness</name>
+			<url>http://repository.springsource.com/maven/bundles/milestone</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
