@@ -11,10 +11,13 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-core
+					org.springframework.batch:org.springframework.batch.test
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-infrastructure
+					org.springframework.batch:org.springframework.batch.core
+				</include>
+				<include>
+					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
 			</includes>
 			<sources>
@@ -33,7 +36,10 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-samples
+					org.springframework.batch:org.springframework.batch.samples
+				</include>
+				<include>
+					org.springframework.batch:org.springframework.batch.archetype.simple.cli
 				</include>
 			</includes>
 			<sources>
@@ -53,10 +59,13 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-core
+					org.springframework.batch:org.springframework.batch.test
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-infrastructure
+					org.springframework.batch:org.springframework.batch.core
+				</include>
+				<include>
+					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
 			</includes>
 			<sources>
@@ -76,10 +85,13 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-core
+					org.springframework.batch:org.springframework.batch.test
 				</include>
 				<include>
-					org.springframework.batch:spring-batch-infrastructure
+					org.springframework.batch:org.springframework.batch.core
+				</include>
+				<include>
+					org.springframework.batch:org.springframework.batch.infrastructure
 				</include>
 			</includes>
 			<binaries>
@@ -89,24 +101,27 @@
 				<dependencySets>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
+							lib/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:spring-batch
+								org.springframework.batch:org.springframework.batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.test
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.core
+							</exclude>
+							<exclude>
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
+							lib/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>provided</scope>
 					</dependencySet>
@@ -116,7 +131,7 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:spring-batch-samples
+					org.springframework.batch:org.springframework.batch.samples
 				</include>
 			</includes>
 			<binaries>
@@ -126,52 +141,61 @@
 				<dependencySets>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
+							lib/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>runtime</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:spring-batch
+								org.springframework.batch:org.springframework.batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.test
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.core
+							</exclude>
+							<exclude>
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
+							lib/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>provided</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:spring-batch
+								org.springframework.batch:org.springframework.batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.test
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.core
+							</exclude>
+							<exclude>
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
-							lib/${module.groupId}/${module.version}/${module.artifactId}-${module.version}.${module.extension}
+							lib/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
 						<scope>test</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:spring-batch
+								org.springframework.batch:org.springframework.batch
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-core
+								org.springframework.batch:org.springframework.batch.test
 							</exclude>
 							<exclude>
-								org.springframework.batch:spring-batch-infrastructure
+								org.springframework.batch:org.springframework.batch.core
+							</exclude>
+							<exclude>
+								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
 					</dependencySet>

@@ -1,26 +1,58 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>org.springframework.batch.dist</artifactId>
+	<version>2.0.0.CI-SNAPSHOT</version>
 	<name>Distribution</name>
-    <packaging>pom</packaging>
+	<packaging>pom</packaging>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch Distribution - used to create a .zip package for distribution of the main sub modules.]]>
 	</description>
-	<parent>
-		<groupId>org.springframework.batch</groupId>
-		<artifactId>org.springframework.batch.batch</artifactId>
-		<version>2.0.0.CI-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>verify</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-invoker-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<modules>
 		<module>../spring-batch-infrastructure</module>
 		<module>../spring-batch-core</module>
 		<module>../spring-batch-test</module>
 		<module>../spring-batch-samples</module>
+		<module>../archetypes</module>
 	</modules>
 
 	<build>
@@ -31,7 +63,121 @@
 				<version>1.2</version>
 			</extension>
 		</extensions>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>extract</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<configuration>
+								<tasks>
+									<unzip dest="target/it/with-dep">
+										<fileset dir="target">
+											<include name="*with-dep*.zip" />
+										</fileset>
+										<regexpmapper from="^[^/]*/(.*)$$" to="\1"
+											handledirsep="true" />
+									</unzip>
+									<unzip dest="target/it/no-dep">
+										<fileset dir="target">
+											<include name="*no-dep*.zip" />
+										</fileset>
+										<regexpmapper from="^[^/]*/(.*)$$" to="\1"
+											handledirsep="true" />
+									</unzip>
+									<fail message="Spring Batch jar files are missing.">
+										<condition>
+											<not>
+												<resourcecount count="9">
+													<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
+												</resourcecount>
+											</not>
+										</condition>
+									</fail>
+									<fail message="Dependency jar files are missing.">
+										<condition>
+											<not>
+												<resourcecount count="1">
+													<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar" />
+												</resourcecount>
+											</not>
+										</condition>
+									</fail>
+									<fail message="Test dependency jar files are missing.">
+										<condition>
+											<not>
+												<resourcecount count="1">
+													<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar" />
+												</resourcecount>
+											</not>
+										</condition>
+									</fail>
+								</tasks>
+							</configuration>
+						</execution>
+						<execution>
+							<id>copy-parent-pom</id>
+							<phase>generate-sources</phase>
+							<configuration>
+								<tasks>
+									<copy file="../pom.xml" todir="target" />
+								</tasks>
+							</configuration>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant-apache-regexp</artifactId>
+							<version>1.7.0</version>
+						</dependency>
+						<dependency>
+							<groupId>org.apache.ant</groupId>
+							<artifactId>ant</artifactId>
+							<version>1.7.0</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-invoker-plugin</artifactId>
+					<configuration>
+						<projectsDirectory>target/it/no-dep</projectsDirectory>
+						<localRepositoryPath>target/local-repo</localRepositoryPath>
+						<debug>true</debug>
+						<settingsFile>${basedir}/src/it/settings.xml</settingsFile>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<pomIncludes>
+							<pomInclude>samples/*/pom.xml</pomInclude>
+						</pomIncludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
@@ -48,24 +194,6 @@
 								<descriptor>src/assembly/with-dependencies.xml</descriptor>
 							</descriptors>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-parent-pom</id>
-						<phase>generate-sources</phase>
-						<configuration>
-							<tasks>
-								<copy file="../pom.xml" todir="target"/>
-							</tasks>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>
