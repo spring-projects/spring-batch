@@ -12,7 +12,9 @@
 	<version>2.0.0.CI-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
-		<module>build-maven</module>
+		<module>spring-batch-infrastructure</module>
+		<module>spring-batch-core</module>
+		<module>spring-batch-test</module>
 	</modules>
 	<url>http://www.springframework.org/spring-batch</url>
 	<organization>
@@ -59,14 +61,16 @@
 		</profile>
 		<profile>
 			<id>deployment</id>
-			<distributionManagement>
-				<site>
-					<id>static.springframework.org</id>
-					<url>
-						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk
-					</url>
-				</site>
-			</distributionManagement>
+			<activation>
+				<file>
+					<exists>deployment.txt</exists>
+				</file>
+			</activation>
+			<modules>
+				<module>spring-batch-samples</module>
+				<module>archetypes</module>
+				<module>docs</module>
+			</modules>
 			<build>
 				<plugins>
 					<plugin>
@@ -74,6 +78,23 @@
 					</plugin>
 				</plugins>
 			</build>
+		</profile>
+		<profile>
+			<id>samples</id>
+			<modules>
+				<module>spring-batch-infrastructure-tests</module>
+				<module>spring-batch-samples</module>
+				<module>archetypes</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>staging</id>
+			<distributionManagement>
+				<site>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</site>
+			</distributionManagement>
 		</profile>
 		<profile>
 			<id>strict</id>
@@ -227,8 +248,10 @@
 	<distributionManagement>
 		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
-			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
+			<id>static.springframework.org</id>
+			<url>
+				scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk
+			</url>
 		</site>
 		<repository>
 			<id>spring-milestone</id>
@@ -340,6 +363,13 @@
 								<goal>jar</goal>
 							</goals>
 						</execution>
+						<execution>
+							<id>repost</id>
+							<phase>site</phase>
+							<goals>
+								<goal>javadoc</goal>
+							</goals>
+						</execution>
 					</executions>
 					<configuration>
 						<links>
@@ -360,7 +390,7 @@
 							<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 						</links>
 						<aggregate>true</aggregate>
-						<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
+						<excludePackageNames>*.batch.sample,*.batch.container,example,test</excludePackageNames>
 					</configuration>
 				</plugin>
 			</plugins>

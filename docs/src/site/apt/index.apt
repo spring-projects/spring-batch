@@ -8,6 +8,6 @@
 
 Spring Batch Documentation
 
-  This is the home of the Spring Batch Reference Guide.  This is where you can find out how to use Spring Batch and how the pieces fit together.  For detailed descriptions of the individual classes in Spring Batch please refer to the {{{../apidocs/index.html}Javadocs}}.  There is also a separate section of this web site for the {{{../spring-batch-samples/index.html}Spring Batch Samples}}.  If you want to get started quickly that might be a good place to start.
+  This is the home of the Spring Batch Reference Guide.  This is where you can find out how to use Spring Batch and how the pieces fit together.  For detailed descriptions of the individual classes in Spring Batch please refer to the {{{../apidocs/index.html}Javadocs}}.  There is also a separate section of this web site for the {{{../org.springframework.batch.samples/index.html}Spring Batch Samples}}.  If you want to get started quickly that might be a good place to start.
 
   Use the links on the left to navigate to the HTML and PDF versions of the guide.
