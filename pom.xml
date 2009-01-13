@@ -295,10 +295,21 @@
 					<groupId>com.springsource.bundlor</groupId>
 					<artifactId>com.springsource.bundlor.maven</artifactId>
 					<version>${bundlor.version}</version>
+					<inherited>true</inherited>
 					<configuration>
 						<manifestTemplatePath>${project.basedir}/template.mf</manifestTemplatePath>
 						<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
 					</configuration>
+					<executions>
+						<execution>
+							<id>bundlor-transform</id>
+							<!-- This isn't necessary, but Q4E barfs without it. -->
+							<phase>package</phase>
+							<goals>
+								<goal>transform</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -357,21 +368,6 @@
 							<version>2.2.1</version>
 						</dependency>
 					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>com.springsource.bundlor</groupId>
-					<artifactId>com.springsource.bundlor.maven</artifactId>
-					<version>${bundlor.version}</version>
-					<executions>
-						<execution>
-							<id>bundlor-transform</id>
-							<!-- This isn't necessary, but Q4E barfs without it. -->
-							<phase>package</phase>
-							<goals>
-								<goal>transform</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 				<plugin>
 					<artifactId>maven-javadoc-plugin</artifactId>
