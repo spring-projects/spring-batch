@@ -39,6 +39,15 @@
 							<chunkedOutput>false</chunkedOutput>
 							<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
 							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
+							<preProcess>
+								<copy todir="${basedir}/target/docbkx/pdf">
+									<fileset dir="${basedir}">
+										<include name="src/site/docbook/reference/**/*.png" />
+										<include name="src/site/docbook/reference/**/*.gif" />
+										<include name="src/site/docbook/reference/**/*.jpg" />
+									</fileset>
+								</copy>
+							</preProcess>
 							<postProcess>
 								<copy todir="${basedir}/target/site/reference">
 									<fileset dir="${basedir}/target/docbkx">
@@ -47,7 +56,7 @@
 								</copy>
 								<copy todir="${basedir}/target/site/reference/html-single">
 									<fileset dir="${basedir}/target/docbkx/html">
-										<include name="**/*.html" />
+										<include name="index.html" />
 									</fileset>
 								</copy>
 								<copy todir="${basedir}/target/site/reference/html-single">
@@ -56,14 +65,13 @@
 									</fileset>
 								</copy>
 								<copy todir="${basedir}/target/site/reference/html-single">
-									<fileset dir="${basedir}/src/site/resources/reference">
+									<fileset dir="${basedir}/src/site/docbook/reference">
 										<include name="**/*.png" />
 										<include name="**/*.gif" />
 										<include name="**/*.jpg" />
 									</fileset>
 								</copy>
-								<move file="${basedir}/target/site/reference/pdf/index.pdf"
-									tofile="${basedir}/target/site/reference/pdf/${artifactId}.pdf"
+								<move file="${basedir}/target/site/reference/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
 									failonerror="false" />
 							</postProcess>
 						</configuration>
@@ -92,7 +100,7 @@
 									</fileset>
 								</copy>
 								<copy todir="${basedir}/target/site/reference/html">
-									<fileset dir="${basedir}/src/site/resources/reference">
+									<fileset dir="${basedir}/src/site/docbook/reference">
 										<include name="**/*.png" />
 										<include name="**/*.gif" />
 										<include name="**/*.jpg" />

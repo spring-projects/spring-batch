@@ -28,7 +28,7 @@
       </imageobject>
 
       <imageobject role="html">
-        <imagedata fileref="src/site/resources/reference/images/meta-data-erd.png"
+        <imagedata fileref="src/site/docbook/reference/images/meta-data-erd.png"
                    format="PNG" />
       </imageobject>
     </mediaobject>

@@ -929,7 +929,7 @@
     <para><mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/xmlinput.png"
+                     fileref="src/site/docbook/reference/images/xmlinput.png"
                      format="PNG" width="66%" />
         </imageobject>
 
@@ -956,7 +956,7 @@
     <para><mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/oxm-fragments.png"
+                     fileref="src/site/docbook/reference/images/oxm-fragments.png"
                      format="PNG" width="66%" />
         </imageobject>
 
@@ -1332,7 +1332,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/cursorExample.png"
+                     fileref="src/site/docbook/reference/images/cursorExample.png"
                      width="66%" />
         </imageobject>
       </mediaobject>
@@ -1757,7 +1757,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/drivingQueryExample.png"
+                     fileref="src/site/docbook/reference/images/drivingQueryExample.png"
                      width="66%" />
         </imageobject>
       </mediaobject>
@@ -1777,7 +1777,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/drivingQueryJob.png"
+                     fileref="src/site/docbook/reference/images/drivingQueryJob.png"
                      width="66%" />
         </imageobject>
       </mediaobject>
@@ -2020,22 +2020,24 @@
       that implement the <classname>ItemWriter</classname> interface or use
       one from a custom <classname>ItemWriter</classname> that's written for
       generic processing concerns, either way, they should work without any
-      issues. The one exception to this is buffered output. This is most
+      issues. One thing to look out for is the performance and error handling
+      capabilities that are provided by batching the outputs. This is most
       common when using hibernate as an <classname>ItemWriter</classname>, but
-      could have the same issues when using Jdbc batch mode. Buffering
-      database output doesn't have any inherent flaws, assuming there are no
-      errors in the data. However, any errors while writing out can cause
-      issues because there is no way to know which individual item caused an
-      exception, as illustrated below:</para>
+      could have the same issues when using Jdbc batch mode. Batching database
+      output doesn't have any inherent flaws, assuming we are careful to flush
+      and there are no errors in the data. However, any errors while writing
+      out can cause confusion because there is no way to know which individual
+      item caused an exception, or even ideed if any individual item was
+      responsible, as illustrated below:</para>
 
       <para><mediaobject>
           <imageobject role="html">
-            <imagedata align="center" fileref="images/errorOnFlush.jpg" />
+            <imagedata align="center" fileref="images/errorOnFlush.png" />
           </imageobject>
 
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="src/site/resources/reference/images/errorOnFlush.jpg" />
+                       fileref="src/site/docbook/reference/images/errorOnFlush.png" />
           </imageobject>
         </mediaobject>If items are buffered before being written out, any
       errors encountered will not be thrown until the buffer is flushed just
@@ -2044,67 +2046,34 @@
       As far as the Step is concerned, all 20 item will be written out
       successfully, since there's no way to know that an error will occur
       until they are actually written out. Once
-      <classname>ItemWriter#</classname><methodname>flush</methodname>() is
+      <classname>Session#</classname><methodname>flush</methodname>() is
       called, the buffer will be emptied and the exception will be hit. At
       this point, there's nothing the <classname>Step</classname> can do, the
-      transaction must be rolled back. Normally, this exception will cause the
-      Item to be skipped (depending upon the skip/retry policies), and then it
-      won't be written out again. However, in this scenario, there's no way
-      for it to know which item caused the issue, the whole buffer was being
-      written out when the failure happened. The only way to solve this issue
-      is to flush after each item:</para>
+      transaction must be rolled back. Normally, this exception might cause
+      the Item to be skipped (depending upon the skip/retry policies), and
+      then it won't be written out again. However, in the batched scenario,
+      there's no way for it to know which item caused the issue, the whole
+      buffer was being written out when the failure happened. The only way to
+      solve this issue is to flush after each item:</para>
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/errorOnWrite.jpg" />
+          <imagedata fileref="images/errorOnWrite.png" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/resources/reference/images/errorOnWrite.jpg" />
+                     fileref="src/site/docbook/reference/images/errorOnWrite.jpg" />
         </imageobject>
       </mediaobject>
 
-      <para>Because this is a common enough use case, especially when using
-      Hibernate, Spring Batch provides an implementation to help:
-      <classname>HibernateAwareItemWriter</classname>. The
-      <classname>HibernateAwareItemWriter</classname> solves the problem in a
-      straightforward way: if a chunk fails the first time, on subsequent runs
-      it will be flushed after after each time. This effectively lowers the
-      commit interval to one for the length of the chunk. Doing so allows for
-      items to be skipped reliably. The following example illustrates how to
-      configure the <classname>HibernateAwareItemWriter</classname>:</para>
-
-      <programlisting><![CDATA[  <bean id="hibernateItemWriter"
-        class="org.springframework.batch.item.database.HibernateAwareItemWriter">
-    <property name="sessionFactory" ref="sessionFactory" />
-    <property name="delegate" ref="customerCreditWriter" />
-  </bean>
-
-  <bean id="customerCreditWriter"
-        class="org.springframework.batch.sample.dao.HibernateCreditItemWriter">
-    <property name="sessionFactory" ref="sessionFactory" />
-  </bean>
-
-]]></programlisting>
-
-      <para>If you are using JPA then the
-      <classname>JpaAwareItemWriter</classname> provides comparable
-      functionality. The following example illustrates how to configure the
-      <classname>JpaAwareItemWriter</classname>:</para>
-
-      <programlisting><![CDATA[  <bean id="hibernateItemWriter"
-        class="org.springframework.batch.item.database.JpaAwareItemWriter">
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
-    <property name="delegate" ref="customerCreditWriter" />
-  </bean>
-
-  <bean id="customerCreditWriter"
-        class="org.springframework.batch.sample.dao.JpaCreditDao">
-    <property name="entityManagerFactory" ref="entityManagerFactory" />
-  </bean>
-
-]]></programlisting>
+      <para>This is a common use case, especially when using Hibernate, and
+      the simple guideline for implementations of
+      <classname>ItemWriter</classname>, is to flush on each call to
+      <methodname>write()</methodname>. Doing so allows for items to be
+      skipped reliably, with Spring Batch taking care internally of the
+      granularity of the calls to <classname>ItemWriter</classname> after an
+      error.</para>
     </section>
   </section>
 
