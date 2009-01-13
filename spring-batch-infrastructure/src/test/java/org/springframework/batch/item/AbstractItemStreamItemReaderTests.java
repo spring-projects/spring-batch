@@ -12,7 +12,7 @@ import org.junit.Test;
  * {@link ItemStream}. Expected input is five {@link Foo} objects with values 1
  * to 5.
  */
-public abstract class CommonItemStreamItemReaderTests extends CommonItemReaderTests {
+public abstract class AbstractItemStreamItemReaderTests extends AbstractItemReaderTests {
 
 	protected ExecutionContext executionContext = new ExecutionContext();
 

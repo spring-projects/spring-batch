@@ -13,7 +13,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 @SuppressWarnings({"unchecked", "deprecation"})
 @RunWith(JUnit4ClassRunner.class)
-public class IbatisItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
+public class IbatisItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();

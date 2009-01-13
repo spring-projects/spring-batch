@@ -13,7 +13,7 @@ import javax.xml.transform.Source;
 
 import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
-import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
@@ -25,7 +25,7 @@ import org.springframework.oxm.XmlMappingException;
 import org.springframework.xml.transform.StaxSource;
 
 @RunWith(JUnit4ClassRunner.class)
-public class MultiResourceItemReaderXmlTests extends CommonItemStreamItemReaderTests {
+public class MultiResourceItemReaderXmlTests extends AbstractItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		MultiResourceItemReader<Foo> multiReader = new MultiResourceItemReader<Foo>();

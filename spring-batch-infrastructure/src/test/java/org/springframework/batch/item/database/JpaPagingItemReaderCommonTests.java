@@ -3,7 +3,7 @@ package org.springframework.batch.item.database;
 import javax.persistence.EntityManagerFactory;
 
 import org.junit.runner.RunWith;
-import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class JpaPagingItemReaderCommonTests extends CommonItemStreamItemReaderTests {
+public class JpaPagingItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	@Autowired
 	private EntityManagerFactory entityManagerFactory;

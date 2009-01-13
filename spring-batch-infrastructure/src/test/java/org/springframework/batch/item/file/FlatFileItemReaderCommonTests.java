@@ -1,6 +1,6 @@
 package org.springframework.batch.item.file;
 
-import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.LineMapper;
@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
 /**
  * Tests for {@link FlatFileItemReader}.
  */
-public class FlatFileItemReaderCommonTests extends CommonItemStreamItemReaderTests{
+public class FlatFileItemReaderCommonTests extends AbstractItemStreamItemReaderTests{
 
 	private static final String FOOS = "1 \n 2 \n 3 \n 4 \n 5 \n"; 
 	

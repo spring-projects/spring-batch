@@ -2,12 +2,12 @@ package org.springframework.batch.item.database;
 
 import javax.sql.DataSource;
 
-import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.junit.Before;
 import org.junit.After;
 
-public abstract class CommonDatabaseItemStreamItemReaderTests extends CommonItemStreamItemReaderTests {
+public abstract class AbstractDatabaseItemStreamItemReaderTests extends AbstractItemStreamItemReaderTests {
 
 	private ClassPathXmlApplicationContext ctx;
 

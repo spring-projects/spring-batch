@@ -11,7 +11,7 @@ import org.springframework.batch.item.sample.Foo;
  * Common tests for {@link ItemReader} implementations. Expected input is five
  * {@link Foo} objects with values 1 to 5.
  */
-public abstract class CommonItemReaderTests {
+public abstract class AbstractItemReaderTests {
 
 	protected ItemReader<Foo> tested;
 

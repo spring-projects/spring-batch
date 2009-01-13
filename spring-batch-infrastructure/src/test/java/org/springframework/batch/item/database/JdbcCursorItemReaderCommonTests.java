@@ -8,7 +8,7 @@ import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.Test;
 
 @RunWith(JUnit4ClassRunner.class)
-public class JdbcCursorItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
+public class JdbcCursorItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 

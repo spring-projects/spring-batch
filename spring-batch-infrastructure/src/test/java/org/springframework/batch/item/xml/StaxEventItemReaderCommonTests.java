@@ -13,7 +13,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.transform.Source;
 
-import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.sample.Foo;
@@ -23,7 +23,7 @@ import org.springframework.oxm.XmlMappingException;
 import org.springframework.xml.transform.StaxSource;
 
 @RunWith(JUnit4ClassRunner.class)
-public class StaxEventItemReaderCommonTests extends CommonItemStreamItemReaderTests {
+public class StaxEventItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	private final static String FOOS = "<foos> <foo value=\"1\"/> <foo value=\"2\"/> <foo value=\"3\"/> <foo value=\"4\"/> <foo value=\"5\"/> </foos>";
 

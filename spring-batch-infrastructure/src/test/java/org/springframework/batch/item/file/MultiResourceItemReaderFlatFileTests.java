@@ -4,7 +4,7 @@ import java.util.Comparator;
 
 import org.junit.internal.runners.JUnit4ClassRunner;
 import org.junit.runner.RunWith;
-import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.mapping.LineMapper;
@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 
 @RunWith(JUnit4ClassRunner.class)
 public class MultiResourceItemReaderFlatFileTests extends
-		CommonItemStreamItemReaderTests {
+		AbstractItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 

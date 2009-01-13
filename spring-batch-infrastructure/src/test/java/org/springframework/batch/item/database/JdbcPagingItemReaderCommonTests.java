@@ -3,7 +3,7 @@ package org.springframework.batch.item.database;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.batch.item.CommonItemStreamItemReaderTests;
+import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.database.support.HsqlPagingQueryProvider;
@@ -17,7 +17,7 @@ import java.sql.SQLException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class JdbcPagingItemReaderCommonTests extends CommonItemStreamItemReaderTests {
+public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReaderTests {
 
 	@Autowired
 	private DataSource dataSource;

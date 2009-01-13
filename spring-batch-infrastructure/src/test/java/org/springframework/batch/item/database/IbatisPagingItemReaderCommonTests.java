@@ -11,7 +11,7 @@ import com.ibatis.sqlmap.client.SqlMapClient;
 
 @SuppressWarnings("unchecked")
 @RunWith(JUnit4ClassRunner.class)
-public class IbatisPagingItemReaderCommonTests extends CommonDatabaseItemStreamItemReaderTests {
+public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
 
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
