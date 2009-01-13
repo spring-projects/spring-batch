@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="package-bundle">
 	
-	<target name="package" depends="ivy.init, jar">
+	<target name="package" depends="ivy.init">
 		<dist-jar/>
 		<src-jar/>
 		<ext-jars/>
