@@ -7,6 +7,6 @@
 		<ext-jars/>
 	</target>
 	
-	<import file="${basedir}/../spring-build/standard/default.xml"/>	
+	<import file="${basedir}/../spring-build/standard/default.xml"/>
 
 </project>
