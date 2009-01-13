@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="com.springframework.batch.test">
+<project name="org.springframework.batch.test">
 
 	<property file="${basedir}/../build.properties" />
 	<import file="${basedir}/../build-ivy/package-bundle.xml"/>
