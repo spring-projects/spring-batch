@@ -529,6 +529,11 @@
 						<groupId>org.objectweb.asm</groupId>
 						<artifactId>com.springsource.org.objectweb.asm.attrs</artifactId>
 					</exclusion>
+					<exclusion>
+						<!-- This one isn't in BRITS but is needed by Maven Central -->
+						<groupId>javax.transaction</groupId>
+						<artifactId>jta</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
 			<dependency>
