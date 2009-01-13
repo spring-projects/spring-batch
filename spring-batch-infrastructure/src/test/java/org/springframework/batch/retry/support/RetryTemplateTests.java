@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
+import static org.easymock.EasyMock.*;
+
 import java.util.Collections;
 
 import org.junit.Test;
@@ -129,7 +131,7 @@ public class RetryTemplateTests {
 		retryTemplate.setRetryPolicy(new SimpleRetryPolicy(attempts));
 		BinaryExceptionClassifier classifier = new BinaryExceptionClassifier(Collections
 				.<Class<? extends Throwable>> singleton(IllegalArgumentException.class), false);
-		retryTemplate.execute(callback, new DefaultRetryState("foo",classifier));
+		retryTemplate.execute(callback, new DefaultRetryState("foo", classifier));
 		assertEquals(attempts, callback.attempts);
 	}
 
@@ -254,6 +256,50 @@ public class RetryTemplateTests {
 		catch (BackOffInterruptedException e) {
 			assertEquals("foo", e.getMessage());
 		}
+	}
+
+	/**
+	 * {@link BackOffPolicy} should apply also for exceptions that are
+	 * re-thrown.
+	 */
+	@Test
+	public void testBackOffForRethrownException() throws Exception {
+		
+		RetryTemplate tested = new RetryTemplate();
+		tested.setRetryPolicy(new SimpleRetryPolicy(1));
+
+		BackOffPolicy bop = createStrictMock(BackOffPolicy.class);
+		BackOffContext backOffContext = new BackOffContext() {
+		};
+		tested.setBackOffPolicy(bop);
+
+		expect(bop.start(isA(RetryContext.class))).andReturn(backOffContext);
+		bop.backOff(backOffContext);
+		expectLastCall().once();
+		replay(bop);
+
+		try {
+			tested.execute(new RetryCallback<Object>() {
+
+				public Object doWithRetry(RetryContext context) throws Exception {
+					throw new Exception("maybe next time!");
+				}
+
+			}, null, new DefaultRetryState(tested) {
+
+				@Override
+				public boolean rollbackFor(Exception exception) {
+					return true;
+				}
+
+			});
+			fail();
+		}
+		catch (Exception expected) {
+			assertEquals("maybe next time!", expected.getMessage());
+		}
+		
+		verify(bop);
 	}
 
 	private static class MockRetryCallback implements RetryCallback<Object> {

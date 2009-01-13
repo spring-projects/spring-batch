@@ -236,23 +236,23 @@ public class RetryTemplate implements RetryOperations {
 					doOnErrorInterceptors(retryCallback, context, e);
 
 					registerThrowable(retryPolicy, state, context, e);
-
+					
+					try {
+						backOffPolicy.backOff(backOffContext);
+					}
+					catch (BackOffInterruptedException ex) {
+						lastException = e;
+						// back off was prevented by another thread - fail the
+						// retry
+						logger.debug("Abort retry because interrupted: count=" + context.getRetryCount());
+						throw ex;
+					}
+					
 					if (shouldRethrow(retryPolicy, context, state)) {
 						logger.debug("Rethrow in retry for policy: count=" + context.getRetryCount());
 						throw e;
 					}
 
-				}
-
-				try {
-					backOffPolicy.backOff(backOffContext);
-				}
-				catch (BackOffInterruptedException e) {
-					lastException = e;
-					// back off was prevented by another thread - fail the
-					// retry
-					logger.debug("Abort retry because interrupted: count=" + context.getRetryCount());
-					throw e;
 				}
 
 				/*
