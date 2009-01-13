@@ -2082,7 +2082,7 @@
   </bean>
 
   <bean id="customerCreditWriter"
-        class="org.springframework.batch.sample.dao.HibernateCreditDao">
+        class="org.springframework.batch.sample.dao.HibernateCreditItemWriter">
     <property name="sessionFactory" ref="sessionFactory" />
   </bean>
 
