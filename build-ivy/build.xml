@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="com.springsource.test.build" default="test">
+	
+	<path id="bundles">
+		<pathelement location="${basedir}/../spring-batch-infrastructure"/>
+		<pathelement location="${basedir}/../spring-batch-core"/>
+		<pathelement location="${basedir}/../spring-batch-test"/>
+	</path>
+
+	<property file="${basedir}/../build.properties" />
+	<import file="${basedir}/../spring-build/multi-bundle/default.xml"/>
+
+</project>

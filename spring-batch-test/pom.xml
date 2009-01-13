@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<artifactId>org.springframework.batch</artifactId>
-		<groupId>org.springframework.batch</groupId>
-		<version>2.0.0.CI-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.springframework.batch.test</artifactId>
 	<version>2.0.0.CI-SNAPSHOT</version>
 	<name>Test</name>
 	<packaging>jar</packaging>
 	<description>Domain for batch job testing</description>
+
+	<parent>
+		<artifactId>org.springframework.batch</artifactId>
+		<groupId>org.springframework.batch</groupId>
+		<version>2.0.0.CI-SNAPSHOT</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<profiles>
+		<profile>
+			<id>tiger</id>
+			<activation>
+				<jdk>1.5</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>javax.xml.stream</groupId>
+					<artifactId>com.springsource.javax.xml.stream</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -55,13 +73,8 @@
 			<artifactId>com.springsource.org.apache.commons.collections
 			</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>stax</groupId>
-			<artifactId>stax</artifactId>
-			<!-- optional for Java 6 -->
-			<optional>true</optional>
-		</dependency>
 	</dependencies>
+
 	<reporting>
 		<plugins>
 			<plugin>
@@ -70,4 +83,5 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
 </project>

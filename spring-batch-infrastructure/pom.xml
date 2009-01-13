@@ -20,24 +20,16 @@
 	</properties>
 	<profiles>
 		<profile>
-			<id>clover</id>
+			<id>tiger</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
+				<jdk>1.5</jdk>
 			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-clover-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-			<reporting>
-				<plugins>
-					<plugin>
-						<artifactId>maven-clover-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</reporting>
+			<dependencies>
+				<dependency>
+					<groupId>stax</groupId>
+					<artifactId>stax</artifactId>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 	<build>
@@ -128,12 +120,6 @@
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>com.springsource.javax.persistence</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<!-- TODO: remove this or find a replacement in Java 5 / BRITS -->
-			<groupId>stax</groupId>
-			<artifactId>stax</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<!-- Spring Dependencies -->

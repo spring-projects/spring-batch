@@ -1,7 +1,6 @@
 Bundle-SymbolicName: org.springframework.batch.core
-Bundle-Version: 2.0.0.CI-SNAPSHOT
-Bundle-ManifestVersion: 2
 Bundle-Name: Spring Batch Core
+Bundle-Vendor: Spring
 Ignored-Existing-Headers: 
  Import-Package,
  Export-Package

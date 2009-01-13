@@ -10,6 +10,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>build.properties</name>
+			<type>1</type>
+			<locationURI>SPRING_BATCH/build.properties</locationURI>
+		</link>
+		<link>
 			<name>pom.xml</name>
 			<type>1</type>
 			<locationURI>SPRING_BATCH/pom.xml</locationURI>
