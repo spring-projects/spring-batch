@@ -1849,7 +1849,7 @@
   &lt;/bean&gt;
 
   &lt;bean id="customerCreditWriter"
-        class="org.springframework.batch.sample.dao.HibernateCreditDao"&gt;
+        class="org.springframework.batch.sample.dao.HibernateCreditItemWriter"&gt;
     &lt;property name="sessionFactory" ref="sessionFactory" /&gt;
   &lt;/bean&gt;
 
