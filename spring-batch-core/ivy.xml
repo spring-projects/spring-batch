@@ -14,6 +14,11 @@
 		<include file="${spring.build.dir}/common/default-ivy-configurations.xml"/>
 	</configurations>
 
+	<publications>
+		<artifact name="${ant.project.name}" />
+		<artifact name="${ant.project.name}-sources" type="src" ext="jar" />
+	</publications>
+
 	<dependencies>
 		<dependency org="org.springframework.batch" name="org.springframework.batch.infrastructure" rev="latest.integration" conf="compile->runtime,provided"/>
 		<dependency org="org.objectweb.asm" name="com.springsource.org.objectweb.asm.commons" rev="2.2.3" conf="optional->runtime,provided"/>
