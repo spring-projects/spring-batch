@@ -15,13 +15,23 @@
  */
 package org.springframework.batch.integration.file;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.Properties;
+
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.converter.DefaultJobParametersConverter;
+import org.springframework.batch.core.converter.JobParametersConverter;
 import org.springframework.batch.core.job.SimpleJob;
+import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.resource.StepExecutionResourceProxy;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.integration.item.MessageChannelItemWriter;
 import org.springframework.batch.integration.launch.JobLaunchingMessageHandler;
@@ -31,7 +41,10 @@ import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.core.io.FileSystemResourceLoader;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageChannel;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -65,6 +78,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
 	public void setBeanName(String name) {
@@ -77,7 +91,8 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	 * case there is no need to set the resource property as it will be set by
 	 * this factory.
 	 * 
-	 * @param itemReader the itemReader to set
+	 * @param itemReader
+	 *            the itemReader to set
 	 */
 	@Required
 	public void setItemReader(ItemReader<? extends T> itemReader) {
@@ -87,7 +102,9 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	/**
 	 * Public setter for the channel. Each item from the item reader will be
 	 * sent to this channel.
-	 * @param channel the channel to set
+	 * 
+	 * @param channel
+	 *            the channel to set
 	 */
 	@Required
 	public void setChannel(MessageChannel channel) {
@@ -96,7 +113,9 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 
 	/**
 	 * Public setter for the {@link JobRepository}.
-	 * @param jobRepository the job repository to set
+	 * 
+	 * @param jobRepository
+	 *            the job repository to set
 	 */
 	@Required
 	public void setJobRepository(JobRepository jobRepository) {
@@ -105,7 +124,9 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 
 	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
-	 * @param transactionManager the transaction manager to set
+	 * 
+	 * @param transactionManager
+	 *            the transaction manager to set
 	 */
 	@Required
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
@@ -130,8 +151,8 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 
 		Assert.state((itemReader instanceof FlatFileItemReader) || (itemReader instanceof StaxEventItemReader),
 				"ItemReader must be either a FlatFileItemReader or a StaxEventItemReader");
-		StepExecutionResourceProxy resourceProxy = new StepExecutionResourceProxy();
-		resourceProxy.setFilePattern("%" + ResourcePayloadAsJobParameterStrategy.FILE_INPUT_PATH + "%");
+		JobParameterResourceProxy resourceProxy = new JobParameterResourceProxy();
+		resourceProxy.setKey(ResourcePayloadAsJobParameterStrategy.FILE_INPUT_PATH);
 		stepFactory.setListeners(new StepExecutionListener[] { resourceProxy });
 		setResource(itemReader, resourceProxy);
 		stepFactory.setItemReader(itemReader);
@@ -168,6 +189,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 
 	/**
 	 * Always returns {@link Job}.
+	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#getObjectType()
 	 */
 	public Class<Job> getObjectType() {
@@ -176,10 +198,176 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 
 	/**
 	 * Always true. TODO: should it be false?
+	 * 
 	 * @see org.springframework.beans.factory.FactoryBean#isSingleton()
 	 */
 	public boolean isSingleton() {
 		return true;
 	}
 
+	/**
+	 * Strategy for resolving a filename just prior to step execution. The proxy
+	 * is given a key that will correspond to a key in the job parameters. Just
+	 * before the step is executed, the resource will be created with its
+	 * filename as the value found in the job parameters.
+	 * 
+	 * To use this resource it must be initialised with a {@link StepExecution}.
+	 * The best way to do that is to register it as a listener in the step that
+	 * is going to need it. For this reason the resource implements
+	 * {@link StepExecutionListener}.
+	 * 
+	 * @see Resource
+	 */
+	private class JobParameterResourceProxy extends StepExecutionListenerSupport implements Resource,
+			ResourceLoaderAware, StepExecutionListener {
+
+		private JobParametersConverter jobParametersConverter = new DefaultJobParametersConverter();
+
+		private ResourceLoader resourceLoader = new FileSystemResourceLoader();
+
+		private Resource delegate;
+
+		private String key = null;
+
+		private static final String NOT_INITIALISED = "The delegate resource has not been initialised. "
+				+ "Remember to register this object as a StepListener.";
+
+		/**
+		 * @param relativePath
+		 * @throws IOException
+		 * @see org.springframework.core.io.Resource#createRelative(java.lang.String)
+		 */
+		public Resource createRelative(String relativePath) throws IOException {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.createRelative(relativePath);
+		}
+
+		/**
+		 * @see org.springframework.core.io.Resource#exists()
+		 */
+		public boolean exists() {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.exists();
+		}
+
+		/**
+		 * @see org.springframework.core.io.Resource#getDescription()
+		 */
+		public String getDescription() {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.getDescription();
+		}
+
+		/**
+		 * @throws IOException
+		 * @see org.springframework.core.io.Resource#getFile()
+		 */
+		public File getFile() throws IOException {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.getFile();
+		}
+
+		/**
+		 * @see org.springframework.core.io.Resource#getFilename()
+		 */
+		public String getFilename() {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.getFilename();
+		}
+
+		/**
+		 * @throws IOException
+		 * @see org.springframework.core.io.InputStreamSource#getInputStream()
+		 */
+		public InputStream getInputStream() throws IOException {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.getInputStream();
+		}
+
+		/**
+		 * @throws IOException
+		 * @see org.springframework.core.io.Resource#getURI()
+		 */
+		public URI getURI() throws IOException {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.getURI();
+		}
+
+		/**
+		 * @throws IOException
+		 * @see org.springframework.core.io.Resource#getURL()
+		 */
+		public URL getURL() throws IOException {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.getURL();
+		}
+
+		/**
+		 * @see org.springframework.core.io.Resource#isOpen()
+		 */
+		public boolean isOpen() {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.isOpen();
+		}
+
+		/**
+		 * @see org.springframework.core.io.Resource#isReadable()
+		 */
+		public boolean isReadable() {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.isReadable();
+		}
+
+		/**
+		 * @see org.springframework.core.io.Resource#lastModified()
+		 */
+		public long lastModified() throws IOException {
+			Assert.state(delegate != null, NOT_INITIALISED);
+			return delegate.lastModified();
+		}
+
+		/**
+		 * Public setter for the {@link JobParametersConverter} used to
+		 * translate {@link JobParameters} into {@link Properties}. Defaults to
+		 * a {@link DefaultJobParametersConverter}.
+		 * 
+		 * @param jobParametersConverter
+		 *            the {@link JobParametersConverter} to set
+		 */
+		public void setJobParametersFactory(JobParametersConverter jobParametersConverter) {
+			this.jobParametersConverter = jobParametersConverter;
+		}
+
+		/**
+		 * Always false because we are expecting to be step scoped.
+		 * 
+		 * @see org.springframework.beans.factory.config.AbstractFactoryBean#isSingleton()
+		 */
+		public boolean isSingleton() {
+			return false;
+		}
+
+		/**
+		 * @see org.springframework.context.ResourceLoaderAware#setResourceLoader(org.springframework.core.io.ResourceLoader)
+		 */
+		public void setResourceLoader(ResourceLoader resourceLoader) {
+			this.resourceLoader = resourceLoader;
+		}
+
+		public void setKey(String key) {
+			this.key = key;
+		}
+
+		/**
+		 * Collect the properties of the enclosing {@link StepExecution} that
+		 * will be needed to create a file name.
+		 * 
+		 * @see org.springframework.batch.core.StepExecutionListener#beforeStep(org.springframework.batch.core.StepExecution)
+		 */
+		public void beforeStep(StepExecution execution) {
+			Properties properties = jobParametersConverter.getProperties(execution.getJobExecution().getJobInstance()
+					.getJobParameters());
+			delegate = resourceLoader.getResource(properties.getProperty(this.key));
+		}
+	}
 }
