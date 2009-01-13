@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
-<stringAttribute key="bad_container_name" value="\spring-batch-samples\.settings\j"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/spring-batch-core/src/main/java/org/springframework/batch/core/launch/support/JobRegistryBackgroundJobRunner.java"/>
 </listAttribute>

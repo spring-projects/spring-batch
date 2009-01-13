@@ -10,9 +10,19 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>build-central-pom.xml</name>
+			<type>1</type>
+			<locationURI>SPRING_BATCH/build-central/pom.xml</locationURI>
+		</link>
+		<link>
 			<name>build.properties</name>
 			<type>1</type>
 			<locationURI>SPRING_BATCH/build.properties</locationURI>
+		</link>
+		<link>
+			<name>central-pom.xml</name>
+			<type>1</type>
+			<location>SPRING_BATCH/central-pom.xml</location>
 		</link>
 		<link>
 			<name>pom.xml</name>
