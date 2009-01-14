@@ -43,6 +43,7 @@ import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.Classifier;
+import org.springframework.util.Assert;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -78,7 +79,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private int cacheCapacity = 0;
 
-	private int retryLimit = 0;
+	private int retryLimit = 1;
 
 	private Collection<Class<? extends Throwable>> retryableExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
@@ -109,10 +110,13 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	/**
 	 * Public setter for the retry limit. Each item can be retried up to this
-	 * limit.
-	 * @param retryLimit the retry limit to set
+	 * limit. Note this limit includes the initial attempt to process the item,
+	 * therefore <code>retryLimit == 1</code> by default.
+	 * 
+	 * @param retryLimit the retry limit to set, must be greater or equal to 1.
 	 */
 	public void setRetryLimit(int retryLimit) {
+		Assert.isTrue(retryLimit >= 1, "retry limit must be greater or equal to 1");
 		this.retryLimit = retryLimit;
 	}
 
@@ -211,7 +215,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	protected void applyConfiguration(TaskletStep step) {
 		super.applyConfiguration(step);
 
-		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
+		if (retryLimit > 1 || skipLimit > 0 || retryPolicy != null) {
 
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
 			addFatalExceptionIfMissing(NonSkippableReadException.class);
@@ -233,7 +237,10 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 					exceptionTypeMap.put(cls, simpleRetryPolicy);
 				}
 				classifierRetryPolicy.setPolicyMap(exceptionTypeMap);
-				retryPolicy = classifierRetryPolicy;
+
+				// TODO use the classifier wrapper above to take care of fatal
+				// exceptions, regardless of the injected retry policy
+				retryPolicy = simpleRetryPolicy;
 
 			}
 			BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
@@ -270,7 +277,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
 			SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
 					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-			
+
 			Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
 				public Boolean classify(Throwable classifiable) {
 					return getTransactionAttribute().rollbackOn(classifiable);
@@ -280,17 +287,23 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 					getChunkOperations());
 			chunkProvider.setSkipPolicy(readSkipPolicy);
-			chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>>getListeners(getListeners(), ItemReadListener.class));
-			chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T,S>>getListeners(getListeners(), SkipListener.class));
+			chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
+					ItemReadListener.class));
+			chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+					SkipListener.class));
 
-			FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(), getItemWriter(), batchRetryTemplate);
+			FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(
+					getItemProcessor(), getItemWriter(), batchRetryTemplate);
 			chunkProcessor.setBuffering(!isReaderTransactionalQueue);
 			chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 			chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 			chunkProcessor.setRollbackClassifier(rollbackClassifier);
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T,S>>getListeners(getListeners(), ItemProcessListener.class));
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>>getListeners(getListeners(), ItemWriteListener.class));
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T,S>>getListeners(getListeners(), SkipListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(
+					getListeners(), ItemProcessListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
+					ItemWriteListener.class));
+			chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+					SkipListener.class));
 
 			ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 			tasklet.setBuffering(!isReaderTransactionalQueue);

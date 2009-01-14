@@ -16,36 +16,40 @@
 
 package org.springframework.batch.retry.policy;
 
+import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
-import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.springframework.batch.retry.RetryContext;
 
-public class SimpleRetryPolicyTests extends TestCase {
+public class SimpleRetryPolicyTests {
 
+	@Test
 	public void testCanRetryIfNoException() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
 		assertTrue(policy.canRetry(context));
 	}
 
-	@SuppressWarnings("unchecked")
+	@Test
 	public void testEmptyExceptionsNeverRetry() throws Exception {
 
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
 
 		// We can't retry any exceptions...
-		policy.setRetryableExceptionClasses(Collections.EMPTY_SET);
+		Collection<Class<? extends Throwable>> empty = Collections.emptySet();
+		policy.setRetryableExceptionClasses(empty);
 
 		// ...so we can't retry this one...
 		policy.registerThrowable(context, new IllegalStateException());
 		assertFalse(policy.canRetry(context));
 	}
 
+	@Test
 	public void testRetryLimitInitialState() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
@@ -55,6 +59,7 @@ public class SimpleRetryPolicyTests extends TestCase {
 		assertFalse(policy.canRetry(context));
 	}
 
+	@Test
 	public void testRetryLimitSubsequentState() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
@@ -66,6 +71,7 @@ public class SimpleRetryPolicyTests extends TestCase {
 		assertFalse(policy.canRetry(context));
 	}
 
+	@Test
 	public void testRetryCount() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);
@@ -77,6 +83,7 @@ public class SimpleRetryPolicyTests extends TestCase {
 		assertEquals("foo", context.getLastThrowable().getMessage());
 	}
 
+	@Test
 	public void testFatalOverridesRetryable() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		policy.setFatalExceptionClasses(getClasses(Exception.class));
@@ -97,6 +104,7 @@ public class SimpleRetryPolicyTests extends TestCase {
 		return classes;
 	}
 
+	@Test
 	public void testParent() throws Exception {
 		SimpleRetryPolicy policy = new SimpleRetryPolicy();
 		RetryContext context = policy.open(null);

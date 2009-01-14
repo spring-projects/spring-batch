@@ -48,7 +48,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 */
 	public final static int DEFAULT_MAX_ATTEMPTS = 3;
 
-	private volatile int maxAttempts;
+	private volatile int maxAttempts = 1;
 
 	private BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier();
 
@@ -66,7 +66,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 * Create a {@link SimpleRetryPolicy} with the specified number of retry
 	 * attempts, and default exceptions to retry.
 	 * 
-	 * @param maxAttempts
+	 * @param maxAttempts number of allowed attempts (typically >= 1)
 	 */
 	public SimpleRetryPolicy(int maxAttempts) {
 		super();
