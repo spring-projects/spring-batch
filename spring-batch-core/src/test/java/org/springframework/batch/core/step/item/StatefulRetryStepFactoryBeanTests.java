@@ -80,6 +80,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see junit.framework.TestCase#setUp()
 	 */
 	protected void setUp() throws Exception {
@@ -141,8 +142,8 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		try {
-		step.execute(stepExecution);
-		fail();
+			step.execute(stepExecution);
+			fail();
 		}
 		catch (NonSkippableException expected) {
 			assertEquals(0, stepExecution.getSkipCount());
@@ -152,7 +153,6 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 			assertEquals(1, stepExecution.getItemCount().intValue());
 		}
 
-		
 	}
 
 	public void testSkipAndRetry() throws Exception {
@@ -268,7 +268,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 	}
 
 	public void testRetryWithSkipLimitBreach() throws Exception {
-		factory.setRetryLimit(0);
+		factory.setRetryLimit(1);
 		factory.setSkipLimit(2);
 		factory.setCommitInterval(3);
 		List items = TransactionAwareProxyFactory.createTransactionalList();
@@ -302,7 +302,7 @@ public class StatefulRetryStepFactoryBeanTests extends TestCase {
 		assertEquals(2, stepExecution.getSkipCount());
 		// One chunk read twice
 		assertEquals(6, count);
-		// Crapped out after two skips 
+		// Crapped out after two skips
 		assertEquals(2, stepExecution.getItemCount().intValue());
 	}
 
