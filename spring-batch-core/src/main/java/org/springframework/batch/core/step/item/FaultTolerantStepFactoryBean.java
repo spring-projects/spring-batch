@@ -18,7 +18,6 @@ package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -38,7 +37,6 @@ import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
-import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
@@ -231,15 +229,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 				}
 				simpleRetryPolicy.setFatalExceptionClasses(fatalExceptionClasses);
 
-				ExceptionClassifierRetryPolicy classifierRetryPolicy = new ExceptionClassifierRetryPolicy();
-				HashMap<Class<? extends Throwable>, RetryPolicy> exceptionTypeMap = new HashMap<Class<? extends Throwable>, RetryPolicy>();
-				for (Class<? extends Throwable> cls : retryableExceptionClasses) {
-					exceptionTypeMap.put(cls, simpleRetryPolicy);
-				}
-				classifierRetryPolicy.setPolicyMap(exceptionTypeMap);
-
-				// TODO use the classifier wrapper above to take care of fatal
-				// exceptions, regardless of the injected retry policy
 				retryPolicy = simpleRetryPolicy;
 
 			}
