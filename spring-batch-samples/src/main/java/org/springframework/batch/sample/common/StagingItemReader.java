@@ -34,7 +34,6 @@ import org.springframework.batch.item.ReaderNotOpenException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.util.Assert;
@@ -42,8 +41,11 @@ import org.springframework.util.Assert;
 /**
  * Thread-safe database {@link ItemReader} implementing the process indicator
  * pattern.
+ * 
+ * To achieve restartability use together with {@link StagingItemProcessor}.
  */
-public class StagingItemReader<T> implements ItemReader<T>, StepExecutionListener, InitializingBean, DisposableBean {
+public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrapper<T>>, StepExecutionListener,
+		InitializingBean, DisposableBean {
 
 	private static Log logger = LogFactory.getLog(StagingItemReader.class);
 
@@ -90,7 +92,7 @@ public class StagingItemReader<T> implements ItemReader<T>, StepExecutionListene
 
 	}
 
-	public T read() throws DataAccessException {
+	public ProcessIndicatorItemWrapper<T> read() throws DataAccessException {
 
 		if (!initialized) {
 			throw new ReaderNotOpenException("ItemStream must be open before it can be read.");
@@ -116,15 +118,7 @@ public class StagingItemReader<T> implements ItemReader<T>, StepExecutionListene
 					}
 				}, id);
 
-		// Update now - changes will rollback if there is a problem later.
-		int count = jdbcTemplate.update("UPDATE BATCH_STAGING SET PROCESSED=? WHERE ID=? AND PROCESSED=?",
-				StagingItemWriter.DONE, id, StagingItemWriter.NEW);
-		if (count != 1) {
-			throw new OptimisticLockingFailureException("The staging record with ID=" + id
-					+ " was updated concurrently when trying to mark as complete (updated " + count + " records.");
-		}
-
-		return result;
+		return new ProcessIndicatorItemWrapper<T>(id, result);
 
 	}
 

@@ -10,8 +10,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<batch:job id="parallelJob">
-		<batch:step name="staging" next="loading"/>
-		<batch:step name="loading"/>
+		<batch:step name="staging" next="loading" />
+		<batch:step name="loading" />
 	</batch:job>
 
 	<bean id="staging" parent="simpleStep">
@@ -35,13 +35,18 @@
 			</bean>
 		</property>
 	</bean>
-	
+
 	<bean id="loading" parent="simpleStep">
 		<property name="taskExecutor">
 			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
 		</property>
 		<property name="itemReader">
 			<bean class="org.springframework.batch.sample.common.StagingItemReader">
+				<property name="dataSource" ref="dataSource" />
+			</bean>
+		</property>
+		<property name="itemProcessor">
+			<bean class="org.springframework.batch.sample.common.StagingItemProcessor">
 				<property name="dataSource" ref="dataSource" />
 			</bean>
 		</property>

@@ -65,15 +65,20 @@ public class StagingItemReaderTests {
 
 	@Transactional
 	@Test
-	public void testReaderUpdatesProcessIndicator() throws Exception {
+	public void testReaderWithProcessorUpdatesProcessIndicator() throws Exception {
 
 		long id = simpleJdbcTemplate.queryForLong("SELECT MIN(ID) from BATCH_STAGING where JOB_ID=?", jobId);
 		String before = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
 		assertEquals(StagingItemWriter.NEW, before);
 
-		String item = reader.read();
+		ProcessIndicatorItemWrapper<String> wrapper = reader.read();
+		String item = wrapper.getItem(); 
 		assertEquals("FOO", item);
+		
+		StagingItemProcessor<String> updater = new StagingItemProcessor<String>();
+		updater.setJdbcTemplate(simpleJdbcTemplate);
+		updater.process(wrapper);
 
 		String after = simpleJdbcTemplate.queryForObject("SELECT PROCESSED from BATCH_STAGING where ID=?",
 				String.class, id);
@@ -89,7 +94,7 @@ public class StagingItemReaderTests {
 		txTemplate.execute(new TransactionCallback() {
 			public Object doInTransaction(TransactionStatus transactionStatus) {
 				try {
-					testReaderUpdatesProcessIndicator();
+					testReaderWithProcessorUpdatesProcessIndicator();
 				}
 				catch (Exception e) {
 					fail("Unxpected Exception: " + e);
@@ -118,8 +123,8 @@ public class StagingItemReaderTests {
 						String.class, id);
 				assertEquals(StagingItemWriter.NEW, before);
 
-				Object item = reader.read();
-				assertEquals("FOO", item);
+				ProcessIndicatorItemWrapper<String> wrapper = reader.read();
+				assertEquals("FOO", wrapper.getItem());
 
 				transactionStatus.setRollbackOnly();
 
