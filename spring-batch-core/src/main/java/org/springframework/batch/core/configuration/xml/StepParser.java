@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -418,21 +418,8 @@ public class StepParser {
 				String id = listenerElement.getAttribute("id");
 				String listenerRef = listenerElement.getAttribute("ref");
 				String className = listenerElement.getAttribute("class");
-				if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
-						&& StringUtils.hasText(listenerRef)) {
-					NamedNodeMap attributeNodes = listenerElement.getAttributes();
-					StringBuilder attributes = new StringBuilder();
-					for (int i = 0; i < attributeNodes.getLength(); i++) {
-						if (i > 0) {
-							attributes.append(" ");
-						}
-						attributes.append(attributeNodes.item(i));
-					}
-					parserContext.getReaderContext().error("Both 'ref' and " +
-							(StringUtils.hasText(id) ? "'id'" : "'class'") +
-							" specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-							listenerElement.getTagName() + "> element specified with attributes: " + attributes, element);
-				}
+				checkListenerElementAttributes(parserContext, element,
+						listenerElement, id, listenerRef, className);
 				if (StringUtils.hasText(listenerRef)) {
 			        BeanReference bean = new RuntimeBeanReference(listenerRef);
 					beans.add(bean);
@@ -465,21 +452,8 @@ public class StepParser {
 				String id = listenerElement.getAttribute("id");
 				String listenerRef = listenerElement.getAttribute("ref");
 				String className = listenerElement.getAttribute("class");
-				if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
-						&& StringUtils.hasText(listenerRef)) {
-					NamedNodeMap attributeNodes = listenerElement.getAttributes();
-					StringBuilder attributes = new StringBuilder();
-					for (int i = 0; i < attributeNodes.getLength(); i++) {
-						if (i > 0) {
-							attributes.append(" ");
-						}
-						attributes.append(attributeNodes.item(i));
-					}
-					parserContext.getReaderContext().error("Both 'ref' and " +
-							(StringUtils.hasText(id) ? "'id'" : "'class'") +
-							" specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-							listenerElement.getTagName() + "> element specified with attributes: " + attributes, element);
-				}
+				checkListenerElementAttributes(parserContext, element,
+						listenerElement, id, listenerRef, className);
 				if (StringUtils.hasText(listenerRef)) {
 			        listenerBuilder.addPropertyReference("delegate", listenerRef);
 				}
@@ -528,6 +502,26 @@ public class StepParser {
 		        BeanReference bean = new RuntimeBeanReference(id);
 				beans.add(bean);
 			}
+		}
+	}
+
+	private void checkListenerElementAttributes(ParserContext parserContext,
+			Element element, Element listenerElement, String id,
+			String listenerRef, String className) {
+		if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
+				&& StringUtils.hasText(listenerRef)) {
+			NamedNodeMap attributeNodes = listenerElement.getAttributes();
+			StringBuilder attributes = new StringBuilder();
+			for (int i = 0; i < attributeNodes.getLength(); i++) {
+				if (i > 0) {
+					attributes.append(" ");
+				}
+				attributes.append(attributeNodes.item(i));
+			}
+			parserContext.getReaderContext().error("Both 'ref' and " +
+					(StringUtils.hasText(id) ? "'id'" : "'class'") +
+					" specified; use 'class' with an optional 'id' or just 'ref' for <" + 
+					listenerElement.getTagName() + "> element specified with attributes: " + attributes, element);
 		}
 	}
 

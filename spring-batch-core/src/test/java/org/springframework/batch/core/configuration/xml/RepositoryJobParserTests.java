@@ -54,7 +54,7 @@ public class RepositoryJobParserTests {
 	}
 
 	@Test
-	public void testJobWithRepository() throws Exception {
+	public void testTaskletStepWithBadListener() throws Exception {
 		assertNotNull(job);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
