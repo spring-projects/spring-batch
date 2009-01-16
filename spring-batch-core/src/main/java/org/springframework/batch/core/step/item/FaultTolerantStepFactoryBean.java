@@ -37,7 +37,9 @@ import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.backoff.BackOffPolicy;
+import org.springframework.batch.retry.policy.ExceptionClassifierRetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
+import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.Classifier;
@@ -223,25 +225,41 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			if (retryPolicy == null) {
 
 				SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
-				if (!retryableExceptionClasses.isEmpty()) { // otherwise we
-					// retry all exceptions
+				if (!retryableExceptionClasses.isEmpty()) {
+					// otherwise we retry all exceptions
 					simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 				}
-				simpleRetryPolicy.setFatalExceptionClasses(fatalExceptionClasses);
 
 				retryPolicy = simpleRetryPolicy;
 
 			}
+
+			// wrapper of the injected retry policy takes care of fatal
+			// exceptions (never retried)
+			final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
+			ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
+			retryPolicyWrapper.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
+
+				public RetryPolicy classify(Throwable classifiable) {
+
+					for (Class<? extends Throwable> fatal : fatalExceptionClasses) {
+						if (fatal.isAssignableFrom(classifiable.getClass())) {
+							return neverRetryPolicy;
+						}
+					}
+					return retryPolicy;
+				}
+			});
 			BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
 			if (backOffPolicy != null) {
 				batchRetryTemplate.setBackOffPolicy(backOffPolicy);
 			}
-			batchRetryTemplate.setRetryPolicy(retryPolicy);
+			batchRetryTemplate.setRetryPolicy(retryPolicyWrapper);
 
 			// Co-ordinate the retry policy with the exception handler:
 			RepeatOperations stepOperations = getStepOperations();
 			if (stepOperations instanceof RepeatTemplate) {
-				SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicy,
+				SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicyWrapper,
 						getExceptionHandler(), fatalExceptionClasses);
 				((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
 			}
