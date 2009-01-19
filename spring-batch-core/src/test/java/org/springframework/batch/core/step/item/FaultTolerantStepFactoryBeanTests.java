@@ -1,8 +1,6 @@
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,14 +14,15 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
-import org.springframework.batch.core.step.JobRepositorySupport;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -55,6 +54,10 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	private JobExecution jobExecution;
 
+	private StepExecution stepExecution;
+
+	private JobRepository repository;
+
 	private List<String> processed = new ArrayList<String>();
 
 	protected int count;
@@ -64,7 +67,6 @@ public class FaultTolerantStepFactoryBeanTests {
 	@Before
 	public void setUp() throws Exception {
 		factory.setBeanName("stepName");
-		factory.setJobRepository(new JobRepositorySupport());
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
@@ -72,8 +74,16 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setSkippableExceptionClasses(skippableExceptions);
 		factory.setSkipLimit(2);
 
-		JobInstance jobInstance = new JobInstance(new Long(1), new JobParameters(), "skipJob");
-		jobExecution = new JobExecution(jobInstance);
+		MapJobRepositoryFactoryBean.clear();
+		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
+		repositoryFactory.setTransactionManager(new ResourcelessTransactionManager());
+		repositoryFactory.afterPropertiesSet();
+		repository = (JobRepository) repositoryFactory.getObject();
+		factory.setJobRepository(repository);
+
+		jobExecution = repository.createJobExecution("skipJob", new JobParameters());
+		stepExecution = jobExecution.createStepExecution(factory.getName());
+		repository.add(stepExecution);
 	}
 
 	/**
@@ -95,12 +105,14 @@ public class FaultTolerantStepFactoryBeanTests {
 		});
 
 		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		// assertEquals("Ouch!",
-		// stepExecution.getFailureExceptions().get(0).getMessage());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("Non-skippable exception during read"));
+
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	@Test
@@ -122,11 +134,14 @@ public class FaultTolerantStepFactoryBeanTests {
 		});
 
 		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(1, reader.processed.size());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
+		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("non-skippable exception"));
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -139,7 +154,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemWriter(writer);
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		System.err.println(writer.written);
@@ -158,7 +172,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.written);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -175,7 +190,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemProcessor(processor);
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
@@ -192,7 +206,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.written);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -205,7 +220,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemReader(reader);
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
@@ -222,7 +236,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.written);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -238,8 +253,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		});
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
@@ -250,7 +263,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(1, stepExecution.getRollbackCount());
 
 		assertEquals(4, stepExecution.getReadCount());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -268,10 +282,11 @@ public class FaultTolerantStepFactoryBeanTests {
 		});
 
 		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		step.execute(stepExecution);
 		assertTrue(stepExecution.getFailureExceptions().get(0).getMessage().equals("Ouch!"));
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -284,8 +299,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
@@ -297,7 +310,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// failure on "4" tripped the skip limit so we never got to "5"
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,3"));
 		assertEquals(expectedOutput, writer.written);
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -315,8 +329,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 
@@ -331,7 +343,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// only "1" was ever committed
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1"));
 		assertEquals(expectedOutput, writer.written);
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -355,8 +368,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
@@ -366,7 +377,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(3, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -390,15 +402,14 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
 		assertEquals(1, stepExecution.getWriteSkipCount());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -415,8 +426,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());
 		assertEquals(3, stepExecution.getReadSkipCount());
@@ -429,7 +438,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// reader exceptions should not cause rollback, 1 writer exception
 		// causes 2 rollbacks
 		assertEquals(2, stepExecution.getRollbackCount());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -450,8 +460,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
-
 		step.execute(stepExecution);
 		assertEquals(4, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
@@ -460,7 +468,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// skipped 2,3,4,5
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,6,7"));
 		assertEquals(expectedOutput, writer.written);
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	@Test
@@ -481,12 +490,13 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemReader(provider);
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
 		// b is processed once and skipped, plus 1, plus c, plus the null at end
 		assertEquals(4, count);
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -505,8 +515,6 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		Step step = (Step) factory.getObject();
 
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
-
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("bad skip count", 3, stepExecution.getSkipCount());
@@ -520,7 +528,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// only "1" was ever committed
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5,7,8,9,10,11"));
 		assertEquals(expectedOutput, writer.written);
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -537,13 +546,13 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
 		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		processor.rollback = false;
 		step.execute(stepExecution);
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getRollbackCount());
-
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	/**
@@ -559,12 +568,13 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
 
 		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 
 		processor.rollback = true;
 		step.execute(stepExecution);
 		assertEquals(2, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getRollbackCount());
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 	}
 
 	@Test
@@ -578,7 +588,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
 
 		Step step = (Step) factory.getObject();
-		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
@@ -588,6 +597,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		// identified and skipped
 		assertEquals(7, processed.size());
 		assertEquals("[1, 2, 3, 4, 3, 4, 3]", processed.toString());
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
 
 	}
 
@@ -710,4 +721,22 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 	}
 
+	private void assertStepExecutionsAreEqual(StepExecution expected, StepExecution actual) {
+		assertEquals(expected.getId(), actual.getId());
+		assertEquals(expected.getStartTime(), actual.getStartTime());
+		assertEquals(expected.getEndTime(), actual.getEndTime());
+		assertEquals(expected.getSkipCount(), actual.getSkipCount());
+		assertEquals(expected.getCommitCount(), actual.getCommitCount());
+		assertEquals(expected.getReadCount(), actual.getReadCount());
+		assertEquals(expected.getWriteCount(), actual.getWriteCount());
+		assertEquals(expected.getFilterCount(), actual.getFilterCount());
+		assertEquals(expected.getWriteSkipCount(), actual.getWriteSkipCount());
+		assertEquals(expected.getReadSkipCount(), actual.getReadSkipCount());
+		assertEquals(expected.getProcessSkipCount(), actual.getProcessSkipCount());
+		assertEquals(expected.getRollbackCount(), actual.getRollbackCount());
+		assertEquals(expected.getExitStatus(), actual.getExitStatus());
+		assertEquals(expected.getLastUpdated(), actual.getLastUpdated());
+		assertEquals(expected.getExitStatus(), actual.getExitStatus());
+		assertEquals(expected.getJobExecutionId(), actual.getJobExecutionId());
+	}
 }

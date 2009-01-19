@@ -228,19 +228,18 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 
 			stepExecution.setEndTime(new Date());
+			stepExecution.setExitStatus(exitStatus);
 
 			try {
 				getJobRepository().update(stepExecution);
 			}
 			catch (Exception e) {
 				stepExecution.setStatus(BatchStatus.UNKNOWN);
-				exitStatus = exitStatus.and(ExitStatus.UNKNOWN);
+				stepExecution.setExitStatus(exitStatus.and(ExitStatus.UNKNOWN));
 				stepExecution.addFailureException(e);
 				logger.error("Encountered an error saving batch meta data."
 						+ "This job is now in an unknown state and should not be restarted.", commitException);
 			}
-
-			stepExecution.setExitStatus(exitStatus);
 
 			try {
 				close(stepExecution.getExecutionContext());
@@ -251,7 +250,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 
 			StepSynchronizationManager.release();
-			
+
 			logger.debug("Step execution complete: " + stepExecution);
 		}
 	}
