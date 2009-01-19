@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007 the original author or authors.
+ * Copyright 2006-2009 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
@@ -79,6 +80,28 @@ public class ChunkOrientedTaskletTests {
 			assertEquals("Foo!", e.getMessage());
 		}
 		assertEquals(0, contribution.getReadCount());
+	}
+
+	@Test
+	public void testExitCode() throws Exception {
+		ChunkOrientedTasklet<String> handler = new ChunkOrientedTasklet<String>(new ChunkProvider<String>() {
+			public Chunk<String> provide(StepContribution contribution) throws Exception {
+				contribution.incrementReadCount();
+				Chunk<String> chunk = new Chunk<String>();
+				chunk.add("foo");
+				chunk.setEnd();
+				return chunk;
+			}
+			public void postProcess(StepContribution contribution, Chunk<String> chunk) {};
+		}, new ChunkProcessor<String>() {
+			public void process(StepContribution contribution, Chunk<String> chunk) {
+				contribution.incrementWriteCount(1);
+			}
+		});
+		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
+				123L, new JobParameters(), "job"))));
+		handler.execute(contribution, context);
+		assertEquals(ExitStatus.FINISHED.getExitCode(), contribution.getExitStatus().getExitCode());
 	}
 
 }
