@@ -49,31 +49,26 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	private static final String COUNT_JOB_EXECUTION_CONTEXT = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION_CONTEXT "
 			+ "WHERE JOB_EXECUTION_ID = ?";
 
-	private static final String FIND_JOB_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT " +
-			"FROM %PREFIX%JOB_EXECUTION_CONTEXT WHERE JOB_EXECUTION_ID = ?";
+	private static final String FIND_JOB_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT "
+			+ "FROM %PREFIX%JOB_EXECUTION_CONTEXT WHERE JOB_EXECUTION_ID = ?";
 
-	private static final String INSERT_JOB_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%JOB_EXECUTION_CONTEXT " +
-			"(JOB_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " +
-			"VALUES(?, ?, ?)";
+	private static final String INSERT_JOB_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%JOB_EXECUTION_CONTEXT "
+			+ "(JOB_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " + "VALUES(?, ?, ?)";
 
-	private static final String UPDATE_JOB_EXECUTION_CONTEXT = "UPDATE %PREFIX%JOB_EXECUTION_CONTEXT " +
-			"SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " +
-			"WHERE JOB_EXECUTION_ID = ?";
+	private static final String UPDATE_JOB_EXECUTION_CONTEXT = "UPDATE %PREFIX%JOB_EXECUTION_CONTEXT "
+			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE JOB_EXECUTION_ID = ?";
 
 	private static final String COUNT_STEP_EXECUTION_CONTEXT = "SELECT COUNT(*) FROM %PREFIX%STEP_EXECUTION_CONTEXT "
 			+ "WHERE STEP_EXECUTION_ID = ?";
 
-	private static final String FIND_STEP_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT " +
-			"FROM %PREFIX%STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = ?";
+	private static final String FIND_STEP_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT "
+			+ "FROM %PREFIX%STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = ?";
 
+	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%STEP_EXECUTION_CONTEXT "
+			+ "(STEP_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " + "VALUES(?, ?, ?)";
 
-	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%STEP_EXECUTION_CONTEXT " +
-			"(STEP_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " +
-			"VALUES(?, ?, ?)";
-
-	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT " +
-			"SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " +
-			"WHERE STEP_EXECUTION_ID = ?";
+	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT "
+			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE STEP_EXECUTION_ID = ?";
 
 	private static final int MAX_VARCHAR_LENGTH = 2500;
 
@@ -90,8 +85,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
 		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_JOB_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(),
-				executionId);
+				new ExecutionContextRowMapper(), executionId);
 		if (results.size() > 0) {
 			return results.get(0);
 		}
@@ -109,8 +103,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		Assert.notNull(executionId, "ExecutionId must not be null.");
 
 		List<ExecutionContext> results = getJdbcTemplate().query(getQuery(FIND_STEP_EXECUTION_CONTEXT),
-				new ExecutionContextRowMapper(),
-				executionId);
+				new ExecutionContextRowMapper(), executionId);
 		if (results.size() > 0) {
 			return results.get(0);
 		}
@@ -124,7 +117,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * jobExecution
 	 * @param jobExecution
 	 */
-	public void persistExecutionContext(final JobExecution jobExecution) {
+	public void updateExecutionContext(final JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -140,7 +133,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	 * stepExecution
 	 * @param stepExecution
 	 */
-	public void persistExecutionContext(final StepExecution stepExecution) {
+	public void updateExecutionContext(final StepExecution stepExecution) {
 
 		Long executionId = stepExecution.getId();
 		ExecutionContext executionContext = stepExecution.getExecutionContext();
@@ -152,6 +145,14 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		persistSerializedContext(executionId, serializedContext, false);
 	}
 
+	public void saveExecutionContext(JobExecution jobExecution) {
+		updateExecutionContext(jobExecution);
+	}
+
+	public void saveExecutionContext(StepExecution stepExecution) {
+		updateExecutionContext(stepExecution);
+	}
+
 	public void setLobHandler(LobHandler lobHandler) {
 		this.lobHandler = lobHandler;
 	}
@@ -160,10 +161,11 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 	public void afterPropertiesSet() throws Exception {
 		super.afterPropertiesSet();
 		serializer = new XStreamExecutionContextStringSerializer();
-		((XStreamExecutionContextStringSerializer)serializer).afterPropertiesSet();
+		((XStreamExecutionContextStringSerializer) serializer).afterPropertiesSet();
 	}
 
-	private void persistSerializedContext(final Long executionId, String serializedContext, boolean isJobExecutionContext) {
+	private void persistSerializedContext(final Long executionId, String serializedContext,
+			boolean isJobExecutionContext) {
 		String countSql = isJobExecutionContext ? COUNT_JOB_EXECUTION_CONTEXT : COUNT_STEP_EXECUTION_CONTEXT;
 		String updateSql = isJobExecutionContext ? UPDATE_JOB_EXECUTION_CONTEXT : UPDATE_STEP_EXECUTION_CONTEXT;
 		String insertSql = isJobExecutionContext ? INSERT_JOB_EXECUTION_CONTEXT : INSERT_STEP_EXECUTION_CONTEXT;
@@ -181,36 +183,33 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-
 		if (count > 0) {
-			getJdbcTemplate().getJdbcOperations().update(getQuery(updateSql),
-					new PreparedStatementSetter() {
-						public void setValues(PreparedStatement ps) throws SQLException {
-							ps.setString(1, shortContext);
-							if (longContext != null) {
-								lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-							}
-							else {
-								ps.setNull(2, Types.CLOB);
-							}
-							ps.setLong(3, executionId);
-						}
-					});
+			getJdbcTemplate().getJdbcOperations().update(getQuery(updateSql), new PreparedStatementSetter() {
+				public void setValues(PreparedStatement ps) throws SQLException {
+					ps.setString(1, shortContext);
+					if (longContext != null) {
+						lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
+					}
+					else {
+						ps.setNull(2, Types.CLOB);
+					}
+					ps.setLong(3, executionId);
+				}
+			});
 		}
 		else {
-			getJdbcTemplate().getJdbcOperations().update(getQuery(insertSql),
-					new PreparedStatementSetter() {
-						public void setValues(PreparedStatement ps) throws SQLException {
-							ps.setLong(1, executionId);
-							ps.setString(2, shortContext);
-							if (longContext != null) {
-								lobHandler.getLobCreator().setClobAsString(ps, 3, longContext);
-							}
-							else {
-								ps.setNull(3, Types.CLOB);
-							}
-						}
-					});
+			getJdbcTemplate().getJdbcOperations().update(getQuery(insertSql), new PreparedStatementSetter() {
+				public void setValues(PreparedStatement ps) throws SQLException {
+					ps.setLong(1, executionId);
+					ps.setString(2, shortContext);
+					if (longContext != null) {
+						lobHandler.getLobCreator().setClobAsString(ps, 3, longContext);
+					}
+					else {
+						ps.setNull(3, Types.CLOB);
+					}
+				}
+			});
 		}
 	}
 
@@ -236,4 +235,5 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			return executionContext;
 		}
 	}
+
 }

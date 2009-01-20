@@ -40,14 +40,30 @@ public interface ExecutionContextDao {
 	ExecutionContext getExecutionContext(StepExecution stepExecution);
 
 	/**
-	 * Persist the execution context associated with the given jobExecution
+	 * Persist the execution context associated with the given jobExecution,
+	 * persistent entry for the context should not exist yet.
 	 * @param jobExecution
 	 */
-	void persistExecutionContext(final JobExecution jobExecution);
+	void saveExecutionContext(final JobExecution jobExecution);
 
 	/**
-	 * Persist the execution context associated with the given stepExecution
+	 * Persist the execution context associated with the given stepExecution,
+	 * persistent entry for the context should not exist yet.
 	 * @param stepExecution
 	 */
-	void persistExecutionContext(final StepExecution stepExecution);
+	void saveExecutionContext(final StepExecution stepExecution);
+
+	/**
+	 * Persist the updates of execution context associated with the given
+	 * jobExecution. Persistent entry should already exist for this context.
+	 * @param jobExecution
+	 */
+	void updateExecutionContext(final JobExecution jobExecution);
+
+	/**
+	 * Persist the updates of execution context associated with the given
+	 * stepExecution. Persistent entry should already exist for this context.
+	 * @param stepExecution
+	 */
+	void updateExecutionContext(final StepExecution stepExecution);
 }

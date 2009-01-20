@@ -45,13 +45,13 @@ public class MapExecutionContextDaoTests extends AbstractExecutionContextDaoTest
 		StepExecution stepExecution = new StepExecution("stepName", jobExecution);
 		assertTrue(stepExecution.getExecutionContext().isEmpty());
 		
-		tested.persistExecutionContext(stepExecution);
+		tested.updateExecutionContext(stepExecution);
 		stepExecution.getExecutionContext().put("key","value");
 		
 		ExecutionContext retrieved = tested.getExecutionContext(stepExecution);
 		assertTrue(retrieved.isEmpty());
 		
-		tested.persistExecutionContext(jobExecution);
+		tested.updateExecutionContext(jobExecution);
 		jobExecution.getExecutionContext().put("key", "value");
 		retrieved = tested.getExecutionContext(jobExecution);
 		assertTrue(retrieved.isEmpty());

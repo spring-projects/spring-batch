@@ -50,7 +50,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"/simple-job-launcher-context.xml"})
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml" })
 public class JdbcJobRepositoryTests {
 
 	private JobRepository repository;
@@ -67,9 +67,9 @@ public class JdbcJobRepositoryTests {
 
 	private PlatformTransactionManager transactionManager;
 
-	/** Logger  */
+	/** Logger */
 	private final Log logger = LogFactory.getLog(getClass());
-	
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
@@ -100,18 +100,21 @@ public class JdbcJobRepositoryTests {
 	@AfterTransaction
 	public void onTearDownAfterTransaction() throws Exception {
 		for (Long id : jobExecutionIds) {
+			simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", id);
 			simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", id);
 		}
 		for (Long id : jobIds) {
 			simpleJdbcTemplate.update("DELETE FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
 		}
 		for (Long id : jobIds) {
-			int count = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
+			int count = simpleJdbcTemplate.queryForInt(
+					"SELECT COUNT(*) FROM BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", id);
 			assertEquals(0, count);
 		}
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testFindOrCreateJob() throws Exception {
 		job.setName("foo");
 		int before = 0;
@@ -121,7 +124,8 @@ public class JdbcJobRepositoryTests {
 		assertNotNull(execution.getId());
 	}
 
-	@Transactional @Test
+	@Transactional
+	@Test
 	public void testFindOrCreateJobConcurrently() throws Exception {
 
 		job.setName("bar");
@@ -199,7 +203,8 @@ public class JdbcJobRepositoryTests {
 					new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
 						public Object doInTransaction(org.springframework.transaction.TransactionStatus status) {
 							try {
-								JobExecution execution = repository.createJobExecution(job.getName(), new JobParameters());
+								JobExecution execution = repository.createJobExecution(job.getName(),
+										new JobParameters());
 								cacheJobIds(execution);
 								list.add(execution);
 								Thread.sleep(1000);

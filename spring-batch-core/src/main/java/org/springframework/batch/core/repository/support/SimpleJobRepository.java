@@ -196,18 +196,17 @@ public class SimpleJobRepository implements JobRepository {
 		// Save the JobExecution so that it picks up an ID (useful for clients
 		// monitoring asynchronous executions):
 		jobExecutionDao.saveJobExecution(jobExecution);
+		ecDao.saveExecutionContext(jobExecution);
 
 		return jobExecution;
 
 	}
 
 	/**
-	 * Save or Update a JobExecution. A JobExecution is considered one
-	 * 'execution' of a particular job. Therefore, it must have it's jobId field
-	 * set before it is passed into this method. It also has it's own unique
-	 * identifier, because it must be updatable separately. If an id isn't
-	 * found, a new JobExecution is created, if one is found, the current row is
-	 * updated.
+	 * Update a JobExecution. A JobExecution is considered one 'execution' of a
+	 * particular job. Therefore, it must have it's jobId field set before it is
+	 * passed into this method. It also has it's own unique identifier, because
+	 * it must be updatable separately.
 	 * 
 	 * @param jobExecution to be stored.
 	 * @throws IllegalArgumentException if jobExecution is null.
@@ -233,6 +232,7 @@ public class SimpleJobRepository implements JobRepository {
 
 		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		stepExecutionDao.saveStepExecution(stepExecution);
+		ecDao.saveExecutionContext(stepExecution);
 	}
 
 	/**
@@ -256,17 +256,9 @@ public class SimpleJobRepository implements JobRepository {
 		Assert.notNull(stepExecution.getJobExecutionId(), "StepExecution must belong to persisted JobExecution");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.springframework.batch.core.repository.JobRepository#
-	 * persistExecutionContext
-	 * (org.springframework.batch.core.domain.StepExecution)
-	 */
 	public void updateExecutionContext(StepExecution stepExecution) {
-		// Until there is an interface change (
-		ecDao.persistExecutionContext(stepExecution.getJobExecution());
-		ecDao.persistExecutionContext(stepExecution);
+		ecDao.updateExecutionContext(stepExecution.getJobExecution());
+		ecDao.updateExecutionContext(stepExecution);
 	}
 
 	/**

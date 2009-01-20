@@ -44,7 +44,7 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		return copy(contextsByStepExecutionId.get(stepExecution.getId()));
 	}
 
-	public void persistExecutionContext(StepExecution stepExecution) {
+	public void updateExecutionContext(StepExecution stepExecution) {
 		contextsByStepExecutionId.put(stepExecution.getId(), copy(stepExecution.getExecutionContext()));
 	}
 	
@@ -52,9 +52,17 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 		return copy(contextsByJobExecutionId.get(jobExecution.getId()));
 	}
 
-	public void persistExecutionContext(JobExecution jobExecution) {
+	public void updateExecutionContext(JobExecution jobExecution) {
 		contextsByJobExecutionId.put(jobExecution.getId(), copy(jobExecution.getExecutionContext()));
 
+	}
+
+	public void saveExecutionContext(JobExecution jobExecution) {
+		updateExecutionContext(jobExecution);
+	}
+
+	public void saveExecutionContext(StepExecution stepExecution) {
+		updateExecutionContext(stepExecution);
 	}
 
 }
