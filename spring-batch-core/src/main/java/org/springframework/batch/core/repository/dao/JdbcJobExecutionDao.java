@@ -287,7 +287,7 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	 * @author Dave Syer
 	 * 
 	 */
-	protected static class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
+	private static class JobExecutionRowMapper implements ParameterizedRowMapper<JobExecution> {
 
 		private JobInstance jobInstance;
 

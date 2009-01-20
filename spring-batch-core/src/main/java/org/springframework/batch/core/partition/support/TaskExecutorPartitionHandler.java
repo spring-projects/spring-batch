@@ -36,6 +36,15 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.TaskRejectedException;
 import org.springframework.util.Assert;
 
+/**
+ * A {@link PartitionHandler} that uses a {@link TaskExecutor} to execute the
+ * partitioned {@link Step} locally in multiple threads. This can be an effective
+ * approach for scaling batch steps that are IO intensive, like directory and
+ * filesystem scanning and copying.
+ * 
+ * @author Dave Syer
+ * 
+ */
 public class TaskExecutorPartitionHandler implements PartitionHandler, InitializingBean {
 
 	private int gridSize = 1;
@@ -48,14 +57,36 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 		Assert.notNull(step, "A Step must be provided.");
 	}
 
+	/**
+	 * Passed to the {@link StepExecutionSplitter} in the
+	 * {@link #handle(StepExecutionSplitter, StepExecution)} method, instructing
+	 * it how many {@link StepExecution} instances are required, ideally. The
+	 * {@link StepExecutionSplitter} is allowed to ignore the grid size in the case of
+	 * a restart, since the input data partitions must be preserved.
+	 * 
+	 * @param gridSize the number of step executions that will be created
+	 */
 	public void setGridSize(int gridSize) {
 		this.gridSize = gridSize;
 	}
 
+	/**
+	 * Setter for the {@link TaskExecutor} that is used to farm out step
+	 * executions to multiple threads.
+	 * @param taskExecutor a {@link TaskExecutor}
+	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
 
+	/**
+	 * Setter for the {@link Step} that will be used to execute the partitioned
+	 * {@link StepExecution}. This is a regular Spring Batch step, with all the
+	 * business logic required to complete an execution based on the input
+	 * parameters in its {@link StepExecution} context.
+	 * 
+	 * @param step the {@link Step} instance to use to execute business logic
+	 */
 	public void setStep(Step step) {
 		this.step = step;
 	}
