@@ -22,42 +22,64 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.transaction.annotation.Isolation;
 
 /**
  * <p>
- * Repository for storing batch {@link JobExecution} and {@link StepExecution}s.
- * Before using any methods, a {@link JobExecution} must first be obtained using
- * the createJobExecution method. Once a {@link JobExecution} is obtained, they
- * can be updated.
+ * Repository responsible for persistence of batch metadata entities.
  * </p>
+ * 
+ * @see JobInstance
+ * @see JobExecution
+ * @see StepExecution
  * 
  * @author Lucas Ward
  * @author Dave Syer
- * 
+ * @author Robert Kasanicky
  */
 public interface JobRepository {
 
 	/**
-	 * Check if an instance of this job already exists with the parameters provided.
+	 * Check if an instance of this job already exists with the parameters
+	 * provided.
 	 * 
 	 * @param jobName the name of the job
 	 * @param jobParameters the parameters to match
-	 * @return true if a {@link JobInstance} already exists for this job name and job parameters
+	 * @return true if a {@link JobInstance} already exists for this job name
+	 * and job parameters
 	 */
 	boolean isJobInstanceExists(String jobName, JobParameters jobParameters);
 
 	/**
-	 * Find or create a {@link JobExecution} for a given {@link Job} and
-	 * {@link JobParameters}. If the {@link Job} was already executed with these
-	 * {@link JobParameters}, its persisted values (including ID) will be
-	 * returned in a new {@link JobInstance}, associated with the
-	 * {@link JobExecution}. If no previous instance is found, the execution
-	 * will be associated with a new {@link JobInstance}
-	 * @param jobName the name of the job that is to be executed
+	 * <p>
+	 * Create a {@link JobExecution} for a given {@link Job} and
+	 * {@link JobParameters}. If matching {@link JobInstance} already exists,
+	 * the job must be restartable and it's last JobExecution must *not* be
+	 * completed. If matching {@link JobInstance} does not exist yet it will be
+	 * created.
+	 * </p>
+	 * 
+	 * <p>
+	 * If this method is run in a transaction (as it normally would be) with
+	 * isolation level at {@link Isolation#REPEATABLE_READ} or better, then this
+	 * method should block if another transaction is already executing it (for
+	 * the same {@link JobParameters} and job name). The first transaction to
+	 * complete in this scenario obtains a valid {@link JobExecution}, and
+	 * others throw {@link JobExecutionAlreadyRunningException} (or timeout).
+	 * There are no such guarantees if the {@link JobInstanceDao} and
+	 * {@link JobExecutionDao} do not respect the transaction isolation levels
+	 * (e.g. if using a non-relational data-store, or if the platform does not
+	 * support the higher isolation levels).
+	 * </p>
+	 * 
+	 * @param jobName the name of the job that is to be executed </p>
+	 * 
 	 * @param jobParameters the runtime parameters for the job
 	 * 
-	 * @return a valid job {@link JobExecution} for the arguments provided
+	 * @return a valid {@link JobExecution} for the arguments provided
 	 * @throws JobExecutionAlreadyRunningException if there is a
 	 * {@link JobExecution} already running for the job instance with the
 	 * provided job and parameters.
@@ -68,11 +90,11 @@ public interface JobRepository {
 	 * found and was already completed successfully.
 	 * 
 	 */
-	JobExecution createJobExecution(String jobName, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-			JobRestartException, JobInstanceAlreadyCompleteException;
+	JobExecution createJobExecution(String jobName, JobParameters jobParameters)
+			throws JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException;
 
 	/**
-	 * Update the {@link JobExecution}.
+	 * Update the {@link JobExecution} (but not its {@link ExecutionContext}).
 	 * 
 	 * Preconditions: {@link JobExecution} must contain a valid
 	 * {@link JobInstance} and be saved (have an id assigned).
@@ -82,11 +104,10 @@ public interface JobRepository {
 	void update(JobExecution jobExecution);
 
 	/**
-	 * Save the {@link StepExecution}. ID will be assigned - it is not permitted
-	 * that an ID be assigned before calling this method. Instead, it should be
-	 * left blank, to be assigned by a {@link JobRepository}. The
-	 * {@link ExecutionContext} of the {@link StepExecution} is <em>not</em>
-	 * saved: see {@link #updateExecutionContext(StepExecution)}.
+	 * Save the {@link StepExecution} and its {@link ExecutionContext}. ID will
+	 * be assigned - it is not permitted that an ID be assigned before calling
+	 * this method. Instead, it should be left blank, to be assigned by a
+	 * {@link JobRepository}.
 	 * 
 	 * Preconditions: {@link StepExecution} must have a valid {@link Step}.
 	 * 
@@ -95,7 +116,7 @@ public interface JobRepository {
 	void add(StepExecution stepExecution);
 
 	/**
-	 * Update the {@link StepExecution}.
+	 * Update the {@link StepExecution} (but not its {@link ExecutionContext}).
 	 * 
 	 * Preconditions: {@link StepExecution} must be saved (have an id assigned).
 	 * 
@@ -104,11 +125,10 @@ public interface JobRepository {
 	void update(StepExecution stepExecution);
 
 	/**
-	 * Persist the {@link ExecutionContext} of the given {@link StepExecution}
-	 * and enclosing {@link JobExecution}.
+	 * Persist the updated {@link ExecutionContext}s of the given
+	 * {@link StepExecution} and corresponding {@link JobExecution}.
 	 * 
-	 * @param stepExecution the {@link StepExecution} containing the
-	 * {@link ExecutionContext} to be saved.
+	 * @param stepExecution
 	 */
 	void updateExecutionContext(StepExecution stepExecution);
 
@@ -125,7 +145,7 @@ public interface JobRepository {
 	int getStepExecutionCount(JobInstance jobInstance, String stepName);
 
 	/**
-	 * @param jobName the name of the job that might have run 
+	 * @param jobName the name of the job that might have run
 	 * @param jobParameters parameters identifying the {@link JobInstance}
 	 * @return the last execution of job if exists, null otherwise
 	 */

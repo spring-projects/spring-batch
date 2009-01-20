@@ -70,10 +70,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 	private ExecutionContextStringSerializer serializer;
 
-	/**
-	 * @param jobExecution
-	 * @return execution context associated with the given jobExecution.
-	 */
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -88,10 +84,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 	}
 
-	/**
-	 * @param stepExecution
-	 * @return execution context associated with the given stepExecution.
-	 */
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		Long executionId = stepExecution.getId();
 		Assert.notNull(executionId, "ExecutionId must not be null.");
@@ -106,11 +98,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		}
 	}
 
-	/**
-	 * Persist or update the execution context associated with the given
-	 * jobExecution
-	 * @param jobExecution
-	 */
 	public void updateExecutionContext(final JobExecution jobExecution) {
 		Long executionId = jobExecution.getId();
 		ExecutionContext executionContext = jobExecution.getExecutionContext();
@@ -122,11 +109,6 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		persistSerializedContext(executionId, serializedContext, UPDATE_JOB_EXECUTION_CONTEXT);
 	}
 
-	/**
-	 * Persist or update the execution context associated with the given
-	 * stepExecution
-	 * @param stepExecution
-	 */
 	public void updateExecutionContext(final StepExecution stepExecution) {
 
 		Long executionId = stepExecution.getId();
@@ -173,6 +155,11 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		((XStreamExecutionContextStringSerializer) serializer).afterPropertiesSet();
 	}
 
+	/**
+	 * @param executionId
+	 * @param serializedContext
+	 * @param sql with parameters (shortContext, longContext, executionId)
+	 */
 	private void persistSerializedContext(final Long executionId, String serializedContext, String sql) {
 
 		final String shortContext;

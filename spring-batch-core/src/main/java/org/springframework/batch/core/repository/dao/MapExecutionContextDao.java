@@ -24,21 +24,28 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 
+/**
+ * In-memory implementation of {@link ExecutionContextDao} backed by static
+ * maps.
+ *
+ * @author Robert Kasanicky
+ */
 public class MapExecutionContextDao implements ExecutionContextDao {
 
-	private static Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
+	private static Map<Long, ExecutionContext> contextsByStepExecutionId = TransactionAwareProxyFactory
+			.createTransactionalMap();
 
-	private static Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory.createTransactionalMap();
-	
+	private static Map<Long, ExecutionContext> contextsByJobExecutionId = TransactionAwareProxyFactory
+			.createTransactionalMap();
+
 	public static void clear() {
 		contextsByJobExecutionId.clear();
 		contextsByStepExecutionId.clear();
 	}
-	
+
 	private static ExecutionContext copy(ExecutionContext original) {
 		return (ExecutionContext) SerializationUtils.deserialize(SerializationUtils.serialize(original));
 	}
-
 
 	public ExecutionContext getExecutionContext(StepExecution stepExecution) {
 		return copy(contextsByStepExecutionId.get(stepExecution.getId()));
@@ -47,14 +54,13 @@ public class MapExecutionContextDao implements ExecutionContextDao {
 	public void updateExecutionContext(StepExecution stepExecution) {
 		contextsByStepExecutionId.put(stepExecution.getId(), copy(stepExecution.getExecutionContext()));
 	}
-	
+
 	public ExecutionContext getExecutionContext(JobExecution jobExecution) {
 		return copy(contextsByJobExecutionId.get(jobExecution.getId()));
 	}
 
 	public void updateExecutionContext(JobExecution jobExecution) {
 		contextsByJobExecutionId.put(jobExecution.getId(), copy(jobExecution.getExecutionContext()));
-
 	}
 
 	public void saveExecutionContext(JobExecution jobExecution) {
