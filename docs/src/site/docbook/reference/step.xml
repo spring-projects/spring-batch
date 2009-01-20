@@ -1,0 +1,1097 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="execution">
+  <title>Step</title>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>In Chapter 2, the overall architecture design was discussed, using
+    the following diagram as a guide:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center"
+                   fileref="images/spring-batch-reference-model.png"
+                   width="75%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/spring-batch-reference-model.png"
+                   width="75%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>When viewed from left to right, the diagram describes a basic flow
+    for the execution of a batch job:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>A Scheduler kicks off a job script (usually some form of shell
+        script)</para>
+      </listitem>
+
+      <listitem>
+        <para>The script sets up the classpath appropriately, and starts the
+        Java process. In most cases, using
+        <classname>CommandLineJobRunner</classname> as the entry point</para>
+      </listitem>
+
+      <listitem>
+        <para>The JobRunner finds the <classname>Job</classname> using the
+        <classname>JobLocator</classname>, pulls together the
+        <classname>JobParameters</classname> and launches the
+        <classname>Job</classname></para>
+      </listitem>
+
+      <listitem>
+        <para>The <classname>JobLauncher</classname> retrieves a
+        <classname>JobExecution</classname> from the
+        <classname>JobRepository</classname>, and executes the
+        <classname>Job</classname></para>
+      </listitem>
+
+      <listitem>
+        <para>The <classname>Job</classname> executes each
+        <classname>Step</classname> in sequence.</para>
+      </listitem>
+
+      <listitem>
+        <para>The <classname>Step</classname> calls read on the
+        <classname>ItemReader</classname>, handing the resulting item to the
+        <classname>ItemWriter</classname> until null is returned, periodically
+        committing and storing status in the
+        <classname>JobRepository</classname>.</para>
+      </listitem>
+
+      <listitem>
+        <para>When execution is complete, the <classname>Step</classname>
+        returns control back to the <classname>Job</classname>, and if no more
+        steps exist, control is returned back to the original caller, in this
+        case, the scheduler.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>This flow is perhaps a bit overly simplified, but describes the
+    complete flow in the most basic terms. From here, each tier will be
+    described in detail, using actual implementations and examples.</para>
+  </section>
+
+  <section>
+    <title>Application Tier</title>
+
+    <para>The Application tier is entirely concerned with the actual
+    processing of input:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/application-tier.png" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/application-tier.png" />
+      </imageobject>
+    </mediaobject>
+
+    <section>
+      <title>StepHandlerStep</title>
+
+      <para>The figure above shows a simple 'item-oriented' execution flow.
+      One item is read in from an <classname>ItemReader</classname>, and then
+      handed to an <classname>ItemWriter</classname>, until their are no more
+      items left. When processing first begins, a transaction is started and
+      periodically committed until the <classname>Step</classname> is
+      complete. Given these basic requirements, the
+      <classname>StepHandlerStep</classname> requires the following
+      dependencies, at a minimum:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><classname>ItemReader</classname> - The
+          <classname>ItemReader</classname> that provides items for
+          processing.</para>
+        </listitem>
+
+        <listitem>
+          <para><classname>ItemWriter</classname> - The
+          <classname>ItemWriter</classname> that processes the items provided
+          by the <classname>ItemReader</classname>.</para>
+        </listitem>
+
+        <listitem>
+          <para><classname>PlatformTransactionManager</classname> - Spring
+          transaction manager that will be used to begin and commit
+          transactions during processing.</para>
+        </listitem>
+
+        <listitem>
+          <para><classname>JobRepository</classname> - The
+          <classname>JobRepository</classname> that will be used to
+          periodically store the <classname>StepExecution</classname> and
+          <classname>ExecutionContext</classname> during processing (just
+          before committing).</para>
+        </listitem>
+      </itemizedlist>
+
+      <section>
+        <title>SimpleStepFactoryBean</title>
+
+        <para>Despite the relatively short list of required dependencies for
+        an <classname>StepHandlerStep</classname>, it is an extremely complex
+        class that can potentially contain many collaborators. In order to
+        ease configuration, a <classname>SimpleStepFactoryBean</classname> can
+        be used:</para>
+
+        <programlisting>  &lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="itemReader" ref="itemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+        <para>The configuration above represents the only required
+        dependencies of the factory bean. Attempting to instantiate a
+        <classname>SimpleStepFactoryBean</classname> without at least those
+        four dependencies will result in an exception being thrown during
+        construction by the Spring container.</para>
+      </section>
+
+      <section>
+        <title>Configuring a CommitInterval</title>
+
+        <para>As mentioned above, the <classname>StepHandlerStep</classname>
+        reads in and writes out items, periodically commiting using the
+        supplied <classname>PlatformTransactionManager</classname>. By
+        default, it will commit after each item has been written. This is less
+        than ideal in many situations, since beginning and commiting a
+        transaction is expensive. Ideally, you would like to process as many
+        items as possible in each transaction, which is completely dependant
+        upon the type of data being processed and the resources that are being
+        interacted with. For this reason, the number of items that are
+        processed within a commit can be set as the commit interval:</para>
+
+        <programlisting> &lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="itemReader" ref="itemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    <emphasis role="bold">&lt;property name="commitInterval" value="10" /&gt;</emphasis>
+  &lt;/bean&gt;</programlisting>
+
+        <para>In this example, 10 items will be processed within each
+        transaction. At the beginning of processing a transaction is begun,
+        and each time <markup>read</markup> is called on the
+        <classname>ItemReader</classname>, a counter is incremented. When it
+        reaches 10, the transaction will be committed.</para>
+      </section>
+
+      <section>
+        <title>Configuring a Step for Restart</title>
+
+        <para>Earlier in this chapter, restarting a <classname>Job</classname>
+        was discussed. Restart has numerous impacts on steps, and as such may
+        require some specific configuration.</para>
+
+        <section>
+          <title>Setting a StartLimit</title>
+
+          <para>There are many scenarios where you may want to control the
+          number of times a <classname>Step</classname> may be started. An
+          example is a <classname>Step</classname> that may be run only once,
+          usually because it invalidates some resource that must be fixed
+          manually before it can be run again. This is configurable on the
+          step level, since different steps have different requirements. One
+          Step that may only be executed once can exist as part of the same
+          <classname>Job</classname> as <classname>Step</classname> that can
+          be run infinitely. Below is an example start limit
+          configuration:</para>
+
+          <programlisting> &lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="itemReader" ref="itemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    &lt;property name="commitInterval" value="10" /&gt;
+    <emphasis role="bold">&lt;property name="startLimit" value="1" /&gt;</emphasis>
+  &lt;/bean&gt;</programlisting>
+
+          <para>The simple step above can be run only once. Attempting to run
+          it again will cause an exception to be thrown. It should be noted
+          that the default value for startLimit is
+          <classname>Integer.MAX_VALUE</classname>.</para>
+        </section>
+
+        <section>
+          <title>Restarting a completed step</title>
+
+          <para>In the case of a restartable job, there may be one or more
+          steps that should always be run, regardless of whether or not they
+          were successful the first time. An example might be a validation
+          step, or a step that cleans up resources before processing. During
+          normal processing of a restarted job, any step with a status of
+          'COMPLETED', meaning it has already been completed successfully,
+          will be skipped. Setting allowStartIfComplete to true overrides this
+          so that the step will always run:</para>
+
+          <programlisting> &lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="itemReader" ref="itemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    &lt;property name="commitInterval" value="10" /&gt;
+    &lt;property name="startLimit" value="1" /&gt;
+    <emphasis role="bold">&lt;property name="allowStartIfComplete" value="true" /&gt;</emphasis>
+  &lt;/bean&gt;</programlisting>
+        </section>
+
+        <section>
+          <title>Step restart configuration example</title>
+
+          <programlisting>  &lt;bean id="footballJob"
+        class="org.springframework.batch.core.job.SimpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;list&gt;
+        &lt;!-- Step Bean details ommitted for clarity --&gt;
+        &lt;bean id="playerload" parent="simpleStep" /&gt;
+        &lt;bean id="gameLoad" parent="simpleStep" &gt;
+          &lt;property name="allowStartIfComplete" value="true" /&gt;
+        &lt;/bean&gt;
+        &lt;bean id="playerSummarization" parent="simpleStep" &gt;
+          &lt;property name="startLimit" value="2" /&gt;
+        &lt;/bean&gt;
+      &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="restartable" value="true" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+          <para>The above example configuration is for a job that loads in
+          information about football games and summarizes them. It contains
+          three steps: playerLoad, gameLoad, and playerSummarization. The
+          playerLoad <classname>Step</classname> loads player information from
+          a flat file, while the <classname>gameLoad</classname>
+          <classname>Step</classname> does the same for games. The final
+          <classname>Step</classname>, playerSummarization, then summarizes
+          the statistics for each player based upon the provided games. It is
+          assumed that the file loaded by 'playerLoad' must be loaded only
+          once, but that 'gameLoad' will load any games found within a
+          particular directory, deleting them after they have been
+          successfully loaded into the database. As a result, the playerLoad
+          <classname>Step</classname> contains no additional configuration. It
+          can be started almost limitlessly, and if complete will be skipped.
+          The 'gameLoad' <classname>Step</classname>, however, needs to be run
+          everytime, in case extra files have been dropped since it last
+          executed, so it has 'allowStartIfComplete' set to 'true' in order to
+          always be started. (It is assumed that the database tables games are
+          loaded into has a process indicator on it, to ensure new games can
+          be properly found by the summarization step) The summarization
+          <classname>step</classname>, which is the most important in the
+          <classname>Job</classname>, is configured to have a start limit of
+          3. This is useful in case it continually fails, a new exit code will
+          be returned to the operators that control job execution, and it
+          won't be allowed to start again until manual intervention has taken
+          place.</para>
+
+          <note>
+            <para>This job is purely for example purposes and is not the same
+            as the footballJob found in the samples project.</para>
+          </note>
+
+          <para>Run 1:</para>
+
+          <orderedlist>
+            <listitem>
+              <para>playerLoad is executed and completes successfully, adding
+              400 players to the 'PLAYERS' table.</para>
+            </listitem>
+
+            <listitem>
+              <para>gameLoad is executed and processes 11 files worth of game
+              data, loading their contents into the 'GAMES' table.</para>
+            </listitem>
+
+            <listitem>
+              <para>playerSummarization begins processing and fails after 5
+              minutes.</para>
+            </listitem>
+          </orderedlist>
+
+          <para>Run 2:</para>
+
+          <orderedlist>
+            <listitem>
+              <para>playerLoad is not run, since it has already completed
+              succesfully, and allowStartIfComplete is false (the
+              default).</para>
+            </listitem>
+
+            <listitem>
+              <para>gameLoad is executed again and processes another 2 files,
+              loading their contents into the 'GAMES' table as well (with a
+              process indicator indicating they have yet to be
+              processed)</para>
+            </listitem>
+
+            <listitem>
+              <para>playerSummarization begins processing of all remaining
+              game data (filtering using the process indicator) and fails
+              again after 30 minutes.</para>
+            </listitem>
+          </orderedlist>
+
+          <para>Run 3:</para>
+
+          <orderedlist>
+            <listitem>
+              <para>playerLoad is not run, since it has already completed
+              succesfully, and allowStartIfComplete is false (the
+              default).</para>
+            </listitem>
+
+            <listitem>
+              <para>gameLoad is executed again and processes another 2 files,
+              loading their contents into the 'GAMES' table as well (with a
+              process indicator indicating they have yet to be
+              processed)</para>
+            </listitem>
+
+            <listitem>
+              <para>playerSummarization is not start, and the job is
+              immeadiately killed, since this is the third execution of
+              playerSummarization, and it's limit is only 2. The limit must
+              either be raised, or the <classname>Job</classname> must be
+              executed as a new <classname>JobInstance</classname>.</para>
+            </listitem>
+          </orderedlist>
+        </section>
+      </section>
+
+      <section>
+        <title>Configuring Skip Logic</title>
+
+        <para>There are many scenarios where errors encountered while
+        processing should not result in <classname>Step</classname> failure,
+        but should be skipped instead. This is usually a decision that must be
+        made by someone who understands the data itself and what meaning it
+        has. Financial data, for example, may not be skippable because it
+        results in money being transferred, which needs to be completely
+        accurate. Loading in a list of vendors, on the other hand, might allow
+        for skips, since a vendor not being loaded because it was formatted
+        incorrectly, or missing necessary information, won't cause issues.
+        Usually these bad records are logged as well, which will be covered
+        later when discussing listeners. Configuring skip handling requires
+        using a new factory bean:
+        <classname>SkipLimitStepFactoryBean</classname><programlisting>  &lt;bean id="skipSample"
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
+    &lt;property name="skipLimit" value="10" /&gt;
+    &lt;property name="itemReader" ref="flatFileItemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    <emphasis role="bold">&lt;property name="skippableExceptionClasses"
+              value="org.springframework.batch.item.file.FlatFileParseException"&gt;</emphasis>
+    &lt;/property&gt;
+  &lt;/bean&gt; </programlisting></para>
+
+        <para>In this example, a <classname>FlatFileItemReader</classname> is
+        used, and if at any point a FlatFileParseException is thrown, it will
+        be skipped and counted against the total skip limit of 10. It should
+        be noted that any failures encountered while reading will not count
+        against the commit interval. In other words, the commit interval is
+        only incremented on writes (regardless of success or failure).</para>
+      </section>
+
+      <section>
+        <para>One problem with the example above is that any other exception
+        besides a <classname>FlatFileParseException</classname> will cause the
+        <classname>Job</classname> to fail. In certain scenarios this may be
+        the correct behaviour, however, in certain scenarios it may be easier
+        to identify which exceptions should cause failure and skip everything
+        else:<programlisting>  &lt;bean id="skipSample"
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
+    &lt;property name="skipLimit" value="10" /&gt;
+    &lt;property name="itemReader" ref="flatFileItemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    <emphasis role="bold">&lt;property name="skippableExceptionClasses"
+              value="java.lang.Exception"&gt;</emphasis>
+    <emphasis role="bold">&lt;property name="fatalExceptionClasses"
+              value="java.io.FileNotFoundException"&gt;</emphasis>
+    &lt;/property&gt;
+  &lt;/befan&gt;</programlisting></para>
+
+        <para>By setting the skippable exceptions to
+        <classname>java.lang.Exception</classname>, any exception that is
+        thrown will be skipped. However, the second list,
+        'fatalExceptionClasses', contains specific exceptions that should be
+        fatal if encountered.</para>
+      </section>
+
+      <section>
+        <title>Configuring Retry Logic</title>
+
+        <para>In most cases you want an Exception to cause either a skip or
+        <classname>Step</classname> failure. However, not all exceptions are
+        deterministic. If a FlatFileParseException is encountered while
+        reading, it will always be thrown for that record. Resseting the
+        <classname>ItemReader</classname> will not help. However, for other
+        exceptions, such as a
+        <classname>DeadlockLoserDataAccessException</classname>, which
+        indicates that the current process has attempted to update a record
+        that another process holds a lock on, waiting and trying again might
+        result in success. In this case, retry should be configured:</para>
+
+        <programlisting>  &lt;bean id="step1"
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
+    &lt;property name="itemReader" ref="itemGenerator" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    <emphasis role="bold">&lt;property name="retryLimit" value="3" /&gt;
+    &lt;property name="retryableExceptionClasses" value="org.springframework.dao.DeadlockLoserDataAccessException" /&gt;</emphasis>
+  &lt;/bean&gt;</programlisting>
+
+        <para>The <classname>SkipLimitStepFactoryBean</classname> requires a
+        limit for the number of times an individual item can be retried, and a
+        list of Exceptions that are 'retryable'.</para>
+      </section>
+
+      <section>
+        <title>Controlling rollback</title>
+
+        <para>By default, regardless of retry or skip, any exceptions thrown
+        from the <classname>ItemWriter</classname> will cause the transaction
+        controlled by the <classname>Step</classname> to rollback. If skip is
+        configured as described above, exceptions thrown from the
+        <classname>ItemReader</classname> will not cause a rollback. However,
+        there are many scenarios in which exceptions thrown from the
+        <classname>ItemWriter</classname> should not cause a rollback because
+        no action has taken place to invalidate the transaction. For this
+        reason, the <classname>SkipLimitStepFactoryBean</classname> can be
+        configured with a list of exceptions that should not cause
+        rollback:</para>
+
+        <programlisting>  &lt;bean id="step2" 
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
+    &lt;property name="commitInterval" value="2" /&gt;
+    &lt;property name="skipLimit" value="1" /&gt;
+    &lt;!-- No rollback for exceptions that are marked with "+" in the tx attributes --&gt;
+    <emphasis role="bold">&lt;property name="transactionAttribute"
+      value="+org.springframework.batch.item.validator.ValidationException" /&gt;</emphasis>
+    &lt;property name="itemReader"
+              ref="tradeSqlItemReader" /&gt;
+    &lt;property name="itemWriter"
+              ref="itemTrackingWriter" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+        <para>The <classname>TransactionAttribute</classname> property above
+        can be used to control multiple other settings such as isolation and
+        propagation behaviour. More information on setting transaction
+        attributes can be found in the spring core documentation.</para>
+      </section>
+
+      <section>
+        <title>Registering ItemStreams with the Step</title>
+
+        <para>The step has to take care of <classname>ItemStream</classname>
+        callbacks at the necessary points in its lifecycle. This is vital if a
+        step fails, and might need to be restarted, because the
+        <classname>ItemStream</classname> interface is where the step gets the
+        information it needs about persistent state between executions. The
+        factory beans that Spring Batch provides for convenient configuration
+        of <classname>Step</classname> instances have features that allow
+        streams to be registered with the step when it is configured.</para>
+
+        <para>If the <classname>ItemReader</classname> or
+        <classname>ItemWriter</classname> themselves implement the ItemStream
+        interface, then these will be registered automatically. Any other
+        streams need to be registered separately. This is often the case where
+        there are indirect dependencies, like delegates being injected into
+        the reader and writer. To register these they can be injected into the
+        factory beans through the streams property, as illustrated
+        below:</para>
+
+        <programlisting>&lt;bean id="step1"
+        class="org.springframework.batch.core.step.item.SkipLimitStepFactoryBean"&gt;
+    &lt;property name="streams" ref="fileItemReader" /&gt;
+    &lt;property name="itemReader"&gt;
+        &lt;bean
+            class="org.springframework.batch.item.validator.ValidatingItemReader"&gt;
+            &lt;property name="itemReader" ref="itemReader" /&gt;
+            &lt;property name="validator" ref="fixedValidator" /&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+    ...
+&lt;/bean&gt;</programlisting>
+
+        <para>In the example above the main item reader is being set up to
+        delegate to a bean called "fileItemReader", which itself is being
+        registered as a stream directly. The step will now be restartable and
+        the state of the reader will be correctly persisted in case of a
+        failure.</para>
+      </section>
+
+      <section>
+        <title>Intercepting Step Execution</title>
+
+        <para>Just as with the <classname>Job</classname>, there are many
+        events during the execution of a <classname>Step</classname> that a
+        user may need notification of. For example, if writing out to a flat
+        file that requires a footer, the <classname>ItemWriter</classname>
+        needs to be notified when the <classname>Step</classname> has been
+        completed, so that it can write the footer. This can be accomplished
+        with one of many <classname>Step</classname> scoped listeners.</para>
+
+        <section>
+          <title>StepExecutionListener</title>
+
+          <para><classname>StepExecutionListener</classname> represents the
+          most generic listener for <classname>Step</classname> execution. It
+          allows for notification before a <classname>Step</classname> is
+          started, after it has completed, and if any errors are encountered
+          during processing:</para>
+
+          <programlisting>  public interface StepExecutionListener extends StepListener {
+
+    void beforeStep(StepExecution stepExecution);
+
+    ExitStatus onErrorInStep(StepExecution stepExecution, Throwable e);
+
+    ExitStatus afterStep(StepExecution stepExecution);
+}</programlisting>
+
+          <para><classname>ExitStatus</classname> is the return type of
+          <methodname>onErrorInStep</methodname> and
+          <methodname>afterStep</methodname> in order to allow listeners the
+          chance to modify the exit code that is returned upon completion of a
+          <classname>Step</classname>. A
+          <classname>StepExecutionListener</classname> can be applied to any
+          step factory bean via the listeners property:</para>
+
+          <programlisting>  &lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="itemReader" ref="itemReader" /&gt;
+    &lt;property name="itemWriter" ref="itemWriter" /&gt;
+    &lt;property name="commitInterval" value="10" /&gt;
+    &lt;property name="listeners" ref="stepListener" /&gt;    
+  &lt;/bean&gt;</programlisting>
+
+          <para>Because all listeners extend the
+          <classname>StepListener</classname> interface, they all may be
+          applied to factory beans in the same way.</para>
+        </section>
+
+        <section>
+          <title>ChunkListener</title>
+
+          <para>A chunk is defined as the items processed within the scope of
+          a transaction. Committing a transaction commits a 'chunk'. It may be
+          useful to be nofied before and after a chunk has completed, in which
+          case the <classname>ChunkListener</classname> interface may be
+          used:</para>
+
+          <programlisting>  public interface ChunkListener extends StepListener {
+
+    void beforeChunk();
+
+    void afterChunk();
+  }</programlisting>
+
+          <para>The <methodname>beforeChunk</methodname> method is called
+          after the transaction is started, but before
+          <methodname>read</methodname> is called on the
+          <classname>ItemReader</classname>. Conversely,
+          <methodname>afterChunk</methodname> is called after the last call to
+          <methodname>write</methodname> on the
+          <classname>ItemWriter</classname>, but before the chunk has been
+          committed.</para>
+        </section>
+
+        <section>
+          <title>ItemReadListener</title>
+
+          <para>When discussing skip logic above, it was mentioned that it may
+          be beneficial to log out skipped records, so that they can be deal
+          with later. In the case of read errors, this can be done with an
+          <classname>ItemReaderListener:</classname><programlisting>  public interface ItemReadListener extends StepListener {
+  
+    void beforeRead();
+
+    void afterRead(Object item);
+    
+    void onReadError(Exception ex);
+}</programlisting></para>
+
+          <para>The <methodname>beforeRead</methodname> method will be called
+          before each call to <methodname>read</methodname> on the
+          <classname>ItemReader</classname>. The
+          <methodname>afterRead</methodname> method will be called after each
+          successful call to <methodname>read</methodname>, and will be passed
+          the item that was read. If there was an error while reading, the
+          <classname>onReadError</classname> method will be called. The
+          exception encounterd will be provided so that it can be
+          logged.</para>
+        </section>
+
+        <section>
+          <title>ItemWriteListener</title>
+
+          <para>Just as with the ItemReaderListener, the writing of an item
+          can be 'listened' to:</para>
+
+          <programlisting>  public interface ItemWriteListener extends StepListener {
+
+    void beforeWrite(Object item);
+
+    void afterWrite(Object item);
+
+    void onWriteError(Exception ex, Object item);
+}</programlisting>
+
+          <para>The <methodname>beforeWrite</methodname> method will be called
+          before <methodname>write</methodname> on the
+          <classname>ItemWriter</classname>, and is handed the item that will
+          be written. The <methodname>afterWrite</methodname> method will be
+          called after the item has been succesfully writen. If there was an
+          error while writing, the <methodname>onWriteError</methodname>
+          method will be called. The exception encountered and the item that
+          was attempted to be written will be provided, so that they can be
+          logged.</para>
+        </section>
+
+        <section>
+          <title>SkipListener</title>
+
+          <para>Both <classname>ItemReadListener</classname> and
+          <classname>ItemWriteListner</classname> provide a mechanism for
+          being notified of errors, but neither one will inform you that a
+          record has actually been skipped.
+          <methodname>onWriteError</methodname>, for example, will be called
+          even if an item is retried and successful. For this reason, there is
+          a separate interface for tracking skipped items:</para>
+
+          <programlisting>
+  public interface SkipListener extends StepListener {
+
+    void onSkipInRead(Throwable t);
+
+    void onSkipInWrite(Object item, Throwable t);
+  }
+
+</programlisting>
+
+          <para><methodname>onSkipInRead</methodname> will be called whenever
+          an item is skipped while reading. It should be noted that rollbacks
+          may cause the same item to be registered as skipped more than once.
+          <methodname>onSkipInWrite</methodname> will be called when an item
+          is skipped while writing. Because the item has been read
+          successfully (and not skipped), it is also provided the item itself
+          as an argument.</para>
+        </section>
+      </section>
+    </section>
+
+    <section>
+      <title>TaskletStep</title>
+
+      <para>Item oriented processing is not the only way to process in a
+      <classname>Step</classname>. What if a <classname>Step</classname> must
+      consist as a simple storec procedure call? You could implement the call
+      as an <classname>ItemReader</classname> and return null after the
+      procedure finishes, but it is a bit unnatural since there would need to
+      be a no-op <classname>ItemWriter</classname> and lots of overhead for
+      transaction handling, listeners, etc. Spring Batch provides an
+      implementation of <classname>Step</classname> for this scenario:
+      <classname>TaskletStep</classname>. As explained in Chapter 2, the
+      <classname>Tasklet</classname> is a simple interface that has one
+      method, <methodname>execute</methodname>, which will be a called once
+      for the whole <classname>Step</classname>.
+      <classname>Tasklet</classname> implementors might call a stored
+      procedure, a script, or a simple SQL upate statement. Because there are
+      less concerns, there are only two required dependencies for a
+      <classname>TaskletStep</classname>: a <classname>Tasklet</classname>,
+      and a <classname>JobRepository</classname>:</para>
+
+      <programlisting>&lt;bean id="taskletStep"
+      class="org.springframework.batch.core.step.tasklet.TaskletStep" /&gt;
+  &lt;property name="tasklet" ref="tasklet" /&gt;
+  &lt;property name="jobRepository" ref="repository" /&gt;
+&lt;/bean&gt;</programlisting>
+
+      <note>
+        <para>TaskletStep will automatically register the tasklet as
+        <classname>StepExecutionListener</classname> if it implements this
+        interface</para>
+      </note>
+
+      <section>
+        <title>TaskletAdapter</title>
+
+        <para>As with other adapters for the <classname>ItemWriter</classname>
+        and <classname>ItemReader</classname> interfaces, the
+        <classname>Tasklet</classname> interface contains an implementation
+        that allows for adapting itself to any pre-existing class:
+        <classname>TaskletAdapter</classname>. An example where this may be
+        useful is an existing DAO that is used to upate a flag on a set of
+        records. The <classname>TaskletAdapter</classname> can be used to call
+        this class without having to write an adapter for the
+        <classname>Tasklet</classname> interface:</para>
+
+        <programlisting>  &lt;bean id="deleteFilesInDir" parent="taskletStep"&gt;
+    &lt;property name="tasklet"&gt;
+      &lt;bean class="org.springframework.batch.core.step.tasklet.TaskletAdapter"&gt;
+        &lt;property name="targetObject"&gt;
+          &lt;bean class="org.mycompany.FooDao"&gt;
+        &lt;/property&gt;
+        &lt;property name="targetMethod" value-"updateFoo" /&gt;
+      &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+      </section>
+
+      <section>
+        <title>Example Tasklet implementation</title>
+
+        <para>Many batch jobs contains steps that must be done before the main
+        processing begins in order to set up various resources, or after
+        processing has completed to cleanup those resources. In the case of a
+        job that works heavily with files, it is often necessary to delete
+        certain files locally after they have been uploaded successfully to
+        another location. The example below taken from the Spring Batch
+        samples project, is a <classname>Tasklet</classname> implementation
+        with just such a responsibility:</para>
+
+        <programlisting>  public class FileDeletingTasklet implements Tasklet, InitializingBean {
+
+    private Resource directory;
+
+    public ExitStatus execute() throws Exception {
+      File dir = directory.getFile();
+      Assert.state(dir.isDirectory());
+    
+      File[] files = dir.listFiles();
+      for (int i = 0; i &lt; files.length; i++) {
+        boolean deleted = files[i].delete();
+        if (!deleted) {
+          throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());
+        }
+      }
+      return ExitStatus.FINISHED;
+    }
+
+    public void setDirectoryResource(Resource directory) {
+      this.directory = directory;
+    }
+
+    public void afterPropertiesSet() throws Exception {
+      Assert.notNull(directory, "directory must be set");
+    }
+  }</programlisting>
+
+        <para>The above <classname>Tasklet</classname> implementation will
+        delete all files within a given directory. It should be noted that the
+        <methodname>execute</methodname> method will only be called once. All
+        that is left is to inject the <classname>Tasklet</classname> into a
+        <classname>TaskletStep</classname>:</para>
+
+        <programlisting>  &lt;bean id="taskletJob" parent="simpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;bean id="deleteFilesInDir" parent="taskletStep"&gt;
+        &lt;property name="tasklet"&gt;
+          &lt;bean class="org.springframework.batch.sample.tasklet.FileDeletingTasklet"&gt;
+            &lt;property name="directoryResource" ref="directory" /&gt;
+          &lt;/bean&gt;
+        &lt;/property&gt;
+      &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="directory"
+        class="org.springframework.core.io.FileSystemResource"&gt;
+    &lt;constructor-arg value="target/test-outputs/test-dir" /&gt;
+  &lt;/bean&gt;</programlisting>
+      </section>
+
+      <section>
+        <title>Executing System Commands</title>
+
+        <para>Many batch jobs may require that an external command be called
+        from within the batch job. Such a process could be kicked off
+        separately by the scheduler, but the advantage of common meta-data
+        about the run would be lost. Furthermore, a multi-step job would also
+        need to be split up into multiple jobs as well. Because the need is so
+        common, Spring Batch provides a <classname>Tasklet</classname>
+        implementation for calling system commands:</para>
+
+        <programlisting>
+  &lt;bean class="org.springframework.batch.sample.tasklet.SystemCommandTasklet"&gt;
+    &lt;property name="command" value="echo hello" /&gt;
+    &lt;!-- 5 second timeout for the command to complete --&gt;
+    &lt;property name="timeout" value="5000" /&gt;
+  &lt;/bean&gt;
+
+</programlisting>
+      </section>
+    </section>
+
+    <section>
+      <title>Controlling Step Flow</title>
+
+      <para></para>
+
+      <section>
+        <title>Conditional Flow</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>Configuring for Stop</title>
+
+        <para></para>
+      </section>
+
+      <section>
+        <title>Programmatic flow decisions</title>
+
+        <para></para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Examples of Customized Business Logic</title>
+
+    <section>
+      <para>Some batch jobs can be assembled purely from off-the-shelf
+      components in Spring Batch, mostly the <classname>ItemReader</classname>
+      and <classname>ItemWriter</classname> implementations. Where this is not
+      possible (the majority of cases) the main API entry points for
+      application developers are the <classname>Tasklet</classname>,
+      <classname>ItemReader</classname>, <classname>ItemWriter</classname> and
+      the various listener interfaces. Most simple batch jobs will be able to
+      use off-the-shelf input from a Spring Batch
+      <classname>ItemReader</classname>, but it is very often the case that
+      there are custom concerns in the processing and writing, which normally
+      leads developers to implement an <classname>ItemWriter</classname>, or
+      <classname>ItemTransformer</classname>.</para>
+
+      <para>Here we provide a few examples of common patterns in custom
+      business logic, mainly using the listener interfaces . It should be
+      noted that an <classname>ItemReader</classname> or
+      <classname>ItemWriter</classname> can implement the listener interfaces
+      as well if appropriate.</para>
+    </section>
+
+    <section>
+      <title>Logging Item Processing and Failures</title>
+
+      <para>A common use case is the need for special handling of errors in a
+      step, item by item, perhaps logging to a special channel, or inserting a
+      record into a database. The <classname>StepHandlerStep</classname>
+      (created from the step factory beans) allows users to implement this use
+      case with a simple <classname>ItemReadListener</classname>, for errors
+      on read, and an <classname>ItemWriteListener</classname>, for errors on
+      write. The below code snippets illustrate a listener that logs both read
+      and write failures:</para>
+
+      <programlisting>public class ItemFailureLoggerListener extends ItemListenerSupport {
+
+    private static Log logger = LogFactory.getLog("item.error");    
+
+    public void onReadError(Exception ex) {
+        logger.error("Encountered error on read", e);
+    }
+
+    public void onWriteError(Exception ex, Object item) {
+        logger.error("Encountered error on write", e);
+    }
+
+}</programlisting>
+
+      <para>Having implemented this listener it must be registered with the
+      step:</para>
+
+      <programlisting>&lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    ...
+    &lt;property name="listeners"&gt;
+        &lt;bean class="org.example...ItemFailureLoggerListener"/&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>Remember that if your listener does anything in an
+      <code>onError()</code> method, it will be inside a transaction that is
+      going to be rolled back. If you need to use a transactional resource
+      such as a database inside an <code>onError()</code> method, consider
+      adding a declarative transaction to that method (see Spring Core
+      Reference Guide for details), and giving its propagation attribute the
+      value REQUIRES_NEW.</para>
+    </section>
+
+    <section>
+      <title>Stopping a Job Manually for Business Reasons</title>
+
+      <para>Spring Batch provides a stop() method through the JobLauncher
+      interface, but this is really aimed at the operator, rather than the
+      application programmer. Sometimes it is more convenient or makes more
+      sense to stop a job execution from within the business logic.</para>
+
+      <para>The simplest thing to do is to throw a RuntimeException (one that
+      isn't retried indefinitely or skipped), For example, a custom exception
+      type could be used, as in the example below:</para>
+
+      <programlisting>public class PoisonPillItemWriter extends AbstractItemWriter {
+    
+    public void write(Object item) throws Exception {
+
+        if (isPoisonPill(item)) {
+            throw new PoisonPillException("Posion pill detected: "+item);
+       }
+
+    }
+
+}</programlisting>
+
+      <para>Another simple way to stop a step from executing is to simply
+      return <code>null</code> from the
+      <classname>ItemReader</classname>:</para>
+
+      <programlisting>public class EarlyCompletionItemReader extends AbstractItemReader {
+
+    private ItemReader delegate;
+
+    public void setDelegate(ItemReader delegate) { ... }
+    
+    public Object read() throws Exception {
+
+        Object item = delegate.read();
+
+        if (isEndItem(item)) {
+            return null; // end the step here
+        }
+
+        return item;
+
+    }
+
+}</programlisting>
+
+      <para>The previous example actually relies on the fact that there is a
+      default implementation of the <classname>CompletionPolicy</classname>
+      strategy which signals a complete batch when the item to be processed is
+      null. A more sophisticated completion policy could be implemented and
+      injected into the <classname>Step</classname> through the
+      <classname>RepeatOperationsStepFactoryBean</classname>:</para>
+
+      <programlisting>&lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBean" &gt;
+    ...
+    &lt;property name="chunkOperations"&gt;
+        &lt;bean class="org.springframework.batch.repeat.support.RepeatTemplate"&gt;
+            &lt;property name="completionPolicy"&gt;
+                &lt;bean class="org.example...SpecialCompletionPolicy"/&gt;
+            &lt;/property&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>An alternative is to set a flag in the
+      <classname>StepExecution</classname>, which is checked by the
+      <classname>Step</classname> implementations in the framework in between
+      item processing. To implement this alternative, we need access to the
+      current StepExecution, and this can be achieved by implementing a
+      StepListener and registering it with the Step. Here is an example of a
+      listener that sets the flag:</para>
+
+      <programlisting>public class CustomItemWriter extends ItemListenerSupport implements StepListener {
+
+    private StepExecution stepExecution;    
+
+    public void beforeStep(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
+
+    public void afterRead(Object item) {
+
+        if (isPoisonPill(item)) {
+            stepExecution.setTerminateOnly(true);
+       }
+
+    }
+
+}</programlisting>
+
+      <para>The default behaviour here when the flag is set is for the step to
+      throw a <classname>JobInterruptedException</classname>. This can be
+      controlled through the <classname>StepInterruptionPolicy</classname>,
+      but the only choice is to throw or not throw an exception, so this is
+      always an abnormal ending to a job.</para>
+    </section>
+
+    <section>
+      <title>Adding a Footer Record</title>
+
+      <para>A very common requirement is to aggregate information during the
+      output process and to append a record at the end of a file summarizing
+      the data, or providing a checksum. This can also be achieved with a
+      callbacks in the step, normally as part of a custom
+      <classname>ItemWriter</classname>. In this case, since a job is
+      accumulating state that should not be lost if the job aborts, the
+      <classname>ItemStream</classname> interface should be
+      implemented:</para>
+
+      <programlisting>public class CustomItemWriter extends AbstractItemWriter implements 
+    ItemStream, StepListener
+{
+
+    private static final String TOTAL_AMOUNT_KEY = "total.amount";
+
+    private ItemWriter delegate;
+
+    private double totalAmount = 0.0;
+
+    public void setDelegate(ItemWriter delegate) { ... }
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        // Add the footer record here...
+        delegate.write("Total Amount Processed: " + totalAmount);
+    }
+
+    public void open(ExecutionContext executionContext) {
+        if (executionContext.containsKey(TOTAL_AMOUNT_KEY) {
+            totalAmount = executionContext.getDouble(TOTAL_AMOUNT_KEY);
+        }
+    }
+
+    public void update(ExecutionContext executionContext) {
+        executionContext.setDouble(TOTAL_AMOUNT_KEY, totalAmount);
+    }
+    
+    public void write(Object item) {
+
+        delegate.write(item);
+        totalAmount += ((Trade) item).getAmount();
+
+    }
+
+}</programlisting>
+
+      <para>The custom writer in the example is stateful (it maintains its
+      total in an instance variable <varname>totalAmount</varname>), but the
+      state is stored through the <classname>ItemStream</classname> interface
+      in the <classname>ExecutionContext</classname>. In this way we can be
+      sure that when the <code>open()</code> callback is received on a
+      restart. The framework garuntees we always get the last value that was
+      committed. It should be noted that it is not always necessary to
+      implement ItemStream. For example, if the ItemWriter is re-runnable, in
+      the sense that it maintains its own state in a transactional resource
+      like a database, there is no need to maintain state within the writer
+      itself.</para>
+    </section>
+  </section>
+</chapter>

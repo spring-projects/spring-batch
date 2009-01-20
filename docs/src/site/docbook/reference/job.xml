@@ -1,0 +1,1029 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="execution">
+  <title>Configuring and Executing A Job</title>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>In Chapter 2, the overall architecture design was discussed, using
+    the following diagram as a guide:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center"
+                   fileref="images/spring-batch-reference-model.png"
+                   width="75%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/spring-batch-reference-model.png"
+                   width="75%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>When viewed from left to right, the diagram describes a basic flow
+    for the execution of a batch job:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>A Scheduler kicks off a job script (usually some form of shell
+        script)</para>
+      </listitem>
+
+      <listitem>
+        <para>The script sets up the classpath appropriately, and starts the
+        Java process. In most cases, using
+        <classname>CommandLineJobRunner</classname> as the entry point</para>
+      </listitem>
+
+      <listitem>
+        <para>The JobRunner finds the <classname>Job</classname> using the
+        <classname>JobLocator</classname>, pulls together the
+        <classname>JobParameters</classname> and launches the
+        <classname>Job</classname></para>
+      </listitem>
+
+      <listitem>
+        <para>The <classname>JobLauncher</classname> retrieves a
+        <classname>JobExecution</classname> from the
+        <classname>JobRepository</classname>, and executes the
+        <classname>Job</classname></para>
+      </listitem>
+
+      <listitem>
+        <para>The <classname>Job</classname> executes each
+        <classname>Step</classname>.</para>
+      </listitem>
+
+      <listitem>
+        <para>When execution is complete, the <classname>Step</classname>
+        returns control back to the <classname>Job</classname>, and if no more
+        steps exist, control is returned back to the original caller, in this
+        case, the scheduler.</para>
+      </listitem>
+    </orderedlist>
+
+    <para>This flow is perhaps a bit overly simplified, but describes the
+    complete flow in the most basic terms. From here, each tier will be
+    described in detail, using actual implementations and examples.</para>
+  </section>
+
+  <section>
+    <title>JobLauncher</title>
+
+    <para>The most basic implementation of the
+    <classname>JobLauncher</classname> interface is the SimpleJobLauncher.
+    It's only required dependency is a <classname>JobRepository</classname>,
+    in order to obtain an execution:</para>
+
+    <programlisting>  &lt;bean id="jobLauncher"
+        class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>Once a <classname>JobExecution</classname> is obtained, it is passed
+    to the execute method of <classname>Job</classname>, ultimately returning
+    the <classname>JobExecution</classname> to the caller:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center"
+                   fileref="images/job-launcher-sequence-sync.png" width="66%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/job-launcher-sequence-sync.png"
+                   width="66%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The sequence is straightforward, and works well when launched from a
+    scheduler, but causes issues when trying to launch from an HTTP request.
+    In this scenario, the launching needs to be done asynchronously, so that
+    the <classname>SimpleJobLauncher</classname> returns immediately to it's
+    caller. This is because it is not good practice to keep an HTTP request
+    open for the amount of time needed by long running processes such as
+    batch. An example sequence is below:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center"
+                   fileref="images/job-launcher-sequence-async.png"
+                   width="66%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/job-launcher-sequence-async.png"
+                   width="66%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The <classname>SimpleJobLauncher</classname> can easily be
+    configured to allow for this scenario by configuring a
+    <classname>TaskExecutor</classname>:</para>
+
+    <programlisting> &lt;bean id="jobLauncher"
+        class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="taskExecutor"&gt;
+      &lt;bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" /&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>Any implementation of the spring <classname>TaskExecutor</classname>
+    interface can be used to control how jobs are asynchronously
+    executed.</para>
+  </section>
+
+  <section>
+    <title>JobRepository</title>
+
+    <para>The SimpleJobRepository is the only provided implementation of the
+    <classname>JobRepository</classname> interface. It completely manages the
+    various batch domain objects and ensures they are created and persisted
+    correctly. The <classname>SimpleJobRepository</classname> uses three
+    different DAO interfaces for the three major domain types it stores:
+    <classname>JobInstanceDao</classname>,
+    <classname>JobExecutionDao</classname>, and
+    <classname>StepExecutionDao</classname>. The repository delegates to these
+    DAOs to both persist the various domain objects and query for them during
+    initialization. The following configuration shows a SimpleJobRepository
+    configured with JDBC DAOs:</para>
+
+    <programlisting>  &lt;bean id="jobRepository" class="org.springframework.batch.core.repository.support.SimpleJobRepository"&gt;
+    &lt;constructor-arg ref="jobInstanceDao" /&gt;
+    &lt;constructor-arg ref="jobExecutionDao" /&gt;
+    &lt;constructor-arg ref="stepExecutionDao" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="jobInstanceDao" class="org.springframework.batch.core.repository.support.dao.JdbcJobInstanceDao" &gt;
+    &lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
+    &lt;property name="jobIncrementer" ref="jobIncrementer" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="jobExecutionDao" class="org.springframework.batch.core.repository.support.dao.JdbcJobExecutionDao" &gt;
+    &lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
+    &lt;property name="jobExecutionIncrementer" ref="jobExecutionIncrementer" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="stepExecutionDao" class="org.springframework.batch.core.repository.support.dao.JdbcStepExecutionDao" &gt;
+    &lt;property name="jdbcTemplate" ref="jdbcTemplate" /&gt;
+    &lt;property name="stepExecutionIncrementer" ref="stepExecutionIncrementer" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" &gt;
+    &lt;property name="dataSource" ref="dataSource" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>The configuration above isn't quite complete, each DAO
+    implementation makes a reference to a Spring
+    <classname>DataFieldMaxValueIncrementer</classname>.
+    <classname>JobInstance</classname>, <classname>JobExecution</classname>,
+    and <classname>StepExecution</classname> each have unique IDs, and the
+    incrementers are used to create them.</para>
+
+    <section>
+      <title>JobRepositoryFactoryBean</title>
+
+      <para>Including the incrementers, which must be database specific, the
+      configuration above is verbose. In order to make this more manageable,
+      the framework provides a <classname>FactoryBean</classname> for
+      convenience: <classname>JobRepositoryFactoryBean</classname>.</para>
+
+      <programlisting>  &lt;bean id="jobRepository"
+        class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
+    &lt;property name="databaseType" value="hsql" /&gt; 
+    &lt;property name="dataSource" ref="dataSource" /&gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>The databaseType property indicates the type of incrementer that
+      must be used. Options include: "db2", "db2zos", "derby", "hsql",
+      "mysql", "oracle", and "postgres".</para>
+    </section>
+
+    <section>
+      <title>In-Memory Repository</title>
+
+      <para>There are scenarios in which you may not want to persist your
+      domain objects to the database. One reason may be speed, storing domain
+      objects at each commit point takes extra time. Another reason may be
+      that you just don't need to persist status for a particular job. Spring
+      batch provides a solution:</para>
+
+      <programlisting>  &lt;bean id="simpleJobRepository" class="org.springframework.batch.core.repository.support.SimpleJobRepository"&gt; 
+    &lt;constructor-arg ref="mapJobInstanceDao" /&gt; 
+    &lt;constructor-arg ref="mapJobExecutionDao" /&gt; 
+    &lt;constructor-arg ref="mapStepExecutionDao" /&gt; 
+  &lt;/bean&gt; 
+
+  &lt;bean id="mapJobInstanceDao" 
+        class="org.springframework.batch.core.repository.dao.MapJobInstanceDao" /&gt; 
+
+  &lt;bean id="mapJobExecutionDao" 
+        class="org.springframework.batch.core.repository.dao.MapJobExecutionDao" /&gt; 
+
+  &lt;bean id="mapStepExecutionDao" 
+        class="org.springframework.batch.core.repository.dao.MapStepExecutionDao" /&gt; </programlisting>
+
+      <para>The Map* DAO implementations store the batch artifacts in a
+      transactional map. So, the repository and DAOs may still be used
+      normally, and are transactionally sound, but their contents will be lost
+      when the class is destroyed.</para>
+
+      <para>There is also a separate FactoryBean for the in-memory
+      <classname>JobRepository</classname>, which reduces the amount of
+      configuration required:</para>
+
+      <programlisting>  &lt;bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
+
+      <section>
+        <title>Transaction Configuration For the JobRepository</title>
+
+        <para>If either of the JobRepository factory beans are used,
+        transactional advice will be automatically created around the
+        repository. This is to ensure that the batch meta data, including
+        state that is necessary for restarts after a failure, is persisted
+        correctly. The behaviour of the framework is not well defined if the
+        repository methods are not transactional. The isolation level in the
+        <code>create*</code> method attributes is specified separately to
+        ensure that when jobs are launched there if two processes are trying
+        to launch the same job at the same time, only one will succeed. The
+        default isolation level for that method is SERIALIZABLE, which is
+        quite aggressive: READ_COMMITTED would work just as well;
+        READ_UNCOMMITTED would be fine if two processes are not likely to
+        collide in this way. However, since a call to the
+        <classname>create*</classname> method is quite short, it is unlikely
+        that the SERIALIZED will cause problems, as long as the database
+        platform supports it. However, this can be overriden in the factory
+        beans:</para>
+
+        <para><programlisting>  &lt;bean id="jobRepository"
+        class="org.springframework.batch.execution.repository.JobRepositoryFactoryBean"
+    &lt;property name="databaseType" value="hsql" /&gt; 
+    &lt;property name="dataSource" ref="dataSource" /&gt;
+    &lt;property name="transactionManager" ref="transactionManager" /&gt;
+    <emphasis role="bold">&lt;property name="IsolationLevelForCreate" value="ISOLATION_REPEATABLE_READ" /&gt;</emphasis>
+  &lt;/bean&gt;</programlisting></para>
+
+        <para>If the factory beans aren't used then it is also essential to
+        configure the transactional behaviour of the repository using
+        AOP:</para>
+
+        <para><programlisting>  
+  &lt;aop:config&gt;
+      &lt;aop:advisor 
+           pointcut="execution(* org.springframework.batch.core..*Repository+.*(..))"
+      &lt;advice-ref="txAdvice" /&gt;
+  &lt;/aop:config&gt;
+
+  &lt;tx:advice id="txAdvice" transaction-manager="transactionManager"&gt;
+      &lt;tx:attributes&gt;
+          &lt;tx:method name="*" /&gt;
+      &lt;/tx:attributes&gt;
+  &lt;/tx:advice&gt;
+
+</programlisting></para>
+
+        <para>This fragment can be used as is, with almost no changes.
+        Remember also to include the appropiate namespace declarations and to
+        make sure spring-tx and spring-aop (or the whole of spring) is on the
+        classpath.</para>
+      </section>
+
+      <section>
+        <title>Recommendations for Indexing Meta Data Tables</title>
+
+        <para>Spring Batch provides DDL samples for the meta-data tables in
+        the Core jar file for several common database platforms. Index
+        declarations are not included in that DDL because there are too many
+        variations in how users may want to index dependeing on their precise
+        platform, local conventions and also the business requirements of how
+        the jobs will be operated. The table below provides some indication as
+        to which columns are going to be used in a WHERE clause by the Dao
+        ipmlementations provided by Spring Batch, and how frequently they
+        might be used, so that individual projects can make up their own minds
+        about indexing.</para>
+
+        <table>
+          <title>Where clauses in SQL statements (exluding primary keys) and
+          their approximate frequency of use.</title>
+
+          <tgroup cols="3">
+            <tbody>
+              <row>
+                <entry>Default Table Name</entry>
+
+                <entry>Where Clause</entry>
+
+                <entry>Frequency</entry>
+              </row>
+
+              <row>
+                <entry>BATCH_JOB_INSTANCE</entry>
+
+                <entry>JOB_NAME = ? and JOB_KEY = ?</entry>
+
+                <entry>Every time a job is launched</entry>
+              </row>
+
+              <row>
+                <entry>BATCH_JOB_EXECUTION</entry>
+
+                <entry>JOB_INSTANCE_ID = ?</entry>
+
+                <entry>Every time a job is restarted</entry>
+              </row>
+
+              <row>
+                <entry>BATCH_EXECUTION_CONTEXT</entry>
+
+                <entry>EXECUTION_ID = ? and KEY_NAME = ?</entry>
+
+                <entry>On commit interval, a.k.a. chunk</entry>
+              </row>
+
+              <row>
+                <entry>BATCH_STEP_EXECUTION</entry>
+
+                <entry>VERSION = ?</entry>
+
+                <entry>On commit interval, a.k.a. chunk (and at start and end
+                of step)</entry>
+              </row>
+
+              <row>
+                <entry>BATCH_STEP_EXECUTION</entry>
+
+                <entry>STEP_NAME = ? and JOB_EXECUTION_ID = ?</entry>
+
+                <entry>Before each step execution</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Job</title>
+
+    <para>The only current implementation of the <classname>Job</classname>
+    interface is <classname>SimpleJob</classname>. Since a
+    <classname>Job</classname> is just a simple loop through a list of Steps,
+    this implementation should be sufficient for the majority of needs. It has
+    only three required dependencies: a name,
+    <classname>JobRepository</classname>, and a list of Steps.</para>
+
+    <programlisting>  &lt;bean id="footballJob"
+        class="org.springframework.batch.core.job.SimpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;list&gt;
+        &lt;!-- Step Bean details ommitted for clarity --&gt;
+        &lt;bean id="playerload" parent="simpleStep" /&gt;
+        &lt;bean id="gameLoad" parent="simpleStep" /&gt;
+        &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
+      &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>Each <classname>Step</classname> will be executed in sequence until
+    all have completed successfully. Any Step that fails will cause the entire
+    job to fail.</para>
+
+    <section>
+      <title>Restartability</title>
+
+      <para>One key concern when execution a batch job, is what happens when a
+      failed job is restarted? A Job is considered to have been 'restarted' if
+      the same JobInstance has more than one JobExecution. Ideally, all jobs
+      should be able to start up where they left off, but there are scenarios
+      where this is not possible. <emphasis role="bold">It is entirely up to
+      the developer to ensure that a new instance is always created in this
+      scenario</emphasis>. However, Spring Batch does provide some help. If a
+      Job should never be restarted, but should always be run as part of a new
+      <classname>JobInstance</classname>, then the restartable property may be
+      set to 'false':</para>
+
+      <programlisting>  &lt;bean id="footballJob"
+        class="org.springframework.batch.core.job.SimpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;list&gt;
+        &lt;!-- Step Bean details ommitted for clarity --&gt;
+        &lt;bean id="playerload" parent="simpleStep" /&gt;
+        &lt;bean id="gameLoad" parent="simpleStep" /&gt;
+        &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
+      &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    <emphasis role="bold">&lt;property name="restartable" value="false" /&gt;</emphasis>
+  &lt;/bean&gt;</programlisting>
+
+      <para>To phrase it another way, setting restartable to false means "this
+      Job does not support being started again". Restarting a Job that is not
+      restartable will cause a <classname>JobRestartException</classname> to
+      be thrown:</para>
+
+      <programlisting>  Job job = new SimpleJob();
+  job.setRestartable(false);
+
+  JobParameters jobParameters = new JobParameters();
+
+  JobExecution firstExecution = jobRepository.createJobExecution(job, jobParameters);
+  jobRepository.saveOrUpdate(firstExecution);
+
+  try {
+    jobRepository.createJobExecution(job, jobParameters);
+    fail();
+  }
+  catch (JobRestartException e) {
+    // expected
+  }</programlisting>
+
+      <para>This snippet of JUnit code shows how attempting to create a
+      <classname>JobExecution</classname> the first time for a non restartable
+      <classname>job</classname> will cause no issues. However, the second
+      attempt will throw a <classname>JobRestartException</classname>.</para>
+    </section>
+
+    <section>
+      <title>Intercepting Job execution</title>
+
+      <para>During the course of the execution of a
+      <classname>Job</classname>, it may be useful to be notified of various
+      events in its lifecycle so that custom code may be executed. The
+      <classname>SimpleJob</classname> allows for this by calling a
+      <classname>JobListener</classname> at the appropriate time:</para>
+
+      <programlisting>  public interface JobListener {
+
+    void beforeJob(JobExecution jobExecution);
+
+    void afterJob(JobExecution jobExecution);
+
+    void onError(JobExecution jobExecution, Throwable e);
+
+    void onInterrupt(JobExecution jobExecution);
+  }</programlisting>
+
+      <para>Listeners can be added to a <classname>SimpleJob</classname> via
+      the setJobListeners property:</para>
+
+      <programlisting>  &lt;bean id="footballJob"
+        class="org.springframework.batch.core.job.SimpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;list&gt;
+        &lt;!-- Step Bean details ommitted for clarity --&gt;
+        &lt;bean id="playerload" parent="simpleStep" /&gt;
+        &lt;bean id="gameLoad" parent="simpleStep" /&gt;
+        &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
+      &lt;/list&gt;
+    &lt;/property&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+  &lt;property name="jobListeners"&gt;
+    &lt;bean class="org.springframework.batch.core.listener.JobListenerSupport" /&gt;
+  &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+    </section>
+
+    <section>
+      <title>JobFactory and Stateful Components in Steps</title>
+
+      <para>Unlike many traditional Spring applications, many of the
+      components of a batch application are stateful, the file readers and
+      writers are obvious examples. The recommended way to deal with this is
+      to create a fresh <classname>ApplicationContext</classname> for each job
+      execution. If the <classname>Job</classname> is launched from the
+      command line with <classname>CommandLineJobRunner</classname> this is
+      trivial. For more complex launching scenarios, where jobs are executed
+      in parallel or serially from the same process, some extra steps have to
+      be taken to ensure that the <classname>ApplicationContext</classname> is
+      refreshed. This is preferable to using prototype scope for the stateful
+      beans because then they would not receive lifecycle callbacks from the
+      container at the end of use. (e.g. through destroy-method in XML)</para>
+
+      <para>The strategy provided by Spring Batch to deal with this scenario
+      is the <classname>JobFactory</classname>, and the samples provide an
+      example of a specialized implementation that can load an
+      <classname>ApplicationContext</classname> and close it properly when the
+      job is finished. A relevant examples is
+      <classname>ClassPathXmlApplicationContextJobFactory</classname> and its
+      use in the <code>adhoc-job-launcher-context.xml</code> and the
+      <code>quartz-job-launcher-context.xml</code>, which can be found in the
+      Samples project.</para>
+    </section>
+  </section>
+
+  <section>
+    <title>Running a Job</title>
+
+    <para>Regardless of whether the originator is a Scheduler or an HTTP
+    request, a Job must be obtained, parameters must be parsed, and eventually
+    a <classname>JobLauncher</classname> called:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/run-tier.png" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/run-tier.png" />
+      </imageobject>
+    </mediaobject>
+
+    <section>
+      <title>Running Jobs from the Command Line</title>
+
+      <para>For users that want to run their jobs from an enterprise
+      scheduler, the command line is the primary interface. This is because
+      most schedulers (with the exception of Quartz unless using the
+      <classname>NativeJob</classname>) work directly with operating system
+      processes, primarily kicked off with shell scripts. There are many ways
+      to launch a Java process besides a shell script, such as Perl, Ruby, or
+      even 'build tools' such as ant or maven. However, because most people
+      are familiar with shell scripts, this example will focus on them.</para>
+
+      <section>
+        <title>The CommandLineJobRunner</title>
+
+        <para>Because the script launching the job must kick off a Java
+        Virtual Machine, there needs to be a class with a main method to act
+        as the primary entry point. Spring Batch provides an implementation
+        that serves just this purpose:
+        <classname>CommandLineJobRunner</classname>. It's important to note
+        that this is just one way to bootstrap your application, but there are
+        many ways to launch a Java process, and this class should in no way be
+        viewed as definitive. It performs four tasks:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Loads the appropriate Application Context</para>
+          </listitem>
+
+          <listitem>
+            <para>Parses command line arguments into JobParameters</para>
+          </listitem>
+
+          <listitem>
+            <para>Locates the appropriate job based on arguments</para>
+          </listitem>
+
+          <listitem>
+            <para>Uses the JobLauncher provided in the application context to
+            launch the job.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>All of these tasks are accomplished based completely upon the
+        arguments passed in. The following are required arguments:</para>
+
+        <table>
+          <title>CommandLineJobRunner arguments</title>
+
+          <tgroup cols="2">
+            <tbody>
+              <row>
+                <entry>jobPath</entry>
+
+                <entry>The location of the XML file that will be used to
+                create an <classname>ApplicationContext</classname>. This file
+                should contain everything needed to run the complete
+                <classname>Job</classname></entry>
+              </row>
+
+              <row>
+                <entry>jobName</entry>
+
+                <entry>The name of the job to be run.</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+
+        <para>These arguments must be passed in with the path first and the
+        name second. All arguments after these are considered to be
+        JobParameters and must be in the format of 'name=value':</para>
+
+        <screen><prompt>bash$</prompt> java CommandLineJobRunner endOfDayJob.xml endOfDay schedule.date(date)=2008/01/01</screen>
+
+        <para>In most cases you would want to use a manifest to declare your
+        main class in a jar, but for simplicity, the class was used directly.
+        This example is using the same 'EndOfDay' example from Chapter 2. The
+        first argument is 'endOfDayJob.xml', which is the Spring
+        <classname>ApplicationContext</classname> containing the Job. The
+        second argument, 'endOfDay' represents the job name. The final
+        argument, 'schedule.date=01-01-2008' will be converted into
+        <classname>JobParameters</classname>. An example of the XML
+        configuration is below:</para>
+
+        <programlisting>  &lt;bean id="endOfDay"
+        class="org.springframework.batch.core.job.SimpleJob"&gt;
+    &lt;property name="steps"&gt;
+      &lt;bean id="step1" parent="simpleStep" /&gt;
+      &lt;!-- Step details removed for clarity --&gt;
+    &lt;/property&gt; 
+  &lt;/bean&gt;
+
+  &lt;!-- Launcher details removed for clarity --&gt;
+  &lt;bean id="jobLauncher"
+        class="org.springframework.batch.core.launch.support.SimpleJobLauncher" /&gt;</programlisting>
+
+        <para>This example is overly simplistic, since there are many more
+        requirements to a run a batch job in Spring Batch in general, but it
+        serves to show the two main requirements of the
+        <classname>CommandLineJobRunner</classname>:
+        <classname>Job</classname> and
+        <classname>JobLauncher</classname></para>
+      </section>
+
+      <section>
+        <title>ExitCodes</title>
+
+        <para>When launching a batch job from the command-line, it is often
+        from an enterprise scheduler. Most schedulers are fairly dumb, and
+        work only at the process level. Meaning, they only know about some
+        operating system process such as a shell script that they're invoking.
+        In this scenario, the only way to communicate back to the scheduler
+        about the success or failure of a job is through return codes. A
+        number is returned to a scheduler that is told how to interpret the
+        result. In the simple case: 0 is success and 1 is failure. However,
+        there may be scenarios such as: If job A returns 4 kick off job B, if
+        it returns 5 kick off job C. This type of behavior is configured at
+        the scheduler level, but it is important that a processing framework
+        such as Spring Batch provide a way to return a numeric representation
+        of of the 'Exit Code' for a particular batch job. In Spring Batch this
+        is encapsulated within an <classname>ExitStatus</classname>, which is
+        covered in more detail in Chapter 5. For the purposes of discussing
+        exit codes, the only important thing to know is that an
+        <classname>ExitStatus</classname> has an exit code property that is
+        set by the framework (or the developer) and is returned as part of the
+        <classname>JobExecution</classname> returned from the
+        <classname>JobLauncher</classname>. The
+        <classname>CommandLineJobRunner</classname> converts this string value
+        to a number using the <classname>ExitCodeMapper</classname>
+        interface:</para>
+
+        <programlisting>  public interface ExitCodeMapper {
+
+    public int intValue(String exitCode);
+}</programlisting>
+
+        <para>The essential contract of an
+        <classname>ExitCodeMapper</classname> is that, given a string exit
+        code, a number representation will be returned. The default
+        implementation used by the job runner is the SimpleJvmExitCodeMapper
+        that returns 0 for completion, 1 for generic errors, and 2 for any job
+        runner errors such as not being able to find a
+        <classname>Job</classname> in the provided context. If anything more
+        complex than the 3 values above is needed, then a custom
+        implementation of the <classname>ExitCodeMapper</classname> interface
+        must be supplied. Because the
+        <classname>CommandLineJobRunner</classname> is the class that creates
+        an <classname>ApplicationContext</classname>, and thus cannot be
+        'wired together', any values that need to be overwritten must be
+        autowired. This means that if an implementation of
+        <classname>ExitCodeMapper</classname> is found within the BeanFactory,
+        it will be injected into the runner after the context is created. All
+        that needs to be done to provide your own
+        <classname>ExitCodeMapper</classname> is to declare the implementation
+        as a root level bean, and ensure it's part of the
+        <classname>ApplicationContext</classname> that is loaded by the
+        runner.</para>
+      </section>
+    </section>
+
+    <section>
+      <title>Running Jobs from within a container</title>
+
+      <para></para>
+    </section>
+  </section>
+
+  <section>
+    <title>Advanced Meta-Data Usage</title>
+
+    <para></para>
+
+    <section>
+      <title>Querying the repository</title>
+
+      <para></para>
+
+      <section>
+        <title>JobExporer</title>
+
+        <para></para>
+      </section>
+    </section>
+
+    <section>
+      <title>Stopping a Job</title>
+
+      <para>One of the most common reasons for wanting to launching a
+      <classname>job</classname> asynchronously is to be able to gracefully
+      stop it. This can be done through the
+      <classname>JobExecution</classname> returned by the
+      <classname>JobLauncher</classname>:</para>
+
+      <programlisting>  JobExecution jobExecution = launcher.run(getJob(), jobParameters);
+
+  //give job adequate time to start
+  Thread.sleep(1000);
+
+  assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
+  assertTrue(jobExecution.isRunning());
+
+  jobExecution.stop();
+
+  //give job time to stop
+  Thread.sleep(1000);
+
+  assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+  assertFalse(jobExecution.isRunning());</programlisting>
+
+      <para>The shutdown is not immediate, since there is no way to force
+      immediate shutdown, especially if the execution is currently in
+      developer code that the framework has no control over, such as a
+      business service. What it does mean, is that as soon as control is
+      returned back to the framework, it will set the status of the current
+      <classname>StepExecution</classname> to
+      <classname>BatchStatus.STOPPED</classname>, save it, then do the same
+      for the <classname>JobExecution</classname> before finishing.</para>
+
+      <section>
+        <title>JobOperator</title>
+
+        <para></para>
+      </section>
+    </section>
+  </section>
+
+  <section>
+    <title>Job Tier</title>
+
+    <para>The Job Tier is responsible for the overall execution of a batch
+    job. It sequentially executes batch steps, ensuring that all steps are in
+    the correct state and all appropriate policies are enforced:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/jobTier.png" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/jobTier.png" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The job tier is entirely concerned with maintaining the three job
+    stereotypes: <classname>Job</classname>,
+    <classname>JobInstance</classname>, and
+    <classname>JobExecution</classname>. The
+    <classname>JobLauncher</classname> interacts with the
+    <classname>JobRepository</classname> in order to create a
+    <classname>JobExecution</classname>, and the <classname>Job</classname>
+    stores the <classname>JobExecution</classname> using the
+    repository.</para>
+  </section>
+
+  <section>
+    <title>Examples of Customized Business Logic</title>
+
+    <section>
+      <para>Some batch jobs can be assembled purely from off-the-shelf
+      components in Spring Batch, mostly the <classname>ItemReader</classname>
+      and <classname>ItemWriter</classname> implementations. Where this is not
+      possible (the majority of cases) the main API entry points for
+      application developers are the <classname>Tasklet</classname>,
+      <classname>ItemReader</classname>, <classname>ItemWriter</classname> and
+      the various listener interfaces. Most simple batch jobs will be able to
+      use off-the-shelf input from a Spring Batch
+      <classname>ItemReader</classname>, but it is very often the case that
+      there are custom concerns in the processing and writing, which normally
+      leads developers to implement an <classname>ItemWriter</classname>, or
+      <classname>ItemTransformer</classname>.</para>
+
+      <para>Here we provide a few examples of common patterns in custom
+      business logic, mainly using the listener interfaces . It should be
+      noted that an <classname>ItemReader</classname> or
+      <classname>ItemWriter</classname> can implement the listener interfaces
+      as well if appropriate.</para>
+    </section>
+
+    <section>
+      <title>Logging Item Processing and Failures</title>
+
+      <para>A common use case is the need for special handling of errors in a
+      step, item by item, perhaps logging to a special channel, or inserting a
+      record into a database. The <classname>StepHandlerStep</classname>
+      (created from the step factory beans) allows users to implement this use
+      case with a simple <classname>ItemReadListener</classname>, for errors
+      on read, and an <classname>ItemWriteListener</classname>, for errors on
+      write. The below code snippets illustrate a listener that logs both read
+      and write failures:</para>
+
+      <programlisting>public class ItemFailureLoggerListener extends ItemListenerSupport {
+
+    private static Log logger = LogFactory.getLog("item.error");    
+
+    public void onReadError(Exception ex) {
+        logger.error("Encountered error on read", e);
+    }
+
+    public void onWriteError(Exception ex, Object item) {
+        logger.error("Encountered error on write", e);
+    }
+
+}</programlisting>
+
+      <para>Having implemented this listener it must be registered with the
+      step:</para>
+
+      <programlisting>&lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    ...
+    &lt;property name="listeners"&gt;
+        &lt;bean class="org.example...ItemFailureLoggerListener"/&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>Remember that if your listener does anything in an
+      <code>onError()</code> method, it will be inside a transaction that is
+      going to be rolled back. If you need to use a transactional resource
+      such as a database inside an <code>onError()</code> method, consider
+      adding a declarative transaction to that method (see Spring Core
+      Reference Guide for details), and giving its propagation attribute the
+      value REQUIRES_NEW.</para>
+    </section>
+
+    <section>
+      <title>Stopping a Job Manually for Business Reasons</title>
+
+      <para>Spring Batch provides a stop() method through the JobLauncher
+      interface, but this is really aimed at the operator, rather than the
+      application programmer. Sometimes it is more convenient or makes more
+      sense to stop a job execution from within the business logic.</para>
+
+      <para>The simplest thing to do is to throw a RuntimeException (one that
+      isn't retried indefinitely or skipped), For example, a custom exception
+      type could be used, as in the example below:</para>
+
+      <programlisting>public class PoisonPillItemWriter extends AbstractItemWriter {
+    
+    public void write(Object item) throws Exception {
+
+        if (isPoisonPill(item)) {
+            throw new PoisonPillException("Posion pill detected: "+item);
+       }
+
+    }
+
+}</programlisting>
+
+      <para>Another simple way to stop a step from executing is to simply
+      return <code>null</code> from the
+      <classname>ItemReader</classname>:</para>
+
+      <programlisting>public class EarlyCompletionItemReader extends AbstractItemReader {
+
+    private ItemReader delegate;
+
+    public void setDelegate(ItemReader delegate) { ... }
+    
+    public Object read() throws Exception {
+
+        Object item = delegate.read();
+
+        if (isEndItem(item)) {
+            return null; // end the step here
+        }
+
+        return item;
+
+    }
+
+}</programlisting>
+
+      <para>The previous example actually relies on the fact that there is a
+      default implementation of the <classname>CompletionPolicy</classname>
+      strategy which signals a complete batch when the item to be processed is
+      null. A more sophisticated completion policy could be implemented and
+      injected into the <classname>Step</classname> through the
+      <classname>RepeatOperationsStepFactoryBean</classname>:</para>
+
+      <programlisting>&lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBean" &gt;
+    ...
+    &lt;property name="chunkOperations"&gt;
+        &lt;bean class="org.springframework.batch.repeat.support.RepeatTemplate"&gt;
+            &lt;property name="completionPolicy"&gt;
+                &lt;bean class="org.example...SpecialCompletionPolicy"/&gt;
+            &lt;/property&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+      <para>An alternative is to set a flag in the
+      <classname>StepExecution</classname>, which is checked by the
+      <classname>Step</classname> implementations in the framework in between
+      item processing. To implement this alternative, we need access to the
+      current StepExecution, and this can be achieved by implementing a
+      StepListener and registering it with the Step. Here is an example of a
+      listener that sets the flag:</para>
+
+      <programlisting>public class CustomItemWriter extends ItemListenerSupport implements StepListener {
+
+    private StepExecution stepExecution;    
+
+    public void beforeStep(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
+
+    public void afterRead(Object item) {
+
+        if (isPoisonPill(item)) {
+            stepExecution.setTerminateOnly(true);
+       }
+
+    }
+
+}</programlisting>
+
+      <para>The default behaviour here when the flag is set is for the step to
+      throw a <classname>JobInterruptedException</classname>. This can be
+      controlled through the <classname>StepInterruptionPolicy</classname>,
+      but the only choice is to throw or not throw an exception, so this is
+      always an abnormal ending to a job.</para>
+    </section>
+
+    <section>
+      <title>Adding a Footer Record</title>
+
+      <para>A very common requirement is to aggregate information during the
+      output process and to append a record at the end of a file summarizing
+      the data, or providing a checksum. This can also be achieved with a
+      callbacks in the step, normally as part of a custom
+      <classname>ItemWriter</classname>. In this case, since a job is
+      accumulating state that should not be lost if the job aborts, the
+      <classname>ItemStream</classname> interface should be
+      implemented:</para>
+
+      <programlisting>public class CustomItemWriter extends AbstractItemWriter implements 
+    ItemStream, StepListener
+{
+
+    private static final String TOTAL_AMOUNT_KEY = "total.amount";
+
+    private ItemWriter delegate;
+
+    private double totalAmount = 0.0;
+
+    public void setDelegate(ItemWriter delegate) { ... }
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        // Add the footer record here...
+        delegate.write("Total Amount Processed: " + totalAmount);
+    }
+
+    public void open(ExecutionContext executionContext) {
+        if (executionContext.containsKey(TOTAL_AMOUNT_KEY) {
+            totalAmount = executionContext.getDouble(TOTAL_AMOUNT_KEY);
+        }
+    }
+
+    public void update(ExecutionContext executionContext) {
+        executionContext.setDouble(TOTAL_AMOUNT_KEY, totalAmount);
+    }
+    
+    public void write(Object item) {
+
+        delegate.write(item);
+        totalAmount += ((Trade) item).getAmount();
+
+    }
+
+}</programlisting>
+
+      <para>The custom writer in the example is stateful (it maintains its
+      total in an instance variable <varname>totalAmount</varname>), but the
+      state is stored through the <classname>ItemStream</classname> interface
+      in the <classname>ExecutionContext</classname>. In this way we can be
+      sure that when the <code>open()</code> callback is received on a
+      restart. The framework garuntees we always get the last value that was
+      committed. It should be noted that it is not always necessary to
+      implement ItemStream. For example, if the ItemWriter is re-runnable, in
+      the sense that it maintains its own state in a transactional resource
+      like a database, there is no need to maintain state within the writer
+      itself.</para>
+    </section>
+  </section>
+</chapter>
