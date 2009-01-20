@@ -46,26 +46,20 @@ import org.springframework.util.Assert;
  */
 public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implements ExecutionContextDao {
 
-	private static final String COUNT_JOB_EXECUTION_CONTEXT = "SELECT COUNT(*) FROM %PREFIX%JOB_EXECUTION_CONTEXT "
-			+ "WHERE JOB_EXECUTION_ID = ?";
-
 	private static final String FIND_JOB_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT "
 			+ "FROM %PREFIX%JOB_EXECUTION_CONTEXT WHERE JOB_EXECUTION_ID = ?";
 
 	private static final String INSERT_JOB_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%JOB_EXECUTION_CONTEXT "
-			+ "(JOB_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " + "VALUES(?, ?, ?)";
+			+ "(SHORT_CONTEXT, SERIALIZED_CONTEXT, JOB_EXECUTION_ID) " + "VALUES(?, ?, ?)";
 
 	private static final String UPDATE_JOB_EXECUTION_CONTEXT = "UPDATE %PREFIX%JOB_EXECUTION_CONTEXT "
 			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE JOB_EXECUTION_ID = ?";
-
-	private static final String COUNT_STEP_EXECUTION_CONTEXT = "SELECT COUNT(*) FROM %PREFIX%STEP_EXECUTION_CONTEXT "
-			+ "WHERE STEP_EXECUTION_ID = ?";
 
 	private static final String FIND_STEP_EXECUTION_CONTEXT = "SELECT SHORT_CONTEXT, SERIALIZED_CONTEXT "
 			+ "FROM %PREFIX%STEP_EXECUTION_CONTEXT WHERE STEP_EXECUTION_ID = ?";
 
 	private static final String INSERT_STEP_EXECUTION_CONTEXT = "INSERT INTO %PREFIX%STEP_EXECUTION_CONTEXT "
-			+ "(STEP_EXECUTION_ID, SHORT_CONTEXT, SERIALIZED_CONTEXT) " + "VALUES(?, ?, ?)";
+			+ "(SHORT_CONTEXT, SERIALIZED_CONTEXT, STEP_EXECUTION_ID) " + "VALUES(?, ?, ?)";
 
 	private static final String UPDATE_STEP_EXECUTION_CONTEXT = "UPDATE %PREFIX%STEP_EXECUTION_CONTEXT "
 			+ "SET SHORT_CONTEXT = ?, SERIALIZED_CONTEXT = ? " + "WHERE STEP_EXECUTION_ID = ?";
@@ -125,7 +119,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		String serializedContext = serializeContext(executionContext);
 
-		persistSerializedContext(executionId, serializedContext, true);
+		persistSerializedContext(executionId, serializedContext, UPDATE_JOB_EXECUTION_CONTEXT);
 	}
 
 	/**
@@ -142,15 +136,30 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 
 		String serializedContext = serializeContext(executionContext);
 
-		persistSerializedContext(executionId, serializedContext, false);
+		persistSerializedContext(executionId, serializedContext, UPDATE_STEP_EXECUTION_CONTEXT);
 	}
 
 	public void saveExecutionContext(JobExecution jobExecution) {
-		updateExecutionContext(jobExecution);
+
+		Long executionId = jobExecution.getId();
+		ExecutionContext executionContext = jobExecution.getExecutionContext();
+		Assert.notNull(executionId, "ExecutionId must not be null.");
+		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
+
+		String serializedContext = serializeContext(executionContext);
+
+		persistSerializedContext(executionId, serializedContext, INSERT_JOB_EXECUTION_CONTEXT);
 	}
 
 	public void saveExecutionContext(StepExecution stepExecution) {
-		updateExecutionContext(stepExecution);
+		Long executionId = stepExecution.getId();
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		Assert.notNull(executionId, "ExecutionId must not be null.");
+		Assert.notNull(executionContext, "The ExecutionContext must not be null.");
+
+		String serializedContext = serializeContext(executionContext);
+
+		persistSerializedContext(executionId, serializedContext, INSERT_STEP_EXECUTION_CONTEXT);
 	}
 
 	public void setLobHandler(LobHandler lobHandler) {
@@ -164,13 +173,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 		((XStreamExecutionContextStringSerializer) serializer).afterPropertiesSet();
 	}
 
-	private void persistSerializedContext(final Long executionId, String serializedContext,
-			boolean isJobExecutionContext) {
-		String countSql = isJobExecutionContext ? COUNT_JOB_EXECUTION_CONTEXT : COUNT_STEP_EXECUTION_CONTEXT;
-		String updateSql = isJobExecutionContext ? UPDATE_JOB_EXECUTION_CONTEXT : UPDATE_STEP_EXECUTION_CONTEXT;
-		String insertSql = isJobExecutionContext ? INSERT_JOB_EXECUTION_CONTEXT : INSERT_STEP_EXECUTION_CONTEXT;
-
-		int count = getJdbcTemplate().queryForInt(getQuery(countSql), executionId);
+	private void persistSerializedContext(final Long executionId, String serializedContext, String sql) {
 
 		final String shortContext;
 		final String longContext;
@@ -183,34 +186,18 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 			longContext = null;
 		}
 
-		if (count > 0) {
-			getJdbcTemplate().getJdbcOperations().update(getQuery(updateSql), new PreparedStatementSetter() {
-				public void setValues(PreparedStatement ps) throws SQLException {
-					ps.setString(1, shortContext);
-					if (longContext != null) {
-						lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
-					}
-					else {
-						ps.setNull(2, Types.CLOB);
-					}
-					ps.setLong(3, executionId);
+		getJdbcTemplate().getJdbcOperations().update(getQuery(sql), new PreparedStatementSetter() {
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, shortContext);
+				if (longContext != null) {
+					lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
 				}
-			});
-		}
-		else {
-			getJdbcTemplate().getJdbcOperations().update(getQuery(insertSql), new PreparedStatementSetter() {
-				public void setValues(PreparedStatement ps) throws SQLException {
-					ps.setLong(1, executionId);
-					ps.setString(2, shortContext);
-					if (longContext != null) {
-						lobHandler.getLobCreator().setClobAsString(ps, 3, longContext);
-					}
-					else {
-						ps.setNull(3, Types.CLOB);
-					}
+				else {
+					ps.setNull(2, Types.CLOB);
 				}
-			});
-		}
+				ps.setLong(3, executionId);
+			}
+		});
 	}
 
 	private String serializeContext(ExecutionContext ctx) {

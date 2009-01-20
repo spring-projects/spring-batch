@@ -147,9 +147,9 @@ public class JobRepositoryTestUtils implements InitializingBean {
 						stepExecutionId);
 				jdbcTemplate.update("delete from BATCH_STEP_EXECUTION where STEP_EXECUTION_ID=?", stepExecutionId);
 			}
-			jdbcTemplate.update("delete from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", jobExecution.getId());
 			jdbcTemplate.update("delete from BATCH_JOB_EXECUTION_CONTEXT where JOB_EXECUTION_ID=?", jobExecution
 					.getId());
+			jdbcTemplate.update("delete from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID=?", jobExecution.getId());
 			jdbcTemplate.update("delete from BATCH_JOB_PARAMS where JOB_INSTANCE_ID=?", jobExecution.getJobId());
 			jdbcTemplate.update("delete from BATCH_JOB_INSTANCE where JOB_INSTANCE_ID=?", jobExecution.getJobId());
 		}

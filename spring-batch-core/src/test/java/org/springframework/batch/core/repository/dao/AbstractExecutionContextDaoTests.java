@@ -72,11 +72,11 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testSaveAndFindContext() {
+	public void testSaveAndFindJobContext() {
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
-		contextDao.updateExecutionContext(jobExecution);
+		contextDao.saveExecutionContext(jobExecution);
 
 		ExecutionContext retrieved = contextDao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
@@ -84,11 +84,11 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 	@Transactional
 	@Test
-	public void testSaveAndFindEmptyContext() {
+	public void testSaveAndFindEmptyJobContext() {
 
 		ExecutionContext ctx = new ExecutionContext();
 		jobExecution.setExecutionContext(ctx);
-		contextDao.updateExecutionContext(jobExecution);
+		contextDao.saveExecutionContext(jobExecution);
 
 		ExecutionContext retrieved = contextDao.getExecutionContext(jobExecution);
 		assertEquals(ctx, retrieved);
@@ -101,7 +101,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		ExecutionContext ctx = new ExecutionContext(Collections
 				.<String, Object> singletonMap("key", "value"));
 		jobExecution.setExecutionContext(ctx);
-		contextDao.updateExecutionContext(jobExecution);
+		contextDao.saveExecutionContext(jobExecution);
 
 		ctx.putLong("longKey", 7);
 		contextDao.updateExecutionContext(jobExecution);
@@ -117,7 +117,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
-		contextDao.updateExecutionContext(stepExecution);
+		contextDao.saveExecutionContext(stepExecution);
 
 		ExecutionContext retrieved = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
@@ -129,7 +129,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext();
 		stepExecution.setExecutionContext(ctx);
-		contextDao.updateExecutionContext(stepExecution);
+		contextDao.saveExecutionContext(stepExecution);
 
 		ExecutionContext retrieved = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ctx, retrieved);
@@ -141,7 +141,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 
 		ExecutionContext ctx = new ExecutionContext(Collections.<String, Object> singletonMap("key", "value"));
 		stepExecution.setExecutionContext(ctx);
-		contextDao.updateExecutionContext(stepExecution);
+		contextDao.saveExecutionContext(stepExecution);
 
 		ctx.putLong("longKey", 7);
 		contextDao.updateExecutionContext(stepExecution);
@@ -158,7 +158,7 @@ public abstract class AbstractExecutionContextDaoTests extends AbstractTransacti
 		ExecutionContext ec = new ExecutionContext();
 		ec.put("intValue", new Integer(343232));
 		stepExecution.setExecutionContext(ec);
-		contextDao.updateExecutionContext(stepExecution);
+		contextDao.saveExecutionContext(stepExecution);
 		ExecutionContext restoredEc = contextDao.getExecutionContext(stepExecution);
 		assertEquals(ec, restoredEc);
 	}

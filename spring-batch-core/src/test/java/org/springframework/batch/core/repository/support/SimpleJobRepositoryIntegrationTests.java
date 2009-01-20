@@ -105,7 +105,6 @@ public class SimpleJobRepositoryIntegrationTests {
 		// first execution
 		JobExecution firstJobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
 		StepExecution firstStepExec = new StepExecution(step.getName(), firstJobExec);
-		jobRepository.update(firstJobExec);
 		jobRepository.add(firstStepExec);
 
 		assertEquals(1, jobRepository.getStepExecutionCount(firstJobExec.getJobInstance(), step.getName()));
@@ -124,7 +123,6 @@ public class SimpleJobRepositoryIntegrationTests {
 		// second execution
 		JobExecution secondJobExec = jobRepository.createJobExecution(job.getName(), jobParameters);
 		StepExecution secondStepExec = new StepExecution(step.getName(), secondJobExec);
-		jobRepository.update(secondJobExec);
 		jobRepository.add(secondStepExec);
 
 		assertEquals(2, jobRepository.getStepExecutionCount(secondJobExec.getJobInstance(), step.getName()));
@@ -150,7 +148,6 @@ public class SimpleJobRepositoryIntegrationTests {
 		stepExec.setExecutionContext(ctx);
 
 		jobRepository.add(stepExec);
-		jobRepository.updateExecutionContext(stepExec);
 
 		StepExecution retrievedStepExec = jobRepository.getLastStepExecution(jobExec.getJobInstance(), step.getName());
 		assertEquals(stepExec, retrievedStepExec);
