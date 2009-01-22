@@ -126,11 +126,18 @@ public interface JobRepository {
 
 	/**
 	 * Persist the updated {@link ExecutionContext}s of the given
-	 * {@link StepExecution} and corresponding {@link JobExecution}.
+	 * {@link StepExecution}.
 	 * 
 	 * @param stepExecution
 	 */
 	void updateExecutionContext(StepExecution stepExecution);
+
+	/**
+	 * Persist the updated {@link ExecutionContext} of the given
+	 * {@link JobExecution}.
+	 * @param jobExecution
+	 */
+	void updateExecutionContext(JobExecution jobExecution);
 
 	/**
 	 * @param stepName the name of the step execution that might have run.

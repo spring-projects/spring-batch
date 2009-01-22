@@ -15,16 +15,21 @@
  */
 package org.springframework.batch.core.job;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+
+import java.util.Date;
 
 import org.junit.Test;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
+import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.StepSupport;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
 /**
  * @author Dave Syer
@@ -35,7 +40,8 @@ public class AbstractJobTests {
 	AbstractJob job = new StubJob("job");
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#getName()}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.job.AbstractJob#getName()}.
 	 */
 	@Test
 	public void testGetName() {
@@ -44,7 +50,9 @@ public class AbstractJobTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}
+	 * .
 	 */
 	@Test
 	public void testSetBeanName() {
@@ -53,7 +61,9 @@ public class AbstractJobTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.job.AbstractJob#setBeanName(java.lang.String)}
+	 * .
 	 */
 	@Test
 	public void testSetBeanNameWithNullName() {
@@ -64,7 +74,9 @@ public class AbstractJobTests {
 	}
 
 	/**
-	 * Test method for {@link org.springframework.batch.core.job.AbstractJob#setRestartable(boolean)}.
+	 * Test method for
+	 * {@link org.springframework.batch.core.job.AbstractJob#setRestartable(boolean)}
+	 * .
 	 */
 	@Test
 	public void testSetRestartable() {
@@ -78,7 +90,7 @@ public class AbstractJobTests {
 		String value = job.toString();
 		assertTrue("Should contain name: " + value, value.indexOf("name=") >= 0);
 	}
-	
+
 	@Test
 	public void testAfterPropertiesSet() throws Exception {
 		job.setJobRepository(null);
@@ -92,8 +104,51 @@ public class AbstractJobTests {
 	}
 
 	/**
+	 * Runs the step and persists job execution context.
+	 */
+	@Test
+	public void testHandleStep() throws Exception {
+		
+		class StubStep extends StepSupport {
+
+			static final String value = "message for next steps";
+
+			static final String key = "StubStep";
+
+			{
+				setName("StubStep");
+			}
+
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+				stepExecution.getJobExecution().getExecutionContext().put(key, value);
+			}
+		}
+		
+		MapJobRepositoryFactoryBean.clear();
+		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
+		factory.setTransactionManager(new ResourcelessTransactionManager());
+		factory.afterPropertiesSet();
+		JobRepository repository = (JobRepository) factory.getObject();
+		job.setJobRepository(repository);
+		job.setRestartable(true);
+
+		JobExecution execution = repository.createJobExecution("testHandleStepJob", new JobParameters());
+		job.handleStep(new StubStep(), execution);
+
+		assertEquals(StubStep.value, execution.getExecutionContext().get(StubStep.key));
+
+		// simulate restart and check the job execution context's content survives
+		execution.setEndTime(new Date());
+		execution.setStatus(BatchStatus.FAILED);
+		repository.update(execution);
+
+		JobExecution restarted = repository.createJobExecution("testHandleStepJob", new JobParameters());
+		assertEquals(StubStep.value, restarted.getExecutionContext().get(StubStep.key));
+	}
+
+	/**
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	private static class StubJob extends AbstractJob {
 		/**

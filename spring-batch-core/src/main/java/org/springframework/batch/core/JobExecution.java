@@ -218,7 +218,8 @@ public class JobExecution extends Entity {
 	}
 
 	/**
-	 * Returns the {@link ExecutionContext} for this execution
+	 * Returns the {@link ExecutionContext} for this execution. The content is
+	 * expected to be persisted after each step completion (successful or not).
 	 * 
 	 * @return the context
 	 */

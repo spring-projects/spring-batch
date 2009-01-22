@@ -173,8 +173,11 @@ public class SimpleJobRepository implements JobRepository {
 	}
 
 	public void updateExecutionContext(StepExecution stepExecution) {
-		ecDao.updateExecutionContext(stepExecution.getJobExecution());
 		ecDao.updateExecutionContext(stepExecution);
+	}
+	
+	public void updateExecutionContext(JobExecution jobExecution) {
+		ecDao.updateExecutionContext(jobExecution);
 	}
 
 	public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
@@ -242,8 +245,14 @@ public class SimpleJobRepository implements JobRepository {
 		if (jobInstance == null) {
 			return null;
 		}
-		return jobExecutionDao.getLastJobExecution(jobInstance);
+		JobExecution jobExecution = jobExecutionDao.getLastJobExecution(jobInstance);
+	
+		if (jobExecution != null) {
+			jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
+		}
+		return jobExecution;
 
 	}
+
 
 }

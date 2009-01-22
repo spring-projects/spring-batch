@@ -82,4 +82,7 @@ public class JobRepositorySupport implements JobRepository {
 		return null;
 	}
 
+	public void updateExecutionContext(JobExecution jobExecution) {
+	}
+
 }

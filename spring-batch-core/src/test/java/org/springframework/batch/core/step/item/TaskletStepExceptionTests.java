@@ -280,6 +280,9 @@ public class TaskletStepExceptionTests {
 		public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 			return null;
 		}
+
+		public void updateExecutionContext(JobExecution jobExecution) {
+		}
 	}
 
 }
