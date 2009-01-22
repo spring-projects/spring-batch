@@ -28,7 +28,6 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/JobRepositoryParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/partition/launch-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/scope/util/MultipleContextPlaceholderTargetSourceTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeFailureJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/scope/util/PlaceholderTargetSourceTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/RepositoryJobParserTests-context.xml</config>
@@ -43,6 +42,11 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepWithFaultTolerantProcessTaskJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepWithSimpleTaskJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/EndTransitionJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeDefaultFailureJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeMultipleFinalJobParserTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

@@ -135,8 +135,7 @@ public class StepParser {
 				BeanDefinitionBuilder endBuilder = 
 					BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
 				endBuilder.addConstructorArgValue(status);
-				String endName = "end" + endCounter;
-				endCounter++;
+				String endName = "stop".equals(name) ? "end" + (endCounter++) : null;
 
 				endBuilder.addConstructorArgValue(endName);
 				list.add(getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), onAttribute, nextOnEnd));
@@ -145,6 +144,11 @@ public class StepParser {
 			}
 			list.add(getStateTransitionReference(parserContext, stateDef, onAttribute, nextAttribute));
 		}
+
+		if(hasNextAttribute && nextElements.isEmpty()) 
+		{ 
+		    list.add(getStateTransitionReference(parserContext, stateDef, "FAILED", null));
+		} 
 
 		if (list.isEmpty() && !hasNextAttribute) {
 			list.add(getStateTransitionReference(parserContext, stateDef, null, null));
