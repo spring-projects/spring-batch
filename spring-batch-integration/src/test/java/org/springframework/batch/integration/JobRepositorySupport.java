@@ -69,6 +69,9 @@ public class JobRepositorySupport implements JobRepository {
 	 */
 	public void updateExecutionContext(StepExecution stepExecution) {
 	}
+	
+	public void updateExecutionContext(JobExecution jobExecution) {
+	}
 
 	public void add(StepExecution stepExecution) {
 	}
@@ -86,5 +89,6 @@ public class JobRepositorySupport implements JobRepository {
 	public JobExecution getLastJobExecution(String jobName, JobParameters jobParameters) {
 		return null;
 	}
+
 
 }
