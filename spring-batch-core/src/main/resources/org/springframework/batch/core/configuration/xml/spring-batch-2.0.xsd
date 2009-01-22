@@ -189,26 +189,26 @@
 				</xsd:element>			
 			</xsd:choice>
 			<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-							List of all listeners for the job
-							]]>
-							</xsd:documentation>
-						</xsd:annotation>
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="listener" minOccurs="1"
-									maxOccurs="unbounded">
-									<xsd:complexType>
-										<xsd:attribute name="id" type="xsd:ID" />
-										<xsd:attribute name="ref" type="xsd:string" />
-										<xsd:attribute name="class" type="xsd:string" />
-										<xsd:attribute name="before-method" type="xsd:string" />
-										<xsd:attribute name="after-method" type="xsd:string" />
-									</xsd:complexType>
-								</xsd:element>
-							</xsd:sequence>
-						</xsd:complexType>
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of all listeners for the job
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="listener" minOccurs="1"
+							maxOccurs="unbounded">
+							<xsd:complexType>
+								<xsd:attribute name="id" type="xsd:ID" />
+								<xsd:attribute name="ref" type="xsd:string" />
+								<xsd:attribute name="class" type="xsd:string" />
+								<xsd:attribute name="before-method" type="xsd:string" />
+								<xsd:attribute name="after-method" type="xsd:string" />
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
@@ -217,9 +217,7 @@
 		<xsd:complexContent>
 			<xsd:extension base="nextType">
 				<xsd:sequence>
-					<xsd:sequence>
-						<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
-					</xsd:sequence>
+					<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
 					<xsd:group ref="transitions"/>
 					<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
@@ -244,7 +242,7 @@
 	<xsd:complexType name="taskletType">
 		<xsd:complexContent>
 			<xsd:extension base="beans:identifiedType">
-				<xsd:sequence>
+				<xsd:all>
 					<xsd:element name="retry-listeners" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
@@ -308,7 +306,7 @@
 							<xsd:restriction base="xsd:string"/>
 						</xsd:simpleType>
 					</xsd:element>
-				</xsd:sequence>
+				</xsd:all>
 				<xsd:attribute name="commit-interval" type="xsd:integer" use="required">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
