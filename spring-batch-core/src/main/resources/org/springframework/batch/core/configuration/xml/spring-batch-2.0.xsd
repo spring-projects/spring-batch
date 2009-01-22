@@ -245,19 +245,6 @@
 		<xsd:complexContent>
 			<xsd:extension base="beans:identifiedType">
 				<xsd:sequence>
-					<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-							List of all listeners for the step definition
-							]]>
-							</xsd:documentation>
-						</xsd:annotation>
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded"/>
-							</xsd:sequence>
-						</xsd:complexType>
-					</xsd:element>
 					<xsd:element name="retry-listeners" minOccurs="0" maxOccurs="1">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
