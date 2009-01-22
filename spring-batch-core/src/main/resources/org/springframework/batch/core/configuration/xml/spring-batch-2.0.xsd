@@ -48,7 +48,7 @@
 							</xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="restartable" type="xsd:boolean"
+					<xsd:attribute name="restartable" type="xsd:string"
 						default="false" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
@@ -307,7 +307,7 @@
 						</xsd:simpleType>
 					</xsd:element>
 				</xsd:all>
-				<xsd:attribute name="commit-interval" type="xsd:integer" use="required">
+				<xsd:attribute name="commit-interval" type="xsd:string" use="required">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The number of items that will be processed before commit is called for the transaction.
@@ -335,21 +335,21 @@
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="skip-limit" type="xsd:integer" use="optional">
+				<xsd:attribute name="skip-limit" type="xsd:string" use="optional">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The maximum number of items that will be allowed to be skipped.
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="retry-limit" type="xsd:integer" use="optional">
+				<xsd:attribute name="retry-limit" type="xsd:string" use="optional">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The maximum number of times the processing of an item will be retried.
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="cache-capacity" type="xsd:integer" use="optional">
+				<xsd:attribute name="cache-capacity" type="xsd:string" use="optional">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						The capacity of the cache in the retry policy.
@@ -364,7 +364,7 @@
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
-				<xsd:attribute name="is-reader-transactional-queue" type="xsd:boolean" default="false" use="optional">
+				<xsd:attribute name="is-reader-transactional-queue" type="xsd:string" default="false" use="optional">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
 						Whether the reader is a transactional queue. If it is then items read should not be cached 
