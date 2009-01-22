@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<job id="job">
+		<step name="step">
+			<tasklet reader="reader" processor="processor" writer="writer"
+					start-limit="25" allow-start-if-complete="true"
+					commit-interval="10" skip-limit="20" 
+					retry-limit="3" cache-capacity="100"
+					transaction-attribute="PROPAGATION_REQUIRED,ISOLATION_DEFAULT,timeout_10,-org.springframework.dao.DataIntegrityViolationException" 
+					is-reader-transactional-queue="true"
+					task-executor="taskExecutor">
+				<retry-listeners>
+					<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener"/>
+				</retry-listeners>
+				<streams>
+					<stream ref="reader"/>
+				</streams>
+				<fatal-exception-classes>
+					org.springframework.jdbc.BadSqlGrammarException
+				</fatal-exception-classes>
+				<skippable-exception-classes>
+					org.springframework.dao.DataIntegrityViolationException
+				</skippable-exception-classes>
+			</tasklet>
+			<listeners>
+				<listener ref="listener"/>
+			</listeners>
+		</step>
+	</job>
+
+	<beans:bean id="reader" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+	
+	<beans:bean id="processor" class="org.springframework.batch.core.configuration.xml.TestProcessor"/>
+	
+	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
+
+	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+	
+	<beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor"/>
+
+	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
+
+	<beans:bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<beans:property name="transactionManager" ref="transactionManager" />
+	</beans:bean>
+
+</beans:beans>

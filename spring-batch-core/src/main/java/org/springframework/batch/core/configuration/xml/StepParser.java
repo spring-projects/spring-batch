@@ -70,12 +70,12 @@ public class StepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
 		if (StringUtils.hasText(taskletRef)) {
-			Object task = handleTaskletStep(element, taskletRef, parserContext);
+			Object task = handleTaskletRef(element, taskletRef, parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
 		else if (processTaskElements.size() > 0) {
-			Object task = handleChunkOrientedTaskletStep(element, processTaskElements.get(0), parserContext);
+			Object task = handleTaskletElement(element, processTaskElements.get(0), parserContext);
 			stateBuilder.addConstructorArgValue(stepRef);
 			stateBuilder.addConstructorArgValue(task);
 		}
@@ -199,7 +199,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition handleTaskletStep(Element stepElement, String taskletRef, ParserContext parserContext) {
+	protected RootBeanDefinition handleTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext) {
 
     	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
 
@@ -229,7 +229,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition handleChunkOrientedTaskletStep(Element stepElement, Element element, ParserContext parserContext) {
+	protected RootBeanDefinition handleTaskletElement(Element stepElement, Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd;
     	
@@ -265,6 +265,15 @@ public class StepParser {
         }
 
 		// now, set the properties on the new bean 
+        String startLimit = element.getAttribute("start-limit");
+        if (StringUtils.hasText(startLimit)) {
+            bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
+        }
+        String allowStartIfComplete = element.getAttribute("allow-start-if-complete");
+        if (StringUtils.hasText(allowStartIfComplete)) {
+            bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
+        }
+
         String readerBeanId = element.getAttribute("reader");
         if (StringUtils.hasText(readerBeanId)) {
             RuntimeBeanReference readerRef = new RuntimeBeanReference(readerBeanId);

@@ -16,10 +16,16 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.util.Map;
+
 import org.junit.Test;
+import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
@@ -28,6 +34,18 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class StepParserTests {
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testTaskletStepAttributes() throws Exception {
+		ConfigurableApplicationContext ctx = 
+			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml");
+		Map<String, Object> beans = ctx.getBeansOfType(FaultTolerantStepFactoryBean.class);
+		String factoryName = (String) beans.keySet().toArray()[0];
+		FaultTolerantStepFactoryBean<Object, Object> factory = (FaultTolerantStepFactoryBean<Object, Object>) beans.get(factoryName);
+		TaskletStep bean = (TaskletStep) factory.getObject();
+		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
+	}
+
 	@Test
 	public void testTaskletStepWithBadStepListener() throws Exception {
 		loadContextWithBadListener("org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml");
