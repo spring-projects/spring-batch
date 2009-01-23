@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:batch="http://www.springframework.org/schema/batch"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" 
+	xmlns:beans="http://www.springframework.org/schema/beans" 
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p"
@@ -11,81 +11,78 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<batch:job id="restartSampleJob" restartable="true">
-		<batch:step name="step1"/>
-	</batch:job>
-
-	<bean id="step1" parent="simpleStep">
-		<property name="streams" ref="fileItemReader" />
-		<property name="itemReader" ref="itemReader" />
-			<property name="itemProcessor">
-				<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-					<constructor-arg ref="fixedValidator" />
-				</bean>
-			</property>	
-		<property name="itemWriter">
-			<bean
-				class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
-				<property name="dao" ref="tradeDao" />
-			</bean>
-		</property>
-		<property name="commitInterval" value="2" />
-	</bean>
+	<job id="restartSampleJob" restartable="true">
+		<step name="step1">
+			<tasklet reader="itemReader" processor="processor" writer="tradeWriter" commit-interval="2">
+				<streams>
+					<stream ref="fileItemReader"/>
+				</streams>
+			</tasklet>
+		</step>
+	</job>
 
 	<!-- INFRASTRUCTURE SETUP -->
 
-	<bean id="itemReader"
+	<beans:bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<beans:constructor-arg ref="fixedValidator" />
+	</beans:bean>
+
+	<beans:bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+		<beans:property name="dao" ref="tradeDao" />
+	</beans:bean>
+
+	<beans:bean id="itemReader"
 		class="org.springframework.batch.sample.support.ExceptionThrowingItemReaderProxy">
-		<property name="delegate" ref="fileItemReader" />
-	</bean>
+		<beans:property name="delegate" ref="fileItemReader" />
+	</beans:bean>
 
-	<bean id="fileItemReader"
+	<beans:bean id="fileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource"
+		<beans:property name="resource"
 			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer" ref="fixedFileTokenizer" />
-				<property name="fieldSetMapper" ref="fieldSetMapper" />
-			</bean>
-		</property>
-		<property name="saveState" value="true" />
-	</bean>
+		<beans:property name="lineMapper">
+			<beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<beans:property name="lineTokenizer" ref="fixedFileTokenizer" />
+				<beans:property name="fieldSetMapper" ref="fieldSetMapper" />
+			</beans:bean>
+		</beans:property>
+		<beans:property name="saveState" value="true" />
+	</beans:bean>
 
-	<bean id="fixedFileTokenizer"
+	<beans:bean id="fixedFileTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<property name="names" value="ISIN, Quantity, Price, Customer" />
-		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
-	</bean>
+		<beans:property name="names" value="ISIN, Quantity, Price, Customer" />
+		<beans:property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</beans:bean>
 
-	<bean id="fixedValidator"
+	<beans:bean id="fixedValidator"
 		class="org.springframework.batch.item.validator.SpringValidator">
-		<property name="validator">
-			<bean id="tradeValidator"
+		<beans:property name="validator">
+			<beans:bean id="tradeValidator"
 				class="org.springmodules.validation.valang.ValangValidator">
-				<property name="valang">
-					<value>
+				<beans:property name="valang">
+					<beans:value>
 						<![CDATA[
 						{ isin : length(?) < 13 : 'ISIN too long' : 'isin_length' : 12}
 						]]>
-					</value>
-				</property>
-			</bean>
-		</property>
-	</bean>
+					</beans:value>
+				</beans:property>
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
 
-	<bean id="tradeDao"
+	<beans:bean id="tradeDao"
 		class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
-		<property name="dataSource" ref="dataSource" />
-		<property name="incrementer">
-			<bean parent="incrementerParent">
-				<property name="incrementerName" value="TRADE_SEQ" />
-			</bean>
+		<beans:property name="dataSource" ref="dataSource" />
+		<beans:property name="incrementer">
+			<beans:bean parent="incrementerParent">
+				<beans:property name="incrementerName" value="TRADE_SEQ" />
+			</beans:bean>
 
-		</property>
-	</bean>
+		</beans:property>
+	</beans:bean>
 
-	<bean id="fieldSetMapper"
+	<beans:bean id="fieldSetMapper"
 		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 
-</beans>
+</beans:beans>

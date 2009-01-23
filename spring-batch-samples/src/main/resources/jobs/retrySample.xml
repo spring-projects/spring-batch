@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" 
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
-	<batch:job id="retrySample">
-		<batch:step name="step1"/>
-	</batch:job>
+	<job id="retrySample">
+		<step name="step1">
+			<tasklet reader="itemGenerator" 
+			         writer="itemWriter" 
+			         commit-interval="1"
+			         retry-limit="3">
+			    <retryable-exception-classes>
+			    	java.lang.Exception
+			    </retryable-exception-classes>
+			</tasklet>
+		</step>
+	</job>
 
-	<bean id="step1" parent="simpleStep"
-		class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean">
-		<property name="itemReader" ref="itemGenerator" />
-		<property name="itemWriter" ref="itemWriter" />
-		<property name="retryLimit" value="3" />
-		<property name="retryableExceptionClasses" value="java.lang.Exception" />
-	</bean>
+	<beans:bean id="itemGenerator" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
+		<beans:property name="limit" value="10" />
+	</beans:bean>
 
-	<bean id="itemGenerator" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
-		<property name="limit" value="10" />
-	</bean>
+	<beans:bean id="itemWriter" class="org.springframework.batch.sample.support.RetrySampleItemWriter" />
 
-	<bean id="itemWriter" class="org.springframework.batch.sample.support.RetrySampleItemWriter" />
-
-</beans>
+</beans:beans>

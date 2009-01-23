@@ -22,7 +22,7 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 	private String stepName;
 
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		this.simpleJdbcTemplate.update("insert into ERROR_LOG values ('"+jobName+"', '"+stepName+"', 'Some records were skipped!')");
+		this.simpleJdbcTemplate.update("insert into ERROR_LOG values (?, ?, 'Some records were skipped!')", jobName, stepName);
 		return RepeatStatus.FINISHED;
 	}
 
@@ -31,13 +31,11 @@ public class ErrorLogTasklet implements Tasklet, StepExecutionListener {
 	}
 
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public void beforeStep(StepExecution stepExecution) {
 		this.jobName = stepExecution.getJobExecution().getJobInstance().getJobName().trim();
 		this.stepName = (String)stepExecution.getJobExecution().getExecutionContext().get("stepName");
-		
 	}
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:batch="http://www.springframework.org/schema/batch"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" 
+	xmlns:beans="http://www.springframework.org/schema/beans" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -10,75 +10,71 @@
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<batch:job id="multilineJob">
-		<batch:step name="step1"/>
-	</batch:job>
+	<job id="multilineJob">
+		<step name="step1">
+			<tasklet reader="reader" writer="writer" commit-interval="1">
+				<streams>
+					<stream ref="fileItemReader"/>
+				</streams>
+			</tasklet>
+		</step>
+	</job>
 
-	<bean id="step1" parent="simpleStep">
-		<property name="streams" ref="fileItemReader"/>
-		<property name="itemReader">
-			<bean
-				class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
-				<property name="itemReader"
-					ref="fileItemReader" />
-			</bean>
-		</property>
-		<property name="itemWriter">
-			<bean
-				class="org.springframework.batch.item.file.FlatFileItemWriter">
-				<property name="resource"
-					value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
-					<property name="lineAggregator">
-						<bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
-					</property>
-			</bean>
-		</property>
-	</bean>
+	<beans:bean id="reader" class="org.springframework.batch.sample.domain.multiline.AggregateItemReader">
+		<beans:property name="itemReader" ref="fileItemReader" />
+	</beans:bean>
 
-	<bean id="fileItemReader"
+	<beans:bean id="writer" class="org.springframework.batch.item.file.FlatFileItemWriter">
+		<beans:property name="resource" value="file:target/test-outputs/20070122.testStream.multilineStep.txt" />
+		<beans:property name="lineAggregator">
+			<beans:bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="fileItemReader"
 		class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource"
+		<beans:property name="resource"
 			value="classpath:data/multilineJob/input/20070122.teststream.multilineStep.txt" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer" ref="fixedFileDescriptor" />
-				<property name="fieldSetMapper">
-					<bean class="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapper">
-						<property name="delegate" ref="tradeLineMapper" />
-					</bean>
-				</property>
-			</bean>
-		</property>
-	</bean>
+		<beans:property name="lineMapper">
+			<beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+				<beans:property name="lineTokenizer" ref="fixedFileDescriptor" />
+				<beans:property name="fieldSetMapper">
+					<beans:bean class="org.springframework.batch.sample.domain.multiline.AggregateItemFieldSetMapper">
+						<beans:property name="delegate" ref="tradeLineMapper" />
+					</beans:bean>
+				</beans:property>
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
 
-	<bean id="tradeLineMapper"
+	<beans:bean id="tradeLineMapper"
 		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 
-	<bean id="fixedFileDescriptor"
+	<beans:bean id="fixedFileDescriptor"
 		class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">
-		<property name="tokenizers">
-			<map>
-				<entry key="BEGIN" value-ref="beginRecordTokenizer" />
-				<entry key="END" value-ref="endRecordTokenizer" />
-				<entry key="" value-ref="tradeRecordTokenizer" />
-			</map>
-		</property>
-	</bean>
+		<beans:property name="tokenizers">
+			<beans:map>
+				<beans:entry key="BEGIN" value-ref="beginRecordTokenizer" />
+				<beans:entry key="END" value-ref="endRecordTokenizer" />
+				<beans:entry key="" value-ref="tradeRecordTokenizer" />
+			</beans:map>
+		</beans:property>
+	</beans:bean>
 
-	<bean id="beginRecordTokenizer"
+	<beans:bean id="beginRecordTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<property name="columns" value="1-5" />
-	</bean>
+		<beans:property name="columns" value="1-5" />
+	</beans:bean>
 
-	<bean id="endRecordTokenizer"
+	<beans:bean id="endRecordTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<property name="columns" value="1-3" />
-	</bean>
+		<beans:property name="columns" value="1-3" />
+	</beans:bean>
 
-	<bean id="tradeRecordTokenizer"
+	<beans:bean id="tradeRecordTokenizer"
 		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<property name="names" value="ISIN,Quantity,Price,Customer" />
-		<property name="columns" value="1-12, 13-15, 16-20, 21-29" />
-	</bean>
+		<beans:property name="names" value="ISIN,Quantity,Price,Customer" />
+		<beans:property name="columns" value="1-12, 13-15, 16-20, 21-29" />
+	</beans:bean>
 
-</beans>
+</beans:beans>

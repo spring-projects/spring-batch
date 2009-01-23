@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:batch="http://www.springframework.org/schema/batch"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" 
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 		http://www.springframework.org/schema/batch 
@@ -11,31 +13,28 @@
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
 		multiple environments. -->
 
-	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-		<property name="jobRepository" ref="jobRepository" />
-		<property name="taskExecutor">
-			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
-		</property>
-	</bean>
+	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<beans:property name="jobRepository" ref="jobRepository" />
+		<beans:property name="taskExecutor">
+			<beans:bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+		</beans:property>
+	</beans:bean>
 
-	<batch:job id="infiniteLoopJob" 
+	<job id="infiniteLoopJob" 
 			   incrementer="jobParametersIncrementer" 
 			   restartable="true">
-		<batch:step name="infiniteStep"/>
-	</batch:job>
+		<step name="infiniteStep">
+			<tasklet reader="reader" writer="writer" commit-interval="1"/>
+		</step>
+	</job>
 
-	<bean id="jobParametersIncrementer" 
+	<beans:bean id="jobParametersIncrementer" 
 	      class="org.springframework.batch.sample.common.InfiniteLoopIncrementer" />	
 
-	<bean id="infiniteStep" parent="simpleStep">
-		<property name="itemReader">
-			<bean id="reader" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
-				<property name="limit" value="1000000" />
-			</bean>
-		</property>
-		<property name="itemWriter">
-			<bean id="writer" class="org.springframework.batch.sample.support.DummyItemWriter" />
-		</property>
-	</bean>
+	<beans:bean id="reader" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
+		<beans:property name="limit" value="1000000" />
+	</beans:bean>
 
-</beans>
+	<beans:bean id="writer" class="org.springframework.batch.sample.support.DummyItemWriter" />
+
+</beans:beans>

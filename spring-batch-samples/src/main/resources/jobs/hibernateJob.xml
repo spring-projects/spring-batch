@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:batch="http://www.springframework.org/schema/batch"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
@@ -8,37 +8,35 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
-	<description>Example for Hibernate integration.</description>
+	<beans:description>Example for Hibernate integration.</beans:description>
 
-	<batch:job id="hibernateJob" restartable="false">
-		<batch:step name="step1"/>
-	</batch:job>
+	<job id="hibernateJob" restartable="false">
+		<step name="step1">
+			<tasklet reader="hibernateItemReader" 
+			         processor="creditIncreaseProcessor" 
+			         writer="hibernateCreditWriter" 
+			         skip-limit="5" 
+			         commit-interval="3"/>
+		</step>
+	</job>
 
-	<bean id="step1" parent="skipLimitStep">
-		<property name="skipLimit" value="5" />
-		<property name="itemReader" ref="hibernateItemReader" />
-		<property name="itemProcessor" ref="creditIncreaseProcessor" />
-		<property name="itemWriter" ref="hibernateCreditWriter" />
-		<property name="commitInterval" value="3" />
-	</bean>
+	<beans:bean id="creditIncreaseProcessor" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
-	<bean id="creditIncreaseProcessor" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
-
-	<bean id="hibernateCreditWriter"
+	<beans:bean id="hibernateCreditWriter"
 		class="org.springframework.batch.sample.domain.trade.internal.HibernateAwareCustomerCreditItemWriter">
-		<property name="sessionFactory" ref="sessionFactory" />
-		<property name="dao" ref="customerCreditDao" />
-	</bean>
+		<beans:property name="sessionFactory" ref="sessionFactory" />
+		<beans:property name="dao" ref="customerCreditDao" />
+	</beans:bean>
 
-	<bean id="customerCreditDao"
+	<beans:bean id="customerCreditDao"
 		class="org.springframework.batch.sample.domain.trade.internal.HibernateCreditDao">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
+		<beans:property name="sessionFactory" ref="sessionFactory" />
+	</beans:bean>
 
-	<bean id="hibernateItemReader"
+	<beans:bean id="hibernateItemReader"
 		class="org.springframework.batch.item.database.HibernateCursorItemReader">
-		<property name="queryString" value="from CustomerCredit" />
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
+		<beans:property name="queryString" value="from CustomerCredit" />
+		<beans:property name="sessionFactory" ref="sessionFactory" />
+	</beans:bean>
 
-</beans>
+</beans:beans>
