@@ -49,7 +49,7 @@
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attribute name="restartable" type="xsd:string"
-						default="false" use="optional">
+						default="true" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							Whether the job should be retartable or not in case of failure.
