@@ -15,10 +15,13 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
@@ -417,42 +420,11 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		ItemWriter<? super S> itemWriter = getItemWriter();
 		ItemProcessor<? super T, ? extends S> itemProcessor = getItemProcessor();
 
-		// Since we are going to wrap these things with listener callbacks we
-		// need to register them here because the step will not know we did
-		// that.
-		if (itemReader instanceof ItemStream) {
-			step.registerStream((ItemStream) itemReader);
-		}
-		if (itemReader instanceof StepExecutionListener) {
-			step.registerStepExecutionListener((StepExecutionListener) itemReader);
-		}
-		if (itemProcessor instanceof ItemStream) {
-			step.registerStream((ItemStream) itemProcessor);
-		}
-		if (itemProcessor instanceof StepExecutionListener) {
-			step.registerStepExecutionListener((StepExecutionListener) itemProcessor);
-		}
-		if (itemWriter instanceof ItemStream) {
-			step.registerStream((ItemStream) itemWriter);
-		}
-		if (itemWriter instanceof StepExecutionListener) {
-			step.registerStepExecutionListener((StepExecutionListener) itemWriter);
-		}
-
-		List<StepExecutionListener> array = BatchListenerFactoryHelper.getListeners(listeners,
-				StepExecutionListener.class);
-		StepExecutionListener[] stepListeners = new StepExecutionListener[array.size()];
-		for (int i = 0; i < stepListeners.length; i++) {
-			stepListeners[i] = array.get(i);
-		}
-		step.setStepExecutionListeners(stepListeners);
-
 		if (chunkOperations == null) {
 			RepeatTemplate repeatTemplate = new RepeatTemplate();
 			repeatTemplate.setCompletionPolicy(getChunkCompletionPolicy());
 			chunkOperations = repeatTemplate;
 		}
-		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, getListeners());
 
 		if (stepOperations == null) {
 
@@ -471,14 +443,46 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 		step.setStepOperations(stepOperations);
 
+		SimpleChunkProvider<T> chunkProvider = new SimpleChunkProvider<T>(itemReader, chunkOperations);
+		List<ItemReadListener<T>> readListeners = BatchListenerFactoryHelper.<ItemReadListener<T>>getListeners(getListeners(), ItemReadListener.class);
+		chunkProvider.setListeners(readListeners);
+
 		SimpleChunkProcessor<T, S> chunkProcessor = new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
 		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T,S>>getListeners(getListeners(), ItemProcessListener.class));
 		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>>getListeners(getListeners(), ItemWriteListener.class));
 
-		SimpleChunkProvider<T> chunkProvider = new SimpleChunkProvider<T>(itemReader, chunkOperations);
-		List<ItemReadListener<T>> readListeners = BatchListenerFactoryHelper.<ItemReadListener<T>>getListeners(getListeners(), ItemReadListener.class);
-		chunkProvider.setListeners(readListeners);
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
+
+		// Since we are going to wrap these things with listener callbacks we
+		// need to register them here because the step will not know we did
+		// that.
+		List<StepListener> chunkListeners = new ArrayList<StepListener>(Arrays.asList(getListeners()));
+		for(Object itemHandler: new Object[]{itemReader, itemWriter, itemProcessor}){
+			if (itemHandler instanceof ItemStream) {
+				step.registerStream((ItemStream) itemHandler);
+			}
+			if (itemHandler instanceof StepExecutionListener) {
+				step.registerStepExecutionListener((StepExecutionListener) itemHandler);
+			}
+			if (itemHandler instanceof ChunkListener) {
+				chunkListeners.add((StepListener) itemHandler);
+			}
+			if (itemHandler instanceof ItemReadListener) {
+				chunkProvider.registerListener((StepListener) itemHandler);
+			}
+			if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
+				chunkProcessor.registerListener((StepListener) itemHandler);
+			}
+		}
+
+		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, chunkListeners.toArray(new StepListener[]{}));
+		List<StepExecutionListener> array = BatchListenerFactoryHelper.getListeners(listeners,
+				StepExecutionListener.class);
+		StepExecutionListener[] stepListeners = new StepExecutionListener[array.size()];
+		for (int i = 0; i < stepListeners.length; i++) {
+			stepListeners[i] = array.get(i);
+		}
+		step.setStepExecutionListeners(stepListeners);
 
 		step.setTasklet(tasklet);
 		

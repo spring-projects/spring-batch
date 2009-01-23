@@ -30,6 +30,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
@@ -81,7 +84,7 @@ public class SimpleStepFactoryBeanTests {
 		MapStepExecutionDao.clear();
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void testMandatoryProperties() throws Exception {
 		new SimpleStepFactoryBean<String, String>().getObject();
 	}
@@ -289,6 +292,73 @@ public class SimpleStepFactoryBeanTests {
 			// expected
 		}
 
+	}
+
+	@Test
+	public void testAutoRegisterItemListeners() throws Exception {
+
+		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
+
+		final List<Integer> listenerCalls = new ArrayList<Integer>();
+
+		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
+				ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
+			public void write(List<? extends String> items) throws Exception {
+			}
+
+			public void afterRead(String item) {
+				listenerCalls.add(1);
+			}
+
+			public void beforeRead() {
+			}
+
+			public void onReadError(Exception ex) {
+			}
+
+			public void afterWrite(List<? extends String> items) {
+				listenerCalls.add(2);
+			}
+
+			public void beforeWrite(List<? extends String> items) {
+			}
+
+			public void onWriteError(Exception exception, List<? extends String> items) {
+			}
+
+			public void afterProcess(String item, String result) {
+				listenerCalls.add(3);
+			}
+
+			public void beforeProcess(String item) {
+			}
+
+			public void onProcessError(String item, Exception e) {
+			}
+
+			public void afterChunk() {
+				listenerCalls.add(4);
+			}
+
+			public void beforeChunk() {
+			}
+
+		}
+
+		factory.setItemWriter(new TestItemListenerWriter());
+
+		Step step = (Step) factory.getObject();
+
+		job.setSteps(Collections.singletonList(step));
+
+		JobExecution jobExecution = repository.createJobExecution(job.getName(), new JobParameters());
+
+		job.execute(jobExecution);
+
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		for (int i = 1; i <= 4; i++) {
+			assertTrue(listenerCalls.contains(i));
+		}
 	}
 
 	private SimpleStepFactoryBean<String, String> getStepFactory(String... args) throws Exception {

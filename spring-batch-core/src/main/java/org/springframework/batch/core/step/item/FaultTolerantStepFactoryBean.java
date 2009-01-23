@@ -25,6 +25,7 @@ import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.SkipListener;
+import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -312,6 +313,22 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
 					SkipListener.class));
 
+			
+			for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
+
+				if (itemHandler instanceof SkipListener) {
+					chunkProvider.registerListener((StepListener) itemHandler);
+					chunkProcessor.registerListener((StepListener) itemHandler);
+					// already registered with both so avoid double-registering
+					continue;
+				}
+				if (itemHandler instanceof ItemReadListener) {
+					chunkProvider.registerListener((StepListener) itemHandler);
+				}
+				if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
+					chunkProcessor.registerListener((StepListener) itemHandler);
+				}
+			}
 			ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 			tasklet.setBuffering(!isReaderTransactionalQueue);
 

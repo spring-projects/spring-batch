@@ -14,9 +14,14 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.ItemProcessListener;
+import org.springframework.batch.core.ItemReadListener;
+import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepListener;
@@ -600,6 +605,81 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 
+	}
+
+	@Test
+	public void testAutoRegisterItemListeners() throws Exception {
+
+		final List<Integer> listenerCalls = new ArrayList<Integer>();
+
+		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
+				ItemWriteListener<String>, ItemProcessListener<String, String>, SkipListener<String, String>,
+				ChunkListener {
+			public void write(List<? extends String> items) throws Exception {
+				if (items.contains("4")) {
+					throw new SkippableException("skippable");
+				}
+			}
+
+			public void afterRead(String item) {
+				listenerCalls.add(1);
+			}
+
+			public void beforeRead() {
+			}
+
+			public void onReadError(Exception ex) {
+			}
+
+			public void afterWrite(List<? extends String> items) {
+				listenerCalls.add(2);
+			}
+
+			public void beforeWrite(List<? extends String> items) {
+			}
+
+			public void onWriteError(Exception exception, List<? extends String> items) {
+			}
+
+			public void afterProcess(String item, String result) {
+				listenerCalls.add(3);
+			}
+
+			public void beforeProcess(String item) {
+			}
+
+			public void onProcessError(String item, Exception e) {
+			}
+
+			public void afterChunk() {
+				listenerCalls.add(4);
+			}
+
+			public void beforeChunk() {
+			}
+
+			public void onSkipInProcess(String item, Throwable t) {
+			}
+
+			public void onSkipInRead(Throwable t) {
+				listenerCalls.add(6);
+			}
+
+			public void onSkipInWrite(String item, Throwable t) {
+				listenerCalls.add(5);
+			}
+
+		}
+
+		factory.setItemWriter(new TestItemListenerWriter());
+
+		Step step = (Step) factory.getObject();
+		step.execute(stepExecution);
+
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		for (int i = 1; i <= 6; i++) {
+			assertTrue("didn't call listener " + i, listenerCalls.contains(i));
+		}
 	}
 
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
