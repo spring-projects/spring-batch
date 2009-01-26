@@ -80,9 +80,9 @@ public class AbstractJobTests {
 	 */
 	@Test
 	public void testSetRestartable() {
-		assertFalse(job.isRestartable());
-		job.setRestartable(true);
 		assertTrue(job.isRestartable());
+		job.setRestartable(false);
+		assertFalse(job.isRestartable());
 	}
 
 	@Test
