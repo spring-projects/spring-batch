@@ -15,11 +15,13 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.flow.support.util.PatternMatcher;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -32,12 +34,17 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
  * end of a step. A list of keys should be provided that correspond to the items
  * in the {@link Step} {@link ExecutionContext} that should be promoted.
  * 
+ * Additionally, an optional list of statuses can be set to indicate for which
+ * exit status codes the promotion should occur. These statuses will be checked
+ * using the {@link PatternMatcher}, so wildcards are allowed.
+ * 
  * @author Dan Garrette
  * @since 2.0
  */
 public class ExecutionContextPromotionListener extends StepExecutionListenerSupport implements InitializingBean {
 
 	private List<String> keys = null;
+	private List<String> statuses = Collections.singletonList(ExitStatus.FINISHED.getExitCode());
 
 	/*
 	 * (non-Javadoc)
@@ -46,19 +53,52 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 	 *      stepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
+		if (statuses == null) {
+			this.performPromotion(stepExecution);
+		}
+		else {
+			String exitCode = stepExecution.getExitStatus().getExitCode();
+			for (String statusPattern : statuses) {
+				if (PatternMatcher.match(statusPattern, exitCode)) {
+					this.performPromotion(stepExecution);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private void performPromotion(StepExecution stepExecution) {
 		ExecutionContext stepContext = stepExecution.getExecutionContext();
 		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
 		for (String key : keys) {
 			jobContext.put(key, stepContext.get(key));
 		}
-		return null;
 	}
 
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.keys, "The 'keys' property must be provided");
+		Assert.notEmpty(this.statuses, "The 'keys' property must not be empty");
+		Assert.notNull(this.statuses, "The 'statuses' property must be provided");
+		Assert.notEmpty(this.statuses, "The 'statuses' property must not be empty");
 	}
 
+	/**
+	 * @param keys
+	 *            A list of keys corresponding to items in the {@link Step}
+	 *            {@link ExecutionContext} that must be promoted.
+	 */
 	public void setKeys(List<String> keys) {
 		this.keys = keys;
+	}
+
+	/**
+	 * @param statuses
+	 *            A list of statuses for which the promotion should occur.
+	 *            Statuses can may contain wildcards recognizable by the
+	 *            {@link PatternMatcher} class.
+	 */
+	public void setStatuses(List<String> statuses) {
+		this.statuses = statuses;
 	}
 }
