@@ -60,4 +60,8 @@ public class GeneratingTradeItemReader implements ItemReader<Trade> {
 		return limit;
 	}
 
+	public void resetCounter()
+	{
+		this.counter = 0;
+	}
 }
