@@ -1,40 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch" 
-	xmlns:beans="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:aop="http://www.springframework.org/schema/aop" 
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-		http://www.springframework.org/schema/batch 
-		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
        	http://www.springframework.org/schema/aop
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
 		multiple environments. -->
 
-	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
-		<beans:property name="jobRepository" ref="jobRepository" />
-		<beans:property name="taskExecutor">
-			<beans:bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
-		</beans:property>
-	</beans:bean>
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor"/>
+		</property>
+	</bean>
 
-	<job id="infiniteLoopJob" 
-			   incrementer="jobParametersIncrementer" 
-			   restartable="true">
-		<step name="infiniteStep">
-			<tasklet reader="reader" writer="writer" commit-interval="1"/>
-		</step>
-	</job>
+	<bean id="simpleJob" class="org.springframework.batch.core.job.SimpleJob" abstract="true">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="restartable" value="true" />
+	</bean>
+	
+	<bean id="taskletStep" class="org.springframework.batch.core.step.tasklet.TaskletStep" abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="allowStartIfComplete" value="true" />
+	</bean>
+	
+	<bean id="simpleStep" class="org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean" abstract="true">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
 
-	<beans:bean id="jobParametersIncrementer" 
-	      class="org.springframework.batch.sample.common.InfiniteLoopIncrementer" />	
+	<bean id="infiniteLoopJob" parent="simpleJob">
+		<property name="jobParametersIncrementer">
+			<bean class="org.springframework.batch.sample.common.InfiniteLoopIncrementer" />	
+		</property>
+		<property name="steps">
+			<!--bean id="step1" parent="taskletStep">
+				<property name="tasklet">
+					<bean id="module" class="org.springframework.batch.sample.tasklet.InfiniteLoopTasklet"/>
+				</property>
+			</bean-->
+			<bean id="infiniteStep" parent="simpleStep">
+				<property name="itemReader">
+					<bean id="reader" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
+						<property name="limit" value="1000000" />
+					</bean>
+				</property>
+				<property name="itemWriter">
+					<bean id="writer" class="org.springframework.batch.sample.support.DummyItemWriter" />
+				</property>
+			</bean>
+		</property>
+	</bean>
 
-	<beans:bean id="reader" class="org.springframework.batch.sample.domain.trade.internal.GeneratingTradeItemReader">
-		<beans:property name="limit" value="1000000" />
-	</beans:bean>
-
-	<beans:bean id="writer" class="org.springframework.batch.sample.support.DummyItemWriter" />
-
-</beans:beans>
+</beans>
