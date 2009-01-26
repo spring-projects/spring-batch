@@ -33,7 +33,7 @@ import org.springframework.core.io.Resource;
  */
 public abstract class AssertFile {
 
-	public static void assertFileEquals(File actual, File expected) throws Exception {
+	public static void assertFileEquals(File expected, File actual) throws Exception {
 		BufferedReader expectedReader = new BufferedReader(new FileReader(expected));
 		BufferedReader actualReader = new BufferedReader(new FileReader(actual));
 		try {

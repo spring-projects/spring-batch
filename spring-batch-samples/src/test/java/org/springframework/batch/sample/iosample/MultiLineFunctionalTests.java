@@ -42,6 +42,6 @@ public class MultiLineFunctionalTests extends AbstractJobTests {
 	@Test
 	public void testJob() throws Exception {
 		this.launchJob();
-		AssertFile.assertFileEquals(new FileSystemResource(OUTPUT_FILE), new FileSystemResource(INPUT_FILE));
+		AssertFile.assertFileEquals(new FileSystemResource(INPUT_FILE), new FileSystemResource(OUTPUT_FILE));
 	}
 }

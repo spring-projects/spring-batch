@@ -35,7 +35,7 @@ public class AssertFileTests {
 	@Test
 	public void testAssertEquals_tooLong() throws Exception {
 		try {
-			executeAssertEquals("input1.txt", "input3.txt");
+			executeAssertEquals("input3.txt", "input1.txt");
 			fail();
 		}
 		catch (AssertionFailedError e) {
@@ -46,7 +46,7 @@ public class AssertFileTests {
 	@Test
 	public void testAssertEquals_tooShort() throws Exception {
 		try {
-			executeAssertEquals("input3.txt", "input1.txt");
+			executeAssertEquals("input1.txt", "input3.txt");
 			fail();
 		}
 		catch (AssertionFailedError e) {
@@ -62,7 +62,7 @@ public class AssertFileTests {
 	@Test
 	public void testAssertEquals_blank_tooLong() throws Exception {
 		try {
-			executeAssertEquals("input1.txt", "blank.txt");
+			executeAssertEquals("blank.txt", "input1.txt");
 			fail();
 		}
 		catch (AssertionFailedError e) {
@@ -73,7 +73,7 @@ public class AssertFileTests {
 	@Test
 	public void testAssertEquals_blank_tooShort() throws Exception {
 		try {
-			executeAssertEquals("blank.txt", "input1.txt");
+			executeAssertEquals("input1.txt", "blank.txt");
 			fail();
 		}
 		catch (AssertionFailedError e) {
