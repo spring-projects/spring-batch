@@ -48,17 +48,21 @@
 
   <xi:include href="spring-batch-intro.xml" />
 
-  <xi:include href="core.xml" />
+  <xi:include href="domain.xml" />
+  
+  <xi:include href="job.xml" />
+  
+  <xi:include href="step.xml" />
 
   <xi:include href="readersAndWriters.xml" />
-
-  <xi:include href="execution.xml" />
 
   <xi:include href="repeat.xml" />
 
   <xi:include href="retry.xml" />
   
   <xi:include href="testing.xml" />
+  
+  <xi:include href="common-patterns.xml" />
 
   <xi:include href="appendix.xml" />
   

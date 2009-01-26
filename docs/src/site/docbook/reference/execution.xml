@@ -13,8 +13,7 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/spring-batch-reference-model.png"
-                   width="75%" />
+                   fileref="images/spring-batch-reference-model.png" />
       </imageobject>
 
       <imageobject role="fo">
@@ -457,8 +456,8 @@
   &lt;/bean&gt;</programlisting>
 
         <para>The databaseType property indicates the type of incrementer that
-        must be used. Options include: "db2", "db2zos", "derby", "hsql", "mysql",
-        "oracle", and "postgres".</para>
+        must be used. Options include: "db2", "db2zos", "derby", "hsql",
+        "mysql", "oracle", and "postgres".</para>
       </section>
 
       <section>
@@ -1152,9 +1151,9 @@
     &lt;property name="retryableExceptionClasses" value="org.springframework.dao.DeadlockLoserDataAccessException" /&gt;</emphasis>
   &lt;/bean&gt;</programlisting>
 
-        <para>The <classname>SkipLimitStepFactoryBean</classname> requires
-        a limit for the number of times an individual item can be retried, and
-        a list of Exceptions that are 'retryable'.</para>
+        <para>The <classname>SkipLimitStepFactoryBean</classname> requires a
+        limit for the number of times an individual item can be retried, and a
+        list of Exceptions that are 'retryable'.</para>
       </section>
 
       <section>
@@ -1421,11 +1420,11 @@
   &lt;property name="jobRepository" ref="repository" /&gt;
 &lt;/bean&gt;</programlisting>
 
-		<note>
-          <para>TaskletStep will automatically register the tasklet as
-          <classname>StepExecutionListener</classname> if it implements
-          this interface</para>
-        </note>
+      <note>
+        <para>TaskletStep will automatically register the tasklet as
+        <classname>StepExecutionListener</classname> if it implements this
+        interface</para>
+      </note>
 
       <section>
         <title>TaskletAdapter</title>
@@ -1565,16 +1564,14 @@
     <section>
       <title>Logging Item Processing and Failures</title>
 
-      <para>A common use case is the need for special handling of
-      errors in a step, item by item, perhaps logging to a special
-      channel, or inserting a record into a
-      database. The <classname>StepHandlerStep</classname> (created
-      from the step factory beans) allows users to implement this use
-      case with a simple
-      <classname>ItemReadListener</classname>, for errors on read, and an
-      <classname>ItemWriteListener</classname>, for errors on write. The below
-      code snippets illustrate a listener that logs both read and write
-      failures:</para>
+      <para>A common use case is the need for special handling of errors in a
+      step, item by item, perhaps logging to a special channel, or inserting a
+      record into a database. The <classname>StepHandlerStep</classname>
+      (created from the step factory beans) allows users to implement this use
+      case with a simple <classname>ItemReadListener</classname>, for errors
+      on read, and an <classname>ItemWriteListener</classname>, for errors on
+      write. The below code snippets illustrate a listener that logs both read
+      and write failures:</para>
 
       <programlisting>public class ItemFailureLoggerListener extends ItemListenerSupport {
 

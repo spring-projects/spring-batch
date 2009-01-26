@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="patterns">
+  <title>Common Batch Patterns</title>
+
+  <section>
+    <title>Introduction</title>
+
+    <para>Some batch jobs can be assembled purely from off-the-shelf
+    components in Spring Batch, mostly the <classname>ItemReader</classname>
+    and <classname>ItemWriter</classname> implementations. Where this is not
+    possible (the majority of cases) the main API entry points for application
+    developers are the <classname>Tasklet</classname>,
+    <classname>ItemReader</classname>, <classname>ItemWriter</classname> and
+    the various listener interfaces. Most simple batch jobs will be able to
+    use off-the-shelf input from a Spring Batch
+    <classname>ItemReader</classname>, but it is very often the case that
+    there are custom concerns in the processing and writing, which normally
+    leads developers to implement an <classname>ItemWriter</classname>, or
+    <classname>ItemTransformer</classname>.</para>
+
+    <para>Here we provide a few examples of common patterns in custom business
+    logic, mainly using the listener interfaces . It should be noted that an
+    <classname>ItemReader</classname> or <classname>ItemWriter</classname> can
+    implement the listener interfaces as well if appropriate.</para>
+  </section>
+
+  <section>
+    <title>Logging Item Processing and Failures</title>
+
+    <para>A common use case is the need for special handling of errors in a
+    step, item by item, perhaps logging to a special channel, or inserting a
+    record into a database. The <classname>StepHandlerStep</classname>
+    (created from the step factory beans) allows users to implement this use
+    case with a simple <classname>ItemReadListener</classname>, for errors on
+    read, and an <classname>ItemWriteListener</classname>, for errors on
+    write. The below code snippets illustrate a listener that logs both read
+    and write failures:</para>
+
+    <programlisting>public class ItemFailureLoggerListener extends ItemListenerSupport {
+
+    private static Log logger = LogFactory.getLog("item.error");    
+
+    public void onReadError(Exception ex) {
+        logger.error("Encountered error on read", e);
+    }
+
+    public void onWriteError(Exception ex, Object item) {
+        logger.error("Encountered error on write", e);
+    }
+
+}</programlisting>
+
+    <para>Having implemented this listener it must be registered with the
+    step:</para>
+
+    <programlisting>&lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    ...
+    &lt;property name="listeners"&gt;
+        &lt;bean class="org.example...ItemFailureLoggerListener"/&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>Remember that if your listener does anything in an
+    <code>onError()</code> method, it will be inside a transaction that is
+    going to be rolled back. If you need to use a transactional resource such
+    as a database inside an <code>onError()</code> method, consider adding a
+    declarative transaction to that method (see Spring Core Reference Guide
+    for details), and giving its propagation attribute the value
+    REQUIRES_NEW.</para>
+  </section>
+
+  <section>
+    <title>Stopping a Job Manually for Business Reasons</title>
+
+    <para>Spring Batch provides a stop() method through the JobLauncher
+    interface, but this is really aimed at the operator, rather than the
+    application programmer. Sometimes it is more convenient or makes more
+    sense to stop a job execution from within the business logic.</para>
+
+    <para>The simplest thing to do is to throw a RuntimeException (one that
+    isn't retried indefinitely or skipped), For example, a custom exception
+    type could be used, as in the example below:</para>
+
+    <programlisting>public class PoisonPillItemWriter extends AbstractItemWriter {
+    
+    public void write(Object item) throws Exception {
+
+        if (isPoisonPill(item)) {
+            throw new PoisonPillException("Posion pill detected: "+item);
+       }
+
+    }
+
+}</programlisting>
+
+    <para>Another simple way to stop a step from executing is to simply return
+    <code>null</code> from the <classname>ItemReader</classname>:</para>
+
+    <programlisting>public class EarlyCompletionItemReader extends AbstractItemReader {
+
+    private ItemReader delegate;
+
+    public void setDelegate(ItemReader delegate) { ... }
+    
+    public Object read() throws Exception {
+
+        Object item = delegate.read();
+
+        if (isEndItem(item)) {
+            return null; // end the step here
+        }
+
+        return item;
+
+    }
+
+}</programlisting>
+
+    <para>The previous example actually relies on the fact that there is a
+    default implementation of the <classname>CompletionPolicy</classname>
+    strategy which signals a complete batch when the item to be processed is
+    null. A more sophisticated completion policy could be implemented and
+    injected into the <classname>Step</classname> through the
+    <classname>RepeatOperationsStepFactoryBean</classname>:</para>
+
+    <programlisting>&lt;bean id="simpleStep"
+        class="org.springframework.batch.core.step.item.RepeatOperationsStepFactoryBean" &gt;
+    ...
+    &lt;property name="chunkOperations"&gt;
+        &lt;bean class="org.springframework.batch.repeat.support.RepeatTemplate"&gt;
+            &lt;property name="completionPolicy"&gt;
+                &lt;bean class="org.example...SpecialCompletionPolicy"/&gt;
+            &lt;/property&gt;
+        &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>An alternative is to set a flag in the
+    <classname>StepExecution</classname>, which is checked by the
+    <classname>Step</classname> implementations in the framework in between
+    item processing. To implement this alternative, we need access to the
+    current StepExecution, and this can be achieved by implementing a
+    StepListener and registering it with the Step. Here is an example of a
+    listener that sets the flag:</para>
+
+    <programlisting>public class CustomItemWriter extends ItemListenerSupport implements StepListener {
+
+    private StepExecution stepExecution;    
+
+    public void beforeStep(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
+
+    public void afterRead(Object item) {
+
+        if (isPoisonPill(item)) {
+            stepExecution.setTerminateOnly(true);
+       }
+
+    }
+
+}</programlisting>
+
+    <para>The default behaviour here when the flag is set is for the step to
+    throw a <classname>JobInterruptedException</classname>. This can be
+    controlled through the <classname>StepInterruptionPolicy</classname>, but
+    the only choice is to throw or not throw an exception, so this is always
+    an abnormal ending to a job.</para>
+  </section>
+
+  <section>
+    <title>Adding a Footer Record</title>
+
+    <para>A very common requirement is to aggregate information during the
+    output process and to append a record at the end of a file summarizing the
+    data, or providing a checksum. This can also be achieved with a callbacks
+    in the step, normally as part of a custom
+    <classname>ItemWriter</classname>. In this case, since a job is
+    accumulating state that should not be lost if the job aborts, the
+    <classname>ItemStream</classname> interface should be implemented:</para>
+
+    <programlisting>public class CustomItemWriter extends AbstractItemWriter implements 
+    ItemStream, StepListener
+{
+
+    private static final String TOTAL_AMOUNT_KEY = "total.amount";
+
+    private ItemWriter delegate;
+
+    private double totalAmount = 0.0;
+
+    public void setDelegate(ItemWriter delegate) { ... }
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        // Add the footer record here...
+        delegate.write("Total Amount Processed: " + totalAmount);
+    }
+
+    public void open(ExecutionContext executionContext) {
+        if (executionContext.containsKey(TOTAL_AMOUNT_KEY) {
+            totalAmount = executionContext.getDouble(TOTAL_AMOUNT_KEY);
+        }
+    }
+
+    public void update(ExecutionContext executionContext) {
+        executionContext.setDouble(TOTAL_AMOUNT_KEY, totalAmount);
+    }
+    
+    public void write(Object item) {
+
+        delegate.write(item);
+        totalAmount += ((Trade) item).getAmount();
+
+    }
+
+}</programlisting>
+
+    <para>The custom writer in the example is stateful (it maintains its total
+    in an instance variable <varname>totalAmount</varname>), but the state is
+    stored through the <classname>ItemStream</classname> interface in the
+    <classname>ExecutionContext</classname>. In this way we can be sure that
+    when the <code>open()</code> callback is received on a restart. The
+    framework garuntees we always get the last value that was committed. It
+    should be noted that it is not always necessary to implement ItemStream.
+    For example, if the ItemWriter is re-runnable, in the sense that it
+    maintains its own state in a transactional resource like a database, there
+    is no need to maintain state within the writer itself.</para>
+  </section>
+</chapter>

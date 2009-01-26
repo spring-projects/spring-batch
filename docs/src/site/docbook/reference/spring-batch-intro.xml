@@ -4,209 +4,201 @@
 <chapter id="spring-batch-intro">
   <title>Spring Batch Introduction</title>
 
+  <para>Many applications within the enterprise domain require bulk processing
+  to perform business operations in mission critical environments. These
+  business operations include automated, complex processing of large volumes
+  of information that is most efficiently processed without user interaction.
+  These operations typically include time based events (e.g. month-end
+  calculations, notices or correspondence), periodic application of complex
+  business rules processed repetitively across very large data sets (e.g.
+  Insurance benefit determination or rate adjustments), or the integration of
+  information that is received from internal and external systems that
+  typically requires formatting, validation and processing in a transactional
+  manner into the system of record. Batch processing is used to process
+  billions of transactions every day for enterprises.</para>
+
+  <para>Spring Batch is a lightweight, comprehensive batch framework designed
+  to enable the development of robust batch applications vital for the daily
+  operations of enterprise systems. Spring Batch builds upon the productivity,
+  POJO-based development approach, and general ease of use capabilities people
+  have come to know from the Spring Framework, while making it easy for
+  developers to access and leverage more advance enterprise services when
+  necessary. Spring Batch is not a scheduling framework. There are many good
+  enterprise schedulers available in both the commercial and open source
+  spaces such as Quartz, Tivoli, Control-M, etc. It is intended to work in
+  conjunction with a scheduler, not replace a scheduler.</para>
+
+  <para>Spring Batch provides reusable functions that are essential in
+  processing large volumes of records, including logging/tracing, transaction
+  management, job processing statistics, job restart, skip, and resource
+  management. It also provides more advance technical services and features
+  that will enable extremely high-volume and high performance batch jobs
+  though optimization and partitioning techniques. Simple as well as complex,
+  high-volume batch jobs can leverage the framework in a highly scalable
+  manner to process significant volumes of information.</para>
+
   <section>
-    <title id="s.1">Introduction</title>
+    <title id="s.1.4">Background</title>
 
-    <para>Many applications within the enterprise domain require bulk
-    processing to perform business operations in mission critical
-    environments. These business operations include automated, complex
-    processing of large volumes of information that is most efficiently
-    processed without user interaction. These operations typically include
-    time based events (e.g. month-end calculations, notices or
-    correspondence), periodic application of complex business rules processed
-    repetitively across very large data sets (e.g. Insurance benefit
-    determination or rate adjustments), or the integration of information that
-    is received from internal and external systems that typically requires
-    formatting, validation and processing in a transactional manner into the
-    system of record. Batch processing is used to process billions of
-    transactions every day for enterprises.</para>
+    <para>While open source software projects and associated communities have
+    focused greater attention on web-based and SOA messaging-based
+    architecture frameworks, there has been a notable lack of focus on
+    reusable architecture frameworks to accommodate Java-based batch
+    processing needs, despite continued needs to handle such processing within
+    enterprise IT environments. The lack of a standard, reusable batch
+    architecture has resulted in the proliferation of many one-off, in-house
+    solutions developed within client enterprise IT functions.</para>
 
-    <para>Spring Batch is a lightweight, comprehensive batch framework
-    designed to enable the development of robust batch applications vital for
-    the daily operations of enterprise systems. Spring Batch builds upon the
-    productivity, POJO-based development approach, and general ease of use
-    capabilities people have come to know from the Spring Framework, while
-    making it easy for developers to access and leverage more advance
-    enterprise services when necessary. Spring Batch is not a scheduling
-    framework. There are many good enterprise schedulers available in both the
-    commercial and open source spaces such as Quartz, Tivoli, Control-M, etc.
-    It is intended to work in conjunction with a scheduler, not replace a
-    scheduler.</para>
+    <para>SpringSource and Accenture have collaborated to change this.
+    Accenture's hands-on industry and technical experience in implementing
+    batch architectures, SpringSource's depth of technical experience, and
+    Spring's proven programming model together mark a natural and powerful
+    partnership to create high-quality, market relevant software aimed at
+    filling an important gap in enterprise Java. Both companies are also
+    currently working with a number of clients solving similar problems
+    developing Spring-based batch architecture solutions. This has provided
+    some useful additional detail and real-life constraints helping to ensure
+    the solution can be applied to the real-world problems posed by clients.
+    For these reasons and many more, SpringSource and Accenture have teamed to
+    collaborate on the development of Spring Batch.</para>
 
-    <para>Spring Batch provides reusable functions that are essential in
-    processing large volumes of records, including logging/tracing,
-    transaction management, job processing statistics, job restart, skip, and
-    resource management. It also provides more advance technical services and
-    features that will enable extremely high-volume and high performance batch
-    jobs though optimization and partitioning techniques. Simple as well as
-    complex, high-volume batch jobs can leverage the framework in a highly
-    scalable manner to process significant volumes of information.</para>
+    <para>Accenture has contributed previously proprietary batch processing
+    architecture frameworks, based upon decades worth of experience in
+    building batch architectures with the last several generations of
+    platforms, (i.e., COBOL/Mainframe, C++/Unix, and now Java/anywhere) to the
+    Spring Batch project along with committer resources to drive support,
+    enhancements, and the future roadmap.</para>
 
-    <section>
-      <title id="s.1.4">Background</title>
+    <para>The collaborative effort between Accenture and SpringSource aims to
+    promote the standardization of software processing approaches, frameworks,
+    and tools that can be consistently leveraged by enterprise users when
+    creating batch applications. Companies and government agencies desiring to
+    deliver standard, proven solutions to their enterprise IT environments
+    will benefit from Spring Batch.</para>
+  </section>
 
-      <para>While open source software projects and associated communities
-      have focused greater attention on web-based and SOA messaging-based
-      architecture frameworks, there has been a notable lack of focus on
-      reusable architecture frameworks to accommodate Java-based batch
-      processing needs, despite continued needs to handle such processing
-      within enterprise IT environments. The lack of a standard, reusable
-      batch architecture has resulted in the proliferation of many one-off,
-      in-house solutions developed within client enterprise IT
-      functions.</para>
+  <section>
+    <title id="s-b-i.1.2">Usage Scenarios</title>
 
-      <para>SpringSource and Accenture have collaborated to change this.
-      Accenture's hands-on industry and technical experience in implementing
-      batch architectures, SpringSource's depth of technical experience, and
-      Spring's proven programming model together mark a natural and powerful
-      partnership to create high-quality, market relevant software aimed at
-      filling an important gap in enterprise Java. Both companies are also
-      currently working with a number of clients solving similar problems
-      developing Spring-based batch architecture solutions. This has provided
-      some useful additional detail and real-life constraints helping to
-      ensure the solution can be applied to the real-world problems posed by
-      clients. For these reasons and many more, SpringSource and Accenture
-      have teamed to collaborate on the development of Spring Batch.</para>
+    <para>A typical batch program generally reads a large number of records
+    from a database, file, or queue, processes the data in some fashion, and
+    then writes back data in a modified form. Spring Batch automates this
+    basic batch iteration, providing the capability to process similar
+    transactions as a set, typically in an offline environment without any
+    user interaction. Batch jobs are part of most IT projects and Spring Batch
+    is the only open source framework that provides a robust, enterprise-scale
+    solution.</para>
 
-      <para>Accenture has contributed previously proprietary batch processing
-      architecture frameworks, based upon decades worth of experience in
-      building batch architectures with the last several generations of
-      platforms, (i.e., COBOL/Mainframe, C++/Unix, and now Java/anywhere) to
-      the Spring Batch project along with committer resources to drive
-      support, enhancements, and the future roadmap.</para>
+    <para>Business Scenarios <itemizedlist>
+        <listitem>
+          <para>Commit batch process periodically</para>
+        </listitem>
 
-      <para>The collaborative effort between Accenture and SpringSource aims
-      to promote the standardization of software processing approaches,
-      frameworks, and tools that can be consistently leveraged by enterprise
-      users when creating batch applications. Companies and government
-      agencies desiring to deliver standard, proven solutions to their
-      enterprise IT environments will benefit from Spring Batch.</para>
-    </section>
+        <listitem>
+          <para>Concurrent batch processing: parallel processing of a
+          job</para>
+        </listitem>
 
-    <section>
-      <title id="s-b-i.1.2">Usage Scenarios</title>
+        <listitem>
+          <para>Staged, enterprise message-driven processing</para>
+        </listitem>
 
-      <para>A typical batch program generally reads a large number of records
-      from a database, file, or queue, processes the data in some fashion, and
-      then writes back data in a modified form. Spring Batch automates this
-      basic batch iteration, providing the capability to process similar
-      transactions as a set, typically in an offline environment without any
-      user interaction. Batch jobs are part of most IT projects and Spring
-      Batch is the only open source framework that provides a robust,
-      enterprise-scale solution.</para>
+        <listitem>
+          <para>Massively parallel batch processing</para>
+        </listitem>
 
-      <para>Business Scenarios <itemizedlist>
-          <listitem>
-            <para>Commit batch process periodically</para>
-          </listitem>
+        <listitem>
+          <para>Manual or scheduled restart after failure</para>
+        </listitem>
 
-          <listitem>
-            <para>Concurrent batch processing: parallel processing of a
-            job</para>
-          </listitem>
+        <listitem>
+          <para>Sequential processing of dependent steps (with extensions to
+          workflow-driven batches)</para>
+        </listitem>
 
-          <listitem>
-            <para>Staged, enterprise message-driven processing</para>
-          </listitem>
+        <listitem>
+          <para>Partial processing: skip records (e.g. on rollback)</para>
+        </listitem>
 
-          <listitem>
-            <para>Massively parallel batch processing</para>
-          </listitem>
+        <listitem>
+          <para>Whole-batch transaction: for cases with a small batch size or
+          existing stored procedures/scripts</para>
+        </listitem>
+      </itemizedlist></para>
 
-          <listitem>
-            <para>Manual or scheduled restart after failure</para>
-          </listitem>
+    <para>Technical Objectives <itemizedlist>
+        <listitem>
+          <para>Batch developers use the Spring programming model: concentrate
+          on business logic; let the framework take care of
+          infrastructure.</para>
+        </listitem>
 
-          <listitem>
-            <para>Sequential processing of dependent steps (with extensions to
-            workflow-driven batches)</para>
-          </listitem>
+        <listitem>
+          <para>Clear separation of concerns between the infrastructure, the
+          batch execution environment, and the batch application.</para>
+        </listitem>
 
-          <listitem>
-            <para>Partial processing: skip records (e.g. on rollback)</para>
-          </listitem>
+        <listitem>
+          <para>Provide common, core execution services as interfaces that all
+          projects can implement.</para>
+        </listitem>
 
-          <listitem>
-            <para>Whole-batch transaction: for cases with a small batch size
-            or existing stored procedures/scripts</para>
-          </listitem>
-        </itemizedlist></para>
+        <listitem>
+          <para>Provide simple and default implementations of the core
+          execution interfaces that can be used ‘out of the box’.</para>
+        </listitem>
 
-      <para>Technical Objectives <itemizedlist>
-          <listitem>
-            <para>Batch developers use the Spring programming model:
-            concentrate on business logic; let the framework take care of
-            infrastructure.</para>
-          </listitem>
+        <listitem>
+          <para>Easy to configure, customize, and extend services, by
+          leveraging the spring framework in all layers.</para>
+        </listitem>
 
-          <listitem>
-            <para>Clear separation of concerns between the infrastructure, the
-            batch execution environment, and the batch application.</para>
-          </listitem>
+        <listitem>
+          <para>All existing core services should be easy to replace or
+          extend, without any impact to the infrastructure layer.</para>
+        </listitem>
 
-          <listitem>
-            <para>Provide common, core execution services as interfaces that
-            all projects can implement.</para>
-          </listitem>
+        <listitem>
+          <para>Provide a simple deployment model, with the architecture JARs
+          completely separate from the application, built using Maven.</para>
+        </listitem>
+      </itemizedlist></para>
+  </section>
 
-          <listitem>
-            <para>Provide simple and default implementations of the core
-            execution interfaces that can be used ‘out of the box’.</para>
-          </listitem>
+  <section>
+    <title id="s.1.1">Spring Batch Architecture</title>
 
-          <listitem>
-            <para>Easy to configure, customize, and extend services, by
-            leveraging the spring framework in all layers.</para>
-          </listitem>
+    <para>Spring Batch is designed with extensibility and a diverse group of
+    end users in mind. The figure below shows a sketch of the layered
+    architecture that supports the extensibility and ease of use for end-user
+    developers. <mediaobject>
+        <imageobject role="fo">
+          <imagedata align="center" contentdepth="" contentwidth=""
+                     fileref="src/site/docbook/reference/images/spring-batch-layers.png"
+                     format="PNG" scalefit="" width="338" />
+        </imageobject>
 
-          <listitem>
-            <para>All existing core services should be easy to replace or
-            extend, without any impact to the infrastructure layer.</para>
-          </listitem>
+        <imageobject role="html">
+          <imagedata align="center" fileref="images/spring-batch-layers.png"
+                     format="PNG" scalefit="" width="35%" />
+        </imageobject>
 
-          <listitem>
-            <para>Provide a simple deployment model, with the architecture
-            JARs completely separate from the application, built using
-            Maven.</para>
-          </listitem>
-        </itemizedlist></para>
-    </section>
+        <caption><para>Figure 1.1: Spring Batch Layered
+        Architecture</para></caption>
+      </mediaobject></para>
 
-    <section>
-      <title id="s.1.1">Spring Batch Architecture</title>
-
-      <para>Spring Batch is designed with extensibility and a diverse group of
-      end users in mind. The figure below shows a sketch of the layered
-      architecture that supports the extensibility and ease of use for
-      end-user developers. <mediaobject>
-          <imageobject role="fo">
-            <imagedata align="center"
-                       fileref="src/site/docbook/reference/images/spring-batch-layers.png"
-                       format="PNG" />
-          </imageobject>
-
-          <imageobject role="html">
-            <imagedata align="center" fileref="images/spring-batch-layers.png"
-                       format="PNG" />
-          </imageobject>
-
-          <caption><para>Figure 1.1: Spring Batch Layered
-          Architecture</para></caption>
-        </mediaobject></para>
-
-      <para>This layered architecture highlights three major high level
-      components: Application, Core, and Infrastructure. The application
-      contains all batch jobs and custom code written by developers using
-      Spring Batch. The Batch Core contains the core runtime classes necessary
-      to launch and control a batch job. It includes things such as a
-      <classname>JobLauncher</classname>, <classname>Job</classname>, and
-      <classname>Step</classname> implementations. Both Application and Core
-      are built on top of a common infrastructure. This infrastructure
-      contains common readers and writers, and services such as the
-      <classname>RetryTemplate</classname>, which are used both by application
-      developers(<classname>ItemReader</classname> and
-      <classname>ItemWriter</classname>) and the core framework itself.
-      (retry)</para>
-    </section>
+    <para>This layered architecture highlights three major high level
+    components: Application, Core, and Infrastructure. The application
+    contains all batch jobs and custom code written by developers using Spring
+    Batch. The Batch Core contains the core runtime classes necessary to
+    launch and control a batch job. It includes things such as a
+    <classname>JobLauncher</classname>, <classname>Job</classname>, and
+    <classname>Step</classname> implementations. Both Application and Core are
+    built on top of a common infrastructure. This infrastructure contains
+    common readers and writers, and services such as the
+    <classname>RetryTemplate</classname>, which are used both by application
+    developers(<classname>ItemReader</classname> and
+    <classname>ItemWriter</classname>) and the core framework itself.
+    (retry)</para>
   </section>
 </chapter>
