@@ -17,53 +17,93 @@ package org.springframework.batch.core.listener;
 
 import java.util.List;
 
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
 
 /**
- * Basic no-op implementation of both the {@link ItemWriteListener} and
- * {@link ItemReadListener} interfaces.  Both are implemented, since it is 
- * very common that both may need to be implemented at once.
+ * Basic no-op implementation of the {@link ItemReadListener},
+ * {@link ItemProcessListener}, and {@link ItemWriteListener} interfaces. All
+ * are implemented, since it is very common that all may need to be implemented
+ * at once.
  * 
  * @author Lucas Ward
- *
+ * 
  */
-public class ItemListenerSupport<T,S> implements ItemWriteListener<S>, ItemReadListener<T> {
+public class ItemListenerSupport<I, O> implements ItemReadListener<I>, ItemProcessListener<I, O>, ItemWriteListener<O> {
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
-	 */
-	public void afterWrite(List<? extends S> item) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemWriteListener#beforeWrite(java.lang.Object)
-	 */
-	public void beforeWrite(List<? extends S> item) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.domain.ItemWriteListener#onWriteError(java.lang.Exception, java.lang.Object)
-	 */
-	public void onWriteError(Exception ex, List<? extends S> item) {
-	}
-
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.domain.ItemReadListener#afterRead(java.lang.Object)
 	 */
-	public void afterRead(T item) {
+	public void afterRead(I item) {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.domain.ItemReadListener#beforeRead()
 	 */
 	public void beforeRead() {
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.core.domain.ItemReadListener#onReadError(java.lang.Exception)
 	 */
 	public void onReadError(Exception ex) {
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.core.ItemProcessListener#afterProcess(java.lang.Object,
+	 *      java.lang.Object)
+	 */
+	public void afterProcess(I item, O result) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.core.ItemProcessListener#beforeProcess(java.lang.Object)
+	 */
+	public void beforeProcess(I item) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.core.ItemProcessListener#onProcessError(java.lang.Object,
+	 *      java.lang.Exception)
+	 */
+	public void onProcessError(I item, Exception e) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#afterWrite()
+	 */
+	public void afterWrite(List<? extends O> item) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#beforeWrite(java.lang.Object)
+	 */
+	public void beforeWrite(List<? extends O> item) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.core.domain.ItemWriteListener#onWriteError(java.lang.Exception,
+	 *      java.lang.Object)
+	 */
+	public void onWriteError(Exception ex, List<? extends O> item) {
+	}
 }
