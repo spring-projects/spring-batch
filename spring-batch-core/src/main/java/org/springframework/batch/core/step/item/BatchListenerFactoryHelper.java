@@ -49,8 +49,6 @@ abstract class BatchListenerFactoryHelper {
 			StepListener listener = listeners[i];
 			if (listener instanceof ChunkListener) {
 				hasChunkListener = true;
-			}
-			if (listener instanceof ChunkListener) {
 				multicaster.register((ChunkListener) listener);
 			}
 		}
