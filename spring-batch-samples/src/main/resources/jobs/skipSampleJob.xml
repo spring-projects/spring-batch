@@ -24,6 +24,7 @@
 
 			<listeners>
 				<listener ref="skipCheckingListener"/>
+				<listener ref="promotionListener"/>
 			</listeners>
 		</step>
 
@@ -33,12 +34,13 @@
 			<tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="itemTrackingWriter"
 					 commit-interval="2" skip-limit="1">
 				<skippable-exception-classes>
-					org.springframework.batch.item.validator.ValidationException,
+					org.springframework.batch.item.validator.ValidationException
 					java.lang.RuntimeException
 				</skippable-exception-classes>
 			</tasklet>
 			<listeners>
 				<listener ref="skipCheckingListener"/>
+				<listener ref="promotionListener"/>
 			</listeners>
 		</step>
 
@@ -57,6 +59,14 @@
 	</beans:bean>
 	
 	<beans:bean id="skipCheckingListener" class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+	
+	<beans:bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+		<beans:property name="keys">
+			<beans:list>
+				<beans:value>stepName</beans:value>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
 	
 	<beans:bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
 		<beans:property name="resource" value="classpath:/data/skipJob/input/input#{jobParameters[run.id]}.txt" />

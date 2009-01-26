@@ -16,6 +16,6 @@ public class SkipCheckingListener implements StepExecutionListener {
 	}
 
 	public void beforeStep(StepExecution stepExecution) {
-		stepExecution.getJobExecution().getExecutionContext().put("stepName", stepExecution.getStepName());
+		stepExecution.getExecutionContext().put("stepName", stepExecution.getStepName());
 	}
 }
