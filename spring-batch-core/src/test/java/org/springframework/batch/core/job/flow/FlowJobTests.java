@@ -55,6 +55,8 @@ public class FlowJobTests {
 	private JobExecution jobExecution;
 
 	private JobRepository jobRepository;
+	
+	private boolean fail = false;
 
 	@Before
 	public void setUp() throws Exception {
@@ -101,6 +103,48 @@ public class FlowJobTests {
 		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
+	}
+
+	@Test
+	public void testFailedStepRestarted() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		Collection<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StepSupport("step1") {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException,
+					UnexpectedJobExecutionException {
+				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setExitStatus(ExitStatus.FAILED);
+				jobRepository.update(stepExecution);
+			}
+		}), "step2"));
+		transitions.add(StateTransition.createEndStateTransition(new StepState(new StubStep("step2") {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException,
+					UnexpectedJobExecutionException {
+				if (fail) {
+					stepExecution.setStatus(BatchStatus.FAILED);
+					stepExecution.setExitStatus(ExitStatus.FAILED);
+					jobRepository.update(stepExecution);
+				} else {
+					super.execute(stepExecution);
+				}
+			}
+		})));
+		flow.setStateTransitions(transitions);
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		fail = true;
+		job.execute(jobExecution);
+		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
+		assertEquals(2, jobExecution.getStepExecutions().size());
+		jobRepository.update(jobExecution);
+		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		fail = false;
+		job.execute(jobExecution);
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		// TODO: fix this (BATCH-1030)
+		// assertEquals(1, jobExecution.getStepExecutions().size());
 	}
 
 	@Test
