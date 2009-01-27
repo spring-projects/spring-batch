@@ -15,9 +15,9 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -30,7 +30,6 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.beans.factory.InitializingBean;
-
 
 /**
  * A {@link Flow} that branches conditionally depending on the exit status of
@@ -50,9 +49,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 	private Map<String, State> stateMap = new HashMap<String, State>();
 
-	private String startStateName;
-
-	private Collection<StateTransition> stateTransitions = new HashSet<StateTransition>();
+	private List<StateTransition> stateTransitions = new ArrayList<StateTransition>();
 
 	private final String name;
 
@@ -75,18 +72,11 @@ public class SimpleFlow implements Flow, InitializingBean {
 	}
 
 	/**
-	 * Public setter for the start state name.
-	 * @param startStateName the name of the start state
-	 */
-	public void setStartStateName(String startStateName) {
-		this.startStateName = startStateName;
-	}
-
-	/**
 	 * Public setter for the stateTransitions.
+	 * 
 	 * @param stateTransitions the stateTransitions to set
 	 */
-	public void setStateTransitions(Collection<StateTransition> stateTransitions) {
+	public void setStateTransitions(List<StateTransition> stateTransitions) {
 
 		this.stateTransitions = stateTransitions;
 	}
@@ -140,7 +130,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 		FlowExecution result = new FlowExecution(stateName, status);
 		executor.close(result);
-		return result; 
+		return result;
 
 	}
 
@@ -199,6 +189,10 @@ public class SimpleFlow implements Flow, InitializingBean {
 		stateMap.clear();
 		boolean hasEndStep = false;
 
+		if (stateTransitions.isEmpty()) {
+			throw new IllegalArgumentException("No start state was found. You must specify at least one step in a job.");
+		}
+
 		for (StateTransition stateTransition : stateTransitions) {
 			State state = stateTransition.getState();
 			stateMap.put(state.getName(), state);
@@ -237,45 +231,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 					"No end state was found.  You must specify at least one transition with no next state.");
 		}
 
-		if (startStateName != null) {
+		startState = stateTransitions.get(0).getState();
 
-			startState = stateMap.get(startStateName);
-			if (startState == null) {
-				throw new IllegalArgumentException(
-						"Start state does not exist (if you specify a startStateName make sure "
-								+ "a state with that name is in one of the transitions): [" + startStateName + "]");
-			}
-
-		}
-		else {
-
-			// Try and locate a transition with no incoming links
-
-			Set<String> nextStateNames = new HashSet<String>();
-
-			for (StateTransition stateTransition : stateTransitions) {
-				nextStateNames.add(stateTransition.getNext());
-			}
-
-			for (StateTransition stateTransition : stateTransitions) {
-				State state = stateTransition.getState();
-				if (!nextStateNames.contains(state.getName())) {
-					if (startState != null && !startState.getName().equals(state.getName())) {
-						throw new IllegalArgumentException(String.format(
-								"Multiple possible start states found: [%s, %s].  "
-										+ "Please specify one explicitly with the startStateName property.", startState
-										.getName(), state.getName()));
-					}
-					startState = state;
-				}
-			}
-
-			if (startState == null) {
-				throw new IllegalArgumentException(
-						"No start state could be located (no transition without incoming links)");
-			}
-
-		}
 	}
-
 }

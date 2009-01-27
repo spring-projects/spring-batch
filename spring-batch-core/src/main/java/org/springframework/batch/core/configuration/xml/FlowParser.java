@@ -23,13 +23,13 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.xml.DomUtils;
-
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class FlowParser {
 
@@ -42,30 +42,33 @@ public class FlowParser {
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext, String flowName) {
 		List<RuntimeBeanReference> stateTransitions = new ArrayList<RuntimeBeanReference>();
 
-		@SuppressWarnings("unchecked")
-		List<Element> stepElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "step");
 		StepParser stepParser = new StepParser();
-		for (Element stepElement : stepElements) {
-			stateTransitions.addAll(stepParser.parse(stepElement, parserContext));
-		}
-
-		@SuppressWarnings("unchecked")
-		List<Element> decisionElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "decision");
 		DecisionParser decisionParser = new DecisionParser();
-		for (Element stepElement : decisionElements) {
-			stateTransitions.addAll(decisionParser.parse(stepElement, parserContext));
-		}
-
-		@SuppressWarnings("unchecked")
-		List<Element> splitElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "split");
 		SplitParser splitParser = new SplitParser();
-		for (Element stepElement : splitElements) {
-			stateTransitions.addAll(splitParser.parse(stepElement, parserContext));
+		
+		NodeList children = element.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node node = children.item(i);
+			if (node instanceof Element) {
+				String nodeName = node.getLocalName();
+				if(nodeName.equals("step"))
+				{
+					stateTransitions.addAll(stepParser.parse((Element)node, parserContext));
+				}
+				else if(nodeName.equals("decision"))
+				{
+					stateTransitions.addAll(decisionParser.parse((Element)node, parserContext));
+				}
+				else if(nodeName.equals("split"))
+				{
+					stateTransitions.addAll(splitParser.parse((Element)node, parserContext));
+				}
+			}
 		}
 
-		BeanDefinitionBuilder flowBuilder = 
-			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.SimpleFlow");
-		flowBuilder.addConstructorArgValue(flowName );
+		BeanDefinitionBuilder flowBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.SimpleFlow");
+		flowBuilder.addConstructorArgValue(flowName);
 		ManagedList managedList = new ManagedList();
 		@SuppressWarnings( { "unchecked", "unused" })
 		boolean dummy = managedList.addAll(stateTransitions);

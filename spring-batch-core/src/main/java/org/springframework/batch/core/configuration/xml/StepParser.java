@@ -128,6 +128,8 @@ public class StepParser {
 						element);
 			}
 
+			RuntimeBeanReference additionalState = null;
+			
 			String name = nextElement.getNodeName();
 			if ("stop".equals(name) || "end".equals(name)) {
 
@@ -141,11 +143,18 @@ public class StepParser {
 				String endName = "stop".equals(name) ? "end" + (endCounter++) : null;
 
 				endBuilder.addConstructorArgValue(endName);
-				list.add(getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), onAttribute, nextOnEnd));
+				additionalState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), onAttribute, nextOnEnd);
 				nextAttribute = endName;
 	
 			}
 			list.add(getStateTransitionReference(parserContext, stateDef, onAttribute, nextAttribute));
+			if(additionalState != null)
+			{
+				//
+				// Must be added after the state to ensure that the state is the first in the list
+				//
+				list.add(additionalState);
+			}
 		}
 
 		if(hasNextAttribute && nextElements.isEmpty()) 
