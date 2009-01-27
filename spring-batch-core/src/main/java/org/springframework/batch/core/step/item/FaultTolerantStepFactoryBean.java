@@ -172,7 +172,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * Public setter for the {@link RetryListener}s.
 	 * @param retryListeners the {@link RetryListener}s to set
 	 */
-	public void setRetryListeners(RetryListener[] retryListeners) {
+	public void setRetryListeners(RetryListener... retryListeners) {
 		this.retryListeners = retryListeners;
 	}
 
@@ -216,135 +216,153 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	protected void applyConfiguration(TaskletStep step) {
 		super.applyConfiguration(step);
 
-		if (retryLimit > 1 || skipLimit > 0 || retryPolicy != null) {
+		if (!(retryLimit > 1 || skipLimit > 0 || retryPolicy != null)) {
+			// zero fault-tolerance, just use the parent's simple config
+			return;
+		}
 
-			addFatalExceptionIfMissing(SkipLimitExceededException.class);
-			addFatalExceptionIfMissing(NonSkippableReadException.class);
-			addFatalExceptionIfMissing(SkipListenerFailedException.class);
-			addFatalExceptionIfMissing(RetryException.class);
+		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
+				SkipListenerFailedException.class, RetryException.class);
 
-			if (retryPolicy == null) {
+		if (retryPolicy == null) {
 
-				SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
-				if (!retryableExceptionClasses.isEmpty()) {
-					// otherwise we retry all exceptions
-					simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
-				}
-
-				retryPolicy = simpleRetryPolicy;
-
+			SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
+			if (!retryableExceptionClasses.isEmpty()) {
+				// otherwise we retry all exceptions
+				simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 			}
 
-			// wrapper of the injected retry policy takes care of fatal
-			// exceptions (never retried)
-			final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
-			ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
-			retryPolicyWrapper.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
-
-				public RetryPolicy classify(Throwable classifiable) {
-
-					for (Class<? extends Throwable> fatal : fatalExceptionClasses) {
-						if (fatal.isAssignableFrom(classifiable.getClass())) {
-							return neverRetryPolicy;
-						}
-					}
-					return retryPolicy;
-				}
-			});
-			BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
-			if (backOffPolicy != null) {
-				batchRetryTemplate.setBackOffPolicy(backOffPolicy);
-			}
-			batchRetryTemplate.setRetryPolicy(retryPolicyWrapper);
-
-			// Co-ordinate the retry policy with the exception handler:
-			RepeatOperations stepOperations = getStepOperations();
-			if (stepOperations instanceof RepeatTemplate) {
-				SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicyWrapper,
-						getExceptionHandler(), fatalExceptionClasses);
-				((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
-			}
-
-			if (retryContextCache == null) {
-				if (cacheCapacity > 0) {
-					batchRetryTemplate.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
-				}
-			}
-			else {
-				batchRetryTemplate.setRetryContextCache(retryContextCache);
-			}
-
-			if (retryListeners != null) {
-				batchRetryTemplate.setListeners(retryListeners);
-			}
-
-			List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>(
-					skippableExceptionClasses);
-			SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
-					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-			exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
-			SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
-					new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-
-			Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
-				public Boolean classify(Throwable classifiable) {
-					return getTransactionAttribute().rollbackOn(classifiable);
-				}
-			};
-
-			FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
-					getChunkOperations());
-			chunkProvider.setSkipPolicy(readSkipPolicy);
-			chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
-					ItemReadListener.class));
-			chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
-					SkipListener.class));
-
-			FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(
-					getItemProcessor(), getItemWriter(), batchRetryTemplate);
-			chunkProcessor.setBuffering(!isReaderTransactionalQueue);
-			chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
-			chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
-			chunkProcessor.setRollbackClassifier(rollbackClassifier);
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(
-					getListeners(), ItemProcessListener.class));
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
-					ItemWriteListener.class));
-			chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
-					SkipListener.class));
-
-			
-			for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
-
-				if (itemHandler instanceof SkipListener) {
-					chunkProvider.registerListener((StepListener) itemHandler);
-					chunkProcessor.registerListener((StepListener) itemHandler);
-					// already registered with both so avoid double-registering
-					continue;
-				}
-				if (itemHandler instanceof ItemReadListener) {
-					chunkProvider.registerListener((StepListener) itemHandler);
-				}
-				if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
-					chunkProcessor.registerListener((StepListener) itemHandler);
-				}
-			}
-			ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
-			tasklet.setBuffering(!isReaderTransactionalQueue);
-
-			step.setTasklet(tasklet);
+			retryPolicy = simpleRetryPolicy;
 
 		}
+
+		// wrapper of the injected retry policy takes care of fatal
+		// exceptions (never retried)
+		final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
+		ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
+		retryPolicyWrapper.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
+
+			public RetryPolicy classify(Throwable classifiable) {
+
+				for (Class<? extends Throwable> fatal : fatalExceptionClasses) {
+					if (fatal.isAssignableFrom(classifiable.getClass())) {
+						return neverRetryPolicy;
+					}
+				}
+				return retryPolicy;
+			}
+		});
+		BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
+		if (backOffPolicy != null) {
+			batchRetryTemplate.setBackOffPolicy(backOffPolicy);
+		}
+		batchRetryTemplate.setRetryPolicy(retryPolicyWrapper);
+
+		// Co-ordinate the retry policy with the exception handler:
+		RepeatOperations stepOperations = getStepOperations();
+		if (stepOperations instanceof RepeatTemplate) {
+			SimpleRetryExceptionHandler exceptionHandler = new SimpleRetryExceptionHandler(retryPolicyWrapper,
+					getExceptionHandler(), fatalExceptionClasses);
+			((RepeatTemplate) stepOperations).setExceptionHandler(exceptionHandler);
+		}
+
+		if (retryContextCache == null) {
+			if (cacheCapacity > 0) {
+				batchRetryTemplate.setRetryContextCache(new MapRetryContextCache(cacheCapacity));
+			}
+		}
+		else {
+			batchRetryTemplate.setRetryContextCache(retryContextCache);
+		}
+
+		if (retryListeners != null) {
+			batchRetryTemplate.setListeners(retryListeners);
+		}
+
+		List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>(
+				skippableExceptionClasses);
+		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+				new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
+		exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
+				new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
+
+		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
+			public Boolean classify(Throwable classifiable) {
+				return getTransactionAttribute().rollbackOn(classifiable);
+			}
+		};
+
+		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
+				getChunkOperations());
+		chunkProvider.setSkipPolicy(readSkipPolicy);
+		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
+				getItemWriter(), batchRetryTemplate);
+		chunkProcessor.setBuffering(!isReaderTransactionalQueue);
+		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
+		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
+		chunkProcessor.setRollbackClassifier(rollbackClassifier);
+
+		registerItemListeners(chunkProvider, chunkProcessor);
+		autoRegisterItemListeners(chunkProvider, chunkProcessor);
+
+		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
+		tasklet.setBuffering(!isReaderTransactionalQueue);
+
+		step.setTasklet(tasklet);
 
 	}
 
-	public void addFatalExceptionIfMissing(Class<? extends Throwable> cls) {
-		List<Class<? extends Throwable>> fatalExceptionList = new ArrayList<Class<? extends Throwable>>();
-		for (Class<? extends Throwable> exceptionClass : fatalExceptionClasses) {
+	/**
+	 * Register injected item listeners.
+	 */
+	private void registerItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
+
+		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
+				ItemReadListener.class));
+		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+				SkipListener.class));
+
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(getListeners(),
+				ItemProcessListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
+				ItemWriteListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+				SkipListener.class));
+	}
+
+	/**
+	 * Auto-register reader, processor and writer as item listeners if applicable
+	 */
+	private void autoRegisterItemListeners(SimpleChunkProvider<T> chunkProvider,
+			SimpleChunkProcessor<T, S> chunkProcessor) {
+		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
+
+			if (itemHandler instanceof SkipListener) {
+				chunkProvider.registerListener((StepListener) itemHandler);
+				chunkProcessor.registerListener((StepListener) itemHandler);
+				// already registered with both so avoid double-registering
+				continue;
+			}
+			if (itemHandler instanceof ItemReadListener) {
+				chunkProvider.registerListener((StepListener) itemHandler);
+			}
+			if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
+				chunkProcessor.registerListener((StepListener) itemHandler);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addFatalExceptionIfMissing(Class... cls) {
+		List fatalExceptionList = new ArrayList<Class<? extends Throwable>>();
+		for (Class exceptionClass : fatalExceptionClasses) {
 			fatalExceptionList.add(exceptionClass);
 		}
-		if (!fatalExceptionList.contains(cls)) {
-			fatalExceptionList.add(cls);
+		for (Class fatal : cls) {
+			if (!fatalExceptionList.contains(fatal)) {
+				fatalExceptionList.add(fatal);
+			}
 		}
 		fatalExceptionClasses = fatalExceptionList;
 	}
