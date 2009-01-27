@@ -405,6 +405,32 @@
 							<link>http://static.springframework.org/spring-batch/apidocs/</link>
 							<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 						</links>
+						<header><![CDATA[
+	<!-- Begin Google Analytics code -->
+	<script type="text/javascript">
+		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+	</script>
+	<script type="text/javascript">
+		var pageTracker = _gat._getTracker("UA-2728886-3");
+		pageTracker._setDomainName("none");
+		pageTracker._setAllowLinker(true);
+		pageTracker._trackPageview();
+	</script>
+	<!-- End Google Analytics code -->
+]]>
+						</header>
+						<bottom><![CDATA[
+	<!-- Begin LoopFuse code -->
+	<script src="http://loopfuse.net/webrecorder/js/listen.js" type="text/javascript">
+	</script>
+	<script type="text/javascript"> 
+		_lf_cid = "LF_48be82fa";
+		_lf_remora();
+	</script>
+	<!-- End LoopFuse code -->
+]]>
+						</bottom>
 						<aggregate>true</aggregate>
 						<excludePackageNames>*.batch.sample,*.batch.container,example,test</excludePackageNames>
 					</configuration>
