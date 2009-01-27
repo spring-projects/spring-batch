@@ -67,22 +67,23 @@ import org.springframework.util.Assert;
  */
 public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
 
-	private int skipLimit = 0;
-
 	private Collection<Class<? extends Throwable>> skippableExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
 	private Collection<Class<? extends Throwable>> fatalExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
+	private Collection<Class<? extends Throwable>> retryableExceptionClasses = new HashSet<Class<? extends Throwable>>();
+
 	{
 		fatalExceptionClasses.add(Error.class);
 		skippableExceptionClasses.add(Exception.class);
+		retryableExceptionClasses.add(Exception.class);
 	}
 
 	private int cacheCapacity = 0;
 
 	private int retryLimit = 1;
 
-	private Collection<Class<? extends Throwable>> retryableExceptionClasses = new HashSet<Class<? extends Throwable>>();
+	private int skipLimit = 0;
 
 	private BackOffPolicy backOffPolicy;
 
@@ -225,33 +226,14 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 				SkipListenerFailedException.class, RetryException.class);
 
 		if (retryPolicy == null) {
-
 			SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
-			if (!retryableExceptionClasses.isEmpty()) {
-				// otherwise we retry all exceptions
-				simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
-			}
-
+			simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
 			retryPolicy = simpleRetryPolicy;
-
 		}
 
-		// wrapper of the injected retry policy takes care of fatal
-		// exceptions (never retried)
-		final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
-		ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
-		retryPolicyWrapper.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
-
-			public RetryPolicy classify(Throwable classifiable) {
-
-				for (Class<? extends Throwable> fatal : fatalExceptionClasses) {
-					if (fatal.isAssignableFrom(classifiable.getClass())) {
-						return neverRetryPolicy;
-					}
-				}
-				return retryPolicy;
-			}
-		});
+		
+		RetryPolicy retryPolicyWrapper = fatalExceptionAwareProxy(retryPolicy); 
+		
 		BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
 		if (backOffPolicy != null) {
 			batchRetryTemplate.setBackOffPolicy(backOffPolicy);
@@ -314,6 +296,30 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
+	 * Wrap the provided retryPolicy so that it never retries fatal exceptions.
+	 */
+	private RetryPolicy fatalExceptionAwareProxy(final RetryPolicy retryPolicy) {
+
+		// wrapper of the injected retry policy takes care of fatal
+		// exceptions (never retried)
+		final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
+		ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
+		retryPolicyWrapper.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
+
+			public RetryPolicy classify(Throwable classifiable) {
+
+				for (Class<? extends Throwable> fatal : fatalExceptionClasses) {
+					if (fatal.isAssignableFrom(classifiable.getClass())) {
+						return neverRetryPolicy;
+					}
+				}
+				return retryPolicy;
+			}
+		});
+		return retryPolicyWrapper;
+	}
+
+	/**
 	 * Register injected item listeners.
 	 */
 	private void registerItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
@@ -332,7 +338,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Auto-register reader, processor and writer as item listeners if applicable
+	 * Auto-register reader, processor and writer as item listeners if
+	 * applicable
 	 */
 	private void autoRegisterItemListeners(SimpleChunkProvider<T> chunkProvider,
 			SimpleChunkProcessor<T, S> chunkProcessor) {
