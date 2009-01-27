@@ -16,7 +16,11 @@
 
 package org.springframework.batch.item.file.transform;
 
-
+/**
+ * A {@link LineAggregator} implementation that simply calls
+ * {@link Object#toString()} on the given object
+ * 
+ */
 public class PassThroughLineAggregator<T> implements LineAggregator<T> {
 
 	/**

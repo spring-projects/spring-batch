@@ -23,6 +23,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * A {@link LineTokenizer} implementation that splits the input String on a
+ * configurable delimiter. This implementation also supports the use of an
+ * escape character to escape delimiters and line endings.
  * 
  * @author Rob Harrop
  * @author Dave Syer

@@ -16,6 +16,11 @@
 
 package org.springframework.batch.item.file.mapping;
 
+/**
+ * Pass through {@link LineMapper} useful for passing the original
+ * {@link String} back directly rather than a mapped object.
+ * 
+ */
 public class PassThroughLineMapper implements LineMapper<String>{
 
 	public String mapLine(String line, int lineNumber) throws Exception {

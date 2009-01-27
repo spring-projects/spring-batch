@@ -18,6 +18,11 @@ package org.springframework.batch.item.file.transform;
 import org.springframework.util.Assert;
 
 /**
+ * An abstract {@link LineAggregator} implementation that utilizes a
+ * {@link FieldExtractor} to convert the incoming object to an array of its
+ * parts. Extending classes must decide how those parts will be aggregated
+ * together.
+ * 
  * @author Dan Garrette
  * @since 2.0
  */

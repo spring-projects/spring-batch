@@ -21,6 +21,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 
+/**
+ * A {@link LineTokenizer} implementation that stores a mapping of String
+ * prefixes to delegate {@link LineTokenizer}s. Each line tokenizied will be
+ * checked for its prefix. If the prefix matches a key in the map of delegates,
+ * then the corresponding delegate {@link LineTokenizer} will be used.
+ * Otherwise, the default {@link LineTokenizer} will be used. The default
+ * {@link LineTokenizer} can be configured in the delegate map by setting its
+ * corresponding prefix to the empty string.
+ * 
+ */
 public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
 
 	private Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
