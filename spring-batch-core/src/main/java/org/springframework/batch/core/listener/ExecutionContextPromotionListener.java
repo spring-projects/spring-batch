@@ -21,8 +21,8 @@ import java.util.List;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.support.util.PatternMatcher;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
