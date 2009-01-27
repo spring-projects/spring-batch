@@ -164,12 +164,11 @@ public class SkipSampleFunctionalTests {
 
 		// Both steps contained skips
 		assertEquals(2, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "ERROR_LOG"));
-		
-		// TODO: uncomment when step name storage is fixed
-		//		for (int i = 1; i <= 2; i++) {
-		//			assertEquals(1, simpleJdbcTemplate.queryForInt(
-		//					"SELECT Count(*) from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", "skipJob", "step" + i));
-		//		}
+
+		for (int i = 1; i <= 2; i++) {
+			assertEquals(1, simpleJdbcTemplate.queryForInt(
+					"SELECT Count(*) from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", "skipJob", "step" + i));
+		}
 	}
 
 	private void validateLaunchWithoutSkips() {
