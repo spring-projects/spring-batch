@@ -81,11 +81,29 @@
               simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)", i, "customer" + i);
           }
 
-          JobExecution jobExecution = this.launchJob();
+          JobExecution jobExecution = <emphasis role="bold">this.launchJob()</emphasis>;
 
           Assert.assertEquals("COMPLETED", jobExecution.getExitStatus());
       }
   }
+
+</programlisting>
+  </section>
+
+  <section>
+    <title>Testing Individual Steps</title>
+
+    <para>For complex batch jobs, test cases in the end-to-end tesing approach
+    may become unmanageable. It these cases, it may be more useful to have
+    test cases to test individual steps on their own. The
+    <classname>AbstractJobTests</classname> class contains a method
+    <methodname>launchStep</methodname> that takes a step name and runs just
+    that particular <classname>Step</classname>. This approach allows for more
+    targeted tests by allowing the test to set up data for just that step and
+    to validate its results directly.</para>
+
+    <programlisting>
+  JobExecution jobExecution = this.launchStep("loadFileStep");
 
 </programlisting>
   </section>
