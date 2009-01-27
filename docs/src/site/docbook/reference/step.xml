@@ -13,8 +13,8 @@
   developer desires. A simple <classname>Step</classname> might load data from
   a file into the database, requiring little or no code. (depending upon the
   implementations used) A more complex <classname>Step</classname> may have
-  complicated business rules that are applied as part of the processing.
-  </para>
+  complicated business rules that are applied as part of the
+  processing.</para>
 
   <mediaobject>
     <imageobject role="html">
@@ -38,7 +38,7 @@
     <classname>ItemReader</classname>, handed to an
     <classname>ItemWriter</classname>, and aggregated. Once the number of
     items read equals the commit interval, the entire chunk is written out via
-    the ItemWriter, and then the transaction is committed. </para>
+    the ItemWriter, and then the transaction is committed.</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -54,8 +54,8 @@
       </imageobject>
     </mediaobject>
 
-    <para>Below is a code representation of the same concepts shown above:
-    </para>
+    <para>Below is a code representation of the same concepts shown
+    above:</para>
 
     <programlisting>  
   List items = new Arraylist();
@@ -780,6 +780,32 @@
             <para><classname>@OnSkipInProcess</classname></para>
           </listitem>
         </itemizedlist>
+
+        <section>
+          <title>SkipListeners and Transactions</title>
+
+          <para>One of the most common use cases for a
+          <classname>SkipListener</classname> is to log out a skipped item, so
+          that another batch process or even human process can be used to
+          evaluate and fix the issue leading to the skip. Because there are
+          many cases in which the original trasaction may be rolledback,
+          Spring Batch makes two garantees:</para>
+
+          <orderedlist>
+            <listitem>
+              <para>The appropriate skip method (depending on when the error
+              happened) will only be called once per item.</para>
+            </listitem>
+
+            <listitem>
+              <para>The <classname>SkipListener</classname> will always be
+              called just before the transaction is committed. This is to
+              ensure that any transactional resources call by the listener are
+              not rolled back by a failure within the
+              <classname>ItemWriter</classname>.</para>
+            </listitem>
+          </orderedlist>
+        </section>
       </section>
     </section>
   </section>
@@ -956,7 +982,7 @@
         </imageobject>
       </mediaobject>
 
-      <para> This can be achieved using the 'next' attribute of
+      <para>This can be achieved using the 'next' attribute of
       <classname>Step</classname>:</para>
 
       <para><programlisting>
@@ -1135,7 +1161,7 @@
     </section>
 
     <section>
-      <title> Configuring for Stop</title>
+      <title>Configuring for Stop</title>
 
       <para>If it is desired that the batch job stop under certain conditions,
       then either the "stop" tag or the "end" tag may be used.</para>
