@@ -11,7 +11,7 @@ public class TestTasklet extends AbstractTestComponent implements Tasklet {
 	public RepeatStatus execute(StepContribution contribution,
 			ChunkContext chunkContext) throws Exception {
 		executed = true;
-		contribution.setExitStatus(ExitStatus.FINISHED);
+		contribution.setExitStatus(ExitStatus.COMPLETED);
 		return RepeatStatus.FINISHED;  
 	}  
 

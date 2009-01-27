@@ -38,7 +38,7 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 		
 		ecm2 = new SimpleJvmExitCodeMapper();
 		Map<String, Integer> ecm2Map = new HashMap<String, Integer>();
-		ecm2Map.put(ExitStatus.FINISHED.getExitCode(), new Integer(-1));
+		ecm2Map.put(ExitStatus.COMPLETED.getExitCode(), new Integer(-1));
 		ecm2Map.put(ExitStatus.FAILED.getExitCode(), new Integer(-2));
 		ecm2Map.put(ExitCodeMapper.JOB_NOT_PROVIDED, new Integer(-3));
 		ecm2Map.put(ExitCodeMapper.NO_SUCH_JOB, new Integer(-3));
@@ -51,7 +51,7 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 
 	public void testGetExitCodeWithpPredefinedCodes() {
 		assertEquals(
-				ecm.intValue(ExitStatus.FINISHED.getExitCode()),
+				ecm.intValue(ExitStatus.COMPLETED.getExitCode()),
 				ExitCodeMapper.JVM_EXITCODE_COMPLETED);
 		assertEquals(
 				ecm.intValue(ExitStatus.FAILED.getExitCode()),
@@ -65,9 +65,9 @@ public class SimpleJvmExitCodeMapperTests extends TestCase {
 	}
 	
 	public void testGetExitCodeWithPredefinedCodesOverridden() {
-		System.out.println(ecm2.intValue(ExitStatus.FINISHED.getExitCode()));
+		System.out.println(ecm2.intValue(ExitStatus.COMPLETED.getExitCode()));
 		assertEquals(
-				ecm2.intValue(ExitStatus.FINISHED.getExitCode()), -1);
+				ecm2.intValue(ExitStatus.COMPLETED.getExitCode()), -1);
 		assertEquals(
 				ecm2.intValue(ExitStatus.FAILED.getExitCode()), -2);
 		assertEquals(

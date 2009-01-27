@@ -231,7 +231,7 @@ public class TaskletStepTests {
 		}
 		catch (Exception ex) {
 			ExitStatus status = stepExecution.getExitStatus();
-			assertEquals(ExitStatus.FINISHED, status);
+			assertEquals(ExitStatus.COMPLETED, status);
 		}
 	}
 

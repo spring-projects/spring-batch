@@ -42,7 +42,7 @@ public class ExitStatusTests {
 
 	@Test
 	public void testExitStatusConstantsFinished() {
-		ExitStatus status = ExitStatus.FINISHED;
+		ExitStatus status = ExitStatus.COMPLETED;
 		assertEquals("COMPLETED", status.getExitCode());
 	}
 
@@ -104,7 +104,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenFinishedAddedToContinuable() {
-		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.EXECUTING.and(ExitStatus.FINISHED).getExitCode());
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), ExitStatus.EXECUTING.and(ExitStatus.COMPLETED).getExitCode());
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenContinuableAddedToFinished() {
-		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(ExitStatus.EXECUTING).getExitCode());
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), ExitStatus.COMPLETED.and(ExitStatus.EXECUTING).getExitCode());
 	}
 
 	/**
@@ -134,7 +134,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenCustomCompletedAddedToCompleted() {
-		assertEquals("COMPLETED_CUSTOM", ExitStatus.FINISHED.and(ExitStatus.EXECUTING.replaceExitCode("COMPLETED_CUSTOM")).getExitCode());
+		assertEquals("COMPLETED_CUSTOM", ExitStatus.COMPLETED.and(ExitStatus.EXECUTING.replaceExitCode("COMPLETED_CUSTOM")).getExitCode());
 	}
 
 	/**
@@ -144,8 +144,8 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusFailedPlusFinished() {
-		assertEquals("FAILED", ExitStatus.FINISHED.and(ExitStatus.FAILED).getExitCode());
-		assertEquals("FAILED", ExitStatus.FAILED.and(ExitStatus.FINISHED).getExitCode());
+		assertEquals("FAILED", ExitStatus.COMPLETED.and(ExitStatus.FAILED).getExitCode());
+		assertEquals("FAILED", ExitStatus.FAILED.and(ExitStatus.COMPLETED).getExitCode());
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenCustomContinuableAddedToFinished() {
-		assertEquals(ExitStatus.FINISHED.getExitCode(), ExitStatus.FINISHED.and(
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), ExitStatus.COMPLETED.and(
 				ExitStatus.EXECUTING.replaceExitCode("CUSTOM")).getExitCode());
 	}
 

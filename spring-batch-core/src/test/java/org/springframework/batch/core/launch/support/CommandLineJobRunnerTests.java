@@ -59,7 +59,7 @@ public class CommandLineJobRunnerTests {
 	@Before
 	public void setUp() throws Exception {
 		JobExecution jobExecution = new JobExecution(null, new Long(1));
-		ExitStatus exitStatus = ExitStatus.FINISHED;
+		ExitStatus exitStatus = ExitStatus.COMPLETED;
 		jobExecution.setExitStatus(exitStatus);
 		StubJobLauncher.jobExecution = jobExecution;
 	}

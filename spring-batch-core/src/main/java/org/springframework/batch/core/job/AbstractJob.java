@@ -233,7 +233,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 				// The job was already stopped before we even got this far. Deal
 				// with it in the same way as any other interruption.
 				execution.setStatus(BatchStatus.STOPPED);
-				execution.setExitStatus(ExitStatus.FINISHED);
+				execution.setExitStatus(ExitStatus.COMPLETED);
 
 			}
 

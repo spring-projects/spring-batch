@@ -25,7 +25,7 @@ public class ConfigurableSystemProcessExitCodeMapperTests {
 	public void testMapping() {
 		Map<Object, ExitStatus> mappings = new HashMap<Object, ExitStatus>() {
 			{
-				put(0, ExitStatus.FINISHED);
+				put(0, ExitStatus.COMPLETED);
 				put(1, ExitStatus.FAILED);
 				put(2, ExitStatus.EXECUTING);
 				put(3, ExitStatus.NOOP);

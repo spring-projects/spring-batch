@@ -49,7 +49,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	/**
 	 * Convenient constant value representing finished processing.
 	 */
-	public static final ExitStatus FINISHED = new ExitStatus("COMPLETED");
+	public static final ExitStatus COMPLETED = new ExitStatus("COMPLETED");
 
 	/**
 	 * Convenient constant value representing job that did no processing (e.g.
@@ -153,7 +153,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return
 	 */
 	private int severity(ExitStatus status) {
-		if (status.exitCode.startsWith(FINISHED.exitCode)) {
+		if (status.exitCode.startsWith(COMPLETED.exitCode)) {
 			return 2;
 		}
 		if (status.exitCode.startsWith(NOOP.exitCode)) {

@@ -62,7 +62,7 @@ public class StepListenerMethodInterceptorTests {
 		invokers.add(MethodInvokerUtils.createMethodInvokerByName(testClass, "method3", false));
 		invokerMap.put("method3", invokers);
 		interceptor = new MethodInvokerMethodInterceptor(invokerMap);
-		assertEquals(ExitStatus.FINISHED, interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method3"))));
+		assertEquals(ExitStatus.COMPLETED, interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method3"))));
 	}
 	
 	public Set<MethodInvoker> asSet(MethodInvoker methodInvoker){
@@ -87,7 +87,7 @@ public class StepListenerMethodInterceptorTests {
 		
 		public ExitStatus method3(){
 			method3Count++;
-			return ExitStatus.FINISHED;
+			return ExitStatus.COMPLETED;
 		}
 	}
 	

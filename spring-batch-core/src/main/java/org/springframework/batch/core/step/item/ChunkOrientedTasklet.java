@@ -74,7 +74,7 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		chunkContext.setComplete();
 		chunkProvider.postProcess(contribution, inputs);
 		if (inputs.isEnd()) {
-			contribution.setExitStatus(ExitStatus.FINISHED);
+			contribution.setExitStatus(ExitStatus.COMPLETED);
 		}
 
 		return RepeatStatus.continueIf(!inputs.isEnd());

@@ -77,7 +77,7 @@ public class FlowJobTests {
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		StepExecution stepExecution = job.doExecute(jobExecution);
-		assertEquals(ExitStatus.FINISHED, stepExecution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 	}
 
@@ -98,7 +98,7 @@ public class FlowJobTests {
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		StepExecution stepExecution = job.doExecute(jobExecution);
-		assertEquals(ExitStatus.FINISHED, stepExecution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 	}
@@ -198,7 +198,7 @@ public class FlowJobTests {
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		StepExecution stepExecution = job.doExecute(jobExecution);
-		assertEquals(ExitStatus.FINISHED, stepExecution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution.getExitStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertEquals("step3", stepExecution.getStepName());
 	}
@@ -261,7 +261,7 @@ public class FlowJobTests {
 
 		public void execute(StepExecution stepExecution) throws JobInterruptedException {
 			stepExecution.setStatus(BatchStatus.COMPLETED);
-			stepExecution.setExitStatus(ExitStatus.FINISHED);
+			stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			jobRepository.update(stepExecution);
 		}
 

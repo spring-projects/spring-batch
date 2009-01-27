@@ -23,7 +23,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 /**
  * A {@link Tasklet} that wraps a method in a POJO. By default the return
- * value is {@link ExitStatus#FINISHED} unless the delegate POJO itself returns
+ * value is {@link ExitStatus#COMPLETED} unless the delegate POJO itself returns
  * an {@link ExitStatus}. The POJO method is usually going to have no arguments,
  * but a static argument or array of arguments can be used by setting the
  * arguments property.
@@ -49,7 +49,7 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 
 	/**
 	 * If the result is an {@link ExitStatus} already just return that,
-	 * otherwise return {@link ExitStatus#FINISHED}.
+	 * otherwise return {@link ExitStatus#COMPLETED}.
 	 * 
 	 * @param result the value returned by the delegate method
 	 * @return an {@link ExitStatus} consistent with the result
@@ -58,7 +58,7 @@ public class MethodInvokingTaskletAdapter extends AbstractMethodInvokingDelegato
 		if (result instanceof ExitStatus) {
 			return (ExitStatus) result;
 		}
-		return ExitStatus.FINISHED;
+		return ExitStatus.COMPLETED;
 	}
 
 }

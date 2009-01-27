@@ -30,7 +30,7 @@ public class JdbcJobDaoTests extends AbstractJobDaoTests {
 
 		assertTrue(LONG_STRING.length() > 250);
 		((JdbcJobExecutionDao) jobExecutionDao).setExitMessageLength(250);
-		jobExecution.setExitStatus(ExitStatus.FINISHED
+		jobExecution.setExitStatus(ExitStatus.COMPLETED
 				.addExitDescription(LONG_STRING));
 		jobExecutionDao.updateJobExecution(jobExecution);
 

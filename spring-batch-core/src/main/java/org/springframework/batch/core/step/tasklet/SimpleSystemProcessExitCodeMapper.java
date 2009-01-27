@@ -29,7 +29,7 @@ import org.springframework.batch.core.ExitStatus;
 public class SimpleSystemProcessExitCodeMapper implements SystemProcessExitCodeMapper {
 	public ExitStatus getExitStatus(int exitCode) {
 		if (exitCode == 0) {
-			return ExitStatus.FINISHED;
+			return ExitStatus.COMPLETED;
 		} else {
 			return ExitStatus.FAILED;
 		}

@@ -116,7 +116,7 @@ public class MessageOrientedStep extends AbstractStep {
 			waitForReply(request.getJobId());
 		}
 
-		stepExecution.setExitStatus(ExitStatus.FINISHED);
+		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
 	}
 

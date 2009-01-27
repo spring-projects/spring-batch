@@ -106,7 +106,7 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 			stepExecution.setStatus(BatchStatus.FAILED);
 			throw new ItemStreamException("Timed out waiting for back log at end of step");
 		}
-		return ExitStatus.FINISHED.addExitDescription("Waited for " + expecting + " results.");
+		return ExitStatus.COMPLETED.addExitDescription("Waited for " + expecting + " results.");
 	}
 
 	public void close() throws ItemStreamException {

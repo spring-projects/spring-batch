@@ -65,7 +65,7 @@ public class StepHandlerAdapterTests {
 		tasklet.setTargetMethod("process");
 		StepContribution contribution = stepExecution.createStepContribution();
 		tasklet.execute(contribution,null);
-		assertEquals(ExitStatus.FINISHED, contribution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, contribution.getExitStatus());
 	}
 
 	@Test
@@ -74,7 +74,7 @@ public class StepHandlerAdapterTests {
 		this.result = "foo";
 		StepContribution contribution = stepExecution.createStepContribution();
 		tasklet.execute(contribution,null);
-		assertEquals(ExitStatus.FINISHED, contribution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, contribution.getExitStatus());
 	}
 
 }

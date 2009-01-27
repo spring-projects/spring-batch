@@ -13,7 +13,7 @@ public class SkipCheckingDecider implements JobExecutionDecider {
 				&& stepExecution.getSkipCount() > 0) {
 			return "COMPLETED WITH SKIPS";
 		} else {
-			return ExitStatus.FINISHED.getExitCode();
+			return ExitStatus.COMPLETED.getExitCode();
 		}
 	}
 }

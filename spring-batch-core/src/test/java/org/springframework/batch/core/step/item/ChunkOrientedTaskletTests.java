@@ -101,7 +101,7 @@ public class ChunkOrientedTaskletTests {
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
 		handler.execute(contribution, context);
-		assertEquals(ExitStatus.FINISHED.getExitCode(), contribution.getExitStatus().getExitCode());
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), contribution.getExitStatus().getExitCode());
 	}
 
 }

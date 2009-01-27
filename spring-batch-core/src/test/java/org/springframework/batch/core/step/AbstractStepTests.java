@@ -59,7 +59,7 @@ public class AbstractStepTests {
 		protected void doExecute(StepExecution context) throws Exception {
 			assertSame(execution, context);
 			events.add("doExecute");
-			context.setExitStatus(ExitStatus.FINISHED);
+			context.setExitStatus(ExitStatus.COMPLETED);
 		}
 
 		protected void close(ExecutionContext ctx) throws Exception {
@@ -180,7 +180,7 @@ public class AbstractStepTests {
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
-		assertEquals(ExitStatus.FINISHED, execution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, execution.getExitStatus());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("beforeStep"));

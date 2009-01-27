@@ -52,7 +52,7 @@ public class SimpleJobLauncherTests {
 	private Job job = new JobSupport("foo") {
 		@Override
 		public void execute(JobExecution execution) {
-			execution.setExitStatus(ExitStatus.FINISHED);
+			execution.setExitStatus(ExitStatus.COMPLETED);
 			return;
 		}
 	};
@@ -81,7 +81,7 @@ public class SimpleJobLauncherTests {
 
 		jobLauncher.afterPropertiesSet();
 		jobLauncher.run(job, jobParameters);
-		assertEquals(ExitStatus.FINISHED, jobExecution.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
 		verify(jobRepository);
 	}
@@ -100,7 +100,7 @@ public class SimpleJobLauncherTests {
 
 			@Override
 			public void execute(JobExecution execution) {
-				execution.setExitStatus(ExitStatus.FINISHED);
+				execution.setExitStatus(ExitStatus.COMPLETED);
 				return;
 			}
 		};

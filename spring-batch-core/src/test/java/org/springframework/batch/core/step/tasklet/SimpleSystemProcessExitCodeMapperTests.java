@@ -19,7 +19,7 @@ public class SimpleSystemProcessExitCodeMapperTests {
 	 */
 	@Test
 	public void testMapping() {
-		assertEquals(ExitStatus.FINISHED, mapper.getExitStatus(0));
+		assertEquals(ExitStatus.COMPLETED, mapper.getExitStatus(0));
 		assertEquals(ExitStatus.FAILED, mapper.getExitStatus(1));
 		assertEquals(ExitStatus.FAILED, mapper.getExitStatus(-1));
 	}

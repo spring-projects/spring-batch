@@ -228,7 +228,7 @@ public class SimpleJobTests {
 		step2.setStartLimit(5);
 		job.execute(jobExecution);
 		assertEquals(2, list.size());
-		checkRepository(BatchStatus.COMPLETED, ExitStatus.FINISHED);
+		checkRepository(BatchStatus.COMPLETED, ExitStatus.COMPLETED);
 
 	}
 
@@ -536,7 +536,7 @@ public class SimpleJobTests {
 			if (runnable != null) {
 				runnable.run();
 			}
-			stepExecution.setExitStatus(ExitStatus.FINISHED);
+			stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			jobRepository.update(stepExecution);
 			jobRepository.updateExecutionContext(stepExecution);

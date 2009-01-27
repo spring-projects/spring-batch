@@ -41,7 +41,7 @@ public class SimpleJvmExitCodeMapper implements ExitCodeMapper {
 
 	public SimpleJvmExitCodeMapper() {
 		mapping = new HashMap<String, Integer>();
-		mapping.put(ExitStatus.FINISHED.getExitCode(), JVM_EXITCODE_COMPLETED);
+		mapping.put(ExitStatus.COMPLETED.getExitCode(), JVM_EXITCODE_COMPLETED);
 		mapping.put(ExitStatus.FAILED.getExitCode(), JVM_EXITCODE_GENERIC_ERROR);
 		mapping.put(ExitCodeMapper.JOB_NOT_PROVIDED, JVM_EXITCODE_JOB_ERROR);
 		mapping.put(ExitCodeMapper.NO_SUCH_JOB, JVM_EXITCODE_JOB_ERROR);

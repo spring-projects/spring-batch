@@ -167,7 +167,7 @@ public abstract class AbstractJobDaoTests {
 	public void testUpdateJobExecution() {
 
 		jobExecution.setStatus(BatchStatus.COMPLETED);
-		jobExecution.setExitStatus(ExitStatus.FINISHED);
+		jobExecution.setExitStatus(ExitStatus.COMPLETED);
 		jobExecution.setEndTime(new Date(System.currentTimeMillis()));
 		jobExecutionDao.updateJobExecution(jobExecution);
 

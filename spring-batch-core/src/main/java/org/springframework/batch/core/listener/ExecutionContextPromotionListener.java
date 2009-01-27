@@ -44,7 +44,7 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
 public class ExecutionContextPromotionListener extends StepExecutionListenerSupport implements InitializingBean {
 
 	private List<String> keys = null;
-	private List<String> statuses = Collections.singletonList(ExitStatus.FINISHED.getExitCode());
+	private List<String> statuses = Collections.singletonList(ExitStatus.COMPLETED.getExitCode());
 
 	/*
 	 * (non-Javadoc)

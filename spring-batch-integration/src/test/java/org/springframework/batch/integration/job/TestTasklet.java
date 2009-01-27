@@ -32,7 +32,7 @@ public class TestTasklet implements Tasklet {
 	 * 
 	 */
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		contribution.setExitStatus(ExitStatus.FINISHED);
+		contribution.setExitStatus(ExitStatus.COMPLETED);
 		return RepeatStatus.FINISHED;
 	}
 

@@ -35,7 +35,7 @@ public class ExecutionContextPromotionListenerTests {
 
 		JobExecution jobExecution = new JobExecution(1L);
 		StepExecution stepExecution = jobExecution.createStepExecution("step1");
-		stepExecution.setExitStatus(ExitStatus.FINISHED);
+		stepExecution.setExitStatus(ExitStatus.COMPLETED);
 
 		Assert.state(jobExecution.getExecutionContext().isEmpty());
 		Assert.state(stepExecution.getExecutionContext().isEmpty());

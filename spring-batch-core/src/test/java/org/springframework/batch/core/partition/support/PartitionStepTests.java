@@ -65,7 +65,7 @@ public class PartitionStepTests {
 				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
 				for (StepExecution execution : executions) {
 					execution.setStatus(BatchStatus.COMPLETED);
-					execution.setExitStatus(ExitStatus.FINISHED);
+					execution.setExitStatus(ExitStatus.COMPLETED);
 				}
 				return executions;
 			}
