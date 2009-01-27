@@ -67,6 +67,10 @@ public class StepParser {
 		String stepRef = element.getAttribute("name");
 		String taskletRef = element.getAttribute("tasklet");
 
+		if (!StringUtils.hasText(stepRef)) {
+			parserContext.getReaderContext().error("The name attribute can't be empty for <" + element.getNodeName() + ">", element);
+		}
+		
 		@SuppressWarnings("unchecked")
 		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
 		if (StringUtils.hasText(taskletRef)) {

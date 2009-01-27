@@ -117,9 +117,11 @@
 					<xsd:annotation>
 						<xsd:documentation>
 							Defines a stage in job processing backed by a
-							Step. The name
-							attribute has to match the id of a bean definition
-							for a Step.
+							Step. 
+							The name attribute must be specified and
+							can match the id of a bean definition
+							for a Step. If it does not, then you must provide a
+							tasklet definition.
 							The next attribute is a synonym for &lt;next on="*" .../&gt;
 						</xsd:documentation>
 					</xsd:annotation>
@@ -129,7 +131,8 @@
 								<xsd:attribute name="name" type="xsd:string" use="required" >
 									<xsd:annotation>
 										<xsd:documentation>
-										The step name is a reference to another bean definition where business logic is specified.
+										The step name attribute defines the name for the step. It can be used as 
+										a reference to another bean definition where business logic is specified.
 										</xsd:documentation>
 									</xsd:annotation>
 								</xsd:attribute>
