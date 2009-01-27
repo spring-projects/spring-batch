@@ -15,13 +15,14 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
@@ -44,6 +45,16 @@ public class StepParserTests {
 		FaultTolerantStepFactoryBean<Object, Object> factory = (FaultTolerantStepFactoryBean<Object, Object>) beans.get(factoryName);
 		TaskletStep bean = (TaskletStep) factory.getObject();
 		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testStepParserBeanName() throws Exception {
+		ConfigurableApplicationContext ctx = 
+			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/StepParserBeanNameTests-context.xml");
+		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		assertTrue("'step1' bean not found", beans.containsKey("step1"));
+		assertTrue("'step2' bean not found", beans.containsKey("step2"));
 	}
 
 	@Test

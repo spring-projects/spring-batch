@@ -70,18 +70,17 @@ public class StepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
 		if (StringUtils.hasText(taskletRef)) {
-			Object task = handleTaskletRef(element, taskletRef, parserContext);
-			stateBuilder.addConstructorArgValue(stepRef);
-			stateBuilder.addConstructorArgValue(task);
+			BeanDefinition task = handleTaskletRef(element, taskletRef, parserContext);
+			parserContext.getRegistry().registerBeanDefinition(stepRef, task);
+			stateBuilder.addConstructorArgReference(stepRef);
 		}
 		else if (processTaskElements.size() > 0) {
-			Object task = handleTaskletElement(element, processTaskElements.get(0), parserContext);
-			stateBuilder.addConstructorArgValue(stepRef);
-			stateBuilder.addConstructorArgValue(task);
+			BeanDefinition task = handleTaskletElement(element, processTaskElements.get(0), parserContext);
+			parserContext.getRegistry().registerBeanDefinition(stepRef, task);
+			stateBuilder.addConstructorArgReference(stepRef);
 		}
 		else if (StringUtils.hasText(stepRef)) {
-				RuntimeBeanReference stateDef = new RuntimeBeanReference(stepRef);
-				stateBuilder.addConstructorArgValue(stateDef);
+				stateBuilder.addConstructorArgReference(stepRef);
 		}
 		else {
 			parserContext.getReaderContext().error("Incomplete configuration detected while creating step with name " + stepRef, element);
@@ -199,7 +198,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition handleTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext) {
+	protected BeanDefinition handleTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext) {
 
     	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
 
@@ -229,7 +228,7 @@ public class StepParser {
 	 * @param parserContext
 	 * @return the TaskletStep bean
 	 */
-	protected RootBeanDefinition handleTaskletElement(Element stepElement, Element element, ParserContext parserContext) {
+	protected BeanDefinition handleTaskletElement(Element stepElement, Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd;
     	
@@ -348,9 +347,6 @@ public class StepParser {
         
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
         
-		String id = parserContext.getReaderContext().generateBeanName(bd);
-		parserContext.getRegistry().registerBeanDefinition(id, bd);
-        
         return bd;
 
 	}
@@ -374,7 +370,7 @@ public class StepParser {
 		return false;
 	}
 
-	private void handleExceptionElement(Element element, ParserContext parserContext, RootBeanDefinition bd, 
+	private void handleExceptionElement(Element element, ParserContext parserContext, BeanDefinition bd, 
 			String subElementName, String propertyName, boolean isFaultTolerant) {
 		String exceptions = 
         	DomUtils.getChildElementValueByTagName(element, subElementName);
@@ -394,7 +390,7 @@ public class StepParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleListenersElement(Element element, RootBeanDefinition bd, ParserContext parserContext, String property) {
+	private void handleListenersElement(Element element, BeanDefinition bd, ParserContext parserContext, String property) {
 		Element listenersElement = 
         	DomUtils.getChildElementByTagName(element, "listeners");
 		if (listenersElement != null) {
@@ -408,7 +404,7 @@ public class StepParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleRetryListenersElement(Element element, RootBeanDefinition bd, ParserContext parserContext) {
+	private void handleRetryListenersElement(Element element, BeanDefinition bd, ParserContext parserContext) {
 		Element retryListenersElement = 
         	DomUtils.getChildElementByTagName(element, "retry-listeners");
 		if (retryListenersElement != null) {
@@ -539,7 +535,7 @@ public class StepParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleStreamsElement(Element element, RootBeanDefinition bd, ParserContext parserContext) {
+	private void handleStreamsElement(Element element, BeanDefinition bd, ParserContext parserContext) {
 		Element streamsElement = 
         	DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
