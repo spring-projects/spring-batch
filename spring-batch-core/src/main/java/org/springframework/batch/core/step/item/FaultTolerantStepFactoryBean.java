@@ -76,7 +76,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	{
 		fatalExceptionClasses.add(Error.class);
 		skippableExceptionClasses.add(Exception.class);
-		retryableExceptionClasses.add(Exception.class);
+		// TODO seems to cause trouble, although it shouldn't matter for
+		// retryLimit=1?
+		// retryableExceptionClasses.add(Exception.class);
 	}
 
 	private int cacheCapacity = 0;
@@ -231,9 +233,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			retryPolicy = simpleRetryPolicy;
 		}
 
-		
-		RetryPolicy retryPolicyWrapper = fatalExceptionAwareProxy(retryPolicy); 
-		
+		RetryPolicy retryPolicyWrapper = fatalExceptionAwareProxy(retryPolicy);
+
 		BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
 		if (backOffPolicy != null) {
 			batchRetryTemplate.setBackOffPolicy(backOffPolicy);
