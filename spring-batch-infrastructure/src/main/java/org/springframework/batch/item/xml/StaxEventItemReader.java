@@ -163,7 +163,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 		noInput = false;
 		if (!resource.exists()) {
 			noInput = true;
-			logger.warn("Input resource does not exist");
+			logger.warn("Input resource does not exist " + resource.getDescription());
 			return;
 		}
 
