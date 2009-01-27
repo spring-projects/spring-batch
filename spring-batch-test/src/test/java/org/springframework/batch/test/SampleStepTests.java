@@ -19,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/sampleJob.xml" })
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/sample-steps.xml" })
 public class SampleStepTests implements ApplicationContextAware{
 
 	@Autowired

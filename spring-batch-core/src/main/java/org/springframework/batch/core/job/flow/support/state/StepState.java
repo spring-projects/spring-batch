@@ -53,4 +53,10 @@ public class StepState extends AbstractState {
 		return executor.executeStep(step);
 	}
 
+	/**
+	 * @return the step
+	 */
+	public Step getStep() {
+		return step;
+	}
 }

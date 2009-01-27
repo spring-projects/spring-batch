@@ -9,8 +9,10 @@
 	<configs>
 		<config>src/test/resources/data-source-context.xml</config>
 		<config>src/test/resources/simple-job-launcher-context.xml</config>
-		<config>src/test/resources/jobs/sampleJob.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/config/common-context.xml</config>
+		<config>src/test/resources/jobs/sampleFlowJob.xml</config>
+		<config>src/test/resources/jobs/sampleSimpleJob.xml</config>
+		<config>src/test/resources/jobs/sample-steps.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -19,7 +21,6 @@
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/test/resources/data-source-context.xml</config>
-				<config>src/test/resources/jobs/sampleJob.xml</config>
 				<config>src/test/resources/org/springframework/batch/sample/config/common-context.xml</config>
 				<config>src/test/resources/simple-job-launcher-context.xml</config>
 			</configs>

@@ -57,6 +57,13 @@ public class FlowJob extends AbstractJob {
 	}
 
 	/**
+	 * @return the flow
+	 */
+	public Flow getFlow(){
+		return this.flow;
+	}
+	
+	/**
 	 * @see AbstractJob#doExecute(JobExecution)
 	 */
 	@Override

@@ -82,6 +82,14 @@ public class SimpleFlow implements Flow, InitializingBean {
 	}
 
 	/**
+	 * @param stateName
+	 * @return state with given name, null if not found 
+	 */
+	public State getState(String stateName) {
+		return stateMap.get(stateName);
+	}
+
+	/**
 	 * Locate start state and pre-populate data structures needed for execution.
 	 * 
 	 * @see InitializingBean#afterPropertiesSet()
