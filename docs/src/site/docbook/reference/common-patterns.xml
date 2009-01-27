@@ -4,27 +4,23 @@
 <chapter id="patterns">
   <title>Common Batch Patterns</title>
 
-  <section>
-    <title>Introduction</title>
+  <para>Some batch jobs can be assembled purely from off-the-shelf components
+  in Spring Batch, mostly the <classname>ItemReader</classname> and
+  <classname>ItemWriter</classname> implementations. Where this is not
+  possible (the majority of cases) the main API entry points for application
+  developers are the <classname>Tasklet</classname>,
+  <classname>ItemReader</classname>, <classname>ItemWriter</classname> and the
+  various listener interfaces. Most simple batch jobs will be able to use
+  off-the-shelf input from a Spring Batch <classname>ItemReader</classname>,
+  but it is very often the case that there are custom concerns in the
+  processing and writing, which normally leads developers to implement an
+  <classname>ItemWriter</classname>, or
+  <classname>ItemTransformer</classname>.</para>
 
-    <para>Some batch jobs can be assembled purely from off-the-shelf
-    components in Spring Batch, mostly the <classname>ItemReader</classname>
-    and <classname>ItemWriter</classname> implementations. Where this is not
-    possible (the majority of cases) the main API entry points for application
-    developers are the <classname>Tasklet</classname>,
-    <classname>ItemReader</classname>, <classname>ItemWriter</classname> and
-    the various listener interfaces. Most simple batch jobs will be able to
-    use off-the-shelf input from a Spring Batch
-    <classname>ItemReader</classname>, but it is very often the case that
-    there are custom concerns in the processing and writing, which normally
-    leads developers to implement an <classname>ItemWriter</classname>, or
-    <classname>ItemTransformer</classname>.</para>
-
-    <para>Here we provide a few examples of common patterns in custom business
-    logic, mainly using the listener interfaces . It should be noted that an
-    <classname>ItemReader</classname> or <classname>ItemWriter</classname> can
-    implement the listener interfaces as well if appropriate.</para>
-  </section>
+  <para>Here we provide a few examples of common patterns in custom business
+  logic, mainly using the listener interfaces . It should be noted that an
+  <classname>ItemReader</classname> or <classname>ItemWriter</classname> can
+  implement the listener interfaces as well if appropriate.</para>
 
   <section>
     <title>Logging Item Processing and Failures</title>
@@ -228,5 +224,58 @@
     For example, if the ItemWriter is re-runnable, in the sense that it
     maintains its own state in a transactional resource like a database, there
     is no need to maintain state within the writer itself.</para>
+  </section>
+
+  <section>
+    <title>Driving Query Based ItemReaders</title>
+
+    <para>In the chapter on readers and writers, database input using paging
+    was discussed. Many database vendors, such as DB2, have extremely
+    pessimistic locking strategies that can cause issues if the table being
+    read also needs to be used by other portions of the online application.
+    Furthermore, opening cursors over extremely large datasets can cause
+    issues on certain vendors. Therefore, many projects prefer to use a
+    'Driving Query' approach to reading in data. This approach works by
+    iterating over keys, rather than the entire object that needs to be
+    returned, as the following example illustrates:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/drivingQueryExample.png"
+                   width="50%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/drivingQueryExample.png"
+                   width="66%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>As you can see, this example uses the same 'FOO' table as was used
+    in the cursor based example. However, rather than selecting the entire
+    row, only the ID's were selected in the SQL statement. So, rather than a
+    FOO object being returned from <classname>read</classname>, an Integer
+    will be returned. This number can then be used to query for the 'details',
+    which is a complete Foo object:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/drivingQueryJob.png"
+                   width="66%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/drivingQueryJob.png"
+                   width="66%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>As you can see, an existing DAO can be used to obtain a full 'Foo'
+    object using the key obtained from the driving query. In Spring Batch,
+    driving query style input is implemented with a
+    <classname>DrivingQueryItemReader</classname>, which has only one
+    dependency: a <classname>KeyCollector</classname></para>
   </section>
 </chapter>

@@ -8,10 +8,13 @@
     <title>Overview</title>
 
     <para>The Spring Batch Meta-Data tables very closely match the Domain
-    objects that represent them in Java. For example, JobInstance,
-    JobExecution, JobParameters, StepExecution, and ExecutionContext map to
-    BATCH_JOB_INSTANCE, BATCH_JOB_EXECUTION, BATCH_JOB_PARAMS,
-    BATCH_STEP_EXECUTION, BATCH_STEP_EXECUTION_CONTEXT, respectively. The
+    objects that represent them in Java. For example,
+    <classname>JobInstance</classname>, <classname>JobExecution</classname>,
+    <classname>JobParameters</classname>, and
+    <classname>StepExecution</classname> map to BATCH_JOB_INSTANCE,
+    BATCH_JOB_EXECUTION, BATCH_JOB_PARAMS, and BATCH_STEP_EXECUTION,
+    respectively. <classname>ExecutionContext</classname> maps to both
+    BATCH_JOB_EXECUTION_CONTEXT and BATCH_STEP_EXECUTION_CONTEXT. The
     <classname>JobRepository</classname> is responsible for saving and storing
     each Java object into it's correct table. The following appendix describes
     the meta-data tables in detail, along with many of the design decisions
@@ -19,7 +22,7 @@
     statements below, it is important to realize that the data types used are
     as generic as possible. Spring Batch provides many schemas as examples,
     which all have varying data types due to variations in individual database
-    vendors' handling of data types. Below is an ERD model of all 5 tables and
+    vendors' handling of data types. Below is an ERD model of all 6 tables and
     their relationships to one another:</para>
 
     <mediaobject>
@@ -122,7 +125,9 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
         <para>JOB_KEY: A serialization of the
         <classname>JobParameters</classname> that uniquely identifies separate
         instances of the same job from one another.
-        (<classname>JobInstances</classname> with the same job name</para>
+        (<classname>JobInstances</classname> with the same job name must have
+        different <classname>JobParameters</classname>, and thus, different
+        JOB_KEY values).</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -131,11 +136,12 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     <title>BATCH_JOB_PARAMS</title>
 
     <para>The BATCH_JOB_PARAMS table holds all information relevant to the
-    JobParameters object. It contains 0 or more key/value pairs that together
-    uniquely identify a <classname>JobInstance</classname> and serve as a
-    record of the parameters a job was run with. It should be noted that the
-    table has been denormalized. Rather than creating a separate table for
-    each type, there is one table with a column indicating the type:</para>
+    <classname>JobParameters</classname> object. It contains 0 or more
+    key/value pairs that together uniquely identify a
+    <classname>JobInstance</classname> and serve as a record of the parameters
+    a job was run with. It should be noted that the table has been
+    denormalized. Rather than creating a separate table for each type, there
+    is one table with a column indicating the type:</para>
 
     <programlisting>CREATE TABLE BATCH_JOB_PARAMS  (
   JOB_INSTANCE_ID BIGINT NOT NULL ,
@@ -204,12 +210,13 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
   JOB_EXECUTION_ID BIGINT  PRIMARY KEY ,
   VERSION BIGINT,  
   JOB_INSTANCE_ID BIGINT NOT NULL,
+  CREATE_TIME TIMESTAMP NOT NULL,
   START_TIME TIMESTAMP DEFAULT NULL, 
   END_TIME TIMESTAMP DEFAULT NULL,
   STATUS VARCHAR(10),
-  CONTINUABLE CHAR(1),
   EXIT_CODE VARCHAR(20),
   EXIT_MESSAGE VARCHAR(2500),
+  LAST_UPDATED TIMESTAMP,
   constraint JOB_INSTANCE_EXECUTION_FK foreign key (JOB_INSTANCE_ID)
   references BATCH_JOB_INSTANCE(JOB_INSTANCE_ID)
 ) ;</programlisting>
@@ -235,6 +242,11 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
       </listitem>
 
       <listitem>
+        <para>CREATE_TIME: Timestamp representing the time that the execution
+        was created.</para>
+      </listitem>
+
+      <listitem>
         <para>START_TIME: Timestamp representing the time the execution was
         started.</para>
       </listitem>
@@ -255,11 +267,6 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
       </listitem>
 
       <listitem>
-        <para>CONTINUABLE: Character indicating whether or not the execution
-        is currently able to continue. 'Y' for yes and 'N' for no.</para>
-      </listitem>
-
-      <listitem>
         <para>EXIT_CODE: Character string representing the exit code of the
         execution. In the case of a command line job, this may be converted
         into a number.</para>
@@ -269,6 +276,11 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
         <para>EXIT_MESSAGE: Character string representing a more detailed
         description of how the job exited. In the case of failure, this might
         include as much of the stack trace as is possible.</para>
+      </listitem>
+
+      <listitem>
+        <para>LAST_UPDATED: Timestamp representing the last time this
+        execution was persisted.</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -291,10 +303,16 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
   END_TIME TIMESTAMP DEFAULT NULL,  
   STATUS VARCHAR(10),
   COMMIT_COUNT BIGINT , 
-  ITEM_COUNT BIGINT , 
-  CONTINUABLE CHAR(1),
-  EXIT_CODE VARCHAR(20),
-  EXIT_MESSAGE VARCHAR(2500),
+  READ_COUNT BIGINT ,
+  FILTER_COUNT BIGINT ,
+  WRITE_COUNT BIGINT ,
+  READ_SKIP_COUNT BIGINT ,
+  WRITE_SKIP_COUNT BIGINT ,
+  PROCESS_SKIP_COUNT BIGINT ,
+  ROLLBACK_COUNT BIGINT , 
+  EXIT_CODE VARCHAR(20) ,
+  EXIT_MESSAGE VARCHAR(2500) ,
+  LAST_UPDATED TIMESTAMP,
   constraint JOB_EXECUTION_STEP_FK foreign key (JOB_EXECUTION_ID)
   references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
 ) ;</programlisting>
@@ -352,13 +370,38 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
       </listitem>
 
       <listitem>
-        <para>ITEM_COUNT: The number of items that have been written out
-        during this execution.</para>
+        <para>READ_COUNT: The number of items read during this
+        execution.</para>
       </listitem>
 
       <listitem>
-        <para>CONTINUABLE: Character indicating whether or not the execution
-        is currently able to continue. 'Y' for yes and 'N' for no.</para>
+        <para>FILTER_COUNT: The number of items filtered out of this
+        execution.</para>
+      </listitem>
+
+      <listitem>
+        <para>WRITE_COUNT: The number of items written during this
+        execution.</para>
+      </listitem>
+
+      <listitem>
+        <para>READ_SKIP_COUNT: The number of items skipped on read during this
+        execution.</para>
+      </listitem>
+
+      <listitem>
+        <para>WRITE_SKIP_COUNT: The number of items skipped on write during
+        this execution.</para>
+      </listitem>
+
+      <listitem>
+        <para>PROCESS_SKIP_COUNT: The number of items skipped during
+        processing during this execution.</para>
+      </listitem>
+
+      <listitem>
+        <para>ROLLBACK_COUNT: The number of rollbacks during this
+        execution.</para>
       </listitem>
 
       <listitem>
@@ -372,88 +415,94 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
         description of how the job exited. In the case of failure, this might
         include as much of the stack trace as is possible.</para>
       </listitem>
+
+      <listitem>
+        <para>LAST_UPDATED: Timestamp representing the last time this
+        execution was persisted.</para>
+      </listitem>
     </itemizedlist>
   </section>
 
   <section>
-    <title>BATCH_EXECUTION_CONTEXT</title>
+    <title>BATCH_JOB_EXECUTION_CONTEXT</title>
 
-    <para>The BATCH_STEP_EXECUTION_CONTEXT table holds all information
-    relevant to an <classname>ExecutionContext</classname>. There is exactly
-    one <classname>ExecutionContext</classname> per
-    <classname>StepExecution</classname>, and it contains all user defined
-    key/value pairs that need to persisted for a particular job run. This data
-    is typically state that must be retrieved back after a failure so that a
-    <classname>JobInstance</classname> can 'start from where it left off'. As
-    with the BATCH_JOB_PARAMS table, this table has been denormalized and uses
-    a column to determine the type:</para>
+    <para>The BATCH_JOB_EXECUTION_CONTEXT table holds all information relevant
+    to an <classname>Job</classname>'s
+    <classname>ExecutionContext</classname>. There is exactly one
+    <classname>ExecutionContext</classname> per
+    <classname>StepExecution</classname>, and it contains all of the job-level
+    data that is needed for a particular job execution. This data typically
+    represents the state that must be retrieved after a failure so that a
+    <classname>JobInstance</classname> can 'start from where it left
+    off'.</para>
 
-    <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
-  EXECUTION_ID BIGINT NOT NULL ,
-  DISCRIMINATOR VARCHAR2(1) NOT NULL,
-  TYPE_CD VARCHAR(6) NOT NULL ,
-  KEY_NAME VARCHAR(1000) NOT NULL , 
-  STRING_VAL VARCHAR(1000) , 
-  DATE_VAL TIMESTAMP DEFAULT NULL ,
-  LONG_VAL VARCHAR(10) ,
-  DOUBLE_VAL DOUBLE PRECISION ,
-  OBJECT_VAL BLOB,
+    <programlisting>CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT  (
+  JOB_EXECUTION_ID BIGINT PRIMARY KEY,
+  SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+  SERIALIZED_CONTEXT CLOB,
+  constraint JOB_EXEC_CTX_FK foreign key (JOB_EXECUTION_ID)
+  references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
 ) ;</programlisting>
 
     <para>Below are descriptions for each column:</para>
 
     <itemizedlist>
       <listitem>
-        <para>EXECUTION_ID: Foreign key representing the
-        <classname>StepExecution</classname> or
+        <para>JOB_EXECUTION_ID: Foreign key representing the
         <classname>JobExecution</classname> to which the context belongs.
         There may be more than one row associated to a given execution.</para>
       </listitem>
 
       <listitem>
-        <para>DISCRIMINATOR: Character indicating whether or not the entry is
-        job or step scoped. (i.e. does it belong to the JobExecution or
-        StepExecution)</para>
+        <para>SHORT_CONTEXT: A string version of the
+        SERIALIZED_CONTEXT.</para>
       </listitem>
 
       <listitem>
-        <para>TYPE_CD: String representation of the type of value stored,
-        which can be either a character string, date, long, or double. Because
-        the type must be known, it cannot be null.</para>
-      </listitem>
-
-      <listitem>
-        <para>KEY_NAME: The Parameter key.</para>
-      </listitem>
-
-      <listitem>
-        <para>STRING_VAL: Parameter value, if the type is string.</para>
-      </listitem>
-
-      <listitem>
-        <para>DATE_VAL: Parameter value, if the type is date.</para>
-      </listitem>
-
-      <listitem>
-        <para>LONG_VAL: Parameter value, if the type is a long.</para>
-      </listitem>
-
-      <listitem>
-        <para>DOUBLE_VAL: Parameter value, if the type is double.</para>
-      </listitem>
-
-      <listitem>
-        <para>OBJECT_VAL: Parameter value, if the type is a blob.</para>
+        <para>SERIALIZED_CONTEXT: The entire context, serialized.</para>
       </listitem>
     </itemizedlist>
+  </section>
 
-    <para>When an ExecutionContext is stored, values that are one of the well
-    known types above will be stored as their respective type. Any unknown
-    type will be serialized to a blob and stored in the OBJECT_VAL column. As
-    with BATCH_JOB_PARAMS, there is no primary key for this table. This is
-    simply because the framework has no use for one, and thus doesn't require
-    it. If a user so chooses, one may be added with a database generated key,
-    without causing any issues to the framework itself.</para>
+  <section>
+    <title>BATCH_STEP_EXECUTION_CONTEXT</title>
+
+    <para>The BATCH_STEP_EXECUTION_CONTEXT table holds all information
+    relevant to an <classname>Step</classname>'s
+    <classname>ExecutionContext</classname>. There is exactly one
+    <classname>ExecutionContext</classname> per
+    <classname>StepExecution</classname>, and it contains all of the data that
+    needs to persisted for a particular step execution. This data typically
+    represents the state that must be retrieved after a failure so that a
+    <classname>JobInstance</classname> can 'start from where it left
+    off'.</para>
+
+    <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
+  STEP_EXECUTION_ID BIGINT PRIMARY KEY,
+  SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+  SERIALIZED_CONTEXT CLOB,
+  constraint STEP_EXEC_CTX_FK foreign key (STEP_EXECUTION_ID)
+  references BATCH_STEP_EXECUTION(STEP_EXECUTION_ID)
+) ;</programlisting>
+
+    <para>Below are descriptions for each column:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>STEP_EXECUTION_ID: Foreign key representing the
+        <classname>StepExecution</classname> to which the context belongs.
+        There may be more than one row associated to a given execution.</para>
+      </listitem>
+
+      <listitem>
+        <para>SHORT_CONTEXT: A string version of the
+        SERIALIZED_CONTEXT.</para>
+      </listitem>
+
+      <listitem>
+        <para>SERIALIZED_CONTEXT: The entire context, serialized.</para>
+      </listitem>
+    </itemizedlist>
   </section>
 
   <section>
@@ -463,22 +512,27 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     is run, it is common to create an archive strategy for the meta-data
     tables. The tables themselves are designed to show a record of what
     happened in the past, and generally won't affect the run of any job, with
-    a couple of notable exceptions:</para>
+    a couple of notable exceptions pertaining to restart:</para>
 
     <itemizedlist>
       <listitem>
-        <para>Restart: Because the ExecutionContext is persisted, removing any
-        entries from this table of jobs that haven't completed successfully,
-        will prevent them from starting at the correct point if run again.
-        Furthermore, if an entry for a JobInstance is removed without having
-        completed successfully, the framework will think that the job is new,
-        rather than a restart.</para>
+        <para>The framework will use the meta-data tables to determine if a
+        particular JobInstance has been run before. If it has been run, and
+        the job is not restartable, then an exception will be thrown. </para>
       </listitem>
 
       <listitem>
-        <para>Determining if an instance has been run: The framework will use
-        the meta-data tables to determine if a particular JobInstance has been
-        run before, and if it has an exception will be thrown.</para>
+        <para>If an entry for a JobInstance is removed without having
+        completed successfully, the framework will think that the job is new,
+        rather than a restart. </para>
+      </listitem>
+
+      <listitem>
+        <para>If a job is restarted, the framework will use any data that has
+        been persisted to the ExecutionContext to restore the Job's state.
+        Therefore, removing any entries from this table for jobs that haven't
+        completed successfully will prevent them from starting at the correct
+        point if run again.</para>
       </listitem>
     </itemizedlist>
   </section>
