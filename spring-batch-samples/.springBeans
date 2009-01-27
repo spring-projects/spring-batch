@@ -82,33 +82,12 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[fixedLengthImport]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[football]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/jobs/footballJob.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
-			<name><![CDATA[ibatis]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
@@ -234,17 +213,6 @@
 			</configs>
 		</configSet>
 		<configSet>
-			<name><![CDATA[jobExecutionContextSample]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
 			<name><![CDATA[adhocLoop]]></name>
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
@@ -273,17 +241,6 @@
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
-			<name><![CDATA[tasklet]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -317,28 +274,6 @@
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/data-source-context.xml</config>
 				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
-			<name><![CDATA[nonSequentialDecision]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
-			</configs>
-		</configSet>
-		<configSet>
-			<name><![CDATA[nonSequential]]></name>
-			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
-			<incomplete>false</incomplete>
-			<configs>
-				<config>src/main/resources/data-source-context.xml</config>
-				<config>src/main/resources/data-source-context-init.xml</config>
-				<config>src/main/resources/simple-job-launcher-context.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
@@ -439,6 +374,25 @@
 				<config>src/main/resources/jobs/ioSampleJob.xml</config>
 				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 				<config>src/main/resources/simple-job-launcher-context.xml</config>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[data-source-contex]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+			</configs>
+		</configSet>
+		<configSet>
+			<name><![CDATA[ibatis]]></name>
+			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
+			<incomplete>false</incomplete>
+			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/iosample/ibatis.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
