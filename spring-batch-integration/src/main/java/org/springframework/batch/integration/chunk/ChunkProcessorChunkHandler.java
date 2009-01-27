@@ -19,6 +19,7 @@ package org.springframework.batch.integration.chunk;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.step.item.Chunk;
 import org.springframework.batch.core.step.item.ChunkProcessor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.integration.annotation.MessageEndpoint;
@@ -62,7 +63,7 @@ public class ChunkProcessorChunkHandler<S> implements ChunkHandler<S>, Initializ
 
 		StepContribution stepContribution = chunkRequest.getStepContribution();
 		try {
-			chunkProcessor.process(stepContribution, chunkRequest.getChunk());
+			chunkProcessor.process(stepContribution, new Chunk<S>(chunkRequest.getItems()));
 		}
 		catch (Exception e) {
 			logger.debug("Failed chunk", e);

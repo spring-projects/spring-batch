@@ -20,16 +20,15 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import org.springframework.batch.core.StepContribution;
-import org.springframework.batch.core.step.item.Chunk;
 
 public class ChunkRequest<T> implements Serializable {
 
 	private final Long jobId;
-	private final Chunk<T> items;
+	private final Collection<? extends T> items;
 	private final StepContribution stepContribution;
 
 	public ChunkRequest(Collection<? extends T> items, Long jobId, StepContribution stepContribution) {
-		this.items = new Chunk<T>(items);
+		this.items = items;
 		this.jobId = jobId;
 		this.stepContribution = stepContribution;
 	}
@@ -38,7 +37,7 @@ public class ChunkRequest<T> implements Serializable {
 		return jobId;
 	}
 
-	public Chunk<T> getChunk() {
+	public Collection<? extends T> getItems() {
 		return items;
 	}
 	
