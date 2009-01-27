@@ -192,4 +192,24 @@ public class StepContribution implements Serializable {
 				+ processSkipCount + ", exitStatus=" + exitStatus.getExitCode() + "]";
 	}
 
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof StepContribution)) {
+			return false;
+		}
+		StepContribution other = (StepContribution) obj;
+		return toString().equals(other.toString());
+	}
+
+	/**
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		return 11 + toString().hashCode() * 43;
+	}
+
 }
