@@ -48,11 +48,13 @@
 	</profiles>
 
 	<modules>
-		<module>../spring-batch-infrastructure</module>
-		<module>../spring-batch-core</module>
-		<module>../spring-batch-test</module>
+		<module>..</module>
 		<module>../spring-batch-samples</module>
 		<module>../archetypes</module>
+		<module>../spring-batch-infrastructure-tests</module>
+		<module>../spring-batch-integration</module>
+		<module>../docs</module>
+		<module>../build-central</module>
 	</modules>
 
 	<build>
