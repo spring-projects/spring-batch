@@ -19,6 +19,7 @@ package org.springframework.batch.item.file.transform;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
@@ -26,11 +27,13 @@ import org.springframework.util.Assert;
  * A {@link LineTokenizer} implementation that stores a mapping of String
  * prefixes to delegate {@link LineTokenizer}s. Each line tokenizied will be
  * checked for its prefix. If the prefix matches a key in the map of delegates,
- * then the corresponding delegate {@link LineTokenizer} will be used.
- * Otherwise, the default {@link LineTokenizer} will be used. The default
- * {@link LineTokenizer} can be configured in the delegate map by setting its
- * corresponding prefix to the empty string.
+ * then the corresponding delegate {@link LineTokenizer} will be used. Prefixes
+ * are sorted starting with the most specific, and the first match always
+ * succeeds.
  * 
+ * @see PatternMatcher#matchPrefix(String, Map)
+ * 
+ * @author Ben Hale
  * @author Dan Garrette
  */
 public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
@@ -43,45 +46,7 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, Init
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
 	 */
 	public FieldSet tokenize(String line) {
-		return this.matchPrefix(line, this.tokenizers).tokenize(line);
-	}
-
-	/**
-	 * @param line
-	 * @return the delegate whose prefix matches the given line
-	 */
-	protected <S> S matchPrefix(String line, Map<String, S> delegates) {
-		S delegate = null;
-		S defaultDelegate = null;
-
-		if (line != null) {
-			for (String key : delegates.keySet()) {
-				if (key != null) {
-					if ("".equals(key)) {
-						defaultDelegate = delegates.get(key);
-					}
-					else if (line.startsWith(key)) {
-						delegate = delegates.get(key);
-						break;
-					}
-				}
-			}
-
-			if (delegate == null) {
-				delegate = defaultDelegate;
-			}
-		}
-		else if (delegates.containsKey(null)) {
-			delegate = delegates.get(null);
-		}
-		else {
-			throw new IllegalStateException("Could not handle a null line");
-		}
-
-		if (delegate == null) {
-			throw new IllegalStateException("Could not find a matching prefix for line=[" + line + "]");
-		}
-		return delegate;
+		return PatternMatcher.matchPrefix(line, this.tokenizers).tokenize(line);
 	}
 
 	/*

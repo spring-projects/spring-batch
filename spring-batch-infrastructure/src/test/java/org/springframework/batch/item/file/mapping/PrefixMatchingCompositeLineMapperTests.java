@@ -31,6 +31,7 @@ import org.springframework.batch.item.file.transform.Name;
 
 /**
  * @author Dan Garrette
+ * @since 2.0
  */
 public class PrefixMatchingCompositeLineMapperTests {
 
@@ -42,38 +43,6 @@ public class PrefixMatchingCompositeLineMapperTests {
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = Collections.emptyMap();
 		mapper.setFieldSetMappers(fieldSetMappers);
 		mapper.afterPropertiesSet();
-	}
-
-	@Test
-	public void test_NullLine() throws Exception {
-		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
-		tokenizers.put(null, new LineTokenizer() {
-			public FieldSet tokenize(String line) {
-				return new DefaultFieldSet(new String[] { "a", "b" });
-			}
-		});
-		tokenizers.put("bar", new LineTokenizer() {
-			public FieldSet tokenize(String line) {
-				return new DefaultFieldSet(new String[] { "c", "d" });
-			}
-		});
-		mapper.setTokenizers(tokenizers);
-
-		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<String, FieldSetMapper<Name>>();
-		fieldSetMappers.put(null, new FieldSetMapper<Name>() {
-			public Name mapFieldSet(FieldSet fs) {
-				return new Name(fs.readString(0), fs.readString(1), 0);
-			}
-		});
-		fieldSetMappers.put("bar", new FieldSetMapper<Name>() {
-			public Name mapFieldSet(FieldSet fs) {
-				return new Name(fs.readString(1), fs.readString(0), 0);
-			}
-		});
-		mapper.setFieldSetMappers(fieldSetMappers);
-
-		Name name = mapper.mapLine(null, 1);
-		assertEquals(new Name("a", "b", 0), name);
 	}
 
 	@Test

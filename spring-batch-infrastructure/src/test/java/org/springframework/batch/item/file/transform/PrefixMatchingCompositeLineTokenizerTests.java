@@ -26,6 +26,7 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
+ * @author Ben Hale
  * @author Dan Garrette
  */
 public class PrefixMatchingCompositeLineTokenizerTests {
@@ -36,54 +37,6 @@ public class PrefixMatchingCompositeLineTokenizerTests {
 	public void testNoTokenizers() throws Exception {
 		tokenizer.afterPropertiesSet();
 		tokenizer.tokenize("a line");
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testNullLineNoKey() throws Exception {
-		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer()));
-		tokenizer.afterPropertiesSet();
-		FieldSet fields = tokenizer.tokenize(null);
-		assertEquals(0, fields.getFieldCount());
-	}
-
-	@Test
-	public void testNullLineWithKey() throws Exception {
-		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
-		map.put(null, new LineTokenizer() {
-			public FieldSet tokenize(String line) {
-				return new DefaultFieldSet(new String[] { "a" });
-			}
-		});
-		map.put("foo", new LineTokenizer() {
-			public FieldSet tokenize(String line) {
-				return new DefaultFieldSet(new String[] { "b" });
-			}
-		});
-		tokenizer.setTokenizers(map);
-		tokenizer.afterPropertiesSet();
-		FieldSet fields = tokenizer.tokenize(null);
-		assertEquals(1, fields.getFieldCount());
-		assertEquals("a", fields.readString(0));
-	}
-
-	@Test
-	public void testNullKey() throws Exception {
-		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
-		map.put(null, new LineTokenizer() {
-			public FieldSet tokenize(String line) {
-				return new DefaultFieldSet(new String[] { "a" });
-			}
-		});
-		map.put("foo", new LineTokenizer() {
-			public FieldSet tokenize(String line) {
-				return new DefaultFieldSet(new String[] { "b" });
-			}
-		});
-		tokenizer.setTokenizers(map);
-		tokenizer.afterPropertiesSet();
-		FieldSet fields = tokenizer.tokenize("foo");
-		assertEquals(1, fields.getFieldCount());
-		assertEquals("b", fields.readString(0));
 	}
 
 	@Test

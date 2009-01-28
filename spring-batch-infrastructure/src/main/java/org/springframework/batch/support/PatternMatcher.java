@@ -15,11 +15,26 @@
  */
 package org.springframework.batch.support;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Dave Syer
- * 
+ * @author Dan Garrette
  */
 public class PatternMatcher {
+
+	/**
+	 * Used for reverse-sorting strings
+	 */
+	private static Comparator<String> STRING_REVERSE_COMPARATOR = new Comparator<String>() {
+		public int compare(String o1, String o2) {
+			return o2.compareTo(o1);
+		}
+	};
 
 	/**
 	 * Lifted from AntPathMatcher in Spring Core. Tests whether or not a string
@@ -27,11 +42,14 @@ public class PatternMatcher {
 	 * characters:<br>
 	 * '*' means zero or more characters<br>
 	 * '?' means one and only one character
-	 * @param pattern pattern to match against. Must not be <code>null</code>.
-	 * @param str string which must be matched against the pattern. Must not be
-	 * <code>null</code>.
+	 * 
+	 * @param pattern
+	 *            pattern to match against. Must not be <code>null</code>.
+	 * @param str
+	 *            string which must be matched against the pattern. Must not be
+	 *            <code>null</code>.
 	 * @return <code>true</code> if the string matches against the pattern, or
-	 * <code>false</code> otherwise.
+	 *         <code>false</code> otherwise.
 	 */
 	public static boolean match(String pattern, String str) {
 		char[] patArr = pattern.toCharArray();
@@ -159,4 +177,48 @@ public class PatternMatcher {
 		return true;
 	}
 
+	/**
+	 * <p>
+	 * This method takes a String line and a map from String prefixes to values
+	 * of any type. During processing, the method will identify the most
+	 * specific prefix in the map that matches the beginning of the line. Once
+	 * the correct is identified, its value is returned. Note that if the map
+	 * contains the empty string as a prefix, then it will serve as the
+	 * "default" case, matching every non-null line given.
+	 * 
+	 * <p>
+	 * If no matching prefix is found, a {@link IllegalStateException} will be
+	 * thrown.
+	 * 
+	 * <p>
+	 * Null keys are not allowed in the map.
+	 * 
+	 * @param line
+	 *            An input string
+	 * @param map
+	 *            A map with String prefixes as keys.
+	 * @return the value whose prefix matches the given line
+	 */
+	public static <S> S matchPrefix(String line, Map<String, S> map) {
+		S value = null;
+
+		if (line == null) {
+			throw new IllegalStateException("Could not handle a null line");
+		}
+
+		// Sort keys to start with the most specific
+		List<String> sorted = new ArrayList<String>(map.keySet());
+		Collections.sort(sorted, STRING_REVERSE_COMPARATOR);
+		for (String key : sorted) {
+			if (line.startsWith(key)) {
+				value = map.get(key);
+				break;
+			}
+		}
+
+		if (value == null) {
+			throw new IllegalStateException("Could not find a matching prefix for line=[" + line + "]");
+		}
+		return value;
+	}
 }

@@ -21,26 +21,32 @@ import java.util.Map;
 
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer;
+import org.springframework.batch.support.PatternMatcher;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
  * <p>
  * A {@link LineMapper} implementation that stores a mapping of String prefixes
  * to delegate {@link LineTokenizer}s as well as a mapping of String prefixes
- * to delegate {@link LineTokenizer}s. Each line received will be tokenized and
- * then mapped to a field set.
+ * to delegate {@link FieldSetMapper}s. Each line received will be tokenized
+ * and then mapped to a field set.
  * 
  * <p>
  * Both the tokenizing and the mapping work in a similar way. The line will be
  * checked for its prefix. If the prefix matches a key in the map of delegates,
- * then the corresponding delegate will be used. Otherwise, the default
- * tokenizer or mapper will be used. The default can be configured in the
- * delegate map by setting its corresponding prefix to the empty string.
+ * then the corresponding delegate will be used. Prefixes are sorted starting
+ * with the most specific, and the first match always succeeds.
+ * 
+ * @see PrefixMatchingCompositeLineTokenizer
+ * @see PatternMatcher#matchPrefix(String, Map)
  * 
  * @author Dan Garrette
+ * @since 2.0
  */
-public class PrefixMatchingCompositeLineMapper<T> extends PrefixMatchingCompositeLineTokenizer implements LineMapper<T> {
+public class PrefixMatchingCompositeLineMapper<T> implements LineMapper<T>, InitializingBean {
 
+	private PrefixMatchingCompositeLineTokenizer tokenizer = new PrefixMatchingCompositeLineTokenizer();
 	private Map<String, FieldSetMapper<T>> fieldSetMappers = null;
 
 	/*
@@ -50,7 +56,7 @@ public class PrefixMatchingCompositeLineMapper<T> extends PrefixMatchingComposit
 	 *      int)
 	 */
 	public T mapLine(String line, int lineNumber) throws Exception {
-		return this.matchPrefix(line, this.fieldSetMappers).mapFieldSet(this.tokenize(line));
+		return PatternMatcher.matchPrefix(line, this.fieldSetMappers).mapFieldSet(this.tokenizer.tokenize(line));
 	}
 
 	/*
@@ -59,9 +65,13 @@ public class PrefixMatchingCompositeLineMapper<T> extends PrefixMatchingComposit
 	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
+		this.tokenizer.afterPropertiesSet();
 		Assert.isTrue(this.fieldSetMappers != null && this.fieldSetMappers.size() > 0,
 				"The 'fieldSetMappers' property must be non-empty");
+	}
+
+	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
+		this.tokenizer.setTokenizers(tokenizers);
 	}
 
 	public void setFieldSetMappers(Map<String, FieldSetMapper<T>> fieldSetMappers) {
