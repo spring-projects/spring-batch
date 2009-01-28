@@ -195,12 +195,7 @@
 			<artifactId>jtds</artifactId>
 			<version>1.2.2</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.oracle.jdbc</groupId>
-			<artifactId>com.springsource.oracle.jdbc</artifactId>
-			<version>10.2.0.2</version>
-			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
