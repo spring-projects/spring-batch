@@ -33,7 +33,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>prepare</id>
+			<id>all</id>
 	<modules>
 		<module>../spring-batch-infrastructure-tests</module>
 		<module>../spring-batch-integration</module>
@@ -79,7 +79,7 @@
 	</profiles>
 
 	<modules>
-	  <!-- use -P prepare for the release:prepare goal, or mvn clean -->
+	  <!-- use -P all for the release:prepare goal, or mvn clean -->
 		<module>..</module>
 		<module>../spring-batch-samples</module>
 		<module>../archetypes</module>
