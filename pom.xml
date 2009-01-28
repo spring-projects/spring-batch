@@ -79,25 +79,6 @@
 			</build>
 		</profile>
 		<profile>
-			<id>dist</id>
-			<activation>
-				<file>
-					<exists>dist.txt</exists>
-				</file>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-javadoc-plugin</artifactId>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>samples</id>
 			<modules>
 				<module>spring-batch-infrastructure-tests</module>
@@ -112,6 +93,14 @@
 					<id>staging</id>
 					<url>file:///${user.dir}/target/staging</url>
 				</site>
+		<repository>
+			<id>staging</id>
+			<url>file:///${user.dir}/target/staging</url>
+		</repository>
+		<snapshotRepository>
+			<id>staging</id>
+			<url>file:///${user.dir}/target/staging</url>
+		</snapshotRepository>
 			</distributionManagement>
 		</profile>
 		<profile>

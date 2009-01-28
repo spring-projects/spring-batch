@@ -40,6 +40,19 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>staging</id>
+			<distributionManagement>
+		<repository>
+			<id>staging</id>
+			<url>file:///${user.dir}/target/staging</url>
+		</repository>
+		<snapshotRepository>
+			<id>staging</id>
+			<url>file:///${user.dir}/target/staging</url>
+		</snapshotRepository>
+			</distributionManagement>
+		</profile>
+		<profile>
 			<id>manifest</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
@@ -223,7 +236,7 @@
 		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
 			<id>staging</id>
-			<url>file:///${user.dir}/archetypes/simple-cli/target/staging</url>
+			<url>file:///${user.dir}/target/staging</url>
 		</site>
 		<repository>
 			<id>spring-milestone</id>
