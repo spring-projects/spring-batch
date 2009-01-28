@@ -2,7 +2,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>spring-batch-core</artifactId>
-  <version>1.1.4.CI-SNAPSHOT</version>
+  <version>1.1.4.RELEASE</version>
 	<packaging>jar</packaging>
 	<name>Core</name>
 	<description>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>spring-batch</artifactId>
-		<version>1.1.4.CI-SNAPSHOT</version>
+		<version>1.1.4.RELEASE</version>
 		<relativePath>..</relativePath>
 	</parent>
 
