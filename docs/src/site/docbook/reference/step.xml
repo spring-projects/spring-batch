@@ -1241,9 +1241,9 @@
       <title>Late binding of Job and Step Attributes</title>
 
       <para>Both the XML and Flat File examples above use the Spring
-      <classname>Resource</classname> abstraction to obtain the file to read
-      or write from. This works because <classname>Resource</classname> has a
-      <markup>getFile</markup> method, that returns a
+      <classname>Resource</classname> abstraction to obtain a file . This
+      works because <classname>Resource</classname> has a
+      <markup>getFile</markup> method, which returns a
       <classname>java.io.File</classname>. Both XML and Flat File resources
       can be configured using standard Spring constructs:</para>
 
@@ -1288,14 +1288,14 @@
       <programlisting>  
   &lt;bean id="flatFileItemReader" scope="step"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="#{jobParameters[input.file.name]}" /&gt;
+    &lt;property name="resource" value="<emphasis role="bold">#{jobParameters[input.file.name]}</emphasis>" /&gt;
   &lt;/bean&gt;
 
 </programlisting>
 
       <para>Both the <classname>JobExecution</classname> and
       <classname>StepExecution</classname> level
-      <classname>ExecutionContext</classname> can be access in the same
+      <classname>ExecutionContext</classname> can be accessed in the same
       way:</para>
 
       <programlisting>  
@@ -1332,7 +1332,7 @@
         order to use late binding, since the bean cannot actually be
         instantiated until the <classname>Step</classname> starts, which
         allows the attributes to be found. Because it is not part of the
-        Spring container by default, it must be added explicitely: </para>
+        Spring container by default, it must be added explicitly: </para>
 
         <programlisting>
   &lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;

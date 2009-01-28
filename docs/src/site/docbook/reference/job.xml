@@ -51,7 +51,7 @@
     overriden explicitely:</para>
 
     <programlisting> 
-  &lt;job id="footballJob" <emphasis role="bold">repository="specialRepository"</emphasis>&gt;
+  &lt;job id="footballJob" <emphasis role="bold">job-repository="specialRepository"</emphasis>&gt;
     &lt;step name="playerload" next="gameLoad"/&gt;
     &lt;step name="gameLoad" next="playerSummarization"/&gt;
     &lt;step name="playerSummarization"/&gt;
