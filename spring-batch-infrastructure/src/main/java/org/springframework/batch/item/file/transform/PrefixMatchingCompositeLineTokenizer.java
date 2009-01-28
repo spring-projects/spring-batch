@@ -16,10 +16,11 @@
 
 package org.springframework.batch.item.file.transform;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.Assert;
 
 /**
  * A {@link LineTokenizer} implementation that stores a mapping of String
@@ -30,46 +31,69 @@ import java.util.Map;
  * {@link LineTokenizer} can be configured in the delegate map by setting its
  * corresponding prefix to the empty string.
  * 
+ * @author Dan Garrette
  */
-public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer {
+public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
 
-	private Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
+	private Map<String, LineTokenizer> tokenizers = null;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
+	 */
+	public FieldSet tokenize(String line) {
+		return this.matchPrefix(line, this.tokenizers).tokenize(line);
+	}
+
+	/**
+	 * @param line
+	 * @return the delegate whose prefix matches the given line
+	 */
+	protected <S> S matchPrefix(String line, Map<String, S> delegates) {
+		S delegate = null;
+		S defaultDelegate = null;
+
+		if (line != null) {
+			for (String key : delegates.keySet()) {
+				if ("".equals(key)) {
+					defaultDelegate = delegates.get(key);
+					// don't break here or the delegate may not be found
+				}
+				else if (line.startsWith(key)) {
+					delegate = delegates.get(key);
+					break;
+				}
+			}
+
+			if (delegate == null) {
+				delegate = defaultDelegate;
+			}
+		}
+		else if (delegates.containsKey(null)) {
+			delegate = delegates.get(null);
+		}
+		else {
+			throw new IllegalStateException("Could not handle a null line");
+		}
+
+		if (delegate == null) {
+			throw new IllegalStateException("Could not find a matching prefix for line=[" + line + "]");
+		}
+		return delegate;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 */
+	public void afterPropertiesSet() throws Exception {
+		Assert.isTrue(this.tokenizers != null && this.tokenizers.size() > 0,
+				"The 'tokenizers' property must be non-empty");
+	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
 		this.tokenizers = new LinkedHashMap<String, LineTokenizer>(tokenizers);
 	}
-
-	public FieldSet tokenize(String line) {
-
-		if (line == null) {
-			return new DefaultFieldSet(new String[0]);
-		}
-
-		LineTokenizer tokenizer = null;
-		LineTokenizer defaultTokenizer = null;
-
-		for (String key : tokenizers.keySet()) {
-
-			if ("".equals(key)) {
-				defaultTokenizer = (LineTokenizer) tokenizers.get(key);
-				// don't break here or the tokenizer may not be found
-				continue;
-			}
-			if (line.startsWith(key)) {
-				tokenizer = (LineTokenizer) tokenizers.get(key);
-				break;
-			}
-		}
-
-		if (tokenizer == null) {
-			tokenizer = defaultTokenizer;
-		}
-
-		if (tokenizer == null) {
-			throw new IllegalStateException("Could not match record to tokenizer for line=[" + line + "]");
-		}
-
-		return tokenizer.tokenize(line);
-	}
-
 }

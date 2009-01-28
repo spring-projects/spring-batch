@@ -1,5 +1,7 @@
 package org.springframework.batch.item.file.transform;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 public class Name {
 	private String first;
 	private String last;
@@ -37,5 +39,9 @@ public class Name {
 
 	public void setBorn(int born) {
 		this.born = born;
+	}
+
+    public boolean equals(Object o) {
+		return EqualsBuilder.reflectionEquals(this, o);
 	}
 }

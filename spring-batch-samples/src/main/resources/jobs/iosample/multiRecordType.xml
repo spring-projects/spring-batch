@@ -21,39 +21,18 @@
 
 	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
 		<property name="resource" value="data/iosample/input/multiRecordType.txt" />
-		<property name="lineMapper">
-			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
-				<property name="lineTokenizer" ref="compositeLineTokenizer" />
-				<property name="fieldSetMapper" ref="compositeFieldSetMapper" />
-			</bean>
-		</property>
+		<property name="lineMapper" ref="prefixMatchingLineMapper"/>
 	</bean>
 
-	<bean id="compositeLineTokenizer"
-		class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">
+	<bean id="prefixMatchingLineMapper"
+		class="org.springframework.batch.item.file.mapping.PrefixMatchingCompositeLineMapper">
 		<property name="tokenizers">
 			<map>
 				<entry key="TRAD" value-ref="tradeLineTokenizer" />
 				<entry key="CUST" value-ref="customerLineTokenizer" />
 			</map>
 		</property>
-	</bean>
-
-	<bean id="tradeLineTokenizer"
-		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<property name="names" value="isin,quantity,price,customer,prefix" />
-		<property name="columns" value="5-16,17-19,20-25,26-34,1-4" />
-	</bean>
-
-	<bean id="customerLineTokenizer"
-		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
-		<property name="names" value="id,name,credit,prefix" />
-		<property name="columns" value="5-9,10-18,19-26,1-4" />
-	</bean>
-
-	<bean id="compositeFieldSetMapper"
-		class="org.springframework.batch.sample.iosample.internal.PrefixMatchingCompositeFieldSetMapper">
-		<property name="mappers">
+		<property name="fieldSetMappers">
 			<map>
 				<entry key="TRAD" value-ref="tradeFieldSetMapper" />
 				<entry key="CUST" value-ref="customerFieldSetMapper" />
@@ -61,18 +40,29 @@
 		</property>
 	</bean>
 
+	<bean id="tradeLineTokenizer"
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="isin,quantity,price,customer" />
+		<property name="columns" value="5-16,17-19,20-25,26-34" />
+	</bean>
+
+	<bean id="customerLineTokenizer"
+		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+		<property name="names" value="id,name,credit" />
+		<property name="columns" value="5-9,10-18,19-26" />
+	</bean>
+
 	<bean id="tradeFieldSetMapper"
 		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+		
 	<bean id="customerFieldSetMapper"
 		class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditFieldSetMapper" />
 
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
-		<property name="resource"
-			value="file:target/test-outputs/multiRecordTypeOutput.txt" />
+		<property name="resource" value="file:target/test-outputs/multiRecordTypeOutput.txt" />
 		<property name="lineAggregator">
-			<bean
-				class="org.springframework.batch.sample.iosample.internal.DelegatingTradeLineAggregator">
+			<bean class="org.springframework.batch.sample.iosample.internal.DelegatingTradeLineAggregator">
 				<property name="tradeLineAggregator" ref="tradeLineAggregator" />
 				<property name="customerLineAggregator" ref="customerLineAggregator" />
 			</bean>
@@ -82,8 +72,7 @@
 	<bean id="tradeLineAggregator"
 		class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
 		<property name="fieldExtractor">
-			<bean
-				class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+			<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
 				<property name="names" value="isin,quantity,price,customer" />
 			</bean>
 		</property>
@@ -93,8 +82,7 @@
 	<bean id="customerLineAggregator"
 		class="org.springframework.batch.item.file.transform.FormatterLineAggregator">
 		<property name="fieldExtractor">
-			<bean
-				class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
+			<bean class="org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor">
 				<property name="names" value="id,name,credit" />
 			</bean>
 		</property>

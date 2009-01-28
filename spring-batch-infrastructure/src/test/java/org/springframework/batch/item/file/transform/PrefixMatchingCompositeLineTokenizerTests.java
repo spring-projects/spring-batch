@@ -16,33 +16,52 @@
 
 package org.springframework.batch.item.file.transform;
 
+import static junit.framework.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
+/**
+ * @author Dan Garrette
+ */
+public class PrefixMatchingCompositeLineTokenizerTests {
 
-public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
+	private PrefixMatchingCompositeLineTokenizer tokenizer = new PrefixMatchingCompositeLineTokenizer();
 
-	PrefixMatchingCompositeLineTokenizer tokenizer = new PrefixMatchingCompositeLineTokenizer();
-	
+	@Test(expected = IllegalArgumentException.class)
 	public void testNoTokenizers() throws Exception {
-		try {
-			tokenizer.tokenize("a line");
-			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
-			// expected
-		}
+		tokenizer.afterPropertiesSet();
+		tokenizer.tokenize("a line");
 	}
-	
-	public void testNullLine() throws Exception {
-		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer())); 
+
+	@Test(expected = IllegalStateException.class)
+	public void testNullLineNoKey() throws Exception {
+		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer()));
+		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize(null);
 		assertEquals(0, fields.getFieldCount());
 	}
-	
+
+	@Test
+	public void testNullLineWithKey() throws Exception {
+		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
+		map.put(null, new DelimitedLineTokenizer());
+		map.put("foo", new LineTokenizer() {
+			public FieldSet tokenize(String line) {
+				return null;
+			}
+		});
+		tokenizer.setTokenizers(map);
+		tokenizer.afterPropertiesSet();
+		FieldSet fields = tokenizer.tokenize(null);
+		assertEquals(0, fields.getFieldCount());
+	}
+
+	@Test
 	public void testEmptyKeyMatchesAnyLine() throws Exception {
 		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
 		map.put("", new DelimitedLineTokenizer());
@@ -51,13 +70,15 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 				return null;
 			}
 		});
-		tokenizer.setTokenizers(map); 
+		tokenizer.setTokenizers(map);
+		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("abc");
 		assertEquals(1, fields.getFieldCount());
 	}
 
+	@Test
 	public void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
-		
+
 		Map<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
 		map.put("", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
@@ -65,27 +86,27 @@ public class PrefixMatchingCompositeLineTokenizerTests extends TestCase {
 			}
 		});
 		map.put("foo", new DelimitedLineTokenizer());
-		tokenizer.setTokenizers(map); 
+		tokenizer.setTokenizers(map);
+		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("foo,bar");
 		assertEquals("bar", fields.readString(1));
 	}
 
+	@Test(expected = IllegalStateException.class)
 	public void testNoMatch() throws Exception {
-		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer())); 
-		try {
-			tokenizer.tokenize("nomatch");
-			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
-			// expected
-		}
+		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new DelimitedLineTokenizer()));
+		tokenizer.afterPropertiesSet();
+		tokenizer.tokenize("nomatch");
 	}
-	
+
+	@Test
 	public void testMatchWithPrefix() throws Exception {
 		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new LineTokenizer() {
 			public FieldSet tokenize(String line) {
-				return new DefaultFieldSet(new String[] {line});
+				return new DefaultFieldSet(new String[] { line });
 			}
 		}));
+		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("foo bar");
 		assertEquals(1, fields.getFieldCount());
 		assertEquals("foo bar", fields.readString(0));
