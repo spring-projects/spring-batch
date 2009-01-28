@@ -639,44 +639,245 @@
   <section>
     <title>Advanced Meta-Data Usage</title>
 
-    <para></para>
+    <para>So far, both the JobLauncher and JobRepository interfaces have been
+    discussed. Together, they represent simple launching of a job, and basic
+    CRUD operations of batch domain objects:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/job-repository.png" scale=""
+                   width="40%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/job-repository.png"
+                   scale="80" width="40%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>A <classname>JobLauncher</classname> uses the
+    <classname>JobRepository</classname> to create new
+    <classname>JobExecution</classname> objects, and run them.
+    <classname>Job</classname> and <classname>Step</classname> implementations
+    later use the same <classname>JobRepository</classname> for basic updates
+    of the same executions during the running of a <classname>Job</classname>.
+    The basic operations suffice for simple scenarios. However, in a large
+    batch environment with hundreds of batch jobs and complex scheduling
+    requirements, more advanced access of the meta data is required:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/job-repository-advanced.png"
+                   scale="" width="65%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/job-repository-advanced.png"
+                   scale="80" width="65%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The JobExplorer and JobOperatoer interfaces, which will be discussed
+    below, add additional functionality for querying and controlling the meta
+    data.</para>
 
     <section>
       <title>Querying the repository</title>
 
-      <para></para>
+      <para>The most basic need before any advanced features is the ability to
+      query the repository for existing executions. This functionality is
+      provided by the JobExplorer interface:</para>
 
-      <section>
-        <title>JobExporer</title>
+      <programlisting>  
+  public interface JobExplorer {
 
-        <para></para>
-      </section>
+    List&lt;JobInstance&gt; getJobInstances(String jobName, int start, int count);
+
+    JobExecution getJobExecution(Long executionId);
+
+    StepExecution getStepExecution(Long jobExecutionId, Long stepExecutionId);
+
+    JobInstance getJobInstance(Long instanceId);
+
+    List&lt;JobExecution&gt; getJobExecutions(JobInstance jobInstance);
+
+    Set&lt;JobExecution&gt; findRunningJobExecutions(String jobName);
+  }
+
+</programlisting>
+
+      <para>As is evident from the method signatures above,
+      <classname>JobExplorer</classname> is a read-only version of the
+      <classname>JobRepository</classname>, and like the
+      <classname>JobRepository</classname>, it can be easily configured via a
+      factory bean:</para>
+
+      <programlisting>  
+  &lt;bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" 
+        p:dataSource-ref="dataSource" /&gt;
+
+</programlisting>
+
+      <para>Earlier in this chapter, it was mentioned that the table prefix of
+      the JobRepository can be modified to allow for different versions or
+      schemas. Because the JobExplorer is working with the same tables, it too
+      needs the ability to set a prefix:</para>
+
+      <programlisting>  
+  &lt;bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" 
+        p:dataSource-ref="dataSource" <emphasis role="bold">p:tablePrefix="BATCH_" </emphasis>/&gt;
+
+</programlisting>
+    </section>
+
+    <section>
+      <title>JobOperator</title>
+
+      <para>As previously discussed, the <classname>JobRepository</classname>
+      provides CRUD operations on the meta-data, and the
+      <classname>JobExplorer</classname> provides read-only operations on the
+      meta-data. However, those operations are most useful when used together
+      to perform common monitoring tasks such as stopping, restarting, or
+      summarizing a Job, as is commonly done by batch operators. Spring Batch
+      provides for these types of operations via the
+      <classname>JobOperator</classname> interface:</para>
+
+      <programlisting>
+  public interface JobOperator {
+
+    List&lt;Long&gt; getExecutions(long instanceId) throws NoSuchJobInstanceException;
+
+    List&lt;Long&gt; getJobInstances(String jobName, int start, int count) throws NoSuchJobException;
+
+    Set&lt;Long&gt; getRunningExecutions(String jobName) throws NoSuchJobException;
+
+    String getParameters(long executionId) throws NoSuchJobExecutionException;
+
+    Long start(String jobName, String parameters) 
+           throws NoSuchJobException, JobInstanceAlreadyExistsException;
+
+    Long restart(long executionId) 
+           throws JobInstanceAlreadyCompleteException, NoSuchJobExecutionException,
+                  NoSuchJobException, JobRestartException;
+
+    Long startNextInstance(String jobName) 
+           throws NoSuchJobException, JobParametersNotFoundException, JobRestartException, 
+                  JobExecutionAlreadyRunningException, JobInstanceAlreadyCompleteException;
+
+    boolean stop(long executionId) throws NoSuchJobExecutionException, JobExecutionNotRunningException;
+
+    String getSummary(long executionId) throws NoSuchJobExecutionException;
+
+    Map&lt;Long, String&gt; getStepExecutionSummaries(long executionId) throws NoSuchJobExecutionException;
+
+    Set&lt;String&gt; getJobNames();
+
+  }
+
+</programlisting>
+
+      <para>The above operations represent methods from many different
+      interfaces, such as <classname>JobLauncher</classname>,
+      <classname>JobRepository</classname>,
+      <classname>JobExplorer</classname>, and
+      <classname>JobRegistry</classname>. For this reason, the provided
+      implementation of JobOperator, SimpleJobOperator, has many dependencies:
+      </para>
+
+      <programlisting>
+  &lt;bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator"&gt;
+    &lt;property name="jobExplorer"&gt;
+      &lt;bean class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean"&gt;
+        &lt;property name="dataSource" ref="dataSource" /&gt;
+      &lt;/bean&gt; 
+    &lt;/property&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+    &lt;property name="jobRegistry" ref="jobRegistry" /&gt;
+    &lt;property name="jobLauncher" ref="jobLauncher" /&gt;
+  &lt;/bean&gt;
+
+</programlisting>
+    </section>
+
+    <section>
+      <title>JobParametersIncrementer</title>
+
+      <para>Most of the methods on <classname>JobOperator</classname> are
+      self-explanatory, and more detailed explanations can be found on the
+      javadoc of the interface. However, the 'startNextInstance' method is
+      worth noting. This method will always start a new instance of a Job.
+      This can be extremely useful if there are serious issues in a
+      <classname>Job</classname>Execution, and the <classname>Job</classname>
+      needs to be started over again from the beginning. Unlike
+      <classname>JobLauncher</classname> though, which requires a new
+      <classname>JobParameters</classname> that will trigger a new JobInstance
+      if they are different than any previous one, the startNextInstance
+      method will use the JobParametersIncrementer tied to the Job to force
+      the <classname>Job</classname> to a new instance:</para>
+
+      <programlisting>
+  public interface JobParametersIncrementer {
+
+    JobParameters getNext(JobParameters parameters);
+  }
+
+</programlisting>
+
+      <para>The contract of JobParametersIncrementer is that, given a
+      JobParameters, it will return the 'next' parameter by incrementing any
+      values it may contain. This strategy is useful because the framework has
+      no way of knowing what changes to the JobParameters make it the 'next'
+      instance. For example, if the only value in JobParameters is a date, and
+      the next instance should be created, should that value be incremented by
+      one day? Or one week? (if the job is weekly for instance) The same can
+      be said for any numerical values that help to identify the Job, as shown
+      below:</para>
+
+      <programlisting>  
+  public class SampleIncrementer implements JobParametersIncrementer {
+  
+    public JobParameters getNext(JobParameters parameters) { 
+      if (parameters==null || parameters.isEmpty()) {
+        return new JobParametersBuilder().addLong("run.id", 1L).toJobParameters();
+      }
+      long id = parameters.getLong("run.id",1L) + 1;
+      return new JobParametersBuilder().addLong("run.id", id).toJobParameters();
+    }
+}
+
+</programlisting>
+
+      <para>In this example, the value with a key of 'run.id' is used to
+      descriminate between JobInstances. If the JobParameters passed in is
+      null, it can be assumed that the Job has never been run before and thus
+      it's initial state can be returned. However, if not, the old value is
+      obtained, incremented by one, and returned. An incrementer can be
+      associated with Job via the 'incrementer' attribute in the
+      namespace:</para>
+
+      <programlisting>  
+  &lt;job id="footballJob" <emphasis role="bold">incrementer="sampleIncrementer"</emphasis>&gt;
+    &lt;step name="playerload" next="gameLoad"/&gt;
+    &lt;step name="gameLoad" next="playerSummarization"/&gt;
+    &lt;step name="playerSummarization"/&gt;
+  &lt;/job&gt;
+
+</programlisting>
     </section>
 
     <section>
       <title>Stopping a Job</title>
 
-      <para>One of the most common reasons for wanting to launching a
-      <classname>job</classname> asynchronously is to be able to gracefully
-      stop it. This can be done through the
-      <classname>JobExecution</classname> returned by the
-      <classname>JobLauncher</classname>:</para>
+      <para>One of the most common use cases of JobOperator is gracefully
+      stopping a <classname>Job:</classname></para>
 
-      <programlisting>  JobExecution jobExecution = launcher.run(getJob(), jobParameters);
+      <programlisting>
+  Set&lt;Long&gt; executions = jobOperator.getRunningExecutions("sampleJob");
 
-  //give job adequate time to start
-  Thread.sleep(1000);
-
-  assertEquals(BatchStatus.STARTED, jobExecution.getStatus());
-  assertTrue(jobExecution.isRunning());
-
-  jobExecution.stop();
-
-  //give job time to stop
-  Thread.sleep(1000);
-
-  assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
-  assertFalse(jobExecution.isRunning());</programlisting>
+  jobOperator.stop(executions.iterator().next());
+  </programlisting>
 
       <para>The shutdown is not immediate, since there is no way to force
       immediate shutdown, especially if the execution is currently in
@@ -686,12 +887,6 @@
       <classname>StepExecution</classname> to
       <classname>BatchStatus.STOPPED</classname>, save it, then do the same
       for the <classname>JobExecution</classname> before finishing.</para>
-
-      <section>
-        <title>JobOperator</title>
-
-        <para></para>
-      </section>
     </section>
   </section>
 </chapter>
