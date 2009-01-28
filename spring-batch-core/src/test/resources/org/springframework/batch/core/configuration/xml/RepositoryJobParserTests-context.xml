@@ -20,7 +20,7 @@
 		</beans:property>
 	</beans:bean>
 
-	<job id="job" repository="thisRepository">
+	<job id="job" job-repository="thisRepository">
 		<step name="step1" />
 	</job>
 

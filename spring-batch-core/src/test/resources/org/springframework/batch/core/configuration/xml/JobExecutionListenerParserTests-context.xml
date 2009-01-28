@@ -6,7 +6,7 @@
 
 	<beans:import resource="common-context.xml" />
 	
-	<job id="job" incrementer="testIncrementer" repository="jobRepository">
+	<job id="job" incrementer="testIncrementer" job-repository="jobRepository">
 		<step name="step1" tasklet="tasklet"/>
 		<listeners>
 			<listener after-method="afterJob" ref="testListener"/>

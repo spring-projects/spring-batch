@@ -49,10 +49,7 @@ public class JobParser extends AbstractBeanDefinitionParser {
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
 		
-		String repositoryAttribute = element.getAttribute("repository");
-		if (!StringUtils.hasText(repositoryAttribute)) {
-			repositoryAttribute = "jobRepository";
-		}
+		String repositoryAttribute = element.getAttribute("job-repository");
 		builder.addPropertyReference("jobRepository", repositoryAttribute);
 
 		String restartableAttribute = element.getAttribute("restartable");

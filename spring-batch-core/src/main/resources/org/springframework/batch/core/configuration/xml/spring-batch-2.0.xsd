@@ -30,15 +30,7 @@
 			<xsd:complexContent>
 				<xsd:extension base="flowType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attribute name="repository" type="xsd:string"
-						use="optional">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[ 
-								A reference to a JobRepository bean definition. Defaults to "jobRepository".
-								]]>
-							</xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
+					<xsd:attributeGroup ref="jobRepository"/>
 					<xsd:attribute name="incrementer" type="xsd:string"
 						use="optional">
 						<xsd:annotation>
