@@ -1,0 +1,28 @@
+Release Notes - Spring Batch - Version 1.1.4
+
+
+* Bug Fixes
+
+  * {{{http://jira.springframework.org/browse/BATCH-901}BATCH-901}} -         Uncreachable code in SkipLimitFactoryBean (setting BackOffPolicy)
+
+  * {{{http://jira.springframework.org/browse/BATCH-925}BATCH-925}} -         StaxEventItemWriter doesn't reset restart flag on close
+
+  * {{{http://jira.springframework.org/browse/BATCH-926}BATCH-926}} -         vague skip limit for concurrent chunks
+
+  * {{{http://jira.springframework.org/browse/BATCH-934}BATCH-934}} -         FlatFileItemWriter.clear does not reset OutputState
+
+  * {{{http://jira.springframework.org/browse/BATCH-943}BATCH-943}} -         Remove or change reference to ItemProcessor in 1.x docos
+
+  * {{{http://jira.springframework.org/browse/BATCH-950}BATCH-950}} -         Exception during rollback hides root cause
+
+  * {{{http://jira.springframework.org/browse/BATCH-972}BATCH-972}} -         Job has the same ExitStatus as the last StepExecution
+
+  * {{{http://jira.springframework.org/browse/BATCH-996}BATCH-996}} -         use default retryLimit  == 1 (not 0) in *StepFactoryBean
+
+    
+* Improvement
+
+  * {{{http://jira.springframework.org/browse/BATCH-909}BATCH-909}} -         Turn off getWarnings() call in JdbcCursorItemReader when ignoreWarnings is true
+
+  * {{{http://jira.springframework.org/browse/BATCH-993}BATCH-993}} -         Slightly confusing use of *Dao in sample configuration in documentation, where *ItemWriter would be clearer
+
