@@ -56,13 +56,14 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, Init
 
 		if (line != null) {
 			for (String key : delegates.keySet()) {
-				if ("".equals(key)) {
-					defaultDelegate = delegates.get(key);
-					// don't break here or the delegate may not be found
-				}
-				else if (line.startsWith(key)) {
-					delegate = delegates.get(key);
-					break;
+				if (key != null) {
+					if ("".equals(key)) {
+						defaultDelegate = delegates.get(key);
+					}
+					else if (line.startsWith(key)) {
+						delegate = delegates.get(key);
+						break;
+					}
 				}
 			}
 

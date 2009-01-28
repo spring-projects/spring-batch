@@ -49,16 +49,41 @@ public class PrefixMatchingCompositeLineTokenizerTests {
 	@Test
 	public void testNullLineWithKey() throws Exception {
 		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
-		map.put(null, new DelimitedLineTokenizer());
+		map.put(null, new LineTokenizer() {
+			public FieldSet tokenize(String line) {
+				return new DefaultFieldSet(new String[] { "a" });
+			}
+		});
 		map.put("foo", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
-				return null;
+				return new DefaultFieldSet(new String[] { "b" });
 			}
 		});
 		tokenizer.setTokenizers(map);
 		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize(null);
-		assertEquals(0, fields.getFieldCount());
+		assertEquals(1, fields.getFieldCount());
+		assertEquals("a", fields.readString(0));
+	}
+
+	@Test
+	public void testNullKey() throws Exception {
+		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
+		map.put(null, new LineTokenizer() {
+			public FieldSet tokenize(String line) {
+				return new DefaultFieldSet(new String[] { "a" });
+			}
+		});
+		map.put("foo", new LineTokenizer() {
+			public FieldSet tokenize(String line) {
+				return new DefaultFieldSet(new String[] { "b" });
+			}
+		});
+		tokenizer.setTokenizers(map);
+		tokenizer.afterPropertiesSet();
+		FieldSet fields = tokenizer.tokenize("foo");
+		assertEquals(1, fields.getFieldCount());
+		assertEquals("b", fields.readString(0));
 	}
 
 	@Test
