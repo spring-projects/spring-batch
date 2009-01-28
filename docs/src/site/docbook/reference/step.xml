@@ -204,8 +204,8 @@
 
         <programlisting>
   &lt;step name="step1"&gt;
-    &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="10" <emphasis
-            role="bold">allow-start-if-complete="true"</emphasis>/&gt;
+    &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="10" 
+             <emphasis role="bold">allow-start-if-complete="true"</emphasis>/&gt;
   &lt;/step&gt;
 
 </programlisting>
@@ -484,7 +484,8 @@
     &lt;/tasklet&gt;
   &lt;/step&gt;
 
-  &lt;beans:bean id="compositeWriter" class="org.springframework.batch.item.support.CompositeItemWriter"&gt;
+  &lt;beans:bean id="compositeWriter" 
+              class="org.springframework.batch.item.support.CompositeItemWriter"&gt;
     &lt;beans:property name="delegates"&gt;
       &lt;beans:list&gt;
         &lt;beans:ref bean="fileItemWriter1" /&gt;
@@ -972,13 +973,13 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/sequential-flow.png"
-                     scale="50" width="" />
+                     scale="" width="40%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="src/site/docbook/reference/images/sequential-flow.png"
-                     width="75%" />
+                     width="40%" />
         </imageobject>
       </mediaobject>
 
@@ -1019,13 +1020,13 @@
       rather than causing failure? <mediaobject>
           <imageobject role="html">
             <imagedata align="center" fileref="images/conditional-flow.png"
-                       scale="75" width="" />
+                       scale="" width="40%" />
           </imageobject>
 
           <imageobject role="fo">
             <imagedata align="center"
                        fileref="src/site/docbook/reference/images/conditional-flow.png"
-                       width="75%" />
+                       width="40%" />
           </imageobject>
         </mediaobject></para>
 
@@ -1237,7 +1238,7 @@
     </section>
 
     <section>
-      <title>Creating File Names at Runtime</title>
+      <title>Late binding of Job and Step Attributes</title>
 
       <para>Both the XML and Flat File examples above use the Spring
       <classname>Resource</classname> abstraction to obtain the file to read
@@ -1246,11 +1247,14 @@
       <classname>java.io.File</classname>. Both XML and Flat File resources
       can be configured using standard Spring constructs:</para>
 
-      <programlisting>  &lt;bean id="flatFileItemReader"
+      <programlisting>  
+  &lt;bean id="flatFileItemReader"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource"
                      value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
-  &lt;/bean&gt;</programlisting>
+  &lt;/bean&gt;
+
+</programlisting>
 
       <para>The above <classname>Resource</classname> will load the file from
       the file system, at the location specificied. Note that absolute
@@ -1260,10 +1264,13 @@
       may need to be determined at runtime as a parameter to the job. This
       could be solved using '-D' parameters, i.e. a system property:</para>
 
-      <programlisting>&lt;bean id="flatFileItemReader"
+      <programlisting>
+  &lt;bean id="flatFileItemReader"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="${input.file.name}" /&gt;
-&lt;/bean&gt;</programlisting>
+  &lt;/bean&gt;
+
+</programlisting>
 
       <para>All that would be required for this solution to work would be a
       system argument (-Dinput.file.name="file://file.txt"). (Note that
@@ -1275,35 +1282,63 @@
       <para>Often in a batch setting it is preferable to parameterize the file
       name in the <classname>JobParameters</classname> of the job, instead of
       through system properties, and access them that way. To allow for this,
-      Spring Batch provides the
-      <classname>StepExecutionResourceProxy</classname>. The proxy can use
-      either job name, step name, or any values from the
-      <classname>JobParameters</classname>, by surrounding them with %:</para>
+      Spring Batch allows for the late binding of various Job and Step
+      attributes:</para>
 
-      <programlisting>  &lt;bean id="inputFile"
-        class="org.springframework.batch.core.resource.StepExecutionResourceProxy" /&gt;
-    &lt;property name="filePattern" value="//%JOB_NAME%/%STEP_NAME%/%file.name%" /&gt;
-  &lt;/bean&gt;</programlisting>
+      <programlisting>  
+  &lt;bean id="flatFileItemReader" scope="step"
+        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    &lt;property name="resource" value="#{jobParameters[input.file.name]}" /&gt;
+  &lt;/bean&gt;
 
-      <para>Assuming a job name of 'fooJob', and a step name of 'fooStep', and
-      the key-value pair of 'file.name="fileName.txt"' is in the
-      <classname>JobParameters</classname> the job is started with, the
-      following filename will be passed as the
-      <classname>Resource</classname>:
-      "<filename>//fooJob/fooStep/fileName.txt</filename>". It should be noted
-      that in order for the proxy to have access to the
-      <classname>StepExecution</classname>, it must be registered as a
-      <classname>StepListener</classname>:</para>
+</programlisting>
 
-      <programlisting>  &lt;bean id="fooStep" parent="abstractStep"
-    p:itemReader-ref="itemReader"
-    p:itemWriter-ref="itemWriter"&gt;
-    &lt;property name="listeners" ref="inputFile" /&gt;
-  &lt;/bean&gt;</programlisting>
+      <para>Both the <classname>JobExecution</classname> and
+      <classname>StepExecution</classname> level
+      <classname>ExecutionContext</classname> can be access in the same
+      way:</para>
 
-      <para>The <classname>StepListener</classname> interface will be
-      discussed in more detail in Chapter 4. For now, it is sufficient to know
-      that the proxy must be registered.</para>
+      <programlisting>  
+  &lt;bean id="flatFileItemReader" scope="step"
+        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    &lt;property name="resource" value="#{<emphasis role="bold">jobExecutionContext</emphasis>[input.file.name]}" /&gt;
+  &lt;/bean&gt;
+
+</programlisting>
+
+      <programlisting>  
+  &lt;bean id="flatFileItemReader" scope="step"
+        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    &lt;property name="resource" value="#{<emphasis role="bold">stepExecutionContext</emphasis>[input.file.name]}" /&gt;
+  &lt;/bean&gt;
+
+</programlisting>
+
+      <section>
+        <title>Step Scope</title>
+
+        <para>All of the late binding examples from above have a scope of
+        "step" declared on the bean definition:</para>
+
+        <programlisting>  
+  &lt;bean id="flatFileItemReader" <emphasis role="bold">scope="step"</emphasis>
+        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    &lt;property name="resource" value="#{jobParameters[input.file.name]}" /&gt;
+  &lt;/bean&gt;
+
+</programlisting>
+
+        <para>Using a scope of <classname>Step</classname> is required in
+        order to use late binding, since the bean cannot actually be
+        instantiated until the <classname>Step</classname> starts, which
+        allows the attributes to be found. Because it is not part of the
+        Spring container by default, it must be added explicitely: </para>
+
+        <programlisting>
+  &lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;
+
+</programlisting>
+      </section>
     </section>
   </section>
 </chapter>

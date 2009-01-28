@@ -182,11 +182,14 @@
       fields so that the fields may be accessed either by index or name as
       patterned after <classname>ResultSet</classname>:</para>
 
-      <programlisting>  String[] tokens = new String[]{"foo", "1", "true"};
+      <programlisting>  
+  String[] tokens = new String[]{"foo", "1", "true"};
   FieldSet fs = new DefaultFieldSet(tokens);
   String name = fs.readString(0);
   int value = fs.readInt(1);
-  boolean booleanValue = fs.readBoolean(2);</programlisting>
+  boolean booleanValue = fs.readBoolean(2);
+
+</programlisting>
 
       <para>There are many more options on the <classname>FieldSet</classname>
       interface, such as <classname>Date</classname>, long,
@@ -217,7 +220,7 @@
       guide will not go into the details of creating
       <classname>Resource</classname> objects. However, a simple example of a
       file system resource can be found below: <programlisting>
-        Resource resource = new FileSystemResource("resources/trades.csv");
+  Resource resource = new FileSystemResource("resources/trades.csv");
         </programlisting></para>
 
       <para>In complex batch environments the directory structures are often
@@ -320,10 +323,13 @@
         <para>As with <classname>RowMapper</classname>, which takes a low
         level construct such as <classname>ResultSet and returns an Object,
         flat file procesing requires the same construct to convert a String
-        line into an Object:</classname><programlisting>public interface LineMapper&lt;T&gt; {
+        line into an Object:</classname><programlisting>
+  public interface LineMapper&lt;T&gt; {
 
-  T mapLine(String line, int lineNumber) throws Exception;
-}</programlisting></para>
+    T mapLine(String line, int lineNumber) throws Exception;
+  }
+
+</programlisting></para>
 
         <para>The basic constract is that, given the current line, and the
         line number its associated with, return a resulting domain object.
@@ -349,11 +355,14 @@
         necessary. In Spring Batch, this is called a
         <classname>LineTokenizer</classname>:</para>
 
-        <programlisting>  public interface LineTokenizer {
+        <programlisting>  
+  public interface LineTokenizer {
   
     FieldSet tokenize(String line);
 
-  }</programlisting>
+  }
+
+</programlisting>
 
         <para>The contract of a <classname>LineTokenizer</classname> is such
         that, given a line of input (in theory the
@@ -397,11 +406,14 @@
         <classname>LineTokenizer</classname> to translate a line of data from
         a resource into an object of the desired type:</para>
 
-        <programlisting>  public interface FieldSetMapper&lt;T&gt; {
+        <programlisting>  
+  public interface FieldSetMapper&lt;T&gt; {
   
     T mapFieldSet(FieldSet fieldSet);
 
-  }</programlisting>
+  }
+
+</programlisting>
 
         <para>The pattern used is the same as <classname>RowMapper</classname>
         used by <classname>JdbcTemplate</classname>.</para>
@@ -459,7 +471,9 @@
     public void setFieldSetMapper(FieldSetMapper&lt;T&gt; fieldSetMapper) { 
       this.fieldSetMapper = fieldSetMapper;
     }
-}</programlisting>
+  }
+
+</programlisting>
 
         <para>The above functionality is provided in a default implementation,
         rather than being built into the reader itself (as was done in
@@ -522,7 +536,8 @@
 
       return player;
     }
-  }    </programlisting></para>
+  }
+    </programlisting></para>
 
         <para>The file can then be read by correctly constructing a
         <classname>FlatFileItemReader</classname> and calling
@@ -583,7 +598,8 @@
            return player;
         }
 
-   }        </programlisting></para>
+   }     
+   </programlisting></para>
       </section>
 
       <section>
@@ -599,14 +615,17 @@
         <classname>FieldSetMapper</classname> configuration looks like the
         following:</para>
 
-        <programlisting>  &lt;bean id="fieldSetMapper"
+        <programlisting>  
+  &lt;bean id="fieldSetMapper"
         class="org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper"&gt;
     &lt;property name="prototypeBeanName" value="player" /&gt;
   &lt;/bean&gt;
 
   &lt;bean id="player"
         class="org.springframework.batch.sample.domain.Player"
-        scope="prototype" /&gt;</programlisting>
+        scope="prototype" /&gt;
+
+</programlisting>
 
         <para>For each entry in the <classname>FieldSet</classname>, the
         mapper will look for a corresponding setter on a new instance of the
@@ -680,7 +699,8 @@
         <classname>ApplicationContext</classname>:</para>
 
         <programlisting>  
-  &lt;bean id="customEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer"&gt;
+  &lt;bean id="customEditorConfigurer" 
+        class="org.springframework.beans.factory.config.CustomEditorConfigurer"&gt;
     &lt;property name="customEditors"&gt;
       &lt;map&gt;
         &lt;entry key="org.springframework.batch.item.file.transform.Range[]"&gt;
@@ -717,7 +737,8 @@
         PrefixMatchingCompositeLineTokenizer makes this easier by matching the
         prefix in a line with a particular tokenizer:</para>
 
-        <programlisting>  &lt;bean id="orderFileDescriptor"
+        <programlisting>  
+  &lt;bean id="orderFileDescriptor"
         class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
     &lt;property name="tokenizers"&gt;
      &lt;map&gt;
@@ -733,7 +754,9 @@
       &lt;entry key="" value-ref="defaultLineDescriptor" /&gt;
      &lt;/map&gt;
     &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+  &lt;/bean&gt;
+
+</programlisting>
 
         <para>This ensures that the line will be parsed correctly, which is
         especially important for fixed length input. Any users of the
@@ -863,11 +886,14 @@
         writing to a file. In Spring Batch this is the
         <classname>LineAggregator</classname>:</para>
 
-        <programlisting>  public interface LineAggregator&lt;T&gt; {
+        <programlisting>  
+  public interface LineAggregator&lt;T&gt; {
 
     public String aggregate(T item);
 
-  }</programlisting>
+  }
+
+</programlisting>
 
         <para>The <classname>LineAggregator</classname> is the opposite of a
         <classname>LineTokenizer</classname>.
@@ -927,20 +953,26 @@
         <classname>FlatFileItemWriter</classname> expresses this in
         code:</para>
 
-        <programlisting>  public void write(T item) throws Exception {
+        <programlisting>  
+  public void write(T item) throws Exception {
     write(lineAggregator.aggregate(item) + LINE_SEPARATOR);
-  }</programlisting>
+  }
+
+</programlisting>
 
         <para>A simple configuration would look like the following:</para>
 
-        <programlisting>  &lt;bean id="itemWriter"
+        <programlisting>  
+  &lt;bean id="itemWriter"
         class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
     &lt;property name="resource"
               value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
     &lt;property name="lineAggregator"&gt;
       &lt;bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator"/&gt;
     &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+  &lt;/bean&gt;
+
+</programlisting>
       </section>
 
       <section>
@@ -1201,12 +1233,12 @@
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="src/site/docbook/reference/images/xmlinput.png"
-                     format="PNG" width="50%" />
+                     format="PNG" width="40%" />
         </imageobject>
 
         <imageobject role="html">
           <imagedata align="center" fileref="images/xmlinput.png" format="PNG"
-                     width="50%" />
+                     width="40%" />
         </imageobject>
 
         <caption><para>Figure 3.1: XML Input</para></caption>
@@ -1228,12 +1260,12 @@
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="src/site/docbook/reference/images/oxm-fragments.png"
-                     format="PNG" width="50%" />
+                     format="PNG" width="40%" />
         </imageobject>
 
         <imageobject role="html">
           <imagedata align="center" fileref="images/oxm-fragments.png"
-                     format="PNG" width="50%" />
+                     format="PNG" width="40%" />
         </imageobject>
 
         <caption><para>Figure 3.2: OXM Binding</para></caption>
@@ -2241,7 +2273,8 @@
       <programlisting>  
   &lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
-      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="compositeItemWriter" commit-interval="2"/&gt;
+      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="compositeItemWriter" 
+               commit-interval="2"/&gt;
       &lt;streams&gt;
         &lt;stream ref="barWriter" /&gt;
       &lt;/streams&gt;
@@ -2357,11 +2390,14 @@
     rather provides a very simple interface that can be implemented by any
     number of frameworks:</para>
 
-    <programlisting>  public interface Validator {
+    <programlisting>  
+  public interface Validator {
   
     void validate(Object value) throws ValidationException;
 
-  }</programlisting>
+  }
+
+</programlisting>
 
     <para>The contract is that the <methodname>validate</methodname> method
     will throw an exception if the object is invalid, and return normally if
@@ -2381,9 +2417,14 @@
           &lt;value&gt;
             &lt;![CDATA[
               { orderId : ? &gt; 0 AND ? &lt;= 9999999999 : 'Incorrect order ID' : 'error.order.id' }
-              { totalLines : ? = size(lineItems) : 'Bad count of order lines' : 'error.order.lines.badcount'}
-              { customer.registered : customer.businessCustomer = FALSE OR ? = TRUE : 'Business customer must be registered' : 'error.customer.registration'}
-              { customer.companyName : customer.businessCustomer = FALSE OR ? HAS TEXT : 'Company name for business customer is mandatory' :'error.customer.companyname'}
+              { totalLines : ? = size(lineItems) : 'Bad count of order lines' 
+                                                 : 'error.order.lines.badcount'}
+              { customer.registered : customer.businessCustomer = FALSE OR ? = TRUE 
+                                    : 'Business customer must be registered' 
+                                    : 'error.customer.registration'}
+              { customer.companyName : customer.businessCustomer = FALSE OR ? HAS TEXT 
+                                     : 'Company name for business customer is mandatory' 
+                                     :'error.customer.companyname'}
           ]]&gt;
           &lt;/value&gt;
         &lt;/property&gt;
@@ -2468,7 +2509,8 @@
       basic contract of <classname>ItemReader</classname>,
       <methodname>read</methodname>:</para>
 
-      <programlisting>  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
+      <programlisting>  
+  public class CustomItemReader&lt;T&gt; implements ItemReader&lt;T&gt;{
 
     List&lt;T&gt; items;
 
@@ -2484,7 +2526,9 @@
       }
       return null;
     }
-  }</programlisting>
+  }
+
+</programlisting>
 
       <para>This very simple class takes a list of items, and returns one at a
       time, removing it from the list. When the list empty, it returns null,

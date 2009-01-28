@@ -154,11 +154,12 @@
 
       <programlisting>
   void afterJob(JobExecution jobExecution){
-  if( jobExecution.getStatus = BatchStatus.COMPLETED ){
-    //job success
-  }
-  else if(jobExecution.getStatus = BatchStatus.FAILED){
-    //job failure
+    if( jobExecution.getStatus = BatchStatus.COMPLETED ){
+      //job success
+    }
+    else if(jobExecution.getStatus = BatchStatus.FAILED){
+      //job failure
+    }
   }
 
 </programlisting>
@@ -379,7 +380,8 @@
       that you just don't need to persist status for a particular job. Spring
       batch provides a solution:</para>
 
-      <programlisting>  &lt;bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
+      <programlisting>  &lt;bean id="jobRepository" 
+        class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
     </section>
   </section>
 

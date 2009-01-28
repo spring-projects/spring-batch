@@ -90,7 +90,7 @@
     <para>In Spring Batch, a Job is simply a continer for Steps. It combines
     multiple steps that belong logically together in a flow and allows for
     configuration of properties global to all steps, such as restartability.
-    The job configuration contains: </para>
+    The job configuration contains:</para>
 
     <itemizedlist>
       <listitem>
@@ -303,7 +303,7 @@
         <tgroup cols="2">
           <tbody>
             <row>
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>JOB_NAME</entry>
             </row>
@@ -323,7 +323,7 @@
         <tgroup cols="4">
           <tbody>
             <row>
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>TYPE_CD</entry>
 
@@ -339,7 +339,7 @@
 
               <entry>schedule.Date</entry>
 
-              <entry>2008-01-01 00:00:00</entry>
+              <entry>2008-01-01</entry>
             </row>
           </tbody>
         </tgroup>
@@ -351,9 +351,9 @@
         <tgroup cols="5">
           <tbody>
             <row>
-              <entry>JOB_EXECUTION_ID</entry>
+              <entry>JOB_EXEC_ID</entry>
 
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>START_TIME</entry>
 
@@ -367,9 +367,9 @@
 
               <entry>1</entry>
 
-              <entry>2008-01-01 21:00:23.571</entry>
+              <entry>2008-01-01 21:00</entry>
 
-              <entry>2008-01-01 21:30:17.132</entry>
+              <entry>2008-01-01 21:30</entry>
 
               <entry>FAILED</entry>
             </row>
@@ -378,8 +378,8 @@
       </table>
 
       <note>
-        <para>extra columns in the tables have been removed for added
-        clarity.</para>
+        <para>column names may have been abbreviated or removed for clarity
+        and formatting</para>
       </note>
 
       <para>Now that the job has failed, let's assume that it took the entire
@@ -409,7 +409,7 @@
         <tgroup cols="2">
           <tbody>
             <row>
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>JOB_NAME</entry>
             </row>
@@ -435,7 +435,7 @@
         <tgroup cols="4">
           <tbody>
             <row>
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>TYPE_CD</entry>
 
@@ -473,9 +473,9 @@
         <tgroup cols="5">
           <tbody>
             <row>
-              <entry>JOB_EXECUTION_ID</entry>
+              <entry>JOB_EXEC_ID</entry>
 
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>START_TIME</entry>
 
@@ -522,6 +522,11 @@
           </tbody>
         </tgroup>
       </table>
+
+      <note>
+        <para>column names may have been abbreviated or removed for clarity
+        and formatting</para>
+      </note>
     </section>
   </section>
 
@@ -717,7 +722,7 @@
         <tgroup cols="2">
           <tbody>
             <row>
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>JOB_NAME</entry>
             </row>
@@ -735,7 +740,7 @@
         <tgroup cols="4">
           <tbody>
             <row>
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>TYPE_CD</entry>
 
@@ -751,7 +756,7 @@
 
               <entry>schedule.Date</entry>
 
-              <entry>2008-01-01 00:00:00</entry>
+              <entry>2008-01-01 </entry>
             </row>
           </tbody>
         </tgroup>
@@ -761,9 +766,9 @@
         <tgroup cols="5">
           <tbody>
             <row>
-              <entry>JOB_EXECUTION_ID</entry>
+              <entry>JOB_EXEC_ID</entry>
 
-              <entry>JOB_INSTANCE_ID</entry>
+              <entry>JOB_INST_ID</entry>
 
               <entry>START_TIME</entry>
 
@@ -777,9 +782,9 @@
 
               <entry>1</entry>
 
-              <entry>2008-01-01 21:00:23.571</entry>
+              <entry>2008-01-01 21:00</entry>
 
-              <entry>2008-01-01 21:30:17.132</entry>
+              <entry>2008-01-01 21:30</entry>
 
               <entry>FAILED</entry>
             </row>
@@ -791,9 +796,9 @@
         <tgroup cols="6">
           <tbody>
             <row>
-              <entry>STEP_EXECUTION_ID</entry>
+              <entry>STEP_EXEC_ID</entry>
 
-              <entry>JOB_EXECUTION_ID</entry>
+              <entry>JOB_EXEC_ID</entry>
 
               <entry>STEP_NAME</entry>
 
@@ -811,9 +816,9 @@
 
               <entry>loadDate</entry>
 
-              <entry>2008-01-01 21:00:23.571</entry>
+              <entry>2008-01-01 21:00</entry>
 
-              <entry>2008-01-01 21:30:17.132</entry>
+              <entry>2008-01-01 21:30</entry>
 
               <entry>FAILED</entry>
             </row>
@@ -825,7 +830,7 @@
         <tgroup cols="2">
           <tbody>
             <row>
-              <entry>STEP_EXECUTION_ID</entry>
+              <entry>STEP_EXEC_ID</entry>
 
               <entry>SHORT_CONTEXT</entry>
             </row>
@@ -945,8 +950,8 @@
 
     <programlisting>  public interface JobLauncher {
 
-    public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-        JobRestartException;
+    public JobExecution run(Job job, JobParameters jobParameters) 
+                throws JobExecutionAlreadyRunningException, JobRestartException;
 }
 </programlisting>
 

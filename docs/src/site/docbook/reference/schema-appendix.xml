@@ -27,12 +27,14 @@
 
     <mediaobject>
       <imageobject role="html">
-        <imagedata align="center" fileref="images/meta-data-erd.png" />
+        <imagedata align="center" fileref="images/meta-data-erd.png"
+                   width="45%" />
       </imageobject>
 
       <imageobject role="html">
-        <imagedata fileref="src/site/docbook/reference/images/meta-data-erd.png"
-                   format="PNG" />
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/meta-data-erd.png"
+                   width="45%" />
       </imageobject>
     </mediaobject>
 
@@ -518,13 +520,13 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
       <listitem>
         <para>The framework will use the meta-data tables to determine if a
         particular JobInstance has been run before. If it has been run, and
-        the job is not restartable, then an exception will be thrown. </para>
+        the job is not restartable, then an exception will be thrown.</para>
       </listitem>
 
       <listitem>
         <para>If an entry for a JobInstance is removed without having
         completed successfully, the framework will think that the job is new,
-        rather than a restart. </para>
+        rather than a restart.</para>
       </listitem>
 
       <listitem>
