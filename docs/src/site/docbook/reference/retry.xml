@@ -17,27 +17,27 @@
     <classname>RetryOperations</classname> strategy. The
     <classname>RetryOperations</classname> interface looks like this:</para>
 
-    <para><programlisting><![CDATA[public interface RetryOperations {
+    <para><programlisting>public interface RetryOperations {
 
-    <T> T execute(RetryCallback<T> retryCallback) throws Exception;
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback) throws Exception;
 
-    <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback) 
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback) 
         throws Exception;
 
-    <T> T execute(RetryCallback<T> retryCallback, RetryState retryState) 
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RetryState retryState) 
         throws Exception, ExhaustedRetryException;
 
-    <T> T execute(RetryCallback<T> retryCallback, RecoveryCallback<T> recoveryCallback, 
+    &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback, 
         RetryState retryState) throws Exception;
 
-}]]></programlisting>where the basic callback is a simple interface that
-    allows you to insert some business logic to be retried</para>
+}</programlisting>where the basic callback is a simple interface that allows
+    you to insert some business logic to be retried</para>
 
-    <para><programlisting><![CDATA[public interface RetryCallback<T> {
+    <para><programlisting>public interface RetryCallback&lt;T&gt; {
 
     T doWithRetry(RetryContext context) throws Throwable;
 
-}]]></programlisting>The callback is executed and if it fails (by throwing an
+}</programlisting>The callback is executed and if it fails (by throwing an
     <classname>Exception</classname>), it will be retried until either it is
     successful, or the implementation decides to abort. There are a number of
     overloaded <methodname>execute</methodname> methods in the
@@ -50,18 +50,18 @@
     <classname>RetryOperations</classname> is
     <classname>RetryTemplate</classname>. It could be used like this</para>
 
-    <programlisting><![CDATA[RetryTemplate template = new RetryTemplate();
+    <programlisting>RetryTemplate template = new RetryTemplate();
 
 template.setRetryPolicy(new TimeoutRetryPolicy(30000L));
 
-Foo result = template.execute(new RetryCallback<Foo>() {
+Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
 
     public Foo doWithRetry(RetryContext context) {
         // Do stuff that might fail, e.g. webservice operation
         return result;
     }
 
-});]]></programlisting>
+});</programlisting>
 
     <para>In the example we execute a web service call and return the result
     to the user. If that call fails then it is retried until a timeout is
@@ -90,17 +90,17 @@ Foo result = template.execute(new RetryCallback<Foo>() {
       clients just pass in the callbacks together to the same method, for
       example:</para>
 
-      <para><programlisting><![CDATA[Foo foo = template.execute(new RetryCallback<Foo>() {
+      <para><programlisting>Foo foo = template.execute(new RetryCallback&lt;Foo&gt;() {
     public Foo doWithRetry(RetryContext context) {
         // business logic here
     },
-  new RecoveryCallback<Foo>() {
+  new RecoveryCallback&lt;Foo&gt;() {
     Foo recover(RetryContext context) throws Exception {
           // recover logic here
     }
-});]]></programlisting>If the business logic does not succeed before the
-      template decides to abort, then the client is given the chance to do
-      some alternate processing through the recovery callback.</para>
+});</programlisting>If the business logic does not succeed before the template
+      decides to abort, then the client is given the chance to do some
+      alternate processing through the recovery callback.</para>
     </section>
 
     <section>
@@ -144,7 +144,7 @@ Foo result = template.execute(new RetryCallback<Foo>() {
       <classname>RetryContextCache</classname> with a cluster cache of some
       sort (even in a clustered environment this might be overkill).</para>
 
-      <para>Part of the reponsibility of the
+      <para>Part of the responsibility of the
       <classname>RetryOperations</classname> is to recognise the failed
       operations when they come back in a new execution (and usually wrapped
       in a new transaction). To facilitate this, Spring Batch provides the
@@ -189,7 +189,7 @@ Foo result = template.execute(new RetryCallback<Foo>() {
     or fail in the <methodname>execute</methodname> method is determined by a
     <classname>RetryPolicy</classname> which is also a factory for the
     <classname>RetryContext</classname>. The
-    <classname>RetryTemplate</classname> has the reponsibility to use the
+    <classname>RetryTemplate</classname> has the responsibility to use the
     current policy to create a <classname>RetryContext</classname> and pass
     that in to the <classname>RetryCallback</classname> at every attempt.
     After a callback fails the <classname>RetryTemplate</classname> has to
@@ -210,8 +210,9 @@ Foo result = template.execute(new RetryCallback<Foo>() {
       doesn't help to retry it. So don't retry on all exception types - try to
       focus on only those exceptions that you expect to be retryable. It's not
       usually harmful to the business logic to retry more aggressively, but
-      it's wasteful because if a failure is determinstic there could be a very
-      tight loop retrying something that you know in advance is fatal.</para>
+      it's wasteful because if a failure is deterministic there could be a
+      very tight loop retrying something that you know in advance is
+      fatal.</para>
     </tip>
 
     <para>Spring Batch provides some simple general purpose implementations of
@@ -226,7 +227,7 @@ Foo result = template.execute(new RetryCallback<Foo>() {
     this list overrides the retryable list, so it can be used to give finer
     control over the retry behaviour, e.g.</para>
 
-    <programlisting><![CDATA[SimpleRetryPolicy policy = new SimpleRetryPolicy(5);
+    <programlisting>SimpleRetryPolicy policy = new SimpleRetryPolicy(5);
 // Retry on all exceptions (this is the default)
 policy.setRetryableExceptions(new Class[] {Exception.class});
 // ... but never retry IllegalStateException
@@ -235,11 +236,11 @@ policy.setFatalExceptions(new Class[] {ILlegalStateException.class});
 // Use the policy...
 RetryTemplate template = new RetryTemplate();
 template.setRetryPolicy(policy);
-template.execute(new RetryCallback<Foo>() {
+template.execute(new RetryCallback&lt;Foo&gt;() {
     public Foo doWithRetry(RetryContext context) {
         // business logic here
     }
-});]]></programlisting>
+});</programlisting>
 
     <para>There is also a more flexible implementation called
     <classname>ExceptionClassifierRetryPolicy</classname>, which allows the
@@ -265,20 +266,20 @@ template.execute(new RetryCallback<Foo>() {
     <classname>RetryTemplate</classname> can pause execution according to the
     <classname>BackoffPolicy</classname> in place.</para>
 
-    <para><programlisting><![CDATA[public interface BackoffPolicy {
+    <para><programlisting>public interface BackoffPolicy {
 
     BackOffContext start(RetryContext context);
 
     void backOff(BackOffContext backOffContext) 
         throws BackOffInterruptedException;
 
-}]]></programlisting>A <classname>BackoffPolicy</classname> is free to
-    implement the backOff in any way it chooses. The policies provided by
-    Spring Batch out of the box all use <code>Object.wait()</code>. A common
-    use case is to backoff with an exponentially increasing wait period, to
-    avoid two retries getting into lock step and both failing - this is a
-    lesson learned from the ethernet. For this purpose Spring Batch provides
-    the <classname>ExponentialBackoffPolicy</classname>.</para>
+}</programlisting>A <classname>BackoffPolicy</classname> is free to implement
+    the backOff in any way it chooses. The policies provided by Spring Batch
+    out of the box all use <code>Object.wait()</code>. A common use case is to
+    backoff with an exponentially increasing wait period, to avoid two retries
+    getting into lock step and both failing - this is a lesson learned from
+    the ethernet. For this purpose Spring Batch provides the
+    <classname>ExponentialBackoffPolicy</classname>.</para>
   </section>
 
   <section>
@@ -295,15 +296,15 @@ template.execute(new RetryCallback<Foo>() {
 
     <para>The interface looks like this:</para>
 
-    <para><programlisting><![CDATA[public interface RetryListener {
+    <para><programlisting>public interface RetryListener {
 
-    void open(RetryContext context, RetryCallback<T> callback);
+    void open(RetryContext context, RetryCallback&lt;T&gt; callback);
 
-    void onError(RetryContext context, RetryCallback<T> callback, Throwable e);
+    void onError(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
 
-    void close(RetryContext context, RetryCallback<T> callback, Throwable e);
+    void close(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
 }
-]]></programlisting>The <methodname>open</methodname> and
+</programlisting>The <methodname>open</methodname> and
     <methodname>close</methodname> callbacks come before and after the entire
     retry in the simplest case, and <methodname>onError</methodname> applies
     to the individual RetryCallback calls. The <methodname>close</methodname>
@@ -334,20 +335,20 @@ template.execute(new RetryCallback<Foo>() {
     <methodname>remoteCall</methodname> (for more detail on how to configure
     AOP interceptors see the Spring User Guide):</para>
 
-    <programlisting><![CDATA[<aop:config>
-    <aop:pointcut id="transactional"
-        expression="execution(* com...*Service.remoteCall(..))" />
-    <aop:advisor pointcut-ref="transactional"
-        advice-ref="retryAdvice" order="-1"/>
-</aop:config>
+    <programlisting>&lt;aop:config&gt;
+    &lt;aop:pointcut id="transactional"
+        expression="execution(* com...*Service.remoteCall(..))" /&gt;
+    &lt;aop:advisor pointcut-ref="transactional"
+        advice-ref="retryAdvice" order="-1"/&gt;
+&lt;/aop:config&gt;
 
-<bean id="retryAdvice"
-    class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"/>
-]]></programlisting>
+&lt;bean id="retryAdvice"
+    class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"/&gt;
+</programlisting>
 
     <para>The example above uses a default
     <classname>RetryTemplate</classname> inside the interceptor. To change the
-    policies, listeners etc. you only need to inject an instance of
+    policies or listeners, you only need to inject an instance of
     <classname>RetryTemplate</classname> into the interceptor.</para>
   </section>
 </chapter>

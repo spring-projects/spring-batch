@@ -510,7 +510,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
   <section>
     <title>Archiving</title>
 
-    <para>Because there are entries in multiple tables everytime a batch job
+    <para>Because there are entries in multiple tables every time a batch job
     is run, it is common to create an archive strategy for the meta-data
     tables. The tables themselves are designed to show a record of what
     happened in the past, and generally won't affect the run of any job, with

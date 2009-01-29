@@ -10,7 +10,7 @@
   detail, so it won't be repeated here. It is important, however, to think
   about how to 'end to end' test a batch job, which is what this chapter will
   focus on. The spring-batch-test project includes classes that will help
-  factillitate this end-to-end test approach.</para>
+  facilitate this end-to-end test approach.</para>
 
   <section>
     <title>Creating a Unit Test Class</title>
@@ -27,7 +27,7 @@
 
       <listitem>
         <para><classname>@ContextConfiguration(locations = {...})</classname>:
-        Indicates which xml files contain the ApplicationContext.</para>
+        Indicates which XML files contain the ApplicationContext.</para>
       </listitem>
     </itemizedlist>
 
@@ -93,9 +93,9 @@
   <section>
     <title>Testing Individual Steps</title>
 
-    <para>For complex batch jobs, test cases in the end-to-end tesing approach
-    may become unmanageable. It these cases, it may be more useful to have
-    test cases to test individual steps on their own. The
+    <para>For complex batch jobs, test cases in the end-to-end testing
+    approach may become unmanageable. It these cases, it may be more useful to
+    have test cases to test individual steps on their own. The
     <classname>AbstractJobTests</classname> class contains a method
     <methodname>launchStep</methodname> that takes a step name and runs just
     that particular <classname>Step</classname>. This approach allows for more

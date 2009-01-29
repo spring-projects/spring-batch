@@ -87,7 +87,7 @@
       </imageobject>
     </mediaobject>
 
-    <para>In Spring Batch, a Job is simply a continer for Steps. It combines
+    <para>In Spring Batch, a Job is simply a container for Steps. It combines
     multiple steps that belong logically together in a flow and allows for
     configuration of properties global to all steps, such as restartability.
     The job configuration contains:</para>
@@ -110,7 +110,7 @@
     interface is provided by Spring Batch in the form of the
     <classname>SimpleJob</classname> class which creates some standard
     functionality on top of <classname>Job</classname>, however the batch
-    namespace abstracts away the need to instaniate it directly. Instead, the
+    namespace abstracts away the need to instantiate it directly. Instead, the
     <code>&lt;job&gt;</code> tag can be used:</para>
 
     <programlisting>  
@@ -151,7 +151,7 @@
       likely be a business decision, it is left up to the
       <classname>ItemReader</classname> to decide. What using the same
       <classname>JobInstance</classname> will determine, however, is whether
-      or not the 'state' (i.e. the ExecutionContext, which is discussed below)
+      or not the 'state' (i.e. The ExecutionContext, which is discussed below)
       from previous executions will be used. Using a new
       <classname>JobInstance</classname> will mean 'start from the beginning'
       and using an existing instance will generally mean 'start from where you
@@ -756,7 +756,7 @@
 
               <entry>schedule.Date</entry>
 
-              <entry>2008-01-01 </entry>
+              <entry>2008-01-01</entry>
             </row>
           </tbody>
         </tgroup>
@@ -917,7 +917,7 @@
     <para>As noted in the comment, ecStep will not equal ecJob, they are two
     different <classname>ExecutionContext</classname>s. The one scoped to the
     <classname>Step</classname> will be saved at every commit point in the
-    <classname>Step</classname>, wheras the one scoped to the
+    <classname>Step</classname>, whereas the one scoped to the
     <classname>Job</classname> will be saved in between every
     <classname>Step</classname> execution.</para>
   </section>

@@ -48,7 +48,7 @@
 
     <para>The namespace defaults to referencing a repository with an id of
     'jobRepository', which is a sensible default. However, this can be
-    overriden explicitely:</para>
+    overridden explicitly:</para>
 
     <programlisting> 
   &lt;job id="footballJob" <emphasis role="bold">job-repository="specialRepository"</emphasis>&gt;
@@ -64,12 +64,13 @@
 
       <para>One key concern when execution a batch job, is what happens when a
       failed job is restarted? A Job is considered to have been 'restarted' if
-      the same JobInstance has more than one JobExecution. Ideally, all jobs
-      should be able to start up where they left off, but there are scenarios
-      where this is not possible. <emphasis role="bold">It is entirely up to
-      the developer to ensure that a new instance is always created in this
-      scenario</emphasis>. However, Spring Batch does provide some help. If a
-      Job should never be restarted, but should always be run as part of a new
+      the same <classname>JobInstance</classname> has more than one
+      JobExecution. Ideally, all jobs should be able to start up where they
+      left off, but there are scenarios where this is not possible. <emphasis
+      role="bold">It is entirely up to the developer to ensure that a new
+      instance is always created in this scenario</emphasis>. However, Spring
+      Batch does provide some help. If a Job should never be restarted, but
+      should always be run as part of a new
       <classname>JobInstance</classname>, then the restartable property may be
       set to 'false':</para>
 
@@ -196,7 +197,7 @@
   <section>
     <title>Configuring a JobRepository</title>
 
-    <para>As described in Chatper 2, the JobRepository is used for basic CRUD
+    <para>As described in Chapter 2, the JobRepository is used for basic CRUD
     operations of the various persisted domain objects within Spring Batch,
     such as JobExecution and StepExecution. It is required by many of the
     major framework features, such as the <classname>JobLauncher</classname>,
@@ -236,7 +237,7 @@
       to collide in this way. However, since a call to the
       <classname>create*</classname> method is quite short, it is unlikely
       that the SERIALIZED will cause problems, as long as the database
-      platform supports it. However, this can be overriden:</para>
+      platform supports it. However, this can be overridden:</para>
 
       <para><programlisting>  
   &lt;job-repository id="jobRepository"
@@ -264,7 +265,7 @@
 </programlisting></para>
 
       <para>This fragment can be used as is, with almost no changes. Remember
-      also to include the appropiate namespace declarations and to make sure
+      also to include the appropriate namespace declarations and to make sure
       spring-tx and spring-aop (or the whole of spring) is on the
       classpath.</para>
 
@@ -274,11 +275,11 @@
         <para>Spring Batch provides DDL samples for the meta-data tables in
         the Core jar file for several common database platforms. Index
         declarations are not included in that DDL because there are too many
-        variations in how users may want to index dependeing on their precise
+        variations in how users may want to index depending on their precise
         platform, local conventions and also the business requirements of how
         the jobs will be operated. The table below provides some indication as
         to which columns are going to be used in a WHERE clause by the Dao
-        ipmlementations provided by Spring Batch, and how frequently they
+        implementations provided by Spring Batch, and how frequently they
         might be used, so that individual projects can make up their own minds
         about indexing.</para>
 
@@ -679,7 +680,7 @@
       </imageobject>
     </mediaobject>
 
-    <para>The JobExplorer and JobOperatoer interfaces, which will be discussed
+    <para>The JobExplorer and JobOperator interfaces, which will be discussed
     below, add additional functionality for querying and controlling the meta
     data.</para>
 
@@ -783,8 +784,8 @@
       <classname>JobRepository</classname>,
       <classname>JobExplorer</classname>, and
       <classname>JobRegistry</classname>. For this reason, the provided
-      implementation of JobOperator, SimpleJobOperator, has many dependencies:
-      </para>
+      implementation of JobOperator, SimpleJobOperator, has many
+      dependencies:</para>
 
       <programlisting>
   &lt;bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator"&gt;
@@ -850,7 +851,7 @@
 </programlisting>
 
       <para>In this example, the value with a key of 'run.id' is used to
-      descriminate between JobInstances. If the JobParameters passed in is
+      discriminate between JobInstances. If the JobParameters passed in is
       null, it can be assumed that the Job has never been run before and thus
       it's initial state can be returned. However, if not, the old value is
       obtained, incremented by one, and returned. An incrementer can be

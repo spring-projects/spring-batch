@@ -8,7 +8,7 @@
     <title>RepeatTemplate</title>
 
     <para>Batch processing is about repetitive actions - either as a simple
-    optimisation, or as part of a job. To strategise and generalise the
+    optimisation, or as part of a job. To strategie and generalise the
     repetition, and provide what amounts to an iterator framework, Spring
     Batch has the <classname>RepeatOperations</classname> interface. The
     <classname>RepeatOperations</classname> interface looks like this:</para>
@@ -137,10 +137,10 @@ template.iterate(new RepeatCallback() {
       flexible, so that they can be created with any code and description the
       user needs. Spring Batch comes with some standard values out of the box,
       to support common use cases, but users are free to create their own
-      values, as long as the semantics of teh <code>continuable</code>
+      values, as long as the semantics of the <code>continuable</code>
       property are honoured.</para>
 
-      <para>ExitStatus values can also be combined with valrious operators
+      <para>ExitStatus values can also be combined with various operators
       built into the class as methods. You can add an exit code, or
       description, or combine the continuable values with logical AND using
       methods in ExitStatus. You can also combine two ExitStatus values with
@@ -163,7 +163,7 @@ template.iterate(new RepeatCallback() {
     the loop in the <methodname>iterate</methodname> method is determined by a
     <classname>CompletionPolicy</classname> which is also a factory for the
     <classname>ReapeatContext</classname>. The
-    <classname>RepeatTemplate</classname> has the reponsibility to use the
+    <classname>RepeatTemplate</classname> has the responsibility to use the
     current policy to create a <classname>RepeatContext</classname> and pass
     that in to the <classname>RepeatCallback</classname> at every stage in the
     iteration. After a callback completes its

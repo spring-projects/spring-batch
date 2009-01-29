@@ -1257,12 +1257,12 @@
 </programlisting>
 
       <para>The above <classname>Resource</classname> will load the file from
-      the file system, at the location specificied. Note that absolute
-      locations have to start with a double slash ("//"). In most spring
-      applications, this solution is good enough because the names of these
-      are known at compile time. However, in batch scenarios, the file name
-      may need to be determined at runtime as a parameter to the job. This
-      could be solved using '-D' parameters, i.e. a system property:</para>
+      the file system, at the location specified. Note that absolute locations
+      have to start with a double slash ("//"). In most spring applications,
+      this solution is good enough because the names of these are known at
+      compile time. However, in batch scenarios, the file name may need to be
+      determined at runtime as a parameter to the job. This could be solved
+      using '-D' parameters, i.e. a system property:</para>
 
       <programlisting>
   &lt;bean id="flatFileItemReader"
@@ -1332,7 +1332,7 @@
         order to use late binding, since the bean cannot actually be
         instantiated until the <classname>Step</classname> starts, which
         allows the attributes to be found. Because it is not part of the
-        Spring container by default, it must be added explicitly: </para>
+        Spring container by default, it must be added explicitly:</para>
 
         <programlisting>
   &lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;

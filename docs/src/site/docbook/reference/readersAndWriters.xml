@@ -331,14 +331,14 @@
 
 </programlisting></para>
 
-        <para>The basic constract is that, given the current line, and the
-        line number its associated with, return a resulting domain object.
-        This is similiar to <classname>RowMapper</classname> in that each line
-        is associated with it's line number, just as each row in a resultset
-        is tied to the row number it belongs to. This allows for tying the
-        line number to the resulting domain object for identitiy comparison,
-        or for more informative logging. However, unlike
-        <classname>RowMapper</classname>, the
+        <para>The basic contract is that, given the current line, and the line
+        number its associated with, return a resulting domain object. This is
+        similar to <classname>RowMapper</classname> in that each line is
+        associated with it's line number, just as each row in a
+        <classname>ResultSet</classname> is tied to the row number it belongs
+        to. This allows for tying the line number to the resulting domain
+        object for identity comparison, or for more informative logging.
+        However, unlike <classname>RowMapper</classname>, the
         <classname>LineMapper</classname> is given a raw line which, as
         discussed above, only gets you halfway there. What is needed is
         tokenization of the line into a <classname>FieldSet</classname>, which
@@ -566,7 +566,7 @@
 
         <para>There is one additional functionality a
         <classname>LineTokenizer</classname> that is similar in function to a
-        JDBC <classname>ResultSet</classname>. The names of the fields can be
+        Jdbc <classname>ResultSet</classname>. The names of the fields can be
         injected into the <classname>LineTokenizer</classname> to increase the
         readability of the mapping function. First, the column names of all
         fields in the flat file are injected into the
@@ -608,10 +608,10 @@
         <para>For many, having to write a specific
         <classname>FieldSetMapper</classname> is equally as cumbersome as
         writing a specific <classname>RowMapper</classname> for a
-        JdbcTemplate. Spring Batch makes this easier by providing a
-        <classname>FieldSetMapper</classname> that automatically maps fields
-        by matching a field name with a setter on the object using the
-        JavaBean specification. Again using the football example, the
+        <classname>JdbcTemplate</classname>. Spring Batch makes this easier by
+        providing a <classname>FieldSetMapper</classname> that automatically
+        maps fields by matching a field name with a setter on the object using
+        the JavaBean specification. Again using the football example, the
         <classname>FieldSetMapper</classname> configuration looks like the
         following:</para>
 
@@ -641,7 +641,7 @@
         <title>Fixed Length file formats</title>
 
         <para>So far only delimited files have been discussed in much detail,
-        however, they respresent only half of the file reading picture. Many
+        however, they represent only half of the file reading picture. Many
         organizations that use flat files use fixed length formats. An example
         fixed length file is below:</para>
 
@@ -689,8 +689,8 @@
 </programlisting>
 
         <para>This <classname>LineTokenizer</classname> will return the same
-        <classname>FieldSet</classname> as if a dlimiter had been used,
-        allowing the same approachs above to be used such as the
+        <classname>FieldSet</classname> as if a delimiter had been used,
+        allowing the same approach above to be used such as the
         <classname>BeanWrapperFieldSetMapper</classname>, in a way that is
         ignorant of how the actual line was parsed.</para>
 
@@ -907,7 +907,7 @@
         <section>
           <title>PassThroughLineAggregator</title>
 
-          <para>The most basic implementation of the LineAggreagot interface
+          <para>The most basic implementation of the LineAggregator interface
           is the PassThroughLineAggregator, which simply assumes that the
           object is already a string, or that it's string representation is
           acceptable for writing:</para>
@@ -1000,7 +1000,7 @@
             </listitem>
           </orderedlist></para>
 
-        <para>File writing has similiar, but inverse steps:</para>
+        <para>File writing has similar, but inverse steps:</para>
 
         <orderedlist>
           <listitem>
@@ -1145,9 +1145,9 @@
         <title>Fixed Width File Writing Example</title>
 
         <para>Delimited is not the only type of flat file format, many prefer
-        to use a set width for each column to deliniate between fields, which
+        to use a set width for each column to delineate between fields, which
         is usually referred to as 'fixed width'. Spring Batch supports this in
-        file writting via the FormatterLineAggregator. Using the same
+        file writing via the FormatterLineAggregator. Using the same
         CustomerCredit domain object described above, it can be configured as
         follows:</para>
 
@@ -1248,7 +1248,7 @@
     above. Everything between '&lt;trade&gt;' and '&lt;/trade&gt;' is
     considered one 'fragment'. Spring Batch uses Object/XML Mapping (OXM) to
     bind fragments to objects. However, Spring Batch is not tied to any
-    particular xml binding technology. Typical use is to delegate to <ulink
+    particular XML binding technology. Typical use is to delegate to <ulink
     url="http://static.springframework.org/spring-ws/site/reference/html/oxm.html"><citetitle>Spring
     OXM</citetitle></ulink>, which provides uniform abstraction for the most
     popular OXM technologies. The dependency on Spring OXM is optional and you
@@ -1446,7 +1446,7 @@
       optionally sets the overwriteOutput=true, mentioned earlier in the
       chapter for specifying whether an existing file can be overwritten. It
       should be noted the marshaller used for the writer is the exact same as
-      the one used in the reading example from ealier in the chapter:</para>
+      the one used in the reading example from earlier in the chapter:</para>
 
       <programlisting> 
   &lt;bean id="customerCreditMarshaller" class="org.springframework.oxm.xstream.XStreamMarshaller"&gt;
@@ -1592,7 +1592,7 @@
       <section>
         <title>JdbcCursorItemReader</title>
 
-        <para><classname>JdbcCursorItemReader</classname> is the JDBC
+        <para><classname>JdbcCursorItemReader</classname> is the Jdbc
         implementation of the cursor based technique. It works directly with a
         <classname>ResultSet</classname> and requires a SQL statement to run
         against a connection obtained from a
@@ -1650,7 +1650,7 @@
         <classname>DataSource</classname>, the provided SQL will be run
         against it, and the <methodname>mapRow</methodname> method will be
         called for each row in the <classname>ResultSet</classname>. Let's
-        constrast this with the approach of the
+        contrast this with the approach of the
         <classname>JdbcCursorItemReader</classname>:</para>
 
         <programlisting>  
@@ -1717,7 +1717,7 @@
                 <row>
                   <entry>fetchSize</entry>
 
-                  <entry>Gives the JDBC driver a hint as to the number of rows
+                  <entry>Gives the Jdbc driver a hint as to the number of rows
                   that should be fetched from the database when more rows are
                   needed by the <classname>ResultSet</classname> object used
                   by the ItemReader. By default, no hint is given.</entry>
@@ -1768,10 +1768,10 @@
                 <row>
                   <entry>driverSupportsAbsolute</entry>
 
-                  <entry>Defaults to false. Indicates whether the JDBC driver
+                  <entry>Defaults to false. Indicates whether the Jdbc driver
                   supports setting the absolute row on a
                   <classname>ResultSet</classname>. It is recommended that
-                  this is set to true for JDBC drivers that supports
+                  this is set to true for Jdbc drivers that supports
                   ResultSet.absolute() as it may improve performance,
                   especially if a step fails while working with a large data
                   set.</entry>
@@ -1795,8 +1795,8 @@
                   'READ_ONLY' and 'HOLD_CUSORS_OVER_COMMIT' options. This
                   allows holding the cursor open over transaction start and
                   commits performed in the step processing. To use this
-                  feature you need a database that supports this and a JDBC
-                  driver supporting JDBC 3.0 or later.</entry>
+                  feature you need a database that supports this and a Jdbc
+                  driver supporting Jdbc 3.0 or later.</entry>
                 </row>
               </tbody>
             </tgroup>
@@ -1888,7 +1888,7 @@
         <classname>JdbcPagingItemReader</classname> needs a
         <classname>PagingQueryProvider</classname> responsible for providing
         the SQL queries used to retrieve the rows making up a page. Since each
-        database has its own strategy for proviing paging support, we need to
+        database has its own strategy for providing paging support, we need to
         use a different <classname>PagingQueryProvider</classname> for each
         supported database type. There is also the
         <classname>SimpleDelegatingPagingQueryProvider</classname> that will
@@ -1952,7 +1952,7 @@
         <classname>ItemReader</classname> is the
         <classname>JpaPagingItemReader</classname>. JPA doesn't have a concept
         similar to the Hibernate <classname>StatelessSession</classname> so we
-        have to use other features provided by the JPA specification. SInce
+        have to use other features provided by the JPA specification. Since
         JPA supports paging, this is a natural choice when it comes to using
         JPA for batch processing. After each page is read the entities will
         become detached and the persistence context will be cleared in order
@@ -2021,7 +2021,7 @@
         <classname>IbatisPagingItemReader</classname> and there is also a
         <classname>_page</classname> variable that can be used if necessary.
         The syntax for the paging queries varies with the database used. Here
-        is an example for Oracle (unfortunatey we need to use CDATA for some
+        is an example for Oracle (unfortunately we need to use CDATA for some
         operators since this belongs in an XML document):</para>
 
         <programlisting>  &lt;select id="getPagedCustomerCredits" resultMap="customerCreditResult"&gt;
@@ -2044,9 +2044,9 @@
       for files because they must act as if they're transactional, keeping
       track of written items and flushing or clearing at the appropriate
       times. Databases have no need for this functionality, since the write is
-      already contained in a transaction. Users can create their own DAO's
-      that implement the <classname>ItemWriter</classname> interface or use
-      one from a custom <classname>ItemWriter</classname> that's written for
+      already contained in a transaction. Users can create their own DAOs that
+      implement the <classname>ItemWriter</classname> interface or use one
+      from a custom <classname>ItemWriter</classname> that's written for
       generic processing concerns, either way, they should work without any
       issues. One thing to look out for is the performance and error handling
       capabilities that are provided by batching the outputs. This is most
@@ -2201,10 +2201,10 @@
 }</programlisting>
 
     <para>An <classname>ItemProcessor</classname> is very simple, given one
-    object, transorm it and return another. The object provided may or may not
-    be of the same type. The point is that business logic may be applied
+    object, transform it and return another. The object provided may or may
+    not be of the same type. The point is that business logic may be applied
     within process, and is completely up to the developer to create. An
-    <classname>ItemProcessor</classname> can be wired direclty into a step,
+    <classname>ItemProcessor</classname> can be wired directly into a step,
     For example, assuming an <classname>ItemReader</classname> provides a
     class of type Foo, and it needs to be converted to type Bar before being
     written out. An <classname>ItemTransformer</classname> can be written that
@@ -2346,7 +2346,7 @@
   itemProcessors.add(new BarTransformer());
   compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
 
-      <para>Just as with the previous example, the compsite processor can be
+      <para>Just as with the previous example, the composite processor can be
       configured into the <classname>Step</classname>:</para>
 
       <programlisting> 
@@ -2453,7 +2453,7 @@
     flipped from false to true. The SQL statement can then contain an extra
     statement in the where clause, such as: "where PROCESSED_IND = false",
     thereby insuring that only unprocessed records will be returned in the
-    case of a restart. In this scenario, it is prefereable to not store any
+    case of a restart. In this scenario, it is preferable to not store any
     state, such as the current row number, since it will be irrelevant upon
     restart. For this reason, all readers and writers include the 'saveState'
     property:</para>
@@ -2557,9 +2557,9 @@
         actually valid in many scenarios, but it is sometimes preferable that
         a batch job starts off at where it left off. The key discriminant is
         often whether the reader is stateful or stateless. A stateless reader
-        does not need to worry about restartablility, but a stateful one has
-        to try and reconstitute its last known state on restart. For this
-        reason, we recommend that you keep custom readers stateless as far as
+        does not need to worry about restartability, but a stateful one has to
+        try and reconstitute its last known state on restart. For this reason,
+        we recommend that you keep custom readers stateless as far as
         possible, so you don't have to worry about restartability.</para>
 
         <para>If you do need to store state, then in Spring Batch, this is
