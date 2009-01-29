@@ -1,0 +1,171 @@
+Spring Batch 2.0.0.M4 Release Notes
+
+* Bug
+
+
+	* {{{http://jira.springframework.org/browse/BATCH-923}BATCH-923}} -         Missing dependency / repository breaks build on fresh checkout
+
+	* {{{http://jira.springframework.org/browse/BATCH-946}BATCH-946}} -         NullPointerException in MapStepExecutionDao.getStepExecutions
+
+	* {{{http://jira.springframework.org/browse/BATCH-948}BATCH-948}} -         MapJobInstanceDao.getLastJobInstances ignores jobName parameter
+
+	* {{{http://jira.springframework.org/browse/BATCH-950}BATCH-950}} -         Exception during rollback hides root cause
+
+	* {{{http://jira.springframework.org/browse/BATCH-951}BATCH-951}} -         MapJobInstanceDao.getLastJobInstances doesn't return the last job instance 
+
+	* {{{http://jira.springframework.org/browse/BATCH-952}BATCH-952}} -         StagingItemReader is not restartable
+
+	* {{{http://jira.springframework.org/browse/BATCH-954}BATCH-954}} -         Failure on job stop
+
+	* {{{http://jira.springframework.org/browse/BATCH-957}BATCH-957}} -         Optional dependencies included by default with new m3 pom
+
+	* {{{http://jira.springframework.org/browse/BATCH-959}BATCH-959}} -         Get rid of compiler warnings in samples
+
+	* {{{http://jira.springframework.org/browse/BATCH-960}BATCH-960}} -         Redundant test cases in samples?
+
+	* {{{http://jira.springframework.org/browse/BATCH-963}BATCH-963}} -         ExecutionContext modifications in ItemStream.close(ExecutionContext) are not persisted
+
+	* {{{http://jira.springframework.org/browse/BATCH-969}BATCH-969}} -         FlatFileItemWriters interference in CompositeItemWriter
+
+	* {{{http://jira.springframework.org/browse/BATCH-979}BATCH-979}} -         Insert Apache license header in Java sources (where missing)
+
+	* {{{http://jira.springframework.org/browse/BATCH-991}BATCH-991}} -         Getting  PSQLException: ERROR: column "serialized_context" is of type bytea but expression is of type oid 
+
+	* {{{http://jira.springframework.org/browse/BATCH-994}BATCH-994}} -         BackOffPolicy is not applied for exceptions that cause rollback
+
+	* {{{http://jira.springframework.org/browse/BATCH-995}BATCH-995}} -         unclear retry configuration in FaultTolerantStepFactoryBean
+
+	* {{{http://jira.springframework.org/browse/BATCH-996}BATCH-996}} -         use default retryLimit  == 1 (not 0) in *StepFactoryBean
+
+	* {{{http://jira.springframework.org/browse/BATCH-997}BATCH-997}} -         EXIT_CODE and EXIT_MESSAGE out of synch for step
+
+	* {{{http://jira.springframework.org/browse/BATCH-998}BATCH-998}} -         PDF of Reference Documentation does not contain images of figures
+
+	* {{{http://jira.springframework.org/browse/BATCH-999}BATCH-999}} -         JobExecution ExecutionContext should not be persisted by Step?
+
+	* {{{http://jira.springframework.org/browse/BATCH-1001}BATCH-1001}} -         Make jobs restartable by default
+
+	* {{{http://jira.springframework.org/browse/BATCH-1002}BATCH-1002}} -         Default behavior for a Job should be failure if a step fails
+
+	* {{{http://jira.springframework.org/browse/BATCH-1003}BATCH-1003}} -         spring-batch-2.0.xsd should not allow "listeners" element on "tasklet"
+
+	* {{{http://jira.springframework.org/browse/BATCH-1004}BATCH-1004}} -         Using namespace to define a step does not store step name
+
+	* {{{http://jira.springframework.org/browse/BATCH-1005}BATCH-1005}} -         startLimit and allowStartIfComplete cannot be set in the namespace
+
+	* {{{http://jira.springframework.org/browse/BATCH-1006}BATCH-1006}} -         Namespace does not allow for variables (ie, ${varname})
+
+	* {{{http://jira.springframework.org/browse/BATCH-1007}BATCH-1007}} -         JobRepository default is inconsistent between job and step
+
+	* {{{http://jira.springframework.org/browse/BATCH-1021}BATCH-1021}} -         AssertFile.assertFileEquals(File,File) parameters in the wrong order
+
+	* {{{http://jira.springframework.org/browse/BATCH-1031}BATCH-1031}} -         FlatFileItemReader should identify missing resource in warning
+
+    
+* Improvement
+
+
+	* {{{http://jira.springframework.org/browse/BATCH-883}BATCH-883}} -         Document JobOperator.start
+
+	* {{{http://jira.springframework.org/browse/BATCH-919}BATCH-919}} -         Clean up FaultTolerant*
+
+	* {{{http://jira.springframework.org/browse/BATCH-945}BATCH-945}} -         Add support for step and job name in late binding
+
+	* {{{http://jira.springframework.org/browse/BATCH-964}BATCH-964}} -         Add fetchSize property to JdbcPagingItemReader
+
+	* {{{http://jira.springframework.org/browse/BATCH-967}BATCH-967}} -         DRY cleanup of StepParser
+
+	* {{{http://jira.springframework.org/browse/BATCH-968}BATCH-968}} -         Refactor step/simple-task/item-task elements in the core namespace
+
+	* {{{http://jira.springframework.org/browse/BATCH-970}BATCH-970}} -         JdbcCursorItemReader executes outside of main transaction
+
+	* {{{http://jira.springframework.org/browse/BATCH-974}BATCH-974}} -         Change Tasklet interface to use StepContext rather than AttributeAccessor
+
+	* {{{http://jira.springframework.org/browse/BATCH-985}BATCH-985}} -         (Skiplistener) improve doumentation and/or provide sample for saving skipped lines
+
+	* {{{http://jira.springframework.org/browse/BATCH-988}BATCH-988}} -         MethodInvokingTaskletAdapter (via AbstractMethodInvokingDelegator) only allows specification of targetObject's declared methods
+
+	* {{{http://jira.springframework.org/browse/BATCH-993}BATCH-993}} -         Slightly confusing use of *Dao in sample configuration in documentation, where *ItemWriter would be clearer
+
+	* {{{http://jira.springframework.org/browse/BATCH-1009}BATCH-1009}} -         Automatically register ItemReadListener, ItemWriteListener and ItemProcessListener
+
+	* {{{http://jira.springframework.org/browse/BATCH-1015}BATCH-1015}} -         ItemListenerSupport should implement ItemProcessListener
+
+	* {{{http://jira.springframework.org/browse/BATCH-1020}BATCH-1020}} -         Create Loop Flow Sample
+
+	* {{{http://jira.springframework.org/browse/BATCH-1024}BATCH-1024}} -         FlowJob's start state should be the first state listed in the config
+
+	* {{{http://jira.springframework.org/browse/BATCH-1032}BATCH-1032}} -         Modify AbstractJobTests in test project to be able to launch FlowJob steps individually
+
+    
+* New Feature
+
+
+	* {{{http://jira.springframework.org/browse/BATCH-677}BATCH-677}} -         Partitioning enablement (SPI).
+
+	* {{{http://jira.springframework.org/browse/BATCH-941}BATCH-941}} -         Create a sample job to highlight late binding.
+
+	* {{{http://jira.springframework.org/browse/BATCH-958}BATCH-958}} -         Batch Ibatis Update Item Writer
+
+	* {{{http://jira.springframework.org/browse/BATCH-965}BATCH-965}} -         Create non-delegating ItemWriters for JPA and Hibernate
+
+	* {{{http://jira.springframework.org/browse/BATCH-980}BATCH-980}} -         Add SystemPropertyInitializer
+
+	* {{{http://jira.springframework.org/browse/BATCH-986}BATCH-986}} -         Provide factory bean for SqlPagingQueryProvider
+
+	* {{{http://jira.springframework.org/browse/BATCH-987}BATCH-987}} -         Create JobRepositoryTestUtils
+
+	* {{{http://jira.springframework.org/browse/BATCH-989}BATCH-989}} -         Add support for named queries on HibernateCursorItemReader
+
+	* {{{http://jira.springframework.org/browse/BATCH-1016}BATCH-1016}} -         Create listener to promote items from Step ExecutionContext to Job ExecutionContext
+
+	* {{{http://jira.springframework.org/browse/BATCH-1033}BATCH-1033}} -         Create a PrefixMatchingCompositeLineMapper
+
+    
+* Refactoring
+
+
+	* {{{http://jira.springframework.org/browse/BATCH-956}BATCH-956}} -         Remove pause and wait functionality
+
+	* {{{http://jira.springframework.org/browse/BATCH-962}BATCH-962}} -         refactor TaskletStep's exception handling for better clarity
+
+	* {{{http://jira.springframework.org/browse/BATCH-982}BATCH-982}} -         Update all samples to use batch namespace
+
+	* {{{http://jira.springframework.org/browse/BATCH-983}BATCH-983}} -         Remove StepExecutionResourceProxy in favor of late-binding
+
+	* {{{http://jira.springframework.org/browse/BATCH-1012}BATCH-1012}} -         BatchListenerFactoryHelper: two if-statements, identical conditions
+
+	* {{{http://jira.springframework.org/browse/BATCH-1019}BATCH-1019}} -         Create one sample without the namespace
+
+	* {{{http://jira.springframework.org/browse/BATCH-1025}BATCH-1025}} -         Move PatternMatcher to infrastructure project
+
+	* {{{http://jira.springframework.org/browse/BATCH-1026}BATCH-1026}} -         Rename ExitStatus.FINISHED to ExitStatus.COMPLETED
+
+	* {{{http://jira.springframework.org/browse/BATCH-1045}BATCH-1045}} -         Move DataSourceInitializer to the test project's "main" folder
+
+    
+* Task
+
+
+	* {{{http://jira.springframework.org/browse/BATCH-674}BATCH-674}} -         Upgrade reference documentation
+
+	* {{{http://jira.springframework.org/browse/BATCH-961}BATCH-961}} -         integration tests for JobOperator
+
+	* {{{http://jira.springframework.org/browse/BATCH-971}BATCH-971}} -         add database writers to iosample
+
+	* {{{http://jira.springframework.org/browse/BATCH-1035}BATCH-1035}} -         Add Late Binding to Docs
+
+
+* Sub-task
+
+
+	* {{{http://jira.springframework.org/browse/BATCH-53}BATCH-53}} -         Aggregation of execution context when partitioning
+
+	* {{{http://jira.springframework.org/browse/BATCH-234}BATCH-234}} -         Revise documentation to reflect chunk-oriented approach
+
+	* {{{http://jira.springframework.org/browse/BATCH-607}BATCH-607}} -         FlatFileItemWriter section needs additional details
+
+	* {{{http://jira.springframework.org/browse/BATCH-730}BATCH-730}} -         HibernateCursorItemReader Parameters
+
+	* {{{http://jira.springframework.org/browse/BATCH-920}BATCH-920}} -         ChunkContext in StepContextRepeatCallback is unused
+
