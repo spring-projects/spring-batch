@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package test.jdbc.datasource;
+package org.springframework.batch.test;
 
 import java.io.IOException;
 import java.util.List;

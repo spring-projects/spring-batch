@@ -5,7 +5,7 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<!--  Initialise the database before every test case: -->
-	<bean id="dataSourceInitializer" class="test.jdbc.datasource.DataSourceInitializer">
+	<bean id="dataSourceInitializer" class="org.springframework.batch.test.DataSourceInitializer">
 		<property name="dataSource" ref="dataSource" />
 		<property name="initScripts">
 			<list>
