@@ -31,7 +31,6 @@ import org.springframework.batch.retry.policy.RecoveryCallbackRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.retry.support.RetryTemplate;
 import org.springframework.batch.support.SubclassExceptionClassifier;
-import org.springframework.util.Assert;
 
 /**
  * Factory bean for step that provides options for configuring skip behavior.
@@ -64,7 +63,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 
 	private int cacheCapacity = 0;
 
-	private int retryLimit = 1;
+	private int retryLimit = 0;
 
 	private Class[] retryableExceptionClasses = new Class[] {};
 
@@ -93,7 +92,6 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	 * @param retryLimit the retry limit to set
 	 */
 	public void setRetryLimit(int retryLimit) {
-		Assert.isTrue(retryLimit >= 1, "retry limit must be greater or equal to 1");
 		this.retryLimit = retryLimit;
 	}
 
@@ -202,7 +200,7 @@ public class SkipLimitStepFactoryBean extends SimpleStepFactoryBean {
 	protected void applyConfiguration(ItemOrientedStep step) {
 		super.applyConfiguration(step);
 
-		if (retryLimit > 1 || skipLimit > 0 || retryPolicy != null) {
+		if (retryLimit > 0 || skipLimit > 0 || retryPolicy != null) {
 
 			addFatalExceptionIfMissing(SkipLimitExceededException.class);
 			addFatalExceptionIfMissing(NonSkippableException.class);
