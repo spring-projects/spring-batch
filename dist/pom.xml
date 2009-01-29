@@ -3,7 +3,7 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.springframework.batch.dist</artifactId>
-	<version>2.0.0.CI-SNAPSHOT</version>
+	<version>2.0.0.M4</version>
 	<name>Distribution</name>
 	<packaging>pom</packaging>
 	<description>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>org.springframework.batch</artifactId>
-		<version>2.0.0.CI-SNAPSHOT</version>
+		<version>2.0.0.M4</version>
 		<relativePath>..</relativePath>
 	</parent>
 
