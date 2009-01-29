@@ -44,7 +44,6 @@ import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.Classifier;
-import org.springframework.util.Assert;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -77,13 +76,13 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		fatalExceptionClasses.add(Error.class);
 		skippableExceptionClasses.add(Exception.class);
 		// TODO seems to cause trouble, although it shouldn't matter for
-		// retryLimit=1?
+		// retryLimit=0?
 		// retryableExceptionClasses.add(Exception.class);
 	}
 
 	private int cacheCapacity = 0;
 
-	private int retryLimit = 1;
+	private int retryLimit = 0;
 
 	private int skipLimit = 0;
 
@@ -120,7 +119,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 * @param retryLimit the retry limit to set, must be greater or equal to 1.
 	 */
 	public void setRetryLimit(int retryLimit) {
-		Assert.isTrue(retryLimit >= 1, "retry limit must be greater or equal to 1");
 		this.retryLimit = retryLimit;
 	}
 
@@ -219,7 +217,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	protected void applyConfiguration(TaskletStep step) {
 		super.applyConfiguration(step);
 
-		if (!(retryLimit > 1 || skipLimit > 0 || retryPolicy != null)) {
+		if (!(retryLimit > 0 || skipLimit > 0 || retryPolicy != null)) {
 			// zero fault-tolerance, just use the parent's simple config
 			return;
 		}

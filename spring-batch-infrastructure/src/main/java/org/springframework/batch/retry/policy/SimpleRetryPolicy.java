@@ -48,7 +48,7 @@ public class SimpleRetryPolicy implements RetryPolicy {
 	 */
 	public final static int DEFAULT_MAX_ATTEMPTS = 3;
 
-	private volatile int maxAttempts = 1;
+	private volatile int maxAttempts;
 
 	private BinaryExceptionClassifier retryableClassifier = new BinaryExceptionClassifier();
 
