@@ -88,6 +88,17 @@
 			</build>
 		</profile>
 		<profile>
+			<id>all</id>
+			<modules>
+			  <module>spring-batch-samples</module>
+			  <module>archetypes</module>
+			  <module>spring-batch-infrastructure-tests</module>
+			  <module>spring-batch-integration</module>
+			  <module>docs</module>
+			  <module>build-central</module>
+			</modules>
+		</profile>
+		<profile>
 			<id>samples</id>
 			<modules>
 				<module>spring-batch-infrastructure-tests</module>

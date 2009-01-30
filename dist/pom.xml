@@ -72,8 +72,6 @@
 	<modules>
 	  <!-- use -P all for the release:prepare goal, or mvn clean -->
 		<module>..</module>
-		<module>../spring-batch-samples</module>
-		<module>../archetypes</module>
 	</modules>
 
 	<build>
