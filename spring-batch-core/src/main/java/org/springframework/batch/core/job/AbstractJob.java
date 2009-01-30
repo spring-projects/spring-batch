@@ -125,6 +125,12 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 		return name;
 	}
 
+	/**
+	 * Boolean flag to prevent categorically a job from restarting, even if it
+	 * has failed previously.
+	 * 
+	 * @param restartable the value of the flag to set (default true)
+	 */
 	public void setRestartable(boolean restartable) {
 		this.restartable = restartable;
 	}
@@ -319,7 +325,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 			jobRepository.add(currentStepExecution);
 
 			step.execute(currentStepExecution);
-			
+
 			jobRepository.updateExecutionContext(execution);
 
 			if (currentStepExecution.getStatus() == BatchStatus.STOPPED
