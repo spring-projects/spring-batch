@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="job">
+<chapter id="configureJob">
   <title>Configuring and Running A Job</title>
 
-  <para>In Chapter 2, the overall architecture design was discussed, using the
-  following diagram as a guide:</para>
+  <para>In <xref linkend="domain" />, the overall architecture design was
+  discussed, using the following diagram as a guide:</para>
 
   <mediaobject>
     <imageobject role="html">
@@ -30,12 +30,10 @@
   <section>
     <title>Configuring a Job</title>
 
-    <para>The only current implementation of the <classname>Job</classname>
-    interface is <classname>SimpleJob</classname>. Since a
-    <classname>Job</classname> is just a simple loop through a list of Steps,
-    this implementation should be sufficient for the majority of needs. It has
-    only three required dependencies: a name,
-    <classname>JobRepository</classname>, and a list of Steps.</para>
+    <para>There are multiple implementations of the <link
+    linkend="job">Job</link> interface, however, the namespace abstracts away
+    the differences in configuration. It has only three required dependencies:
+    a name, <classname>JobRepository</classname>, and a list of Steps.</para>
 
     <programlisting>  
   &lt;job id="footballJob"&gt;
@@ -197,14 +195,16 @@
   <section>
     <title>Configuring a JobRepository</title>
 
-    <para>As described in Chapter 2, the JobRepository is used for basic CRUD
+    <para>As described in earlier, the <link
+    linkend="jobRepository">JobRepository</link> is used for basic CRUD
     operations of the various persisted domain objects within Spring Batch,
     such as JobExecution and StepExecution. It is required by many of the
     major framework features, such as the <classname>JobLauncher</classname>,
     <classname>Job</classname>, and <classname>Step</classname>. The batch
-    namespace abstract much of the implementation details of the JobRepository
-    implementations and their collaborators. However, there are still a few
-    configuration options available:</para>
+    namespace abstract much of the implementation details of the
+    <classname>JobRepository</classname> implementations and their
+    collaborators. However, there are still a few configuration options
+    available:</para>
 
     <programlisting>
   &lt;job-repository id="jobRepository"
@@ -268,82 +268,9 @@
       also to include the appropriate namespace declarations and to make sure
       spring-tx and spring-aop (or the whole of spring) is on the
       classpath.</para>
-
-      <section>
-        <title>Recommendations for Indexing Meta Data Tables</title>
-
-        <para>Spring Batch provides DDL samples for the meta-data tables in
-        the Core jar file for several common database platforms. Index
-        declarations are not included in that DDL because there are too many
-        variations in how users may want to index depending on their precise
-        platform, local conventions and also the business requirements of how
-        the jobs will be operated. The table below provides some indication as
-        to which columns are going to be used in a WHERE clause by the Dao
-        implementations provided by Spring Batch, and how frequently they
-        might be used, so that individual projects can make up their own minds
-        about indexing.</para>
-
-        <table>
-          <title>Where clauses in SQL statements (exluding primary keys) and
-          their approximate frequency of use.</title>
-
-          <tgroup cols="3">
-            <tbody>
-              <row>
-                <entry>Default Table Name</entry>
-
-                <entry>Where Clause</entry>
-
-                <entry>Frequency</entry>
-              </row>
-
-              <row>
-                <entry>BATCH_JOB_INSTANCE</entry>
-
-                <entry>JOB_NAME = ? and JOB_KEY = ?</entry>
-
-                <entry>Every time a job is launched</entry>
-              </row>
-
-              <row>
-                <entry>BATCH_JOB_EXECUTION</entry>
-
-                <entry>JOB_INSTANCE_ID = ?</entry>
-
-                <entry>Every time a job is restarted</entry>
-              </row>
-
-              <row>
-                <entry>BATCH_EXECUTION_CONTEXT</entry>
-
-                <entry>EXECUTION_ID = ? and KEY_NAME = ?</entry>
-
-                <entry>On commit interval, a.k.a. chunk</entry>
-              </row>
-
-              <row>
-                <entry>BATCH_STEP_EXECUTION</entry>
-
-                <entry>VERSION = ?</entry>
-
-                <entry>On commit interval, a.k.a. chunk (and at start and end
-                of step)</entry>
-              </row>
-
-              <row>
-                <entry>BATCH_STEP_EXECUTION</entry>
-
-                <entry>STEP_NAME = ? and JOB_EXECUTION_ID = ?</entry>
-
-                <entry>Before each step execution</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table>
-      </section>
     </section>
 
-    <section>
+    <section id="repositoryTablePrefix">
       <title>Changing the table prefix</title>
 
       <para>Another modifiable property of the
@@ -390,18 +317,20 @@
     <title>Configuring a JobLauncher</title>
 
     <para>The most basic implementation of the
-    <classname>JobLauncher</classname> interface is the SimpleJobLauncher.
-    It's only required dependency is a <classname>JobRepository</classname>,
-    in order to obtain an execution:</para>
+    <classname>JobLauncher</classname> interface is the
+    <classname>SimpleJobLauncher</classname>. It's only required dependency is
+    a <classname>JobRepository</classname>, in order to obtain an
+    execution:</para>
 
     <programlisting>  &lt;bean id="jobLauncher"
         class="org.springframework.batch.execution.launch.SimpleJobLauncher"&gt;
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
   &lt;/bean&gt;</programlisting>
 
-    <para>Once a <classname>JobExecution</classname> is obtained, it is passed
-    to the execute method of <classname>Job</classname>, ultimately returning
-    the <classname>JobExecution</classname> to the caller:</para>
+    <para>Once a <link linkend="jobExecution">JobExecution</link> is obtained,
+    it is passed to the execute method of <classname>Job</classname>,
+    ultimately returning the <classname>JobExecution</classname> to the
+    caller:</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -460,14 +389,15 @@
     <title>Running a Job</title>
 
     <para>At a minimum, launching a batch job requires two things: the Job to
-    be launched and a JobLauncher. Both can be contained within the same
-    context or different contexts. For example, if launching a job from the
-    command line, a new JVM will be instantiated for each Job, and thus every
-    job will have it's own <classname>JobLauncher</classname>. However, if
-    running from within a web container within the scope of an
-    <classname>HttpRequest</classname>, there will usually be one
-    <classname>JobLauncher</classname>, configured for asynchronous job
-    launching, that multiple requests will invoke to launch their jobs.</para>
+    be launched and a <classname>JobLauncher</classname>. Both can be
+    contained within the same context or different contexts. For example, if
+    launching a job from the command line, a new JVM will be instantiated for
+    each Job, and thus every job will have it's own
+    <classname>JobLauncher</classname>. However, if running from within a web
+    container within the scope of an <classname>HttpRequest</classname>, there
+    will usually be one <classname>JobLauncher</classname>, configured for
+    asynchronous job launching, that multiple requests will invoke to launch
+    their jobs.</para>
 
     <section>
       <title>Running Jobs from the Command Line</title>
@@ -546,11 +476,11 @@
 
         <para>In most cases you would want to use a manifest to declare your
         main class in a jar, but for simplicity, the class was used directly.
-        This example is using the same 'EndOfDay' example from Chapter 2. The
-        first argument is 'endOfDayJob.xml', which is the Spring
-        <classname>ApplicationContext</classname> containing the Job. The
-        second argument, 'endOfDay' represents the job name. The final
-        argument, 'schedule.date=01-01-2008' will be converted into
+        This example is using the same 'EndOfDay' example from <xref
+        linkend="domain" />. The first argument is 'endOfDayJob.xml', which is
+        the Spring <classname>ApplicationContext</classname> containing the
+        Job. The second argument, 'endOfDay' represents the job name. The
+        final argument, 'schedule.date=01-01-2008' will be converted into
         <classname>JobParameters</classname>. An example of the XML
         configuration is below:</para>
 
@@ -680,7 +610,8 @@
       </imageobject>
     </mediaobject>
 
-    <para>The JobExplorer and JobOperator interfaces, which will be discussed
+    <para>The <classname>JobExplorer</classname> and
+    <classname>JobOperator</classname> interfaces, which will be discussed
     below, add additional functionality for querying and controlling the meta
     data.</para>
 
@@ -689,7 +620,7 @@
 
       <para>The most basic need before any advanced features is the ability to
       query the repository for existing executions. This functionality is
-      provided by the JobExplorer interface:</para>
+      provided by the <classname>JobExplorer</classname> interface:</para>
 
       <programlisting>  
   public interface JobExplorer {
@@ -721,8 +652,9 @@
 
 </programlisting>
 
-      <para>Earlier in this chapter, it was mentioned that the table prefix of
-      the JobRepository can be modified to allow for different versions or
+      <para><link linkend="repositoryTablePrefix">Earlier in this
+      chapter</link>, it was mentioned that the table prefix of the
+      JobRepository can be modified to allow for different versions or
       schemas. Because the JobExplorer is working with the same tables, it too
       needs the ability to set a prefix:</para>
 
@@ -784,8 +716,8 @@
       <classname>JobRepository</classname>,
       <classname>JobExplorer</classname>, and
       <classname>JobRegistry</classname>. For this reason, the provided
-      implementation of JobOperator, SimpleJobOperator, has many
-      dependencies:</para>
+      implementation of <classname>JobOperator</classname>,
+      <classname>SimpleJobOperator</classname>, has many dependencies:</para>
 
       <programlisting>
   &lt;bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator"&gt;
@@ -807,7 +739,9 @@
 
       <para>Most of the methods on <classname>JobOperator</classname> are
       self-explanatory, and more detailed explanations can be found on the
-      javadoc of the interface. However, the 'startNextInstance' method is
+      <ulink
+      url="http://static.springframework.org/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html">javadoc
+      of the interface</ulink>. However, the 'startNextInstance' method is
       worth noting. This method will always start a new instance of a Job.
       This can be extremely useful if there are serious issues in a
       <classname>Job</classname>Execution, and the <classname>Job</classname>
@@ -826,14 +760,15 @@
 
 </programlisting>
 
-      <para>The contract of JobParametersIncrementer is that, given a
-      JobParameters, it will return the 'next' parameter by incrementing any
-      values it may contain. This strategy is useful because the framework has
-      no way of knowing what changes to the JobParameters make it the 'next'
-      instance. For example, if the only value in JobParameters is a date, and
-      the next instance should be created, should that value be incremented by
-      one day? Or one week? (if the job is weekly for instance) The same can
-      be said for any numerical values that help to identify the Job, as shown
+      <para>The contract of <classname>JobParametersIncrementer</classname> is
+      that, given a <link linkend="jobParameters">JobParameters</link>, it
+      will return the 'next' parameter by incrementing any values it may
+      contain. This strategy is useful because the framework has no way of
+      knowing what changes to the JobParameters make it the 'next' instance.
+      For example, if the only value in JobParameters is a date, and the next
+      instance should be created, should that value be incremented by one day?
+      Or one week? (if the job is weekly for instance) The same can be said
+      for any numerical values that help to identify the Job, as shown
       below:</para>
 
       <programlisting>  
@@ -871,8 +806,9 @@
     <section>
       <title>Stopping a Job</title>
 
-      <para>One of the most common use cases of JobOperator is gracefully
-      stopping a <classname>Job:</classname></para>
+      <para>One of the most common use cases of
+      <classname>JobOperator</classname> is gracefully stopping a
+      <classname>Job:</classname></para>
 
       <programlisting>
   Set&lt;Long&gt; executions = jobOperator.getRunningExecutions("sampleJob");

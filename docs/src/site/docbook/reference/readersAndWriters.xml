@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="spring-batch-infrastructure">
+<chapter id="readersAndWriters">
   <title>ItemReaders and ItemWriters</title>
 
   <para>All batch processing can be described in its most simple form as
   reading in large amounts of data, performing some type of calculation or
-  transformation, and writing the result out. Spring Batch provides two key
+  transformation, and writing the result out. Spring Batch provides three key
   interfaces to help perform bulk reading and writing:
-  <classname>ItemReader</classname> and
+  <classname>ItemReader</classname>, <classname>ItemProcessor</classname> and
   <classname>ItemWriter</classname>.</para>
 
   <section>
@@ -107,6 +107,188 @@
   </section>
 
   <section>
+    <title>ItemProcessor</title>
+
+    <para>The <classname>ItemReader</classname> and
+    <classname>ItemWriter</classname> interfaces are both very useful for
+    their specific tasks, but what if you want to insert business logic before
+    writing? One option for both reading and writing is to use the composite
+    pattern: create an <classname>ItemWriter</classname> that contains another
+    <classname>ItemWriter</classname>, or an <classname>ItemReader</classname>
+    that contains another <classname>ItemReader</classname>. For
+    example:</para>
+
+    <programlisting>  public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
+
+    ItemWriter&lt;T&gt; itemWriter;
+
+    public CompositeItemWriter(ItemWriter&lt;T&gt; itemWriter) {
+      this.itemWriter = itemWriter;
+    }
+
+    public void write(List&lt;? extends T&gt; items) throws Exception {
+
+      //Add business logic here
+
+      itemWriter.write(item);
+    }
+
+    public void setDelegate(ItemWriter&lt;T&gt; itemWriter){
+      this.itemWriter = itemWriter;
+    }
+}</programlisting>
+
+    <para>The class above contains another <classname>ItemWriter</classname>
+    that it delgates to after having provided some business logic. This
+    pattern could easily be used for an <classname>ItemReader</classname> as
+    well, perhaps to obtain more reference data based upon the input that was
+    provided by the main <classname>ItemReader</classname>. It is also useful
+    if you need to control the call to <classname>write</classname> yourself.
+    However, if you only want to 'transform' the item passed in for writing
+    before it is actual written, there isn't much need to call
+    <methodname>write</methodname> yourself, you just want to modify the item.
+    For this scenario, Spring Batch provides the
+    <classname>ItemProcessor</classname> interface:</para>
+
+    <programlisting>  public interface ItemProcessor&lt;I, O&gt; {
+
+  O process(I item) throws Exception;
+}</programlisting>
+
+    <para>An <classname>ItemProcessor</classname> is very simple, given one
+    object, transform it and return another. The object provided may or may
+    not be of the same type. The point is that business logic may be applied
+    within process, and is completely up to the developer to create. An
+    <classname>ItemProcessor</classname> can be wired directly into a step,
+    For example, assuming an <classname>ItemReader</classname> provides a
+    class of type Foo, and it needs to be converted to type Bar before being
+    written out. An <classname>ItemTransformer</classname> can be written that
+    performs the conversion:</para>
+
+    <programlisting>  public class Foo {}
+
+  public class Bar {
+    public Bar(Foo foo) {}
+  }
+
+  public class FooProcessor implements ItemProcessor&lt;Foo,Bar&gt;{
+
+    //Perform simple transformation, convert a Foo to a Bar
+    public Bar transform(Foo foo) throws Exception {
+      return new Bar(foo);
+    }
+  }
+
+  public class BarWriter implements ItemWriter&lt;Bar&gt;{
+
+    public void write(Bar bar) throws Exception {
+      //write bar
+    }
+
+    //rest of class ommitted for clarity
+  }</programlisting>
+
+    <para>In the very simple example above, there is a class
+    <classname>Foo</classname>, a class <classname>Bar</classname>, and a
+    class <classname>FooProcessor</classname> that adheres to the
+    <classname>ItemProcessor</classname> interface. The transformation is
+    simple, but any type of transformation could be done here. The
+    <classname>BarWriter</classname> will be used to write out 'Bars',
+    throwing an exception if any other type is provided. Similarly, the
+    FooProcessor will throw an exception if anything but a
+    <classname>Foo</classname> is provided. The
+    <classname>FooProcessor</classname> can then be injected into a
+    <classname>Step</classname>:</para>
+
+    <programlisting>  
+  &lt;job id="ioSampleJob"&gt;
+    &lt;step name="step1"&gt;
+      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="barWriter" commit-interval="2"/&gt;
+    &lt;/step&gt;
+  &lt;/job&gt;
+
+</programlisting>
+
+    <section>
+      <title>Chaining ItemProcessors</title>
+
+      <para>Performing a single transformation is useful in many scenarios,
+      but what if you want to 'chain' together multiple ItemProcessors? This
+      can be accomplished using the composite pattern mentioned previously. To
+      update the previous, single transformation, example,
+      <classname>Foo</classname> will be Transformed to
+      <classname>Bar</classname>, which will be transformed to
+      <classname>Foobar</classname> and written out:</para>
+
+      <programlisting>  public class Foo {}
+
+  public class Bar {
+    public Bar(Foo foo) {}
+  }
+
+  public class Foobar{
+    public Foobar(Bar bar){}
+  }
+
+  public class FooProcessor implements ItemProcessor&lt;Foo,Bar&gt;{
+
+    //Perform simple transformation, convert a Foo to a Bar
+    public Bar transform(Foo foo) throws Exception {
+      return new Bar(foo);
+    }
+  }
+
+  public class BarProcessor implements ItemProcessor&lt;Bar,FooBar&gt;{
+
+    public FooBar transform(Bar bar) throws Exception {
+      return new Foobar(bar);
+    }
+  }
+
+  public class FoobarWriter implements ItemWriter&lt;FooBar&gt;{
+
+    public void write(Object item) throws Exception {
+      //write Foobar
+    }
+ 
+    //rest of class ommitted for clarity
+  }</programlisting>
+
+      <para>A <classname>FooTransformer</classname> and
+      <classname>BarTransformer</classname> can be 'chained' together to give
+      the resultant <classname>Foobar</classname>:</para>
+
+      <programlisting>  CompositeItemProcessor&lt;Foo,Foobar&gt; compositeProcessor = new CompositeItemProcessor&lt;Foo,Foobar&gt;();
+  List itemProcessors = new ArrayList();
+  itemProcessors.add(new FooTransformer());
+  itemProcessors.add(new BarTransformer());
+  compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
+
+      <para>Just as with the previous example, the composite processor can be
+      configured into the <classname>Step</classname>:</para>
+
+      <programlisting> 
+  &lt;job id="ioSampleJob"&gt;
+    &lt;step name="step1"&gt;
+      &lt;tasklet reader="fooReader" processor="compositeProcessor" writer="foobarWriter" commit-interval="2"/&gt;
+    &lt;/step&gt;
+  &lt;/job&gt;
+
+  &lt;bean id="compositeItemProcessor" 
+        class="org.springframework.batch.item.support.CompositeItemProcessor"&gt;
+    &lt;property name="itemProcessors"&gt;
+      &lt;list&gt;
+        &lt;bean class="..FooProcessor" /&gt;
+        &lt;bean class="..BarProcessor" /&gt;
+      &lt;/list&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt; 
+
+</programlisting>
+    </section>
+  </section>
+
+  <section id="itemStream">
     <title>ItemStream</title>
 
     <para>Both ItemReaders and ItemWriters serve their individual purposes
@@ -156,6 +338,42 @@
   </section>
 
   <section>
+    <title>The Delegate Pattern and Registering with the Step</title>
+
+    <para>Note that the <classname>CompositeItemWriter</classname> is an
+    example of the delegation pattern, which is common in Spring Batch. The
+    delegates themselves might implement callback interfaces like
+    <classname>ItemStream</classname> or <classname>StepListener</classname>.
+    If they do, and they are being used in conjunction with Spring Batch Core
+    as part of a <classname>Step</classname> in a <classname>Job</classname>,
+    then they almost certainly need to be registered manually with the
+    <classname>Step</classname>. Registration is automatic when the reader,
+    writer, or processor is directly wired into the Step. The delegates are
+    not known to the <classname>Step</classname>, so they need to be injected
+    as listeners or streams (or both if appropriate):</para>
+
+    <programlisting>  
+  &lt;job id="ioSampleJob"&gt;
+    &lt;step name="step1"&gt;
+      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="compositeItemWriter" 
+               commit-interval="2"/&gt;
+      &lt;streams&gt;
+        &lt;stream ref="barWriter" /&gt;
+      &lt;/streams&gt;
+    &lt;/step&gt;
+  &lt;/job&gt;
+
+  &lt;bean id="compositeItemWriter" 
+        class="...CompositeItemWriter" &gt;
+    &lt;property name="delegate" ref="barWriter" /&gt;
+  &lt;/bean&gt;
+
+  &lt;bean id="barWriter" class="...BarWriter" /&gt;
+
+</programlisting>
+  </section>
+
+  <section>
     <title id="infrastructure.1.2">Flat Files</title>
 
     <para>One of the most common mechanisms for interchanging bulk data has
@@ -201,7 +419,7 @@
       conversions.</para>
     </section>
 
-    <section>
+    <section id="flatFileItemReader">
       <title id="infrastructure.1.2.1">FlatFileItemReader</title>
 
       <para>A flat file is any type of file that contains at most
@@ -2123,8 +2341,8 @@
     such a common concern, Spring Batch provides implementations:
     <classname>ItemReaderAdapter</classname> and
     <classname>ItemWriterAdapter</classname>. Both classes implement the
-    standard Spring method invoking delegator pattern and are fairly simple to
-    set up. Below is an example of the reader:</para>
+    standard Spring method invoking the delegate pattern and are fairly simple
+    to set up. Below is an example of the reader:</para>
 
     <programlisting>  &lt;bean id="itemReader" class="org.springframework.batch.item.adapter.ItemReaderAdapter"&gt;
     &lt;property name="targetObject" ref="fooService" /&gt;
@@ -2149,225 +2367,6 @@
 
   &lt;bean id="fooService" class="org.springframework.batch.item.sample.FooService" /&gt;
 </programlisting>
-  </section>
-
-  <section>
-    <title>ItemProcessor</title>
-
-    <para>The <classname>ItemReader</classname> and
-    <classname>ItemWriter</classname> interfaces have been discussed in detail
-    in this chapter, but what if you want to insert business logic before
-    writing? One option for both reading and writing is to use the composite
-    pattern: create an <classname>ItemWriter</classname> that contains another
-    <classname>ItemWriter</classname>, or an <classname>ItemReader</classname>
-    that contains another <classname>ItemReader</classname>. For
-    example:</para>
-
-    <programlisting>  public class CompositeItemWriter&lt;T&gt; implements ItemWriter&lt;T&gt; {
-
-    ItemWriter&lt;T&gt; itemWriter;
-
-    public CompositeItemWriter(ItemWriter&lt;T&gt; itemWriter) {
-      this.itemWriter = itemWriter;
-    }
-
-    public void write(List&lt;? extends T&gt; items) throws Exception {
-
-      //Add business logic here
-
-      itemWriter.write(item);
-    }
-
-    public void setDelegate(ItemWriter&lt;T&gt; itemWriter){
-      this.itemWriter = itemWriter;
-    }
-}</programlisting>
-
-    <para>The class above contains another <classname>ItemWriter</classname>
-    that it delgates to after having provided some business logic. This
-    pattern could easily be used for an <classname>ItemReader</classname> as
-    well, perhaps to obtain more reference data based upon the input that was
-    provided by the main <classname>ItemReader</classname>. This pattern is
-    very useful if you need to control the call to
-    <classname>write</classname> yourself. However, if you only want to
-    'transform' the item passed in for writing before it is actual written,
-    there isn't much need to call <methodname>write</methodname> yourself, you
-    just want to modify the item. For this scenario, Spring Batch provides the
-    <classname>ItemProcessor</classname> interface:</para>
-
-    <programlisting>  public interface ItemProcessor&lt;I, O&gt; {
-
-  O process(I item) throws Exception;
-}</programlisting>
-
-    <para>An <classname>ItemProcessor</classname> is very simple, given one
-    object, transform it and return another. The object provided may or may
-    not be of the same type. The point is that business logic may be applied
-    within process, and is completely up to the developer to create. An
-    <classname>ItemProcessor</classname> can be wired directly into a step,
-    For example, assuming an <classname>ItemReader</classname> provides a
-    class of type Foo, and it needs to be converted to type Bar before being
-    written out. An <classname>ItemTransformer</classname> can be written that
-    performs the conversion:</para>
-
-    <programlisting>  public class Foo {}
-
-  public class Bar {
-    public Bar(Foo foo) {}
-  }
-
-  public class FooProcessor implements ItemProcessor&lt;Foo,Bar&gt;{
-
-    //Perform simple transformation, convert a Foo to a Bar
-    public Bar transform(Foo foo) throws Exception {
-      return new Bar(foo);
-    }
-  }
-
-  public class BarWriter implements ItemWriter&lt;Bar&gt;{
-
-    public void write(Bar bar) throws Exception {
-      //write bar
-    }
-
-    //rest of class ommitted for clarity
-  }</programlisting>
-
-    <para>In the very simple example above, there is a class
-    <classname>Foo</classname>, a class <classname>Bar</classname>, and a
-    class <classname>FooProcessor</classname> that adheres to the
-    <classname>ItemProcessor</classname> interface. The transformation is
-    simple, but any type of transformation could be done here. The
-    <classname>BarWriter</classname> will be used to write out 'Bars',
-    throwing an exception if any other type is provided. Similarly, the
-    FooProcessor will throw an exception if anything but a
-    <classname>Foo</classname> is provided. The
-    <classname>FooProcessor</classname> can then be injected into a
-    <classname>Step</classname>:</para>
-
-    <programlisting>  
-  &lt;job id="ioSampleJob"&gt;
-    &lt;step name="step1"&gt;
-      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="barWriter" commit-interval="2"/&gt;
-    &lt;/step&gt;
-  &lt;/job&gt;
-
-</programlisting>
-
-    <section>
-      <title>The Delegate Pattern and Registering with the Step</title>
-
-      <para>Note that the <classname>CompositeItemWriter</classname> is an
-      example of the delegation pattern, which is common in Spring Batch. The
-      delegates themselves might implement callback interfaces like
-      <classname>ItemStream</classname> or
-      <classname>StepListener</classname>. If they do, and they are being used
-      in conjunction with Spring Batch Core as part of a
-      <classname>Step</classname> in a <classname>Job</classname>, then they
-      almost certainly need to be registered manually with the
-      <classname>Step</classname>. Registration is automatic when the reader,
-      writer, or processor is directly wired into the Step. The delegates are
-      not known to the <classname>Step</classname>, so they need to be
-      injected as listeners or streams (or both if appropriate):</para>
-
-      <programlisting>  
-  &lt;job id="ioSampleJob"&gt;
-    &lt;step name="step1"&gt;
-      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="compositeItemWriter" 
-               commit-interval="2"/&gt;
-      &lt;streams&gt;
-        &lt;stream ref="barWriter" /&gt;
-      &lt;/streams&gt;
-    &lt;/step&gt;
-  &lt;/job&gt;
-
-  &lt;bean id="compositeItemWriter" 
-        class="...CompositeItemWriter" &gt;
-    &lt;property name="delegate" ref="barWriter" /&gt;
-  &lt;/bean&gt;
-
-  &lt;bean id="barWriter" class="...BarWriter" /&gt;
-
-</programlisting>
-    </section>
-
-    <section>
-      <title>Chaining ItemProcessors</title>
-
-      <para>Performing a single transformation is useful in many scenarios,
-      but what if you want to 'chain' together multiple ItemProcessors? This
-      can be accomplished using the composite pattern mentioned previously. To
-      update the previous, single transformation, example,
-      <classname>Foo</classname> will be Transformed to
-      <classname>Bar</classname>, which will be transformed to
-      <classname>Foobar</classname> and written out:</para>
-
-      <programlisting>  public class Foo {}
-
-  public class Bar {
-    public Bar(Foo foo) {}
-  }
-
-  public class Foobar{
-    public Foobar(Bar bar){}
-  }
-
-  public class FooProcessor implements ItemProcessor&lt;Foo,Bar&gt;{
-
-    //Perform simple transformation, convert a Foo to a Bar
-    public Bar transform(Foo foo) throws Exception {
-      return new Bar(foo);
-    }
-  }
-
-  public class BarProcessor implements ItemProcessor&lt;Bar,FooBar&gt;{
-
-    public FooBar transform(Bar bar) throws Exception {
-      return new Foobar(bar);
-    }
-  }
-
-  public class FoobarWriter implements ItemWriter&lt;FooBar&gt;{
-
-    public void write(Object item) throws Exception {
-      //write Foobar
-    }
- 
-    //rest of class ommitted for clarity
-  }</programlisting>
-
-      <para>A <classname>FooTransformer</classname> and
-      <classname>BarTransformer</classname> can be 'chained' together to give
-      the resultant <classname>Foobar</classname>:</para>
-
-      <programlisting>  CompositeItemProcessor&lt;Foo,Foobar&gt; compositeProcessor = new CompositeItemProcessor&lt;Foo,Foobar&gt;();
-  List itemProcessors = new ArrayList();
-  itemProcessors.add(new FooTransformer());
-  itemProcessors.add(new BarTransformer());
-  compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
-
-      <para>Just as with the previous example, the composite processor can be
-      configured into the <classname>Step</classname>:</para>
-
-      <programlisting> 
-  &lt;job id="ioSampleJob"&gt;
-    &lt;step name="step1"&gt;
-      &lt;tasklet reader="fooReader" processor="compositeProcessor" writer="foobarWriter" commit-interval="2"/&gt;
-    &lt;/step&gt;
-  &lt;/job&gt;
-
-  &lt;bean id="compositeItemProcessor" 
-        class="org.springframework.batch.item.support.CompositeItemProcessor"&gt;
-    &lt;property name="itemProcessors"&gt;
-      &lt;list&gt;
-        &lt;bean class="..FooProcessor" /&gt;
-        &lt;bean class="..BarProcessor" /&gt;
-      &lt;/list&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt; 
-
-</programlisting>
-    </section>
   </section>
 
   <section>

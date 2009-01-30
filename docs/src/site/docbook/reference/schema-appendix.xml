@@ -538,4 +538,76 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
       </listitem>
     </itemizedlist>
   </section>
+
+  <section>
+    <title>Recommendations for Indexing Meta Data Tables</title>
+
+    <para>Spring Batch provides DDL samples for the meta-data tables in the
+    Core jar file for several common database platforms. Index declarations
+    are not included in that DDL because there are too many variations in how
+    users may want to index depending on their precise platform, local
+    conventions and also the business requirements of how the jobs will be
+    operated. The table below provides some indication as to which columns are
+    going to be used in a WHERE clause by the Dao implementations provided by
+    Spring Batch, and how frequently they might be used, so that individual
+    projects can make up their own minds about indexing.</para>
+
+    <table>
+      <title>Where clauses in SQL statements (exluding primary keys) and their
+      approximate frequency of use.</title>
+
+      <tgroup cols="3">
+        <tbody>
+          <row>
+            <entry>Default Table Name</entry>
+
+            <entry>Where Clause</entry>
+
+            <entry>Frequency</entry>
+          </row>
+
+          <row>
+            <entry>BATCH_JOB_INSTANCE</entry>
+
+            <entry>JOB_NAME = ? and JOB_KEY = ?</entry>
+
+            <entry>Every time a job is launched</entry>
+          </row>
+
+          <row>
+            <entry>BATCH_JOB_EXECUTION</entry>
+
+            <entry>JOB_INSTANCE_ID = ?</entry>
+
+            <entry>Every time a job is restarted</entry>
+          </row>
+
+          <row>
+            <entry>BATCH_EXECUTION_CONTEXT</entry>
+
+            <entry>EXECUTION_ID = ? and KEY_NAME = ?</entry>
+
+            <entry>On commit interval, a.k.a. chunk</entry>
+          </row>
+
+          <row>
+            <entry>BATCH_STEP_EXECUTION</entry>
+
+            <entry>VERSION = ?</entry>
+
+            <entry>On commit interval, a.k.a. chunk (and at start and end of
+            step)</entry>
+          </row>
+
+          <row>
+            <entry>BATCH_STEP_EXECUTION</entry>
+
+            <entry>STEP_NAME = ? and JOB_EXECUTION_ID = ?</entry>
+
+            <entry>Before each step execution</entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
+  </section>
 </appendix>

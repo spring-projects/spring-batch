@@ -4,7 +4,8 @@
 <chapter id="step">
   <title>Configuring a Step</title>
 
-  <para>A <classname>Step</classname> is a domain object that encapsulates an
+  <para>As disucssed in <xref linkend="domain" />, a
+  <classname>Step</classname> is a domain object that encapsulates an
   independent, sequential phase of a batch job and contains all of the
   information necessary to define and control the actual batch processing.
   This is a necessarily vague description because the contents of any given
@@ -28,7 +29,7 @@
     </imageobject>
   </mediaobject>
 
-  <section>
+  <section id="chunkOrientedProcessing">
     <title>Chunk-Oriented Processing</title>
 
     <para>Spring Batch uses a 'Chunk Oriented' processing style within it's
@@ -159,7 +160,7 @@
     <section>
       <title>Configuring a Step for Restart</title>
 
-      <para>In the Chapter on configuring a Job, restarting a
+      <para>In <xref linkend="configureJob" />, restarting a
       <classname>Job</classname> was discussed. Restart has numerous impacts
       on steps, and as such may require some specific configuration.</para>
 
@@ -419,7 +420,8 @@
 
       <para>The <classname>Step</classname> allows a limit for the number of
       times an individual item can be retried, and a list of exceptions that
-      are 'retryable'.</para>
+      are 'retryable'. More details on how retry works can be found in <xref
+      linkend="retry" /></para>
     </section>
 
     <section>
@@ -458,10 +460,10 @@
 
       <para>The step has to take care of <classname>ItemStream</classname>
       callbacks at the necessary points in its lifecycle. (for more
-      information on the ItemStream interface, please refer to the chapter on
-      Readers and Writers) This is vital if a step fails, and might need to be
-      restarted, because the <classname>ItemStream</classname> interface is
-      where the step gets the information it needs about persistent state
+      information on the ItemStream interface, please refer to <xref
+      linkend="itemStream" />) This is vital if a step fails, and might need
+      to be restarted, because the <classname>ItemStream</classname> interface
+      is where the step gets the information it needs about persistent state
       between executions.</para>
 
       <para>If the <classname>ItemReader</classname>,
@@ -1280,10 +1282,10 @@
       filters and does placeholder replacement on system properties.)</para>
 
       <para>Often in a batch setting it is preferable to parameterize the file
-      name in the <classname>JobParameters</classname> of the job, instead of
-      through system properties, and access them that way. To allow for this,
-      Spring Batch allows for the late binding of various Job and Step
-      attributes:</para>
+      name in the <link linkend="jobParameters">JobParameters</link> of the
+      job, instead of through system properties, and access them that way. To
+      allow for this, Spring Batch allows for the late binding of various Job
+      and Step attributes:</para>
 
       <programlisting>  
   &lt;bean id="flatFileItemReader" scope="step"
