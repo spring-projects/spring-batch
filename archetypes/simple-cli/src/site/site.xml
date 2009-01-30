@@ -6,6 +6,12 @@
     	<href>index.html</href>
 	</bannerLeft>
 
+  <skin>
+    <groupId>org.springframework.maven.skins</groupId>
+    <artifactId>maven-spring-skin</artifactId>
+    <version>1.0.5</version>
+  </skin>
+
 	<body>
 
 		<links>

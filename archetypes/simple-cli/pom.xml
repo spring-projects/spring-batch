@@ -236,7 +236,7 @@
 		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
 			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
+			<url>file:///${user.dir}/target/staging/org.springframework.batch.archetype/${pom.artifactId}</url>
 		</site>
 		<repository>
 			<id>spring-milestone</id>

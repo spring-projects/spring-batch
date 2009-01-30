@@ -60,6 +60,15 @@
 			</activation>
 		</profile>
 		<profile>
+			<id>all</id>
+	<modules>
+		<module>spring-batch-infrastructure-tests</module>
+		<module>spring-batch-integration</module>
+		<module>docs</module>
+		<module>build-central</module>
+	</modules>
+		</profile>
+		<profile>
 			<id>deployment</id>
 			<modules>
 				<module>spring-batch-samples</module>
