@@ -12,10 +12,8 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-infrastructure</module>
-		<module>spring-batch-infrastructure-tests</module>
 		<module>spring-batch-core</module>
 		<module>spring-batch-samples</module>
-		<module>spring-batch-integration</module>
 		<module>docs</module>
 		<module>archetypes</module>
 	</modules>
@@ -68,14 +66,29 @@
 			</activation>
 		</profile>
 		<profile>
-			<id>deployment</id>
+			<id>all</id>
+	<modules>
+		<module>spring-batch-infrastructure-tests</module>
+		<module>spring-batch-integration</module>
+	</modules>
+		</profile>
+		<profile>
+			<id>staging</id>
 			<distributionManagement>
-				<site>
-					<id>static.springframework.org</id>
-					<url>
-						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/1.1.x
-					</url>
-				</site>
+		<site>
+			<id>staging</id>
+			<url>file:///${user.dir}/target/staging</url>
+		</site>
+		<repository>
+			<id>spring-milestone</id>
+			<name>Spring Milestone Repository</name>
+			<url>file:///${user.dir}/target/staging</url>
+		</repository>
+		<snapshotRepository>
+			<id>spring-snapshot</id>
+			<name>Spring Snapshot Repository</name>
+			<url>file:///${user.dir}/target/staging</url>
+		</snapshotRepository>
 			</distributionManagement>
 		</profile>
 		<profile>
@@ -117,7 +130,7 @@
 						<!-- This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken -->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
-							<version>2.0-beta-7-SNAPSHOT</version>
+							<version>2.0-beta-8-SNAPSHOT</version>
 						</plugin>
 					</plugins>
 				</pluginManagement>
@@ -197,14 +210,16 @@
 	</profiles>
 	<distributionManagement>
 		<downloadUrl>http://www.springframework.org/download</downloadUrl>
-		<site>
-			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
-		</site>
+				<site>
+					<id>static.springframework.org</id>
+					<url>
+						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/1.1.x
+					</url>
+				</site>
 		<repository>
-			<id>spring-release</id>
+			<id>spring-milestone</id>
 			<name>Spring Milestone Repository</name>
-			<url>s3://maven.springframework.org/release</url>
+			<url>s3://maven.springframework.org/milestone</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
@@ -222,6 +237,10 @@
 		</extensions>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>2.0-beta-7</version>
+				</plugin>
 				<plugin>
 					<groupId>com.atlassian.maven.plugins</groupId>
 					<artifactId>maven-clover-plugin</artifactId>
@@ -623,7 +642,7 @@
 								<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 							</links>
 							<aggregate>true</aggregate>
-							<excludePackageNames>*.batch.sample,*.batch.container</excludePackageNames>
+							<excludePackageNames>*.batch.sample,*.batch.container,example</excludePackageNames>
 						</configuration>
 						<reports>
 							<report>javadoc</report>

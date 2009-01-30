@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="${project.name}">
   <bannerLeft>
-    <name>${project.name}</name>
+    <name>${project.name} 1.1.x</name>
     <href>http://www.springframework.org/spring-batch</href>
   </bannerLeft>
   <bannerRight>

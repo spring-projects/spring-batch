@@ -16,18 +16,28 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<modules>
-		<module>../spring-batch-infrastructure</module>
-		<module>../spring-batch-core</module>
-		<module>../spring-batch-samples</module>
+		<module>..</module>
 	</modules>
+	<profiles>
+		<profile>
+			<id>dist</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 	<build>
-		<extensions>
-			<extension>
-				<groupId>org.springframework.aws</groupId>
-				<artifactId>spring-aws-maven</artifactId>
-				<version>1.2</version>
-			</extension>
-		</extensions>
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
