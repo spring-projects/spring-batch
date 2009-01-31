@@ -567,7 +567,7 @@
     </section>
   </section>
 
-  <section>
+  <section id="advancedMetaData">
     <title>Advanced Meta-Data Usage</title>
 
     <para>So far, both the JobLauncher and JobRepository interfaces have been

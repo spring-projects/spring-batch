@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="step">
+<chapter id="configureStep">
   <title>Configuring a Step</title>
 
   <para>As disucssed in <xref linkend="domain" />, a
@@ -453,6 +453,29 @@
       settings such as isolation and propagation behaviour. More information
       on setting transaction attributes can be found in the spring core
       documentation.</para>
+
+      <section id="transactionalReaders">
+        <title>Transactional readers</title>
+
+        <para>The basic contract of the <classname>ItemReader</classname> is
+        that it is forward only. The step buffers reader input, so that in the
+        case of a rollback the items don't need to be re-read from the reader.
+        However, there are certain scenarios in which the reader is built on
+        top of a transactional resource, such as a JMS queue. In this case,
+        since the queue is tied to the transaction that is rolled back, the
+        messages that have been pulled from the queue will be put back on. For
+        this reason, the step can be configured to not buffer the items:
+        </para>
+
+        <programlisting>
+  &lt;step name="step1"&gt;
+    &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="2" skip-limit="1"
+             <emphasis role="bold">is-reader-transactional-queue="true"</emphasis>&gt;
+    &lt;/tasklet&gt;
+  &lt;/step&gt;
+
+</programlisting>
+      </section>
     </section>
 
     <section>
@@ -954,7 +977,7 @@
     </section>
   </section>
 
-  <section>
+  <section id="controllingStepFlow">
     <title>Controlling Step Flow</title>
 
     <para>With the ability to group steps together within an owning job, comes

@@ -47,6 +47,8 @@
   </bookinfo>
 
   <xi:include href="spring-batch-intro.xml" />
+  
+  <xi:include href="whatsnew.xml" />
 
   <xi:include href="domain.xml" />
   

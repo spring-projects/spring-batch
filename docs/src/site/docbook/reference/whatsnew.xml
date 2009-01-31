@@ -1,185 +1,286 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter id="core">
-  <title>The Domain Language of Batch</title>
+<chapter id="whatsNew">
+  <title>What's new in Spring Batch 2.0</title>
+
+  <para>The Spring Batch 2.0 release has six major themes:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Java 5</para>
+    </listitem>
+
+    <listitem>
+      <para>Non Sequential Step Execution</para>
+    </listitem>
+
+    <listitem>
+      <para>Chunk oriented processing</para>
+    </listitem>
+
+    <listitem>
+      <para>Meta Data enhancements</para>
+    </listitem>
+
+    <listitem>
+      <para>Scalability</para>
+    </listitem>
+
+    <listitem>
+      <para>Configuration</para>
+    </listitem>
+  </itemizedlist>
 
   <section>
-    <title>Introduction</title>
+    <title id="s.2.1.6">Java 5</title>
 
-    <para>To any experienced batch architect, the overall concepts of batch
-    processing used in Spring Batch should be familiar and comfortable. There
-    are “Jobs” and “Steps” and developer supplied processing units called
-    ItemReaders and ItemWriters. However, because of the Spring patterns,
-    operations, templates, callbacks, and idioms, there are opportunities for
-    the following:<itemizedlist>
-        <listitem>
-          <para>significant improvement in adherence to a clear separation of
-          concerns</para>
-        </listitem>
+    <para>The 1.x release of Spring Batch were all based on Java 1.4. This
+    prevented the framework from using many enhancements provided in Java 5
+    such as generics, parameterized types, etc. The entire framework has been
+    updated to utilize these features. <emphasis role="bold">Java 1.4 is no
+    longer supported.</emphasis> Most of the interfaces developers work with
+    have been updated to support generic types. As an example, the ItemReader
+    interface from 1.1 is below:</para>
 
-        <listitem>
-          <para>clearly delineated architectural layers and services provided
-          as interfaces</para>
-        </listitem>
+    <programlisting>
+  public interface ItemReader {
 
-        <listitem>
-          <para>simple and default implementations that allowed for quick
-          adoption and ease of use out-of-the-box</para>
-        </listitem>
+    Object read() throws Exception;
 
-        <listitem>
-          <para>significantly enhanced extensibility</para>
-        </listitem>
-      </itemizedlist></para>
+    void mark() throws MarkFailedException;
+ 
+    void reset() throws ResetFailedException;
+  }
 
-    <para>The diagram below is only a slight variation of the batch reference
-    architecture that has been used for decades. It provides an overview of
-    the high level components, technical services, and basic operations
-    required by a batch architecture. This architecture framework is a
-    blueprint that has been proven through decades of implementations on the
-    last several generations of platforms (COBOL/Mainframe, C++/Unix, and now
-    Java/anywhere). JCL and COBOL developers are likely to be as comfortable
-    with the concepts as C++, C# and Java developers. Spring Batch provides a
-    physical implementation of the layers, components and technical services
-    commonly found in robust, maintainable systems used to address the
-    creation of simple to complex batch applications, with the infrastructure
-    and extensions to address very complex processing needs.</para>
+</programlisting>
+
+    <para>As you can see, the <methodname>read</methodname> method returns an
+    Object. The 2.0 version is below:</para>
+
+    <programlisting>
+  public interface ItemReader&lt;T&gt; {
+
+    T read() throws Exception, UnexpectedInputException, ParseException;
+
+  }
+
+</programlisting>
+
+    <para>As you can see, <classname>ItemReader</classname> now supports the
+    generic type, T, which is returned from read. You may also notice that
+    mark and reset have been removed. This is due to step processing strategy
+    changes, which are discussed below. Many other interfaces have been
+    similarly updated. </para>
   </section>
 
   <section>
-    <title id="s.2">Batch Application Style Interactions and Services</title>
+    <title>Chunk Oriented Processing</title>
 
-    <mediaobject>
-      <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/spring-batch-reference-model.png"
-                   format="PNG" />
-      </imageobject>
-
-      <imageobject role="html">
-        <imagedata align="center"
-                   fileref="images/spring-batch-reference-model.png"
-                   format="PNG" />
-      </imageobject>
-
-      <caption><para>Figure 2.1: Batch Stereotypes</para></caption>
-    </mediaobject>
-
-    <para>The above diagram highlights the interactions and key services
-    provided by the Spring Batch framework. The colors used are important to
-    understanding the responsibilities of a developer in Spring Batch. Grey
-    represents an external application such as an enterprise scheduler or a
-    database. It's important to note that scheduling is grey, and should thus
-    be considered separate from Spring Batch. Blue represents application
-    architecture services. In most cases these are provided by Spring Batch
-    with out of the box implementations, but an architecture team may make
-    specific implementations that better address their specific needs. Yellow
-    represents the pieces that must be configured by a developer. For example,
-    a job schedule needs to be configured so that the job is kicked off at the
-    appropriate time. A job configuration file also needs to be created, which
-    defines how a job will be run. It is also worth noting that the
-    <classname>ItemReader</classname> and <classname>ItemWriter</classname>
-    used by an application may just as easily be a custom one made by a
-    developer for their specific batch job, rather than one provided by Spring
-    Batch or an architecture team.</para>
-
-    <para>The Batch Application Style is organized into four logical tiers,
-    which include Run, Job, Application, and Data. The primary goal for
-    organizing an application according to the tiers is to embed what is known
-    as "separation of concerns" within the system. These tiers can be
-    conceptual but may prove effective in mapping the deployment of the
-    artifacts onto physical components like Java runtimes and integration with
-    data sources and targets. Effective separation of concerns results in
-    reducing the impact of change to the system. The four conceptual tiers
-    containing batch artifacts are:</para>
-
-    <para><itemizedlist>
-        <listitem>
-          <para><emphasis role="bold">Run Tier:</emphasis> The Run Tier is
-          concerned with the scheduling and launching of the application. A
-          vendor product is typically used in this tier to allow time-based
-          and interdependent scheduling of batch jobs as well as providing
-          parallel processing capabilities.</para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">Job Tier:</emphasis> The Job Tier is
-          responsible for the overall execution of a batch job. It
-          sequentially executes batch steps, ensuring that all steps are in
-          the correct state and all appropriate policies are enforced.</para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">Application Tier:</emphasis> The
-          Application Tier contains components required to execute the
-          program. It contains specific tasks that address required batch
-          functionality and enforces policies around execution (e.g., commit
-          intervals, capture of statistics, etc.)</para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">Data Tier:</emphasis> The Data Tier
-          provides integration with the physical data sources that might
-          include databases, files, or queues.</para>
-        </listitem>
-      </itemizedlist></para>
-  </section>
-
-  <section>
-    <title id="jobStereotypes">Job Stereotypes</title>
-
-    <para>This section describes stereotypes relating to the concept of a
-    batch job. A <classname>Job</classname> is an entity that encapsulates an
-    entire batch process. As is common with other Spring projects, a
-    <classname>Job</classname> will be wired together via an XML configuration
-    file. This file may be referred to as the "job configuration". However,
-    <classname>Job</classname> is just the top of an overall hierarchy:</para>
+    <para>Previously, the default processing strategy provided by Spring Batch
+    was item-oriented processing:</para>
 
     <mediaobject>
       <imageobject role="html">
-        <imagedata align="center" fileref="images/job-heirarchy.png" />
+        <imagedata align="center"
+                   fileref="images/item-oriented-processing.png" scale=""
+                   width="50%" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/job-heirarchy.png" />
+                   fileref="src/site/docbook/reference/images/item-oriented-processing.png"
+                   width="50%" />
       </imageobject>
     </mediaobject>
+
+    <para>In item-oriented processing, the ItemReader returns one Object (the
+    'item) which is then handed to the ItemWriter, periodically committing
+    when the number of items hits the commit interval. For example, if the
+    commit interval is 5, ItemReader and ItemWriter will each be called 5
+    times. This is illustrated in a simplified code example below:</para>
+
+    <programlisting>  
+  for(int i = 0; i &lt; commitInterval; i++){
+    Object item = itemReader.read();
+    itemWriter.write(item);
+  }
+
+</programlisting>
+
+    <para>Both the ItemReader and ItemWriter interfaces were completely geared
+    toward this approach:</para>
+
+    <programlisting>
+  public interface ItemReader {
+
+    Object read() throws Exception;
+
+    void mark() throws MarkFailedException;
+ 
+    void reset() throws ResetFailedException;
+  }
+
+</programlisting>
+
+    <programlisting>  public interface ItemWriter {
+
+    void write(Object item) throws Exception;
+
+    void flush() throws FlushFailedException;
+
+    void clear() throws ClearFailedException;
+  }
+
+</programlisting>
+
+    <para>Because the 'scope' of the processing was one item, supporting
+    rollback scenarios required additional methods, which is what mark, reset,
+    flush, and clear provided. If, after successfully reading and writing 2
+    items, the third had an error while writing, the transaction would need to
+    be rolled back. In this case, the clear method on the writer would be
+    called, indicating that it should clear its buffer, and reset would be
+    called on the ItemReader, indicating that it should return back to the
+    last position it was at when mark was called. (Both mark and flush are
+    called on commit)</para>
+
+    <para>In 2.0, this strategy has been changed to a chunk-oriented
+    approach:</para>
+
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center"
+                   fileref="images/simplified-chunk-oriented-processing.png"
+                   scale="" width="60%" />
+      </imageobject>
+
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/simplified-oriented-processing.png"
+                   width="60%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>Using the same example from above, if the commit interval is five,
+    read will be called 5 times, and write once. The items read will be
+    aggregated into a list, that will ultimately be written out, as the
+    simplified example below illustrates:</para>
+
+    <programlisting>
+  List items = new Arraylist();
+  for(int i = 0; i &lt; commitInterval; i++){
+    items.add(itemReader.read());
+  }
+  itemWriter.write(items);
+
+</programlisting>
+
+    <para>This approach not only allows for much simpler processing and
+    scalability approaches, it also makes the ItemReader and ItemWriter
+    interfaces much cleaner:</para>
+
+    <programlisting>
+  public interface ItemReader&lt;T&gt; {
+
+    T read() throws Exception, UnexpectedInputException, ParseException;
+
+  }
+
+</programlisting>
+
+    <programlisting>
+  public interface ItemWriter&lt;T&gt; {
+
+    void write(List&lt;? extends T&gt; items) throws Exception;
+
+  }
+
+</programlisting>
+
+    <para>As you can see, the interfaces no longer contain the mark, reset,
+    flush, and clear methods. This makes the creation of readers and writers
+    much more straightforward for developers. In the case of
+    <classname>ItemReader</classname>, the interface is now forward-only. The
+    framework will buffer read items for developers in the case of rollback.
+    (There are exceptions if the underlying resource is transactional see:
+    <xref linkend="transactionalReaders" />) ItemWriter is also simplified,
+    since it gets the entire 'chunk' of items at once, rather than one at a
+    time, it can decide to flush any resources (such as a file or hibernate
+    session) before returning control to the <classname>Step</classname>. More
+    detailed information on chunk-oriented processing can be found in <xref
+    linkend="chunkOrientedProcessing" />. Reader and writer implementation
+    information can be found in <xref linkend="readersAndWriters" /></para>
 
     <section>
-      <title id="s.2.1.1">Job</title>
+      <title>ItemProcessor</title>
 
-      <para>A job is represented by a Spring bean that implements the
-      <classname>Job</classname> interface and contains all of the information
-      necessary to define the operations performed by a job. A job
-      configuration is typically contained within a Spring XML configuration
-      file and the job's name is determined by the "id" attribute associated
-      with the job configuration bean. The job configuration contains</para>
+      <para>Previously, Steps had only two dependencies,
+      <classname>ItemReader</classname> and
+      <classname>ItemWriter</classname>:</para>
 
-      <itemizedlist>
-        <listitem>
-          <para>The simple name of the job</para>
-        </listitem>
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="images/1-1-step.png" scale=""
+                     width="50%" />
+        </imageobject>
 
-        <listitem>
-          <para>Definition and ordering of Steps</para>
-        </listitem>
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="src/site/docbook/reference/images/1-1-step.png"
+                     width="50%" />
+        </imageobject>
+      </mediaobject>
 
-        <listitem>
-          <para>Whether or not the job is restartable</para>
-        </listitem>
-      </itemizedlist>
+      <para>The basic configuration above is fairly robust. However, there are
+      many cases where the item needs to be transformed before writing. In 1.x
+      this can be achieved using the composite pattern:</para>
 
-      <para>A default simple implementation of the <classname>Job</classname>
-      interface is provided by Spring Batch in the form of the
-      <classname>SimpleJob</classname> class which creates some standard
-      functionality on top of <classname>Job</classname>, namely a standard
-      execution logic that all jobs should utilize. In general, all jobs
-      should be defined using a bean of type
-      <classname>SimpleJob</classname>:</para>
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="images/composite-transformer.png"
+                     scale="" width="70%" />
+        </imageobject>
 
-      <programlisting>  &lt;bean id="footballJob"
+        <imageobject role="fo">
+          <imagedata align="center"
+                     fileref="src/site/docbook/reference/images/composite-transformer.png"
+                     width="70%" />
+        </imageobject>
+      </mediaobject>
+
+      <para>This approach works, however, it requires an extra layer between
+      either the reader or the writer and the <classname>Step</classname>.
+      Furthermore, the <classname>ItemWriter</classname> would need to be
+      registered separately as an <classname>ItemStream</classname> with the
+      <classname>Step</classname>. For this reason, the ItemTransfomer was
+      renamed to ItemProcessor and moved up to the same level as ItemReader
+      and ItemWriter:</para>
+
+      <mediaobject>
+        <imageobject role="html">
+          <imagedata align="center" fileref="images/step.png" scale=""
+                     width="50%" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center" contentwidth="480"
+                     fileref="src/site/docbook/reference/images/step.png"
+                     scale="" width="50%" />
+        </imageobject>
+      </mediaobject>
+    </section>
+  </section>
+
+  <section>
+    <title>Configuration enhancements</title>
+
+    <para>Until 2.0, the only option for configuring batch jobs has been
+    normal spring bean configuration. However, in 2.0 there is a new namespace
+    for configuration. For example, in 1.1, configuring a job looked like the
+    following:</para>
+
+    <programlisting>  
+  &lt;bean id="footballJob"
         class="org.springframework.batch.core.job.SimpleJob"&gt;
     &lt;property name="steps"&gt;
       &lt;list&gt;
@@ -189,915 +290,106 @@
         &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
       &lt;/list&gt;
     &lt;/property&gt;
-    &lt;property name="restartable" value="true" /&gt;
-  &lt;/bean&gt;</programlisting>
-    </section>
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+  &lt;/bean&gt;
 
-    <section>
-      <title id="s.2.1.2">JobInstance</title>
+</programlisting>
 
-      <para>A <classname>JobInstance</classname> refers to the concept of a
-      logical job run. Let's consider a batch job that should be run once at
-      the end of the day, such as the 'EndOfDay' job from the diagram above.
-      There is one 'EndOfDay' <classname>Job</classname>, but each individual
-      run of the <classname>Job</classname> must be tracked separately. In the
-      case of this job, there will be one logical
-      <classname>JobInstance</classname> per day. For example, there will be a
-      January 1st run, and a January 2nd run. If the January 1st run fails the
-      first time and is run again the next day, it's still the January 1st
-      run. (Usually this corresponds with the data its processing as well,
-      meaning the January 1st run processes data for January 1st, etc) That is
-      to say, each <classname>JobInstance</classname> can have multiple
-      executions. (<classname>JobExecution</classname> is discussed in more
-      detail below) and only one <classname>JobInstance</classname>
-      corresponding to a particular <classname>Job</classname> can be running
-      at a given time. The definition of a <classname>JobInstance</classname>
-      has absolutely no bearing on the data the will be loaded. It is entirely
-      up to the <classname>ItemReader</classname> implementation used to
-      determine how data will be loaded. For example, in the EndOfDay
-      scenario, there may be a column on the data that indicates the
-      'effective date' or 'schedule date' to which the data belongs. So, the
-      January 1st run would only load data from the 1st, and the January 2nd
-      run would only use data from the 2nd. Because this determination will
-      likely be a business decision, it is left up to the
-      <classname>ItemReader</classname> to decide. What using the same
-      <classname>JobInstance</classname> will determine, however, is whether
-      or not the 'state' (i.e. the ExecutionContext, which is discussed below)
-      from previous executions will be used. Using a new
-      <classname>JobInstance</classname> will mean 'start from the beginning'
-      and using an existing instance will generally mean 'start from where you
-      left off'.</para>
-    </section>
+    <para>In 2.0, the equivalent would be:</para>
 
-    <section>
-      <title id="s.2.1.3">JobParameters</title>
+    <programlisting>  
+  &lt;job id="footballJob"&gt;
+    &lt;step name="playerload" next="gameLoad"/&gt;
+    &lt;step name="gameLoad" next="playerSummarization"/&gt;
+    &lt;step name="playerSummarization"/&gt;
+  &lt;/job&gt;
 
-      <para>Having discussed <classname>JobInstance</classname> and how it
-      differs from <classname>Job</classname>, the natural question to ask is:
-      "how is one <classname>JobInstance</classname> distinguished from
-      another?" The answer is: <classname>JobParameters</classname>.
-      <classname>JobParameters</classname> are any set of parameters used to
-      start a batch job, which can be used for identification or even as
-      reference data during the run. In the example above, where there are two
-      instances, one for January 1st, and another for January 2nd, there is
-      really only one Job, one that was started with a job parameter of
-      01-01-2008 and another that was started with a parameter of 01-02-2008.
-      Thus, the contract can be defined as: <classname>JobInstance</classname>
-      = <classname>Job</classname> + <classname>JobParameters</classname>.
-      This allows a developer to effectively control how you a
-      <classname>JobInstance</classname> is defined, since they control what
-      parameters are passed in.</para>
-    </section>
+</programlisting>
 
-    <section>
-      <title id="jobExecution">JobExecution</title>
-
-      <para>A <classname>JobExecution</classname> refers to the technical
-      concept of a single attempt to run a <classname>Job</classname>. An
-      execution may end in failure or success, but the
-      <classname>JobInstance</classname> corresponding to a given execution
-      will not be considered complete unless the execution completes
-      successfully. Using the EndOfDay <classname>Job</classname> described
-      above as an example, consider a JobInstance for 01-01-2008 that failed
-      the first time it was run. If it is ran again, with the same job
-      parameters as the first run (01-01-2008), a new JobExecution will be
-      created. However, there will still be only one
-      <classname>JobInstance</classname>.</para>
-
-      <para>A <classname>Job</classname> defines what a job is and how it is
-      to be executed, and <classname>JobInstance</classname> is a purely
-      organizational object to group executions together, primarily to enable
-      correct restart semantics. A <classname>JobExecution</classname>,
-      however, is the primary storage mechanism for what actually happened
-      during a run, and as such contains many more properties that must be
-      controlled and persisted:</para>
-
-      <table>
-        <title>JobExecution properties</title>
-
-        <tgroup cols="2">
-          <tbody>
-            <row>
-              <entry>status</entry>
-
-              <entry>A <classname>BatchStatus</classname> object that
-              indicates the status of the execution. While it's running, it's
-              BatchStatus.STARTED, if it fails it's BatchStatus.FAILED, and if
-              it finishes successfully it's BatchStatus.COMPLETED</entry>
-            </row>
-
-            <row>
-              <entry>startTime</entry>
-
-              <entry>A <classname>java.util.Date</classname> representing the
-              current system time when the execution was started.</entry>
-            </row>
-
-            <row>
-              <entry>endTime</entry>
-
-              <entry>A <classname>java.util.Date</classname> representing the
-              current system time when the execution finished, regardless of
-              whether or not it was successful.</entry>
-            </row>
-
-            <row>
-              <entry>exitStatus</entry>
-
-              <entry>The <classname>ExitStatus</classname> indicating the
-              result of the run. It is most important because it contains an
-              exit code that will be returned to the caller. See chapter 5 for
-              more details.</entry>
-            </row>
-
-            <row>
-              <entry>createTime</entry>
-
-              <entry>A <classname>java.util.Date</classname> representing the
-              current system time when the JobExecution was first persisted.
-              The job may not have been started yet (and thus has no start
-              time), but it will always have a createTime, which is required
-              by the framework for managing job level
-              ExecutionContexts.</entry>
-            </row>
-
-            <row>
-              <entry>lastUpdated</entry>
-
-              <entry>A <classname>java.util.Date</classname> representing the
-              last time a JobExecution was persisted.</entry>
-            </row>
-
-            <row>
-              <entry>executionContext</entry>
-
-              <entry>The 'property bag' containing any user data that needs to
-              be persisted between executions.</entry>
-            </row>
-
-            <row>
-              <entry>failureExceptions</entry>
-
-              <entry>The list of exceptions encountered during the execution
-              of a <classname>Job</classname>. These can be useful if more
-              than one exception is encountered during the failure of a
-              <classname>Job</classname>.</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-
-      <para>These properties are important because they will be persisted and
-      can be used to completely determine the status of an execution. For
-      example, if the EndOfDay job for 01-01 is executed at 9:00 PM, and fails
-      at 9:30, the following entries will be made in the batch meta data
-      tables:</para>
-
-      <table>
-        <title>BATCH_JOB_INSTANCE</title>
-
-        <tgroup cols="2">
-          <tbody>
-            <row>
-              <entry>JOB_INSTANCE_ID</entry>
-
-              <entry>JOB_NAME</entry>
-            </row>
-
-            <row>
-              <entry>1</entry>
-
-              <entry>EndOfDayJob</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-
-      <table>
-        <title>BATCH_JOB_PARAMS</title>
-
-        <tgroup cols="4">
-          <tbody>
-            <row>
-              <entry>JOB_INSTANCE_ID</entry>
-
-              <entry>TYPE_CD</entry>
-
-              <entry>KEY_NAME</entry>
-
-              <entry>DATE_VAL</entry>
-            </row>
-
-            <row>
-              <entry>1</entry>
-
-              <entry>DATE</entry>
-
-              <entry>schedule.Date</entry>
-
-              <entry>2008-01-01 00:00:00</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-
-      <table>
-        <title>BATCH_JOB_EXECUTION</title>
-
-        <tgroup cols="5">
-          <tbody>
-            <row>
-              <entry>JOB_EXECUTION_ID</entry>
-
-              <entry>JOB_INSTANCE_ID</entry>
-
-              <entry>START_TIME</entry>
-
-              <entry>END_TIME</entry>
-
-              <entry>STATUS</entry>
-            </row>
-
-            <row>
-              <entry>1</entry>
-
-              <entry>1</entry>
-
-              <entry>2008-01-01 21:00:23.571</entry>
-
-              <entry>2008-01-01 21:30:17.132</entry>
-
-              <entry>FAILED</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-
-      <note>
-        <para>extra columns in the tables have been removed for added
-        clarity.</para>
-      </note>
-
-      <para>Now that the job has failed, let's assume that it took the entire
-      course of the night for the problem to be determined, so that the 'batch
-      window' is now closed. Assuming the window starts at 9:00 PM, the job
-      will be kicked off again for 01-01, starting where it left off and
-      completing successfully at 9:30. Because it's now the next day, the
-      01-02 job must be run as well, which is kicked off just afterwards at
-      9:31, and completes in it's normal one hour time at 10:30. There is no
-      requirement that one <classname>JobInstance</classname> be kicked off
-      after another, unless there is potential for the two jobs to attempt to
-      access the same data, causing issues with locking at the database level.
-      It is entirely up to the scheduler to determine when a
-      <classname>Job</classname> should be run. Since they're separate
-      JobInstances, Spring Batch will make no attempt to stop them from being
-      run concurrently. (Attempting to run the same
-      <classname>JobInstance</classname> while another is already running will
-      result in a <classname>JobExecutionAlreadyRunningException</classname>
-      being thrown) There should now be an extra entry in both the
-      <classname>JobInstance</classname> and
-      <classname>JobParameters</classname> tables, and two extra entries in
-      the <classname>JobExecution</classname> table:</para>
-
-      <table>
-        <title>BATCH_JOB_INSTANCE</title>
-
-        <tgroup cols="2">
-          <tbody>
-            <row>
-              <entry>JOB_INSTANCE_ID</entry>
-
-              <entry>JOB_NAME</entry>
-            </row>
-
-            <row>
-              <entry>1</entry>
-
-              <entry>EndOfDayJob</entry>
-            </row>
-
-            <row>
-              <entry>2</entry>
-
-              <entry>EndOfDayJob</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-
-      <table>
-        <title>BATCH_JOB_PARAMS</title>
-
-        <tgroup cols="4">
-          <tbody>
-            <row>
-              <entry>JOB_INSTANCE_ID</entry>
-
-              <entry>TYPE_CD</entry>
-
-              <entry>KEY_NAME</entry>
-
-              <entry>DATE_VAL</entry>
-            </row>
-
-            <row>
-              <entry>1</entry>
-
-              <entry>DATE</entry>
-
-              <entry>schedule.Date</entry>
-
-              <entry>2008-01-01 00:00:00</entry>
-            </row>
-
-            <row>
-              <entry>2</entry>
-
-              <entry>DATE</entry>
-
-              <entry>schedule.Date</entry>
-
-              <entry>2008-01-02 00:00:00</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-
-      <table>
-        <title>BATCH_JOB_EXECUTION</title>
-
-        <tgroup cols="5">
-          <tbody>
-            <row>
-              <entry>JOB_EXECUTION_ID</entry>
-
-              <entry>JOB_INSTANCE_ID</entry>
-
-              <entry>START_TIME</entry>
-
-              <entry>END_TIME</entry>
-
-              <entry>STATUS</entry>
-            </row>
-
-            <row>
-              <entry>1</entry>
-
-              <entry>1</entry>
-
-              <entry>2008-01-01 21:00</entry>
-
-              <entry>2008-01-01 21:30</entry>
-
-              <entry>FAILED</entry>
-            </row>
-
-            <row>
-              <entry>2</entry>
-
-              <entry>1</entry>
-
-              <entry>2008-01-02 21:00</entry>
-
-              <entry>2008-01-02 21:30</entry>
-
-              <entry>COMPLETED</entry>
-            </row>
-
-            <row>
-              <entry>3</entry>
-
-              <entry>2</entry>
-
-              <entry>2008-01-02 21:31</entry>
-
-              <entry>2008-01-02 22:29</entry>
-
-              <entry>COMPLETED</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-    </section>
+    <para>More information on how to configure Jobs and Steps with the new
+    namespace can be found in <xref linkend="configureJob" />, and <xref
+    linkend="configureStep" />.</para>
   </section>
 
   <section>
-    <title id="s.2.1">Step Stereotypes</title>
+    <title>Meta Data access improvements</title>
 
-    <para>A <classname>Step</classname> is a domain object that encapsulates
-    an independent, sequential phase of a batch job. Therefore, every
-    <classname>Job</classname> is composed entirely of one or more steps. A
-    <classname>Step</classname> should be thought of as a unique processing
-    stream that will be executed in sequence. For example, if you have one
-    step that loads a file into a database, another that reads from the
-    database, validates the data, preforms processing, and then writes to
-    another table, and another that reads from that table and writes out to a
-    file. Each of these steps will be performed completely before moving on to
-    the next step. The file will be completely read into the database before
-    step 2 can begin. As with <classname>Job</classname>, a
-    <classname>Step</classname> has an individual
-    <classname>StepExecution</classname> that corresponds with a unique
-    <classname>JobExecution</classname>:</para>
+    <para>The <classname>JobRepository</classname> interface represents basic
+    CRUD operations with <classname>Job</classname> meta-data. However, it can
+    be useful to query the meta-data. For that reason, the
+    <classname>JobExplorer</classname> and <classname>JobOperator</classname>
+    interfaces have been created:</para>
 
     <mediaobject>
       <imageobject role="html">
-        <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png" />
+        <imagedata align="center" fileref="images/job-repository-advanced.png"
+                   scale="" width="65%" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/jobHeirarchyWithSteps.png" />
+                   fileref="src/site/docbook/reference/images/job-repository-advanced.png"
+                   scale="80" width="65%" />
       </imageobject>
     </mediaobject>
 
-    <section>
-      <title id="step">Step</title>
-
-      <para>A <classname>Step</classname> contains all of the information
-      necessary to define and control the actual batch processing. This is a
-      necessarily vague description because the contents of any given
-      <classname>Step</classname> are at the discretion of the developer
-      writing a <classname>Job</classname>. A Step can be as simple or complex
-      as the developer desires. A simple <classname>Step</classname> might
-      load data from a file into the database, requiring little or no code.
-      (depending upon the implementations used) A more complex
-      <classname>Step</classname> may have complicated business rules that are
-      applied as part of the processing.</para>
-
-      <para>Steps are defined by instantiating implementations of the
-      <classname>Step</classname> interface. Two step implementation classes
-      are available in the Spring Batch framework, and they are each discussed
-      in detail in Chatper 4 of this guide. For most situations, the
-      <classname>StepHandlerStep</classname> implementation is sufficient, but
-      for situations where only one call is needed, such as a stored procedure
-      call or a wrapper around existing script, a
-      <classname>TaskletStep</classname> may be a better option.</para>
-    </section>
-
-    <section>
-      <title id="stepExecution">StepExecution</title>
-
-      <para>A <classname>StepExecution</classname> represents a single attempt
-      to execute a <classname>Step</classname>. A new
-      <classname>StepExecution</classname> will be created each time a Step is
-      run, similar to <classname>JobExecution</classname>. However, if a step
-      fails to execute because the step before it fails, there will be no
-      execution persisted for it. A <classname>StepExecution</classname> will
-      only be created when it's <classname>Step</classname> is actually
-      started.</para>
-
-      <para>Step executions are represented by objects of the
-      <classname>StepExecution</classname> class. Each execution contains a
-      reference to its corresponding step and
-      <classname>JobExecution</classname>, and transaction related data such
-      as commit and rollback count and start and end times. Additionally, each
-      step execution will contain an <classname>ExecutionContext</classname>,
-      which contains any data a developer needs persisted across batch runs,
-      such as statistics or state information needed to restart. The following
-      is a listing of the properties for
-      <classname>StepExecution</classname>:</para>
-
-      <table>
-        <title>StepExecution properties</title>
-
-        <tgroup cols="2">
-          <tbody>
-            <row>
-              <entry>status</entry>
-
-              <entry>A <classname>BatchStatus</classname> object that
-              indicates the status of the execution. While it's running, the
-              status is BatchStatus.STARTED, if it fails the status is
-              BatchStatus.FAILED, and if it finishes successfully the status
-              is BatchStatus.COMPLETED</entry>
-            </row>
-
-            <row>
-              <entry>startTime</entry>
-
-              <entry>A <classname>java.util.Date</classname> representing the
-              current system time when the execution was started.</entry>
-            </row>
-
-            <row>
-              <entry>endTime</entry>
-
-              <entry>A <classname>java.util.Date</classname> representing the
-              current system time when the execution finished, regardless of
-              whether or not it was successful.</entry>
-            </row>
-
-            <row>
-              <entry>exitStatus</entry>
-
-              <entry>The <classname>ExitStatus</classname> indicating the
-              result of the execution. It is most important because it
-              contains an exit code that will be returned to the caller. See
-              chapter 5 for more details.</entry>
-            </row>
-
-            <row>
-              <entry>executionContext</entry>
-
-              <entry>The 'property bag' containing any user data that needs to
-              be persisted between executions.</entry>
-            </row>
-
-            <row>
-              <entry>readCount</entry>
-
-              <entry>The number of items that have been successfully
-              read</entry>
-            </row>
-
-            <row>
-              <entry>writeCount</entry>
-
-              <entry>The number of items that have been successfully
-              written</entry>
-            </row>
-
-            <row>
-              <entry>commitCount</entry>
-
-              <entry>The number transactions that have been committed for this
-              execution</entry>
-            </row>
-
-            <row>
-              <entry>rollbackCount</entry>
-
-              <entry>The number of times the business transaction controlled
-              by the <classname>Step</classname> has been rolled back.</entry>
-            </row>
-
-            <row>
-              <entry>readSkipCount</entry>
-
-              <entry>The number of times <methodname>read</methodname> has
-              failed, resulting in a skipped item.</entry>
-            </row>
-
-            <row>
-              <entry>processSkipCount</entry>
-
-              <entry>The number of times process has failed, resulting in a
-              skipped item.</entry>
-            </row>
-
-            <row>
-              <entry>filterCount</entry>
-
-              <entry>The number of items that have been 'filtered' by the
-              ItemProcessor</entry>
-            </row>
-
-            <row>
-              <entry>writeSkipCount</entry>
-
-              <entry>The number of times <methodname>write</methodname> has
-              failed, resulting in a skipped item.</entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </table>
-    </section>
-
-    <section>
-      <title>ExecutionContext</title>
-
-      <para>An <classname>ExecutionContext</classname> represents a collection
-      of key/value pairs that are persisted and controlled by the framework in
-      order to allow developers a place to store persistent state that is
-      scoped to a <classname>StepExecution</classname> or
-      <classname>JobExecution</classname>. For those familiar with Quartz, it
-      is very similar to <classname>JobDataMap</classname>. The best usage
-      example is restart. Using flat file input as an example, while
-      processing individual lines, the framework periodically persists the
-      <classname>ExecutionContext</classname> at commit points. This allows
-      the <classname>ItemReader</classname> to store its state in case a fatal
-      error occurs during the run, or even if the power goes out. All that is
-      needed is to put the current number of lines read into the context, and
-      the framework will do the rest:</para>
-
-      <programlisting>executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());</programlisting>
-
-      <para>Using the EndOfDay example from the Job Stereotypes section as an
-      example, assume there's one step: 'loadData', that loads a file into the
-      database. After the first failed run, the meta data tables would look
-      like the following:</para>
-
-      <para><table>
-          <title>BATCH_JOB_INSTANCE</title>
-
-          <tgroup cols="2">
-            <tbody>
-              <row>
-                <entry>JOB_INSTANCE_ID</entry>
-
-                <entry>JOB_NAME</entry>
-              </row>
-
-              <row>
-                <entry>1</entry>
-
-                <entry>EndOfDayJob</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table><table>
-          <title>BATCH_JOB_PARAMS</title>
-
-          <tgroup cols="4">
-            <tbody>
-              <row>
-                <entry>JOB_INSTANCE_ID</entry>
-
-                <entry>TYPE_CD</entry>
-
-                <entry>KEY_NAME</entry>
-
-                <entry>DATE_VAL</entry>
-              </row>
-
-              <row>
-                <entry>1</entry>
-
-                <entry>DATE</entry>
-
-                <entry>schedule.Date</entry>
-
-                <entry>2008-01-01 00:00:00</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table><table>
-          <title>BATCH_JOB_EXECUTION</title>
-
-          <tgroup cols="5">
-            <tbody>
-              <row>
-                <entry>JOB_EXECUTION_ID</entry>
-
-                <entry>JOB_INSTANCE_ID</entry>
-
-                <entry>START_TIME</entry>
-
-                <entry>END_TIME</entry>
-
-                <entry>STATUS</entry>
-              </row>
-
-              <row>
-                <entry>1</entry>
-
-                <entry>1</entry>
-
-                <entry>2008-01-01 21:00:23.571</entry>
-
-                <entry>2008-01-01 21:30:17.132</entry>
-
-                <entry>FAILED</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table><table>
-          <title>BATCH_STEP_EXECUTION</title>
-
-          <tgroup cols="6">
-            <tbody>
-              <row>
-                <entry>STEP_EXECUTION_ID</entry>
-
-                <entry>JOB_EXECUTION_ID</entry>
-
-                <entry>STEP_NAME</entry>
-
-                <entry>START_TIME</entry>
-
-                <entry>END_TIME</entry>
-
-                <entry>STATUS</entry>
-              </row>
-
-              <row>
-                <entry>1</entry>
-
-                <entry>1</entry>
-
-                <entry>loadDate</entry>
-
-                <entry>2008-01-01 21:00:23.571</entry>
-
-                <entry>2008-01-01 21:30:17.132</entry>
-
-                <entry>FAILED</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table><table>
-          <title>BATCH_EXECUTION_CONTEXT</title>
-
-          <tgroup cols="4">
-            <tbody>
-              <row>
-                <entry>EXECUTION_ID</entry>
-
-                <entry>TYPE_CD</entry>
-
-                <entry>KEY_NAME</entry>
-
-                <entry>LONG_VAL</entry>
-              </row>
-
-              <row>
-                <entry>1</entry>
-
-                <entry>LONG</entry>
-
-                <entry>piece.count</entry>
-
-                <entry>40321</entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </table>In this case, the <classname>Step</classname> ran for 30
-      minutes and processed 40,321 'pieces', which would represent lines in a
-      file in this scenario. This value will be updated just before each
-      commit by the framework, and can contain multiple rows corresponding to
-      entries within the <classname>ExecutionContext</classname>. Being
-      notified before a commit requires one of the various StepListeners, or
-      an <classname>ItemStream</classname>, which are discussed in more detail
-      later in this guide. As with the previous example, it is assumed that
-      the Job is restarted the next day. When it is restarted, the values from
-      the <classname>ExecutionContext</classname> of the last run are
-      reconstituted from the database, and when the
-      <classname>ItemReader</classname> is opened, it can check to see if it
-      has any stored state in the context, and initialize itself from
-      there:</para>
-
-      <programlisting>  if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
-    log.debug("Initializing for restart. Restart data is: " + executionContext);
-
-    long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
-
-    LineReader reader = getReader();
-
-    Object record = "";
-    while (reader.getPosition() &lt; lineCount &amp;&amp; record != null) {
-       record = readLine();
-    }
-  }</programlisting>
-
-      <para>In this case, after the above code is executed, the current line
-      will be 40,322, allowing the <classname>Step</classname> to start again
-      from where it left off. The <classname>ExecutionContext</classname> can
-      also be used for statistics that need to be persisted about the run
-      itself. For example, if a flat file contains orders for processing that
-      exist across multiple lines, it may be necessary to store how many
-      orders have been processed (which is much different from than the number
-      of lines read) so that an email can be sent at the end of the
-      <classname>Step</classname> with the total orders processed in the body.
-      The framework handles storing this for the developer, in order to
-      correctly scope it with an individual
-      <classname>JobInstance</classname>. It can be very difficult to know
-      whether an existing <classname>ExecutionContext</classname> should be
-      used or not. For example, using the 'EndOfDay' example from above, when
-      the 01-01 run starts again for the second time, the framework recognizes
-      that it is the same <classname>JobInstance</classname> and on an
-      individual <classname>Step</classname> basis, pulls the
-      <classname>ExecutionContext</classname> out of the database and hands it
-      as part of the <classname>StepExecution</classname> to the
-      <classname>Step</classname> itself. Conversely, for the 01-02 run the
-      framework recognizes that it is a different instance, so an empty
-      context must be handed to the <classname>Step</classname>. There are
-      many of these types of determinations that the framework makes for the
-      developer to ensure the state is given to them at the correct time. It
-      is also important to note that exactly one
-      <classname>ExecutionContext</classname> exists per
-      <classname>StepExecution</classname> at any given time. Clients of the
-      <classname>ExecutionContext</classname> should be careful because this
-      creates a shared keyspace, so care should be taken when putting values
-      in to ensure no data is overwritten, however, the
-      <classname>Step</classname> stores absolutely no data in the context, so
-      there is no way to adversely affect the framework.</para>
-    </section>
+    <para>More information on the new meta data features can be found in <xref
+    linkend="advancedMetaData" />. It is also worth noting that Jobs can now
+    be stopped via the database, removing the requirement to maintain a handle
+    to the <classname>JobExecution</classname> on the JVM the job was launched
+    in.</para>
   </section>
 
   <section>
-    <title>JobRepository</title>
+    <title>Non Sequential Step Execution</title>
 
-    <para><classname>JobRepository</classname> is the persistence mechanism
-    for all of the Stereotypes mentioned above. When a job is first launched,
-    a <classname>JobExecution</classname> is obtained by calling the
-    repository's <methodname>createJobExecution</methodname> method, and
-    during the course of execution, <classname>StepExecution</classname> and
-    <classname>JobExecution</classname> are persisted by passing them to the
-    repository:</para>
+    <para>2.0 has also seen improvements in how steps can be configured.
+    Rather than requiring that they solely be sequential:</para>
 
-    <programlisting>  public interface JobRepository {
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/sequential-flow.png"
+                   scale="" width="40%" />
+      </imageobject>
 
-    public JobExecution createJobExecution(Job job, JobParameters jobParameters)
-         throws JobExecutionAlreadyRunningException, JobRestartException;
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/sequential-flow.png"
+                   width="40%" />
+      </imageobject>
+    </mediaobject>
 
-    void add(StepExecution stepExecution);
+    <para>They may now be conditional:</para>
 
-    void update(JobExecution jobExecution);
+    <mediaobject>
+      <imageobject role="html">
+        <imagedata align="center" fileref="images/conditional-flow.png"
+                   scale="" width="40%" />
+      </imageobject>
 
-    void update(StepExecution stepExecution);
+      <imageobject role="fo">
+        <imagedata align="center"
+                   fileref="src/site/docbook/reference/images/conditional-flow.png"
+                   width="40%" />
+      </imageobject>
+    </mediaobject>
 
-    void updateExecutionContext(StepExecution stepExecution);
+    <para>This new 'conditional flow' support is made easy to configure via
+    the new namespace:</para>
 
-    StepExecution getLastStepExecution(JobInstance jobInstance, Step step);
+    <programlisting>
+  &lt;job id="job"&gt;
+    &lt;step name="stepA"&gt;
+      &lt;next on="FAILED" to="stepB" /&gt;
+      &lt;next on="*" to="stepC" /&gt;
+    &lt;/step&gt;
+    &lt;step name="stepB" next="stepC" /&gt;
+    &lt;step name="stepC" /&gt;
+  &lt;/job&gt;
 
-    int getStepExecutionCount(JobInstance jobInstance, Step step);
-
-}
-</programlisting>
-  </section>
-
-  <section>
-    <title>JobLauncher</title>
-
-    <para><classname>JobLauncher </classname>represents a simple interface for
-    launching a <classname>Job</classname> with a given set of
-    <classname>JobParameters</classname>:</para>
-
-    <programlisting>  public interface JobLauncher {
-
-    public JobExecution run(Job job, JobParameters jobParameters) throws JobExecutionAlreadyRunningException,
-        JobRestartException;
-}
 </programlisting>
 
-    <para>It is expected that implementations will obtain a valid
-    <classname>JobExecution</classname> from the
-    <classname>JobRepository</classname> and execute the
-    <classname>Job</classname>.</para>
-  </section>
-
-  <section>
-    <title>JobLocator</title>
-
-    <para><classname>JobLocator</classname> represents an interface for
-    locating a <classname>Job</classname>:</para>
-
-    <programlisting>  public interface JobLocator {
-
-    Job getJob(String name) throws NoSuchJobException;
-  }</programlisting>
-
-    <para>This interface is very necessary due to the nature of Spring itself.
-    Because it can't be guaranteed that one
-    <classname>ApplicationContext</classname> equals one
-    <classname>Job</classname>, an abstraction is needed to obtain a
-    <classname>Job</classname> for a given name. It becomes especially useful
-    when launching jobs from within a Java EE application server.</para>
-  </section>
-
-  <section>
-    <title id="s.5.1.1">Item Reader</title>
-
-    <para><classname>ItemReader</classname> is an abstraction that represents
-    the retrieval of input for a <classname>Step</classname>, one item at a
-    time. When the <classname>ItemReader</classname> has exhausted the items
-    it can provide, it will indicate this by returning null. More details
-    about the <classname>ItemReader</classname> interface and its various
-    implementations can be found in Chapter 3.</para>
-  </section>
-
-  <section>
-    <title id="s.5.1.2">Item Writer</title>
-
-    <para><classname>ItemWriter</classname> is an abstraction that represents
-    the output of a <classname>Step</classname>, one item at a time.
-    Generally, an item writer has no knowledge of the input it will receive
-    next, only the item that was passed in its current invocation. More
-    details about the <classname>ItemWriter</classname> interface and it's
-    various implementations can be found in Chapter 3.</para>
-  </section>
-
-  <section>
-    <title>Item Processor</title>
-
-    <para><classname>ItemProcessor</classname> is an abstraction that
-    represents the business processing of an item. While the
-    <classname>ItemReader</classname> reads one item, and the
-    <classname>ItemWriter</classname> writes them, the
-    <classname>ItemProcessor</classname> provides access to transform or apply
-    other business processing. If while processing the item it's determined
-    that it's not valid, returning null indicates that it should not be
-    written out.</para>
-  </section>
-
-  <section>
-    <title id="s.2.1.6">Tasklet</title>
-
-    <para>A <classname>Tasklet</classname> represents the execution of a
-    logical unit of work, as defined by its implementation of the Spring Batch
-    provided <classname>Tasklet</classname> interface. A
-    <classname>Tasklet</classname> is useful for encapsulating processing
-    logic that is not natural to split into read-(transform)-write phases,
-    such as invoking a system command or a stored procedure.</para>
+    <para>More details on how to configure non sequential steps can be found
+    in <xref linkend="controllingStepFlow" /></para>
   </section>
 </chapter>
