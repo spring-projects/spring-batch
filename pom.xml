@@ -840,12 +840,17 @@
 		<developer>
 			<id>robokaso</id>
 			<name>Robert Kasanicky</name>
-			<email>robert.kasanicky@accenture.com</email>
+			<email>robokaso@gmail.com</email>
 		</developer>
 		<developer>
 			<id>trisberg</id>
 			<name>Thomas Risberg</name>
 			<email>thomas.risberg@springsource.com</email>
+		</developer>
+		<developer>
+			<id>dhgarrette</id>
+			<name>Dan Garrette</name>
+			<email>daniel.h.garrette@accenture.com</email>
 		</developer>
 	</developers>
 	<repositories>
