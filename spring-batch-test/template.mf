@@ -1,6 +1,7 @@
-Bundle-SymbolicName: org.springframework.batch.test
+Bundle-SymbolicName: com.springframework.batch.test
 Bundle-Name: Spring Batch Test
 Bundle-Vendor: Spring
+Bundle-Version: ${version}
 Ignored-Existing-Headers: 
  Import-Package,
  Export-Package
@@ -11,6 +12,7 @@ Import-Template:
  javax.persistence.*;version="[1.0.0,2.0.0)";resolution:=optional,
  org.aopalliance.*;version="[1.0.0, 2.0.0)";resolution:=optional,
  org.apache.commons.logging.*;version="[1.1.0, 2.0.0)",
+ org.apache.commons.io.*;version="[1.4.0, 2.0.0)";resolution:=optional,
  org.junit;version="[4.4.0,5.0.0)";resolution:=optional,
  junit.framework;version="[4.4.0,5.0.0)";resolution:=optional,
  org.hibernate.*;version="[3.2.5.ga, 3.3.0.ga)";resolution:=optional,
@@ -20,6 +22,7 @@ Import-Template:
  org.springframework.beans.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.core.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.dao.*;version="[2.5.5, 3.0.0)";resolution:=optional,
+ org.springframework.context.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.jdbc.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.jms.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.orm.*;version="[2.5.5, 3.0.0)";resolution:=optional,

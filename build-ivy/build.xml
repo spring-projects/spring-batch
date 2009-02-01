@@ -8,6 +8,9 @@
 	</path>
 
 	<property file="${basedir}/../build.properties" />
+	<propertyset id="bundlor.properties">
+	  <propertyref builtin="all"/>
+	</propertyset>
 	<import file="${basedir}/../spring-build/multi-bundle/default.xml"/>
 
 </project>

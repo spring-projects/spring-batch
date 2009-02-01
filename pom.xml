@@ -904,6 +904,12 @@
 			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
+			<id>com.springsource.repository.bundles.snapshot</id>
+			<name>SpringSource Enterprise Bundle Repository -
+				SpringSource Bundle Snapshots</name>
+			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+		</pluginRepository>
+		<pluginRepository>
 			<id>spring-external</id>
 			<name>Spring External Repository</name>
 			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
