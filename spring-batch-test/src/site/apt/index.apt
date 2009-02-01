@@ -1,0 +1,22 @@
+Spring Batch Test
+
+* Overview
+
+  This module contains code for facilitating the testing of batch jobs.  The project 
+  includes the following classes:
+  
+*----+----+
+| Class Name | Use |
+*----
+| AbstractJobTests | End-to-end batch job testing as well as testing individual steps |
+*----
+| AssertFile | Checking equality of flat files |
+*----
+| DataSourceInitializer | Wrapper for a DataSource that can run scripts on start up and shut down |
+*----
+| JobRepositoryTestUtils | Create and remove JobExecution instances from a database |
+*----
+| MetaDataInstanceFactory | Create test instances of JobExecution, JobInstance and StepExecution |
+*----
+| StepRunner | Execute steps outside of a Job |
+*----

@@ -1,0 +1,15 @@
+Changelog: Spring Batch Test
+
+* 2.0.0.RC1
+  * BATCH-1049: Add compile scope to spring-test in spring-batch-test
+  * BATCH-1048: Add site docos for the Test project
+
+* 2.0.0.M4
+
+  * BATCH-1045: Move DataSourceInitializer to the test project's "main" folder
+  * BATCH-1032: Modify AbstractJobTests in test project to be able to launch FlowJob steps individually
+  
+* 2.0.0.M3
+
+  * BATCH-933: AssertFile class for checking equality of files in unit tests
+  * BATCH-903: Create test project
