@@ -50,7 +50,7 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6.A</spring.framework.version>
-		<bundlor.version>1.0.0.M1</bundlor.version>
+		<bundlor.version>1.0.0.BUILD-SNAPSHOT</bundlor.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -58,15 +58,6 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
-		</profile>
-		<profile>
-			<id>all</id>
-	<modules>
-		<module>spring-batch-infrastructure-tests</module>
-		<module>spring-batch-integration</module>
-		<module>docs</module>
-		<module>build-central</module>
-	</modules>
 		</profile>
 		<profile>
 			<id>deployment</id>
@@ -90,12 +81,12 @@
 		<profile>
 			<id>all</id>
 			<modules>
-			  <module>spring-batch-samples</module>
-			  <module>archetypes</module>
-			  <module>spring-batch-infrastructure-tests</module>
-			  <module>spring-batch-integration</module>
-			  <module>docs</module>
-			  <module>build-central</module>
+				<module>spring-batch-samples</module>
+				<module>archetypes</module>
+				<module>spring-batch-infrastructure-tests</module>
+				<module>spring-batch-integration</module>
+				<module>docs</module>
+				<module>build-central</module>
 			</modules>
 		</profile>
 		<profile>
@@ -113,14 +104,14 @@
 					<id>staging</id>
 					<url>file:///${user.dir}/target/staging</url>
 				</site>
-		<repository>
-			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
-		</repository>
-		<snapshotRepository>
-			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
-		</snapshotRepository>
+				<repository>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</repository>
+				<snapshotRepository>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</snapshotRepository>
 			</distributionManagement>
 		</profile>
 		<profile>
@@ -161,7 +152,8 @@
 				<pluginManagement>
 					<plugins>
 						<!--
-							This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken
+							This seems to work better than the default (2008/03/19) because
+							links on sub-module sites are not broken
 						-->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
@@ -250,7 +242,8 @@
 												<![CDATA[</summary>]]>
 											</footer>
 										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">
+										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html"
+											style="src/main/xsl/emma2html.xsl">
 											<param name="project" expression="${project.name}" />
 											<param name="version" expression="${project.version}" />
 										</xslt>
@@ -339,7 +332,8 @@
 									</junitreport>
 									<echo>Creating Emma reports</echo>
 									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">
+									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
+										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
 										<mapper type="glob" from="*.xml" to="*.fragment" />
 										<param name="project" expression="${project.name}" />
 									</xslt>
