@@ -143,8 +143,7 @@ public class FlowJobTests {
 		fail = false;
 		job.execute(jobExecution);
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
-		// TODO: fix this (BATCH-1030)
-		// assertEquals(1, jobExecution.getStepExecutions().size());
+		assertEquals(1, jobExecution.getStepExecutions().size());
 	}
 
 	@Test

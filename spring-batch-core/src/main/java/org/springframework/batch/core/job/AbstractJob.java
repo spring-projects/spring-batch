@@ -340,6 +340,17 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	}
 
 	/**
+	 * Convenience method for subclasses so they can change the state of a
+	 * {@link StepExecution} if necessary. Use with care (and not at all
+	 * preferably) and only before or after a step is executed.
+	 * 
+	 * @param stepExecution
+	 */
+	protected void updateStepExecution(StepExecution stepExecution) {
+		jobRepository.update(stepExecution);
+	}
+
+	/**
 	 * Given a step and configuration, return true if the step should start,
 	 * false if it should not, and throw an exception if the job should finish.
 	 * @param lastStepExecution the last step execution
@@ -368,7 +379,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 
-		if (stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) {
+		if (stepStatus.isLessThanOrEqualTo(BatchStatus.COMPLETED) && step.isAllowStartIfComplete() == false) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
 			return false;

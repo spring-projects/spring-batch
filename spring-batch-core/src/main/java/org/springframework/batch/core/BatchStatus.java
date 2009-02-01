@@ -32,9 +32,11 @@ public enum BatchStatus {
 	 * execution are COMPLETED will the aggregate status be COMPLETED. A running
 	 * execution is expected to move from STARTING to STARTED to COMPLETED
 	 * (through the order defined by {@link #upgradeTo(BatchStatus)}). Higher
-	 * values than STARTED signify more serious failure.
+	 * values than STARTED signify more serious failure. INCOMPLETE is used for
+	 * steps that have finished processing, but were not successful, and where
+	 * they should be skipped on a restart (so FAILED is the wrong status).
 	 */
-	COMPLETED, STARTING, STARTED, FAILED, STOPPING, STOPPED, UNKNOWN;
+	INCOMPLETE, COMPLETED, STARTING, STARTED, FAILED, STOPPING, STOPPED, UNKNOWN;
 
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
 		if (status1.isLessThan(status2)) {
@@ -57,12 +59,13 @@ public enum BatchStatus {
 	}
 
 	/**
-	 * Convenience method to decide if a status indicates execution was unsuccessful.
+	 * Convenience method to decide if a status indicates execution was
+	 * unsuccessful.
 	 * 
 	 * @return true if the status is FAILED or greater
 	 */
 	public boolean isUnsuccessful() {
-		return this==FAILED || this.isGreaterThan(FAILED);
+		return this == FAILED || this.isGreaterThan(FAILED);
 	}
 
 	/**
@@ -102,6 +105,14 @@ public enum BatchStatus {
 	 */
 	public boolean isLessThan(BatchStatus other) {
 		return this.compareTo(other) < 0;
+	}
+
+	/**
+	 * @param other a status value to compare
+	 * @return true if this is less than other
+	 */
+	public boolean isLessThanOrEqualTo(BatchStatus other) {
+		return this.compareTo(other) <= 0;
 	}
 
 }

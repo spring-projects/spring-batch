@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job.flow;
 
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
@@ -142,6 +143,11 @@ public class FlowJob extends AbstractJob {
 		}
 
 		public String executeStep(Step step) throws JobInterruptedException, JobRestartException, StartLimitExceededException {
+			StepExecution lastStepExecution = stepExecutionHolder.get();
+			if (lastStepExecution!=null && lastStepExecution.getStatus()==BatchStatus.FAILED) {
+				lastStepExecution.setStatus(BatchStatus.INCOMPLETE);
+				updateStepExecution(lastStepExecution);
+			}
 			StepExecution stepExecution = handleStep(step, execution);
 			stepExecutionHolder.set(stepExecution);
 			return stepExecution==null ? FlowExecution.COMPLETED : stepExecution.getExitStatus().getExitCode();
