@@ -464,8 +464,8 @@
         top of a transactional resource, such as a JMS queue. In this case,
         since the queue is tied to the transaction that is rolled back, the
         messages that have been pulled from the queue will be put back on. For
-        this reason, the step can be configured to not buffer the items:
-        </para>
+        this reason, the step can be configured to not buffer the
+        items:</para>
 
         <programlisting>
   &lt;step name="step1"&gt;
@@ -950,27 +950,6 @@
         &lt;constructor-arg value="target/test-outputs/test-dir" /&gt;
       &lt;/bean&gt;
     &lt;/property&gt;
-  &lt;/bean&gt;
-
-</programlisting>
-    </section>
-
-    <section>
-      <title>Executing System Commands</title>
-
-      <para>Many batch jobs may require that an external command be called
-      from within the batch job. Such a process could be kicked off separately
-      by the scheduler, but the advantage of common meta-data about the run
-      would be lost. Furthermore, a multi-step job would also need to be split
-      up into multiple jobs as well. Because the need is so common, Spring
-      Batch provides a <classname>Tasklet</classname> implementation for
-      calling system commands:</para>
-
-      <programlisting>
-  &lt;bean class="org.springframework.batch.sample.tasklet.SystemCommandTasklet"&gt;
-    &lt;property name="command" value="echo hello" /&gt;
-    &lt;!-- 5 second timeout for the command to complete --&gt;
-    &lt;property name="timeout" value="5000" /&gt;
   &lt;/bean&gt;
 
 </programlisting>

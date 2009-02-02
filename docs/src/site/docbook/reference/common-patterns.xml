@@ -392,4 +392,24 @@
     return null;
   }</programlisting>
   </section>
+
+  <section>
+    <title>Executing System Commands</title>
+
+    <para>Many batch jobs may require that an external command be called from
+    within the batch job. Such a process could be kicked off separately by the
+    scheduler, but the advantage of common meta-data about the run would be
+    lost. Furthermore, a multi-step job would also need to be split up into
+    multiple jobs as well. </para>
+
+    <para>Because the need is so common, Spring Batch provides a
+    <classname>Tasklet</classname> implementation for calling system
+    commands:</para>
+
+    <programlisting>  &lt;bean class="org.springframework.batch.sample.tasklet.SystemCommandTasklet"&gt;
+    &lt;property name="command" value="echo hello" /&gt;
+    &lt;!-- 5 second timeout for the command to complete --&gt;
+    &lt;property name="timeout" value="5000" /&gt;
+  &lt;/bean&gt;</programlisting>
+  </section>
 </chapter>
