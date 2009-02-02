@@ -931,57 +931,85 @@
 </programlisting>
       </section>
 
-      <section>
+      <section id="prefixMatchingLineMapper">
         <title>Multiple record types within a single file</title>
 
         <para>All of the file reading examples up to this point have all made
-        a key assumption for simplicity's sake: one record equals one line.
-        However, this may not always be the case. Its very common that a file
-        might have records spanning multiple lines with multiple formats. The
+        a key assumption for simplicity's sake: all of the records in a file
+        have the same format. However, this may not always be the case. Its
+        very common that a file might have records with different formats that
+        need to be tokenized differently and mapped to different objects. The
         following excerpt from a file illustrates this:</para>
 
-        <programlisting>  HEA;0013100345;2007-02-15
-  NCU;Smith;Peter;;T;20014539;F
-  BAD;;Oak Street 31/A;;Small Town;00235;IL;US
-  SAD;Smith, Elizabeth;Elm Street 17;;Some City;30011;FL;United States
-  BIN;VISA;VISA-12345678903
-  LIT;1044391041;37.49;0;0;4.99;2.99;1;45.47
-  LIT;2134776319;221.99;5;0;7.99;2.99;1;221.87
-  SIN;UPS;EXP;DELIVER ONLY ON WEEKDAYS
-  FOT;2;2;267.34</programlisting>
+        <programlisting>
+  USER;Smith;Peter;;T;20014539;F
+  LINEA;1044391041ABC037.49G201XX1383.12H
+  LINEB;2134776319DEF422.99M005LI
 
-        <para>Everything between the line starting with 'HEA' and the line
-        starting with 'FOT' is considered one record. The
-        PrefixMatchingCompositeLineTokenizer makes this easier by matching the
-        prefix in a line with a particular tokenizer:</para>
+</programlisting>
+
+        <para>In this file we have three types of records, "USER", "LINEA",
+        and "LINEB". A "USER" line corresponds to a User object. "LINEA" and
+        "LINEB" both correspond to Line objects, though a "LINEA" has more
+        information than a "LINEB".</para>
+
+        <para>The <classname>ItemReader </classname>will read each line
+        individually, but we must specify different
+        <classname>LineTokenizer</classname> and
+        <classname>FieldSetMapper</classname> objects so that the
+        <classname>ItemWriter</classname> will recieve the correct items. The
+        <classname>PrefixMatchingCompositeLineMapper</classname> makes this
+        easy by allowing maps of prefixes to
+        <classname>LineTokenizer</classname>s and prefixes to
+        <classname>FieldSetMapper</classname>s to be configured:</para>
 
         <programlisting>  
-  &lt;bean id="orderFileDescriptor"
-        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
+  &lt;bean id="orderFileLineMapper"
+        class="org.springframework.batch.item.file.mapping.PrefixMatchingCompositeLineMapper"&gt;
     &lt;property name="tokenizers"&gt;
-     &lt;map&gt;
-      &lt;entry key="HEA" value-ref="headerRecordDescriptor" /&gt;
-      &lt;entry key="FOT" value-ref="footerRecordDescriptor" /&gt;
-      &lt;entry key="BCU" value-ref="businessCustomerLineDescriptor" /&gt;
-      &lt;entry key="NCU" value-ref="customerLineDescriptor" /&gt;
-      &lt;entry key="BAD" value-ref="billingAddressLineDescriptor" /&gt;
-      &lt;entry key="SAD" value-ref="shippingAddressLineDescriptor" /&gt;
-      &lt;entry key="BIN" value-ref="billingLineDescriptor" /&gt;
-      &lt;entry key="SIN" value-ref="shippingLineDescriptor" /&gt;
-      &lt;entry key="LIT" value-ref="itemLineDescriptor" /&gt;
-      &lt;entry key="" value-ref="defaultLineDescriptor" /&gt;
-     &lt;/map&gt;
+      &lt;map&gt;
+        &lt;entry key="USER" value-ref="userTokenizer" /&gt;
+        &lt;entry key="LINEA" value-ref="lineATokenizer" /&gt;
+        &lt;entry key="LINEB" value-ref="lineBTokenizer" /&gt;
+      &lt;/map&gt;
+    &lt;/property&gt;
+    &lt;property name="fieldSetMappers"&gt;
+      &lt;map&gt;
+        &lt;entry key="USER" value-ref="userFieldSetMapper" /&gt;
+        &lt;entry key="LINE" value-ref="lineFieldSetMapper" /&gt;
+      &lt;/map&gt;
     &lt;/property&gt;
   &lt;/bean&gt;
 
 </programlisting>
 
-        <para>This ensures that the line will be parsed correctly, which is
-        especially important for fixed length input. Any users of the
-        <classname>FlatFileItemReader</classname> in this scenario must
-        continue calling <methodname>read</methodname> until the footer for
-        the record is returned, allowing them to return a complete order as
-        one 'item'.</para>
+        <para>In this example, "LINEA" and "LINEB" have separate
+        <classname>LineTokenizer</classname>s but they both use the same
+        <classname>FieldSetMapper</classname>.</para>
+
+        <para>The <classname>PrefixMatchingCompositeLineMapper</classname>
+        makes use of the <classname>PatternMatcher</classname>'s
+        <classname>matchPattern</classname> method in order to select the
+        correct delegate for each line. The pattern will always match the most
+        specific pattern possible, regardless of the order in the
+        configuration. So if "LINE" and "LINEA" were both listed as prefixes,
+        "LINEA" would match prefix "LINEA", while "LINEB" would match prefix
+        "LINE". Additionally, the empty string ("") can serve as a default
+        prefix by matching any line not matched by any other prefix.</para>
+
+        <programlisting>
+ &lt;entry key="" value-ref="defaultLineTokenizer" /&gt;
+
+</programlisting>
+
+        <para>There is also a
+        <classname>PrefixMatchingCompositeLineTokenizer</classname> that can
+        be used for tokenization alone.</para>
+
+        <para>It is also common for a flat file to contain records that each
+        span multiple lines. To handle this situation, a more complex strategy
+        is required. A demonstration of this common patter can be found in
+        <xref linkend="multiLineRecords" />.</para>
       </section>
 
       <section>

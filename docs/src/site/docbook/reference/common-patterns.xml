@@ -278,4 +278,118 @@
     <classname>DrivingQueryItemReader</classname>, which has only one
     dependency: a <classname>KeyCollector</classname></para>
   </section>
+
+  <section id="multiLineRecords">
+    <title>Multi-Line Records</title>
+
+    <para>While it is usually the case with flat files that one each record is
+    confined to a single line, it is common that a file might have records
+    spanning multiple lines with multiple formats. The following excerpt from
+    a file illustrates this:</para>
+
+    <programlisting>  HEA;0013100345;2007-02-15
+  NCU;Smith;Peter;;T;20014539;F
+  BAD;;Oak Street 31/A;;Small Town;00235;IL;US
+  FOT;2;2;267.34</programlisting>
+
+    <para>Everything between the line starting with 'HEA' and the line
+    starting with 'FOT' is considered one record. There are a few
+    considerations that must be made in order to handle this situation
+    correctly:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Instead of reading one record at a time, the
+        <classname>ItemReader</classname> must read every line of the
+        multi-line record as a group, so that it can be passed to the
+        <classname>ItemWriter</classname> intact.</para>
+      </listitem>
+
+      <listitem>
+        <para>Each line type may need to be tokenized differently.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Because a single record spans multiple lines, and we may not know
+    how many lines there are, the <classname>ItemReader</classname> must be
+    careful to always read an entire record. In order to do this, a custom
+    <classname>ItemReader</classname> should be implemented as a wrapper for
+    the <classname>FlatFileItemReader</classname>. </para>
+
+    <programlisting>  &lt;bean id="itemReader" 
+        class="org.springframework.batch.sample.iosample.internal.MultiLineTradeItemReader"&gt;
+    &lt;property name="delegate"&gt;
+      &lt;bean class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+        &lt;property name="resource" value="data/iosample/input/multiLine.txt" /&gt;
+        &lt;property name="lineMapper"&gt;
+          &lt;bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper"&gt;
+            &lt;property name="lineTokenizer" ref="orderFileTokenizer"/&gt;
+            &lt;property name="fieldSetMapper"&gt;
+              &lt;bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" /&gt;
+            &lt;/property&gt;
+          &lt;/bean&gt;
+        &lt;/property&gt;
+      &lt;/bean&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>To ensure that each line is tokenized properly, which is especially
+    important for fixed length input, the
+    <classname>PrefixMatchingCompositeLineTokenizer</classname> can be used on
+    the delegate <classname>FlatFileItemReader</classname>. See <xref
+    linkend="prefixMatchingLineMapper" /> for more details. The delegate
+    reader will then use a <classname>PassThroughFieldSetMapper</classname> to
+    deliver a <classname>FieldSet</classname> for each line back to the
+    wrapping <classname>ItemReader</classname>.</para>
+
+    <programlisting>  &lt;bean id="orderFileTokenizer"
+        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
+    &lt;property name="tokenizers"&gt;
+      &lt;map&gt;
+        &lt;entry key="HEA" value-ref="headerRecordTokenizer" /&gt;
+        &lt;entry key="FOT" value-ref="footerRecordTokenizer" /&gt;
+        &lt;entry key="NCU" value-ref="customerLineTokenizer" /&gt;
+        &lt;entry key="BAD" value-ref="billingAddressLineTokenizer" /&gt;
+      &lt;/map&gt;
+    &lt;/property&gt;
+  &lt;/bean&gt;</programlisting>
+
+    <para>This wrapper will have to be able recognize the end of a record so
+    that it can continually call <methodname>read()</methodname> on its
+    delegate until the end is reached. For each line that is read, the wrapper
+    should build up the item to be returned. Once the footer is reached, the
+    item can be returned for delivery to the
+    <classname>ItemProcessor</classname> and
+    <classname>ItemWriter</classname>.</para>
+
+    <programlisting>  private FlatFileItemReader&lt;FieldSet&gt; delegate;
+
+  public Trade read() throws Exception {
+    Trade t = null;
+
+    for (FieldSet line = null; (line = this.delegate.read()) != null;) {
+      String prefix = line.readString(0);
+      if (prefix.equals("HEA")) {
+        t = new Trade(); // Record must start with header
+      }
+      else if (prefix.equals("NCU")) {
+        Assert.notNull(t, "No header was found.");
+        t.setLast(line.readString(1));
+        t.setFirst(line.readString(2));
+        ...
+      }
+      else if (prefix.equals("BAD")) {
+        Assert.notNull(t, "No header was found.");
+        t.setCity(line.readString(4));
+        t.setState(line.readString(6));
+        ...
+      }
+      else if (prefix.equals("FOT")) {
+        return t; // Record must end with footer
+      }
+    }
+    Assert.isNull(t, "No 'END' was found.");
+    return null;
+  }</programlisting>
+  </section>
 </chapter>
