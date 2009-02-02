@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.job.flow;
 
+import org.springframework.batch.core.job.flow.support.State;
+
 /**
  * @author Dave Syer
  *
@@ -26,6 +28,12 @@ public interface Flow {
 	 */
 	String getName();
 
+	/**
+	 * @param stateName
+	 * @return the State in the flow with given name 
+	 */
+	public State getState(String stateName);
+	
 	/**
 	 * @throws FlowExecutionException
 	 */

@@ -25,6 +25,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -167,6 +168,11 @@ public class AbstractJobTests {
 
 		@Override
 		protected StepExecution doExecute(JobExecution execution) throws JobExecutionException {
+			return null;
+		}
+
+		@Override
+		public Step getStep(String stepName) {
 			return null;
 		}
 

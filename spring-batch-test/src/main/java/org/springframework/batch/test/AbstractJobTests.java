@@ -27,27 +27,24 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.job.flow.FlowJob;
-import org.springframework.batch.core.job.flow.support.SimpleFlow;
-import org.springframework.batch.core.job.flow.support.State;
-import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.Assert;
 
 /**
  * <p>
  * Base class for testing batch jobs. It provides methods for launching an
- * entire {@link Job}, allowing for end to end testing of individual steps,
- * without having to run every step in the job. Any test classes inheriting from
- * this class should make sure they are part of an {@link ApplicationContext},
- * which is generally expected to be done as part of the Spring test framework.
- * Furthermore, the {@link ApplicationContext} in which it is a part of is
- * expected to have one {@link JobLauncher}, {@link JobRepository}, and a
- * single {@link Job} implementation.
+ * entire {@link AbstractJob}, allowing for end to end testing of individual
+ * steps, without having to run every step in the job. Any test classes
+ * inheriting from this class should make sure they are part of an
+ * {@link ApplicationContext}, which is generally expected to be done as part
+ * of the Spring test framework. Furthermore, the {@link ApplicationContext} in
+ * which it is a part of is expected to have one {@link JobLauncher},
+ * {@link JobRepository}, and a single {@link AbstractJob} implementation.
  * 
  * <p>
  * This class also provides the ability to run {@link Step}s from a
@@ -74,13 +71,12 @@ public abstract class AbstractJobTests {
 	private JobLauncher launcher;
 
 	@Autowired
-	private Job job;
+	private AbstractJob job;
 
 	@Autowired
 	private JobRepository jobRepository;
 
 	private StepRunner stepRunner;
-	private Map<String, Step> stepMap;
 
 	/**
 	 * @return the job repository
@@ -92,7 +88,7 @@ public abstract class AbstractJobTests {
 	/**
 	 * @return the job
 	 */
-	public Job getJob() {
+	public AbstractJob getJob() {
 		return job;
 	}
 
@@ -147,69 +143,14 @@ public abstract class AbstractJobTests {
 	 * @param stepName
 	 */
 	public JobExecution launchStep(String stepName) {
-		return getStepRunner().launchStep(getStep(stepName));
-	}
-
-	/**
-	 * @param stepName
-	 * @return
-	 */
-	public Step getStep(String stepName) {
-		Job job = getJob();
-		if (job instanceof FlowJob) {
-			return getFlowJobStep(stepName);
+		Step step;
+		try {
+			step = this.job.getStep(stepName);
 		}
-		else if (job instanceof SimpleJob) {
-			return getSimpleJobStep(stepName);
+		catch (IllegalArgumentException e) {
+			throw new IllegalStateException("No Step found with name: [" + stepName + "]", e);
 		}
-		else {
-			throw new IllegalStateException("Job is neither a FlowJob or a SimpleJob");
-		}
-	}
-
-	/**
-	 * Extract the step from a FlowJob. Throw an exception of the step does not
-	 * exist.
-	 * 
-	 * @param stepName
-	 * @return the step
-	 */
-	private Step getFlowJobStep(String stepName) {
-		try{
-			State state = ((SimpleFlow) ((FlowJob) getJob()).getFlow()).getState(stepName);
-			Assert.notNull(state, "no matching state found in flow for " + stepName);
-			Assert.isInstanceOf(StepState.class, state);
-			return ((StepState) state).getStep();
-		}
-		catch(IllegalArgumentException e)
-		{
-			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
-		}
-	}
-
-	/**
-	 * Extract the step from a SimpleJob. Throw an exception of the step does
-	 * not exist.
-	 * 
-	 * @param stepName
-	 * @return the step
-	 */
-	private Step getSimpleJobStep(String stepName) {
-		if (this.stepMap == null) {
-			//
-			// Populate the step map
-			//
-			SimpleJob simpleJob = (SimpleJob) getJob();
-			this.stepMap = new HashMap<String, Step>();
-			for (Step step : simpleJob.getSteps()) {
-				this.stepMap.put(step.getName(), step);
-			}
-		}
-
-		if (!this.stepMap.containsKey(stepName)) {
-			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
-		}
-		return this.stepMap.get(stepName);
+		return getStepRunner().launchStep(step);
 	}
 
 	/**
@@ -219,6 +160,6 @@ public abstract class AbstractJobTests {
 	 * @param jobParameters
 	 */
 	public JobExecution launchStep(String stepName, JobParameters jobParameters) {
-		return getStepRunner().launchStep(getStep(stepName), jobParameters);
+		return getStepRunner().launchStep(this.job.getStep(stepName), jobParameters);
 	}
 }

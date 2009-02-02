@@ -23,6 +23,8 @@ import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.AbstractJob;
+import org.springframework.batch.core.job.flow.support.State;
+import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.util.Assert;
 
@@ -57,11 +59,14 @@ public class FlowJob extends AbstractJob {
 		this.flow = flow;
 	}
 
-	/**
-	 * @return the flow
+	/* 
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
-	public Flow getFlow(){
-		return this.flow;
+	public Step getStep(String stepName){
+		State state = this.flow.getState(stepName);
+		Assert.isInstanceOf(StepState.class, state, "State is not a StepState: [" + stepName + "]");
+		return ((StepState) state).getStep();
 	}
 	
 	/**

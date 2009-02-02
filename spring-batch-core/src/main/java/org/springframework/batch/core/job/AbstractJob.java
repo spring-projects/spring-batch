@@ -126,6 +126,14 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	}
 
 	/**
+	 * Retrieve the step with the given name
+	 * 
+	 * @param stepName
+	 * @return the step
+	 */
+	public abstract Step getStep(String stepName);
+	
+	/**
 	 * Boolean flag to prevent categorically a job from restarting, even if it
 	 * has failed previously.
 	 * 

@@ -60,11 +60,18 @@ public class SimpleJob extends AbstractJob {
 		this.steps.add(step);
 	}
 	
-	/**
-	 * @return the steps currently set for this job
+	/* 
+	 * (non-Javadoc)
+	 * @see org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
-	public List<Step> getSteps(){
-		return steps;
+	public Step getStep(String stepName){
+		for (Step step : this.steps) {
+			if(step.getName().equals(stepName))
+			{
+				return step;
+			}
+		}
+		throw new IllegalStateException("No Step found with name: [" + stepName + "]");
 	}
 	
 	/**
