@@ -286,6 +286,32 @@
 
 </programlisting>
     </section>
+
+    <section>
+      <title>Filtering Records</title>
+
+      <para>One typical use for an item processor is to filter out records
+      before they are passed to the ItemWriter. Filtering is an action
+      distinct from skpping; skipping indicates that a record is invalid
+      whereas filtering simply indicates that a record should not be written.
+      </para>
+
+      <para>For example, consider a batch job that reads a file containing
+      three different types of records: records to insert, records to update,
+      and records to delete. If record deletion is not supported by the
+      system, then we would not want to send any "delete" records to the
+      <classname>ItemWriter</classname>. But, since these records are not
+      actually bad records, we would want to filter them out, rather than
+      skip. As a result, the ItemWriter would receive only "insert" and
+      "update" records. </para>
+
+      <para>To filter a record, one simply returns "null" from the
+      <classname>ItemProcessor</classname>. The framework will detect that the
+      result is "null" and avoid adding that item to the list of records
+      delivered to the <classname>ItemWriter</classname>. As usual, an
+      exception thrown from the <classname>ItemProcessor</classname> will
+      result in a skip.</para>
+    </section>
   </section>
 
   <section id="itemStream">
