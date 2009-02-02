@@ -2,6 +2,7 @@ Bundle-SymbolicName: com.springframework.batch.test
 Bundle-Name: Spring Batch Test
 Bundle-Vendor: Spring
 Bundle-Version: ${version}
+Bundle-ManifestVersion: 2
 Ignored-Existing-Headers: 
  Import-Package,
  Export-Package
