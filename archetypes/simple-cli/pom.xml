@@ -17,7 +17,6 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6.A</spring.framework.version>
-		<bundlor.version>1.0.0.M1</bundlor.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -42,14 +41,14 @@
 		<profile>
 			<id>staging</id>
 			<distributionManagement>
-		<repository>
-			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
-		</repository>
-		<snapshotRepository>
-			<id>staging</id>
-			<url>file:///${user.dir}/target/staging</url>
-		</snapshotRepository>
+				<repository>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</repository>
+				<snapshotRepository>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</snapshotRepository>
 			</distributionManagement>
 		</profile>
 		<profile>
@@ -62,7 +61,6 @@
 					<plugin>
 						<groupId>com.springsource.bundlor</groupId>
 						<artifactId>com.springsource.bundlor.maven</artifactId>
-						<version>${bundlor.version}</version>
 						<executions>
 							<execution>
 								<id>bundlor-manifest</id>
@@ -70,10 +68,6 @@
 								<goals>
 									<goal>manifest</goal>
 								</goals>
-								<configuration>
-									<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
-						<manifestTemplatePath>${project.basedir}/template.mf</manifestTemplatePath>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -140,6 +134,27 @@
 				<version>2.0.0.RELEASE</version>
 			</extension>
 		</extensions>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>com.springsource.bundlor</groupId>
+					<artifactId>com.springsource.bundlor.maven</artifactId>
+					<configuration>
+						<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
+						<manifestTemplatePath>${project.basedir}/template.mf</manifestTemplatePath>
+					</configuration>
+					<executions>
+						<execution>
+							<id>bundlor-manifest</id>
+							<phase>package</phase>
+							<goals>
+								<goal>manifest</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -152,7 +167,6 @@
 			<plugin>
 				<groupId>com.springsource.bundlor</groupId>
 				<artifactId>com.springsource.bundlor.maven</artifactId>
-				<version>${bundlor.version}</version>
 				<executions>
 					<execution>
 						<id>bundlor-transform</id>
