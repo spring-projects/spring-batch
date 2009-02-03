@@ -142,9 +142,15 @@ public abstract class AbstractJobTests {
 	 * if there is no Step with the given name.
 	 * 
 	 * @param stepName
+	 * @return JobExecution
 	 */
 	public JobExecution launchStep(String stepName) {
-		return getStepRunner().launchStep(this.job.getStep(stepName));
+		Step step = this.job.getStep(stepName);
+		if(step == null)
+		{
+			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
+		}
+		return getStepRunner().launchStep(step);
 	}
 
 	/**

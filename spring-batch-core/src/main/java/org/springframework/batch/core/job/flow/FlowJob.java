@@ -68,7 +68,7 @@ public class FlowJob extends AbstractJob {
 		if(state instanceof StepState){
 			return ((StepState) state).getStep();
 		}
-		throw new IllegalStateException("State is not a StepState: [" + stepName + "]");		
+		return null;
 	}
 	
 	/**

@@ -71,7 +71,7 @@ public class SimpleJob extends AbstractJob {
 				return step;
 			}
 		}
-		throw new IllegalStateException("No Step found with name: [" + stepName + "]");
+		return null;
 	}
 	
 	/**

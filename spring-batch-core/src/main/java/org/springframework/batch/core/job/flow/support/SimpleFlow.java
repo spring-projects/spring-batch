@@ -86,11 +86,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 * @see org.springframework.batch.core.job.flow.Flow#getState(java.lang.String)
 	 */
 	public State getState(String stateName) {
-		State state = stateMap.get(stateName);
-		if(state == null){
-			throw new IllegalStateException("No State found with name: [" + stateName + "]");
-		}
-		return state;
+		return stateMap.get(stateName);
 	}
 
 	/**

@@ -17,6 +17,7 @@ package org.springframework.batch.core.job.flow.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -215,12 +216,13 @@ public class SimpleFlowTests {
 		assertEquals("step1", state.getName());
 	}
 
-	@Test(expected = IllegalStateException.class)
+	@Test
 	public void testGetStateDoesNotExist() throws Exception {
 		flow.setStateTransitions(Collections.singletonList(StateTransition.createEndStateTransition(new StubState(
 				"step1"))));
 		flow.afterPropertiesSet();
-		flow.getState("bar");
+		State state = flow.getState("bar");
+		assertNull(state);
 	}
 
 	private List<StateTransition> collect(StateTransition s1, StateTransition s2) {

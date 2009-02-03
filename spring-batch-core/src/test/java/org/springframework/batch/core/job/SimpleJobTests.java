@@ -446,6 +446,25 @@ public class SimpleJobTests {
 
 		assertNull("Second step was not supposed to be executed", step2.passedInStepContext);
 	}
+	
+	@Test
+	public void testGetStepExists() {
+		step1 = new StubStep("step1", jobRepository);
+		step2 = new StubStep("step2", jobRepository);
+		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
+		Step step = job.getStep("step2");
+		assertNotNull(step);
+		assertEquals("step2", step.getName());
+	}
+
+	@Test
+	public void testGetStepNotExists() {
+		step1 = new StubStep("step1", jobRepository);
+		step2 = new StubStep("step2", jobRepository);
+		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
+		Step step = job.getStep("foo");
+		assertNull(step);
+	}
 
 	/*
 	 * Check JobRepository to ensure status is being saved.

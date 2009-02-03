@@ -17,6 +17,7 @@ package org.springframework.batch.core.job.flow;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -292,6 +293,56 @@ public class FlowJobTests {
 
 	}
 
+	@Test
+	public void testGetStepExists() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		
+
+		Step step = job.getStep("step2");
+		assertNotNull(step);
+		assertEquals("step2", step.getName());
+	}
+
+	@Test
+	public void testGetStepNotExists() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+
+		Step step = job.getStep("foo");
+		assertNull(step);
+	}
+	
+	@Test
+	public void testGetStepNotStepState() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+
+		Step step = job.getStep("end0");
+		assertNull(step);
+	}
+	
 	/**
 	 * @author Dave Syer
 	 * 

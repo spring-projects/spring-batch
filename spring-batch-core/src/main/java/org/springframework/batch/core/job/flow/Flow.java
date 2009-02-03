@@ -29,8 +29,8 @@ public interface Flow {
 	String getName();
 
 	/**
-	 * Retrieve the State with the given name. An IllegalStateException is
-	 * thrown if there is no State with the given name.
+	 * Retrieve the State with the given name. If there is no State with the
+	 * given name, then return null.
 	 * 
 	 * @param stateName
 	 * @return the State
