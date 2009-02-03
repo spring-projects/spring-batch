@@ -20,20 +20,21 @@
     </imageobject>
   </mediaobject>
 
-  <para>While the Job object may seem like a simple container for steps, there
-  are many configuration options that developers should be aware of.
-  Furthermore, there are many considerations for how a
-  <classname>Job</classname> will be run and how its meta data will be stored
-  during that run. This chapter will explain the various configuration options
-  and runtime concerns of a <classname>Job</classname>.</para>
+  <para>While the <classname>Job</classname> object may seem like a simple
+  container for steps, there are many configuration options of which a
+  developers must be aware . Furthermore, there are many considerations for
+  how a <classname>Job</classname> will be run and how its meta-data will be
+  stored during that run. This chapter will explain the various configuration
+  options and runtime concerns of a <classname>Job</classname>.</para>
 
   <section>
     <title>Configuring a Job</title>
 
     <para>There are multiple implementations of the <link
-    linkend="job">Job</link> interface, however, the namespace abstracts away
-    the differences in configuration. It has only three required dependencies:
-    a name, <classname>JobRepository</classname>, and a list of Steps.</para>
+    linkend="job"><classname>Job</classname></link> interface, however, the
+    namespace abstracts away the differences in configuration. It has only
+    three required dependencies: a name, <classname>JobRepository</classname>,
+    and a list of <classname>Step</classname>s.</para>
 
     <programlisting>  
   &lt;job id="footballJob"&gt;
@@ -57,20 +58,26 @@
 
 </programlisting>
 
+    <para>Note that if the job repository's default id is overridden, it must
+    be explicitly specified on <emphasis role="bold">every</emphasis>
+    <classname>Step</classname> <emphasis role="bold">as well as</emphasis> on
+    the <classname>Job</classname>.</para>
+
     <section>
       <title>Restartability</title>
 
-      <para>One key concern when execution a batch job, is what happens when a
-      failed job is restarted? A Job is considered to have been 'restarted' if
-      the same <classname>JobInstance</classname> has more than one
-      JobExecution. Ideally, all jobs should be able to start up where they
-      left off, but there are scenarios where this is not possible. <emphasis
-      role="bold">It is entirely up to the developer to ensure that a new
-      instance is always created in this scenario</emphasis>. However, Spring
-      Batch does provide some help. If a Job should never be restarted, but
-      should always be run as part of a new
-      <classname>JobInstance</classname>, then the restartable property may be
-      set to 'false':</para>
+      <para>One key issue when execution a batch job concerns the behavior of
+      a <classname>Job</classname> when it is restarted? The launching of a
+      <classname>Job</classname> is considered to be a 'restart' if a
+      <classname>JobExecution</classname> already exists for the particular
+      <classname>JobInstance</classname>. Ideally, all jobs should be able to
+      start up where they left off, but there are scenarios where this is not
+      possible. <emphasis role="bold">It is entirely up to the developer to
+      ensure that a new JobInstance is created in this scenario</emphasis>.
+      However, Spring Batch does provide some help. If a
+      <classname>Job</classname> should never be restarted, but should always
+      be run as part of a new <classname>JobInstance</classname>, then the
+      restartable property may be set to 'false':</para>
 
       <programlisting>  
   &lt;job id="footballJob" <emphasis role="bold">restartable="false"</emphasis>&gt;
@@ -131,8 +138,9 @@
 
 </programlisting>
 
-      <para>Listeners can be added to a <classname>SimpleJob</classname> via
-      the setJobListeners property:</para>
+      <para><classname>JobListener</classname>s can be added to a
+      <classname>SimpleJob</classname> via the listeners element on the
+      job:</para>
 
       <programlisting>  
   &lt;job id="footballJob"&gt;
@@ -146,17 +154,17 @@
 
 </programlisting>
 
-      <para>It should be noted that afterJob will be called regardless of the
-      success or failure of the <classname>Job</classname>. If success or
-      failure needs to be determined it can be obtained from the
-      <classname>JobExecution</classname>:</para>
+      <para>It should be noted that <methodname>afterJob</methodname> will be
+      called regardless of the success or failure of the
+      <classname>Job</classname>. If success or failure needs to be determined
+      it can be obtained from the <classname>JobExecution</classname>:</para>
 
       <programlisting>
   void afterJob(JobExecution jobExecution){
-    if( jobExecution.getStatus = BatchStatus.COMPLETED ){
+    if( jobExecution.getStatus() == BatchStatus.COMPLETED ){
       //job success
     }
-    else if(jobExecution.getStatus = BatchStatus.FAILED){
+    else if(jobExecution.getStatus() == BatchStatus.FAILED){
       //job failure
     }
   }
@@ -168,14 +176,14 @@
       <title>JobFactory and Stateful Components in Steps</title>
 
       <para>Unlike many traditional Spring applications, many of the
-      components of a batch application are stateful, the file readers and
+      components of a batch application are stateful; the file readers and
       writers are obvious examples. The recommended way to deal with this is
       to create a fresh <classname>ApplicationContext</classname> for each job
       execution. If the <classname>Job</classname> is launched from the
-      command line with <classname>CommandLineJobRunner</classname> this is
-      trivial. For more complex launching scenarios, where jobs are executed
-      in parallel or serially from the same process, some extra steps have to
-      be taken to ensure that the <classname>ApplicationContext</classname> is
+      command line with <classname>CommandLineJobRunner</classname>, this is
+      trivial. For more complex launching scenarios where jobs are executed in
+      parallel or serially from the same process, some extra steps have to be
+      taken to ensure that the <classname>ApplicationContext</classname> is
       refreshed. This is preferable to using prototype scope for the stateful
       beans because then they would not receive lifecycle callbacks from the
       container at the end of use. (e.g. through destroy-method in XML)</para>
@@ -196,12 +204,13 @@
     <title>Configuring a JobRepository</title>
 
     <para>As described in earlier, the <link
-    linkend="jobRepository">JobRepository</link> is used for basic CRUD
-    operations of the various persisted domain objects within Spring Batch,
-    such as JobExecution and StepExecution. It is required by many of the
-    major framework features, such as the <classname>JobLauncher</classname>,
+    linkend="jobRepository"><classname>JobRepository</classname></link> is
+    used for basic CRUD operations of the various persisted domain objects
+    within Spring Batch, such as <classname>JobExecution</classname> and
+    <classname>StepExecution</classname>. It is required by many of the major
+    framework features, such as the <classname>JobLauncher</classname>,
     <classname>Job</classname>, and <classname>Step</classname>. The batch
-    namespace abstract much of the implementation details of the
+    namespace abstracts away many of the implementation details of the
     <classname>JobRepository</classname> implementations and their
     collaborators. However, there are still a few configuration options
     available:</para>
@@ -226,7 +235,7 @@
       <para>If the namespace is used, transactional advice will be
       automatically created around the repository. This is to ensure that the
       batch meta data, including state that is necessary for restarts after a
-      failure, is persisted correctly. The behaviour of the framework is not
+      failure, is persisted correctly. The behavior of the framework is not
       well defined if the repository methods are not transactional. The
       isolation level in the <code>create*</code> method attributes is
       specified separately to ensure that when jobs are launched, if two
@@ -246,7 +255,7 @@
 </programlisting></para>
 
       <para>If the namespace or factory beans aren't used then it is also
-      essential to configure the transactional behaviour of the repository
+      essential to configure the transactional behavior of the repository
       using AOP:</para>
 
       <para><programlisting>  
@@ -266,7 +275,7 @@
 
       <para>This fragment can be used as is, with almost no changes. Remember
       also to include the appropriate namespace declarations and to make sure
-      spring-tx and spring-aop (or the whole of spring) is on the
+      spring-tx and spring-aop (or the whole of spring) are on the
       classpath.</para>
     </section>
 
@@ -294,7 +303,7 @@
       as SYSTEM.TEST_JOB_EXECUTION.</para>
 
       <note>
-        <para>Only the table prefix is configurable, the table and column
+        <para>Only the table prefix is configurable. The table and column
         names are not.</para>
       </note>
     </section>
@@ -303,10 +312,11 @@
       <title>In-Memory Repository</title>
 
       <para>There are scenarios in which you may not want to persist your
-      domain objects to the database. One reason may be speed, storing domain
+      domain objects to the database. One reason may be speed; storing domain
       objects at each commit point takes extra time. Another reason may be
-      that you just don't need to persist status for a particular job. Spring
-      batch provides a solution:</para>
+      that you just don't need to persist status for a particular job. For
+      this reason, Spring batch provides an in-memory Map version of the job
+      respository:</para>
 
       <programlisting>  &lt;bean id="jobRepository" 
         class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
@@ -318,7 +328,7 @@
 
     <para>The most basic implementation of the
     <classname>JobLauncher</classname> interface is the
-    <classname>SimpleJobLauncher</classname>. It's only required dependency is
+    <classname>SimpleJobLauncher</classname>. Its only required dependency is
     a <classname>JobRepository</classname>, in order to obtain an
     execution:</para>
 
@@ -327,10 +337,11 @@
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
   &lt;/bean&gt;</programlisting>
 
-    <para>Once a <link linkend="jobExecution">JobExecution</link> is obtained,
-    it is passed to the execute method of <classname>Job</classname>,
-    ultimately returning the <classname>JobExecution</classname> to the
-    caller:</para>
+    <para>Once a <link
+    linkend="jobExecution"><classname>JobExecution</classname></link> is
+    obtained, it is passed to the execute method of
+    <classname>Job</classname>, ultimately returning the
+    <classname>JobExecution</classname> to the caller:</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -346,13 +357,13 @@
       </imageobject>
     </mediaobject>
 
-    <para>The sequence is straightforward, and works well when launched from a
-    scheduler, but causes issues when trying to launch from an HTTP request.
-    In this scenario, the launching needs to be done asynchronously, so that
-    the <classname>SimpleJobLauncher</classname> returns immediately to it's
-    caller. This is because it is not good practice to keep an HTTP request
-    open for the amount of time needed by long running processes such as
-    batch. An example sequence is below:</para>
+    <para>The sequence is straightforward and works well when launched from a
+    scheduler. However, issues arise when trying to launch from an HTTP
+    request. In this scenario, the launching needs to be done asynchronously
+    so that the <classname>SimpleJobLauncher</classname> returns immediately
+    to its caller. This is because it is not good practice to keep an HTTP
+    request open for the amount of time needed by long running processes such
+    as batch. An example sequence is below:</para>
 
     <mediaobject>
       <imageobject role="html">
@@ -388,16 +399,16 @@
   <section>
     <title>Running a Job</title>
 
-    <para>At a minimum, launching a batch job requires two things: the Job to
-    be launched and a <classname>JobLauncher</classname>. Both can be
-    contained within the same context or different contexts. For example, if
-    launching a job from the command line, a new JVM will be instantiated for
-    each Job, and thus every job will have it's own
-    <classname>JobLauncher</classname>. However, if running from within a web
-    container within the scope of an <classname>HttpRequest</classname>, there
-    will usually be one <classname>JobLauncher</classname>, configured for
-    asynchronous job launching, that multiple requests will invoke to launch
-    their jobs.</para>
+    <para>At a minimum, launching a batch job requires two things: the
+    <classname>Job</classname> to be launched and a
+    <classname>JobLauncher</classname>. Both can be contained within the same
+    context or different contexts. For example, if launching a job from the
+    command line, a new JVM will be instantiated for each Job, and thus every
+    job will have its own <classname>JobLauncher</classname>. However, if
+    running from within a web container within the scope of an
+    <classname>HttpRequest</classname>, there will usually be one
+    <classname>JobLauncher</classname>, configured for asynchronous job
+    launching, that multiple requests will invoke to launch their jobs.</para>
 
     <section>
       <title>Running Jobs from the Command Line</title>
@@ -421,29 +432,32 @@
         <classname>CommandLineJobRunner</classname>. It's important to note
         that this is just one way to bootstrap your application, but there are
         many ways to launch a Java process, and this class should in no way be
-        viewed as definitive. It performs four tasks:</para>
+        viewed as definitive. The <classname>CommandLineJobRunner</classname>
+        performs four tasks:</para>
 
         <itemizedlist>
           <listitem>
-            <para>Loads the appropriate Application Context</para>
+            <para>Load the appropriate
+            <classname>ApplicationContext</classname></para>
           </listitem>
 
           <listitem>
-            <para>Parses command line arguments into JobParameters</para>
+            <para>Parse command line arguments into
+            <classname>JobParameters</classname></para>
           </listitem>
 
           <listitem>
-            <para>Locates the appropriate job based on arguments</para>
+            <para>Locate the appropriate job based on arguments</para>
           </listitem>
 
           <listitem>
-            <para>Uses the JobLauncher provided in the application context to
-            launch the job.</para>
+            <para>Use the <classname>JobLauncher</classname> provided in the
+            application context to launch the job.</para>
           </listitem>
         </itemizedlist>
 
-        <para>All of these tasks are accomplished based completely upon the
-        arguments passed in. The following are required arguments:</para>
+        <para>All of these tasks are accomplished using only the arguments
+        passed in. The following are required arguments:</para>
 
         <table>
           <title>CommandLineJobRunner arguments</title>
@@ -479,22 +493,21 @@
         This example is using the same 'EndOfDay' example from <xref
         linkend="domain" />. The first argument is 'endOfDayJob.xml', which is
         the Spring <classname>ApplicationContext</classname> containing the
-        Job. The second argument, 'endOfDay' represents the job name. The
-        final argument, 'schedule.date=01-01-2008' will be converted into
-        <classname>JobParameters</classname>. An example of the XML
-        configuration is below:</para>
+        <classname>Job</classname>. The second argument, 'endOfDay' represents
+        the job name. The final argument, 'schedule.date=01-01-2008' will be
+        converted into <classname>JobParameters</classname>. An example of the
+        XML configuration is below:</para>
 
-        <programlisting>  &lt;bean id="endOfDay"
-        class="org.springframework.batch.core.job.SimpleJob"&gt;
-    &lt;property name="steps"&gt;
-      &lt;bean id="step1" parent="simpleStep" /&gt;
+        <programlisting>  &lt;job id="endOfDay"&gt;
+    &lt;steps&gt;
+      &lt;step name="step1" parent="simpleStep" /&gt;
       &lt;!-- Step details removed for clarity --&gt;
-    &lt;/property&gt; 
-  &lt;/bean&gt;
+    &lt;/steps&gt; 
+  &lt;/job&gt;
 
   &lt;!-- Launcher details removed for clarity --&gt;
-  &lt;bean id="jobLauncher"
-        class="org.springframework.batch.core.launch.support.SimpleJobLauncher" /&gt;</programlisting>
+  &lt;beans: bean id="jobLauncher"
+       class="org.springframework.batch.core.launch.support.SimpleJobLauncher" /&gt;</programlisting>
 
         <para>This example is overly simplistic, since there are many more
         requirements to a run a batch job in Spring Batch in general, but it
@@ -507,22 +520,23 @@
       <section>
         <title>ExitCodes</title>
 
-        <para>When launching a batch job from the command-line, it is often
-        from an enterprise scheduler. Most schedulers are fairly dumb, and
-        work only at the process level. Meaning, they only know about some
+        <para>When launching a batch job from the command-line, an enterprise
+        scheduler is often used. Most schedulers are fairly dumb and work only
+        at the process level. This means that they only know about some
         operating system process such as a shell script that they're invoking.
         In this scenario, the only way to communicate back to the scheduler
         about the success or failure of a job is through return codes. A
-        number is returned to a scheduler that is told how to interpret the
-        result. In the simple case: 0 is success and 1 is failure. However,
-        there may be scenarios such as: If job A returns 4 kick off job B, if
-        it returns 5 kick off job C. This type of behavior is configured at
-        the scheduler level, but it is important that a processing framework
-        such as Spring Batch provide a way to return a numeric representation
-        of of the 'Exit Code' for a particular batch job. In Spring Batch this
-        is encapsulated within an <classname>ExitStatus</classname>, which is
-        covered in more detail in Chapter 5. For the purposes of discussing
-        exit codes, the only important thing to know is that an
+        return code is a number that is returned to a scheduler by the process
+        that indicates the result of the run. In the simplest case: 0 is
+        success and 1 is failure. However, there may be more complex
+        scenarios: If job A returns 4 kick off job B, and if it returns 5 kick
+        off job C. This type of behavior is configured at the scheduler level,
+        but it is important that a processing framework such as Spring Batch
+        provide a way to return a numeric representation of the 'Exit Code'
+        for a particular batch job. In Spring Batch this is encapsulated
+        within an <classname>ExitStatus</classname>, which is covered in more
+        detail in Chapter 5. For the purposes of discussing exit codes, the
+        only important thing to know is that an
         <classname>ExitStatus</classname> has an exit code property that is
         set by the framework (or the developer) and is returned as part of the
         <classname>JobExecution</classname> returned from the
@@ -554,7 +568,7 @@
         it will be injected into the runner after the context is created. All
         that needs to be done to provide your own
         <classname>ExitCodeMapper</classname> is to declare the implementation
-        as a root level bean, and ensure it's part of the
+        as a root level bean and ensure that it is part of the
         <classname>ApplicationContext</classname> that is loaded by the
         runner.</para>
       </section>
@@ -589,12 +603,12 @@
 
     <para>A <classname>JobLauncher</classname> uses the
     <classname>JobRepository</classname> to create new
-    <classname>JobExecution</classname> objects, and run them.
+    <classname>JobExecution</classname> objects and run them.
     <classname>Job</classname> and <classname>Step</classname> implementations
     later use the same <classname>JobRepository</classname> for basic updates
     of the same executions during the running of a <classname>Job</classname>.
-    The basic operations suffice for simple scenarios. However, in a large
-    batch environment with hundreds of batch jobs and complex scheduling
+    The basic operations suffice for simple scenarios, but in a large batch
+    environment with hundreds of batch jobs and complex scheduling
     requirements, more advanced access of the meta data is required:</para>
 
     <mediaobject>
@@ -654,9 +668,10 @@
 
       <para><link linkend="repositoryTablePrefix">Earlier in this
       chapter</link>, it was mentioned that the table prefix of the
-      JobRepository can be modified to allow for different versions or
-      schemas. Because the JobExplorer is working with the same tables, it too
-      needs the ability to set a prefix:</para>
+      <classname>JobRepository</classname> can be modified to allow for
+      different versions or schemas. Because the
+      <classname>JobExplorer</classname> is working with the same tables, it
+      too needs the ability to set a prefix:</para>
 
       <programlisting>  
   &lt;bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean" 
@@ -741,35 +756,43 @@
       self-explanatory, and more detailed explanations can be found on the
       <ulink
       url="http://static.springframework.org/spring-batch/apidocs/org/springframework/batch/core/launch/JobOperator.html">javadoc
-      of the interface</ulink>. However, the 'startNextInstance' method is
-      worth noting. This method will always start a new instance of a Job.
+      of the interface</ulink>. However, the
+      <methodname>startNextInstance</methodname> method is worth noting. This
+      method will always start a new instance of a <classname>Job</classname>.
       This can be extremely useful if there are serious issues in a
-      <classname>Job</classname>Execution, and the <classname>Job</classname>
+      <classname>JobExecution</classname> and the <classname>Job</classname>
       needs to be started over again from the beginning. Unlike
       <classname>JobLauncher</classname> though, which requires a new
-      <classname>JobParameters</classname> that will trigger a new JobInstance
-      if they are different than any previous one, the startNextInstance
-      method will use the JobParametersIncrementer tied to the Job to force
-      the <classname>Job</classname> to a new instance:</para>
+      <classname>JobParameters</classname> object that will trigger a new
+      <classname>JobInstance</classname> if the parameters are different from
+      any previous set of parameters, the
+      <methodname>startNextInstance</methodname> method will use the
+      <classname>JobParametersIncrementer</classname> tied to the
+      <classname>Job</classname> to force the <classname>Job</classname> to a
+      new instance:</para>
 
       <programlisting>
   public interface JobParametersIncrementer {
 
     JobParameters getNext(JobParameters parameters);
+
   }
 
 </programlisting>
 
       <para>The contract of <classname>JobParametersIncrementer</classname> is
-      that, given a <link linkend="jobParameters">JobParameters</link>, it
-      will return the 'next' parameter by incrementing any values it may
-      contain. This strategy is useful because the framework has no way of
-      knowing what changes to the JobParameters make it the 'next' instance.
-      For example, if the only value in JobParameters is a date, and the next
-      instance should be created, should that value be incremented by one day?
-      Or one week? (if the job is weekly for instance) The same can be said
-      for any numerical values that help to identify the Job, as shown
-      below:</para>
+      that, given a <link
+      linkend="jobParameters"><classname>JobParameters</classname></link>
+      object, it will return the 'next' <classname>JobParameters</classname>
+      object by incrementing any necessary values it may contain. This
+      strategy is useful because the framework has no way of knowing what
+      changes to the <classname>JobParameters</classname> make it the 'next'
+      instance. For example, if the only value in
+      <classname>JobParameters</classname> is a date, and the next instance
+      should be created, should that value be incremented by one day? Or one
+      week (if the job is weekly for instance)? The same can be said for any
+      numerical values that help to identify the <classname>Job</classname>,
+      as shown below:</para>
 
       <programlisting>  
   public class SampleIncrementer implements JobParametersIncrementer {
@@ -786,12 +809,13 @@
 </programlisting>
 
       <para>In this example, the value with a key of 'run.id' is used to
-      discriminate between JobInstances. If the JobParameters passed in is
-      null, it can be assumed that the Job has never been run before and thus
-      it's initial state can be returned. However, if not, the old value is
-      obtained, incremented by one, and returned. An incrementer can be
-      associated with Job via the 'incrementer' attribute in the
-      namespace:</para>
+      discriminate between <classname>JobInstances</classname>. If the
+      <classname>JobParameters</classname> passed in is null, it can be
+      assumed that the <classname>Job</classname> has never been run before
+      and thus its initial state can be returned. However, if not, the old
+      value is obtained, incremented by one, and returned. An incrementer can
+      be associated with <classname>Job</classname> via the 'incrementer'
+      attribute in the namespace:</para>
 
       <programlisting>  
   &lt;job id="footballJob" <emphasis role="bold">incrementer="sampleIncrementer"</emphasis>&gt;
@@ -819,8 +843,8 @@
       <para>The shutdown is not immediate, since there is no way to force
       immediate shutdown, especially if the execution is currently in
       developer code that the framework has no control over, such as a
-      business service. What it does mean, is that as soon as control is
-      returned back to the framework, it will set the status of the current
+      business service. However, as soon as control is returned back to the
+      framework, it will set the status of the current
       <classname>StepExecution</classname> to
       <classname>BatchStatus.STOPPED</classname>, save it, then do the same
       for the <classname>JobExecution</classname> before finishing.</para>

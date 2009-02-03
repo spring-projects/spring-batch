@@ -477,7 +477,7 @@
       processing locations and vice versa. File moving utilities are beyond
       the scope of the spring batch architecture but it is not unusual for
       batch job streams to include file moving utilities as steps in the job
-      stream. Its sufficient that the batch architecture only needs to know
+      stream. It is sufficient that the batch architecture only needs to know
       how to locate the files to be processed. Spring Batch begins the process
       of feeding the data into the pipe from this starting point. However,
       <ulink
@@ -800,7 +800,7 @@
         <programlisting>  
   FlatFileItemReader&lt;Player&gt; itemReader = new FlatFileItemReader&lt;Player&gt;();
   itemReader.setResource(new FileSystemResource("resources/players.csv"));
-  //DelimitedLineTokenizer defaults to comma as it's delimiter
+  //DelimitedLineTokenizer defaults to comma as its delimiter
   LineMapper&lt;Player&gt; lineMapper = new DefaultLineMapper&lt;Player&gt;();
   lineMapper.setLineTokenizer(new DelimitedLineTokenizer());
   lineMapper.setFieldSetMapper(new PlayerFieldSetMapper());
@@ -973,7 +973,7 @@
 
         <para>All of the file reading examples up to this point have all made
         a key assumption for simplicity's sake: all of the records in a file
-        have the same format. However, this may not always be the case. Its
+        have the same format. However, this may not always be the case. It is
         very common that a file might have records with different formats that
         need to be tokenized differently and mapped to different objects. The
         following excerpt from a file illustrates this:</para>
@@ -1219,7 +1219,7 @@
         <title>Simplified File Writing Example</title>
 
         <para>Now that the <classname>LineAggregator</classname> interface and
-        it's most basic implementation,
+        its most basic implementation,
         <classname>PassThroughLineAggregator</classname>, have been defined,
         the basic flow of writing can be explained:</para>
 
@@ -2408,9 +2408,9 @@
     existing service needs to act as an <classname>ItemReader</classname> or
     <classname>ItemWriter</classname>, either to satisfy the dependency of
     another Spring Batch class, or because it truly is the main
-    <classname>ItemReader</classname> for a step. Its fairly trivial to write
-    an adaptor class for each service that needs wrapping, but because its
-    such a common concern, Spring Batch provides implementations:
+    <classname>ItemReader</classname> for a step. It is fairly trivial to
+    write an adaptor class for each service that needs wrapping, but because
+    it is such a common concern, Spring Batch provides implementations:
     <classname>ItemReaderAdapter</classname> and
     <classname>ItemWriterAdapter</classname>. Both classes implement the
     standard Spring method invoking the delegate pattern and are fairly simple

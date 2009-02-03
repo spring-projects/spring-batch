@@ -10,14 +10,12 @@
     <table>
       <title>Available Item Readers</title>
 
-      <tgroup cols="3">
+      <tgroup cols="2">
         <colspec align="center" />
 
         <thead>
           <row>
             <entry align="center">Item Reader</entry>
-
-            <entry align="center">Type of Item Provided</entry>
 
             <entry align="center">Description</entry>
           </row>
@@ -28,8 +26,6 @@
             <entry
             align="left">AbstractItemCountingItemStreamItemReader</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
             <entry align="left">Abstract base class that provides basic
             restart capabilities by counting the number of items returned from
             an <classname>ItemReader</classname>.</entry>
@@ -38,8 +34,6 @@
           <row>
             <entry align="left">ListItemReader</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
             <entry align="left">Provides the items from a list, one at a
             time</entry>
           </row>
@@ -47,16 +41,12 @@
           <row>
             <entry align="left">ItemReaderAdapter</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
             <entry align="left">Adapts any class to the
             <classname>ItemReader</classname> interface.</entry>
           </row>
 
           <row>
             <entry align="left">AggregateItemReader</entry>
-
-            <entry align="left">java.util.Collection</entry>
 
             <entry align="left">An ItemReader that delivers a list as its
             item, storing up objects from the injected ItemReader until they
@@ -71,17 +61,13 @@
           <row>
             <entry align="left">FlatFileItemReader</entry>
 
-            <entry align="left">java.lang.String</entry>
-
-            <entry align="left">Reads from a flat file, includes ItemStream
+            <entry align="left">Reads from a flat file. Includes ItemStream
             and Skippable functionality. See section on Read from a
             File</entry>
           </row>
 
           <row>
             <entry align="left">StaxEventItemReader</entry>
-
-            <entry align="left">java.lang.Object</entry>
 
             <entry align="left">Reads via StAX. See HOWTO - Read from a
             File</entry>
@@ -90,44 +76,27 @@
           <row>
             <entry align="left">JdbcCursorItemReader</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
             <entry align="left">Reads from a database cursor via JDBC. See
             HOWTO - Read from a Database</entry>
           </row>
 
           <row>
-            <entry align="left">DrivingQueryItemReader</entry>
-
-            <entry align="left">java.lang.Object</entry>
-
-            <entry align="left">Base class for operations that read from a
-            database based on a single driving query. Configured by injecting
-            a KeyGenerator object. See HOWTO - Read from a Database</entry>
-          </row>
-
-          <row>
             <entry align="left">HibernateCursorItemReader</entry>
-
-            <entry align="left">java.lang.Object</entry>
 
             <entry align="left">Reads from a cursor based on an HQL query. See
             section on Reading from a Database</entry>
           </row>
 
           <row>
-            <entry align="left">IbatisDrivingQueryItemReader</entry>
+            <entry align="left">IbatisPagingItemReader</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
-            <entry align="left">Reads via iBATIS based on a driving query. See
-            HOWTO - Read from a Database</entry>
+            <entry align="left">Reads via iBATIS based on a query. Pages
+            through the rows so that large datasets can be read without
+            running out of memory. See HOWTO - Read from a Database</entry>
           </row>
 
           <row>
             <entry align="left">JmsItemReader</entry>
-
-            <entry align="left">javax.jms.Message</entry>
 
             <entry align="left">Given a Spring JmsOperations object and a JMS
             Destination or destination name to send errors, provides items
@@ -138,8 +107,6 @@
           <row>
             <entry align="left">JpaPagingItemReader</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
             <entry align="left">Given a JPQL statement, pages through the
             rows, such that large datasets can be read without running out of
             memory</entry>
@@ -147,8 +114,6 @@
 
           <row>
             <entry align="left">JdbcPagingItemReader</entry>
-
-            <entry align="left">java.lang.Object</entry>
 
             <entry align="left">Given a SQL statement, pages through the rows,
             such that large datasets can be read without running out of
@@ -165,14 +130,12 @@
     <table>
       <title>Available Item Writers</title>
 
-      <tgroup cols="3">
+      <tgroup cols="2">
         <colspec align="center" />
 
         <thead>
           <row>
             <entry align="center">Item Writer</entry>
-
-            <entry align="center">Type of Item Written</entry>
 
             <entry align="center">Description</entry>
           </row>
@@ -182,28 +145,13 @@
           <row>
             <entry align="left">AbstractItemStreamItemWriter</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
             <entry align="left">Abstract base class that combines the
             <classname>ItemStream</classname> and
             <classname>ItemWriter</classname> interfaces.</entry>
           </row>
 
           <row>
-            <entry align="left">BatchSqlUpdateItemWriter</entry>
-
-            <entry align="left">java.lang.Object</entry>
-
-            <entry align="left"><classname>ItemWriter</classname> that uses
-            batching freatures from a <classname>PreparedStatement</classname>
-            if available and can take rudimentary steps to locate a failure
-            during a <methodname>flush</methodname>.</entry>
-          </row>
-
-          <row>
             <entry align="left">CompositeItemWriter</entry>
-
-            <entry align="left">java.lang.Object</entry>
 
             <entry align="left">Passes an item to the process method of each
             in an injected <emphasis role="bold">List</emphasis> of <emphasis
@@ -213,16 +161,12 @@
           <row>
             <entry align="left">ItemWriterAdapter</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
             <entry align="left">Adapts any class to the
             <classname>ItemWriter</classname> interface.</entry>
           </row>
 
           <row>
             <entry align="left">PropertyExtractingDelegatingItemWriter</entry>
-
-            <entry align="left">java.lang.Object</entry>
 
             <entry align="left">Extends AbstractMethodInvokingDelegator
             creating arguments on the fly. Arguments are created by retrieving
@@ -234,19 +178,12 @@
           <row>
             <entry align="left">FlatFileItemWriter</entry>
 
-            <entry align="left">java.lang.Object</entry>
-
-            <entry align="left">Attempts to convert the item to a <emphasis
-            role="bold">String</emphasis>, <emphasis
-            role="bold">Collection</emphasis> or array using an injected
-            <emphasis role="bold">Coverter</emphasis> and then
-            recurses.</entry>
+            <entry align="left">Writes to a flat file. Includes ItemStream and
+            Skippable functionality. See section on Writing to a File</entry>
           </row>
 
           <row>
-            <entry align="left">HibernateAwareItemWriter</entry>
-
-            <entry align="left">java.lang.Object</entry>
+            <entry align="left">HibernateItemWriter</entry>
 
             <entry align="left">This item writer is hibernate session aware
             and handles some transaction-related work that a non-"hibernate
@@ -255,9 +192,16 @@
           </row>
 
           <row>
-            <entry align="left">JpaAwareItemWriter</entry>
+            <entry align="left">JdbcBatchItemWriter</entry>
 
-            <entry align="left">java.lang.Object</entry>
+            <entry align="left">Uses batching freatures from a
+            <classname>PreparedStatement</classname>, if available, and can
+            take rudimentary steps to locate a failure during a
+            <methodname>flush</methodname>.</entry>
+          </row>
+
+          <row>
+            <entry align="left">JpaItemWriter</entry>
 
             <entry align="left">This item writer is JPA EntityManager aware
             and handles some transaction-related work that a non-"jpa aware"
@@ -266,9 +210,7 @@
           </row>
 
           <row>
-            <entry align="left">StaxEventWriterItemWriter</entry>
-
-            <entry align="left">java.lang.Object</entry>
+            <entry align="left">StaxEventItemWriter</entry>
 
             <entry align="left">Uses an <emphasis
             role="bold">ObjectToXmlSerializer</emphasis> implementation to

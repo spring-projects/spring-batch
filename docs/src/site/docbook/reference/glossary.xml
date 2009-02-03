@@ -99,8 +99,8 @@
 
       <glossdef>
         <para>An item represents the smallest ammount of complete data for
-        processing. In the most simple terms this might mean a line in a file,
-        a row in a database table, or a particular element in an XML
+        processing. In the simplest terms, this might mean a line in a file, a
+        row in a database table, or a particular element in an XML
         file.</para>
       </glossdef>
     </glossentry>
@@ -119,7 +119,7 @@
       <glossterm>Commit Interval</glossterm>
 
       <glossdef>
-        <para>A set of LUWs constitute a commit interval.</para>
+        <para>A set of LUWs processed within a single transaction.</para>
       </glossdef>
     </glossentry>
 
@@ -147,7 +147,7 @@
       <glossterm>Restartable</glossterm>
 
       <glossdef>
-        <para>- a job that can be executed again and will assume the same
+        <para>A job that can be executed again and will assume the same
         identity as when run initially. In othewords, it is has the same job
         instance id.</para>
       </glossdef>
@@ -157,14 +157,14 @@
       <glossterm>Rerunnable</glossterm>
 
       <glossdef>
-        <para>a job that is restartable and manages it's own state in terms of
+        <para>A job that is restartable and manages its own state in terms of
         previous run's record processing. An example of a rerunnable step is
         one based on a driving query. If the driving query can be formed so
         that it will limit the processed rows when the job is restarted than
         it is re-runnable. This is managed by the application logic. Often
         times a condition is added to the where statement to limit the rows
         returned by the driving query with something like "and processedFlag
-        != true". </para>
+        != true".</para>
       </glossdef>
     </glossentry>
 
@@ -189,9 +189,8 @@
         calling a block of code, retry is stateful, and continually calls the
         same block of code with the same input, until it either succeeds, or
         some type of retry limit has been exceeded. It is only generally
-        useful if the operation is non-deterministic meaning that a retry on a
-        subsequent invocation might succeed because something in the
-        environment has improved.</para>
+        useful if a subsequent invocation of the operation might succeed
+        because something in the environment has improved.</para>
       </glossdef>
     </glossentry>
 

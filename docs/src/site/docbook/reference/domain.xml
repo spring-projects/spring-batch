@@ -389,7 +389,7 @@
       will be kicked off again for 01-01, starting where it left off and
       completing successfully at 9:30. Because it's now the next day, the
       01-02 job must be run as well, which is kicked off just afterwards at
-      9:31, and completes in it's normal one hour time at 10:30. There is no
+      9:31, and completes in its normal one hour time at 10:30. There is no
       requirement that one <classname>JobInstance</classname> be kicked off
       after another, unless there is potential for the two jobs to attempt to
       access the same data, causing issues with locking at the database level.
@@ -573,7 +573,7 @@
       <classname>JobExecution</classname>. However, if a step fails to execute
       because the step before it fails, there will be no execution persisted
       for it. A <classname>StepExecution</classname> will only be created when
-      it's <classname>Step</classname> is actually started.</para>
+      its <classname>Step</classname> is actually started.</para>
 
       <para>Step executions are represented by objects of the
       <classname>StepExecution</classname> class. Each execution contains a

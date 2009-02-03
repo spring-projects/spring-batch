@@ -5,29 +5,31 @@
   <title>Common Batch Patterns</title>
 
   <para>Some batch jobs can be assembled purely from off-the-shelf components
-  in Spring Batch, mostly the <classname>ItemReader</classname> and
-  <classname>ItemWriter</classname> implementations. Where this is not
-  possible (the majority of cases) the main API entry points for application
+  in Spring Batch. For instance the <classname>ItemReader</classname> and
+  <classname>ItemWriter</classname> implementations can be configured to cover
+  a wide range of scenarios. However, for the majority of cases, custom code
+  will have to be written. The main API entry points for application
   developers are the <classname>Tasklet</classname>,
   <classname>ItemReader</classname>, <classname>ItemWriter</classname> and the
   various listener interfaces. Most simple batch jobs will be able to use
   off-the-shelf input from a Spring Batch <classname>ItemReader</classname>,
-  but it is very often the case that there are custom concerns in the
-  processing and writing, which normally leads developers to implement an
-  <classname>ItemWriter</classname>, or
-  <classname>ItemTransformer</classname>.</para>
+  but it is often the case that there are custom concerns in the processing
+  and writing, which require developers to implement an
+  <classname>ItemWriter</classname> or
+  <classname>ItemProcessor</classname>.</para>
 
-  <para>Here we provide a few examples of common patterns in custom business
-  logic, mainly using the listener interfaces . It should be noted that an
-  <classname>ItemReader</classname> or <classname>ItemWriter</classname> can
-  implement the listener interfaces as well if appropriate.</para>
+  <para>Here, we provide a few examples of common patterns in custom business
+  logic. These examples primarily feature the listener interfaces. It should
+  be noted that an <classname>ItemReader</classname> or
+  <classname>ItemWriter</classname> can implement a listener interface as
+  well, if appropriate.</para>
 
   <section>
     <title>Logging Item Processing and Failures</title>
 
     <para>A common use case is the need for special handling of errors in a
     step, item by item, perhaps logging to a special channel, or inserting a
-    record into a database. The <classname>StepHandlerStep</classname>
+    record into a database. A chunk-oriented <classname>Step</classname>
     (created from the step factory beans) allows users to implement this use
     case with a simple <classname>ItemReadListener</classname>, for errors on
     read, and an <classname>ItemWriteListener</classname>, for errors on
@@ -71,14 +73,16 @@
   <section>
     <title>Stopping a Job Manually for Business Reasons</title>
 
-    <para>Spring Batch provides a stop() method through the JobLauncher
-    interface, but this is really aimed at the operator, rather than the
-    application programmer. Sometimes it is more convenient or makes more
-    sense to stop a job execution from within the business logic.</para>
+    <para>Spring Batch provides a <methodname>stop</methodname>() method
+    through the <classname>JobLauncher</classname> interface, but this is
+    really for use by the operator rather than the application programmer.
+    Sometimes it is more convenient or makes more sense to stop a job
+    execution from within the business logic.</para>
 
-    <para>The simplest thing to do is to throw a RuntimeException (one that
-    isn't retried indefinitely or skipped), For example, a custom exception
-    type could be used, as in the example below:</para>
+    <para>The simplest thing to do is to throw a
+    <classname>RuntimeException</classname> (one that isn't retried
+    indefinitely or skipped). For example, a custom exception type could be
+    used, as in the example below:</para>
 
     <programlisting>public class PoisonPillItemWriter implements ItemWriter&lt;T&gt; {
     
@@ -95,15 +99,15 @@
     <para>Another simple way to stop a step from executing is to simply return
     <code>null</code> from the <classname>ItemReader</classname>:</para>
 
-    <programlisting>public class EarlyCompletionItemReader extends AbstractItemReader {
+    <programlisting>public class EarlyCompletionItemReader implements ItemReader&lt;T&gt; {
 
-    private ItemReader delegate;
+    private ItemReader&lt;T&gt; delegate;
 
-    public void setDelegate(ItemReader delegate) { ... }
+    public void setDelegate(ItemReader&lt;T&gt; delegate) { ... }
     
-    public Object read() throws Exception {
+    public T read() throws Exception {
 
-        Object item = delegate.read();
+        T item = delegate.read();
 
         if (isEndItem(item)) {
             return null; // end the step here
@@ -138,9 +142,10 @@
     <classname>StepExecution</classname>, which is checked by the
     <classname>Step</classname> implementations in the framework in between
     item processing. To implement this alternative, we need access to the
-    current StepExecution, and this can be achieved by implementing a
-    StepListener and registering it with the Step. Here is an example of a
-    listener that sets the flag:</para>
+    current <classname>StepExecution</classname>, and this can be achieved by
+    implementing a <classname>StepListener</classname> and registering it with
+    the <classname>Step</classname>. Here is an example of a listener that
+    sets the flag:</para>
 
     <programlisting>public class CustomItemWriter extends ItemListenerSupport implements StepListener {
 
@@ -160,7 +165,7 @@
 
 }</programlisting>
 
-    <para>The default behaviour here when the flag is set is for the step to
+    <para>The default behavior here when the flag is set is for the step to
     throw a <classname>JobInterruptedException</classname>. This can be
     controlled through the <classname>StepInterruptionPolicy</classname>, but
     the only choice is to throw or not throw an exception, so this is always
@@ -172,7 +177,7 @@
 
     <para>A very common requirement is to aggregate information during the
     output process and to append a record at the end of a file summarizing the
-    data, or providing a checksum. This can also be achieved with a callbacks
+    data, or providing a checksum. This can also be achieved with a callback
     in the step, normally as part of a custom
     <classname>ItemWriter</classname>. In this case, since a job is
     accumulating state that should not be lost if the job aborts, the
@@ -206,10 +211,8 @@
     }
     
     public void write(Trade item) {
-
         delegate.write(item);
         totalAmount += item.getAmount();
-
     }
 
 }</programlisting>
@@ -220,8 +223,9 @@
     <classname>ExecutionContext</classname>. In this way we can be sure that
     when the <code>open()</code> callback is received on a restart. The
     framework garuntees we always get the last value that was committed. It
-    should be noted that it is not always necessary to implement ItemStream.
-    For example, if the ItemWriter is re-runnable, in the sense that it
+    should be noted that it is not always necessary to implement
+    <classname>ItemStream</classname>. For example, if the
+    <classname>ItemWriter</classname> is re-runnable, in the sense that it
     maintains its own state in a transactional resource like a database, there
     is no need to maintain state within the writer itself.</para>
   </section>
@@ -272,11 +276,9 @@
       </imageobject>
     </mediaobject>
 
-    <para>As you can see, an existing DAO can be used to obtain a full 'Foo'
-    object using the key obtained from the driving query. In Spring Batch,
-    driving query style input is implemented with a
-    <classname>DrivingQueryItemReader</classname>, which has only one
-    dependency: a <classname>KeyCollector</classname></para>
+    <para>An ItemProcessor should be used to transform the key obtained from
+    the driving query into a full 'Foo' object. An existing DAO can be used to
+    query for the full object based on the key.</para>
   </section>
 
   <section id="multiLineRecords">
