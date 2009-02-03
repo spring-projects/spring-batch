@@ -30,7 +30,6 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.Assert;
 
 /**
  * A {@link Flow} that branches conditionally depending on the exit status of
@@ -88,7 +87,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 */
 	public State getState(String stateName) {
 		State state = stateMap.get(stateName);
-		Assert.notNull(state, "No State found with name: [" + stateName + "]");
+		if(state == null){
+			throw new IllegalStateException("No State found with name: [" + stateName + "]");
+		}
 		return state;
 	}
 

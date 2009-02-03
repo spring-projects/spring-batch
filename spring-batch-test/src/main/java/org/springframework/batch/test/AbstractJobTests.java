@@ -138,19 +138,13 @@ public abstract class AbstractJobTests {
 	}
 
 	/**
-	 * Launch just the specified step in the job.
+	 * Launch just the specified step in the job. An IllegalStateException is thrown
+	 * if there is no Step with the given name.
 	 * 
 	 * @param stepName
 	 */
 	public JobExecution launchStep(String stepName) {
-		Step step;
-		try {
-			step = this.job.getStep(stepName);
-		}
-		catch (IllegalArgumentException e) {
-			throw new IllegalStateException("No Step found with name: [" + stepName + "]", e);
-		}
-		return getStepRunner().launchStep(step);
+		return getStepRunner().launchStep(this.job.getStep(stepName));
 	}
 
 	/**

@@ -65,8 +65,10 @@ public class FlowJob extends AbstractJob {
 	 */
 	public Step getStep(String stepName){
 		State state = this.flow.getState(stepName);
-		Assert.isInstanceOf(StepState.class, state, "State is not a StepState: [" + stepName + "]");
-		return ((StepState) state).getStep();
+		if(state instanceof StepState){
+			return ((StepState) state).getStep();
+		}
+		throw new IllegalStateException("State is not a StepState: [" + stepName + "]");		
 	}
 	
 	/**

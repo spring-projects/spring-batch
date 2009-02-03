@@ -126,7 +126,8 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	}
 
 	/**
-	 * Retrieve the step with the given name
+	 * Retrieve the step with the given name. An IllegalStateException is thrown
+	 * if there is no Step with the given name.
 	 * 
 	 * @param stepName
 	 * @return the step

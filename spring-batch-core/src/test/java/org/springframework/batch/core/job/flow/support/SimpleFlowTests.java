@@ -215,7 +215,7 @@ public class SimpleFlowTests {
 		assertEquals("step1", state.getName());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expected = IllegalStateException.class)
 	public void testGetStateDoesNotExist() throws Exception {
 		flow.setStateTransitions(Collections.singletonList(StateTransition.createEndStateTransition(new StubState(
 				"step1"))));
