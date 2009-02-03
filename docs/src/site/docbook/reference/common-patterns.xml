@@ -80,9 +80,9 @@
     isn't retried indefinitely or skipped), For example, a custom exception
     type could be used, as in the example below:</para>
 
-    <programlisting>public class PoisonPillItemWriter extends AbstractItemWriter {
+    <programlisting>public class PoisonPillItemWriter implements ItemWriter&lt;T&gt; {
     
-    public void write(Object item) throws Exception {
+    public void write(T item) throws Exception {
 
         if (isPoisonPill(item)) {
             throw new PoisonPillException("Posion pill detected: "+item);
@@ -178,7 +178,7 @@
     accumulating state that should not be lost if the job aborts, the
     <classname>ItemStream</classname> interface should be implemented:</para>
 
-    <programlisting>public class CustomItemWriter extends AbstractItemWriter implements 
+    <programlisting>public class CustomItemWriter implements ItemWriter&lt;Trade&gt;,
     ItemStream, StepListener
 {
 
@@ -205,10 +205,10 @@
         executionContext.setDouble(TOTAL_AMOUNT_KEY, totalAmount);
     }
     
-    public void write(Object item) {
+    public void write(Trade item) {
 
         delegate.write(item);
-        totalAmount += ((Trade) item).getAmount();
+        totalAmount += item.getAmount();
 
     }
 
@@ -314,7 +314,7 @@
     how many lines there are, the <classname>ItemReader</classname> must be
     careful to always read an entire record. In order to do this, a custom
     <classname>ItemReader</classname> should be implemented as a wrapper for
-    the <classname>FlatFileItemReader</classname>. </para>
+    the <classname>FlatFileItemReader</classname>.</para>
 
     <programlisting>  &lt;bean id="itemReader" 
         class="org.springframework.batch.sample.iosample.internal.MultiLineTradeItemReader"&gt;
@@ -400,7 +400,7 @@
     within the batch job. Such a process could be kicked off separately by the
     scheduler, but the advantage of common meta-data about the run would be
     lost. Furthermore, a multi-step job would also need to be split up into
-    multiple jobs as well. </para>
+    multiple jobs as well.</para>
 
     <para>Because the need is so common, Spring Batch provides a
     <classname>Tasklet</classname> implementation for calling system
