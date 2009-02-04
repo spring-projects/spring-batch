@@ -8,38 +8,39 @@
     <title>RepeatTemplate</title>
 
     <para>Batch processing is about repetitive actions - either as a simple
-    optimisation, or as part of a job. To strategie and generalise the
-    repetition, and provide what amounts to an iterator framework, Spring
-    Batch has the <classname>RepeatOperations</classname> interface. The
-    <classname>RepeatOperations</classname> interface looks like this:</para>
+    optimisation, or as part of a job. To strategize and generalize the
+    repetition as well as to provide what amounts to an iterator framework,
+    Spring Batch has the <classname>RepeatOperations</classname> interface.
+    The <classname>RepeatOperations</classname> interface looks like
+    this:</para>
 
     <para><programlisting>public interface RepeatOperations {
 
-    ExitStatus iterate(RepeatCallback callback) throws RepeatException;
+    RepeatStatus iterate(RepeatCallback callback) throws RepeatException;
 
-}</programlisting>where the callback is a simple interface that allows you to
-    insert some business logic to be repeated</para>
+}</programlisting>The callback is a simple interface that allows you to insert
+    some business logic to be repeated:</para>
 
     <para><programlisting>public interface RepeatCallback {
 
-    ExitStatus doInIteration(RepeatContext context) throws Exception;
+    RepeatStatus doInIteration(RepeatContext context) throws Exception;
 
-}</programlisting>The callback is executed repeatedly, until the
-    implementation decides that the iteration should end. The return value in
-    these interfaces is a special form of extendable enumeration (not a true
-    enumeration because users are free to create new values). An
-    <classname>ExitStatus</classname> is immutable and conveys information to
-    the caller of the repeat operations about whether there is any more work
-    to do. Generally speaking, implementations of
+}</programlisting>The callback is executed repeatedly until the implementation
+    decides that the iteration should end. The return value in these
+    interfaces is an enumeration that can either be
+    <code>RepeatStatus.CONTINUABLE</code> or
+    <code>RepeatStatus.FINISHED</code>. A <classname>RepeatStatus</classname>
+    conveys information to the caller of the repeat operations about whether
+    there is any more work to do. Generally speaking, implementations of
     <classname>RepeatOperations</classname> should inspect the
-    <classname>ExitStatus</classname> and use it as part of the decision to
+    <classname>RepeatStatus</classname> and use it as part of the decision to
     end the iteration. Any callback that wishes to signal to the caller that
     there is no more work to do can return
-    <code>ExitStatus.FINISHED</code>.</para>
+    <code>RepeatStatus.FINISHED</code>.</para>
 
     <para>The simplest general purpose implementation of
     <classname>RepeatOperations</classname> is
-    <classname>RepeatTemplate</classname>. It could be used like this</para>
+    <classname>RepeatTemplate</classname>. It could be used like this:</para>
 
     <programlisting>RepeatTemplate template = new RepeatTemplate();
 
@@ -54,13 +55,13 @@ template.iterate(new RepeatCallback() {
 
 });</programlisting>
 
-    <para>In the example we return <code>ExitStatus.CONTINUABLE</code> to show
-    that there is more work to do. The callback can also return
+    <para>In the example we return <code>RepeatStatus.CONTINUABLE</code> to
+    show that there is more work to do. The callback can also return
     <code>ExitStatus.FINISHED</code> if it wants to signal to the caller that
     there is no more work to do. Some iterations can be terminated by
     considerations intrinsic to the work being done in the callback, others
-    are effectively infinite loops as far as the callback is concerned, and
-    the completion decision is delegated to an external policy as in the case
+    are effectively infinite loops as far as the callback is concerned and the
+    completion decision is delegated to an external policy as in the case
     above.</para>
 
     <section>
@@ -82,77 +83,44 @@ template.iterate(new RepeatCallback() {
     </section>
 
     <section>
-      <title>ExitStatus</title>
+      <title>RepeatStatus</title>
 
-      <para><classname>ExitStatus</classname> is used by Spring Batch to
-      indicate whether processing has finished, and if so whether or not is
-      was successful. It is also used to carry textual information about the
-      end state of a batch or iteration, in the form of an exit code and a
-      description of the status in freeform text. These are the properties of
-      an <classname>ExitStatus</classname>:</para>
+      <para><classname>RepeatStatus</classname> is an enumeration used by
+      Spring Batch to indicate whether processing has finished. These are
+      possible <classname>RepeatStatus</classname> values:</para>
 
       <table>
         <title>ExitStatus properties</title>
 
-        <tgroup cols="3">
+        <tgroup cols="2">
           <tbody>
             <row>
-              <entry>Property Name</entry>
+              <entry><emphasis role="bold">Value</emphasis></entry>
 
-              <entry>Type</entry>
-
-              <entry>Description</entry>
+              <entry><emphasis role="bold">Description</emphasis></entry>
             </row>
 
             <row>
-              <entry>continuable</entry>
+              <entry>CONTINUABLE</entry>
 
-              <entry>boolean</entry>
-
-              <entry>true if there is more work to do</entry>
+              <entry>There is more work to do.</entry>
             </row>
 
             <row>
-              <entry>exitCode</entry>
+              <entry>FINISHED</entry>
 
-              <entry>String</entry>
-
-              <entry>Short code describing the exit status, e.g. CONTINUABLE,
-              FINISHED, FAILED</entry>
-            </row>
-
-            <row>
-              <entry>exitDescription</entry>
-
-              <entry>String</entry>
-
-              <entry>Long description of the exit status, could be a stack
-              trace for example.</entry>
+              <entry>No more repetitions should take place.</entry>
             </row>
           </tbody>
         </tgroup>
       </table>
 
-      <para><classname>ExitStatus</classname> values are designed to be
-      flexible, so that they can be created with any code and description the
-      user needs. Spring Batch comes with some standard values out of the box,
-      to support common use cases, but users are free to create their own
-      values, as long as the semantics of the <code>continuable</code>
-      property are honoured.</para>
-
-      <para>ExitStatus values can also be combined with various operators
-      built into the class as methods. You can add an exit code, or
-      description, or combine the continuable values with logical AND using
-      methods in ExitStatus. You can also combine two ExitStatus values with
-      the and method taking ExitStatus as a parameter. The effect of this is
-      to do a logical AND on the continuable flag, concatenate the
-      descriptions and replace the exit code with the new value, as long as
-      the result is continuable, or the input is not continuable. This has the
-      effect of maintaining the semantics of the continuable flag, but not
-      making any "surprising" changes to the exit code (e.g. it never becomes
-      CONTINUABLE when it was already FINISHED, unless someone does something
-      wilful, like pass in a value that is not continuable, but with a code of
-      CONTINUABLE).</para>
+      <para><classname>RepeatStatus</classname> values can also be combined
+      with a logical AND operation using the <methodname>and</methodname>()
+      method in <classname>RepeatStatus</classname>. The effect of this is to
+      do a logical AND on the continuable flag. In other words, if either
+      status is <code>FINISHED</code>, then the result will be
+      <code>FINISHED</code>.</para>
     </section>
   </section>
 
@@ -167,22 +135,22 @@ template.iterate(new RepeatCallback() {
     current policy to create a <classname>RepeatContext</classname> and pass
     that in to the <classname>RepeatCallback</classname> at every stage in the
     iteration. After a callback completes its
-    <methodname>doInIteration</methodname> the
+    <methodname>doInIteration</methodname>, the
     <classname>RepeatTemplate</classname> has to make a call to the
     <classname>CompletionPolicy</classname> to ask it to update its state
-    (which will be stored in the <classname>RepeatContext</classname>), then
+    (which will be stored in the <classname>RepeatContext</classname>). Then
     it asks the policy if the iteration is complete.</para>
 
     <para>Spring Batch provides some simple general purpose implementations of
-    <classname>CompletionPolicy</classname>, for example the
-    <classname>SimpleCompletionPolicy</classname> used in the example above.
-    The <classname>SimpleCompletionPolicy</classname> just allows an execution
-    up to a fixed number of times (with <code>ExitStatus.FINISHED</code>
+    <classname>CompletionPolicy</classname>. The
+    <classname>SimpleCompletionPolicy</classname> just allows an execution up
+    to a fixed number of times (with <code>RepeatStatus.FINISHED</code>
     forcing early completion at any time).</para>
 
     <para>Users might need to implement their own completion policies for more
-    complicated decisions, e.g. a batch processing window that prevents batch
-    jobs from executing once the online systems are in use.</para>
+    complicated decisions. For example, a batch processing window that
+    prevents batch jobs from executing once the online systems are in use
+    would require a custom policy.</para>
   </section>
 
   <section>
@@ -227,7 +195,7 @@ template.iterate(new RepeatCallback() {
     interface. The <classname>RepeatTemplate</classname> allows users to
     register <classname>RepeatListener</classname>s, and they will be given
     callbacks with the <classname>RepeatContext</classname> and
-    <classname>ExitStatus</classname> where available during the
+    <classname>RepeatStatus</classname> where available during the
     iteration.</para>
 
     <para>The interface looks like this:</para>
@@ -235,7 +203,7 @@ template.iterate(new RepeatCallback() {
     <para><programlisting>public interface RepeatListener {
     void before(RepeatContext context);
 
-    void after(RepeatContext context, ExitStatus result);
+    void after(RepeatContext context, RepeatStatus result);
 
     void open(RepeatContext context);
 
@@ -245,13 +213,13 @@ template.iterate(new RepeatCallback() {
 }
 </programlisting>The <methodname>open</methodname> and
     <methodname>close</methodname> callbacks come before and after the entire
-    iteration, and <methodname>before</methodname>,
-    <methodname>after</methodname> and <methodname>onError</methodname> apply
-    to the individual RepeatCallback calls.</para>
+    iteration. <methodname>before</methodname>, <methodname>after</methodname>
+    and <methodname>onError</methodname> apply to the individual
+    RepeatCallback calls.</para>
 
     <para>Note that when there is more than one listener, they are in a list,
     so there is an order. In this case <methodname>open</methodname> and
-    <methodname>before</methodname> are called in the same order, and
+    <methodname>before</methodname> are called in the same order while
     <methodname>after</methodname>, <methodname>onError</methodname> and
     <methodname>close</methodname> are called in reverse order.</para>
   </section>
@@ -262,7 +230,7 @@ template.iterate(new RepeatCallback() {
     <para>Implementations of <classname>RepeatOperations</classname> are not
     restricted to executing the callback sequentially. It is quite important
     that some implementations are able to execute their callbacks in parallel.
-    To this end Spring Batch provides the
+    To this end, Spring Batch provides the
     <classname>TaskExecutorRepeatTemplate</classname>, which uses the Spring
     <classname>TaskExecutor</classname> strategy to run the
     <classname>RepeatCallback</classname>. The default is to use a

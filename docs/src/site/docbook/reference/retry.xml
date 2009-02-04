@@ -10,12 +10,13 @@
     <para>To make processing more robust and less prone to failure, sometimes
     it helps to automatically retry a failed operation in case it might
     succeed on a subsequent attempt. Errors that are susceptible to this kind
-    of treatment are transient in nature, for example a remote call to a web
-    service or RMI service that fails because of a network glitch, or a
-    <classname>DeadLockLoserException</classname> in a database update. To
-    automate the retry of such operations Spring Batch has the
-    <classname>RetryOperations</classname> strategy. The
-    <classname>RetryOperations</classname> interface looks like this:</para>
+    of treatment are transient in nature. For example a remote call to a web
+    service or RMI service that fails because of a network glitch or a
+    <classname>DeadLockLoserException</classname> in a database update may
+    resolve themselves after a short wait. To automate the retry of such
+    operations Spring Batch has the <classname>RetryOperations</classname>
+    strategy. The <classname>RetryOperations</classname> interface looks like
+    this:</para>
 
     <para><programlisting>public interface RetryOperations {
 
@@ -30,8 +31,8 @@
     &lt;T&gt; T execute(RetryCallback&lt;T&gt; retryCallback, RecoveryCallback&lt;T&gt; recoveryCallback, 
         RetryState retryState) throws Exception;
 
-}</programlisting>where the basic callback is a simple interface that allows
-    you to insert some business logic to be retried</para>
+}</programlisting>The basic callback is a simple interface that allows you to
+    insert some business logic to be retried:</para>
 
     <para><programlisting>public interface RetryCallback&lt;T&gt; {
 
@@ -86,9 +87,9 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
 
       <para>When a retry is exhausted the
       <classname>RetryOperations</classname> can pass control to a different
-      callback, the <classname>RetryCallback</classname>. To use this feature
-      clients just pass in the callbacks together to the same method, for
-      example:</para>
+      callback, the <classname>RecoveryCallback</classname>. To use this
+      feature clients just pass in the callbacks together to the same method,
+      for example:</para>
 
       <para><programlisting>Foo foo = template.execute(new RetryCallback&lt;Foo&gt;() {
     public Foo doWithRetry(RetryContext context) {
@@ -106,7 +107,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     <section>
       <title>Stateless Retry</title>
 
-      <para>In the simplest case a retry is just a while loop - the
+      <para>In the simplest case, a retry is just a while loop: the
       <classname>RetryTemplate</classname> can just keep trying until it
       either succeeds or fails. The <classname>RetryContext</classname>
       contains some state to determine whether to retry or abort, but this
@@ -123,12 +124,12 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       <title>Stateful Retry</title>
 
       <para>Where the failure has caused a transactional resource to become
-      invalid there are some special considerations. This does not apply to a
-      simple remote call because there was no transactional resource
-      (usually), but it does sometimes apply to a database update, especially
-      when using Hibernate. In this case it only makes sense to rethrow the
-      exception that called the failure immediately, so that the transaction
-      can roll back, and we can start a new valid one.</para>
+      invalid, there are some special considerations. This does not apply to a
+      simple remote call because there is no transactional resource (usually),
+      but it does sometimes apply to a database update, especially when using
+      Hibernate. In this case it only makes sense to rethrow the exception
+      that called the failure immediately so that the transaction can roll
+      back and we can start a new valid one.</para>
 
       <para>In these cases a stateless retry is not good enough because the
       re-throw and roll back necessarily involve leaving the
@@ -142,20 +143,21 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       <classname>Map</classname>. Advanced usage with multiple processes in a
       clustered environment might also consider implementing the
       <classname>RetryContextCache</classname> with a cluster cache of some
-      sort (even in a clustered environment this might be overkill).</para>
+      sort (though, even in a clustered environment this might be
+      overkill).</para>
 
       <para>Part of the responsibility of the
-      <classname>RetryOperations</classname> is to recognise the failed
+      <classname>RetryOperations</classname> is to recognize the failed
       operations when they come back in a new execution (and usually wrapped
       in a new transaction). To facilitate this, Spring Batch provides the
       <classname>RetryState</classname> abstraction. This works in conjunction
       with a special <classname>execute</classname> methods in the
       <classname>RetryOperations</classname>.</para>
 
-      <para>The way the failed operations are recognised is by identifying the
-      state across multiple invocations of the retry. To identify the state
-      the user can provide an <classname>RetryState</classname> object, and
-      this is responsible for returning a unique key identifying the item. The
+      <para>The way the failed operations are recognized is by identifying the
+      state across multiple invocations of the retry. To identify the state,
+      the user can provide an <classname>RetryState</classname> object that is
+      responsible for returning a unique key identifying the item. The
       identifier is used as a key in the
       <classname>RetryContextCache</classname>.</para>
 
@@ -176,9 +178,8 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       <classname>RetryOperations</classname>.</para>
 
       <para>The decision to retry or not is actually delegated to a regular
-      retry policy, so the usual concerns about limits and timeouts can be
-      injected through the <classname>RetryPolicy</classname> (see
-      below).</para>
+      <classname>RetryPolicy</classname>, so the usual concerns about limits
+      and timeouts can be injected there (see below).</para>
     </section>
   </section>
 
@@ -199,8 +200,8 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     another attempt can be made. If another attempt cannot be made (e.g. a
     limit is reached or a timeout is detected) then the policy is also
     responsible for handling the exhausted state. Simple implementations will
-    just throw <classname>RetryExhaustedException</classname>, and any
-    enclosing transaction will be rolled back. More sophisticated
+    just throw <classname>RetryExhaustedException</classname> which will cause
+    any enclosing transaction to be rolled back. More sophisticated
     implementations might attempt to take some recovery action, in which case
     the transaction can remain intact.</para>
 
@@ -210,9 +211,8 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       doesn't help to retry it. So don't retry on all exception types - try to
       focus on only those exceptions that you expect to be retryable. It's not
       usually harmful to the business logic to retry more aggressively, but
-      it's wasteful because if a failure is deterministic there could be a
-      very tight loop retrying something that you know in advance is
-      fatal.</para>
+      it's wasteful because if a failure is deterministic there will be time
+      spent retrying something that you know in advance is fatal.</para>
     </tip>
 
     <para>Spring Batch provides some simple general purpose implementations of
@@ -224,8 +224,8 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     <para>The <classname>SimpleRetryPolicy</classname> just allows a retry on
     any of a named list of exception types, up to a fixed number of times. It
     also has a list of "fatal" exceptions that should never be retried, and
-    this list overrides the retryable list, so it can be used to give finer
-    control over the retry behaviour, e.g.</para>
+    this list overrides the retryable list so that it can be used to give
+    finer control over the retry behavior:</para>
 
     <programlisting>SimpleRetryPolicy policy = new SimpleRetryPolicy(5);
 // Retry on all exceptions (this is the default)
@@ -244,7 +244,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
 
     <para>There is also a more flexible implementation called
     <classname>ExceptionClassifierRetryPolicy</classname>, which allows the
-    user to configure different retry behaviour for an arbitrary set of
+    user to configure different retry behavior for an arbitrary set of
     excecption types though the <classname>ExceptionClassifier</classname>
     abstraction. The policy works by calling on the classifier to convert an
     exception into a delegate <classname>RetryPolicy</classname>, so for
@@ -252,8 +252,9 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     another by mapping it to a different policy.</para>
 
     <para>Users might need to implement their own retry policies for more
-    customized decisions, e.g. if there is a well-known solution-specific
-    classification of exceptions into retryable and not retryable.</para>
+    customized decisions. For instance, if there is a well-known,
+    solution-specific, classification of exceptions into retryable and not
+    retryable.</para>
   </section>
 
   <section>
@@ -306,16 +307,16 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
 }
 </programlisting>The <methodname>open</methodname> and
     <methodname>close</methodname> callbacks come before and after the entire
-    retry in the simplest case, and <methodname>onError</methodname> applies
-    to the individual RetryCallback calls. The <methodname>close</methodname>
-    method might also receive a <classname>Throwable</classname>, if there has
-    been an error it is the last one thrown by the
-    <classname>RetryCallback</classname>.</para>
+    retry in the simplest case and <methodname>onError</methodname> applies to
+    the individual <classname>RetryCallback</classname> calls. The
+    <methodname>close</methodname> method might also receive a
+    <classname>Throwable</classname>; if there has been an error it is the
+    last one thrown by the <classname>RetryCallback</classname>.</para>
 
     <para>Note that when there is more than one listener, they are in a list,
-    so there is an order. In this case <methodname>open</methodname> is called
-    in the same order, and <methodname>onError</methodname> and
-    <methodname>close</methodname> are called in reverse order.</para>
+    so there is an order. In this case <methodname>open</methodname> will be
+    called in the same order while <methodname>onError</methodname> and
+    <methodname>close</methodname> will be called in reverse order.</para>
   </section>
 
   <section>
