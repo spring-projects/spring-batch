@@ -494,9 +494,9 @@
         linkend="domain" />. The first argument is 'endOfDayJob.xml', which is
         the Spring <classname>ApplicationContext</classname> containing the
         <classname>Job</classname>. The second argument, 'endOfDay' represents
-        the job name. The final argument, 'schedule.date=01-01-2008' will be
-        converted into <classname>JobParameters</classname>. An example of the
-        XML configuration is below:</para>
+        the job name. The final argument, 'schedule.date(date)=2008/01/01'
+        will be converted into <classname>JobParameters</classname>. An
+        example of the XML configuration is below:</para>
 
         <programlisting>  &lt;job id="endOfDay"&gt;
     &lt;steps&gt;
