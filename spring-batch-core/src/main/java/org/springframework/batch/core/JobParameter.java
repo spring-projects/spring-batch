@@ -108,7 +108,7 @@ public class JobParameter implements Serializable{
 	
 	@Override
 	public String toString() {
-		return parameter.toString();
+		return parameterType==ParameterType.DATE ? ""+((Date)parameter).getTime() : parameter.toString();
 	}
 	
 	public int hashCode() {

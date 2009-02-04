@@ -43,6 +43,13 @@ public class JobParameterTests {
 	}
 	
 	@Test
+	public void testDateParameterToString(){
+		Date epoch = new Date(0L);
+		jobParameter = new JobParameter(epoch);
+		assertEquals("0", jobParameter.toString());
+	}
+	
+	@Test
 	public void testEquals(){
 		jobParameter = new JobParameter("test");
 		JobParameter testParameter = new JobParameter("test");
