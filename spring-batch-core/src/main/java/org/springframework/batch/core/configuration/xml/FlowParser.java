@@ -18,10 +18,12 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.job.flow.support.SimpleFlow;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
+import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -31,52 +33,67 @@ import org.w3c.dom.NodeList;
  * @author Dave Syer
  * 
  */
-public class FlowParser {
+public class FlowParser extends AbstractSingleBeanDefinitionParser {
+
+	private final String flowName;
+
+	/**
+	 * Construct a {@link FlowParser} with the specified name.
+	 * @param flowName the name of the flow
+	 */
+	public FlowParser(String flowName) {
+		this.flowName = flowName;
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see AbstractSingleBeanDefinitionParser#getBeanClass(Element)
+	 */
+	@Override
+	protected Class<SimpleFlow> getBeanClass(Element element) {
+		return SimpleFlow.class;
+	}
 
 	/**
 	 * @param element the top level element containing a flow definition
-	 * @param parserContext the {@link ParserContext}
-	 * @param flowName the name of the flow
-	 * @return a bean definition for a {@link org.springframework.batch.core.job.flow.Flow}
+	 * @param outerContext the {@link ParserContext}
 	 */
-	public AbstractBeanDefinition parse(Element element, ParserContext parserContext, String flowName) {
+	@Override
+	protected void doParse(Element element, ParserContext outerContext, BeanDefinitionBuilder builder) {
 		List<RuntimeBeanReference> stateTransitions = new ArrayList<RuntimeBeanReference>();
 
 		StepParser stepParser = new StepParser();
 		DecisionParser decisionParser = new DecisionParser();
 		SplitParser splitParser = new SplitParser();
-		
+		ParserContext parserContext = new ParserContext(outerContext.getReaderContext(), outerContext.getDelegate(),
+				builder.getBeanDefinition());
+
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node instanceof Element) {
 				String nodeName = node.getLocalName();
-				if(nodeName.equals("step"))
-				{
-					stateTransitions.addAll(stepParser.parse((Element)node, parserContext));
+				if (nodeName.equals("step")) {
+					stateTransitions.addAll(stepParser.parse((Element) node, parserContext));
 				}
-				else if(nodeName.equals("decision"))
-				{
-					stateTransitions.addAll(decisionParser.parse((Element)node, parserContext));
+				else if (nodeName.equals("decision")) {
+					stateTransitions.addAll(decisionParser.parse((Element) node, parserContext));
 				}
-				else if(nodeName.equals("split"))
-				{
-					stateTransitions.addAll(splitParser.parse((Element)node, parserContext));
+				else if (nodeName.equals("split")) {
+					stateTransitions.addAll(splitParser.parse((Element) node, parserContext));
 				}
 			}
 		}
 
-		BeanDefinitionBuilder flowBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.SimpleFlow");
-		flowBuilder.addConstructorArgValue(flowName);
+		builder.addConstructorArgValue(flowName);
 		ManagedList managedList = new ManagedList();
 		@SuppressWarnings( { "unchecked", "unused" })
 		boolean dummy = managedList.addAll(stateTransitions);
-		flowBuilder.addPropertyValue("stateTransitions", managedList);
-		AbstractBeanDefinition flowDef = flowBuilder.getBeanDefinition();
-		parserContext.getReaderContext().registerWithGeneratedName(flowDef);
+		builder.addPropertyValue("stateTransitions", managedList);
 
-		return flowDef;
+		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 
 	}
 

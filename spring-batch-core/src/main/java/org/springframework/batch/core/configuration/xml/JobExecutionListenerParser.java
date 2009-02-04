@@ -24,6 +24,7 @@ import java.util.List;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -76,7 +77,8 @@ public class JobExecutionListenerParser {
 			else if(hasText(className)){
 				RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
 				String delegateId = parserContext.getReaderContext().generateBeanName(beanDef);
-				parserContext.getRegistry().registerBeanDefinition(delegateId, beanDef);
+				parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
+				beanDef.setSource(parserContext.extractSource(listenerElement));
 		        listenerBuilder.addPropertyReference("delegate", delegateId);
 			}
 			else {
@@ -98,7 +100,8 @@ public class JobExecutionListenerParser {
 			if (!StringUtils.hasText(id)) {
 				id = parserContext.getReaderContext().generateBeanName(beanDef);
 			}
-			parserContext.getRegistry().registerBeanDefinition(id, beanDef);
+			parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
+			beanDef.setSource(parserContext.extractSource(listenerElement));
 	        BeanReference bean = new RuntimeBeanReference(id);
 			listeners.add(bean);
 		}

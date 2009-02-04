@@ -31,7 +31,6 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
@@ -74,13 +73,12 @@ public class StepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
 		if (StringUtils.hasText(taskletRef)) {
-			BeanDefinition task = handleTaskletRef(element, taskletRef, parserContext);
-			parserContext.getRegistry().registerBeanDefinition(stepRef, task);
+			handleTaskletRef(element, taskletRef, parserContext);
 			stateBuilder.addConstructorArgReference(stepRef);
 		}
 		else if (processTaskElements.size() > 0) {
-			BeanDefinition task = handleTaskletElement(element, processTaskElements.get(0), parserContext);
-			parserContext.getRegistry().registerBeanDefinition(stepRef, task);
+			Element taskElement = processTaskElements.get(0);
+			handleTaskletElement(element, taskElement, parserContext);
 			stateBuilder.addConstructorArgReference(stepRef);
 		}
 		else if (StringUtils.hasText(stepRef)) {
@@ -209,9 +207,8 @@ public class StepParser {
 	 * @param stepElement
 	 * @param taskletRef
 	 * @param parserContext
-	 * @return the TaskletStep bean
 	 */
-	protected BeanDefinition handleTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext) {
+	private void handleTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext) {
 
     	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
 
@@ -232,16 +229,16 @@ public class StepParser {
         
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
         
-        return bd;
+		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepElement.getAttribute("name")));
+		bd.setSource(parserContext.extractSource(stepElement));
 
     }
 
 	/**
 	 * @param element
 	 * @param parserContext
-	 * @return the TaskletStep bean
 	 */
-	protected BeanDefinition handleTaskletElement(Element stepElement, Element element, ParserContext parserContext) {
+	private void handleTaskletElement(Element stepElement, Element element, ParserContext parserContext) {
 
     	RootBeanDefinition bd;
     	
@@ -360,7 +357,8 @@ public class StepParser {
         
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
         
-        return bd;
+		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepElement.getAttribute("name")));
+		bd.setSource(parserContext.extractSource(element));
 
 	}
 
@@ -451,7 +449,8 @@ public class StepParser {
 					if (!StringUtils.hasText(id)) {
 						id = parserContext.getReaderContext().generateBeanName(beanDef);
 					}
-					parserContext.getRegistry().registerBeanDefinition(id, beanDef);
+					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
+					beanDef.setSource(parserContext.extractSource(listenerElement));
 			        BeanReference bean = new RuntimeBeanReference(id);
 					beans.add(bean);
 				}
@@ -482,7 +481,8 @@ public class StepParser {
 				else if (StringUtils.hasText(className)) {
 					RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
 					String delegateId = parserContext.getReaderContext().generateBeanName(beanDef);
-					parserContext.getRegistry().registerBeanDefinition(delegateId, beanDef);
+					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
+					beanDef.setSource(parserContext.extractSource(listenerElement));
 					listenerBuilder.addPropertyReference("delegate", delegateId);
 				}
 				else {
@@ -520,7 +520,8 @@ public class StepParser {
 				if (!StringUtils.hasText(id)) {
 					id = parserContext.getReaderContext().generateBeanName(beanDef);
 				}
-				parserContext.getRegistry().registerBeanDefinition(id, beanDef);
+				parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
+				beanDef.setSource(parserContext.extractSource(listenerElement));
 		        BeanReference bean = new RuntimeBeanReference(id);
 				beans.add(bean);
 			}

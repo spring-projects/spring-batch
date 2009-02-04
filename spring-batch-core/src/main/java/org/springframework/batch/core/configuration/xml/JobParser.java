@@ -15,14 +15,14 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.batch.core.job.flow.FlowJob;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
+import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-
 import org.w3c.dom.Element;
 
 /**
@@ -32,7 +32,12 @@ import org.w3c.dom.Element;
  * @author Dave Syer
  * 
  */
-public class JobParser extends AbstractBeanDefinitionParser {
+public class JobParser extends AbstractSingleBeanDefinitionParser {
+	
+	@Override
+	protected Class<FlowJob> getBeanClass(Element element) {
+		return FlowJob.class;
+	}
 
 	/**
 	 * Create a bean definition for a {@link org.springframework.batch.core.job.flow.FlowJob}. The
@@ -40,16 +45,18 @@ public class JobParser extends AbstractBeanDefinitionParser {
 	 * {@link org.springframework.batch.core.repository.JobRepository} and defaults to "jobRepository". Nested step
 	 * elements are delegated to a {@link StepParser}.
 	 * 
-	 * @see AbstractBeanDefinitionParser#parseInternal(Element, ParserContext)
+	 * @see AbstractSingleBeanDefinitionParser#doParse(Element, ParserContext, BeanDefinitionBuilder)
 	 */
 	@Override
-	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.FlowJob");
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
 		
 		String repositoryAttribute = element.getAttribute("job-repository");
+		if (!StringUtils.hasText(repositoryAttribute)) {
+			repositoryAttribute = "jobRepository";
+		}
 		builder.addPropertyReference("jobRepository", repositoryAttribute);
 
 		String restartableAttribute = element.getAttribute("restartable");
@@ -62,8 +69,8 @@ public class JobParser extends AbstractBeanDefinitionParser {
 			builder.addPropertyReference("jobParametersIncrementer", incrementer);
 		}
 
-		FlowParser flowParser = new FlowParser();
-		AbstractBeanDefinition flowDef = flowParser.parse(element, parserContext, jobName);
+		FlowParser flowParser = new FlowParser(jobName);
+		BeanDefinition flowDef = flowParser.parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
 		
 		JobExecutionListenerParser listenerParser = new JobExecutionListenerParser();
@@ -72,8 +79,7 @@ public class JobParser extends AbstractBeanDefinitionParser {
 			ManagedList managedList = listenerParser.parse(listenersElement, parserContext);
 			builder.addPropertyValue("jobExecutionListeners", managedList);
 		}
-		
-		return builder.getBeanDefinition();
+
 	}
 
 }

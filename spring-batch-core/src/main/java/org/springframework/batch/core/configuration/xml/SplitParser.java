@@ -62,10 +62,10 @@ public class SplitParser {
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.SplitState");
 
 		Collection<BeanDefinition> flows = new ArrayList<BeanDefinition>();
-		FlowParser flowParser = new FlowParser();
 		int i = 0;
 		for (Element nextElement : flowElements) {
-			flows.add(flowParser.parse(nextElement, parserContext, idAttribute+"#"+i));
+			FlowParser flowParser = new FlowParser(idAttribute+"#"+i);
+			flows.add(flowParser.parse(nextElement, parserContext));
 			i++;
 		}	
 		ManagedList managedList = new ManagedList();
