@@ -21,7 +21,6 @@ import static org.springframework.util.StringUtils.hasText;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -34,7 +33,6 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
-
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
@@ -67,8 +65,8 @@ public class JobExecutionListenerParser {
 					}
 					attributes.append(attributeNodes.item(i));
 				}
-				throw new BeanCreationException("Both 'ref' and 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-						listenerElement.getTagName() + "> element with attributes: " + attributes);
+				parserContext.getReaderContext().error("Both 'ref' and 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
+						listenerElement.getTagName() + "> element with attributes: " + attributes, listenerElement);
 			}
 			
 			if(hasText(listenerRef)){
@@ -77,12 +75,12 @@ public class JobExecutionListenerParser {
 			else if(hasText(className)){
 				RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
 				String delegateId = parserContext.getReaderContext().generateBeanName(beanDef);
-				parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
 				beanDef.setSource(parserContext.extractSource(listenerElement));
+				parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
 		        listenerBuilder.addPropertyReference("delegate", delegateId);
 			}
 			else {
-				throw new BeanCreationException("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element");
+				parserContext.getReaderContext().error("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element", listenerElement);
 			}
 			
 			ManagedMap metaDataMap = new ManagedMap();

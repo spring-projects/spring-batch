@@ -229,8 +229,8 @@ public class StepParser {
         
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
         
+        bd.setSource(parserContext.extractSource(stepElement));
 		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepElement.getAttribute("name")));
-		bd.setSource(parserContext.extractSource(stepElement));
 
     }
 
@@ -357,8 +357,8 @@ public class StepParser {
         
         bd.setRole(BeanDefinition.ROLE_SUPPORT);
         
+        bd.setSource(parserContext.extractSource(stepElement));
 		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepElement.getAttribute("name")));
-		bd.setSource(parserContext.extractSource(element));
 
 	}
 
@@ -449,8 +449,8 @@ public class StepParser {
 					if (!StringUtils.hasText(id)) {
 						id = parserContext.getReaderContext().generateBeanName(beanDef);
 					}
-					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
 					beanDef.setSource(parserContext.extractSource(listenerElement));
+					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
 			        BeanReference bean = new RuntimeBeanReference(id);
 					beans.add(bean);
 				}
@@ -481,8 +481,8 @@ public class StepParser {
 				else if (StringUtils.hasText(className)) {
 					RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
 					String delegateId = parserContext.getReaderContext().generateBeanName(beanDef);
-					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
 					beanDef.setSource(parserContext.extractSource(listenerElement));
+					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
 					listenerBuilder.addPropertyReference("delegate", delegateId);
 				}
 				else {
