@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Export-Package: example;version="2.0.0.CI-SNAPSHOT";uses:="org.springf
+ ramework.batch.item",test.jdbc.datasource;version="2.0.0.CI-SNAPSHOT"
+ ;uses:="javax.sql,org.apache.commons.logging,org.springframework.bean
+ s.factory,org.springframework.core.io,org.springframework.transaction
+ ,org.springframework.transaction.support"
+Bundle-Classpath: .
+Bundle-Version: 2.0.0.CI-SNAPSHOT
+Built-By: dsyer
+Build-Jdk: 1.6.0_03
+Bundle-Name: Spring Batch Cammand Line Archetype
+Bundle-ManifestVersion: 2
+Created-By: Apache Maven
+Bundle-SymbolicName: org.springframework.batch.archetype.simple.cli
+Import-Package: javax.sql,org.apache.commons.io;version="[1.4.0, 2.0.0
+ )";resolution:=optional,org.apache.commons.logging;version="[1.1.0, 2
+ .0.0)",org.springframework.batch.core.job;version="[2.0.0, 3.0.0)",or
+ g.springframework.batch.core.step.item;version="[2.0.0, 3.0.0)",org.s
+ pringframework.batch.item;version="[2.0.0, 3.0.0)",org.springframewor
+ k.beans.factory;version="[2.5.5, 3.0.0)";resolution:=optional,org.spr
+ ingframework.context.support;version="[2.5.5, 3.0.0)";resolution:=opt
+ ional,org.springframework.core.io;version="[2.5.5, 3.0.0)";resolution
+ :=optional,org.springframework.dao;version="[2.5.5, 3.0.0)";resolutio
+ n:=optional,org.springframework.jdbc.core;version="[2.5.5, 3.0.0)";re
+ solution:=optional,org.springframework.jdbc.datasource;version="[2.5.
+ 5, 3.0.0)";resolution:=optional,org.springframework.transaction;versi
+ on="[2.5.5, 3.0.0)";resolution:=optional,org.springframework.transact
+ ion.support;version="[2.5.5, 3.0.0)";resolution:=optional,org.springf
+ ramework.util;version="[2.5.5, 3.0.0)";resolution:=optional
+Archiver-Version: Plexus Archiver
+
