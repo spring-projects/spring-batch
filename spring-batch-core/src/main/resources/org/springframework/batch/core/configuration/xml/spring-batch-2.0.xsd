@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
-	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
+<xsd:schema xmlns="http://www.springframework.org/schema/batch"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/batch"
+	elementFormDefault="qualified" attributeFormDefault="unqualified"
 	version="2.0">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
@@ -30,15 +32,22 @@
 				<xsd:extension base="flowType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="jobRepository" />
-					<xsd:attribute name="incrementer" type="xsd:string" use="optional">
+					<xsd:attribute name="incrementer" type="xsd:string"
+						use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[ 
 								A reference to a JobParametersIncrementer bean definition.
 								]]>
 							</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref" />
+								<tool:expected-type
+									type="org.springframework.batch.core.JobParametersIncrementer" />
+							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="restartable" type="xsd:string" default="true" use="optional">
+					<xsd:attribute name="restartable" type="xsd:string"
+						default="true" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							Whether the job should be retartable or not in case of failure.
@@ -59,7 +68,8 @@
 		<xsd:complexType>
 			<xsd:complexContent>
 				<xsd:extension base="beans:identifiedType">
-					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
+					<xsd:attribute name="data-source" type="xsd:string"
+						default="dataSource">
 						<xsd:annotation>
 							<xsd:documentation source="java:javax.sql.DataSource"><![CDATA[
 							The bean name of the DataSource that is to be used. This attribute 
@@ -74,7 +84,8 @@
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attributeGroup ref="transactionManager" />
-					<xsd:attribute name="isolation-level-for-create" type="xsd:string">
+					<xsd:attribute name="isolation-level-for-create"
+						type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							The isolation level to use for creation of job execution entities.
@@ -108,7 +119,8 @@
 							The name attribute must be specified and
 							can
 							match the id of
-							a bean
+							a
+							bean
 							definition
 							for a Step. If it does not, then you must provide
 							a
@@ -219,7 +231,7 @@
 								<xsd:attribute name="class" type="xsd:string">
 									<xsd:annotation>
 										<xsd:documentation>
-										A class name used to create a listener.
+										A class name used to create a listener from the default constructor.
 										</xsd:documentation>
 										<xsd:appinfo>
 											<tool:annotation kind="direct">
@@ -292,7 +304,18 @@
 							<xsd:sequence>
 								<xsd:element name="stream" minOccurs="1" maxOccurs="unbounded">
 									<xsd:complexType>
-										<xsd:attribute name="ref" type="xsd:string"/>
+										<xsd:attribute name="ref" type="xsd:string">
+											<xsd:annotation>
+												<xsd:documentation><![CDATA[
+												A reference to an ItemStream bean definition
+												]]>
+												</xsd:documentation>
+												<xsd:appinfo>
+													<tool:annotation kind="ref" />
+													<tool:expected-type type="org.springframework.batch.item.ItemStream" />
+												</xsd:appinfo>
+											</xsd:annotation>
+										</xsd:attribute>
 									</xsd:complexType>
 								</xsd:element>
 							</xsd:sequence>
@@ -344,6 +367,10 @@
 						<xsd:documentation><![CDATA[
 						The bean name of the item reader that is to be used for the process.
 						]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref" />
+							<tool:expected-type type="org.springframework.batch.item.ItemReader" />
+						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="processor" type="xsd:string" use="optional">
@@ -351,6 +378,10 @@
 						<xsd:documentation><![CDATA[
 						The bean name of the item processor that is to be used for the process.
 						]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref" />
+							<tool:expected-type type="org.springframework.batch.item.ItemProcessor" />
+						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="writer" type="xsd:string" use="required">
@@ -358,12 +389,16 @@
 						<xsd:documentation><![CDATA[
 						The bean name of the item writer that is to be used for the process.
 						]]></xsd:documentation>
+						<xsd:appinfo>
+							<tool:annotation kind="ref" />
+							<tool:expected-type type="org.springframework.batch.item.ItemWriter" />
+						</xsd:appinfo>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="start-limit" type="xsd:string" use="optional">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
-						The maximum number of times a Step may be started.†
+						The maximum number of times a Step may be started.
 						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
@@ -460,8 +495,29 @@
 	
 	<xsd:complexType name="stepListenerType">
 		<xsd:attribute name="id" type="xsd:ID"/>
-		<xsd:attribute name="ref" type="xsd:string"/>
-		<xsd:attribute name="class" type="xsd:string"/>
+		<xsd:attribute name="ref" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A bean definition for a step listener (or POJO if using *-method attributes)
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref"/>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="class" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+				A class name used to create a StepListener from the default constructor.  If the class
+				does not implement StepListener then a *-method attribute must be provided. 
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="direct">
+						<tool:expected-type type="java.lang.Class" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attribute name="before-step-method" type="xsd:string"/>
 		<xsd:attribute name="after-step-method" type="xsd:string"/>
 		<xsd:attribute name="before-chunk-method" type="xsd:string"/>
@@ -483,7 +539,17 @@
 	<xsd:complexType name="jobExecutionListenerType">
 		<xsd:attribute name="before-method" type="xsd:string"/>
 		<xsd:attribute name="after-method" type="xsd:string"/>
-		<xsd:attribute name="ref" type="xsd:string" use="required"/>
+		<xsd:attribute name="ref" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				A bean definition for a job listener (or POJO if using *-method attributes)
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref"/>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		
 	</xsd:complexType>
 
 	<xsd:group name="transitions">
