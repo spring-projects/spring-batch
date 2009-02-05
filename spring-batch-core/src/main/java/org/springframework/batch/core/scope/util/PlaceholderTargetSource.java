@@ -177,7 +177,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 		BeanWrapper wrapper = new BeanWrapperImpl(contextFactory.getContext());
 		if (wrapper.isReadableProperty(key)) {
 			Object property = wrapper.getPropertyValue(key);
-			if (property==null || requiredType.isAssignableFrom(property.getClass())) {
+			if (property == null || requiredType.isAssignableFrom(property.getClass())) {
 				result = property;
 			}
 		}
@@ -218,9 +218,8 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			// here.
 			// replaceIfTypeMatches(result, first, next, key, Date.class,
 			// typeConverter);
-
-			first = result.indexOf(PLACEHOLDER_PREFIX, next + 1);
-			next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);
+			first = result.indexOf(PLACEHOLDER_PREFIX, first + 1);;
+			next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);;
 
 		}
 

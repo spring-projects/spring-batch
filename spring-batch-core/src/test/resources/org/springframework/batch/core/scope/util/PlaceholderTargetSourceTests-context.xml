@@ -48,6 +48,12 @@
 		<property name="targetBeanName" value="withIntegerTarget" />
 	</bean>
 
+	<bean id="withMultiple"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withMultipleTarget" />
+	</bean>
+
 	<bean id="withDate"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
 		<property name="contextFactory" ref="context" />
@@ -96,6 +102,12 @@
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
 		<property name="name" value="bar-#{integer}" />
+	</bean>
+
+	<bean id="withMultipleTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="name" value="bar-#{integer}-#{integer}" />
 	</bean>
 
 	<bean id="withDateTarget"

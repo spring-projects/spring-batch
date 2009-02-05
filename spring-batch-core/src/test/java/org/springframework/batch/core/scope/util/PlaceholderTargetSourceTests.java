@@ -35,6 +35,10 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	private PlaceholderTargetSource withInteger;
 
 	@Autowired
+	@Qualifier("withMultiple")
+	private PlaceholderTargetSource withMultiple;
+
+	@Autowired
 	@Qualifier("withDate")
 	private PlaceholderTargetSource withDate;
 
@@ -142,6 +146,12 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	public void testGetInteger() {
 		Node target = (Node) withInteger.getTarget();
 		assertEquals("bar-4321", target.getName());
+	}
+
+	@Test
+	public void testGetMultiple() {
+		Node target = (Node) withMultiple.getTarget();
+		assertEquals("bar-4321-4321", target.getName());
 	}
 
 	@Test
