@@ -101,7 +101,7 @@ public class FlowJob extends AbstractJob {
 					&& stepExecution.getExitStatus().getExitCode().equals(result.getStatus())) {
 				value = stepExecution;
 			}
-			if (isLater(backup,stepExecution)) {
+			if (isLater(stepExecution, backup)) {
 				backup = stepExecution;
 			}
 		}
@@ -120,7 +120,7 @@ public class FlowJob extends AbstractJob {
 	 * @return true if the first is deemed to be executed after the second
 	 */
 	private boolean isLater(StepExecution first, StepExecution second) {
-		if (first==null) {
+		if (second==null) {
 			return true;
 		}
 		if (first.getEndTime()==null) {
