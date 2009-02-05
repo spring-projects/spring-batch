@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -49,6 +51,11 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class StepParser {
 
+	private static final String NEXT = "next";
+	private static final String END = "end";
+	private static final String FAIL = "fail";
+	private static final String PAUSE = "pause";
+	
 	// For generating unique state names for end transitions
 	private static int endCounter = 0;
 
@@ -103,62 +110,26 @@ public class StepParser {
 
 		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
 
-		String shortNextAttribute = element.getAttribute("next");
+		String shortNextAttribute = element.getAttribute(NEXT);
 		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
 		if (hasNextAttribute) {
 			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
 		}
 
-		@SuppressWarnings("unchecked")
-		List<Element> nextElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "next");
-		@SuppressWarnings("unchecked")
-		List<Element> stopElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "stop");
-		nextElements.addAll(stopElements);
-		@SuppressWarnings("unchecked")
-		List<Element> endElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "end");
-		nextElements.addAll(endElements);
-
-		for (Element nextElement : nextElements) {
-			String onAttribute = nextElement.getAttribute("on");
-			String nextAttribute = nextElement.getAttribute("to");
-			if (hasNextAttribute && onAttribute.equals("*")) {
-				parserContext.getReaderContext().error("Duplicate transition pattern found for '*' "
-						+ "(only specify one of next= attribute at step level and next element with on='*')",
-						element);
-			}
-
-			RuntimeBeanReference additionalState = null;
-			
-			String name = nextElement.getNodeName();
-			if ("stop".equals(name) || "end".equals(name)) {
-
-				String statusName = nextElement.getAttribute("status");
-				String status = StringUtils.hasText(statusName) ? statusName : "STOPPED";
-				String nextOnEnd = StringUtils.hasText(statusName) ? null : nextAttribute;
-
-				BeanDefinitionBuilder endBuilder = 
-					BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
-				endBuilder.addConstructorArgValue(status);
-				String endName = "stop".equals(name) ? "end" + (endCounter++) : null;
-
-				endBuilder.addConstructorArgValue(endName);
-				additionalState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), onAttribute, nextOnEnd);
-				nextAttribute = endName;
-	
-			}
-			list.add(getStateTransitionReference(parserContext, stateDef, onAttribute, nextAttribute));
-			if(additionalState != null)
-			{
-				//
-				// Must be added after the state to ensure that the state is the first in the list
-				//
-				list.add(additionalState);
+		boolean transitionExists = false;
+		for(String transitionName : new String[]{NEXT, PAUSE, END, FAIL})
+		{
+			@SuppressWarnings("unchecked")
+			List<Element> transitionElements = (List<Element>) DomUtils.getChildElementsByTagName(element, transitionName);
+			for (Element transitionElement : transitionElements) {
+				parseTransitionElement(parserContext, stateDef, element, list, hasNextAttribute, transitionElement);
+				transitionExists = true;
 			}
 		}
 
-		if(hasNextAttribute && nextElements.isEmpty()) 
+		if(hasNextAttribute && !transitionExists) 
 		{ 
-		    list.add(getStateTransitionReference(parserContext, stateDef, "FAILED", null));
+		    list.add(getStateTransitionReference(parserContext, stateDef, ExitStatus.FAILED.getExitCode(), null));
 		} 
 
 		if (list.isEmpty() && !hasNextAttribute) {
@@ -166,6 +137,73 @@ public class StepParser {
 		}
 
 		return list;
+	}
+
+	/**
+	 * @param parserContext
+	 * @param stateDef
+	 * @param element
+	 * @param list
+	 * @param hasNextAttribute
+	 * @param transitionElement
+	 */
+	private static void parseTransitionElement(ParserContext parserContext, BeanDefinition stateDef, Element element,
+			Collection<RuntimeBeanReference> list, boolean hasNextAttribute, Element transitionElement) {
+		String onAttribute = transitionElement.getAttribute("on");
+		String nextAttribute = transitionElement.getAttribute("to");
+		if (hasNextAttribute && onAttribute.equals("*")) {
+			parserContext.getReaderContext().error("Duplicate transition pattern found for '*' "
+					+ "(only specify one of next= attribute at step level and next element with on='*')",
+					element);
+		}
+
+		RuntimeBeanReference endState = null;
+		
+		String name = transitionElement.getNodeName();
+		if (PAUSE.equals(name) || END.equals(name) || FAIL.equals(name)) {
+
+			BatchStatus batchStatus = getBatchStatusFromEndTransitionName(name);
+			BeanDefinitionBuilder endBuilder = 
+				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
+			endBuilder.addConstructorArgValue(batchStatus);
+
+			String statusName = transitionElement.getAttribute("status");
+			String exitStatus = StringUtils.hasText(statusName) ? statusName : batchStatus.toString();
+			endBuilder.addConstructorArgValue(new ExitStatus(exitStatus));
+
+			String endName = PAUSE.equals(name) ? "end" + (endCounter++) : null;
+			endBuilder.addConstructorArgValue(endName);
+			
+			String nextOnEnd = StringUtils.hasText(statusName) ? null : nextAttribute;
+			endState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), onAttribute, nextOnEnd);
+			nextAttribute = endName;
+
+		}
+		list.add(getStateTransitionReference(parserContext, stateDef, onAttribute, nextAttribute));
+		if(endState != null)
+		{
+			//
+			// Must be added after the state to ensure that the state is the first in the list
+			//
+			list.add(endState);
+		}
+	}
+
+	/**
+	 * @param name An end transition name
+	 * @return the BatchStatus corresponding to the transition name
+	 */
+	private static BatchStatus getBatchStatusFromEndTransitionName(String name) {
+		if(PAUSE.equals(name)){
+			return BatchStatus.STOPPED;
+		}
+		else if(END.equals(name)){
+			return BatchStatus.COMPLETED;
+		}
+		else if(FAIL.equals(name)){
+			return BatchStatus.FAILED;
+		}
+		throw new IllegalStateException("No BatchStatus defined for transition: [" + name + "]");
 	}
 
 	/**

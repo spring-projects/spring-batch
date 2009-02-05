@@ -581,10 +581,11 @@
 						</xsd:attribute>
 					</xsd:complexType>
 				</xsd:element>		
-				<xsd:element name="stop">
+				<xsd:element name="pause">
 					<xsd:annotation>
 						<xsd:documentation>
-							Declares job should be stop at this point and provides pointer where execution should continue.
+							Declares job should be stop at this point and provides pointer where execution should continue when
+							the job is restarted.
 						</xsd:documentation>
 					</xsd:annotation>
 					<xsd:complexType>
@@ -605,7 +606,8 @@
 				<xsd:element name="end">
 					<xsd:annotation>
 						<xsd:documentation>
-							Declares job should be stop at this point and provides optional pointer where execution should continue.
+							Declares job should end at this point, without the possibility of restart.  
+							BatchStatus will be COMLETED.  ExitStatus is configurable.
 						</xsd:documentation>
 					</xsd:annotation>
 					<xsd:complexType>
@@ -616,17 +618,31 @@
 								Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
-						<xsd:attribute name="status" use="optional" default="COMPLETED">
+						<xsd:attribute name="status" use="optional" type="xsd:string" default="COMPLETED">
 							<xsd:annotation>
-								<xsd:documentation>The BatchStatus value to end on, defaults to COMPLETED.</xsd:documentation>
+								<xsd:documentation>The ExitStatus value to end on, defaults to COMPLETED.</xsd:documentation>
 							</xsd:annotation>
-							<xsd:simpleType>
-								<xsd:restriction base="xsd:string">
-									<xsd:enumeration value="COMPLETED"/>
-									<xsd:enumeration value="FAILED"/>
-									<xsd:enumeration value="STOPPED"/>
-								</xsd:restriction>
-							</xsd:simpleType>
+						</xsd:attribute>
+					</xsd:complexType>		
+				</xsd:element>			
+				<xsd:element name="fail">
+					<xsd:annotation>
+						<xsd:documentation>
+							Declares job should fail at this point.  BatchStatus will be FAILED.  ExitStatus is configurable.
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:attribute name="on" type="xsd:string" use="required" >
+							<xsd:annotation>
+								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
+								When a step finishes the most specific match will be chosen to select the next step. 
+								Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:attribute>
+						<xsd:attribute name="status" use="optional" type="xsd:string" default="FAILED">
+							<xsd:annotation>
+								<xsd:documentation>The ExitStatus value to end on, defaults to FAILED.</xsd:documentation>
+							</xsd:annotation>
 						</xsd:attribute>
 					</xsd:complexType>		
 				</xsd:element>			

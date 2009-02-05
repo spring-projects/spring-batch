@@ -17,6 +17,7 @@
 package org.springframework.batch.core.job.flow.support.state;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutor;
@@ -32,13 +33,22 @@ import org.springframework.batch.core.job.flow.support.State;
 public class EndState extends AbstractState {
 
 	private final BatchStatus status;
+	private final ExitStatus exitStatus;
 
 	/**
 	 * @param name
 	 */
 	public EndState(BatchStatus status, String name) {
+		this(status, new ExitStatus(status.toString()), name);
+	}
+
+	/**
+	 * @param name
+	 */
+	public EndState(BatchStatus status, ExitStatus exitStatus, String name) {
 		super(name);
 		this.status = status;
+		this.exitStatus = exitStatus;
 	}
 
 	/**
@@ -56,6 +66,7 @@ public class EndState extends AbstractState {
 		synchronized (jobExecution) {
 			if (!jobExecution.getStepExecutions().isEmpty()) {
 				jobExecution.upgradeStatus(status);
+				jobExecution.setExitStatus(exitStatus);
 			}
 			return FlowExecution.COMPLETED;
 		}

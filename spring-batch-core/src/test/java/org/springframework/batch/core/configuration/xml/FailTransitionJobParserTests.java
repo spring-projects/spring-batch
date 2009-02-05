@@ -37,7 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class EndTransitionJobParserTests {
+public class FailTransitionJobParserTests {
 
 	@Autowired
 	private Job job;
@@ -51,15 +51,14 @@ public class EndTransitionJobParserTests {
 	}
 
 	@Test
-	public void testEndTransition() throws Exception {
+	public void testFailTransition() throws Exception {
 		assertNotNull(job);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
-
-		// TODO: BATCH-1011
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		// assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		// assertEquals("EARLY TERMINATION (COMPLETE)", jobExecution.getExitStatus().getExitCode());
+		
+		// TODO: BATCH-1011
+		// assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
 		
 		assertEquals(1, jobExecution.getStepExecutions().size());
 	}

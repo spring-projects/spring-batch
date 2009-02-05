@@ -10,7 +10,7 @@
 	
 	<job id="job">
 		<step name="failingStep">
-			<end on="FAILED" status="EARLY TERMINATION (COMPLETE)"/>
+			<fail on="FAILED" status="EARLY TERMINATION (FAIL)"/>
 			<next on="*" to="step2"/>
 		</step>
 		<step name="step2" />
