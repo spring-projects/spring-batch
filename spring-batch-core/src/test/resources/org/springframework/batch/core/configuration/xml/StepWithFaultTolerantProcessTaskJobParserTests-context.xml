@@ -15,6 +15,7 @@
 					is-reader-transactional-queue="true"
 					task-executor="taskExecutor">
 				<retry-listeners>
+					<listener ref="retryListener"/>
 					<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener"/>
 				</retry-listeners>
 				<streams>
@@ -38,6 +39,8 @@
 	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
 
 	<beans:bean id="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+	
+	<beans:bean id="retryListener" class="org.springframework.batch.core.configuration.xml.TestRetryListener"/>
 	
 	<beans:bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ConcurrentTaskExecutor"/>
 

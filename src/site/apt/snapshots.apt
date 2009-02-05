@@ -3,31 +3,32 @@
                                     ---------
                                     Dave Syer
                                     ------
-                                    August 2007
+                                    August 2007, February 2009
 
 Snapshot Builds
 
-	These builds are provided for testing and development purposes only. They are built by a Bamboo process automatically using the latest snapshot from Subversion.
+  These builds are provided for testing and development purposes only. They are built by a Bamboo process automatically using the latest snapshot from Subversion.
 	
-	You can browse the {{{http://s3browse.com/explore/maven.springframework.org/snapshot/org/springframework/batch}repository}} with a web browser.  If you are downloading the jar files manually from there you can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.
+  Snapshots are deployed every night to the {{{http://s3browse.com/explore/repository.springsource.com/maven/bundles/snapshot}SpringSource Enterprise Repository}}, so use this in your POM (inside a \<repositories\> element):
 
-	The snapshots are deloyed to a Maven2 snapshot repository. To use it, just add the following repository to your POM (inside a \<repositories\> element at the top level):
-
-+---------------
++---
 <repository>
-    <id>spring-s3</id>
-    <name>Springframework Maven SNAPSHOT Repository</name>
-    <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
+  <id>com.springsource.repository.bundles.snapshot</id>
+  <name>SpringSource Enterprise Bundle Repository -
+    Snapshot Bundle Releases</name>
+  <url>http://repository.springsource.com/maven/bundles/snapshot</url>
 </repository>
-+---------------
++---
 
-	Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
+  If you are downloading the jar files manually from there you can see the internal and external project dependencies in the <<<org.springframework.batch.*/*.pom>>> files.  You will probably need <<<spring-batch-org.springframework.batch.core>>> and <<<org.springframework.batch.infrastructure>>>.
+
+  Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
 
 +---------------
 <dependency>
     <groupId>org.springframework.batch</groupId>
-    <artifactId>spring-batch-core</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <artifactId>org.springframework.batch.core</artifactId>
+    <version>2.0.0.CI-SNAPSHOT</version>
 </dependency>
 +---------------
 

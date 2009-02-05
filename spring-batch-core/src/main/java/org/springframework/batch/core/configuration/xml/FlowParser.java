@@ -21,6 +21,7 @@ import java.util.List;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
@@ -58,17 +59,18 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 	/**
 	 * @param element the top level element containing a flow definition
-	 * @param outerContext the {@link ParserContext}
+	 * @param parserContext the {@link ParserContext}
 	 */
 	@Override
-	protected void doParse(Element element, ParserContext outerContext, BeanDefinitionBuilder builder) {
+	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		List<RuntimeBeanReference> stateTransitions = new ArrayList<RuntimeBeanReference>();
 
 		StepParser stepParser = new StepParser();
 		DecisionParser decisionParser = new DecisionParser();
 		SplitParser splitParser = new SplitParser();
-		ParserContext parserContext = new ParserContext(outerContext.getReaderContext(), outerContext.getDelegate(),
-				builder.getBeanDefinition());
+		CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(),
+				parserContext.extractSource(element));
+		parserContext.pushContainingComponent(compositeDef);
 
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
@@ -82,7 +84,8 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 					stateTransitions.addAll(decisionParser.parse((Element) node, parserContext));
 				}
 				else if (nodeName.equals("split")) {
-					stateTransitions.addAll(splitParser.parse((Element) node, parserContext));
+					stateTransitions.addAll(splitParser.parse((Element) node, new ParserContext(parserContext
+							.getReaderContext(), parserContext.getDelegate(), builder.getBeanDefinition())));
 				}
 			}
 		}
@@ -94,6 +97,8 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		builder.addPropertyValue("stateTransitions", managedList);
 
 		builder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+
+		parserContext.popAndRegisterContainingComponent();
 
 	}
 

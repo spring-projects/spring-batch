@@ -17,6 +17,7 @@ package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
@@ -76,8 +77,12 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		JobExecutionListenerParser listenerParser = new JobExecutionListenerParser();
 		Element listenersElement = (Element)DomUtils.getChildElementByTagName(element, "listeners");
 		if(listenersElement != null){
+			CompositeComponentDefinition compositeDef =
+				new CompositeComponentDefinition(listenersElement.getTagName(), parserContext.extractSource(element));
+			parserContext.pushContainingComponent(compositeDef);
 			ManagedList managedList = listenerParser.parse(listenersElement, parserContext);
 			builder.addPropertyValue("jobExecutionListeners", managedList);
+			parserContext.popAndRegisterContainingComponent();
 		}
 
 	}

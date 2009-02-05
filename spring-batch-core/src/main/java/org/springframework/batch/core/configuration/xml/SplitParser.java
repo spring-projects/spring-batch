@@ -31,7 +31,7 @@ import org.w3c.dom.Element;
 /**
  * Internal parser for the &lt;split/&gt; elements inside a job. A split element
  * references a bean definition for a 
- * {@link org.springframework.batch.core.job.flow.support.state.JobExecutionDecider} and goes on to
+ * {@link org.springframework.batch.core.job.flow.JobExecutionDecider} and goes on to
  * list a set of transitions to other states with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 

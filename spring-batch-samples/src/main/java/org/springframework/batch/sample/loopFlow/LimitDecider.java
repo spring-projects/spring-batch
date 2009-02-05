@@ -17,7 +17,7 @@ package org.springframework.batch.sample.loopFlow;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.support.state.JobExecutionDecider;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 
 /**
  * This decider will return "CONTINUE" until the limit it reached, at which

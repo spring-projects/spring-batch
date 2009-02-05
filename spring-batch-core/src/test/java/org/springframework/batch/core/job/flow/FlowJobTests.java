@@ -38,7 +38,6 @@ import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.job.flow.support.StateTransition;
 import org.springframework.batch.core.job.flow.support.state.DecisionState;
 import org.springframework.batch.core.job.flow.support.state.EndState;
-import org.springframework.batch.core.job.flow.support.state.JobExecutionDecider;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;

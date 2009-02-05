@@ -111,7 +111,7 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
 		assertEquals("wrong number of listeners:", 2, ((StepListener[])listeners).length);
 		Object retryListeners = ReflectionTestUtils.getField(factory, "retryListeners");
-		assertEquals("wrong number of retry-listeners:", 1, ((RetryListener[])retryListeners).length);
+		assertEquals("wrong number of retry-listeners:", 2, ((RetryListener[])retryListeners).length);
 		Object streams = ReflectionTestUtils.getField(factory, "streams");
 		assertEquals("wrong number of streams:", 1, ((ItemStream[])streams).length);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());

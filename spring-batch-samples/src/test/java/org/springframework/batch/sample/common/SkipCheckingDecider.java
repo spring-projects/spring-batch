@@ -3,7 +3,7 @@ package org.springframework.batch.sample.common;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.support.state.JobExecutionDecider;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
 
 public class SkipCheckingDecider implements JobExecutionDecider {
 

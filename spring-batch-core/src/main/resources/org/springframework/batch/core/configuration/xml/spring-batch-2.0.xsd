@@ -30,7 +30,7 @@
 			<xsd:complexContent>
 				<xsd:extension base="flowType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attributeGroup ref="jobRepository"/>
+					<xsd:attributeGroup ref="jobRepository" />
 					<xsd:attribute name="incrementer" type="xsd:string"
 						use="optional">
 						<xsd:annotation>
@@ -109,10 +109,13 @@
 					<xsd:annotation>
 						<xsd:documentation>
 							Defines a stage in job processing backed by a
-							Step. 
+							Step.
 							The name attribute must be specified and
-							can match the id of a bean definition
-							for a Step. If it does not, then you must provide a
+							can match the id of
+							a bean
+							definition
+							for a Step. If it does not, then you must provide
+							a
 							tasklet definition.
 							The next attribute is a synonym for &lt;next on="*" .../&gt;
 						</xsd:documentation>
@@ -133,6 +136,11 @@
 										<xsd:documentation>
 										The tasklet is a reference to another bean definition that defines implements the Tasklet interface.
 										</xsd:documentation>
+										<xsd:appinfo>
+											<tool:annotation kind="ref">
+												<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
+											</tool:annotation>
+										</xsd:appinfo>
 									</xsd:annotation>
 								</xsd:attribute>
 							</xsd:extension>
@@ -176,6 +184,11 @@
 										The decider is a reference to a JobExecutionDecider that can produce a status to base 
 										the next transition on.
 										</xsd:documentation>
+										<xsd:appinfo>
+											<tool:annotation kind="ref">
+												<tool:expected-type type="org.springframework.batch.core.job.flow.JobExecutionDecider"/>
+											</tool:annotation>
+										</xsd:appinfo>
 									</xsd:annotation>
 								</xsd:attribute>
 							</xsd:extension>
@@ -196,7 +209,16 @@
 							maxOccurs="unbounded">
 							<xsd:complexType>
 								<xsd:attribute name="id" type="xsd:ID" />
-								<xsd:attribute name="ref" type="xsd:string" />
+								<xsd:attribute name="ref" type="xsd:string">
+									<xsd:annotation>
+										<xsd:documentation>
+										A reference to a JobExecutionListener or a POJO (with before-method / after-method).
+										</xsd:documentation>
+										<xsd:appinfo>
+											<tool:annotation kind="ref"/>
+										</xsd:appinfo>
+									</xsd:annotation>
+								</xsd:attribute>
 								<xsd:attribute name="class" type="xsd:string" />
 								<xsd:attribute name="before-method" type="xsd:string" />
 								<xsd:attribute name="after-method" type="xsd:string" />
@@ -451,9 +473,9 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="jobExecutionListenerType">
-		<xsd:attribute name="before-method" type="xsd:string"></xsd:attribute>
-		<xsd:attribute name="after-method" type="xsd:string"></xsd:attribute>
-		<xsd:attribute name="ref" type="xsd:string" use="required"></xsd:attribute>
+		<xsd:attribute name="before-method" type="xsd:string"/>
+		<xsd:attribute name="after-method" type="xsd:string"/>
+		<xsd:attribute name="ref" type="xsd:string" use="required"/>
 	</xsd:complexType>
 
 	<xsd:group name="transitions">
@@ -526,9 +548,9 @@
 							</xsd:annotation>
 							<xsd:simpleType>
 								<xsd:restriction base="xsd:string">
-									<xsd:enumeration value="COMPLETED"></xsd:enumeration>
-									<xsd:enumeration value="FAILED"></xsd:enumeration>
-									<xsd:enumeration value="STOPPED"></xsd:enumeration>
+									<xsd:enumeration value="COMPLETED"/>
+									<xsd:enumeration value="FAILED"/>
+									<xsd:enumeration value="STOPPED"/>
 								</xsd:restriction>
 							</xsd:simpleType>
 						</xsd:attribute>

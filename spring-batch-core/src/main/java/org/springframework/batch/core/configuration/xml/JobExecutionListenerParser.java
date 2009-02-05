@@ -21,9 +21,7 @@ import static org.springframework.util.StringUtils.hasText;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.config.BeanReference;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -37,26 +35,26 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * {@link BeanDefinitionParser} for {@link org.springframework.batch.core.JobExecutionListener}s
+ * {@link BeanDefinitionParser} for
+ * {@link org.springframework.batch.core.JobExecutionListener}s
  * 
  * @author Lucas Ward
- *
+ * @author Dave Syer
+ * 
  */
 public class JobExecutionListenerParser {
 
 	@SuppressWarnings("unchecked")
-	public ManagedList parse(Element element,
-			ParserContext parserContext) {
-		List<BeanReference> listeners = new ArrayList<BeanReference>();
+	public ManagedList parse(Element element, ParserContext parserContext) {
+		List<BeanDefinition> listeners = new ArrayList<BeanDefinition>();
 		List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "listener");
- 		for(Element listenerElement : listenerElements){
-			BeanDefinitionBuilder listenerBuilder = 
-				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.listener.JobListenerFactoryBean");
+		for (Element listenerElement : listenerElements) {
+			BeanDefinitionBuilder listenerBuilder = BeanDefinitionBuilder
+					.genericBeanDefinition("org.springframework.batch.core.listener.JobListenerFactoryBean");
 			String id = listenerElement.getAttribute("id");
 			String listenerRef = listenerElement.getAttribute("ref");
 			String className = listenerElement.getAttribute("class");
-			if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
-					&& StringUtils.hasText(listenerRef)) {
+			if ((StringUtils.hasText(id) || StringUtils.hasText(className)) && StringUtils.hasText(listenerRef)) {
 				NamedNodeMap attributeNodes = listenerElement.getAttributes();
 				StringBuilder attributes = new StringBuilder();
 				for (int i = 0; i < attributeNodes.getLength(); i++) {
@@ -65,48 +63,43 @@ public class JobExecutionListenerParser {
 					}
 					attributes.append(attributeNodes.item(i));
 				}
-				parserContext.getReaderContext().error("Both 'ref' and 'class' specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-						listenerElement.getTagName() + "> element with attributes: " + attributes, listenerElement);
+				parserContext.getReaderContext().error(
+						"Both 'ref' and 'class' specified; use 'class' with an optional 'id' or just 'ref' for <"
+								+ listenerElement.getTagName() + "> element with attributes: " + attributes,
+						listenerElement);
 			}
-			
-			if(hasText(listenerRef)){
+
+			if (hasText(listenerRef)) {
 				listenerBuilder.addPropertyReference("delegate", listenerRef);
 			}
-			else if(hasText(className)){
+			else if (hasText(className)) {
 				RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-				String delegateId = parserContext.getReaderContext().generateBeanName(beanDef);
-				beanDef.setSource(parserContext.extractSource(listenerElement));
-				parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
-		        listenerBuilder.addPropertyReference("delegate", delegateId);
+				listenerBuilder.addPropertyValue("delegate", beanDef);
 			}
 			else {
-				parserContext.getReaderContext().error("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element", listenerElement);
+				parserContext.getReaderContext().error(
+						"Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element",
+						listenerElement);
 			}
-			
+
 			ManagedMap metaDataMap = new ManagedMap();
 			String beforeMethod = listenerElement.getAttribute("before-method");
-			if(StringUtils.hasText(beforeMethod)){
+			if (StringUtils.hasText(beforeMethod)) {
 				metaDataMap.put("beforeMethod", beforeMethod);
 			}
-			
+
 			String afterMethod = listenerElement.getAttribute("after-method");
-			if(StringUtils.hasText(beforeMethod)){
+			if (StringUtils.hasText(beforeMethod)) {
 				metaDataMap.put("afterMethod", afterMethod);
 			}
 			listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
 			AbstractBeanDefinition beanDef = listenerBuilder.getBeanDefinition();
-			if (!StringUtils.hasText(id)) {
-				id = parserContext.getReaderContext().generateBeanName(beanDef);
-			}
-			parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
-			beanDef.setSource(parserContext.extractSource(listenerElement));
-	        BeanReference bean = new RuntimeBeanReference(id);
-			listeners.add(bean);
+			listeners.add(beanDef);
 		}
-		
+
 		ManagedList managedList = new ManagedList();
 		managedList.addAll(listeners);
-		
+
 		return managedList;
 	}
 

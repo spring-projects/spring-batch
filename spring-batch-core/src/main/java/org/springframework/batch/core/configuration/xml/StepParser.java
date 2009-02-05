@@ -23,6 +23,7 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
+import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
@@ -405,32 +406,40 @@ public class StepParser {
 		Element listenersElement = 
         	DomUtils.getChildElementByTagName(element, "listeners");
 		if (listenersElement != null) {
-			List<BeanReference> listenerBeans = new ArrayList<BeanReference>(); 
+			CompositeComponentDefinition compositeDef =
+				new CompositeComponentDefinition(listenersElement.getTagName(), parserContext.extractSource(element));
+			parserContext.pushContainingComponent(compositeDef);
+			List<Object> listenerBeans = new ArrayList<Object>(); 
 			handleStepListenerElements(parserContext, listenersElement,
 					listenerBeans);
 	        ManagedList arguments = new ManagedList();
 	        arguments.addAll(listenerBeans);
         	bd.getPropertyValues().addPropertyValue(property, arguments);
+        	parserContext.popAndRegisterContainingComponent();
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	private void handleRetryListenersElement(Element element, BeanDefinition bd, ParserContext parserContext) {
-		Element retryListenersElement = 
+		Element listenersElement = 
         	DomUtils.getChildElementByTagName(element, "retry-listeners");
-		if (retryListenersElement != null) {
-			List<BeanReference> retryListenerBeans = new ArrayList<BeanReference>(); 
-			handleListenerElements(parserContext, retryListenersElement,
+		if (listenersElement != null) {
+			CompositeComponentDefinition compositeDef =
+				new CompositeComponentDefinition(listenersElement.getTagName(), parserContext.extractSource(element));
+			parserContext.pushContainingComponent(compositeDef);
+			List<Object> retryListenerBeans = new ArrayList<Object>(); 
+			handleRetryListenerElements(parserContext, listenersElement,
 					retryListenerBeans);
 	        ManagedList arguments = new ManagedList();
 	        arguments.addAll(retryListenerBeans);
         	bd.getPropertyValues().addPropertyValue("retryListeners", arguments);
+        	parserContext.popAndRegisterContainingComponent();
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleListenerElements(ParserContext parserContext,
-			Element element, List<BeanReference> beans) {
+	private void handleRetryListenerElements(ParserContext parserContext,
+			Element element, List<Object> beans) {
 		List<Element> listenerElements = 
 			DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
@@ -449,10 +458,7 @@ public class StepParser {
 					if (!StringUtils.hasText(id)) {
 						id = parserContext.getReaderContext().generateBeanName(beanDef);
 					}
-					beanDef.setSource(parserContext.extractSource(listenerElement));
-					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
-			        BeanReference bean = new RuntimeBeanReference(id);
-					beans.add(bean);
+					beans.add(beanDef);
 				}
 				else {
 					parserContext.getReaderContext().error("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element", element);
@@ -463,7 +469,7 @@ public class StepParser {
 	
 	@SuppressWarnings("unchecked")
 	private void handleStepListenerElements(ParserContext parserContext,
-			Element element, List<BeanReference> beans) {
+			Element element, List<Object> beans) {
 		List<Element> listenerElements = 
 			DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
@@ -480,10 +486,7 @@ public class StepParser {
 				}
 				else if (StringUtils.hasText(className)) {
 					RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-					String delegateId = parserContext.getReaderContext().generateBeanName(beanDef);
-					beanDef.setSource(parserContext.extractSource(listenerElement));
-					parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, delegateId));
-					listenerBuilder.addPropertyReference("delegate", delegateId);
+					listenerBuilder.addPropertyValue("delegate", beanDef);
 				}
 				else {
 					parserContext.getReaderContext().error("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element", element);
@@ -520,10 +523,7 @@ public class StepParser {
 				if (!StringUtils.hasText(id)) {
 					id = parserContext.getReaderContext().generateBeanName(beanDef);
 				}
-				parserContext.registerBeanComponent(new BeanComponentDefinition(beanDef, id));
-				beanDef.setSource(parserContext.extractSource(listenerElement));
-		        BeanReference bean = new RuntimeBeanReference(id);
-				beans.add(bean);
+				beans.add(beanDef);
 			}
 		}
 	}
