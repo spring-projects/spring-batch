@@ -33,46 +33,27 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FailTransitionJobParserTests extends AbstractJobParserTests {
+public class DefaultSuccessJobParserTests extends AbstractJobParserTests {
 
 	@Test
-	public void testFailTransition() throws Exception {
+	public void testDefaultSuccess() throws Exception {
 
-		//
-		// First Launch
-		//
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(2, stepNamesList.size());
 		assertTrue(stepNamesList.contains("step1"));
-		assertTrue(stepNamesList.contains("failingStep"));
+		assertTrue(stepNamesList.contains("step2"));
 
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "step1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "failingStep");
-		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
-
-		//
-		// Second Launch
-		//
-		stepNamesList.clear();
-		jobExecution = createJobExecution();
-		job.execute(jobExecution);
-		assertEquals(1, stepNamesList.size()); // step1 is not executed
-		assertTrue(stepNamesList.contains("failingStep"));
-
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
-
-		StepExecution stepExecution3 = getStepExecution(jobExecution, "failingStep");
-		assertEquals(BatchStatus.FAILED, stepExecution3.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution3.getExitStatus().getExitCode());
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "step2");
+		assertEquals(BatchStatus.COMPLETED, stepExecution2.getStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution2.getExitStatus());
 
 	}
 

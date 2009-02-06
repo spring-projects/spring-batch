@@ -167,8 +167,7 @@ public class AbstractJobTests {
 		}
 
 		@Override
-		protected StepExecution doExecute(JobExecution execution) throws JobExecutionException {
-			return null;
+		protected void doExecute(JobExecution execution) throws JobExecutionException {
 		}
 
 		@Override

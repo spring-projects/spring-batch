@@ -80,22 +80,30 @@ public class SimpleJob extends AbstractJob {
 	 * successfully processed if it exists, and null if none were processed.
 	 * 
 	 * @param execution the current {@link JobExecution}
-	 * @return the last successful {@link StepExecution}
 	 * 
 	 * @see AbstractJob#handleStep(Step, JobExecution)
 	 */
-	protected StepExecution doExecute(JobExecution execution) throws JobInterruptedException, JobRestartException,
+	protected void doExecute(JobExecution execution) throws JobInterruptedException, JobRestartException,
 			StartLimitExceededException {
 
 		StepExecution stepExecution = null;
 		for (Step step : steps) {
 			stepExecution = handleStep(step, execution);
 			if (stepExecution.getStatus() != BatchStatus.COMPLETED) {
-				return stepExecution;
+				//
+				// Terminate the job if a step fails
+				//
+				break;
 			}
 		}
 
-		return stepExecution;
+		//
+		// Update the job status to be the same as the last step
+		//
+		if(stepExecution != null) {
+			execution.upgradeStatus(stepExecution.getStatus());
+			execution.setExitStatus(stepExecution.getExitStatus());
+		}
 	}
 
 }

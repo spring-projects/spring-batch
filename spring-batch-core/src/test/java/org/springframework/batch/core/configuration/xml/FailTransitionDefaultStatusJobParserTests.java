@@ -16,21 +16,14 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -40,33 +33,22 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FailTransitionDefaultStatusJobParserTests {
-
-	@Autowired
-	private Job job;
-
-	@Autowired
-	private JobRepository jobRepository;
-
-	@Autowired
-	private ArrayList<String> stepNamesList;
-
-	@Before
-	public void setUp() {
-		MapJobRepositoryFactoryBean.clear();
-	}
+public class FailTransitionDefaultStatusJobParserTests extends AbstractJobParserTests {
 
 	@Test
 	public void testFailTransitionDefaultStatus() throws Exception {
 
-		assertNotNull(job);
-		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
+		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size());
 		assertTrue(stepNamesList.contains("step1"));
+
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		// TODO: BATCH-1011
-		// assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
+		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
+
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "step1");
+		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
 	}
 

@@ -100,13 +100,15 @@ public class StepParser {
 	}
 
 	/**
-	 * @param parserContext
-	 * @param stateDef
-	 * @param element
-	 * @return a collection of {@link org.springframework.batch.core.job.flow.support.StateTransition} references
+	 * @param parserContext the parser context for the bean factory
+	 * @param stateDef The bean definition for the current state
+	 * @param element the &lt;step/gt; element to parse
+	 * @return a collection of
+	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 *         references
 	 */
-	public static Collection<RuntimeBeanReference> getNextElements(ParserContext parserContext,
-			BeanDefinition stateDef, Element element) {
+	protected static Collection<RuntimeBeanReference> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
+			Element element) {
 
 		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
 
@@ -116,94 +118,139 @@ public class StepParser {
 			list.add(getStateTransitionReference(parserContext, stateDef, null, shortNextAttribute));
 		}
 
-		boolean transitionExists = false;
-		for(String transitionName : new String[]{NEXT, PAUSE, END, FAIL})
-		{
+		boolean transitionElementExists = false;
+		List<String> patterns = new ArrayList<String>();
+		for (String transitionName : new String[] { NEXT, PAUSE, END, FAIL }) {
 			@SuppressWarnings("unchecked")
-			List<Element> transitionElements = (List<Element>) DomUtils.getChildElementsByTagName(element, transitionName);
+			List<Element> transitionElements = (List<Element>) DomUtils.getChildElementsByTagName(element,
+					transitionName);
 			for (Element transitionElement : transitionElements) {
-				parseTransitionElement(parserContext, stateDef, element, list, hasNextAttribute, transitionElement);
-				transitionExists = true;
+				verifyUniquePattern(element, parserContext, hasNextAttribute, transitionElement, patterns);
+				list.addAll(parseTransitionElement(transitionElement, stateDef, parserContext));
+				transitionElementExists = true;
 			}
 		}
 
-		if(hasNextAttribute && !transitionExists) 
-		{ 
-		    list.add(getStateTransitionReference(parserContext, stateDef, ExitStatus.FAILED.getExitCode(), null));
-		} 
-
-		if (list.isEmpty() && !hasNextAttribute) {
-			list.add(getStateTransitionReference(parserContext, stateDef, null, null));
+		if (!transitionElementExists) {
+			list.addAll(createTransition(BatchStatus.FAILED, ExitStatus.FAILED.getExitCode(), null, null, stateDef,
+					parserContext));
+			if (!hasNextAttribute) {
+				list.addAll(createTransition(BatchStatus.COMPLETED, null, null, null, stateDef, parserContext));
+			}
 		}
 
 		return list;
 	}
 
 	/**
-	 * @param parserContext
-	 * @param stateDef
 	 * @param element
-	 * @param list
+	 * @param parserContext the parser context for the bean factory
 	 * @param hasNextAttribute
-	 * @param transitionElement
+	 * @param transitionElement The element to parse
+	 * @param patterns a list of patterns on state transitions for this element
 	 */
-	private static void parseTransitionElement(ParserContext parserContext, BeanDefinition stateDef, Element element,
-			Collection<RuntimeBeanReference> list, boolean hasNextAttribute, Element transitionElement) {
+	private static void verifyUniquePattern(Element element, ParserContext parserContext, boolean hasNextAttribute,
+			Element transitionElement, List<String> patterns) {
 		String onAttribute = transitionElement.getAttribute("on");
-		String nextAttribute = transitionElement.getAttribute("to");
 		if (hasNextAttribute && onAttribute.equals("*")) {
-			parserContext.getReaderContext().error("Duplicate transition pattern found for '*' "
-					+ "(only specify one of next= attribute at step level and next element with on='*')",
+			parserContext.getReaderContext().error(
+					"Duplicate transition pattern found.  "
+							+ "Specify one of next= attribute at step level and next element with on='*'", element);
+		}
+		if (patterns.contains(onAttribute)) {
+			parserContext.getReaderContext().error("Duplicate transition pattern found for '" + onAttribute + "'",
 					element);
 		}
-
-		RuntimeBeanReference endState = null;
-		
-		String name = transitionElement.getNodeName();
-		if (PAUSE.equals(name) || END.equals(name) || FAIL.equals(name)) {
-
-			BatchStatus batchStatus = getBatchStatusFromEndTransitionName(name);
-			BeanDefinitionBuilder endBuilder = 
-				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
-			endBuilder.addConstructorArgValue(batchStatus);
-
-			String statusName = transitionElement.getAttribute("status");
-			String exitStatus = StringUtils.hasText(statusName) ? statusName : batchStatus.toString();
-			endBuilder.addConstructorArgValue(new ExitStatus(exitStatus));
-
-			String endName = "end" + (endCounter++);
-			endBuilder.addConstructorArgValue(endName);
-			
-			String nextOnEnd = StringUtils.hasText(statusName) ? null : nextAttribute;
-			endState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), "*", nextOnEnd);
-			nextAttribute = endName;
-
-		}
-		list.add(getStateTransitionReference(parserContext, stateDef, onAttribute, nextAttribute));
-		if(endState != null)
-		{
-			//
-			// Must be added after the state to ensure that the state is the first in the list
-			//
-			list.add(endState);
-		}
+		patterns.add(onAttribute);
 	}
 
 	/**
-	 * @param name An end transition name
+	 * @param transitionElement The element to parse
+	 * @param stateDef The bean definition for the current state
+	 * @param parserContext the parser context for the bean factory
+	 * @param a collection of
+	 *            {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 *            references
+	 */
+	private static Collection<RuntimeBeanReference> parseTransitionElement(Element transitionElement,
+			BeanDefinition stateDef, ParserContext parserContext) {
+
+		BatchStatus batchStatus = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
+		String onAttribute = transitionElement.getAttribute("on");
+		String nextAttribute = transitionElement.getAttribute("to");
+		String statusAttribute = transitionElement.getAttribute("status");
+
+		return createTransition(batchStatus, onAttribute, nextAttribute, statusAttribute, stateDef, parserContext);
+	}
+
+	/**
+	 * @param batchStatus The batch status that this transition will set. Use
+	 *            BatchStatus.UNKNOWN if not applicable.
+	 * @param on The pattern that this transition should match. Use null for
+	 *            "no restriction" (same as "*").
+	 * @param next The state to which this transition should go. Use null if not
+	 *            applicable.
+	 * @param exitCode The exit code that this transition will set. Use null to
+	 *            default to batchStatus.
+	 * @param stateDef The bean definition for the current state
+	 * @param parserContext the parser context for the bean factory
+	 * @param a collection of
+	 *            {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 *            references
+	 */
+	private static Collection<RuntimeBeanReference> createTransition(BatchStatus batchStatus, String on, String next,
+			String exitCode, BeanDefinition stateDef, ParserContext parserContext) {
+
+		RuntimeBeanReference endState = null;
+
+		if (batchStatus == BatchStatus.STOPPED || batchStatus == BatchStatus.COMPLETED
+				|| batchStatus == BatchStatus.FAILED) {
+
+			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
+					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
+			endBuilder.addConstructorArgValue(batchStatus);
+
+			boolean exitCodeExists = StringUtils.hasText(exitCode);
+			endBuilder.addConstructorArgValue(new ExitStatus(exitCodeExists ? exitCode : batchStatus.toString()));
+
+			String endName = "end" + (endCounter++);
+			endBuilder.addConstructorArgValue(endName);
+
+			String nextOnEnd = exitCodeExists ? null : next;
+			endState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), null, nextOnEnd);
+			next = endName;
+
+		}
+
+		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
+		list.add(getStateTransitionReference(parserContext, stateDef, on, next));
+		if (endState != null) {
+			//
+			// Must be added after the state to ensure that the state is the
+			// first in the list
+			//
+			list.add(endState);
+		}
+		return list;
+	}
+
+	/**
+	 * @param elementName An end transition element name
 	 * @return the BatchStatus corresponding to the transition name
 	 */
-	private static BatchStatus getBatchStatusFromEndTransitionName(String name) {
-		if(PAUSE.equals(name)){
+	private static BatchStatus getBatchStatusFromEndTransitionName(String elementName) {
+		if (PAUSE.equals(elementName)) {
 			return BatchStatus.STOPPED;
 		}
-		else if(END.equals(name)){
+		else if (END.equals(elementName)) {
 			return BatchStatus.COMPLETED;
 		}
-		else if(FAIL.equals(name)){
+		else if (FAIL.equals(elementName)) {
 			return BatchStatus.FAILED;
 		}
-		throw new IllegalStateException("No BatchStatus defined for transition: [" + name + "]");
+		else {
+			return BatchStatus.UNKNOWN;
+		}
 	}
 
 	/**

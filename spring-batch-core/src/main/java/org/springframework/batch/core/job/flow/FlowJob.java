@@ -26,7 +26,6 @@ import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.job.flow.support.State;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRestartException;
-import org.springframework.util.Assert;
 
 
 /**
@@ -75,10 +74,9 @@ public class FlowJob extends AbstractJob {
 	 * @see AbstractJob#doExecute(JobExecution)
 	 */
 	@Override
-	protected StepExecution doExecute(final JobExecution execution) throws JobExecutionException {
+	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
-			FlowExecution result = flow.start(new JobFlowExecutor(execution));
-			return getLastStepExecution(execution, result);
+			flow.start(new JobFlowExecutor(execution));
 		}
 		catch (FlowExecutionException e) {
 			if (e.getCause() instanceof JobExecutionException) {
@@ -86,50 +84,6 @@ public class FlowJob extends AbstractJob {
 			}
 			throw new JobExecutionException("Flow execution ended unexpectedly", e);
 		}
-	}
-
-	/**
-	 * @param execution the current {@link JobExecution}
-	 * @param result the result of the flow execution
-	 * @return a {@link StepExecution} with matching properties to the result
-	 */
-	private StepExecution getLastStepExecution(JobExecution execution, FlowExecution result) {
-		StepExecution value = null;
-		StepExecution backup = null;
-		for (StepExecution stepExecution : execution.getStepExecutions()) {
-			if (stepExecution.getStepName().equals(result.getName())
-					&& stepExecution.getExitStatus().getExitCode().equals(result.getStatus())) {
-				value = stepExecution;
-			}
-			if (isLater(stepExecution, backup)) {
-				backup = stepExecution;
-			}
-		}
-		if (value==null) {
-			value = backup;
-		}
-		Assert.state(value != null, String.format(
-				"Could not locate step execution matching expected properties: flowExecution=%s, stepExecutions=%s",
-				result, execution.getStepExecutions()));
-		return value;
-	}
-
-	/**
-	 * @param first
-	 * @param second
-	 * @return true if the first is deemed to be executed after the second
-	 */
-	private boolean isLater(StepExecution first, StepExecution second) {
-		if (second==null) {
-			return true;
-		}
-		if (first.getEndTime()==null) {
-			return first.getStartTime().after(second.getStartTime());
-		}
-		if (second.getEndTime()==null) {
-			return false;
-		}
-		return first.getEndTime().after(second.getEndTime());
 	}
 
 	/**

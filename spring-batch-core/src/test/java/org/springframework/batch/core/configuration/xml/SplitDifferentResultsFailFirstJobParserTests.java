@@ -33,14 +33,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class FailTransitionJobParserTests extends AbstractJobParserTests {
+public class SplitDifferentResultsFailFirstJobParserTests extends AbstractJobParserTests {
 
 	@Test
-	public void testFailTransition() throws Exception {
+	public void testSplitDifferentResultsFailFirst() throws Exception {
 
-		//
-		// First Launch
-		//
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(2, stepNamesList.size());
@@ -48,7 +45,7 @@ public class FailTransitionJobParserTests extends AbstractJobParserTests {
 		assertTrue(stepNamesList.contains("failingStep"));
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
+		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "step1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
@@ -57,22 +54,6 @@ public class FailTransitionJobParserTests extends AbstractJobParserTests {
 		StepExecution stepExecution2 = getStepExecution(jobExecution, "failingStep");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
-
-		//
-		// Second Launch
-		//
-		stepNamesList.clear();
-		jobExecution = createJobExecution();
-		job.execute(jobExecution);
-		assertEquals(1, stepNamesList.size()); // step1 is not executed
-		assertTrue(stepNamesList.contains("failingStep"));
-
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
-
-		StepExecution stepExecution3 = getStepExecution(jobExecution, "failingStep");
-		assertEquals(BatchStatus.FAILED, stepExecution3.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution3.getExitStatus().getExitCode());
 
 	}
 

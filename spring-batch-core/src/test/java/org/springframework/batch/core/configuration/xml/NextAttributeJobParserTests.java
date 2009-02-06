@@ -17,8 +17,6 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +27,9 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.ClassUtils;
 
 /**
  * @author Dave Syer
@@ -62,20 +57,6 @@ public class NextAttributeJobParserTests {
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
-	}
-
-	@Test
-	public void testNextAttributeWithNestedElement() throws Exception {
-		try {
-			new ClassPathXmlApplicationContext(ClassUtils.addResourcePathToPackagePath(getClass(),
-					"NextAttributeMultipleFinalJobParserTests-context.xml"));
-			fail("Expected BeanCreationException");
-		}
-		catch (BeanDefinitionStoreException e) {
-			// expected
-			String message = e.getMessage();
-			assertTrue("Wrong message; " + message, message.contains("Duplicate transition pattern"));
-		}
 	}
 
 }

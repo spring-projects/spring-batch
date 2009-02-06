@@ -36,14 +36,19 @@ public class EndState extends AbstractState {
 	private final ExitStatus exitStatus;
 
 	/**
-	 * @param name
+	 * ExitStatus will be defaulted to the given BatchStatus
+	 * 
+	 * @param status The BatchStatus to end with
+	 * @param name The name of the state
 	 */
 	public EndState(BatchStatus status, String name) {
 		this(status, new ExitStatus(status.toString()), name);
 	}
 
 	/**
-	 * @param name
+	 * @param status The BatchStatus to end with
+	 * @param exitStatus The ExitStatus to end with
+	 * @param name The name of the state
 	 */
 	public EndState(BatchStatus status, ExitStatus exitStatus, String name) {
 		super(name);
@@ -65,8 +70,17 @@ public class EndState extends AbstractState {
 		// restart
 		synchronized (jobExecution) {
 			if (!jobExecution.getStepExecutions().isEmpty()) {
+				BatchStatus beforeStatus = jobExecution.getStatus();
+				
 				jobExecution.upgradeStatus(status);
-				jobExecution.setExitStatus(exitStatus);
+				
+				//
+				// If the status was changed or the target status is the same as the old
+				//
+				if(beforeStatus != jobExecution.getStatus() || beforeStatus == status)
+				{
+					jobExecution.setExitStatus(exitStatus);
+				}
 			}
 			return FlowExecution.COMPLETED;
 		}

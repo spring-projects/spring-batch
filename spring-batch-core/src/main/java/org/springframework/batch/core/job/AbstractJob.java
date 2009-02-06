@@ -209,13 +209,11 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 	 * processing to {@link #handleStep(Step, JobExecution)}.
 	 * 
 	 * @param execution the current {@link JobExecution}
-	 * @return the last {@link StepExecution} (used to compute the final status
-	 * of the {@link JobExecution})
 	 * 
 	 * @throws JobExecutionException to signal a fatal batch framework error
 	 * (not a business or validation exception)
 	 */
-	abstract protected StepExecution doExecute(JobExecution execution) throws JobExecutionException;
+	abstract protected void doExecute(JobExecution execution) throws JobExecutionException;
 
 	/**
 	 * Run the specified job, handling all listener and repository calls, and
@@ -236,12 +234,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 
 				listener.beforeJob(execution);
 
-				StepExecution lastStepExecution = doExecute(execution);
-
-				if (lastStepExecution != null) {
-					execution.upgradeStatus(lastStepExecution.getStatus());
-					execution.setExitStatus(lastStepExecution.getExitStatus());
-				}
+				doExecute(execution);
 			}
 			else {
 
@@ -322,7 +315,7 @@ public abstract class AbstractJob implements Job, BeanNameAware, InitializingBea
 			currentStepExecution = execution.createStepExecution(step.getName());
 
 			boolean isRestart = (lastStepExecution != null && !lastStepExecution.getStatus().equals(
-					BatchStatus.COMPLETED)) ? true : false;
+					BatchStatus.COMPLETED));
 
 			if (isRestart) {
 				currentStepExecution.setExecutionContext(lastStepExecution.getExecutionContext());
