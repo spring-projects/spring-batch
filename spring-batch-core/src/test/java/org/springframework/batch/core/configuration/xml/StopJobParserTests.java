@@ -17,11 +17,15 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
@@ -49,6 +53,9 @@ public class StopJobParserTests {
 	@Autowired
 	private JobRepository jobRepository;
 
+	@Autowired
+	private ArrayList<String> stepNamesList;
+	
 	@Before
 	public void setUp() {
 		MapJobRepositoryFactoryBean.clear();
@@ -57,14 +64,30 @@ public class StopJobParserTests {
 	@Test
 	public void testStopState() throws Exception {
 		assertNotNull(job);
+		
+		//
+		// First Launch
+		//
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
+		assertEquals(1, stepNamesList.size());
+		assertTrue(stepNamesList.contains("step1"));
+
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
-		assertEquals(1, jobExecution.getStepExecutions().size());
+		// TODO: BATCH-1011
+		//assertEquals(BatchStatus.STOPPED.toString(), jobExecution.getExitStatus().getExitCode());
+
+		
+		//
+		// Second Launch
+		//
+		stepNamesList.clear();
 		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
+		assertEquals(1, stepNamesList.size()); //step1 is not executed
+		assertTrue(stepNamesList.contains("step2"));
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(1, jobExecution.getStepExecutions().size());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 	}
 
 	public static class TestDecider implements JobExecutionDecider {

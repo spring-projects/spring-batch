@@ -17,14 +17,17 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +48,9 @@ public class EndTransitionJobParserTests {
 	@Autowired
 	private JobRepository jobRepository;
 
+	@Autowired
+	private ArrayList<String> stepNamesList;
+	
 	@Before
 	public void setUp() {
 		MapJobRepositoryFactoryBean.clear();
@@ -52,16 +58,34 @@ public class EndTransitionJobParserTests {
 
 	@Test
 	public void testEndTransition() throws Exception {
+		
+		//
+		// First Launch
+		//
 		assertNotNull(job);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
+		assertEquals(2, stepNamesList.size());
+		assertTrue(stepNamesList.contains("step1"));
+		assertTrue(stepNamesList.contains("failingStep"));
 
 		// TODO: BATCH-1011
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		// assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		// assertEquals("EARLY TERMINATION (COMPLETE)", jobExecution.getExitStatus().getExitCode());
 		
-		assertEquals(1, jobExecution.getStepExecutions().size());
-	}
 
+		//
+		// Second Launch
+		//
+		stepNamesList.clear();
+		try{
+			jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
+			// TODO: BATCH-1011
+			//fail("JobInstanceAlreadyCompleteException expected");
+		}
+		catch(JobInstanceAlreadyCompleteException e)
+		{
+			
+		}
+	}
 }

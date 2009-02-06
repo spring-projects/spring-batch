@@ -13,22 +13,25 @@
 		<property name="jobRepository" ref="jobRepository"/>
 		<property name="transactionManager" ref="transactionManager"/>
 		<property name="tasklet">
-			<bean class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
-				<property name="targetObject"><bean class="java.util.Date"/></property>
-				<property name="targetMethod" value="getTime"/>
+			<bean class="org.springframework.batch.core.configuration.xml.NameStoringTasklet">
+				<property name="stepNamesList" ref="stepNamesList"/>
 			</bean>
 		</property>
 	</bean>
 	<bean id="step2" parent="step1"/>
 	<bean id="step3" parent="step1"/>
 	<bean id="step4" parent="step1"/>
-
+	
 	<bean id="failingStep" class="org.springframework.batch.core.step.tasklet.TaskletStep">
 		<property name="jobRepository" ref="jobRepository"/>
 		<property name="transactionManager" ref="transactionManager"/>
 		<property name="tasklet">
-			<bean class="org.springframework.batch.core.configuration.xml.FailingTasklet"/>
+			<bean class="org.springframework.batch.core.configuration.xml.FailingTasklet">
+				<property name="stepNamesList" ref="stepNamesList"/>
+			</bean>
 		</property>
 	</bean>
+	
+	<bean id="stepNamesList" class="java.util.ArrayList"/>
 
 </beans>

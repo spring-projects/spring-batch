@@ -171,11 +171,11 @@ public class StepParser {
 			String exitStatus = StringUtils.hasText(statusName) ? statusName : batchStatus.toString();
 			endBuilder.addConstructorArgValue(new ExitStatus(exitStatus));
 
-			String endName = PAUSE.equals(name) ? "end" + (endCounter++) : null;
+			String endName = "end" + (endCounter++);
 			endBuilder.addConstructorArgValue(endName);
 			
 			String nextOnEnd = StringUtils.hasText(statusName) ? null : nextAttribute;
-			endState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), onAttribute, nextOnEnd);
+			endState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), "*", nextOnEnd);
 			nextAttribute = endName;
 
 		}

@@ -17,6 +17,9 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +48,9 @@ public class FailTransitionJobParserTests {
 	@Autowired
 	private JobRepository jobRepository;
 
+	@Autowired
+	private ArrayList<String> stepNamesList;
+	
 	@Before
 	public void setUp() {
 		MapJobRepositoryFactoryBean.clear();
@@ -52,15 +58,35 @@ public class FailTransitionJobParserTests {
 
 	@Test
 	public void testFailTransition() throws Exception {
+		
+		//
+		// First Launch
+		//
 		assertNotNull(job);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
+		assertEquals(2, stepNamesList.size());
+		assertTrue(stepNamesList.contains("step1"));
+		assertTrue(stepNamesList.contains("failingStep"));
+
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		
 		// TODO: BATCH-1011
-		// assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
+		// assertEquals("EARLY TERMINATION (COMPLETE)", jobExecution.getExitStatus().getExitCode());
 		
-		assertEquals(1, jobExecution.getStepExecutions().size());
+
+		//
+		// Second Launch
+		//
+		stepNamesList.clear();
+		jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
+		job.execute(jobExecution);
+		assertEquals(1, stepNamesList.size()); //step1 is not executed
+		assertTrue(stepNamesList.contains("failingStep"));
+
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		// TODO: BATCH-1011
+		// assertEquals("EARLY TERMINATION (COMPLETE)", jobExecution.getExitStatus().getExitCode());
+
 	}
 
 }

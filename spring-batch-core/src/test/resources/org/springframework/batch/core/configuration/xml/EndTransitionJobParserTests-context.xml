@@ -9,6 +9,7 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
+		<step name="step1" next="failingStep"/>
 		<step name="failingStep">
 			<end on="FAILED" status="EARLY TERMINATION (COMPLETE)"/>
 			<next on="*" to="step2"/>
