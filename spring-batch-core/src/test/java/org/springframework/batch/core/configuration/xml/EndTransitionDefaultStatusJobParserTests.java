@@ -27,7 +27,6 @@ import org.junit.runner.RunWith;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class EndTransitionJobParserTests {
+public class EndTransitionDefaultStatusJobParserTests {
 
 	@Autowired
 	private Job job;
@@ -50,41 +49,23 @@ public class EndTransitionJobParserTests {
 
 	@Autowired
 	private ArrayList<String> stepNamesList;
-	
+
 	@Before
 	public void setUp() {
 		MapJobRepositoryFactoryBean.clear();
 	}
 
 	@Test
-	public void testEndTransition() throws Exception {
-		
-		//
-		// First Launch
-		//
+	public void testEndTransitionDefaultStatus() throws Exception {
+
 		assertNotNull(job);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
-		assertEquals(2, stepNamesList.size());
-		assertTrue(stepNamesList.contains("step1"));
+		assertEquals(1, stepNamesList.size());
 		assertTrue(stepNamesList.contains("failingStep"));
 		// TODO: BATCH-1011
 		// assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		// assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
+		// assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
-		//
-		// Second Launch
-		//
-		stepNamesList.clear();
-		try{
-			jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
-			// TODO: BATCH-1011
-			//fail("JobInstanceAlreadyCompleteException expected");
-		}
-		catch(JobInstanceAlreadyCompleteException e)
-		{
-			
-		}
-		
 	}
 }

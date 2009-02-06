@@ -68,11 +68,9 @@ public class FailTransitionJobParserTests {
 		assertEquals(2, stepNamesList.size());
 		assertTrue(stepNamesList.contains("step1"));
 		assertTrue(stepNamesList.contains("failingStep"));
-
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		// TODO: BATCH-1011
-		// assertEquals("EARLY TERMINATION (COMPLETE)", jobExecution.getExitStatus().getExitCode());
-		
+		// assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
 
 		//
 		// Second Launch
@@ -82,10 +80,9 @@ public class FailTransitionJobParserTests {
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size()); //step1 is not executed
 		assertTrue(stepNamesList.contains("failingStep"));
-
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		// TODO: BATCH-1011
-		// assertEquals("EARLY TERMINATION (COMPLETE)", jobExecution.getExitStatus().getExitCode());
+		// assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
 
 	}
 
