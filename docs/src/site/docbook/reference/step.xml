@@ -1014,7 +1014,7 @@
         configuration will <emphasis>always</emphasis> be the first step
         executed by the <classname>Job</classname>. The order of the other
         step elements does not matter, but the first step must always appear
-        first in the xml. </para>
+        first in the xml.</para>
       </note>
     </section>
 
@@ -1064,7 +1064,7 @@
       cannot have both a "next" attribute and a transtion element.</para>
 
       <para>The next element specifies a pattern to match and the step to
-      execute next: </para>
+      execute next:</para>
 
       <para><programlisting>
   &lt;job id="job"&gt;
@@ -1302,7 +1302,7 @@
         <classname>ExitStatus</classname> of "EARLY TERMINATION" and step3
         will not execute; otherwise, execution will move to step3.
         Additionally, if step2 fails, and the <classname>Job</classname> is
-        restarted, the execution will begin again on step2.</para>
+        restarted, then execution will begin again on step2.</para>
 
         <programlisting>  &lt;step name="step1" next="step2"&gt;
   &lt;step name="step2"&gt;
@@ -1317,24 +1317,20 @@
 
         <para>The 'pause' element instructs a <classname>Job</classname> to
         stop with a <classname>BatchStatus</classname> of STOPPED. Pausing a
-        <classname>Job</classname> is a meant to be a temporary so that the
-        operator can take some action before restarting the
-        <classname>Job</classname>. The 'pause' element requires a 'to'
+        <classname>Job</classname> is a meant to be a temporary break in
+        processing so that the operator can take some action before restarting
+        the <classname>Job</classname>. The 'pause' element requires a 'to'
         attribute that specifies the step where execution should pick up once
-        the <classname>Job</classname> is restarted after being paused.</para>
+        the <classname>Job</classname>.</para>
 
-        <para>In the following scenario, step1 will execute and COMPLETE. The
-        job will then stop. Once it is restarted, execution will begin on
+        <para>In the following scenario, if step1 finsihes with COMPLETE, then
+        the job will then stop. Once it is restarted, execution will begin on
         step2.</para>
 
         <para><programlisting>  &lt;step name="step1"&gt;
-    &lt;stop on="COMPLETED" to="step2"/&gt;
+    &lt;pause on="COMPLETED" to="step2"/&gt;
   &lt;/step&gt;
-  &lt;step name="step2"&gt;
-    &lt;next on="FOO" to="step3"/&gt;
-    &lt;end on="*" status="FAILED"/&gt;
-  &lt;/step&gt;
-  &lt;step name="step3" /&gt;</programlisting></para>
+  &lt;step name="step2"/&gt;</programlisting></para>
       </section>
     </section>
 
@@ -1382,6 +1378,32 @@
   &lt;bean id="decider" class="com.MyDecider"/&gt;
 
 </programlisting></para>
+    </section>
+
+    <section>
+      <title>Split Flows</title>
+
+      <para>Every scenario described so far has involved a
+      <classname>Job</classname> that executes its
+      <classname>Step</classname>s one at a time in a linear fashion. In
+      addition to this typical style, the Spring Batch namespace also allows
+      for a job to be configured with parallel flows using the 'split'
+      element. As is seen below, the 'split' element contains one or more
+      'flow' elements, where entire separate flows can be defined. A 'split'
+      element may also contain any of the previously discussed transition
+      elements such as the 'next' attribute or the 'next', 'end', 'fail', or
+      'pause' elements. </para>
+
+      <programlisting>  &lt;split id="split1" next="step4"&gt;
+    &lt;flow&gt;
+      &lt;step name="step1" next="step2"/&gt;
+      &lt;step name="step2"/&gt;
+    &lt;/flow&gt;
+    &lt;flow&gt;
+      &lt;step name="step3"/&gt;
+    &lt;/flow&gt;
+  &lt;/split&gt;
+  &lt;step name="step4"/&gt;</programlisting>
     </section>
   </section>
 
