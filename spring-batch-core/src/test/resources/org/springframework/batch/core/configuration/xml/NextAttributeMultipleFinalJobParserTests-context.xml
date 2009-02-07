@@ -8,7 +8,7 @@
 	
 	<job id="job">
 		<step name="step1" next="step3">
-			<next on="*" to="step2" />
+			<next on="COMPLETED WITH SKIPS" to="step2" />
 		</step>
 		<step name="step2" />
 		<step name="step3" />

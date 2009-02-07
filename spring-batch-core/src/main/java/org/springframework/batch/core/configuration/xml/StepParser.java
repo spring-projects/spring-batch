@@ -125,7 +125,7 @@ public class StepParser {
 			List<Element> transitionElements = (List<Element>) DomUtils.getChildElementsByTagName(element,
 					transitionName);
 			for (Element transitionElement : transitionElements) {
-				verifyUniquePattern(element, parserContext, hasNextAttribute, transitionElement, patterns);
+				verifyUniquePattern(transitionElement, patterns, element, parserContext);
 				list.addAll(parseTransitionElement(transitionElement, stateDef, parserContext));
 				transitionElementExists = true;
 			}
@@ -138,25 +138,23 @@ public class StepParser {
 				list.addAll(createTransition(BatchStatus.COMPLETED, null, null, null, stateDef, parserContext));
 			}
 		}
+		else if (hasNextAttribute) {
+			parserContext.getReaderContext().error("Step may not contain a 'next' attribute and a transition element",
+					element);
+		}
 
 		return list;
 	}
 
 	/**
-	 * @param element
-	 * @param parserContext the parser context for the bean factory
-	 * @param hasNextAttribute
 	 * @param transitionElement The element to parse
 	 * @param patterns a list of patterns on state transitions for this element
+	 * @param element
+	 * @param parserContext the parser context for the bean factory
 	 */
-	private static void verifyUniquePattern(Element element, ParserContext parserContext, boolean hasNextAttribute,
-			Element transitionElement, List<String> patterns) {
+	private static void verifyUniquePattern(Element transitionElement, List<String> patterns, Element element,
+			ParserContext parserContext) {
 		String onAttribute = transitionElement.getAttribute("on");
-		if (hasNextAttribute && onAttribute.equals("*")) {
-			parserContext.getReaderContext().error(
-					"Duplicate transition pattern found.  "
-							+ "Specify one of next= attribute at step level and next element with on='*'", element);
-		}
 		if (patterns.contains(onAttribute)) {
 			parserContext.getReaderContext().error("Duplicate transition pattern found for '" + onAttribute + "'",
 					element);
