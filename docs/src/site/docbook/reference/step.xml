@@ -24,7 +24,7 @@
 
     <imageobject role="fo">
       <imagedata align="center" contentwidth="480"
-                 fileref="src/site/docbook/reference/images/step.png"
+                 fileref="images/step.png"
                  scale="60" width="75%" />
     </imageobject>
   </mediaobject>
@@ -50,7 +50,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/chunk-oriented-processing.png"
+                   fileref="images/chunk-oriented-processing.png"
                    width="75%" />
       </imageobject>
     </mediaobject>
@@ -988,7 +988,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/sequential-flow.png"
+                     fileref="images/sequential-flow.png"
                      width="40%" />
         </imageobject>
       </mediaobject>
@@ -1046,7 +1046,7 @@
 
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="src/site/docbook/reference/images/conditional-flow.png"
+                       fileref="images/conditional-flow.png"
                        width="40%" />
           </imageobject>
         </mediaobject></para>

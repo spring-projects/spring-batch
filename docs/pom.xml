@@ -19,6 +19,9 @@
 		<pluginRepository>
 			<id>agilejava</id>
 			<url>http://agilejava.com/maven</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
 
@@ -35,17 +38,19 @@
 							<goal>generate-html</goal>
 						</goals>
 						<configuration>
-							<chunkedOutput>false</chunkedOutput>
 							<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
 							<postProcess>
-								<copy todir="${basedir}/target/site/reference/html-single">
+								<move todir="${basedir}/target/site/reference/html-single">
 									<fileset dir="${basedir}/target/docbkx/html">
 										<include name="index.html" />
 									</fileset>
-								</copy>
+								</move>
 								<copy todir="${basedir}/target/site/reference/html-single">
 									<fileset dir="${basedir}/src/docbkx/resources">
 										<include name="**/*.css" />
+										<include name="**/*.png" />
+										<include name="**/*.gif" />
+										<include name="**/*.jpg" />
 									</fileset>
 								</copy>
 								<copy todir="${basedir}/target/site/reference/html-single">
@@ -60,23 +65,34 @@
 						<phase>pre-site</phase>
 					</execution>
 					<execution>
-						<id>multi-page</id>
+						<id>single-pdf</id>
 						<goals>
 							<goal>generate-pdf</goal>
+						</goals>
+						<configuration>
+							<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
+							<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
+							<postProcess>
+								<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
+									failonerror="false" />
+							</postProcess>
+						</configuration>
+						<phase>pre-site</phase>
+					</execution>
+					<execution>
+						<id>multi-page</id>
+						<goals>
 							<goal>generate-html</goal>
 						</goals>
 						<configuration>
 							<chunkedOutput>true</chunkedOutput>
-							<imgSrcPath>${basedir}/src/site/docbook/reference/</imgSrcPath>
 							<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
 							<postProcess>
-								<move file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
-									failonerror="false" />
-								<copy todir="${basedir}/target/site/reference">
+								<move todir="${basedir}/target/site/reference">
 									<fileset dir="${basedir}/target/docbkx">
 										<include name="**/*.html" />
 									</fileset>
-								</copy>
+								</move>
 								<copy todir="${basedir}/target/site/reference/html">
 									<fileset dir="${basedir}/src/docbkx/resources">
 										<include name="**/*.css" />
@@ -105,7 +121,7 @@
 						<scope>runtime</scope>
 					</dependency>
 					<dependency>
-						<!-- This is a downgrade for thw 2.0.8 plugin (was 0.94) but prevents ArrayOutOfBounds exception on xiIncludes -->
+						<!-- This is a downgrade for the 2.0.8 plugin (was 0.94) but prevents ArrayOutOfBounds exception on xi:includes -->
 						<groupId>org.apache.xmlgraphics</groupId>
 						<artifactId>fop</artifactId>
 						<version>0.93</version>
@@ -113,10 +129,12 @@
 				</dependencies>
 				<configuration>
 					<includes>index.xml</includes>
+					<chunkedOutput>false</chunkedOutput>
+					<draftWatermarkImage></draftWatermarkImage>
 					<htmlStylesheet>css/html.css</htmlStylesheet>
+					<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
 					<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
 					<xincludeSupported>true</xincludeSupported>
-					<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
 					<entities>
 						<entity>
 							<name>version</name>

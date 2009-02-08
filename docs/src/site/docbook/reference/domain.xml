@@ -46,7 +46,7 @@
   <mediaobject>
     <imageobject role="fo">
       <imagedata align="center"
-                 fileref="src/site/docbook/reference/images/spring-batch-reference-model.png"
+                 fileref="images/spring-batch-reference-model.png"
                  format="PNG" />
     </imageobject>
 
@@ -83,7 +83,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/job-heirarchy.png" />
+                   fileref="images/job-heirarchy.png" />
       </imageobject>
     </mediaobject>
 
@@ -178,7 +178,7 @@
 
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="src/site/docbook/reference/images/job-heirarchy.png" />
+                       fileref="images/job-heirarchy.png" />
           </imageobject>
         </mediaobject></para>
 
@@ -559,7 +559,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/jobHeirarchyWithSteps.png" />
+                   fileref="images/jobHeirarchyWithSteps.png" />
       </imageobject>
     </mediaobject>
 

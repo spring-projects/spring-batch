@@ -311,7 +311,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/drivingQueryExample.png"
+                   fileref="images/drivingQueryExample.png"
                    width="66%" />
       </imageobject>
     </mediaobject>
@@ -331,7 +331,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/drivingQueryJob.png"
+                   fileref="images/drivingQueryJob.png"
                    width="66%" />
       </imageobject>
     </mediaobject>

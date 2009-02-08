@@ -1521,7 +1521,7 @@
     <para><mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/xmlinput.png"
+                     fileref="images/xmlinput.png"
                      format="PNG" width="40%" />
         </imageobject>
 
@@ -1548,7 +1548,7 @@
     <para><mediaobject>
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/oxm-fragments.png"
+                     fileref="images/oxm-fragments.png"
                      format="PNG" width="40%" />
         </imageobject>
 
@@ -1863,7 +1863,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/cursorExample.png"
+                     fileref="images/cursorExample.png"
                      width="66%" />
         </imageobject>
       </mediaobject>
@@ -2355,7 +2355,7 @@
 
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="src/site/docbook/reference/images/errorOnFlush.png" />
+                       fileref="images/errorOnFlush.png" />
           </imageobject>
         </mediaobject>If items are buffered before being written out, any
       errors encountered will not be thrown until the buffer is flushed just
@@ -2381,7 +2381,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/errorOnWrite.jpg" />
+                     fileref="images/errorOnWrite.jpg" />
         </imageobject>
       </mediaobject>
 

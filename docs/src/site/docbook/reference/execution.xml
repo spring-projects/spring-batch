@@ -18,7 +18,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/spring-batch-reference-model.png"
+                   fileref="images/spring-batch-reference-model.png"
                    width="75%" />
       </imageobject>
     </mediaobject>
@@ -93,7 +93,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/run-tier.png" />
+                   fileref="images/run-tier.png" />
       </imageobject>
     </mediaobject>
 
@@ -273,7 +273,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/jobTier.png" />
+                   fileref="images/jobTier.png" />
       </imageobject>
     </mediaobject>
 
@@ -313,7 +313,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/job-launcher-sequence-sync.png"
+                     fileref="images/job-launcher-sequence-sync.png"
                      width="66%" />
         </imageobject>
       </mediaobject>
@@ -336,7 +336,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/job-launcher-sequence-async.png"
+                     fileref="images/job-launcher-sequence-async.png"
                      width="66%" />
         </imageobject>
       </mediaobject>
@@ -790,7 +790,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/application-tier.png" />
+                   fileref="images/application-tier.png" />
       </imageobject>
     </mediaobject>
 

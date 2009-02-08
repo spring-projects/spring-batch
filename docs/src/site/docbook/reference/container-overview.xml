@@ -39,7 +39,7 @@
 		<mediaobject>
 			<imageobject role="fo">
 				<imagedata
-					fileref="src/site/docbook/reference/images/simple-batch-execution-env.jpg"
+					fileref="images/simple-batch-execution-env.jpg"
 					format="JPG" align="center"
                      width="66%" />
 			</imageobject>

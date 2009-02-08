@@ -173,9 +173,9 @@
     architecture that supports the extensibility and ease of use for end-user
     developers. <mediaobject>
         <imageobject role="fo">
-          <imagedata align="center" contentdepth="" contentwidth=""
-                     fileref="src/site/docbook/reference/images/spring-batch-layers.png"
-                     format="PNG" scalefit="" width="338" />
+          <imagedata align="center"
+                     fileref="images/spring-batch-layers.png"
+                     format="PNG" width="338" />
         </imageobject>
 
         <imageobject role="html">

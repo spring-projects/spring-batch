@@ -89,7 +89,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/item-oriented-processing.png"
+                   fileref="images/item-oriented-processing.png"
                    width="50%" />
       </imageobject>
     </mediaobject>
@@ -163,7 +163,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/simplified-oriented-processing.png"
+                   fileref="images/simplified-oriented-processing.png"
                    width="60%" />
       </imageobject>
     </mediaobject>
@@ -237,7 +237,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/1-1-step.png"
+                     fileref="images/1-1-step.png"
                      width="50%" />
         </imageobject>
       </mediaobject>
@@ -254,7 +254,7 @@
 
         <imageobject role="fo">
           <imagedata align="center"
-                     fileref="src/site/docbook/reference/images/composite-transformer.png"
+                     fileref="images/composite-transformer.png"
                      width="70%" />
         </imageobject>
       </mediaobject>
@@ -277,7 +277,7 @@
 
         <imageobject role="fo">
           <imagedata align="center" contentwidth="480"
-                     fileref="src/site/docbook/reference/images/step.png"
+                     fileref="images/step.png"
                      scale="" width="50%" />
         </imageobject>
       </mediaobject>
@@ -341,7 +341,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/job-repository-advanced.png"
+                   fileref="images/job-repository-advanced.png"
                    scale="80" width="65%" />
       </imageobject>
     </mediaobject>
@@ -367,7 +367,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/sequential-flow.png"
+                   fileref="images/sequential-flow.png"
                    width="40%" />
       </imageobject>
     </mediaobject>
@@ -382,7 +382,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="src/site/docbook/reference/images/conditional-flow.png"
+                   fileref="images/conditional-flow.png"
                    width="40%" />
       </imageobject>
     </mediaobject>
