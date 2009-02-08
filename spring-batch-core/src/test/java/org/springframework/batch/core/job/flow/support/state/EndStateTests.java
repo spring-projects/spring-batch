@@ -76,7 +76,7 @@ public class EndStateTests {
 			}
 		});
 		
-		assertEquals(BatchStatus.UNKNOWN, jobExecution.getStatus());
+		assertEquals(BatchStatus.STARTING, jobExecution.getStatus());
 
 	}
 

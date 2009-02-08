@@ -23,7 +23,7 @@ import java.util.Collections;
 
 import org.junit.Test;
 import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.support.state.MaxValueFlowExecutionAggregator;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 
 /**
  * @author Dave Syer
@@ -35,16 +35,16 @@ public class SimpleFlowExecutionAggregatorTests {
 
 	@Test
 	public void testFailed() throws Exception {
-		FlowExecution first = new FlowExecution("foo", FlowExecution.COMPLETED);
-		FlowExecution second = new FlowExecution("foo", FlowExecution.FAILED);
+		FlowExecution first = new FlowExecution("foo", FlowExecutionStatus.COMPLETED);
+		FlowExecution second = new FlowExecution("foo", FlowExecutionStatus.FAILED);
 		assertTrue("Should be negative", first.compareTo(second)<0);
 		assertTrue("Should be positive", second.compareTo(first)>0);
-		assertEquals(FlowExecution.FAILED, aggregator.aggregate(Arrays.asList(first, second)));
+		assertEquals(FlowExecutionStatus.FAILED, aggregator.aggregate(Arrays.asList(first, second)));
 	}
 
 	@Test
 	public void testEmpty() throws Exception {
-		assertEquals(FlowExecution.UNKNOWN, aggregator.aggregate(Collections.<FlowExecution> emptySet()));
+		assertEquals(FlowExecutionStatus.UNKNOWN, aggregator.aggregate(Collections.<FlowExecution> emptySet()));
 	}
 
 }

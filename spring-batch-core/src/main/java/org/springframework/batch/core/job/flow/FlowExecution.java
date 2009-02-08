@@ -15,59 +15,33 @@
  */
 package org.springframework.batch.core.job.flow;
 
+
 /**
  * @author Dave Syer
  * 
  */
 public class FlowExecution implements Comparable<FlowExecution> {
 
-	/**
-	 * Special well-known status value.
-	 */
-	public static final String COMPLETED = Status.COMPLETED.toString();
-
-	/**
-	 * Special well-known status value.
-	 */
-	public static final String PAUSED = Status.PAUSED.toString();
-	
-	/**
-	 * Special well-known status value.
-	 */
-	public static final String FAILED = Status.FAILED.toString();
-
-	/**
-	 * Special well-known status value.
-	 */
-	public static final String UNKNOWN = Status.UNKNOWN.toString();
-
 	private final String name;
-
-	private final String status;
-
-	private enum Status {
-
-		COMPLETED, PAUSED, FAILED, UNKNOWN;
-
-		static Status match(String value) {
-			for (int i = 0; i < values().length; i++) {
-				Status status = values()[i];
-				if (value.startsWith(status.toString())) {
-					return status;
-				}
-			}
-			// Default match should be the lowest priority
-			return COMPLETED;
-		}
-
-	};
+	private final FlowExecutionStatus status;
 
 	/**
-	 * 
+	 * @param name
+	 * @param status
 	 */
-	public FlowExecution(String name, String status) {
+	public FlowExecution(String name, FlowExecutionStatus status) {
 		this.name = name;
 		this.status = status;
+	}
+
+	/**
+	 * Convenience constructor that converts a String status to a {@link FlowExecutionStatus}.
+	 *
+	 * @param name
+	 * @param status
+	 */
+	public FlowExecution(String name, String status) {
+		this(name, new FlowExecutionStatus(status));
 	}
 
 	/**
@@ -80,7 +54,7 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	/**
 	 * @return the exit status
 	 */
-	public String getStatus() {
+	public FlowExecutionStatus getStatus() {
 		return status;
 	}
 
@@ -94,13 +68,7 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	 * @return negative, zero or positive as per the contract
 	 */
 	public int compareTo(FlowExecution other) {
-		Status one = Status.match(this.getStatus());
-		Status two = Status.match(other.getStatus());
-		int comparison = one.compareTo(two);
-		if (comparison==0) {
-			return this.getStatus().compareTo(other.getStatus());
-		}
-		return comparison;
+		return this.status.compareTo(other.getStatus());
 	}
 
 	@Override

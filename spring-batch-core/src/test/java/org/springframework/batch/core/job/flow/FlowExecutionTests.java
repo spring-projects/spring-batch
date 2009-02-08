@@ -31,7 +31,7 @@ public class FlowExecutionTests {
 	public void testBasicProperties() throws Exception {
 		FlowExecution execution = new FlowExecution("foo", "BAR");
 		assertEquals("foo",execution.getName());
-		assertEquals("BAR",execution.getStatus());
+		assertEquals("BAR",execution.getStatus().getStatus());
 	}
 
 	@Test
@@ -44,8 +44,8 @@ public class FlowExecutionTests {
 
 	@Test
 	public void testEnumOrdering() throws Exception {
-		FlowExecution first = new FlowExecution("foo", FlowExecution.COMPLETED);
-		FlowExecution second = new FlowExecution("foo", FlowExecution.FAILED);
+		FlowExecution first = new FlowExecution("foo", FlowExecutionStatus.COMPLETED);
+		FlowExecution second = new FlowExecution("foo", FlowExecutionStatus.FAILED);
 		assertTrue("Should be negative",first.compareTo(second)<0);
 		assertTrue("Should be positive",second.compareTo(first)>0);
 	}

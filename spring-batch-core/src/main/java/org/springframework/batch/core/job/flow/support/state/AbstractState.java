@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job.flow.support.state;
 
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.State;
 
@@ -46,6 +47,6 @@ public abstract class AbstractState implements State {
 		return getClass().getSimpleName()+": name=["+name+"]";
 	}
 	
-	public abstract String handle(FlowExecutor executor) throws Exception;
+	public abstract FlowExecutionStatus handle(FlowExecutor executor) throws Exception;
 
 }

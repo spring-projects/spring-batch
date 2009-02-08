@@ -17,6 +17,7 @@
 package org.springframework.batch.core.job.flow.support.state;
 
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.State;
 
@@ -49,8 +50,8 @@ public class StepState extends AbstractState {
 	}
 
 	@Override
-	public String handle(FlowExecutor executor) throws Exception {
-		return executor.executeStep(step);
+	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
+		return new FlowExecutionStatus(executor.executeStep(step));
 	}
 
 	/**

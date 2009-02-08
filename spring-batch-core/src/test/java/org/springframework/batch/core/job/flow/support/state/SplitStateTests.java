@@ -24,7 +24,7 @@ import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
-import org.springframework.batch.core.job.flow.support.state.SplitState;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
 
@@ -45,12 +45,12 @@ public class SplitStateTests {
 
 		SplitState state = new SplitState(flows, "foo");
 
-		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
-		EasyMock.expect(flow2.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
+		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
+		EasyMock.expect(flow2.start(null)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
 		EasyMock.replay(flow1, flow2);
 
-		String result = state.handle(null);
-		assertEquals(FlowExecution.COMPLETED, result);
+		FlowExecutionStatus result = state.handle(null);
+		assertEquals(FlowExecutionStatus.COMPLETED, result);
 
 		EasyMock.verify(flow1, flow2);
 
@@ -68,12 +68,12 @@ public class SplitStateTests {
 		SplitState state = new SplitState(flows, "foo");
 		state.setTaskExecutor(new SimpleAsyncTaskExecutor());
 
-		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
-		EasyMock.expect(flow2.start(null)).andReturn(new FlowExecution("step1", FlowExecution.COMPLETED));
+		EasyMock.expect(flow1.start(null)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
+		EasyMock.expect(flow2.start(null)).andReturn(new FlowExecution("step1", FlowExecutionStatus.COMPLETED));
 		EasyMock.replay(flow1, flow2);
 
-		String result = state.handle(null);
-		assertEquals(FlowExecution.COMPLETED, result);
+		FlowExecutionStatus result = state.handle(null);
+		assertEquals(FlowExecutionStatus.COMPLETED, result);
 
 		EasyMock.verify(flow1, flow2);
 

@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core;
 
+
 /**
  * Enumeration representing the status of a an Execution.
  * 
@@ -115,4 +116,21 @@ public enum BatchStatus {
 		return this.compareTo(other) <= 0;
 	}
 
+	/**
+	 * Find a BatchStatus that matches the beginning of the given value.  If 
+	 * no match is found, return COMPLETED as the default because has is low
+	 * precedence.
+	 * 
+	 * @param value a string representing a status
+	 * @return a BatchStatus
+	 */
+	public static BatchStatus match(String value) {
+		for (BatchStatus status : values()) {
+			if (value.startsWith(status.toString())) {
+				return status;
+			}
+		}
+		// Default match should be the lowest priority
+		return COMPLETED;
+	}
 }

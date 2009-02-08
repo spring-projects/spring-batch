@@ -24,6 +24,7 @@ import java.util.concurrent.FutureTask;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.State;
 import org.springframework.core.task.SyncTaskExecutor;
@@ -68,7 +69,7 @@ public class SplitState extends AbstractState {
 	 * @see State#handle(FlowExecutor)
 	 */
 	@Override
-	public String handle(final FlowExecutor executor) throws Exception {
+	public FlowExecutionStatus handle(final FlowExecutor executor) throws Exception {
 
 		Collection<Future<FlowExecution>> tasks = new ArrayList<Future<FlowExecution>>();
 

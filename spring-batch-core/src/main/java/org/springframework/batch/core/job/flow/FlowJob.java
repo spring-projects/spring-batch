@@ -16,6 +16,7 @@
 package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
@@ -76,7 +77,13 @@ public class FlowJob extends AbstractJob {
 	@Override
 	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
-			flow.start(new JobFlowExecutor(execution));
+			FlowExecution flowExecution = flow.start(new JobFlowExecutor(execution));
+			
+			synchronized (execution) {
+				FlowExecutionStatus status = flowExecution.getStatus();
+				execution.upgradeStatus(status.getBatchStatus());
+				execution.setExitStatus(status.getExitStatus());
+			}
 		}
 		catch (FlowExecutionException e) {
 			if (e.getCause() instanceof JobExecutionException) {
@@ -111,7 +118,7 @@ public class FlowJob extends AbstractJob {
 			}
 			StepExecution stepExecution = handleStep(step, execution);
 			stepExecutionHolder.set(stepExecution);
-			return stepExecution==null ? FlowExecution.COMPLETED : stepExecution.getExitStatus().getExitCode();
+			return stepExecution==null ? ExitStatus.COMPLETED.getExitCode() : stepExecution.getExitStatus().getExitCode();
 		}
 
 		public JobExecution getJobExecution() {

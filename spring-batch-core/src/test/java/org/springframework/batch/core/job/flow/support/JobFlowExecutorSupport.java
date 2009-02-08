@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StartLimitExceededException;
@@ -26,13 +27,13 @@ import org.springframework.batch.core.repository.JobRestartException;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class JobFlowExecutorSupport implements FlowExecutor {
 
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
 			StartLimitExceededException {
-		return FlowExecution.COMPLETED;
+		return ExitStatus.COMPLETED.getExitCode();
 	}
 
 	public JobExecution getJobExecution() {

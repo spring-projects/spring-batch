@@ -19,7 +19,7 @@ package org.springframework.batch.core.job.flow.support.state;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.State;
 
@@ -57,32 +57,25 @@ public class EndState extends AbstractState {
 	}
 
 	/**
-	 * Set the status as long the {@link JobExecution} is in progress. If this
-	 * is the first place we came after a restart we do nothing (otherwise the
-	 * same outcome that ended the job on the last run will occur).
+	 * Return the {@link BatchStatus} and {@link ExitStatus} stored. If the
+	 * {@link BatchStatus} is {@link BatchStatus#STOPPED}, then mark it on the
+	 * {@link JobExecution} so that the job will know to stop.
 	 * 
 	 * @see State#handle(FlowExecutor)
 	 */
 	@Override
-	public String handle(FlowExecutor executor) throws Exception {
+	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		JobExecution jobExecution = executor.getJobExecution();
 		// If there are no step executions, then we are at the beginning of a
 		// restart
 		synchronized (jobExecution) {
 			if (!jobExecution.getStepExecutions().isEmpty()) {
-				BatchStatus beforeStatus = jobExecution.getStatus();
-				
-				jobExecution.upgradeStatus(status);
-				
-				//
-				// If the status was changed or the target status is the same as the old
-				//
-				if(beforeStatus != jobExecution.getStatus() || beforeStatus == status)
-				{
+				if (status == BatchStatus.STOPPED) {
+					jobExecution.upgradeStatus(status);
 					jobExecution.setExitStatus(exitStatus);
 				}
 			}
-			return FlowExecution.COMPLETED;
+			return new FlowExecutionStatus(status, exitStatus);
 		}
 	}
 

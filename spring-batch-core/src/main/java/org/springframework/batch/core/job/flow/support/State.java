@@ -16,6 +16,7 @@
 package org.springframework.batch.core.job.flow.support;
 
 import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 
 
@@ -42,9 +43,9 @@ public interface State {
 	 * context is thread safe, or used in a thread safe manner.
 	 * 
 	 * @param executor the context passed in by the caller
-	 * @return a status for the execution
+	 * @return a {@link FlowExecutionStatus} for the execution
 	 * @throws Exception if anything goes wrong
 	 */
-	String handle(FlowExecutor executor) throws Exception;
+	FlowExecutionStatus handle(FlowExecutor executor) throws Exception;
 
 }

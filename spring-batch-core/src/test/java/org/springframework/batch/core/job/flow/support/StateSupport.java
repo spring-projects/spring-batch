@@ -15,9 +15,8 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
-import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
-import org.springframework.batch.core.job.flow.support.State;
 import org.springframework.batch.core.job.flow.support.state.AbstractState;
 
 /**
@@ -36,8 +35,8 @@ public class StateSupport extends AbstractState {
 	}
 
 	@Override
-	public String handle(FlowExecutor executor) throws Exception {
-		return FlowExecution.COMPLETED;
+	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
+		return FlowExecutionStatus.COMPLETED;
 	}
 
 }

@@ -16,9 +16,9 @@
 
 package org.springframework.batch.core.job.flow.support.state;
 
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
-
 
 /**
  * @author Dave Syer
@@ -37,8 +37,8 @@ public class DecisionState extends AbstractState {
 	}
 
 	@Override
-	public String handle(FlowExecutor executor) throws Exception {
-		return decider.decide(executor.getJobExecution(), executor.getStepExecution());
+	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
+		return new FlowExecutionStatus(decider.decide(executor.getJobExecution(), executor.getStepExecution()));
 	}
 
 }

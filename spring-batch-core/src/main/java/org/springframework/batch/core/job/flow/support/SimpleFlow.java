@@ -28,6 +28,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -115,7 +116,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 */
 	public FlowExecution resume(String stateName, FlowExecutor executor) throws FlowExecutionException {
 
-		String status = FlowExecution.UNKNOWN;
+		FlowExecutionStatus status = FlowExecutionStatus.UNKNOWN;
 		State state = stateMap.get(stateName);
 
 		// Terminate if there are no more states
@@ -146,13 +147,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 	 * @return the next {@link Step} (or null if this is the end)
 	 * @throws JobExecutionException
 	 */
-	private State nextState(String stateName, String status) throws FlowExecutionException {
-
-		// Special status value indicating that a state wishes to pause
-		// execution
-		if (status.equals(FlowExecution.PAUSED)) {
-			return null;
-		}
+	private State nextState(String stateName, FlowExecutionStatus status) throws FlowExecutionException {
 
 		Set<StateTransition> set = transitionMap.get(stateName);
 
@@ -163,7 +158,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 		String next = null;
 		for (StateTransition stateTransition : set) {
-			if (stateTransition.matches(status)) {
+			if (stateTransition.matches(status.getStatus())) {
 				if (stateTransition.isEnd()) {
 					// End of job
 					return null;

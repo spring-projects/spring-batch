@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.flow.support.state;
 import java.util.Collection;
 
 import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 
 /**
  * Strategy interface for aggregating {@link FlowExecution} instances into a
@@ -32,6 +33,6 @@ public interface FlowExecutionAggregator {
 	 * @param executions the executions to aggregate
 	 * @return a summary status for the whole lot
 	 */
-	String aggregate(Collection<FlowExecution> executions);
+	FlowExecutionStatus aggregate(Collection<FlowExecution> executions);
 
 }

@@ -19,19 +19,24 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public class MaxValueFlowExecutionAggregator implements FlowExecutionAggregator {
 
 	/**
+	 * Aggregate all of the {@link FlowExecutionStatus}es of the
+	 * {@link FlowExecution}s into one status. The aggregate status will be the
+	 * status with the highest precedence.
+	 * 
 	 * @see FlowExecutionAggregator#aggregate(Collection)
 	 */
-	public String aggregate(Collection<FlowExecution> executions) {
-		if (executions==null || executions.size()==0) {
-			return FlowExecution.UNKNOWN;
+	public FlowExecutionStatus aggregate(Collection<FlowExecution> executions) {
+		if (executions == null || executions.size() == 0) {
+			return FlowExecutionStatus.UNKNOWN;
 		}
 		return Collections.max(executions).getStatus();
 	}

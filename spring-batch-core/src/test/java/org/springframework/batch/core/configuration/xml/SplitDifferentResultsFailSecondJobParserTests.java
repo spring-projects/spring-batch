@@ -40,12 +40,13 @@ public class SplitDifferentResultsFailSecondJobParserTests extends AbstractJobPa
 
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
-		assertEquals(2, stepNamesList.size());
+		assertEquals(3, stepNamesList.size());
 		assertTrue(stepNamesList.contains("step1"));
 		assertTrue(stepNamesList.contains("failingStep"));
+		assertTrue(stepNamesList.contains("step3"));
 
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "step1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
@@ -54,6 +55,10 @@ public class SplitDifferentResultsFailSecondJobParserTests extends AbstractJobPa
 		StepExecution stepExecution2 = getStepExecution(jobExecution, "failingStep");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
+
+		StepExecution stepExecution3 = getStepExecution(jobExecution, "step3");
+		assertEquals(BatchStatus.COMPLETED, stepExecution3.getStatus());
+		assertEquals(ExitStatus.COMPLETED, stepExecution3.getExitStatus());
 
 	}
 
