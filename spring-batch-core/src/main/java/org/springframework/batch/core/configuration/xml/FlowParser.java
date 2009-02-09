@@ -49,13 +49,16 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	private static int endCounter = 0;
 
 	private final String flowName;
+	private final String jobRepositoryRef;
 
 	/**
-	 * Construct a {@link FlowParser} with the specified name.
+	 * Construct a {@link FlowParser} with the specified name and using the provided job repository ref.
 	 * @param flowName the name of the flow
+	 * @param jobRepositoryRef the reference to the jobRepository from the enclosing tag
 	 */
-	public FlowParser(String flowName) {
+	public FlowParser(String flowName, String jobRepositoryRef) {
 		this.flowName = flowName;
+		this.jobRepositoryRef = jobRepositoryRef;
 
 	}
 
@@ -79,7 +82,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 		InlineStepParser stepParser = new InlineStepParser();
 		DecisionParser decisionParser = new DecisionParser();
-		SplitParser splitParser = new SplitParser();
+		SplitParser splitParser = new SplitParser(jobRepositoryRef);
 		CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(),
 				parserContext.extractSource(element));
 		parserContext.pushContainingComponent(compositeDef);
@@ -90,7 +93,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 			if (node instanceof Element) {
 				String nodeName = node.getLocalName();
 				if (nodeName.equals("step")) {
-					stateTransitions.addAll(stepParser.parse((Element) node, parserContext));
+					stateTransitions.addAll(stepParser.parse((Element) node, parserContext, jobRepositoryRef));
 				}
 				else if (nodeName.equals("decision")) {
 					stateTransitions.addAll(decisionParser.parse((Element) node, parserContext));

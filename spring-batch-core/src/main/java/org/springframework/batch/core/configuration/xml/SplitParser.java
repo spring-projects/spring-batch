@@ -40,6 +40,17 @@ import org.w3c.dom.Element;
  */
 public class SplitParser {
 
+	private final String jobRepositoryRef;
+
+	/**
+	 * Construct a {@link FlowParser} using the provided job repository ref.
+	 * @param jobRepositoryRef the reference to the jobRepository from the enclosing tag
+	 */
+	public SplitParser(String jobRepositoryRef) {
+		this.jobRepositoryRef = jobRepositoryRef;
+	}
+
+
 	/**
 	 * Parse the split and turn it into a list of transitions.
 	 * 
@@ -62,7 +73,7 @@ public class SplitParser {
 		Collection<BeanDefinition> flows = new ArrayList<BeanDefinition>();
 		int i = 0;
 		for (Element nextElement : flowElements) {
-			FlowParser flowParser = new FlowParser(idAttribute+"#"+i);
+			FlowParser flowParser = new FlowParser(idAttribute+"#"+i, jobRepositoryRef);
 			flows.add(flowParser.parse(nextElement, parserContext));
 			i++;
 		}	

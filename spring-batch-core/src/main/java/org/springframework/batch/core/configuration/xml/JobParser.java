@@ -70,7 +70,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyReference("jobParametersIncrementer", incrementer);
 		}
 
-		FlowParser flowParser = new FlowParser(jobName);
+		FlowParser flowParser = new FlowParser(jobName, repositoryAttribute);
 		BeanDefinition flowDef = flowParser.parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
 		

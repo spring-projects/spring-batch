@@ -52,7 +52,7 @@ public abstract class AbstractStepParser {
 	 * @param taskletRef
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition handleTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext) {
+	protected AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext, String jobRepositoryRef) {
 
     	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
 
@@ -61,7 +61,6 @@ public abstract class AbstractStepParser {
             bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
         }
 
-        String jobRepositoryRef = stepElement.getAttribute("job-repository");
         RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
         bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
 
@@ -83,7 +82,7 @@ public abstract class AbstractStepParser {
 	 * @param element
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition handleTaskletElement(Element stepElement, Element element, ParserContext parserContext) {
+	protected AbstractBeanDefinition parseTaskletElement(Element stepElement, Element element, ParserContext parserContext, String jobRepositoryRef) {
 
     	RootBeanDefinition bd;
     	
@@ -152,12 +151,11 @@ public abstract class AbstractStepParser {
             bd.getPropertyValues().addPropertyValue("taskExecutor", taskExecutorRef);
         }
 
-        String jobRepository = stepElement.getAttribute("job-repository");
-        RuntimeBeanReference jobRepositoryRef = new RuntimeBeanReference(jobRepository);
-        bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryRef);
+        RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
+        bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
 
-        String transactionManager = stepElement.getAttribute("transaction-manager");
-        RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
+        String transactionManagerRef = stepElement.getAttribute("transaction-manager");
+        RuntimeBeanReference tx = new RuntimeBeanReference(transactionManagerRef);
         bd.getPropertyValues().addPropertyValue("transactionManager", tx);
 
         String commitInterval = element.getAttribute("commit-interval");

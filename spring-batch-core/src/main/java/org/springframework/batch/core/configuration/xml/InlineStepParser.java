@@ -46,10 +46,11 @@ public class InlineStepParser extends AbstractStepParser {
 	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
+	 * @param jobRepositoryRef the reference to the jobRepository from the enclosing tag
 	 * @return a collection of bean definitions for {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
-	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
+	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobRepositoryRef) {
 
 		BeanDefinitionBuilder stateBuilder = 
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
@@ -63,13 +64,13 @@ public class InlineStepParser extends AbstractStepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
 		if (StringUtils.hasText(taskletRef)) {
-			AbstractBeanDefinition bd = handleTaskletRef(element, taskletRef, parserContext);
+			AbstractBeanDefinition bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
 			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepRef));
 			stateBuilder.addConstructorArgReference(stepRef);
 		}
 		else if (processTaskElements.size() > 0) {
 			Element taskElement = processTaskElements.get(0);
-			AbstractBeanDefinition bd = handleTaskletElement(element, taskElement, parserContext);
+			AbstractBeanDefinition bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
 			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepRef));
 			stateBuilder.addConstructorArgReference(stepRef);
 		}

@@ -64,6 +64,7 @@
 			<xsd:complexContent>
 				<xsd:extension base="stepType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attributeGroup ref="jobRepository"/>
 					<xsd:attribute name="tasklet" type="xsd:string" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>
@@ -285,7 +286,6 @@
 						</xsd:complexType>
 					</xsd:element>
 				</xsd:sequence>
-				<xsd:attributeGroup ref="jobRepository"/>
 				<xsd:attributeGroup ref="transactionManager"/>
 			</xsd:extension>
 		</xsd:complexContent>

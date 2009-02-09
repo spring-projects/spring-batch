@@ -45,23 +45,18 @@ public class StandaloneStepParser extends AbstractStepParser {
 	 */
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
 
-//		String stepId = element.getAttribute("id");
 		String taskletRef = element.getAttribute("tasklet");
+        String jobRepositoryRef = element.getAttribute("job-repository");
 
-//		TODO: this should be required in xsd
-//		if (!StringUtils.hasText(stepId)) {
-//			parserContext.getReaderContext().error("The id attribute can't be empty for <" + element.getNodeName() + ">", element);
-//		}
-		
 		@SuppressWarnings("unchecked")
 		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
 		AbstractBeanDefinition bd = null;
 		if (StringUtils.hasText(taskletRef)) {
-			bd = handleTaskletRef(element, taskletRef, parserContext);
+			bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
 		}
 		else if (processTaskElements.size() > 0) {
 			Element taskElement = processTaskElements.get(0);
-			bd = handleTaskletElement(element, taskElement, parserContext);
+			bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
 		}
 		
 		return bd;
