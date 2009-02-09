@@ -76,7 +76,7 @@ public class SplitParser {
 		stateBuilder.addConstructorArgValue(idAttribute);
 		
 		// TODO: allow TaskExecutor etc. to be set
-		return StepParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
+		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
 

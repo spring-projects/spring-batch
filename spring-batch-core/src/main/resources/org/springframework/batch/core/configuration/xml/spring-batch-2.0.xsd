@@ -59,6 +59,36 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="step">
+		<xsd:annotation>
+			<xsd:documentation>
+				Defines a stage in job processing backed by a
+				Step. The id attribute must be specified since this
+				step definition will be referred to from other bean 
+				definitions.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="stepType">
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attribute name="tasklet" type="xsd:string" use="optional" >
+						<xsd:annotation>
+							<xsd:documentation>
+							The tasklet is a reference to another bean definition that defines implements the Tasklet interface.
+							</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>				
+
 	<xsd:element name="job-repository">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[

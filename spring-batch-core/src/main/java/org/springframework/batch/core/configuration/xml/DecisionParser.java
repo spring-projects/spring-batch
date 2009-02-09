@@ -55,7 +55,7 @@ public class DecisionParser {
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.DecisionState");
 		stateBuilder.addConstructorArgValue(new RuntimeBeanReference(refAttribute));
 		stateBuilder.addConstructorArgValue(idAttribute);
-		return StepParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
+		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
 }

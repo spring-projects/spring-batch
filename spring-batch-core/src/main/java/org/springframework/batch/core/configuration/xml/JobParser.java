@@ -44,7 +44,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	 * Create a bean definition for a {@link org.springframework.batch.core.job.flow.FlowJob}. The
 	 * <code>jobRepository</code> attribute is a reference to a
 	 * {@link org.springframework.batch.core.repository.JobRepository} and defaults to "jobRepository". Nested step
-	 * elements are delegated to a {@link StepParser}.
+	 * elements are delegated to an {@link InlineStepParser}.
 	 * 
 	 * @see AbstractSingleBeanDefinitionParser#doParse(Element, ParserContext, BeanDefinitionBuilder)
 	 */
