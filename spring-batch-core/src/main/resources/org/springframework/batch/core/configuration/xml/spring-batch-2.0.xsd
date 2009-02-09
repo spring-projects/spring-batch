@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.springframework.org/schema/batch"
-	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:beans="http://www.springframework.org/schema/beans"
-	xmlns:tool="http://www.springframework.org/schema/tool"
-	targetNamespace="http://www.springframework.org/schema/batch"
-	elementFormDefault="qualified" attributeFormDefault="unqualified"
+<xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
+	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
 	version="2.0">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
@@ -19,12 +17,9 @@
 		<xsd:annotation>
 			<xsd:documentation>
 				Defines a job composed of a set of steps and
-				transitions between steps. The job will be exposed
-				in
-				the enclosing
-				bean factory as a component of type Job
-				that can be launched using a
-				JobLauncher.
+				transitions between steps. The job will be exposed in
+				the enclosing bean factory as a component of type Job
+				that can be launched using a JobLauncher.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
@@ -32,8 +27,7 @@
 				<xsd:extension base="flowType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="jobRepository" />
-					<xsd:attribute name="incrementer" type="xsd:string"
-						use="optional">
+					<xsd:attribute name="incrementer" type="xsd:string" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[ 
 								A reference to a JobParametersIncrementer bean definition.
@@ -41,13 +35,11 @@
 							</xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref" />
-								<tool:expected-type
-									type="org.springframework.batch.core.JobParametersIncrementer" />
+								<tool:expected-type type="org.springframework.batch.core.JobParametersIncrementer" />
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="restartable" type="xsd:string"
-						default="true" use="optional">
+					<xsd:attribute name="restartable" type="xsd:string" default="true" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							Whether the job should be retartable or not in case of failure.
@@ -64,7 +56,7 @@
 			<xsd:documentation>
 				Defines a stage in job processing backed by a
 				Step. The id attribute must be specified since this
-				step definition will be referred to from other bean 
+				step definition will be referred to from other bean
 				definitions.
 			</xsd:documentation>
 		</xsd:annotation>
@@ -72,14 +64,15 @@
 			<xsd:complexContent>
 				<xsd:extension base="stepType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attribute name="tasklet" type="xsd:string" use="optional" >
+					<xsd:attribute name="tasklet" type="xsd:string" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>
-							The tasklet is a reference to another bean definition that defines implements the Tasklet interface.
+								The tasklet is a reference to another bean definition that defines implements the Tasklet
+								interface.
 							</xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
-									<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
+									<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet" />
 								</tool:annotation>
 							</xsd:appinfo>
 						</xsd:annotation>
@@ -87,7 +80,7 @@
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
-	</xsd:element>				
+	</xsd:element>
 
 	<xsd:element name="job-repository">
 		<xsd:annotation>
@@ -98,8 +91,7 @@
 		<xsd:complexType>
 			<xsd:complexContent>
 				<xsd:extension base="beans:identifiedType">
-					<xsd:attribute name="data-source" type="xsd:string"
-						default="dataSource">
+					<xsd:attribute name="data-source" type="xsd:string" default="dataSource">
 						<xsd:annotation>
 							<xsd:documentation source="java:javax.sql.DataSource"><![CDATA[
 							The bean name of the DataSource that is to be used. This attribute 
@@ -114,8 +106,7 @@
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attributeGroup ref="transactionManager" />
-					<xsd:attribute name="isolation-level-for-create"
-						type="xsd:string">
+					<xsd:attribute name="isolation-level-for-create" type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							The isolation level to use for creation of job execution entities.
@@ -145,17 +136,11 @@
 					<xsd:annotation>
 						<xsd:documentation>
 							Defines a stage in job processing backed by a
-							Step.
-							The name attribute must be specified and
+							Step. The name attribute must be specified and
 							can
-							match the id of
-							a
-							bean
-							definition
+							match the id of a bean definition
 							for a Step. If it does not, then you must provide
-							a
-							tasklet definition.
-							The next
+							a tasklet definition. The next
 							attribute is a synonym for &lt;next on="*" .../&gt;
 						</xsd:documentation>
 					</xsd:annotation>
@@ -622,8 +607,7 @@
 						<xsd:attribute name="on" type="xsd:string" use="required" >
 							<xsd:annotation>
 								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
-								When a step finishes the most specific match will be chosen to select the next step. 
-								Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
+								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
 							</xsd:annotation></xsd:attribute>
 						<xsd:attribute name="to" type="xsd:string" use="required" >
 							<xsd:annotation>
@@ -644,8 +628,7 @@
 						<xsd:attribute name="on" type="xsd:string" use="required" >
 							<xsd:annotation>
 								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
-								When a step finishes the most specific match will be chosen to select the next step. 
-								Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
+								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
 						<xsd:attribute name="status" use="optional" type="xsd:string" default="COMPLETED">
@@ -665,8 +648,7 @@
 						<xsd:attribute name="on" type="xsd:string" use="required" >
 							<xsd:annotation>
 								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
-								When a step finishes the most specific match will be chosen to select the next step. 
-								Hint: always include a default transition with on=&quot;*&quot;.</xsd:documentation>
+								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
 						<xsd:attribute name="status" use="optional" type="xsd:string" default="FAILED">
