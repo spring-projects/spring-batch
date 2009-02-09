@@ -18,7 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -49,7 +49,7 @@ public class InlineStepParser extends AbstractStepParser {
 	 * @return a collection of bean definitions for {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
-	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
+	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
 		BeanDefinitionBuilder stateBuilder = 
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");

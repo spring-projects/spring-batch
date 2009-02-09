@@ -16,6 +16,7 @@
 package org.springframework.batch.core.job.flow.support;
 
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.support.PatternMatcher;
 import org.springframework.util.StringUtils;
 

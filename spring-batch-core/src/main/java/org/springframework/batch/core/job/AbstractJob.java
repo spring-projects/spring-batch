@@ -35,6 +35,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.CompositeExecutionJobListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
+import org.springframework.batch.core.step.StepLocator;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -50,7 +51,7 @@ import org.springframework.util.ClassUtils;
  * @author Lucas Ward
  * @author Dave Syer
  */
-public abstract class AbstractJob implements Job, BeanNameAware, InitializingBean {
+public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, InitializingBean {
 
 	protected static final Log logger = LogFactory.getLog(AbstractJob.class);
 

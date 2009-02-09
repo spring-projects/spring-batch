@@ -17,7 +17,7 @@ package org.springframework.batch.core.job.flow.support.state;
 
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
-import org.springframework.batch.core.job.flow.support.State;
+import org.springframework.batch.core.job.flow.State;
 
 
 /**

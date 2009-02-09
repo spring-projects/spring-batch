@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.job.flow;
 
-import org.springframework.batch.core.job.flow.support.State;
 
 /**
  * @author Dave Syer

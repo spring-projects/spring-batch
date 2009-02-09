@@ -19,7 +19,8 @@ package org.springframework.batch.core.job.flow.support.state;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
-import org.springframework.batch.core.job.flow.support.State;
+import org.springframework.batch.core.job.flow.State;
+import org.springframework.batch.core.step.StepHolder;
 
 /**
  * {@link State} implementation that delegates to a {@link FlowExecutor} to
@@ -28,7 +29,7 @@ import org.springframework.batch.core.job.flow.support.State;
  * @author Dave Syer
  * 
  */
-public class StepState extends AbstractState {
+public class StepState extends AbstractState implements StepHolder {
 
 	private final Step step;
 

@@ -24,10 +24,8 @@ import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.AbstractJob;
-import org.springframework.batch.core.job.flow.support.State;
-import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRestartException;
-
+import org.springframework.batch.core.step.StepHolder;
 
 /**
  * @author Dave Syer
@@ -36,7 +34,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 public class FlowJob extends AbstractJob {
 
 	private Flow flow;
-	
+
 	/**
 	 * Create a {@link FlowJob} with null name and no flow (invalid state).
 	 */
@@ -59,18 +57,20 @@ public class FlowJob extends AbstractJob {
 		this.flow = flow;
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
-	public Step getStep(String stepName){
+	public Step getStep(String stepName) {
 		State state = this.flow.getState(stepName);
-		if(state instanceof StepState){
-			return ((StepState) state).getStep();
+		if (state instanceof StepHolder) {
+			return ((StepHolder) state).getStep();
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @see AbstractJob#doExecute(JobExecution)
 	 */
@@ -78,7 +78,7 @@ public class FlowJob extends AbstractJob {
 	protected void doExecute(final JobExecution execution) throws JobExecutionException {
 		try {
 			FlowExecution flowExecution = flow.start(new JobFlowExecutor(execution));
-			
+
 			synchronized (execution) {
 				FlowExecutionStatus status = flowExecution.getStatus();
 				execution.upgradeStatus(status.getBatchStatus());
@@ -95,11 +95,12 @@ public class FlowJob extends AbstractJob {
 
 	/**
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	private class JobFlowExecutor implements FlowExecutor {
 
 		private final ThreadLocal<StepExecution> stepExecutionHolder = new ThreadLocal<StepExecution>();
+
 		private final JobExecution execution;
 
 		/**
@@ -110,25 +111,27 @@ public class FlowJob extends AbstractJob {
 			stepExecutionHolder.set(null);
 		}
 
-		public String executeStep(Step step) throws JobInterruptedException, JobRestartException, StartLimitExceededException {
+		public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
+				StartLimitExceededException {
 			StepExecution lastStepExecution = stepExecutionHolder.get();
-			if (lastStepExecution!=null && lastStepExecution.getStatus()==BatchStatus.FAILED) {
+			if (lastStepExecution != null && lastStepExecution.getStatus() == BatchStatus.FAILED) {
 				lastStepExecution.setStatus(BatchStatus.INCOMPLETE);
 				updateStepExecution(lastStepExecution);
 			}
 			StepExecution stepExecution = handleStep(step, execution);
 			stepExecutionHolder.set(stepExecution);
-			return stepExecution==null ? ExitStatus.COMPLETED.getExitCode() : stepExecution.getExitStatus().getExitCode();
+			return stepExecution == null ? ExitStatus.COMPLETED.getExitCode() : stepExecution.getExitStatus()
+					.getExitCode();
 		}
 
 		public JobExecution getJobExecution() {
 			return execution;
 		}
-		
+
 		public StepExecution getStepExecution() {
 			return stepExecutionHolder.get();
 		}
-		
+
 		public void close(FlowExecution result) {
 			stepExecutionHolder.set(null);
 		}

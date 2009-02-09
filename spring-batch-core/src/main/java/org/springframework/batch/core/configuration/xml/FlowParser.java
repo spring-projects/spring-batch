@@ -23,10 +23,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
-import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
@@ -78,7 +75,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 */
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		List<RuntimeBeanReference> stateTransitions = new ArrayList<RuntimeBeanReference>();
+		List<BeanDefinition> stateTransitions = new ArrayList<BeanDefinition>();
 
 		InlineStepParser stepParser = new InlineStepParser();
 		DecisionParser decisionParser = new DecisionParser();
@@ -125,10 +122,10 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 *         references
 	 */
-	protected static Collection<RuntimeBeanReference> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
+	protected static Collection<BeanDefinition> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
 			Element element) {
 
-		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
+		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
 
 		String shortNextAttribute = element.getAttribute(NEXT);
 		boolean hasNextAttribute = StringUtils.hasText(shortNextAttribute);
@@ -188,7 +185,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 *            {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 *            references
 	 */
-	private static Collection<RuntimeBeanReference> parseTransitionElement(Element transitionElement,
+	private static Collection<BeanDefinition> parseTransitionElement(Element transitionElement,
 			BeanDefinition stateDef, ParserContext parserContext) {
 
 		BatchStatus batchStatus = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
@@ -214,10 +211,10 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 *            {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 *            references
 	 */
-	private static Collection<RuntimeBeanReference> createTransition(BatchStatus batchStatus, String on, String next,
+	private static Collection<BeanDefinition> createTransition(BatchStatus batchStatus, String on, String next,
 			String exitCode, BeanDefinition stateDef, ParserContext parserContext) {
 
-		RuntimeBeanReference endState = null;
+		BeanDefinition endState = null;
 
 		if (batchStatus == BatchStatus.STOPPED || batchStatus == BatchStatus.COMPLETED
 				|| batchStatus == BatchStatus.FAILED) {
@@ -238,7 +235,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 		}
 
-		Collection<RuntimeBeanReference> list = new ArrayList<RuntimeBeanReference>();
+		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
 		list.add(getStateTransitionReference(parserContext, stateDef, on, next));
 		if (endState != null) {
 			//
@@ -276,7 +273,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @param next the next step id
 	 * @return a bean definition for a {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 */
-	public static RuntimeBeanReference getStateTransitionReference(ParserContext parserContext,
+	public static BeanDefinition getStateTransitionReference(ParserContext parserContext,
 			BeanDefinition stateDefinition, String on, String next) {
 
 		BeanDefinitionBuilder nextBuilder = 
@@ -295,13 +292,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 			nextBuilder.setFactoryMethod("createEndStateTransition");
 		}
 
-		// TODO: do we need to use RuntimeBeanReference?
-		AbstractBeanDefinition nextDef = nextBuilder.getBeanDefinition();
-		String nextDefName = parserContext.getReaderContext().generateBeanName(nextDef);
-		BeanComponentDefinition nextDefComponent = new BeanComponentDefinition(nextDef, nextDefName);
-		parserContext.registerBeanComponent(nextDefComponent);
-
-		return new RuntimeBeanReference(nextDefName);
+		return nextBuilder.getBeanDefinition();
 
 	}
 

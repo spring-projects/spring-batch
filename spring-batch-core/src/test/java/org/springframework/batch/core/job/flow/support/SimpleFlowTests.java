@@ -31,6 +31,7 @@ import org.springframework.batch.core.job.flow.FlowExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionException;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
+import org.springframework.batch.core.job.flow.State;
 
 /**
  * @author Dave Syer

@@ -21,7 +21,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
-import org.springframework.batch.core.job.flow.support.State;
+import org.springframework.batch.core.job.flow.State;
 
 /**
  * {@link State} implementation for ending a job if it is in progress and

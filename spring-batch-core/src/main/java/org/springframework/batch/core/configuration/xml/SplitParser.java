@@ -20,12 +20,10 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
-
 import org.w3c.dom.Element;
 
 /**
@@ -51,7 +49,7 @@ public class SplitParser {
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
-	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
+	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
 		String idAttribute = element.getAttribute("id");
 

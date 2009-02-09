@@ -17,10 +17,10 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.Collection;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
-
 import org.w3c.dom.Element;
 
 /**
@@ -46,7 +46,7 @@ public class DecisionParser {
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * instances objects
 	 */
-	public Collection<RuntimeBeanReference> parse(Element element, ParserContext parserContext) {
+	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
 		String refAttribute = element.getAttribute("decider");
 		String idAttribute = element.getAttribute("id");
