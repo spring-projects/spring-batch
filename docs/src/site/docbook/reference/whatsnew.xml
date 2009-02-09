@@ -163,7 +163,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/simplified-oriented-processing.png"
+                   fileref="images/simplified-chunk-oriented-processing.png"
                    width="60%" />
       </imageobject>
     </mediaobject>
