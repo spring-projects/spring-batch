@@ -56,7 +56,10 @@ import org.springframework.util.Assert;
  * This factory does not support configuration of fault-tolerant behavior, use
  * appropriate subclass of this factory bean to configure skip or retry.
  * 
+ * @see FaultTolerantStepFactoryBean
+ * 
  * @author Dave Syer
+ * @author Robert Kasanicky
  * 
  */
 public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
@@ -114,7 +117,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	public SimpleStepFactoryBean() {
 		super();
 	}
-	
+
 	/**
 	 * Set the bean name property, which will become the name of the
 	 * {@link Step} when it is created.
@@ -444,12 +447,15 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		step.setStepOperations(stepOperations);
 
 		SimpleChunkProvider<T> chunkProvider = new SimpleChunkProvider<T>(itemReader, chunkOperations);
-		List<ItemReadListener<T>> readListeners = BatchListenerFactoryHelper.<ItemReadListener<T>>getListeners(getListeners(), ItemReadListener.class);
+		List<ItemReadListener<T>> readListeners = BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(
+				getListeners(), ItemReadListener.class);
 		chunkProvider.setListeners(readListeners);
 
 		SimpleChunkProcessor<T, S> chunkProcessor = new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T,S>>getListeners(getListeners(), ItemProcessListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>>getListeners(getListeners(), ItemWriteListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(getListeners(),
+				ItemProcessListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
+				ItemWriteListener.class));
 
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 
@@ -457,7 +463,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		// need to register them here because the step will not know we did
 		// that.
 		List<StepListener> chunkListeners = new ArrayList<StepListener>(Arrays.asList(getListeners()));
-		for(Object itemHandler: new Object[]{itemReader, itemWriter, itemProcessor}){
+		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
 			if (itemHandler instanceof ItemStream) {
 				step.registerStream((ItemStream) itemHandler);
 			}
@@ -475,17 +481,12 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 			}
 		}
 
-		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, chunkListeners.toArray(new StepListener[]{}));
-		List<StepExecutionListener> array = BatchListenerFactoryHelper.getListeners(listeners,
-				StepExecutionListener.class);
-		StepExecutionListener[] stepListeners = new StepExecutionListener[array.size()];
-		for (int i = 0; i < stepListeners.length; i++) {
-			stepListeners[i] = array.get(i);
-		}
-		step.setStepExecutionListeners(stepListeners);
+		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, chunkListeners.toArray(new StepListener[] {}));
+		step.setStepExecutionListeners(BatchListenerFactoryHelper.getListeners(listeners, StepExecutionListener.class)
+				.toArray(new StepExecutionListener[] {}));
 
 		step.setTasklet(tasklet);
-		
+
 	}
 
 	/**
