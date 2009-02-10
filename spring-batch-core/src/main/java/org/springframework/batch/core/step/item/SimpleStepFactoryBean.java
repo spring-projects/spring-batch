@@ -462,9 +462,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		registerExplicitItemListeners(chunkProvider, chunkProcessor);
 		registerImplicitItemListeners(chunkProvider, chunkProcessor);
 
-		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
-		tasklet.setBuffering(!isReaderTransactionalQueue());
-
 		// Since we are going to wrap these things with listener callbacks we
 		// need to register them here because the step will not know we did
 		// that.
@@ -484,6 +481,9 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, chunkListeners.toArray(new StepListener[] {}));
 		step.setStepExecutionListeners(BatchListenerFactoryHelper.getListeners(listeners, StepExecutionListener.class)
 				.toArray(new StepExecutionListener[] {}));
+
+		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
+		tasklet.setBuffering(!isReaderTransactionalQueue());
 
 		step.setTasklet(tasklet);
 
@@ -520,7 +520,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
 	 * listeners.
 	 */
-	protected void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
+	private void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
 			SimpleChunkProcessor<T, S> chunkProcessor) {
 
 		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
@@ -540,7 +540,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * Auto-register reader, processor and writer as item listeners if
 	 * applicable.
 	 */
-	protected void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
+	private void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
 			SimpleChunkProcessor<T, S> chunkProcessor) {
 		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
 
