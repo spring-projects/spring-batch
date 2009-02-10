@@ -210,10 +210,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		this.fatalExceptionClasses = fatalExceptionClasses;
 	}
 
-	/**
-	 * Uses the {@link #setSkipLimit(int)} value to configure item handler and
-	 * and exception handler.
-	 */
 	protected void applyConfiguration(TaskletStep step) {
 		super.applyConfiguration(step);
 
@@ -263,10 +259,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>(
 				skippableExceptionClasses);
 		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
-				new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
-		exceptions.addAll(new ArrayList<Class<? extends Throwable>>(retryableExceptionClasses));
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions,
-				new ArrayList<Class<? extends Throwable>>(fatalExceptionClasses));
+				fatalExceptionClasses);
+		exceptions.addAll(retryableExceptionClasses);
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions, fatalExceptionClasses);
 
 		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
 			public Boolean classify(Throwable classifiable) {
@@ -284,8 +279,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setRollbackClassifier(rollbackClassifier);
 
-		registerItemListeners(chunkProvider, chunkProcessor);
-		autoRegisterItemListeners(chunkProvider, chunkProcessor);
+		registerExplicitItemListeners(chunkProvider, chunkProcessor);
+		registerImplicitItemListeners(chunkProvider, chunkProcessor);
 
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue);
@@ -295,7 +290,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Wrap the provided retryPolicy so that it never retries fatal exceptions.
+	 * Wrap the provided {@link #setRetryPolicy(RetryPolicy)} so that it never
+	 * retries fatal exceptions.
 	 */
 	private RetryPolicy fatalExceptionAwareProxy(final RetryPolicy retryPolicy) {
 
@@ -319,9 +315,11 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Register injected item listeners.
+	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
+	 * listeners.
 	 */
-	private void registerItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
+	private void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
+			SimpleChunkProcessor<T, S> chunkProcessor) {
 
 		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
 				ItemReadListener.class));
@@ -338,9 +336,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	/**
 	 * Auto-register reader, processor and writer as item listeners if
-	 * applicable
+	 * applicable.
 	 */
-	private void autoRegisterItemListeners(SimpleChunkProvider<T> chunkProvider,
+	private void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
 			SimpleChunkProcessor<T, S> chunkProcessor) {
 		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
 
