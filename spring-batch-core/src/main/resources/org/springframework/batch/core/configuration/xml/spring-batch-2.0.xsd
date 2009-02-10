@@ -26,7 +26,7 @@
 			<xsd:complexContent>
 				<xsd:extension base="flowType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attributeGroup ref="jobRepository" />
+					<xsd:attributeGroup ref="jobRepositoryAttribute" />
 					<xsd:attribute name="incrementer" type="xsd:string" use="optional">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[ 
@@ -64,20 +64,8 @@
 			<xsd:complexContent>
 				<xsd:extension base="stepType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attributeGroup ref="jobRepository"/>
-					<xsd:attribute name="tasklet" type="xsd:string" use="optional">
-						<xsd:annotation>
-							<xsd:documentation>
-								The tasklet is a reference to another bean definition that defines implements the Tasklet
-								interface.
-							</xsd:documentation>
-							<xsd:appinfo>
-								<tool:annotation kind="ref">
-									<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet" />
-								</tool:annotation>
-							</xsd:appinfo>
-						</xsd:annotation>
-					</xsd:attribute>
+					<xsd:attributeGroup ref="jobRepositoryAttribute"/>
+					<xsd:attributeGroup ref="taskletAttribute"/>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -106,7 +94,7 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attributeGroup ref="transactionManager" />
+					<xsd:attributeGroup ref="transactionManagerAttribute" />
 					<xsd:attribute name="isolation-level-for-create" type="xsd:string">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
@@ -147,7 +135,7 @@
 					</xsd:annotation>
 					<xsd:complexType>
 						<xsd:complexContent>
-							<xsd:extension base="stepType">
+							<xsd:extension base="flowStepType">
 								<xsd:attribute name="id" type="xsd:ID" use="required" />
 								<xsd:attribute name="ref" type="xsd:string" use="optional" >
 									<xsd:annotation>
@@ -157,18 +145,7 @@
 										</xsd:documentation>
 									</xsd:annotation>
 								</xsd:attribute>
-								<xsd:attribute name="tasklet" type="xsd:string" use="optional" >
-									<xsd:annotation>
-										<xsd:documentation>
-										The tasklet is a reference to another bean definition that defines implements the Tasklet interface.
-										</xsd:documentation>
-										<xsd:appinfo>
-											<tool:annotation kind="ref">
-												<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
-											</tool:annotation>
-										</xsd:appinfo>
-									</xsd:annotation>
-								</xsd:attribute>
+								<xsd:attributeGroup ref="taskletAttribute"/>
 							</xsd:extension>
 						</xsd:complexContent>
 					</xsd:complexType>
@@ -272,22 +249,22 @@
 			<xsd:extension base="nextType">
 				<xsd:sequence>
 					<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
-					<xsd:group ref="transitions"/>
-					<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-							List of all listeners for the step definition
-							]]>
-							</xsd:documentation>
-						</xsd:annotation>
-						<xsd:complexType>
-							<xsd:sequence>
-								<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded"/>
-							</xsd:sequence>
-						</xsd:complexType>
-					</xsd:element>
+					<xsd:group ref="stepListeners"/>
 				</xsd:sequence>
-				<xsd:attributeGroup ref="transactionManager"/>
+				<xsd:attributeGroup ref="transactionManagerAttribute"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="flowStepType">
+		<xsd:complexContent>
+			<xsd:extension base="nextType">
+				<xsd:sequence>
+					<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
+					<xsd:group ref="transitions"/>
+					<xsd:group ref="stepListeners"/>
+				</xsd:sequence>
+				<xsd:attributeGroup ref="transactionManagerAttribute"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -568,6 +545,24 @@
 		
 	</xsd:complexType>
 
+	<xsd:group name="stepListeners">
+		<xsd:sequence>
+			<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of all listeners for the step definition
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+
 	<xsd:group name="transitions">
 		<xsd:sequence>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded" >
@@ -663,7 +658,7 @@
 		</xsd:sequence>
 	</xsd:group>
 	
-	<xsd:attributeGroup name="jobRepository">
+	<xsd:attributeGroup name="jobRepositoryAttribute">
 		<xsd:attribute name="job-repository" type="xsd:string"
 			default="jobRepository">
 			<xsd:annotation>
@@ -683,7 +678,7 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
-	<xsd:attributeGroup name="transactionManager">
+	<xsd:attributeGroup name="transactionManagerAttribute">
 		<xsd:attribute name="transaction-manager" type="xsd:string"
 			default="transactionManager">
 			<xsd:annotation>
@@ -697,6 +692,21 @@
 					<tool:annotation kind="ref">
 						<tool:expected-type
 							type="org.springframework.transaction.PlatformTransactionManager" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="taskletAttribute">
+		<xsd:attribute name="tasklet" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+				The tasklet is a reference to another bean definition that defines implements the Tasklet interface.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>
