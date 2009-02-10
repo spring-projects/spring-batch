@@ -112,6 +112,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	private int throttleLimit = TaskExecutorRepeatTemplate.DEFAULT_THROTTLE_LIMIT;
 
+	private boolean isReaderTransactionalQueue = false;
+
 	/**
 	 * Default constructor for {@link SimpleStepFactoryBean}.
 	 */
@@ -119,9 +121,19 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		super();
 	}
 
+	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
+		this.isReaderTransactionalQueue = isReaderTransactionalQueue;
+	}
+
+	protected boolean isReaderTransactionalQueue() {
+		return isReaderTransactionalQueue;
+	}
+
 	/**
-	 * Set the bean name property, which will become the name of the
-	 * {@link Step} when it is created.
+	 * public void setIsReaderTransactionalQueue(boolean
+	 * isReaderTransactionalQueue) { this.isReaderTransactionalQueue =
+	 * isReaderTransactionalQueue; } Set the bean name property, which will
+	 * become the name of the {@link Step} when it is created.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -443,14 +455,15 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 		step.setStepOperations(stepOperations);
 
-		SimpleChunkProvider<T> chunkProvider = new SimpleChunkProvider<T>(itemReader, chunkOperations);
+		SimpleChunkProvider<T> chunkProvider = configureChunkProvider();
 
-		SimpleChunkProcessor<T, S> chunkProcessor = new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
-		
+		SimpleChunkProcessor<T, S> chunkProcessor = configureChunkProcessor();
+
 		registerExplicitItemListeners(chunkProvider, chunkProcessor);
 		registerImplicitItemListeners(chunkProvider, chunkProcessor);
 
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
+		tasklet.setBuffering(!isReaderTransactionalQueue());
 
 		// Since we are going to wrap these things with listener callbacks we
 		// need to register them here because the step will not know we did
@@ -476,6 +489,14 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	}
 
+	protected SimpleChunkProvider<T> configureChunkProvider() {
+		return new SimpleChunkProvider<T>(itemReader, chunkOperations);
+	}
+
+	protected SimpleChunkProcessor<T, S> configureChunkProcessor() {
+		return new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
+	}
+
 	/**
 	 * @return a {@link CompletionPolicy} consistent with the commit interval
 	 * and injected policy (if present).
@@ -499,13 +520,14 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
 	 * listeners.
 	 */
-	protected void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
-	
+	protected void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
+			SimpleChunkProcessor<T, S> chunkProcessor) {
+
 		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
 				ItemReadListener.class));
 		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
 				SkipListener.class));
-	
+
 		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(getListeners(),
 				ItemProcessListener.class));
 		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
@@ -518,9 +540,10 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 * Auto-register reader, processor and writer as item listeners if
 	 * applicable.
 	 */
-	protected void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
+	protected void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
+			SimpleChunkProcessor<T, S> chunkProcessor) {
 		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
-	
+
 			if (itemHandler instanceof SkipListener) {
 				chunkProvider.registerListener((StepListener) itemHandler);
 				chunkProcessor.registerListener((StepListener) itemHandler);

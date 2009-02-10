@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -86,12 +87,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	private RetryPolicy retryPolicy;
 
 	private RetryContextCache retryContextCache;
-
-	private boolean isReaderTransactionalQueue = false;
-
-	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
-		this.isReaderTransactionalQueue = isReaderTransactionalQueue;
-	}
 
 	/**
 	 * Setter for the retry policy. If this is specified the other retry
@@ -205,33 +200,19 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	@Override
 	protected void applyConfiguration(TaskletStep step) {
-		super.applyConfiguration(step);
-
-		if (!(retryLimit > 0 || skipLimit > 0 || retryPolicy != null)) {
-			// zero fault-tolerance, just use the parent's simple config
-			return;
-		}
 
 		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
-				SkipListenerFailedException.class, RetryException.class);
+				SkipListenerFailedException.class, RetryException.class, JobInterruptedException.class);
 
-		SimpleChunkProvider<T> chunkProvider = configureChunkProvider();
-		SimpleChunkProcessor<T, S> chunkProcessor = configureChunkProcessor();
-
-		registerExplicitItemListeners(chunkProvider, chunkProcessor);
-		registerImplicitItemListeners(chunkProvider, chunkProcessor);
-
-		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
-		tasklet.setBuffering(!isReaderTransactionalQueue);
-
-		step.setTasklet(tasklet);
+		super.applyConfiguration(step);
 
 	}
 
 	/**
 	 * @return {@link ChunkProcessor} configured for fault-tolerance.
 	 */
-	private FaultTolerantChunkProcessor<T, S> configureChunkProcessor() {
+	@Override
+	protected FaultTolerantChunkProcessor<T, S> configureChunkProcessor() {
 
 		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
 				fatalExceptionClasses);
@@ -246,7 +227,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
 				getItemWriter(), batchRetryTemplate);
-		chunkProcessor.setBuffering(!isReaderTransactionalQueue);
+		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setRollbackClassifier(rollbackClassifier);
@@ -257,7 +238,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	/**
 	 * @return {@link ChunkProvider} configured for fault-tolerance.
 	 */
-	private FaultTolerantChunkProvider<T> configureChunkProvider() {
+	@Override
+	protected FaultTolerantChunkProvider<T> configureChunkProvider() {
 
 		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
 				fatalExceptionClasses);
