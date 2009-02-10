@@ -41,12 +41,12 @@ public class FailTransitionDefaultStatusJobParserTests extends AbstractJobParser
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(1, stepNamesList.size());
-		assertTrue(stepNamesList.contains("step1"));
+		assertTrue(stepNamesList.contains("s1"));
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "step1");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 

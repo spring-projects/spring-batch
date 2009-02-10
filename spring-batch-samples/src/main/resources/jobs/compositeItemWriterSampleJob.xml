@@ -16,7 +16,7 @@
 	</beans:description>
 
 	<job id="compositeItemWriterJob">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="fileItemReader" processor="processor" writer="compositeWriter" commit-interval="1">
 				<streams>
 					<stream ref="fileItemReader"/>

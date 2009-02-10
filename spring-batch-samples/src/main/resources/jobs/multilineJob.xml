@@ -11,7 +11,7 @@
  		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<job id="multilineJob">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="reader" writer="writer" commit-interval="1">
 				<streams>
 					<stream ref="fileItemReader"/>

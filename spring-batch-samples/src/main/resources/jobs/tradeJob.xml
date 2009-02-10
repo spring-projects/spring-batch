@@ -13,7 +13,7 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<job id="tradeJob">
-		<step name="step1" next="step2">
+		<step id="step1" next="step2">
 			<tasklet reader="fileItemReader" 
 			         processor="validatingProcessor" 
 			         writer="tradeWriter" 
@@ -24,10 +24,10 @@
 				</streams>
 			</tasklet>
 		</step>
-		<step name="step2" next="step3">
+		<step id="step2" next="step3">
 			<tasklet reader="tradeSqlItemReader" writer="customerWriter" commit-interval="1"/>
 		</step>
-		<step name="step3">
+		<step id="step3">
 			<tasklet reader="customerSqlItemReader" writer="creditWriter" commit-interval="1"/>
 		</step>
 	</job>

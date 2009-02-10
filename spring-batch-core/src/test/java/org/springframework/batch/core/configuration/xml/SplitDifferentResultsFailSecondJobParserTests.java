@@ -41,22 +41,22 @@ public class SplitDifferentResultsFailSecondJobParserTests extends AbstractJobPa
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(3, stepNamesList.size());
-		assertTrue(stepNamesList.contains("step1"));
-		assertTrue(stepNamesList.contains("failingStep"));
-		assertTrue(stepNamesList.contains("step3"));
+		assertTrue(stepNamesList.contains("s1"));
+		assertTrue(stepNamesList.contains("fail"));
+		assertTrue(stepNamesList.contains("s3"));
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
 
-		StepExecution stepExecution1 = getStepExecution(jobExecution, "step1");
+		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
-		StepExecution stepExecution2 = getStepExecution(jobExecution, "failingStep");
+		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
 
-		StepExecution stepExecution3 = getStepExecution(jobExecution, "step3");
+		StepExecution stepExecution3 = getStepExecution(jobExecution, "s3");
 		assertEquals(BatchStatus.COMPLETED, stepExecution3.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution3.getExitStatus());
 

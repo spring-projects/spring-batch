@@ -14,7 +14,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<job id="ioSampleJob">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/>
 		</step>
 	</job>

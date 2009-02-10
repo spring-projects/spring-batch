@@ -13,7 +13,7 @@
 	</beans:description>
 
 	<job id="headerFooterSample">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="reader" writer="writer" commit-interval="3">
 				<streams>
 					<stream ref="reader"/>

@@ -7,10 +7,10 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step name="step1">
-			<next on="*" to="step2" />
+		<step id="s1" ref="step1">
+			<next on="*" to="s2" />
 		</step>
-		<step name="step2" />
+		<step id="s2" ref="step2" />
 	</job>
 
 </beans:beans>

@@ -8,7 +8,7 @@
 		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
 
 	<job id="customerFilterJob">
-		<step name="uploadCustomer">
+		<step id="uploadCustomer">
 			<tasklet reader="customerFileUploadReader" 
 			         processor="customerUpdateProcessor" 
 			         writer="customerUpdateWriter" 

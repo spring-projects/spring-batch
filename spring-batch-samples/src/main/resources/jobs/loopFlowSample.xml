@@ -12,13 +12,13 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<job id="loopFlowSample">
-		<step name="step1" next="step2">
+		<step id="step1" next="step2">
 			<tasklet reader="itemGenerator" writer="itemWriter" commit-interval="1"/>
 			<listeners>
 				<listener ref="resettingListener"/>
 			</listeners>
 		</step>
-		<step name="step2" next="limitDecision">
+		<step id="step2" next="limitDecision">
 			<tasklet reader="itemGenerator" writer="itemWriter" 
 			         commit-interval="1" allow-start-if-complete="true"/>
 			<listeners>

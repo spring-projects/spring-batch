@@ -18,7 +18,7 @@
 	</beans:description>
 
 	<job id="delegateJob">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="reader" writer="writer" commit-interval="1"/>
 		</step>
 	</job>

@@ -13,7 +13,7 @@
 	<beans:import resource="multilineOrderIo.xml" />
 
 	<job id="multilineOrderJob">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="reader" processor="processor" writer="fileItemWriter" commit-interval="">
 				<streams>
 					<stream ref="fileItemWriter"/>

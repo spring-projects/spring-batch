@@ -11,7 +11,7 @@
 	<beans:description>Example for Hibernate integration.</beans:description>
 
 	<job id="hibernateJob" restartable="false">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="hibernateItemReader" 
 			         processor="creditIncreaseProcessor" 
 			         writer="hibernateCreditWriter" 

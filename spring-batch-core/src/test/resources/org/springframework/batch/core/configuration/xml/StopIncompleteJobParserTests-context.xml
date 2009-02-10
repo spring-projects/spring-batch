@@ -9,10 +9,10 @@
 	<beans:bean id="decider" class="org.springframework.batch.core.configuration.xml.StopJobParserTests$TestDecider"/>
 
 	<job id="job">
-		<step name="failingStep">
-			<pause on="FAILED" to="step2"/>
+		<step id="fail" ref="failingStep">
+			<pause on="FAILED" to="s2"/>
 		</step>
-		<step name="step2"/>
+		<step id="s2" ref="step2"/>
 	</job>
 
 </beans:beans>

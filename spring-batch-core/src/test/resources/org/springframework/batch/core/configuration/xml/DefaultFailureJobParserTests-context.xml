@@ -9,8 +9,8 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step name="step1" next="failingStep"/>
-		<step name="failingStep" />
+		<step id="s1" ref="step1" next="fail"/>
+		<step id="fail" ref="failingStep"/>
 	</job>
 
 </beans:beans>

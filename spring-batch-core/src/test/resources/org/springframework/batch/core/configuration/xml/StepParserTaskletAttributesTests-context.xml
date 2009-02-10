@@ -5,7 +5,7 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<job id="job">
-		<step name="step">
+		<step id="step">
 			<tasklet reader="reader" processor="processor" writer="writer"
 					start-limit="25" allow-start-if-complete="true"
 					commit-interval="10" skip-limit="20" 

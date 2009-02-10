@@ -12,15 +12,15 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<job id="footballJob">
-		<step name="playerload" next="gameLoad">
+		<step id="playerload" next="gameLoad">
 			<tasklet reader="playerFileItemReader" writer="playerWriter" 
 			               commit-interval="${job.commit.interval}" />
 		</step>
-		<step name="gameLoad" next="playerSummarization">
+		<step id="gameLoad" next="playerSummarization">
 			<tasklet reader="gameFileItemReader" writer="gameWriter" 
 			               commit-interval="${job.commit.interval}" />
 		</step>
-		<step name="playerSummarization">
+		<step id="playerSummarization">
 			<tasklet reader="playerSummarizationSource" writer="summaryWriter" 
 			               commit-interval="${job.commit.interval}" />
 		</step>

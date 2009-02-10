@@ -12,7 +12,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<job id="restartSampleJob" restartable="true">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="itemReader" processor="processor" writer="tradeWriter" commit-interval="2">
 				<streams>
 					<stream ref="fileItemReader"/>

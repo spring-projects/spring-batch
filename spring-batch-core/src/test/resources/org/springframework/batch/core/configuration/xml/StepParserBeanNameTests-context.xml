@@ -4,23 +4,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+	<beans:import resource="common-context.xml" />
+
 	<job id="job">
-		<step name="step1" next="step2">
-			<tasklet reader="reader" writer="writer" commit-interval="10"/>
-		</step>
-		<step name="step2" tasklet="tasklet"/>
+		<step id="s1" ref="step2"/>
 	</job>
-
-	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"/>
-
-	<beans:bean id="reader" class="org.springframework.batch.core.configuration.xml.TestReader"/>
-	
-	<beans:bean id="writer" class="org.springframework.batch.core.configuration.xml.TestWriter"/>
-
-	<beans:bean id="transactionManager" class="org.springframework.batch.support.transaction.ResourcelessTransactionManager" />
-
-	<beans:bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-		<beans:property name="transactionManager" ref="transactionManager" />
-	</beans:bean>
 
 </beans:beans>

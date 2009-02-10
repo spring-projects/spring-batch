@@ -12,7 +12,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<job id="retrySample">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="itemGenerator" 
 			         writer="itemWriter" 
 			         commit-interval="1"

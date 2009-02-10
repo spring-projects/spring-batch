@@ -53,8 +53,9 @@ public class StepParserTests {
 		ConfigurableApplicationContext ctx = 
 			new ClassPathXmlApplicationContext("org/springframework/batch/core/configuration/xml/StepParserBeanNameTests-context.xml");
 		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue("'step1' bean not found", beans.containsKey("step1"));
-		assertTrue("'step2' bean not found", beans.containsKey("step2"));
+		assertTrue("'s1' bean not found", beans.containsKey("s1"));
+		Step s1 = (Step)ctx.getBean("s1");
+		assertEquals("wrong name", "s1", s1.getName());
 	}
 
 	@Test

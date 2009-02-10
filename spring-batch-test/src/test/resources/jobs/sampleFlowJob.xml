@@ -12,11 +12,25 @@
        		http://www.springframework.org/schema/aop
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
-	<beans:import resource="sample-steps.xml" />
-
 	<job id="sampleFlowJob">
-		<step name="step1" next="step2"/>
-		<step name="step2"/>
+		<step id="step1" ref="s1" next="step2"/>
+		<step id="step2" ref="s2"/>
 	</job>
+
+	<beans:bean id="s1" parent="taskletStep">
+		<beans:property name="tasklet">
+			<beans:bean class="org.springframework.batch.test.sample.SampleTasklet">
+				<beans:constructor-arg value="1" />
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="s2" parent="taskletStep">
+		<beans:property name="tasklet">
+			<beans:bean class="org.springframework.batch.test.sample.SampleTasklet">
+				<beans:constructor-arg value="2" />
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
 
 </beans:beans>

@@ -14,7 +14,7 @@
 		multiple environments. -->
 
 	<job id="loopJob" incrementer="jobParametersIncrementer">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="reader" writer="writer" commit-interval="3"/>
 		</step>
 	</job>

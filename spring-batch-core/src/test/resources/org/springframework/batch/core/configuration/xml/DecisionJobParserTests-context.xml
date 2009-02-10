@@ -10,11 +10,11 @@
 	
 	<job id="job">
 		<decision id="decision" decider="decider">
-			<next on="FOO" to="step1"/>
-			<next on="*" to="step2"/>
+			<next on="FOO" to="s1"/>
+			<next on="*" to="s2"/>
 		</decision>
-		<step name="step1" />
-		<step name="step2" />
+		<step id="s1" ref="step1" />
+		<step id="s2" ref="step2" />
 	</job>
 
 </beans:beans>

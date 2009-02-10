@@ -14,7 +14,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 		
 	<batch:job id="ioSampleJob">
-		<batch:step name="step1">
+		<batch:step id="step1">
 			<batch:tasklet reader="itemReader" writer="itemWriter" commit-interval="2"/>
 		</batch:step>
 	</batch:job>

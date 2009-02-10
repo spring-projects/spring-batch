@@ -7,7 +7,7 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step name="step">
+		<step id="step">
 			<tasklet reader="reader" processor="processor" writer="writer"
 					commit-interval="10" skip-limit="20" 
 					retry-limit="3" cache-capacity="100"

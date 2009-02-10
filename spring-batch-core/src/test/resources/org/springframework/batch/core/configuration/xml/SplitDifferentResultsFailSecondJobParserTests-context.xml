@@ -10,17 +10,17 @@
 	
 	<job id="job">
 		<split id="split1">
-			<next on="FAILED" to="step3"/>
+			<next on="FAILED" to="s3"/>
 			<fail on="COMPLETED" />
 
 			<flow>
-				<step name="step1"/>
+				<step id="s1" ref="step1"/>
 			</flow>
 			<flow>
-				<step name="failingStep"/>
+				<step id="fail" ref="failingStep"/>
 			</flow>
 		</split>
-		<step name="step3"/>
+		<step id="s3" ref="step3"/>
 	</job>
 
 </beans:beans>

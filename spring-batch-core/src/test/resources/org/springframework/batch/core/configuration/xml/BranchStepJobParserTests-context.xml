@@ -7,12 +7,12 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step name="step1">
-			<next on="FAILED" to="step2" />
-			<next on="*" to="step3" />
+		<step id="s1" ref="step1">
+			<next on="FAILED" to="s2" />
+			<next on="*" to="s3" />
 		</step>
-		<step name="step2" />
-		<step name="step3" />
+		<step id="s2" ref="step2"/>
+		<step id="s3" ref="step3"/>
 	</job>
-
+	
 </beans:beans>

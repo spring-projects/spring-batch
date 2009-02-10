@@ -7,16 +7,16 @@
 	<beans:import resource="common-context.xml" />
 
 	<job id="job">
-		<split id="split" next="step4">
+		<split id="split" next="s4">
 			<flow>
-				<step name="step1" next="step2"/>
-				<step name="step2" />
+				<step id="s1" ref="step1" next="s2"/>
+				<step id="s2" ref="step2" />
 			</flow>
 			<flow>
-				<step name="step3" />
+				<step id="s3" ref="step3" />
 			</flow>
 		</split>
-		<step name="step4" />
+		<step id="s4" ref="step4" />
 	</job>
 
 </beans:beans>

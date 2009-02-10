@@ -13,7 +13,7 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<job id="skipJob" incrementer="incrementer">
-		<step name="step1">
+		<step id="step1">
 			<tasklet reader="fileItemReader" processor="tradeProcessor" writer="tradeWriter" 
 			         commit-interval="1" skip-limit="1">
 			</tasklet>
@@ -28,9 +28,9 @@
 			</listeners>
 		</step>
 
-		<step name="errorPrint1" next="step2" tasklet="errorLogTasklet"/>
+		<step id="errorPrint1" next="step2" tasklet="errorLogTasklet"/>
 
-		<step name="step2" next="skipCheckingDecision">
+		<step id="step2" next="skipCheckingDecision">
 			<tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="itemTrackingWriter"
 					 commit-interval="2" skip-limit="1">
 				<skippable-exception-classes>
@@ -49,7 +49,7 @@
 			<end on="*"/>
 		</decision>
 		
-		<step name="errorPrint2" tasklet="errorLogTasklet"/>
+		<step id="errorPrint2" tasklet="errorLogTasklet"/>
 	</job>
 
 	

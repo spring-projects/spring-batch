@@ -12,13 +12,13 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd">
 
 	<job id="parallelJob">
-		<step name="staging" next="loading">
+		<step id="staging" next="loading">
 			<tasklet reader="fileItemReader" 
 			         processor="validatingProcessor" 
 			         writer="stagingItemWriter" 
 			         commit-interval="2"/>
 		</step>
-		<step name="loading">
+		<step id="loading">
 			<tasklet reader="stagingReader" 
 			         processor="stagingProcessor" 
 			         writer="tradeWriter" 

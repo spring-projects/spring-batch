@@ -7,8 +7,8 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step name="step1" next="step2"/>
-		<step name="step2" />
+		<step id="s1" ref="step1" next="s2"/>
+		<step id="s2" ref="step2"/>
 	</job>
 
 </beans:beans>

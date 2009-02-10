@@ -148,7 +148,8 @@
 					<xsd:complexType>
 						<xsd:complexContent>
 							<xsd:extension base="stepType">
-								<xsd:attribute name="name" type="xsd:string" use="required" >
+								<xsd:attribute name="id" type="xsd:ID" use="required" />
+								<xsd:attribute name="ref" type="xsd:string" use="optional" >
 									<xsd:annotation>
 										<xsd:documentation>
 										The step name attribute defines the name for the step. It can be used as 

@@ -54,28 +54,43 @@ public class InlineStepParser extends AbstractStepParser {
 
 		BeanDefinitionBuilder stateBuilder = 
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
-		String stepRef = element.getAttribute("name");
+		String stepId = element.getAttribute("id");
+		String stepRef = element.getAttribute("ref");
 		String taskletRef = element.getAttribute("tasklet");
 
-		if (!StringUtils.hasText(stepRef)) {
-			parserContext.getReaderContext().error("The name attribute can't be empty for <" + element.getNodeName() + ">", element);
-		}
-		
 		@SuppressWarnings("unchecked")
-		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
-		if (StringUtils.hasText(taskletRef)) {
+		List<Element> listOfTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
+		if (StringUtils.hasText(stepRef)) {
+			if (StringUtils.hasText(taskletRef)) {
+				parserContext.getReaderContext().error("The 'tasklet' attribute can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
+			}
+			if (listOfTaskElements.size() > 0) {
+				parserContext.getReaderContext().error("The <" + listOfTaskElements.get(0).getNodeName() +
+						"> element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
+			}
+			BeanDefinitionBuilder stepBuilder = 
+				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.configuration.xml.DelegatingStep");
+			stepBuilder.addConstructorArgValue(stepId);
+			stepBuilder.addConstructorArgReference(stepRef);
+			AbstractBeanDefinition bd = stepBuilder.getBeanDefinition();
+	        bd.setSource(parserContext.extractSource(element));
+			parserContext.getRegistry().registerBeanDefinition(stepId, bd);
+			stateBuilder.addConstructorArgReference(stepId);
+		}
+		else if (StringUtils.hasText(taskletRef)) {
+			if (listOfTaskElements.size() > 0) {
+				parserContext.getReaderContext().error("The <" + listOfTaskElements.get(0).getNodeName() +
+						"> element can't be combined with the 'tasklet=\""+ taskletRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
+			}
 			AbstractBeanDefinition bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
-			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepRef));
-			stateBuilder.addConstructorArgReference(stepRef);
+			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
+			stateBuilder.addConstructorArgReference(stepId);
 		}
-		else if (processTaskElements.size() > 0) {
-			Element taskElement = processTaskElements.get(0);
+		else if (listOfTaskElements.size() > 0) {
+			Element taskElement = listOfTaskElements.get(0);
 			AbstractBeanDefinition bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
-			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepRef));
-			stateBuilder.addConstructorArgReference(stepRef);
-		}
-		else if (StringUtils.hasText(stepRef)) {
-				stateBuilder.addConstructorArgReference(stepRef);
+			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
+			stateBuilder.addConstructorArgReference(stepId);
 		}
 		else {
 			parserContext.getReaderContext().error("Incomplete configuration detected while creating step with name " + stepRef, element);

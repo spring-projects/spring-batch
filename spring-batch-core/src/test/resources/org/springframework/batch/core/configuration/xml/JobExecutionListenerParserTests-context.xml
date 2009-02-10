@@ -7,15 +7,13 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job" incrementer="testIncrementer" job-repository="jobRepository">
-		<step name="step1" tasklet="tasklet"/>
+		<step id="s1" ref="step1"/>
 		<listeners>
 			<listener after-method="afterJob" ref="testListener"/>
 			<listener after-method="afterJob" class="org.springframework.batch.core.configuration.xml.TestJobListener"/>
 			<listener class="org.springframework.batch.core.configuration.xml.JobExecutionListenerParserTests$TestComponent"/>
 		</listeners>
 	</job>
-
-	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"/>
 
 	<beans:bean id="testListener" class="org.springframework.batch.core.configuration.xml.TestJobListener" />
 	
