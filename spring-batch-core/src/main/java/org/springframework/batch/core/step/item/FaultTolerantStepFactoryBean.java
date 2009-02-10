@@ -21,11 +21,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import org.springframework.batch.core.ItemProcessListener;
-import org.springframework.batch.core.ItemReadListener;
-import org.springframework.batch.core.ItemWriteListener;
-import org.springframework.batch.core.SkipListener;
-import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -336,49 +331,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			}
 		});
 		return retryPolicyWrapper;
-	}
-
-	/**
-	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
-	 * listeners.
-	 */
-	private void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
-			SimpleChunkProcessor<T, S> chunkProcessor) {
-
-		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
-				ItemReadListener.class));
-		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
-				SkipListener.class));
-
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(getListeners(),
-				ItemProcessListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
-				ItemWriteListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
-				SkipListener.class));
-	}
-
-	/**
-	 * Auto-register reader, processor and writer as item listeners if
-	 * applicable.
-	 */
-	private void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
-			SimpleChunkProcessor<T, S> chunkProcessor) {
-		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
-
-			if (itemHandler instanceof SkipListener) {
-				chunkProvider.registerListener((StepListener) itemHandler);
-				chunkProcessor.registerListener((StepListener) itemHandler);
-				// already registered with both so avoid double-registering
-				continue;
-			}
-			if (itemHandler instanceof ItemReadListener) {
-				chunkProvider.registerListener((StepListener) itemHandler);
-			}
-			if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
-				chunkProcessor.registerListener((StepListener) itemHandler);
-			}
-		}
 	}
 
 	@SuppressWarnings("unchecked")

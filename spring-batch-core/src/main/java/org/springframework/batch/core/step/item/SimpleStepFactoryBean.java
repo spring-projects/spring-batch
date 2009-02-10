@@ -25,6 +25,7 @@ import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.core.ItemReadListener;
 import org.springframework.batch.core.ItemWriteListener;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
@@ -419,10 +420,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 		step.setStreams(streams);
 
-		ItemReader<? extends T> itemReader = getItemReader();
-		ItemWriter<? super S> itemWriter = getItemWriter();
-		ItemProcessor<? super T, ? extends S> itemProcessor = getItemProcessor();
-
 		if (chunkOperations == null) {
 			RepeatTemplate repeatTemplate = new RepeatTemplate();
 			repeatTemplate.setCompletionPolicy(getChunkCompletionPolicy());
@@ -447,15 +444,11 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		step.setStepOperations(stepOperations);
 
 		SimpleChunkProvider<T> chunkProvider = new SimpleChunkProvider<T>(itemReader, chunkOperations);
-		List<ItemReadListener<T>> readListeners = BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(
-				getListeners(), ItemReadListener.class);
-		chunkProvider.setListeners(readListeners);
 
 		SimpleChunkProcessor<T, S> chunkProcessor = new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(getListeners(),
-				ItemProcessListener.class));
-		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
-				ItemWriteListener.class));
+		
+		registerExplicitItemListeners(chunkProvider, chunkProcessor);
+		registerImplicitItemListeners(chunkProvider, chunkProcessor);
 
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 
@@ -472,12 +465,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 			}
 			if (itemHandler instanceof ChunkListener) {
 				chunkListeners.add((StepListener) itemHandler);
-			}
-			if (itemHandler instanceof ItemReadListener) {
-				chunkProvider.registerListener((StepListener) itemHandler);
-			}
-			if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
-				chunkProcessor.registerListener((StepListener) itemHandler);
 			}
 		}
 
@@ -506,6 +493,47 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 			commitInterval = DEFAULT_COMMIT_INTERVAL;
 		}
 		return new SimpleCompletionPolicy(commitInterval);
+	}
+
+	/**
+	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
+	 * listeners.
+	 */
+	protected void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
+	
+		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
+				ItemReadListener.class));
+		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+				SkipListener.class));
+	
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemProcessListener<T, S>> getListeners(getListeners(),
+				ItemProcessListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<ItemWriteListener<S>> getListeners(getListeners(),
+				ItemWriteListener.class));
+		chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
+				SkipListener.class));
+	}
+
+	/**
+	 * Auto-register reader, processor and writer as item listeners if
+	 * applicable.
+	 */
+	protected void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
+		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
+	
+			if (itemHandler instanceof SkipListener) {
+				chunkProvider.registerListener((StepListener) itemHandler);
+				chunkProcessor.registerListener((StepListener) itemHandler);
+				// already registered with both so avoid double-registering
+				continue;
+			}
+			if (itemHandler instanceof ItemReadListener) {
+				chunkProvider.registerListener((StepListener) itemHandler);
+			}
+			if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
+				chunkProcessor.registerListener((StepListener) itemHandler);
+			}
+		}
 	}
 
 }
