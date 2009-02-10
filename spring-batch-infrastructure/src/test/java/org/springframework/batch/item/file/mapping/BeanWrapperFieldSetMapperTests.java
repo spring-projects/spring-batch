@@ -403,4 +403,34 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 	}
 
+	public void testStrict() throws Exception {
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setStrict(true);
+		mapper.setTargetType(TestObject.class);
+		mapper.afterPropertiesSet();
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
+				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
+		try {
+			mapper.mapFieldSet(fieldSet);
+			fail("expected error");
+		}
+		catch(NotWritablePropertyException e) {
+			assertTrue(e.getMessage().contains("'illegalPropertyName'"));
+		}
+	}
+
+	public void testNotStrict() throws Exception {
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setStrict(false);
+		mapper.setTargetType(TestObject.class);
+		mapper.afterPropertiesSet();
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
+				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
+		TestObject result = mapper.mapFieldSet(fieldSet);
+		assertEquals("This is some dummy string", result.getVarString());
+		assertEquals(true, result.isVarBoolean());
+		assertEquals('C', result.getVarChar());
+	}
 }

@@ -90,6 +90,8 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	private static Map<Class<?>, Map<String, String>> propertiesMatched = new HashMap<Class<?>, Map<String, String>>();
 
 	private static int distanceLimit = 5;
+	
+	private boolean strict = true;
 
 	/*
 	 * (non-Javadoc)
@@ -186,7 +188,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	 */
 	protected DataBinder createBinder(Object target) {
 		DataBinder binder = new DataBinder(target);
-		binder.setIgnoreUnknownFields(false);
+		binder.setIgnoreUnknownFields(!this.strict);
 		initBinder(binder);
 		registerCustomEditors(binder);
 		return binder;
@@ -320,4 +322,14 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 		properties.setProperty(newName, value);
 	}
 
+	/**
+	 * Public setter for the 'strict' property. If true, then
+	 * {@link #mapFieldSet(FieldSet)} will fail of the FieldSet contains fields
+	 * that cannot be mapped to the bean.
+	 * 
+	 * @param strict
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
 }
