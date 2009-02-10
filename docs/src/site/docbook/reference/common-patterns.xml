@@ -258,7 +258,7 @@
       in the event of a restart. In order to make this class restartable, the
       <classname>ItemStream</classname> interface should be implemented along
       with the methods <methodname>open</methodname> and
-      <methodname>update</methodname>: </para>
+      <methodname>update</methodname>:</para>
 
       <programlisting>  private static final String TOTAL_AMOUNT_KEY = "total.amount";
 
@@ -306,12 +306,11 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/drivingQueryExample.png"
-                   width="50%" />
+                   scale="80" width="" />
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/drivingQueryExample.png"
+        <imagedata align="center" fileref="images/drivingQueryExample.png"
                    width="66%" />
       </imageobject>
     </mediaobject>
@@ -326,12 +325,11 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/drivingQueryJob.png"
-                   width="66%" />
+                   scale="80" width="66%" />
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/drivingQueryJob.png"
+        <imagedata align="center" fileref="images/drivingQueryJob.png"
                    width="66%" />
       </imageobject>
     </mediaobject>

@@ -21,8 +21,8 @@
       </listitem>
 
       <listitem>
-        <para>simple and default implementations that allow for quick adoption
-        and ease of use out-of-the-box</para>
+        <para>simple and default implementations that allowed for quick
+        adoption and ease of use out-of-the-box</para>
       </listitem>
 
       <listitem>
@@ -47,13 +47,13 @@
     <imageobject role="fo">
       <imagedata align="center"
                  fileref="images/spring-batch-reference-model.png"
-                 format="PNG" />
+                 format="PNG" scale="70" />
     </imageobject>
 
     <imageobject role="html">
       <imagedata align="center"
                  fileref="images/spring-batch-reference-model.png"
-                 format="PNG" scale="80" />
+                 format="PNG" scale="85" />
     </imageobject>
 
     <caption><para>Figure 2.1: Batch Stereotypes</para></caption>
@@ -63,7 +63,7 @@
   language of batch. A Job has one to many steps, which has exactly one
   ItemReader, ItemProcessor, and ItemWriter. A job needs to be launched
   (JobLauncher), and meta data about the currently running process needs to be
-  stored (JobRepository).</para>
+  stored (JobRepository)</para>
 
   <section id="job">
     <title id="jobStereotypes">Job</title>
@@ -78,12 +78,12 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/job-heirarchy.png"
-                   scale="80" />
+                   scale="90" />
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/job-heirarchy.png" />
+        <imagedata align="center" fileref="images/job-heirarchy.png"
+                   scale="80" />
       </imageobject>
     </mediaobject>
 
@@ -133,11 +133,11 @@
       case of this job, there will be one logical
       <classname>JobInstance</classname> per day. For example, there will be a
       January 1st run, and a January 2nd run. If the January 1st run fails the
-      first time and is run again the next day, it is still the January 1st
-      run. (Usually this corresponds with the data it is processing as well,
-      meaning the January 1st run processes data for January 1st, etc).
-      Therefore, each <classname>JobInstance</classname> can have multiple
-      executions (<classname>JobExecution</classname> is discussed in more
+      first time and is run again the next day, it's still the January 1st
+      run. (Usually this corresponds with the data its processing as well,
+      meaning the January 1st run processes data for January 1st, etc) That is
+      to say, each <classname>JobInstance</classname> can have multiple
+      executions. (<classname>JobExecution</classname> is discussed in more
       detail below) and only one <classname>JobInstance</classname>
       corresponding to a particular <classname>Job</classname> can be running
       at a given time. The definition of a <classname>JobInstance</classname>
@@ -151,11 +151,11 @@
       likely be a business decision, it is left up to the
       <classname>ItemReader</classname> to decide. What using the same
       <classname>JobInstance</classname> will determine, however, is whether
-      or not the 'state' (i.e. the <classname>ExecutionContext</classname>,
-      which is discussed below) from previous executions will be used. Using a
-      new <classname>JobInstance</classname> will mean 'start from the
-      beginning' and using an existing instance will generally mean 'start
-      from where you left off'.</para>
+      or not the 'state' (i.e. The ExecutionContext, which is discussed below)
+      from previous executions will be used. Using a new
+      <classname>JobInstance</classname> will mean 'start from the beginning'
+      and using an existing instance will generally mean 'start from where you
+      left off'.</para>
     </section>
 
     <section id="jobParameters">
@@ -165,20 +165,21 @@
       differs from <classname>Job</classname>, the natural question to ask is:
       "how is one <classname>JobInstance</classname> distinguished from
       another?" The answer is: <classname>JobParameters</classname>.
-      <classname>JobParameters</classname> is a set of parameters used to
-      start a batch job. They can be used for identification or even as
+      <classname>JobParameters</classname> are any set of parameters used to
+      start a batch job, which can be used for identification or even as
       reference data during the run:</para>
 
       <para><mediaobject>
           <imageobject role="html">
             <imagedata align="center"
                        fileref="images/job-stereotypes-parameters.png"
-                       scale="80" />
+                       scale="90" />
           </imageobject>
 
           <imageobject role="fo">
             <imagedata align="center"
-                       fileref="images/job-heirarchy.png" />
+                       fileref="images/job-stereotypes-parameters.png"
+                       scale="80" />
           </imageobject>
         </mediaobject></para>
 
@@ -203,10 +204,10 @@
       will not be considered complete unless the execution completes
       successfully. Using the EndOfDay <classname>Job</classname> described
       above as an example, consider a <classname>JobInstance</classname> for
-      01-01-2008 that failed the first time it was run. If it is run again
+      01-01-2008 that failed the first time it was run. If it is ran again,
       with the same job parameters as the first run (01-01-2008), a new
-      <classname>JobExecution</classname> will be created. However, there will
-      still be only one <classname>JobInstance</classname>.</para>
+      JobExecution will be created. However, there will still be only one
+      <classname>JobInstance</classname>.</para>
 
       <para>A <classname>Job</classname> defines what a job is and how it is
       to be executed, and <classname>JobInstance</classname> is a purely
@@ -225,9 +226,9 @@
               <entry>status</entry>
 
               <entry>A <classname>BatchStatus</classname> object that
-              indicates the status of the execution. While running, it's
-              BatchStatus.STARTED, if it fails, it's BatchStatus.FAILED, and
-              if it finishes successfully, it's BatchStatus.COMPLETED</entry>
+              indicates the status of the execution. While it's running, it's
+              BatchStatus.STARTED, if it fails it's BatchStatus.FAILED, and if
+              it finishes successfully it's BatchStatus.COMPLETED</entry>
             </row>
 
             <row>
@@ -258,19 +259,18 @@
               <entry>createTime</entry>
 
               <entry>A <classname>java.util.Date</classname> representing the
-              current system time when the <classname>JobExecution</classname>
-              was first persisted. The job may not have been started yet (and
-              thus has no start time), but it will always have a createTime,
-              which is required by the framework for managing job level
-              <classname>ExecutionContext</classname>s.</entry>
+              current system time when the JobExecution was first persisted.
+              The job may not have been started yet (and thus has no start
+              time), but it will always have a createTime, which is required
+              by the framework for managing job level
+              ExecutionContexts.</entry>
             </row>
 
             <row>
               <entry>lastUpdated</entry>
 
               <entry>A <classname>java.util.Date</classname> representing the
-              last time a <classname>JobExecution</classname> was
-              persisted.</entry>
+              last time a JobExecution was persisted.</entry>
             </row>
 
             <row>
@@ -389,17 +389,17 @@
       will be kicked off again for 01-01, starting where it left off and
       completing successfully at 9:30. Because it's now the next day, the
       01-02 job must be run as well, which is kicked off just afterwards at
-      9:31, and completes in its normal one hour time at 10:30. There is no
+      9:31, and completes in it's normal one hour time at 10:30. There is no
       requirement that one <classname>JobInstance</classname> be kicked off
       after another, unless there is potential for the two jobs to attempt to
       access the same data, causing issues with locking at the database level.
       It is entirely up to the scheduler to determine when a
       <classname>Job</classname> should be run. Since they're separate
-      <classname>JobInstance</classname>s, Spring Batch will make no attempt
-      to stop them from being run concurrently. (Attempting to run the same
+      JobInstances, Spring Batch will make no attempt to stop them from being
+      run concurrently. (Attempting to run the same
       <classname>JobInstance</classname> while another is already running will
       result in a <classname>JobExecutionAlreadyRunningException</classname>
-      being thrown). There should now be an extra entry in both the
+      being thrown) There should now be an extra entry in both the
       <classname>JobInstance</classname> and
       <classname>JobParameters</classname> tables, and two extra entries in
       the <classname>JobExecution</classname> table:</para>
@@ -554,12 +554,12 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png"
-                   scale="80" />
+                   scale="90" />
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/jobHeirarchyWithSteps.png" />
+        <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png"
+                   scale="90" />
       </imageobject>
     </mediaobject>
 
@@ -568,12 +568,12 @@
 
       <para>A <classname>StepExecution</classname> represents a single attempt
       to execute a <classname>Step</classname>. A new
-      <classname>StepExecution</classname> will be created each time a
-      <classname>Step</classname> is run, similar to
-      <classname>JobExecution</classname>. However, if a step fails to execute
-      because the step before it fails, there will be no execution persisted
-      for it. A <classname>StepExecution</classname> will only be created when
-      its <classname>Step</classname> is actually started.</para>
+      <classname>StepExecution</classname> will be created each time a Step is
+      run, similar to <classname>JobExecution</classname>. However, if a step
+      fails to execute because the step before it fails, there will be no
+      execution persisted for it. A <classname>StepExecution</classname> will
+      only be created when it's <classname>Step</classname> is actually
+      started.</para>
 
       <para>Step executions are represented by objects of the
       <classname>StepExecution</classname> class. Each execution contains a
@@ -596,8 +596,8 @@
 
               <entry>A <classname>BatchStatus</classname> object that
               indicates the status of the execution. While it's running, the
-              status is BatchStatus.STARTED, if it fails, the status is
-              BatchStatus.FAILED, and if it finishes successfully, the status
+              status is BatchStatus.STARTED, if it fails the status is
+              BatchStatus.FAILED, and if it finishes successfully the status
               is BatchStatus.COMPLETED</entry>
             </row>
 
@@ -670,15 +670,15 @@
             <row>
               <entry>processSkipCount</entry>
 
-              <entry>The number of times <methodname>process</methodname> has
-              failed, resulting in a skipped item.</entry>
+              <entry>The number of times process has failed, resulting in a
+              skipped item.</entry>
             </row>
 
             <row>
               <entry>filterCount</entry>
 
               <entry>The number of items that have been 'filtered' by the
-              <classname>ItemProcessor</classname>.</entry>
+              ItemProcessor</entry>
             </row>
 
             <row>
@@ -848,14 +848,14 @@
     this scenario. This value will be updated just before each commit by the
     framework, and can contain multiple rows corresponding to entries within
     the <classname>ExecutionContext</classname>. Being notified before a
-    commit requires one of the various <classname>StepListener</classname>s,
-    or an <classname>ItemStream</classname>, which are discussed in more
-    detail later in this guide. As with the previous example, it is assumed
-    that the <classname>Job</classname> is restarted the next day. When it is
-    restarted, the values from the <classname>ExecutionContext</classname> of
-    the last run are reconstituted from the database, and when the
-    <classname>ItemReader</classname> is opened, it can check to see if it has
-    any stored state in the context, and initialize itself from there:</para>
+    commit requires one of the various StepListeners, or an
+    <classname>ItemStream</classname>, which are discussed in more detail
+    later in this guide. As with the previous example, it is assumed that the
+    Job is restarted the next day. When it is restarted, the values from the
+    <classname>ExecutionContext</classname> of the last run are reconstituted
+    from the database, and when the <classname>ItemReader</classname> is
+    opened, it can check to see if it has any stored state in the context, and
+    initialize itself from there:</para>
 
     <programlisting>  if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     log.debug("Initializing for restart. Restart data is: " + executionContext);
@@ -898,7 +898,7 @@
     exists per <classname>StepExecution</classname> at any given time. Clients
     of the <classname>ExecutionContext</classname> should be careful because
     this creates a shared keyspace, so care should be taken when putting
-    values in to ensure no data is overwritten. However, the
+    values in to ensure no data is overwritten, however, the
     <classname>Step</classname> stores absolutely no data in the context, so
     there is no way to adversely affect the framework.</para>
 
@@ -915,7 +915,7 @@
 
 </programlisting>
 
-    <para>As noted in the comment, ecStep will not equal ecJob; they are two
+    <para>As noted in the comment, ecStep will not equal ecJob, they are two
     different <classname>ExecutionContext</classname>s. The one scoped to the
     <classname>Step</classname> will be saved at every commit point in the
     <classname>Step</classname>, whereas the one scoped to the
@@ -981,7 +981,7 @@
     the output of a <classname>Step</classname>, one item at a time.
     Generally, an item writer has no knowledge of the input it will receive
     next, only the item that was passed in its current invocation. More
-    details about the <classname>ItemWriter</classname> interface and its
+    details about the <classname>ItemWriter</classname> interface and it's
     various implementations can be found in <xref
     linkend="readersAndWriters" /></para>
   </section>
@@ -994,9 +994,9 @@
     <classname>ItemReader</classname> reads one item, and the
     <classname>ItemWriter</classname> writes them, the
     <classname>ItemProcessor</classname> provides access to transform or apply
-    other business processing. If, while processing the item, it is determined
-    that the item is not valid, returning null indicates that the item should
-    not be written out. More details about the ItemProcessor interface can be
-    found in <xref linkend="readersAndWriters" />.</para>
+    other business processing. If while processing the item it's determined
+    that it's not valid, returning null indicates that it should not be
+    written out. More details about the ItemProcessor interface can be found
+    in <xref linkend="readersAndWriters" />.</para>
   </section>
 </chapter>
