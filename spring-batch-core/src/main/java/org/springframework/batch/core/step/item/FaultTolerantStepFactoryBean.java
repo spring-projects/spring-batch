@@ -221,6 +221,47 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, RetryException.class);
 
+		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+				fatalExceptionClasses);
+
+		// TODO why are retryable exceptions automatically skippable?
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, union(skippableExceptionClasses,
+				retryableExceptionClasses), fatalExceptionClasses);
+
+		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
+			public Boolean classify(Throwable classifiable) {
+				return getTransactionAttribute().rollbackOn(classifiable);
+			}
+		};
+
+		BatchRetryTemplate batchRetryTemplate = configureRetry();
+
+		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
+				getChunkOperations());
+		chunkProvider.setSkipPolicy(readSkipPolicy);
+		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
+				getItemWriter(), batchRetryTemplate);
+		chunkProcessor.setBuffering(!isReaderTransactionalQueue);
+		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
+		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
+		chunkProcessor.setRollbackClassifier(rollbackClassifier);
+
+		registerExplicitItemListeners(chunkProvider, chunkProcessor);
+		registerImplicitItemListeners(chunkProvider, chunkProcessor);
+
+		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
+		tasklet.setBuffering(!isReaderTransactionalQueue);
+
+		step.setTasklet(tasklet);
+
+	}
+
+	/**
+	 * @return fully configured retry template to be used for item processing
+	 * phase.
+	 */
+	private BatchRetryTemplate configureRetry() {
+
 		if (retryPolicy == null) {
 			SimpleRetryPolicy simpleRetryPolicy = new SimpleRetryPolicy(retryLimit);
 			simpleRetryPolicy.setRetryableExceptionClasses(retryableExceptionClasses);
@@ -255,38 +296,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		if (retryListeners != null) {
 			batchRetryTemplate.setListeners(retryListeners);
 		}
-
-		List<Class<? extends Throwable>> exceptions = new ArrayList<Class<? extends Throwable>>(
-				skippableExceptionClasses);
-		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
-				fatalExceptionClasses);
-		exceptions.addAll(retryableExceptionClasses);
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, exceptions, fatalExceptionClasses);
-
-		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
-			public Boolean classify(Throwable classifiable) {
-				return getTransactionAttribute().rollbackOn(classifiable);
-			}
-		};
-
-		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
-				getChunkOperations());
-		chunkProvider.setSkipPolicy(readSkipPolicy);
-		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
-				getItemWriter(), batchRetryTemplate);
-		chunkProcessor.setBuffering(!isReaderTransactionalQueue);
-		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
-		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
-		chunkProcessor.setRollbackClassifier(rollbackClassifier);
-
-		registerExplicitItemListeners(chunkProvider, chunkProcessor);
-		registerImplicitItemListeners(chunkProvider, chunkProcessor);
-
-		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
-		tasklet.setBuffering(!isReaderTransactionalQueue);
-
-		step.setTasklet(tasklet);
-
+		return batchRetryTemplate;
 	}
 
 	/**
@@ -369,6 +379,15 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			}
 		}
 		fatalExceptionClasses = fatalExceptionList;
+	}
+
+	/**
+	 * @return union of the two collections provided as arguments.
+	 */
+	private static <T> Collection<T> union(Collection<T> c1, Collection<T> c2) {
+		Collection<T> result = new ArrayList<T>(c1);
+		result.addAll(c2);
+		return result;
 	}
 
 }
