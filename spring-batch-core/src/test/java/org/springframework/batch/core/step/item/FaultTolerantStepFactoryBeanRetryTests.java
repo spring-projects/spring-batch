@@ -45,7 +45,6 @@ import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
-import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
@@ -170,11 +169,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@Test
 	public void testSkipAndRetry() throws Exception {
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
 			public String read() {
@@ -203,11 +198,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	@Test
 	public void testSkipAndRetryWithWriteFailure() throws Exception {
 
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(RetryException.class);
-			}
-		});
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
@@ -268,11 +258,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	public void testSkipAndRetryWithWriteFailureAndNonTrivialCommitInterval() throws Exception {
 
 		factory.setCommitInterval(3);
-		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(RetryException.class);
-			}
-		});
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
@@ -332,11 +317,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@Test
 	public void testRetryWithNoSkip() throws Exception {
-		factory.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
-			{
-				add(Exception.class);
-			}
-		});
+		
 		factory.setRetryLimit(4);
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("b")) {

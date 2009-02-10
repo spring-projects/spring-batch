@@ -75,9 +75,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	{
 		fatalExceptionClasses.add(Error.class);
 		skippableExceptionClasses.add(Exception.class);
-		// TODO seems to cause trouble, although it shouldn't matter for
-		// retryLimit=0?
-		// retryableExceptionClasses.add(Exception.class);
+		retryableExceptionClasses.add(Exception.class);
 	}
 
 	private int cacheCapacity = 0;
@@ -225,8 +223,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 				fatalExceptionClasses);
 
 		// TODO why are retryable exceptions automatically skippable?
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, union(skippableExceptionClasses,
-				retryableExceptionClasses), fatalExceptionClasses);
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+				fatalExceptionClasses);
 
 		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
 			public Boolean classify(Throwable classifiable) {
@@ -379,15 +377,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			}
 		}
 		fatalExceptionClasses = fatalExceptionList;
-	}
-
-	/**
-	 * @return union of the two collections provided as arguments.
-	 */
-	private static <T> Collection<T> union(Collection<T> c1, Collection<T> c2) {
-		Collection<T> result = new ArrayList<T>(c1);
-		result.addAll(c2);
-		return result;
 	}
 
 }
