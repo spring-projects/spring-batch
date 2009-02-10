@@ -208,6 +208,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		this.fatalExceptionClasses = fatalExceptionClasses;
 	}
 
+	@Override
 	protected void applyConfiguration(TaskletStep step) {
 		super.applyConfiguration(step);
 
@@ -219,30 +220,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		addFatalExceptionIfMissing(SkipLimitExceededException.class, NonSkippableReadException.class,
 				SkipListenerFailedException.class, RetryException.class);
 
-		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
-				fatalExceptionClasses);
-
-		// TODO why are retryable exceptions automatically skippable?
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
-				fatalExceptionClasses);
-
-		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
-			public Boolean classify(Throwable classifiable) {
-				return getTransactionAttribute().rollbackOn(classifiable);
-			}
-		};
-
-		BatchRetryTemplate batchRetryTemplate = configureRetry();
-
-		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
-				getChunkOperations());
-		chunkProvider.setSkipPolicy(readSkipPolicy);
-		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
-				getItemWriter(), batchRetryTemplate);
-		chunkProcessor.setBuffering(!isReaderTransactionalQueue);
-		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
-		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
-		chunkProcessor.setRollbackClassifier(rollbackClassifier);
+		SimpleChunkProvider<T> chunkProvider = configureChunkProvider();
+		SimpleChunkProcessor<T, S> chunkProcessor = configureChunkProcessor();
 
 		registerExplicitItemListeners(chunkProvider, chunkProcessor);
 		registerImplicitItemListeners(chunkProvider, chunkProcessor);
@@ -255,8 +234,47 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * @return fully configured retry template to be used for item processing
-	 * phase.
+	 * @return {@link ChunkProcessor} configured for fault-tolerance.
+	 */
+	private FaultTolerantChunkProcessor<T, S> configureChunkProcessor() {
+
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+				fatalExceptionClasses);
+
+		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
+			public Boolean classify(Throwable classifiable) {
+				return getTransactionAttribute().rollbackOn(classifiable);
+			}
+		};
+
+		BatchRetryTemplate batchRetryTemplate = configureRetry();
+
+		FaultTolerantChunkProcessor<T, S> chunkProcessor = new FaultTolerantChunkProcessor<T, S>(getItemProcessor(),
+				getItemWriter(), batchRetryTemplate);
+		chunkProcessor.setBuffering(!isReaderTransactionalQueue);
+		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
+		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
+		chunkProcessor.setRollbackClassifier(rollbackClassifier);
+
+		return chunkProcessor;
+	}
+
+	/**
+	 * @return {@link ChunkProvider} configured for fault-tolerance.
+	 */
+	private FaultTolerantChunkProvider<T> configureChunkProvider() {
+
+		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+				fatalExceptionClasses);
+		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
+				getChunkOperations());
+		chunkProvider.setSkipPolicy(readSkipPolicy);
+
+		return chunkProvider;
+	}
+
+	/**
+	 * @return fully configured retry template for item processing phase.
 	 */
 	private BatchRetryTemplate configureRetry() {
 
@@ -303,8 +321,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 */
 	private RetryPolicy fatalExceptionAwareProxy(final RetryPolicy retryPolicy) {
 
-		// wrapper of the injected retry policy takes care of fatal
-		// exceptions (never retried)
 		final NeverRetryPolicy neverRetryPolicy = new NeverRetryPolicy();
 		ExceptionClassifierRetryPolicy retryPolicyWrapper = new ExceptionClassifierRetryPolicy();
 		retryPolicyWrapper.setExceptionClassifier(new Classifier<Throwable, RetryPolicy>() {
