@@ -999,4 +999,34 @@
     written out. More details about the ItemProcessor interface can be found
     in <xref linkend="readersAndWriters" />.</para>
   </section>
+
+  <section>
+    <title>Batch Namespace</title>
+
+    <para>Many of the domain concepts listed above need to be configured in a
+    Spring <classname>ApplicationContext</classname>. While there are
+    implementations of the interfaces above that can be used in a standard
+    bean definition, a namespace has been provided for ease of
+    configuration:</para>
+
+    <programlisting>  &lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>" 
+    xmlns:beans="http://www.springframework.org/schema/beans" 
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+    <emphasis role="bold">http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd</emphasis>&gt;
+
+    &lt;job id="ioSampleJob"&gt;
+      &lt;step id="step1"&gt;
+        &lt;tasklet reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/&gt;
+      &lt;/step&gt;
+    &lt;/job&gt;
+
+  &lt;/beans:beans&gt;</programlisting>
+
+    <para>As long as the batch namespace has been declared, any of its
+    elements can be used. More information on configuring a
+    <classname>Job</classname> can be found in <xref
+    linkend="configureJob" />. More information on configuring a Step can be
+    found in <xref linkend="configureStep" />.</para>
+  </section>
 </chapter>
