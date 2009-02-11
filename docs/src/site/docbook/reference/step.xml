@@ -124,6 +124,44 @@
     </section>
 
     <section>
+      <title>Referencing a Standalone Step</title>
+
+      <para>While steps must exist within a Job to define the flow, it can
+      sometimes be useful to reference a 'standalone' Step. For example, if a
+      Step is used by multiple jobs it can be useful to declare it once and
+      reference it from multiple jobs. This can be achieved with the ref
+      attribute:</para>
+
+      <programlisting>
+  &lt;job id="sampleJob"&gt;
+    &lt;step id="step1" <emphasis role="bold">ref="standaloneStep"</emphasis> /&gt;
+  &lt;/job&gt;
+
+  &lt;step id="standaloneStep" job-repository="jobRepository" transaction-manager="transactionManager"&gt;
+      &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+  &lt;/step&gt;
+
+</programlisting>
+
+      <para>It should be noted that the id attribute is still required on the
+      step within the job element. This is for two reasons:</para>
+
+      <orderedlist>
+        <listitem>
+          <para>The Id will be used as the step name when persisting the
+          StepExecution, if the same standalone step is referenced in more
+          than one step in the job, an error will occur.</para>
+        </listitem>
+
+        <listitem>
+          <para>When creating job flows, as described later in this chapter,
+          the next attribute should be referring to the step in the flow, not
+          the standalone step.</para>
+        </listitem>
+      </orderedlist>
+    </section>
+
+    <section>
       <title>The Commit Interval</title>
 
       <para>As mentioned above, a step reads in and writes out items,
