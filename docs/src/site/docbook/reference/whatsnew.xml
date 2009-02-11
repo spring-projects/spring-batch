@@ -35,13 +35,13 @@
   <section>
     <title id="s.2.1.6">Java 5</title>
 
-    <para>The 1.x release of Spring Batch were all based on Java 1.4. This
+    <para>The 1.x releases of Spring Batch were all based on Java 1.4. This
     prevented the framework from using many enhancements provided in Java 5
     such as generics, parameterized types, etc. The entire framework has been
-    updated to utilize these features. <emphasis role="bold">Java 1.4 is no
-    longer supported.</emphasis> Most of the interfaces developers work with
-    have been updated to support generic types. As an example, the ItemReader
-    interface from 1.1 is below:</para>
+    updated to utilize these features. As a result, <emphasis role="bold">Java
+    1.4 is no longer supported.</emphasis> Most of the interfaces developers
+    work with have been updated to support generic types. As an example, the
+    <classname>ItemReader</classname> interface from 1.1 is below:</para>
 
     <programlisting>
   public interface ItemReader {
@@ -56,7 +56,7 @@
 </programlisting>
 
     <para>As you can see, the <methodname>read</methodname> method returns an
-    Object. The 2.0 version is below:</para>
+    <classname>Object</classname>. The 2.0 version is below:</para>
 
     <programlisting>
   public interface ItemReader&lt;T&gt; {
@@ -69,9 +69,9 @@
 
     <para>As you can see, <classname>ItemReader</classname> now supports the
     generic type, T, which is returned from read. You may also notice that
-    mark and reset have been removed. This is due to step processing strategy
-    changes, which are discussed below. Many other interfaces have been
-    similarly updated. </para>
+    <methodname>mark</methodname> and <methodname>reset</methodname> have been
+    removed. This is due to step processing strategy changes, which are
+    discussed below. Many other interfaces have been similarly updated.</para>
   </section>
 
   <section>
@@ -94,11 +94,13 @@
       </imageobject>
     </mediaobject>
 
-    <para>In item-oriented processing, the ItemReader returns one Object (the
-    'item) which is then handed to the ItemWriter, periodically committing
+    <para>In item-oriented processing, the <classname>ItemReader</classname>
+    returns one <classname>Object</classname> (the 'item') which is then
+    handed to the <classname>ItemWriter</classname>, periodically committing
     when the number of items hits the commit interval. For example, if the
-    commit interval is 5, ItemReader and ItemWriter will each be called 5
-    times. This is illustrated in a simplified code example below:</para>
+    commit interval is 5, <classname>ItemReader</classname> and
+    <classname>ItemWriter</classname> will each be called 5 times. This is
+    illustrated in a simplified code example below:</para>
 
     <programlisting>  
   for(int i = 0; i &lt; commitInterval; i++){
@@ -108,8 +110,9 @@
 
 </programlisting>
 
-    <para>Both the ItemReader and ItemWriter interfaces were completely geared
-    toward this approach:</para>
+    <para>Both the <classname>ItemReader</classname> and
+    <classname>ItemWriter</classname> interfaces were completely geared toward
+    this approach:</para>
 
     <programlisting>
   public interface ItemReader {
@@ -135,14 +138,18 @@
 </programlisting>
 
     <para>Because the 'scope' of the processing was one item, supporting
-    rollback scenarios required additional methods, which is what mark, reset,
-    flush, and clear provided. If, after successfully reading and writing 2
-    items, the third had an error while writing, the transaction would need to
-    be rolled back. In this case, the clear method on the writer would be
-    called, indicating that it should clear its buffer, and reset would be
-    called on the ItemReader, indicating that it should return back to the
-    last position it was at when mark was called. (Both mark and flush are
-    called on commit)</para>
+    rollback scenarios required additional methods, which is what
+    <methodname>mark</methodname>, <methodname>reset</methodname>,
+    <methodname>flush</methodname>, and <methodname>clear</methodname>
+    provided. If, after successfully reading and writing 2 items, the third
+    has an error while writing, the transaction would need to be rolled back.
+    In this case, the <methodname>clear</methodname> method on the writer
+    would be called, indicating that it should <methodname>clear</methodname>
+    its buffer, and <methodname>reset</methodname> would be called on the
+    <classname>ItemReader</classname>, indicating that it should return back
+    to the last position it was at when <methodname>mark</methodname> was
+    called. (Both <methodname>mark</methodname> and
+    <methodname>flush</methodname> are called on commit)</para>
 
     <para>In 2.0, this strategy has been changed to a chunk-oriented
     approach:</para>
@@ -176,7 +183,8 @@
 </programlisting>
 
     <para>This approach not only allows for much simpler processing and
-    scalability approaches, it also makes the ItemReader and ItemWriter
+    scalability approaches, it also makes the
+    <classname>ItemReader</classname> and <classname>ItemWriter</classname>
     interfaces much cleaner:</para>
 
     <programlisting>
@@ -197,25 +205,28 @@
 
 </programlisting>
 
-    <para>As you can see, the interfaces no longer contain the mark, reset,
-    flush, and clear methods. This makes the creation of readers and writers
-    much more straightforward for developers. In the case of
+    <para>As you can see, the interfaces no longer contain the
+    <methodname>mark</methodname>, <methodname>reset</methodname>,
+    <methodname>flush</methodname>, and <methodname>clear</methodname>
+    methods. This makes the creation of readers and writers much more
+    straightforward for developers. In the case of
     <classname>ItemReader</classname>, the interface is now forward-only. The
-    framework will buffer read items for developers in the case of rollback.
-    (There are exceptions if the underlying resource is transactional see:
-    <xref linkend="transactionalReaders" />) ItemWriter is also simplified,
-    since it gets the entire 'chunk' of items at once, rather than one at a
-    time, it can decide to flush any resources (such as a file or hibernate
-    session) before returning control to the <classname>Step</classname>. More
-    detailed information on chunk-oriented processing can be found in <xref
+    framework will buffer read items for developers in the case of rollback
+    (though there are exceptions if the underlying resource is transactional
+    see: <xref linkend="transactionalReaders" />).
+    <classname>ItemWriter</classname> is also simplified, since it gets the
+    entire 'chunk' of items at once, rather than one at a time, it can decide
+    to flush any resources (such as a file or hibernate session) before
+    returning control to the <classname>Step</classname>. More detailed
+    information on chunk-oriented processing can be found in <xref
     linkend="chunkOrientedProcessing" />. Reader and writer implementation
-    information can be found in 80<xref linkend="readersAndWriters" /></para>
+    information can be found in <xref linkend="readersAndWriters" />.</para>
 
     <section>
       <title>ItemProcessor</title>
 
-      <para>Previously, Steps had only two dependencies,
-      <classname>ItemReader</classname> and
+      <para>Previously, <classname>Step</classname>s had only two
+      dependencies, <classname>ItemReader</classname> and
       <classname>ItemWriter</classname>:</para>
 
       <mediaobject>
@@ -225,7 +236,8 @@
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/1-1-step.png" scale="80"
+          <imagedata align="center"
+                     fileref="images/1-1-step.png" scale="80"
                      width="50%" />
         </imageobject>
       </mediaobject>
@@ -241,18 +253,21 @@
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/composite-transformer.png"
+          <imagedata align="center"
+                     fileref="images/composite-transformer.png"
                      scale="65" width="" />
         </imageobject>
       </mediaobject>
 
-      <para>This approach works, however, it requires an extra layer between
+      <para>This approach works. However, it requires an extra layer between
       either the reader or the writer and the <classname>Step</classname>.
       Furthermore, the <classname>ItemWriter</classname> would need to be
       registered separately as an <classname>ItemStream</classname> with the
-      <classname>Step</classname>. For this reason, the ItemTransfomer was
-      renamed to ItemProcessor and moved up to the same level as ItemReader
-      and ItemWriter:</para>
+      <classname>Step</classname>. For this reason, the
+      <classname>ItemTransfomer</classname> was renamed to
+      <classname>ItemProcessor</classname> and moved up to the same level as
+      <classname>ItemReader</classname> and
+      <classname>ItemWriter</classname>:</para>
 
       <mediaobject>
         <imageobject role="html">
@@ -262,7 +277,8 @@
 
         <imageobject role="fo">
           <imagedata align="center" contentwidth="480"
-                     fileref="images/step.png" scale="60" width="" />
+                     fileref="images/step.png"
+                     scale="60" width="" />
         </imageobject>
       </mediaobject>
     </section>
@@ -312,8 +328,8 @@
     <title>Meta Data access improvements</title>
 
     <para>The <classname>JobRepository</classname> interface represents basic
-    CRUD operations with <classname>Job</classname> meta-data. However, it can
-    be useful to query the meta-data. For that reason, the
+    CRUD operations with <classname>Job</classname> meta-data. However, it may
+    also be useful to query the meta-data. For that reason, the
     <classname>JobExplorer</classname> and <classname>JobOperator</classname>
     interfaces have been created:</para>
 
@@ -324,7 +340,8 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="images/job-repository-advanced.png"
+        <imagedata align="center"
+                   fileref="images/job-repository-advanced.png"
                    scale="70" width="" />
       </imageobject>
     </mediaobject>
@@ -349,7 +366,8 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="images/sequential-flow.png"
+        <imagedata align="center"
+                   fileref="images/sequential-flow.png"
                    scale="80" width="" />
       </imageobject>
     </mediaobject>
@@ -359,12 +377,13 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="80" width="40%" />
+                   scale="80" width="" />
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="80" width="40%" />
+        <imagedata align="center"
+                   fileref="images/conditional-flow.png"
+                   scale="80" width="" />
       </imageobject>
     </mediaobject>
 
@@ -384,6 +403,6 @@
 </programlisting>
 
     <para>More details on how to configure non sequential steps can be found
-    in <xref linkend="controllingStepFlow" /></para>
+    in <xref linkend="controllingStepFlow" />.</para>
   </section>
 </chapter>
