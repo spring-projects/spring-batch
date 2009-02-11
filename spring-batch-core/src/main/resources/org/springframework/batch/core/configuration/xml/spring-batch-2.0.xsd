@@ -245,15 +245,11 @@
 	</xsd:complexType>
 	
 	<xsd:complexType name="stepType">
-		<xsd:complexContent>
-			<xsd:extension base="nextType">
-				<xsd:sequence>
-					<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
-					<xsd:group ref="stepListeners"/>
-				</xsd:sequence>
-				<xsd:attributeGroup ref="transactionManagerAttribute"/>
-			</xsd:extension>
-		</xsd:complexContent>
+		<xsd:sequence>
+			<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
+			<xsd:group ref="stepListeners"/>
+		</xsd:sequence>
+		<xsd:attributeGroup ref="transactionManagerAttribute"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="flowStepType">
