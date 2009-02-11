@@ -115,9 +115,9 @@
 
     <programlisting>  
   &lt;job id="footballJob"&gt;
-    &lt;step name="playerload" next="gameLoad"/&gt;
-    &lt;step name="gameLoad" next="playerSummarization"/&gt;
-    &lt;step name="playerSummarization"/&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
   &lt;/job&gt;
 
 </programlisting>

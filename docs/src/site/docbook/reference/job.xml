@@ -37,9 +37,9 @@
 
     <programlisting>  
   &lt;job id="footballJob"&gt;
-    &lt;step name="playerload" next="gameLoad"/&gt;
-    &lt;step name="gameLoad" next="playerSummarization"/&gt;
-    &lt;step name="playerSummarization"/&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
   &lt;/job&gt;
 
 </programlisting>
@@ -50,9 +50,9 @@
 
     <programlisting> 
   &lt;job id="footballJob" <emphasis role="bold">job-repository="specialRepository"</emphasis>&gt;
-    &lt;step name="playerload" next="gameLoad"/&gt;
-    &lt;step name="gameLoad" next="playerSummarization"/&gt;
-    &lt;step name="playerSummarization"/&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
   &lt;/job&gt;
 
 </programlisting>
@@ -74,9 +74,9 @@
 
       <programlisting>  
   &lt;job id="footballJob" <emphasis role="bold">restartable="false"</emphasis>&gt;
-    &lt;step name="playerload" next="gameLoad"/&gt;
-    &lt;step name="gameLoad" next="playerSummarization"/&gt;
-    &lt;step name="playerSummarization"/&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
   &lt;/job&gt;
 
 </programlisting>
@@ -136,9 +136,9 @@
 
       <programlisting>  
   &lt;job id="footballJob"&gt;
-    &lt;step name="playerload" next="gameLoad"/&gt;
-    &lt;step name="gameLoad" next="playerSummarization"/&gt;
-    &lt;step name="playerSummarization"/&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
     &lt;listeners&gt;
       &lt;listener class="org.springframework.batch.sample.SampleListener"/&gt;
     &lt;/listeners&gt;

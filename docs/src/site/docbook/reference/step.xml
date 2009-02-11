@@ -77,7 +77,7 @@
 
       <programlisting>
   &lt;job id="sampleJob"&gt;
-    &lt;step name="step1" job-repository="jobRepository" transaction-manager="transactionManager"&gt;
+    &lt;step id="step1" job-repository="jobRepository" transaction-manager="transactionManager"&gt;
       &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
     &lt;/step&gt;
   &lt;/job&gt;
@@ -139,7 +139,7 @@
 
       <programlisting>
   &lt;job id="sampleJob"&gt;
-    &lt;step name="step1" job-repository="jobRepository" transaction-manager="transactionManager"&gt;
+    &lt;step id="step1" job-repository="jobRepository" transaction-manager="transactionManager"&gt;
       &lt;tasklet reader="itemReader" writer="itemWriter" <emphasis
           role="bold">commit-interval="10"</emphasis>/&gt;
     &lt;/step&gt;
@@ -177,7 +177,7 @@
         run infinitely. Below is an example start limit configuration:</para>
 
         <programlisting> 
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="10" <emphasis
             role="bold">start-limit="1"</emphasis>/&gt;
   &lt;/step&gt;
@@ -203,7 +203,7 @@
         "true" overrides this so that the step will always run:</para>
 
         <programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="10" 
              <emphasis role="bold">allow-start-if-complete="true"</emphasis>/&gt;
   &lt;/step&gt;
@@ -216,15 +216,15 @@
 
         <programlisting>
   &lt;job id="footballJob" restartable="true"&gt;
-    &lt;step name="playerload" next="gameLoad"&gt;
+    &lt;step id="playerload" next="gameLoad"&gt;
       &lt;tasklet reader="playerFileItemReader" writer="playerWriter" 
                commit-interval="10" /&gt;
     &lt;/step&gt;
-    &lt;step name="gameLoad" next="playerSummarization"&gt;
+    &lt;step id="gameLoad" next="playerSummarization"&gt;
       &lt;tasklet reader="gameFileItemReader" writer="gameWriter" 
                commit-interval="10" allow-start-if-complete="true"/&gt;
     &lt;/step&gt;
-    &lt;step name="playerSummarization"&gt;
+    &lt;step id="playerSummarization"&gt;
       &lt;tasklet reader="playerSummarizationSource" writer="summaryWriter" 
                commit-interval="10" start-limit="3"/&gt;
     &lt;/step&gt;
@@ -344,7 +344,7 @@
       information, then there probably won't be issues. Usually these bad
       records are logged as well, which will be covered later when discussing
       listeners.<programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
             role="bold">skip-limit="10"</emphasis>&gt;
       <emphasis role="bold">&lt;skippable-exception-classes&gt;
@@ -371,7 +371,7 @@
       correct behaviour, however, in certain scenarios it may be easier to
       identify which exceptions should cause failure and skip everything
       else:<programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
             role="bold">skip-limit="10"</emphasis>&gt;
 <emphasis role="bold">      &lt;skippable-exception-classes&gt;
@@ -406,7 +406,7 @@
       success. In this case, retry should be configured:</para>
 
       <programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="2" <emphasis
           role="bold">retry-limit="3"</emphasis>&gt;
       <emphasis role="bold">&lt;retryable-exception-classes&gt;
@@ -440,7 +440,7 @@
       symbol will indicate that exception should not cause rollback.</para>
 
       <programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="2" skip-limit="1"
              <emphasis role="bold">transaction-attribute="+org.springframework.batch.item.validator.ValidationException"</emphasis>&gt;
     &lt;/tasklet&gt;
@@ -467,7 +467,7 @@
         </para>
 
         <programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="2" skip-limit="1"
              <emphasis role="bold">is-reader-transactional-queue="true"</emphasis>&gt;
     &lt;/tasklet&gt;
@@ -499,7 +499,7 @@
       through the 'streams' element, as illustrated below:</para>
 
       <programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="itemReader" writer="compositeWriter" commit-interval="2"&gt;
       <emphasis role="bold">&lt;streams&gt;
         &lt;stream ref="fileItemWriter1"/&gt;
@@ -549,7 +549,7 @@
       listeners element:</para>
 
       <programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;tasklet reader="reader" writer="writer" commit-interval="10"/&gt;
       &lt;listeners&gt;
         &lt;listener ref="stepListener"/&gt;
@@ -857,7 +857,7 @@
     within the 'step':</para>
 
     <programlisting>
-  &lt;step name="step1" <emphasis role="bold">tasklet="myTasklet"</emphasis> /&gt;
+  &lt;step id="step1" <emphasis role="bold">tasklet="myTasklet"</emphasis> /&gt;
 
 </programlisting>
 
@@ -1011,9 +1011,9 @@
 
       <para><programlisting>
   &lt;job id="job"&gt;
-    &lt;step name="stepA" next="stepB" /&gt;
-    &lt;step name="stepB" next="stepC"/&gt;
-    &lt;step name="stepC" /&gt;
+    &lt;step id="stepA" next="stepB" /&gt;
+    &lt;step id="stepB" next="stepC"/&gt;
+    &lt;step id="stepC" /&gt;
   &lt;/job&gt;
 
 </programlisting>In the scenario above, 'step A' will execute first. If 'step
@@ -1081,12 +1081,12 @@
 
       <para><programlisting>
   &lt;job id="job"&gt;
-    &lt;step name="stepA"&gt;
+    &lt;step id="stepA"&gt;
       &lt;next on="FAILED" to="stepB" /&gt;
       &lt;next on="*" to="stepC" /&gt;
     &lt;/step&gt;
-    &lt;step name="stepB" next="stepC" /&gt;
-    &lt;step name="stepC" /&gt;
+    &lt;step id="stepB" next="stepC" /&gt;
+    &lt;step id="stepC" /&gt;
   &lt;/job&gt;
 
 </programlisting></para>
@@ -1130,7 +1130,7 @@
         job, within the samples project:</para>
 
         <programlisting>  
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;end on="FAILED" /&gt;
     &lt;next on="COMPLETED WITH SKIPS" to="errorPrint1" /&gt;
     &lt;next on="*" to="step2" /&gt;
@@ -1202,14 +1202,14 @@
       "COMPLETED".</para>
 
       <para><programlisting>
-  &lt;step name="step1"&gt;
+  &lt;step id="step1"&gt;
     &lt;stop on="COMPLETED" to="step2"/&gt;
   &lt;/step&gt;
-  &lt;step name="step2"&gt;
+  &lt;step id="step2"&gt;
     &lt;next on="FOO" to="step3"/&gt;
     &lt;end on="*" status="FAILED"/&gt;
   &lt;/step&gt;
-  &lt;step name="step3" /&gt;
+  &lt;step id="step3" /&gt;
 
 </programlisting></para>
     </section>
@@ -1243,15 +1243,15 @@
 
       <para><programlisting>
   &lt;job id="job"&gt;
-    &lt;step name="step1" next="decision" /&gt;
+    &lt;step id="step1" next="decision" /&gt;
     
     &lt;decision id="skipCheckingDecision" decider="decider"&gt;
       &lt;next on="FAILED" to="step2" /&gt;
       &lt;next on="COMPLETED" to="step3" /&gt;
     &lt;/step&gt;
 
-    &lt;step name="step2" next="step3"/&gt;
-    &lt;step name="step3" /&gt;
+    &lt;step id="step2" next="step3"/&gt;
+    &lt;step id="step3" /&gt;
   &lt;/job&gt;
 
   &lt;bean id="decider" class="com.MyDecider"/&gt;
