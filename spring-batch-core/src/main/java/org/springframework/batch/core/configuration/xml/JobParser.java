@@ -50,6 +50,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	 */
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+		
+		CoreNamespaceUtils.checkForStepScope(parserContext);
 
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
@@ -86,5 +88,5 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 	}
-
+	
 }

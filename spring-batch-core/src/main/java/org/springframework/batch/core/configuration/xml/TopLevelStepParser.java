@@ -31,6 +31,7 @@ public class TopLevelStepParser extends AbstractBeanDefinitionParser {
 	
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+		CoreNamespaceUtils.checkForStepScope(parserContext);
 		StandaloneStepParser stepParser = new StandaloneStepParser();
 		return stepParser.parse(element, parserContext);
 	}
