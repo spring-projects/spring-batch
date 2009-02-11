@@ -60,6 +60,9 @@ public class InlineStepParser extends AbstractStepParser {
 
 		@SuppressWarnings("unchecked")
 		List<Element> listOfTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
+		@SuppressWarnings("unchecked")
+		List<Element> listOfListenersElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "listeners");
+
 		if (StringUtils.hasText(stepRef)) {
 			if (StringUtils.hasText(taskletRef)) {
 				parserContext.getReaderContext().error("The 'tasklet' attribute can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
@@ -67,6 +70,9 @@ public class InlineStepParser extends AbstractStepParser {
 			if (listOfTaskElements.size() > 0) {
 				parserContext.getReaderContext().error("The <" + listOfTaskElements.get(0).getNodeName() +
 						"> element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
+			}
+			if (listOfListenersElements.size() > 0) {
+				parserContext.getReaderContext().error("The 'listeners' element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
 			}
 			BeanDefinitionBuilder stepBuilder = 
 				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.configuration.xml.DelegatingStep");
