@@ -312,9 +312,9 @@
 
     <programlisting>  
   &lt;job id="footballJob"&gt;
-    &lt;step name="playerload" next="gameLoad"/&gt;
-    &lt;step name="gameLoad" next="playerSummarization"/&gt;
-    &lt;step name="playerSummarization"/&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
   &lt;/job&gt;
 
 </programlisting>
@@ -392,12 +392,12 @@
 
     <programlisting>
   &lt;job id="job"&gt;
-    &lt;step name="stepA"&gt;
+    &lt;step id="stepA"&gt;
       &lt;next on="FAILED" to="stepB" /&gt;
       &lt;next on="*" to="stepC" /&gt;
     &lt;/step&gt;
-    &lt;step name="stepB" next="stepC" /&gt;
-    &lt;step name="stepC" /&gt;
+    &lt;step id="stepB" next="stepC" /&gt;
+    &lt;step id="stepC" /&gt;
   &lt;/job&gt;
 
 </programlisting>
