@@ -42,7 +42,7 @@
 		</listeners>
 	</step>
 	
-	<step id="secondPass" next="skipCheckingDecision">
+	<step id="secondPass">
 		<tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="itemTrackingWriter"
 				 commit-interval="2" skip-limit="1">
 			<skippable-exception-classes>
