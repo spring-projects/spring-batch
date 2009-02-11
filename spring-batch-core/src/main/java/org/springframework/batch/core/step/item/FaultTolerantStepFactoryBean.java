@@ -207,6 +207,21 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		super.applyConfiguration(step);
 
 	}
+	
+	/**
+	 * @return {@link ChunkProvider} configured for fault-tolerance.
+	 */
+	@Override
+	protected FaultTolerantChunkProvider<T> configureChunkProvider() {
+		
+		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+				fatalExceptionClasses);
+		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
+				getChunkOperations());
+		chunkProvider.setSkipPolicy(readSkipPolicy);
+		
+		return chunkProvider;
+	}
 
 	/**
 	 * @return {@link ChunkProcessor} configured for fault-tolerance.
@@ -235,20 +250,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		return chunkProcessor;
 	}
 
-	/**
-	 * @return {@link ChunkProvider} configured for fault-tolerance.
-	 */
-	@Override
-	protected FaultTolerantChunkProvider<T> configureChunkProvider() {
-
-		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
-				fatalExceptionClasses);
-		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
-				getChunkOperations());
-		chunkProvider.setSkipPolicy(readSkipPolicy);
-
-		return chunkProvider;
-	}
 
 	/**
 	 * @return fully configured retry template for item processing phase.

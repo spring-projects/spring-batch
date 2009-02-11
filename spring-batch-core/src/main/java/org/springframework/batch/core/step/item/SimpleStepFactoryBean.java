@@ -459,28 +459,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 		SimpleChunkProcessor<T, S> chunkProcessor = configureChunkProcessor();
 
-		registerExplicitItemListeners(chunkProvider, chunkProcessor);
-		registerImplicitItemListeners(chunkProvider, chunkProcessor);
-
-		// Since we are going to wrap these things with listener callbacks we
-		// need to register them here because the step will not know we did
-		// that.
-		List<StepListener> chunkListeners = new ArrayList<StepListener>(Arrays.asList(getListeners()));
-		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
-			if (itemHandler instanceof ItemStream) {
-				step.registerStream((ItemStream) itemHandler);
-			}
-			if (itemHandler instanceof StepExecutionListener) {
-				step.registerStepExecutionListener((StepExecutionListener) itemHandler);
-			}
-			if (itemHandler instanceof ChunkListener) {
-				chunkListeners.add((StepListener) itemHandler);
-			}
-		}
-
-		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, chunkListeners.toArray(new StepListener[] {}));
-		step.setStepExecutionListeners(BatchListenerFactoryHelper.getListeners(listeners, StepExecutionListener.class)
-				.toArray(new StepExecutionListener[] {}));
+		registerItemListeners(chunkProvider, chunkProcessor);
+		registerStepListeners(step, chunkOperations);
 
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue());
@@ -489,10 +469,20 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	}
 
+	/**
+	 * Extension point for creating appropriate {@link ChunkProvider}. Return
+	 * value must subclass {@link SimpleChunkProvider} due to listener
+	 * registration.
+	 */
 	protected SimpleChunkProvider<T> configureChunkProvider() {
 		return new SimpleChunkProvider<T>(itemReader, chunkOperations);
 	}
 
+	/**
+	 * Extension point for creating appropriate {@link ChunkProcessor}. Return
+	 * value must subclass {@link SimpleChunkProcessor} due to listener
+	 * registration.
+	 */
 	protected SimpleChunkProcessor<T, S> configureChunkProcessor() {
 		return new SimpleChunkProcessor<T, S>(itemProcessor, itemWriter);
 	}
@@ -517,12 +507,35 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
-	 * listeners.
+	 * Register listeners with step and chunk.
 	 */
-	private void registerExplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
-			SimpleChunkProcessor<T, S> chunkProcessor) {
+	private void registerStepListeners(TaskletStep step, RepeatOperations chunkOperations) {
 
+		List<StepListener> chunkListeners = new ArrayList<StepListener>(Arrays.asList(getListeners()));
+		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
+			if (itemHandler instanceof ItemStream) {
+				step.registerStream((ItemStream) itemHandler);
+			}
+			if (itemHandler instanceof StepExecutionListener) {
+				step.registerStepExecutionListener((StepExecutionListener) itemHandler);
+			}
+			if (itemHandler instanceof ChunkListener) {
+				chunkListeners.add((StepListener) itemHandler);
+			}
+		}
+
+		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, chunkListeners.toArray(new StepListener[] {}));
+		step.setStepExecutionListeners(BatchListenerFactoryHelper.getListeners(listeners, StepExecutionListener.class)
+				.toArray(new StepExecutionListener[] {}));
+	}
+
+	/**
+	 * Register explicitly set ({@link #setListeners(StepListener[])}) item
+	 * listeners and auto-register reader, processor and writer if applicable
+	 */
+	private void registerItemListeners(SimpleChunkProvider<T> chunkProvider, SimpleChunkProcessor<T, S> chunkProcessor) {
+
+		// explicitly set item listeners
 		chunkProvider.setListeners(BatchListenerFactoryHelper.<ItemReadListener<T>> getListeners(getListeners(),
 				ItemReadListener.class));
 		chunkProvider.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
@@ -534,14 +547,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 				ItemWriteListener.class));
 		chunkProcessor.setListeners(BatchListenerFactoryHelper.<SkipListener<T, S>> getListeners(getListeners(),
 				SkipListener.class));
-	}
 
-	/**
-	 * Auto-register reader, processor and writer as item listeners if
-	 * applicable.
-	 */
-	private void registerImplicitItemListeners(SimpleChunkProvider<T> chunkProvider,
-			SimpleChunkProcessor<T, S> chunkProcessor) {
+		// auto-register reader, processor and writer
 		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
 
 			if (itemHandler instanceof SkipListener) {
