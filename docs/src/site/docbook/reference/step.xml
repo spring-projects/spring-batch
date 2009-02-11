@@ -4,7 +4,7 @@
 <chapter id="configureStep">
   <title>Configuring a Step</title>
 
-  <para>As disucssed in <xref linkend="domain" />, a
+  <para>As discussed in <xref linkend="domain" />, a
   <classname>Step</classname> is a domain object that encapsulates an
   independent, sequential phase of a batch job and contains all of the
   information necessary to define and control the actual batch processing.
@@ -31,7 +31,7 @@
   <section id="chunkOrientedProcessing">
     <title>Chunk-Oriented Processing</title>
 
-    <para>Spring Batch uses a 'Chunk Oriented' processing style within it's
+    <para>Spring Batch uses a 'Chunk Oriented' processing style within its
     most common implementation. Chunk oriented processing refers to reading
     the data one at a time, and creating 'chunks' that will be written out,
     within a transaction boundary. One item is read in from an
@@ -43,14 +43,13 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/chunk-oriented-processing.png" scale="95"
+                   fileref="images/chunk-oriented-processing.png" scale="75"
                    width="" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/chunk-oriented-processing.png" scale="85"
-                   width="75%" />
+                   fileref="images/chunk-oriented-processing.png" width="75%" />
       </imageobject>
     </mediaobject>
 
@@ -60,7 +59,8 @@
     <programlisting>  
   List items = new Arraylist();
   for(int i = 0; i &lt; commitInterval; i++){
-    Object processedItem = itemProcessor.process(itemReader.read());
+    Object item = itemReader.read()
+    Object processedItem = itemProcessor.process(item);
     items.add(processedItem);
   }
   itemWriter.write(items);
@@ -119,8 +119,9 @@
 
       <para>It should be noted that, job-repository defaults to
       "jobRepository" and transaction-manager defaults to "transactionManger".
-      Furthermore, the ItemProcessor is not required, since the item could be
-      directly passed from the reader to the writer.</para>
+      Furthermore, the <classname>ItemProcessor</classname> is optional, not
+      required, since the item could be directly passed from the reader to the
+      writer.</para>
     </section>
 
     <section>
@@ -129,7 +130,7 @@
       <para>While steps must exist within a Job to define the flow, it can
       sometimes be useful to reference a 'standalone' Step. For example, if a
       Step is used by multiple jobs it can be useful to declare it once and
-      reference it from multiple jobs. This can be achieved with the ref
+      reference it from multiple jobs. This can be achieved with the 'ref'
       attribute:</para>
 
       <programlisting>
@@ -149,7 +150,7 @@
       <orderedlist>
         <listitem>
           <para>The Id will be used as the step name when persisting the
-          StepExecution, if the same standalone step is referenced in more
+          StepExecution. If the same standalone step is referenced in more
           than one step in the job, an error will occur.</para>
         </listitem>
 
@@ -167,13 +168,14 @@
       <para>As mentioned above, a step reads in and writes out items,
       periodically committing using the supplied
       <classname>PlatformTransactionManager</classname>. With a
-      commit-interval of 1, it will commit after writing only one item. This
-      is less than ideal in many situations, since beginning and committing a
-      transaction is expensive. Ideally, it is preferable to process as many
-      items as possible in each transaction, which is completely dependent
-      upon the type of data being processed and the resources with which the
-      step is interacting. For this reason, the number of items that are
-      processed within a commit can be configured.</para>
+      commit-interval of 1, it will commit after writing each individual item.
+      This is less than ideal in many situations, since beginning and
+      committing a transaction is expensive. Ideally, it is preferable to
+      process as many items as possible in each transaction, which is
+      completely dependent upon the type of data being processed and the
+      resources with which the step is interacting. For this reason, the
+      number of items that are processed within a commit can be
+      configured.</para>
 
       <programlisting>
   &lt;job id="sampleJob"&gt;
@@ -205,14 +207,15 @@
         <title>Setting a StartLimit</title>
 
         <para>There are many scenarios where you may want to control the
-        number of times a <classname>Step</classname> may be started. An
-        example is a <classname>Step</classname> that may be run only once,
-        usually because it invalidates some resource that must be fixed
-        manually before it can be run again. This is configurable on the step
-        level, since different steps have different requirements. One Step
-        that may only be executed once can exist as part of the same
-        <classname>Job</classname> as <classname>Step</classname> that can be
-        run infinitely. Below is an example start limit configuration:</para>
+        number of times a <classname>Step</classname> may be started. For
+        example, a particular <classname>Step</classname> might need to be
+        configured so that it only runs once because it invalidates some
+        resource that must be fixed manually before it can be run again. This
+        is configurable on the step level, since different steps may have
+        different requirements. A <classname>Step</classname> that may only be
+        executed once can exist as part of the same <classname>Job</classname>
+        as a <classname>Step</classname> that can be run infinitely. Below is
+        an example start limit configuration:</para>
 
         <programlisting> 
   &lt;step id="step1"&gt;
@@ -360,7 +363,7 @@
           <listitem>
             <para>playerSummarization is not start, and the job is immediately
             killed, since this is the third execution of playerSummarization,
-            and it's limit is only 2. The limit must either be raised, or the
+            and its limit is only 2. The limit must either be raised, or the
             <classname>Job</classname> must be executed as a new
             <classname>JobInstance</classname>.</para>
           </listitem>
@@ -398,15 +401,15 @@
       <classname>FlatFileParseException</classname> is thrown, it will be
       skipped and counted against the total skip limit of 10. It should be
       noted that any failures encountered while reading will not count against
-      the commit interval. In other words, the commit interval is only
-      incremented on writes (regardless of success or failure).</para>
+      the skip limit. In other words, the skip limit is only incremented on
+      writes (regardless of success or failure).</para>
     </section>
 
     <section>
       <para>One problem with the example above is that any other exception
       besides a <classname>FlatFileParseException</classname> will cause the
       <classname>Job</classname> to fail. In certain scenarios this may be the
-      correct behaviour, however, in certain scenarios it may be easier to
+      correct behavior. However, in other scenarios it may be easier to
       identify which exceptions should cause failure and skip everything
       else:<programlisting>
   &lt;step id="step1"&gt;
@@ -435,8 +438,8 @@
       <para>In most cases you want an exception to cause either a skip or
       <classname>Step</classname> failure. However, not all exceptions are
       deterministic. If a <classname>FlatFileParseException</classname> is
-      encountered while reading, it will always be thrown for that record.
-      Resetting the <classname>ItemReader</classname> will not help. However,
+      encountered while reading, it will always be thrown for that record;
+      resetting the <classname>ItemReader</classname> will not help. However,
       for other exceptions, such as a
       <classname>DeadlockLoserDataAccessException</classname>, which indicates
       that the current process has attempted to update a record that another
@@ -475,7 +478,8 @@
       the <classname>Step</classname> can be configured with a list of
       exceptions that should not cause rollback. The transaction-attribute
       attribute is a comma-separated list. Prefixing a class name with the "+"
-      symbol will indicate that exception should not cause rollback.</para>
+      symbol will indicate that that exception should not cause
+      rollback.</para>
 
       <programlisting>
   &lt;step id="step1"&gt;
@@ -487,8 +491,8 @@
 </programlisting>
 
       <para>Transaction attributes can be used to control multiple other
-      settings such as isolation and propagation behaviour. More information
-      on setting transaction attributes can be found in the spring core
+      settings such as isolation and propagation behavior. More information on
+      setting transaction attributes can be found in the spring core
       documentation.</para>
 
       <section id="transactionalReaders">
@@ -501,8 +505,8 @@
         top of a transactional resource, such as a JMS queue. In this case,
         since the queue is tied to the transaction that is rolled back, the
         messages that have been pulled from the queue will be put back on. For
-        this reason, the step can be configured to not buffer the items:
-        </para>
+        this reason, the step can be configured to not buffer the
+        items:</para>
 
         <programlisting>
   &lt;step id="step1"&gt;
@@ -520,21 +524,21 @@
 
       <para>The step has to take care of <classname>ItemStream</classname>
       callbacks at the necessary points in its lifecycle. (for more
-      information on the ItemStream interface, please refer to <xref
-      linkend="itemStream" />) This is vital if a step fails, and might need
-      to be restarted, because the <classname>ItemStream</classname> interface
-      is where the step gets the information it needs about persistent state
-      between executions.</para>
+      information on the <classname>ItemStream</classname> interface, please
+      refer to <xref linkend="itemStream" />) This is vital if a step fails,
+      and might need to be restarted, because the
+      <classname>ItemStream</classname> interface is where the step gets the
+      information it needs about persistent state between executions.</para>
 
       <para>If the <classname>ItemReader</classname>,
       <classname>ItemProcessor</classname>, or
       <classname>ItemWriter</classname> itself implements the
       <classname>ItemStream</classname> interface, then these will be
       registered automatically. Any other streams need to be registered
-      separately. This is often the case where there are indirect
-      dependencies, like delegates being injected into the reader and writer.
-      To a stream it can be injected into the <classname>Step</classname>
-      through the 'streams' element, as illustrated below:</para>
+      separately. This is often the case where there are indirect dependencies
+      such as delegates being injected into the reader and writer. A stream
+      can be registered on the <classname>Step</classname> through the
+      'streams' element, as illustrated below:</para>
 
       <programlisting>
   &lt;step id="step1"&gt;
@@ -563,11 +567,11 @@
       <classname>ItemStream</classname>, but both of its delegates are.
       Therefore, both delegate writers must be explicitly registered as
       streams in order for the framework to handle them correctly. The
-      <classname>ItemReader</classname> does not need to explicitly registered
-      as a stream because it is a direct property of the
+      <classname>ItemReader</classname> does not need to be explicitly
+      registered as a stream because it is a direct property of the
       <classname>Step</classname>. The step will now be restartable and the
-      state of the reader and writer will be correctly persisted in case of a
-      failure.</para>
+      state of the reader and writer will be correctly persisted in the event
+      of a failure.</para>
     </section>
 
     <section>
@@ -597,7 +601,7 @@
 </programlisting>
 
       <para>In addition to the <classname>StepListener</classname> interfaces,
-      annotations are provided address the same concerns.</para>
+      annotations are provided to address the same concerns.</para>
 
       <section>
         <title>StepExecutionListener</title>
@@ -800,9 +804,10 @@
       <section>
         <title>SkipListener</title>
 
-        <para>Both <classname>ItemReadListener</classname> and
-        <classname>ItemWriteListner</classname> provide a mechanism for being
-        notified of errors, but neither one will inform you that a record has
+        <para><classname>ItemReadListener</classname>,
+        <classname>ItemProcessListener</classname>, and
+        <classname>ItemWriteListner</classname> all provide mechanisms for
+        being notified of errors, but none will inform you that a record has
         actually been skipped. <methodname>onWriteError</methodname>, for
         example, will be called even if an item is retried and successful. For
         this reason, there is a separate interface for tracking skipped
@@ -813,9 +818,9 @@
 
     void onSkipInRead(Throwable t);
 
-    void onSkipInWrite(S item, Throwable t);
-
     void onSkipInProcess(T item, Throwable t);
+
+    void onSkipInWrite(S item, Throwable t);
   }
 
 </programlisting>
@@ -851,8 +856,8 @@
           <classname>SkipListener</classname> is to log out a skipped item, so
           that another batch process or even human process can be used to
           evaluate and fix the issue leading to the skip. Because there are
-          many cases in which the original trasaction may be rolledback,
-          Spring Batch makes two garantees:</para>
+          many cases in which the original transaction may be rolled back,
+          Spring Batch makes two guarantees:</para>
 
           <orderedlist>
             <listitem>
@@ -900,8 +905,8 @@
 </programlisting>
 
     <note>
-      <para>TaskletStep will automatically register the tasklet as
-      <classname>StepExecutionListener</classname> if it implements this
+      <para><classname>TaskletStep</classname> will automatically register the
+      tasklet as <classname>StepListener</classname> if it implements this
       interface</para>
     </note>
 
@@ -933,7 +938,7 @@
       <title>Example Tasklet implementation</title>
 
       <para>Many batch jobs contain steps that must be done before the main
-      processing begins in order to set up various resources, or after
+      processing begins in order to set up various resources or after
       processing has completed to cleanup those resources. In the case of a
       job that works heavily with files, it is often necessary to delete
       certain files locally after they have been uploaded successfully to
@@ -976,7 +981,7 @@
 
       <programlisting>
   &lt;job id="taskletJob"&gt;
-    &lt;step name="deleteFilesInDir" tasklet="fileDeletingTasklet"/&gt;
+    &lt;step id="deleteFilesInDir" tasklet="fileDeletingTasklet"/&gt;
   &lt;/job&gt;
 
   &lt;bean id="fileDeletingTasklet" 
@@ -991,37 +996,16 @@
 
 </programlisting>
     </section>
-
-    <section>
-      <title>Executing System Commands</title>
-
-      <para>Many batch jobs may require that an external command be called
-      from within the batch job. Such a process could be kicked off separately
-      by the scheduler, but the advantage of common meta-data about the run
-      would be lost. Furthermore, a multi-step job would also need to be split
-      up into multiple jobs as well. Because the need is so common, Spring
-      Batch provides a <classname>Tasklet</classname> implementation for
-      calling system commands:</para>
-
-      <programlisting>
-  &lt;bean class="org.springframework.batch.sample.tasklet.SystemCommandTasklet"&gt;
-    &lt;property name="command" value="echo hello" /&gt;
-    &lt;!-- 5 second timeout for the command to complete --&gt;
-    &lt;property name="timeout" value="5000" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
-    </section>
   </section>
 
   <section id="controllingStepFlow">
     <title>Controlling Step Flow</title>
 
-    <para>With the ability to group steps together within an owning job, comes
+    <para>With the ability to group steps together within an owning job comes
     the need to be able to control how the job 'flows' from one step to
     another. The failure of a <classname>Step</classname> doesn't necessarily
-    mean that the <classname>Job</classname> should fail. Further, there may
-    be more than one type of 'success', which determines which
+    mean that the <classname>Job</classname> should fail. Furthermore, there
+    may be more than one type of 'success' which determines which
     <classname>Step</classname> should be executed next. Depending upon how a
     group of Steps is configured, certain steps may not even be processed at
     all.</para>
@@ -1035,17 +1019,17 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/sequential-flow.png"
-                     scale="" width="40%" />
+                     scale="80" width="40%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center" fileref="images/sequential-flow.png"
-                     scale="80" width="40%" />
+                     width="40%" />
         </imageobject>
       </mediaobject>
 
-      <para>This can be achieved using the 'next' attribute of
-      <classname>Step</classname>:</para>
+      <para>This can be achieved using the 'next' attribute of the step
+      element:</para>
 
       <para><programlisting>
   &lt;job id="job"&gt;
@@ -1054,31 +1038,42 @@
     &lt;step id="stepC" /&gt;
   &lt;/job&gt;
 
-</programlisting>In the scenario above, 'step A' will execute first. If 'step
-      A' completes normally, then 'step B' will execute and so on. However, if
-      'step A' fails, then the entire <classname>Job</classname> will fail and
-      'step B' will not execute.</para>
+</programlisting>In the scenario above, 'step A' will execute first because it
+      is the first <classname>Step</classname> listed. If 'step A' completes
+      normally, then 'step B' will execute, and so on. However, if 'step A'
+      fails, then the entire <classname>Job</classname> will fail and 'step B'
+      will not execute.</para>
+
+      <note>
+        <para>With the Spring Batch namespace, the first step listed in the
+        configuration will <emphasis>always</emphasis> be the first step
+        executed by the <classname>Job</classname>. The order of the other
+        step elements does not matter, but the first step must always appear
+        first in the xml.</para>
+      </note>
     </section>
 
     <section>
       <title>Conditional Flow</title>
 
-      <para>In the example above, there's only two possibilities:</para>
+      <para>In the example above, there are only two possibilities:</para>
 
       <orderedlist>
         <listitem>
-          <para>The Step is successful and the next Step should be
-          executed</para>
+          <para>The <classname>Step</classname> is successful and the next
+          <classname>Step</classname> should be executed.</para>
         </listitem>
 
         <listitem>
-          <para>The Step failed and thus the Job should fail.</para>
+          <para>The <classname>Step</classname> failed and thus the
+          <classname>Job</classname> should fail.</para>
         </listitem>
       </orderedlist>
 
-      <para>In many cases this may be sufficient. However, what about a
-      scenario in which the failure of a Step should trigger a different Step,
-      rather than causing failure? <mediaobject>
+      <para>In many cases, this may be sufficient. However, what about a
+      scenario in which the failure of a <classname>Step</classname> should
+      trigger a different <classname>Step</classname>, rather than causing
+      failure? <mediaobject>
           <imageobject role="html">
             <imagedata align="center" fileref="images/conditional-flow.png"
                        scale="" width="40%" />
@@ -1086,15 +1081,41 @@
 
           <imageobject role="fo">
             <imagedata align="center" fileref="images/conditional-flow.png"
-                       scale="80" width="40%" />
+                       width="40%" />
           </imageobject>
         </mediaobject></para>
 
-      <para>In order to handle this scenario, the next step can be determined
-      based on the result of the step by adding a next element to the Step.
-      The "on" attribute uses a simple pattern-matching scheme to match the
-      exit code of the Step to the various next elements declared. Only two
-      special characters are allowed:</para>
+      <para id="nextElement">In order to handle more complex scenarios, the
+      Spring Batch namespace allows transition elements to be defined within
+      the step element. One such transition is the "next" element. Like the
+      "next" attribute, the "next" element will tell the
+      <classname>Job</classname> which <classname>Step</classname> to execute
+      next. However, unlike the attribute, any number of "next" elements are
+      allowed on a given <classname>Step</classname>, and there is no default
+      behavior the the case of failure. This means that if transition elements
+      are used, then all of the behavior for the <classname>Step</classname>'s
+      transitions must be defined explicitly. Note also that a single step
+      cannot have both a "next" attribute and a transtion element.</para>
+
+      <para>The next element specifies a pattern to match and the step to
+      execute next:</para>
+
+      <para><programlisting>
+  &lt;job id="job"&gt;
+    &lt;step id="stepA"&gt;
+      &lt;next on="FAILED" to="stepB" /&gt;
+      &lt;next on="*" to="stepC" /&gt;
+    &lt;/step&gt;
+    &lt;step id="stepB" next="stepC" /&gt;
+    &lt;step id="stepC" /&gt;
+  &lt;/job&gt;
+
+</programlisting></para>
+
+      <para>The "on" attribute of a transition element uses a simple
+      pattern-matching scheme to match the <classname>ExitStatus</classname>
+      that results from the exeution of the <classname>Step</classname>. Only
+      two special characters are allowed in the pattern:</para>
 
       <itemizedlist>
         <listitem>
@@ -1109,27 +1130,17 @@
       <para>For example, "c*t" will match "cat" and "count", while "c?t" will
       match "cat" but not "count".</para>
 
-      <para>Any number of "next" elements is allowed, but if the step has an
-      exit code that is not covered by a "next" element, then the framework
-      will throw an exception and the job will fail. It is important to note
-      that the framework will automatically order transitions from most
-      specific to least specific. So even if the "next" elements were swapped
-      for "stepA" below, an exit status of "FAILED" would still go to
-      "stepB".</para>
+      <para>While there is no limit to the number of transition elements on a
+      <classname>Step</classname>, if the <classname>Step</classname>'s
+      execution results in an <classname>ExitStatus</classname> that is not
+      covered by an element, then the framework will throw an exception and
+      the <classname>Job</classname> will fail. It is important to note that
+      the framework will automatically order transitions from most specific to
+      least specific. This means that even if the elements were swapped for
+      "stepA" in the example above, an <classname>ExitStatus</classname> of
+      "FAILED" would still go to "stepB".</para>
 
-      <para><programlisting>
-  &lt;job id="job"&gt;
-    &lt;step id="stepA"&gt;
-      &lt;next on="FAILED" to="stepB" /&gt;
-      &lt;next on="*" to="stepC" /&gt;
-    &lt;/step&gt;
-    &lt;step id="stepB" next="stepC" /&gt;
-    &lt;step id="stepC" /&gt;
-  &lt;/job&gt;
-
-</programlisting></para>
-
-      <section>
+      <section id="batchStatusVsExitStatus" label="">
         <title>Batch Status vs. Exit Status</title>
 
         <para>When configuring a <classname>Job</classname> for conditional
@@ -1138,11 +1149,11 @@
         <classname>ExitStatus</classname>. <classname>BatchStatus</classname>
         is an enumeration that is a property of both
         <classname>JobExecution</classname> and
-        <classname>StepExecution</classname>, and is used by the framework to
+        <classname>StepExecution</classname> and is used by the framework to
         record the status of a <classname>Job</classname> or
         <classname>Step</classname>. It can be one of the following values:
         COMPLETED, STARTING, STARTED, FAILED, STOPPING, STOPPED, or UNKNOWN.
-        Most of them are self explanatory, COMPLETED is the status set when a
+        Most of them are self explanatory: COMPLETED is the status set when a
         step or job has completed successfully, FAILED is set when it fails,
         and so on. The example above contains the following 'next'
         element:</para>
@@ -1154,18 +1165,18 @@
 
         <para>At first glance, it would appear that the 'on' attribute
         references the <classname>BatchStatus</classname> of the
-        <classname>Step</classname> it belongs to. However, it references the
-        <classname>ExitStatus</classname> of the <classname>Step</classname>.
-        As the name implies, <classname>ExitStatus</classname> represents the
-        status of a <classname>Step</classname> after it finishes execution.
-        More specifically, the 'next' element above references the
-        <classname>ExitCode</classname> of the
+        <classname>Step</classname> to which it belongs. However, it actually
+        references the <classname>ExitStatus</classname> of the
+        <classname>Step</classname>. As the name implies,
+        <classname>ExitStatus</classname> represents the status of a
+        <classname>Step</classname> after it finishes execution. More
+        specifically, the 'next' element above references the exit code of the
         <classname>ExitStatus</classname>. To write it in English, it says:
         "go to stepB if the exit code is FAILED". By default, the exit code is
         always the same as the <classname>BatchStatus</classname> for the
         Step, which is why the entry above works. However, what if the exit
         code needs to be different? A good example comes from the skip sample
-        job, within the samples project:</para>
+        job within the samples project:</para>
 
         <programlisting>  
   &lt;step id="step1"&gt;
@@ -1180,83 +1191,189 @@
 
         <orderedlist>
           <listitem>
-            <para>The step failed, in which case the job should fail.</para>
+            <para>The <classname>Step</classname> failed, in which case the
+            job should fail.</para>
           </listitem>
 
           <listitem>
-            <para>The Step completed successfully.</para>
+            <para>The <classname>Step</classname> completed
+            successfully.</para>
           </listitem>
 
           <listitem>
-            <para>The Step completed successfully, but with an exit code of
-            'COMPLETED WITH SKIPS'. In this case, a different step should be
-            run to handle the errors.</para>
+            <para>The <classname>Step</classname> completed successfully, but
+            with an exit code of 'COMPLETED WITH SKIPS'. In this case, a
+            different step should be run to handle the errors.</para>
           </listitem>
         </orderedlist>
 
-        <para>The above configuration will work, however, something needs to
+        <para>The above configuration will work. However, something needs to
         change the exit code based on the condition of the execution having
         skipped records:</para>
 
-        <programlisting>public class SkipCheckingListener implements StepExecutionListener {
+        <programlisting>  public class SkipCheckingListener extends StepExecutionListenerSupport {
 
-  public ExitStatus afterStep(StepExecution stepExecution) {
-    if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
-          &amp;&amp; stepExecution.getSkipCount() &gt; 0) {
-      return new ExitStatus("COMPLETED WITH SKIPS");
-    } else {
-      return null;
+    public ExitStatus afterStep(StepExecution stepExecution) {
+      if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
+            &amp;&amp; stepExecution.getSkipCount() &gt; 0) {
+        return new ExitStatus("COMPLETED WITH SKIPS");
+      } else {
+        return null;
+      }
     }
-  }
 
-  ...
-}</programlisting>
+  }</programlisting>
 
         <para>The above code is a <classname>StepExecutionListener</classname>
         that first checks to make sure the <classname>Step</classname> was
         successful, and next if the skip count on the
         <classname>StepExecution</classname> is higher than 0. If both
-        conditions are met, a new ExitStatus with an exit code of "COMPLETED
-        WITH SKIPS" is returned.</para>
+        conditions are met, a new <classname>ExitStatus</classname> with an
+        exit code of "COMPLETED WITH SKIPS" is returned.</para>
       </section>
     </section>
 
     <section>
       <title>Configuring for Stop</title>
 
-      <para>If it is desired that the batch job stop under certain conditions,
-      then either the "stop" tag or the "end" tag may be used.</para>
+      <para>After the discussion of <link
+      linkend="batchStatusVsExitStatus"><classname>BatchStatus</classname> and
+      <classname>ExitStatus</classname></link>, one might wonder how the
+      <classname>BatchStatus</classname> and <classname>ExitStatus</classname>
+      are determined for the <classname>Job</classname>. While these statuses
+      are determined for the <classname>Step</classname> by the code that is
+      executed, the statuses for the <classname>Job</classname> will be
+      determined based on the configuration.</para>
 
-      <para>The "stop" tag indicates the job should stop processing with an
-      exit status of "STOPPED". The "to" attribute tells the framework which
-      step should be first when the job is subsequently restarted. This
-      mechanism allows the job to pause temporarily.</para>
+      <para>So far, all of the job configurations discussed have had at least
+      one final <classname>Step</classname> with no transitions. For example,
+      after the following step executes, the <classname>Job</classname> will
+      end:</para>
 
-      <para>On the other hand, the "end" tag will stop the job but does not
-      allow for a "to" attribute. The "status" attribute is optional. It will
-      determine the exit status of the step if the flow ends at that location.
-      The only legal values for the "status" are "COMPLETED", "FAILED", and
-      "STOPPED". If no status is specified, then the default is
-      "COMPLETED".</para>
+      <para><programlisting>  &lt;step id="stepC" /&gt;</programlisting></para>
 
-      <para><programlisting>
-  &lt;step id="step1"&gt;
-    &lt;stop on="COMPLETED" to="step2"/&gt;
-  &lt;/step&gt;
+      <para>If no transitions are defined for a <classname>Step</classname>,
+      then the <classname>Job</classname>'s statuses will be defined as
+      follows:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>If the <classname>Step</classname> ends with
+          <classname>ExitStatus</classname> FAILED, then the
+          <classname>Job</classname>'s <classname>BatchStatus</classname> and
+          <classname>ExitStatus</classname> will both be FAILED.</para>
+        </listitem>
+
+        <listitem>
+          <para>Otherwise, the the <classname>Job</classname>'s
+          <classname>BatchStatus</classname> and
+          <classname>ExitStatus</classname> will both be COMPLETED.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>While this method of terminating a batch job is sufficient for
+      some batch jobs, such as a simple sequential step job, custom defined
+      job-stopping scenarios may be required. For this purpose, Spring Batch
+      provides three transition elements to stop a <classname>Job</classname>
+      (in addition to the <link linkend="nextElement">"next" element</link>
+      that we discussed previously). Each of these stopping elements will stop
+      a <classname>Job</classname> with a particular
+      <classname>BatchStatus</classname>. It is important to note that the
+      stop transition elements will have no effect on either the
+      <classname>BatchStatus</classname> or <classname>ExitStatus</classname>
+      of any <classname>Step</classname>s in the <classname>Job</classname>:
+      these elements will only affect the final statuses of the
+      <classname>Job</classname>. For example, it is possible for every step
+      in a job to have a status of FAILED but the job to have a status of
+      COMPLETED, or vise versa.</para>
+
+      <section>
+        <title>The 'End' Element</title>
+
+        <para>The 'end' element instructs a <classname>Job</classname> to stop
+        with a <classname>BatchStatus</classname> of COMPLETED. A
+        <classname>Job</classname> that has finished with status COMPLETED
+        cannot be restarted (the framework will throw a
+        <classname>JobInstanceAlreadyCompleteException</classname>). The 'end'
+        element also allows for an optional 'status' attribute that can be
+        used to customize the <classname>ExitStatus</classname> of the
+        <classname>Job</classname>. If no 'status' attribute is given, then
+        the <classname>ExitStatus</classname> will be "COMPLETED" by default,
+        to match the <classname>BatchStatus</classname>.</para>
+
+        <para>In the following scenario, if step2 fails, then the
+        <classname>Job</classname> will stop with a
+        <classname>BatchStatus</classname> of COMPLETE and an
+        <classname>ExitStatus</classname> of "COMPLETED" and step3 will not
+        execute; otherwise, execution will move to step3. Additionally, if
+        step2 fails, the <classname>Job</classname> will not be
+        restartable.</para>
+
+        <programlisting>  &lt;step id="step1" next="step2"&gt;
   &lt;step id="step2"&gt;
-    &lt;next on="FOO" to="step3"/&gt;
-    &lt;end on="*" status="FAILED"/&gt;
+    &lt;end on="FAILED"/&gt;
+    &lt;next on="*" to="step3"/&gt;
   &lt;/step&gt;
-  &lt;step id="step3" /&gt;
+  &lt;step id="step3"&gt;</programlisting>
+      </section>
 
-</programlisting></para>
+      <section>
+        <title>The 'Fail' Element</title>
+
+        <para>The 'fail' element instructs a <classname>Job</classname> to
+        stop with a <classname>BatchStatus</classname> of FAILED. Unlike the
+        'end' element, the 'fail' element will not prevent the
+        <classname>Job</classname> from being restarted. The 'fail' element
+        also allows for an optional 'status' attribute that can be used to
+        customize the <classname>ExitStatus</classname> of the
+        <classname>Job</classname>. If no 'status' attribute is given, then
+        the <classname>ExitStatus</classname> will be "FAILED" by default, to
+        match the <classname>BatchStatus</classname>.</para>
+
+        <para>In the following scenario, if step2 fails, then the
+        <classname>Job</classname> will stop with a
+        <classname>BatchStatus</classname> of FAILED and an
+        <classname>ExitStatus</classname> of "EARLY TERMINATION" and step3
+        will not execute; otherwise, execution will move to step3.
+        Additionally, if step2 fails, and the <classname>Job</classname> is
+        restarted, then execution will begin again on step2.</para>
+
+        <programlisting>  &lt;step id="step1" next="step2"&gt;
+  &lt;step id="step2"&gt;
+    &lt;fail on="FAILED" status="EARLY TERMINATION"/&gt;
+    &lt;next on="*" to="step3"/&gt;
+  &lt;/step&gt;
+  &lt;step id="step3"&gt;</programlisting>
+      </section>
+
+      <section>
+        <title>The 'Pause' Element</title>
+
+        <para>The 'pause' element instructs a <classname>Job</classname> to
+        stop with a <classname>BatchStatus</classname> of STOPPED. Pausing a
+        <classname>Job</classname> is a meant to be a temporary break in
+        processing so that the operator can take some action before restarting
+        the <classname>Job</classname>. The 'pause' element requires a 'to'
+        attribute that specifies the step where execution should pick up once
+        the <classname>Job</classname>.</para>
+
+        <para>In the following scenario, if step1 finsihes with COMPLETE, then
+        the job will then stop. Once it is restarted, execution will begin on
+        step2.</para>
+
+        <para><programlisting>  &lt;step id="step1"&gt;
+    &lt;pause on="COMPLETED" to="step2"/&gt;
+  &lt;/step&gt;
+  &lt;step id="step2"/&gt;</programlisting></para>
+      </section>
     </section>
 
     <section>
       <title>Programmatic flow decisions</title>
 
-      <para>In some situations, more information than the exit status may be
-      required to decide which step to execute next. In this case, a
+      <para>In some situations, more information than the
+      <classname>ExitStatus</classname> may be required to decide which step
+      to execute next. In this case, a
       <classname>JobExecutionDecider</classname> can be used to assist in the
       decision.</para>
 
@@ -1298,16 +1415,43 @@
     </section>
 
     <section>
-      <title>Late binding of Job and Step Attributes</title>
+      <title>Split Flows</title>
 
-      <para>Both the XML and Flat File examples above use the Spring
-      <classname>Resource</classname> abstraction to obtain a file . This
-      works because <classname>Resource</classname> has a
-      <markup>getFile</markup> method, which returns a
-      <classname>java.io.File</classname>. Both XML and Flat File resources
-      can be configured using standard Spring constructs:</para>
+      <para>Every scenario described so far has involved a
+      <classname>Job</classname> that executes its
+      <classname>Step</classname>s one at a time in a linear fashion. In
+      addition to this typical style, the Spring Batch namespace also allows
+      for a job to be configured with parallel flows using the 'split'
+      element. As is seen below, the 'split' element contains one or more
+      'flow' elements, where entire separate flows can be defined. A 'split'
+      element may also contain any of the previously discussed transition
+      elements such as the 'next' attribute or the 'next', 'end', 'fail', or
+      'pause' elements.</para>
 
-      <programlisting>  
+      <programlisting>  &lt;split id="split1" next="step4"&gt;
+    &lt;flow&gt;
+      &lt;step id="step1" next="step2"/&gt;
+      &lt;step id="step2"/&gt;
+    &lt;/flow&gt;
+    &lt;flow&gt;
+      &lt;step id="step3"/&gt;
+    &lt;/flow&gt;
+  &lt;/split&gt;
+  &lt;step id="step4"/&gt;</programlisting>
+    </section>
+  </section>
+
+  <section>
+    <title>Late binding of Job and Step Attributes</title>
+
+    <para>Both the XML and Flat File examples above use the Spring
+    <classname>Resource</classname> abstraction to obtain a file . This works
+    because <classname>Resource</classname> has a <markup>getFile</markup>
+    method, which returns a <classname>java.io.File</classname>. Both XML and
+    Flat File resources can be configured using standard Spring
+    constructs:</para>
+
+    <programlisting>  
   &lt;bean id="flatFileItemReader"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource"
@@ -1316,15 +1460,15 @@
 
 </programlisting>
 
-      <para>The above <classname>Resource</classname> will load the file from
-      the file system, at the location specified. Note that absolute locations
-      have to start with a double slash ("//"). In most spring applications,
-      this solution is good enough because the names of these are known at
-      compile time. However, in batch scenarios, the file name may need to be
-      determined at runtime as a parameter to the job. This could be solved
-      using '-D' parameters, i.e. a system property:</para>
+    <para>The above <classname>Resource</classname> will load the file from
+    the file system location specified. Note that absolute locations have to
+    start with a double slash ("//"). In most spring applications, this
+    solution is good enough because the names of these are known at compile
+    time. However, in batch scenarios, the file name may need to be determined
+    at runtime as a parameter to the job. This could be solved using '-D'
+    parameters, i.e. a system property:</para>
 
-      <programlisting>
+    <programlisting>
   &lt;bean id="flatFileItemReader"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="${input.file.name}" /&gt;
@@ -1332,20 +1476,21 @@
 
 </programlisting>
 
-      <para>All that would be required for this solution to work would be a
-      system argument (-Dinput.file.name="file://file.txt"). (Note that
-      although a <classname>PropertyPlaceholderConfigurer</classname> can be
-      used here, it is not necessary if the system property is always set
-      because the <classname>ResourceEditor</classname> in Spring already
-      filters and does placeholder replacement on system properties.)</para>
+    <para>All that would be required for this solution to work would be a
+    system argument (-Dinput.file.name="file://file.txt"). (Note that although
+    a <classname>PropertyPlaceholderConfigurer</classname> can be used here,
+    it is not necessary if the system property is always set because the
+    <classname>ResourceEditor</classname> in Spring already filters and does
+    placeholder replacement on system properties.)</para>
 
-      <para>Often in a batch setting it is preferable to parameterize the file
-      name in the <link linkend="jobParameters">JobParameters</link> of the
-      job, instead of through system properties, and access them that way. To
-      allow for this, Spring Batch allows for the late binding of various Job
-      and Step attributes:</para>
+    <para>Often in a batch setting it is preferable to parameterize the file
+    name in the <link
+    linkend="jobParameters"><classname>JobParameters</classname></link> of the
+    job, instead of through system properties, and access them that way. To
+    accomplish this, Spring Batch allows for the late binding of various Job
+    and Step attributes:</para>
 
-      <programlisting>  
+    <programlisting>  
   &lt;bean id="flatFileItemReader" scope="step"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{jobParameters[input.file.name]}</emphasis>" /&gt;
@@ -1353,34 +1498,34 @@
 
 </programlisting>
 
-      <para>Both the <classname>JobExecution</classname> and
-      <classname>StepExecution</classname> level
-      <classname>ExecutionContext</classname> can be accessed in the same
-      way:</para>
+    <para>Both the <classname>JobExecution</classname> and
+    <classname>StepExecution</classname> level
+    <classname>ExecutionContext</classname> can be accessed in the same
+    way:</para>
 
-      <programlisting>  
+    <programlisting>  
   &lt;bean id="flatFileItemReader" scope="step"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="#{<emphasis role="bold">jobExecutionContext</emphasis>[input.file.name]}" /&gt;
+    &lt;property name="resource" value="<emphasis role="bold">#{jobExecutionContext[input.file.name]}</emphasis>" /&gt;
   &lt;/bean&gt;
 
 </programlisting>
 
-      <programlisting>  
+    <programlisting>  
   &lt;bean id="flatFileItemReader" scope="step"
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-    &lt;property name="resource" value="#{<emphasis role="bold">stepExecutionContext</emphasis>[input.file.name]}" /&gt;
+    &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext[input.file.name]}</emphasis>" /&gt;
   &lt;/bean&gt;
 
 </programlisting>
 
-      <section>
-        <title>Step Scope</title>
+    <section>
+      <title>Step Scope</title>
 
-        <para>All of the late binding examples from above have a scope of
-        "step" declared on the bean definition:</para>
+      <para>All of the late binding examples from above have a scope of "step"
+      declared on the bean definition:</para>
 
-        <programlisting>  
+      <programlisting>  
   &lt;bean id="flatFileItemReader" <emphasis role="bold">scope="step"</emphasis>
         class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="#{jobParameters[input.file.name]}" /&gt;
@@ -1388,17 +1533,16 @@
 
 </programlisting>
 
-        <para>Using a scope of <classname>Step</classname> is required in
-        order to use late binding, since the bean cannot actually be
-        instantiated until the <classname>Step</classname> starts, which
-        allows the attributes to be found. Because it is not part of the
-        Spring container by default, it must be added explicitly:</para>
+      <para>Using a scope of <classname>Step</classname> is required in order
+      to use late binding since the bean cannot actually be instantiated until
+      the <classname>Step</classname> starts, which allows the attributes to
+      be found. Because it is not part of the Spring container by default, it
+      must be added explicitly:</para>
 
-        <programlisting>
+      <programlisting>
   &lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;
 
 </programlisting>
-      </section>
     </section>
   </section>
 </chapter>
