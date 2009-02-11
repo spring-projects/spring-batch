@@ -20,11 +20,13 @@
 			<tasklet reader="gameFileItemReader" writer="gameWriter" 
 			               commit-interval="${job.commit.interval}" />
 		</step>
-		<step id="playerSummarization">
-			<tasklet reader="playerSummarizationSource" writer="summaryWriter" 
-			               commit-interval="${job.commit.interval}" />
-		</step>
+		<step id="playerSummarization" ref="summarizationStep" />
 	</job>
+
+	<step id="summarizationStep">
+		<tasklet reader="playerSummarizationSource" writer="summaryWriter" 
+			               commit-interval="${job.commit.interval}" />
+	</step>
 
 	<beans:bean id="playerWriter" class="org.springframework.batch.sample.domain.football.internal.PlayerItemWriter">
 		<beans:property name="playerDao">
