@@ -26,23 +26,33 @@ import org.springframework.beans.factory.xml.ParserContext;
  * @author Thomas Risberg
  */
 public class CoreNamespaceUtils {
+	
+	public static final String STEP_SCOPE_PROCESSOR_BEAN_NAME =
+		"org.springframework.batch.core.scope.internalStepScope";
 
-	protected static void checkForStepScope(ParserContext parserContext) {
-		final String stepScopeClassName = "org.springframework.batch.core.scope.StepScope";
+	public static final String STEP_SCOPE_PROCESSOR_CLASS_NAME =
+		"org.springframework.batch.core.scope.StepScope";
+
+
+	protected static void checkForStepScope(ParserContext parserContext, Object source) {
+		
 		boolean foundStepScope = false;
 		String[] beanNames = parserContext.getRegistry().getBeanDefinitionNames();
 		for (String beanName : beanNames) {
 			BeanDefinition bd = parserContext.getRegistry().getBeanDefinition(beanName);
-			if (stepScopeClassName.equals(bd.getBeanClassName())) {
+			if (STEP_SCOPE_PROCESSOR_CLASS_NAME.equals(bd.getBeanClassName())) {
 				foundStepScope = true;
 				break;
 			}
 		}
 		if (!foundStepScope) {
 			BeanDefinitionBuilder stepScopeBuilder = 
-				BeanDefinitionBuilder.genericBeanDefinition(stepScopeClassName);
+				BeanDefinitionBuilder.genericBeanDefinition(STEP_SCOPE_PROCESSOR_CLASS_NAME);
+			stepScopeBuilder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			AbstractBeanDefinition abd = stepScopeBuilder.getBeanDefinition();
-			parserContext.getRegistry().registerBeanDefinition(stepScopeClassName, abd);
+			abd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			abd.setSource(source);
+			parserContext.getRegistry().registerBeanDefinition(STEP_SCOPE_PROCESSOR_BEAN_NAME, abd);
 		}
 	}
 
