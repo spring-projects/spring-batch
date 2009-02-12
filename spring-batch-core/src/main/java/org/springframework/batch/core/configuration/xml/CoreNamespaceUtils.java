@@ -48,7 +48,6 @@ public class CoreNamespaceUtils {
 		if (!foundStepScope) {
 			BeanDefinitionBuilder stepScopeBuilder = 
 				BeanDefinitionBuilder.genericBeanDefinition(STEP_SCOPE_PROCESSOR_CLASS_NAME);
-			stepScopeBuilder.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			AbstractBeanDefinition abd = stepScopeBuilder.getBeanDefinition();
 			abd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			abd.setSource(source);
