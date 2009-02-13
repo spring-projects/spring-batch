@@ -74,8 +74,6 @@ import org.springframework.util.StringValueResolver;
  */
 public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	
-	private static Object activePostProcessor = null;
-
 	private Log logger = LogFactory.getLog(getClass());
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
@@ -181,33 +179,23 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 */
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		
-		if (activePostProcessor == null) {
-			activePostProcessor = this;
-		}
+		beanFactory.registerScope(name, this);
 		
-		// Avoid having potential duplicate registrations of this bean run the post process
-		if (this == activePostProcessor) {
+		Assert.state(beanFactory instanceof BeanDefinitionRegistry,
+				"BeanFactory was not a BeanDefinitionRegistry, so StepScope cannot be used.");
+		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
-			beanFactory.registerScope(name, this);
-			
-			Assert.state(beanFactory instanceof BeanDefinitionRegistry,
-					"BeanFactory was not a BeanDefinitionRegistry, so StepScope cannot be used.");
-			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
-	
-			Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass);
-	
-			for (String beanName : beanFactory.getBeanDefinitionNames()) {
-				BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
-				// Replace this or any of its inner beans with scoped proxy if it
-				// has this scope
-				scopifier.visitBeanDefinition(definition);
-				if (name.equals(definition.getScope())) {
-					createScopedProxy(beanName, definition, registry, proxyTargetClass);
-				}
+		Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass);
+
+		for (String beanName : beanFactory.getBeanDefinitionNames()) {
+			BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
+			// Replace this or any of its inner beans with scoped proxy if it
+			// has this scope
+			scopifier.visitBeanDefinition(definition);
+			if (name.equals(definition.getScope())) {
+				createScopedProxy(beanName, definition, registry, proxyTargetClass);
 			}
-
 		}
-
 
 	}
 
