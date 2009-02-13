@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.1.v200811281800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.0.v200809261800]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -43,7 +43,6 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepWithSimpleTaskJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/EndTransitionJobParserTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeDefaultFailureJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeMultipleFinalJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml</config>
