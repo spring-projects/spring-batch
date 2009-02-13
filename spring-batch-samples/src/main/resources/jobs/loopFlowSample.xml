@@ -18,9 +18,9 @@
 				<listener ref="resettingListener"/>
 			</listeners>
 		</step>
-		<step id="step2" next="limitDecision">
+		<step id="step2" allow-start-if-complete="true" next="limitDecision">
 			<tasklet reader="itemGenerator" writer="itemWriter" 
-			         commit-interval="1" allow-start-if-complete="true"/>
+			         commit-interval="1"/>
 			<listeners>
 				<listener ref="resettingListener"/>
 			</listeners>
