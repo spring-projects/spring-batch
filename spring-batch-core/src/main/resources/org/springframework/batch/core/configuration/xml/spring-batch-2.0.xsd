@@ -65,7 +65,7 @@
 				<xsd:extension base="stepType">
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="jobRepositoryAttribute"/>
-					<xsd:attributeGroup ref="taskletAttribute"/>
+					<xsd:attributeGroup ref="stepAttributes"/>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -145,7 +145,7 @@
 										</xsd:documentation>
 									</xsd:annotation>
 								</xsd:attribute>
-								<xsd:attributeGroup ref="taskletAttribute"/>
+								<xsd:attributeGroup ref="stepAttributes"/>
 							</xsd:extension>
 						</xsd:complexContent>
 					</xsd:complexType>
@@ -382,20 +382,6 @@
 							<tool:annotation kind="ref" />
 							<tool:expected-type type="org.springframework.batch.item.ItemWriter" />
 						</xsd:appinfo>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="start-limit" type="xsd:string" use="optional">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-						The maximum number of times a Step may be started.
-						]]></xsd:documentation>
-					</xsd:annotation>
-				</xsd:attribute>
-				<xsd:attribute name="allow-start-if-complete" type="xsd:string" use="optional">
-					<xsd:annotation>
-						<xsd:documentation><![CDATA[
-						Set to true to allow a step to be started even if it is already complete.
-						]]></xsd:documentation>
 					</xsd:annotation>
 				</xsd:attribute>
 				<xsd:attribute name="skip-limit" type="xsd:string" use="optional">
@@ -694,7 +680,7 @@
 		</xsd:attribute>
 	</xsd:attributeGroup>
 
-	<xsd:attributeGroup name="taskletAttribute">
+	<xsd:attributeGroup name="stepAttributes">
 		<xsd:attribute name="tasklet" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
@@ -705,6 +691,20 @@
 						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
 					</tool:annotation>
 				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="start-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The maximum number of times a Step may be started.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="allow-start-if-complete" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Set to true to allow a step to be started even if it is already complete.
+				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:attributeGroup>

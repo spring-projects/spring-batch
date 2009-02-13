@@ -5,9 +5,8 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<job id="job">
-		<step id="step">
+		<step id="step" start-limit="25" allow-start-if-complete="true">
 			<tasklet reader="reader" processor="processor" writer="writer"
-					start-limit="25" allow-start-if-complete="true"
 					commit-interval="10" skip-limit="20" 
 					retry-limit="3" cache-capacity="100"
 					transaction-attribute="PROPAGATION_REQUIRED,ISOLATION_DEFAULT,timeout_10,-org.springframework.dao.DataIntegrityViolationException" 

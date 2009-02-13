@@ -61,6 +61,8 @@ public abstract class AbstractStepParser {
             bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
         }
 
+        checkStepAttributes(stepElement, bd);
+
         RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
         bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
 
@@ -118,14 +120,7 @@ public abstract class AbstractStepParser {
         }
 
 		// now, set the properties on the new bean 
-        String startLimit = element.getAttribute("start-limit");
-        if (StringUtils.hasText(startLimit)) {
-            bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
-        }
-        String allowStartIfComplete = element.getAttribute("allow-start-if-complete");
-        if (StringUtils.hasText(allowStartIfComplete)) {
-            bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
-        }
+        checkStepAttributes(stepElement, bd);
 
         String readerBeanId = element.getAttribute("reader");
         if (StringUtils.hasText(readerBeanId)) {
@@ -204,6 +199,17 @@ public abstract class AbstractStepParser {
 
         return bd;
         
+	}
+
+	private void checkStepAttributes(Element element, RootBeanDefinition bd) {
+		String startLimit = element.getAttribute("start-limit");
+        if (StringUtils.hasText(startLimit)) {
+            bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
+        }
+        String allowStartIfComplete = element.getAttribute("allow-start-if-complete");
+        if (StringUtils.hasText(allowStartIfComplete)) {
+            bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
+        }
 	}
 
 	private boolean checkIntValueForFaultToleranceNeeded(String stringValue) {
