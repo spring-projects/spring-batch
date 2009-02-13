@@ -201,12 +201,12 @@ public abstract class AbstractStepParser {
         
 	}
 
-	private void checkStepAttributes(Element element, RootBeanDefinition bd) {
-		String startLimit = element.getAttribute("start-limit");
+	private void checkStepAttributes(Element stepElement, RootBeanDefinition bd) {
+		String startLimit = stepElement.getAttribute("start-limit");
         if (StringUtils.hasText(startLimit)) {
             bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
         }
-        String allowStartIfComplete = element.getAttribute("allow-start-if-complete");
+        String allowStartIfComplete = stepElement.getAttribute("allow-start-if-complete");
         if (StringUtils.hasText(allowStartIfComplete)) {
             bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
         }
