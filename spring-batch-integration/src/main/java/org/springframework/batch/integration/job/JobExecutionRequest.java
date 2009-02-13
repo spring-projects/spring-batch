@@ -27,8 +27,8 @@ import org.springframework.batch.core.JobExecution;
  * (generally a handler cannot determine if the whole job execution is complete,
  * so this is just information about the step).<br/>
  * 
- * If the incoming status is {@link BatchStatus#FAILED},
- * {@link BatchStatus#STOPPED} or {@link BatchStatus#STOPPING} the request
+ * If the incoming status is {@link BatchStatus#INCOMPLETE},
+ * {@link BatchStatus#FAILED} or {@link BatchStatus#STOPPING} the request
  * should be ignored by handlers (passed on without modification).
  * 
  * @author Dave Syer

@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.job.flow.support;
 
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
@@ -28,16 +30,26 @@ import org.springframework.batch.core.job.flow.support.state.AbstractState;
  */
 public class StateSupport extends AbstractState {
 
-	/**
-	 * @param name
-	 */
+	private FlowExecutionStatus status;
+	
 	public StateSupport(String name) {
+		this(name, FlowExecutionStatus.COMPLETED);
+	}
+
+	public StateSupport(String name, FlowExecutionStatus status) {
 		super(name);
+		this.status = status;
 	}
 
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
-		return FlowExecutionStatus.COMPLETED;
+		JobExecution jobExecution = executor.getJobExecution();
+		if (jobExecution != null) {
+			jobExecution.getStepExecutions().add(new StepExecution(getName(), jobExecution));
+		}
+		return this.status;
 	}
 
+	public void validate(String nextState) {
+	}
 }

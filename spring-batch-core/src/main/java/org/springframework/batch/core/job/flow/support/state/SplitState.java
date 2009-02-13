@@ -103,4 +103,13 @@ public class SplitState extends AbstractState {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
+	 */
+	public void validate(String nextState) {
+		if (nextState == null) {
+			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
+					+ "] requires a 'next' state.");
+		}
+	}
 }

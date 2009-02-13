@@ -150,8 +150,8 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		if (!transitionElementExists) {
-			list.addAll(createTransition(BatchStatus.FAILED, ExitStatus.FAILED.getExitCode(), null, null, stateDef,
-					parserContext));
+			list.addAll(createTransition(BatchStatus.INCOMPLETE, ExitStatus.FAILED.getExitCode(), null, null,
+					stateDef, parserContext));
 			if (!hasNextAttribute) {
 				list.addAll(createTransition(BatchStatus.COMPLETED, null, null, null, stateDef, parserContext));
 			}
@@ -219,15 +219,16 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 		BeanDefinition endState = null;
 
-		if (batchStatus == BatchStatus.STOPPED || batchStatus == BatchStatus.COMPLETED
-				|| batchStatus == BatchStatus.FAILED) {
+		if (batchStatus == BatchStatus.FAILED || batchStatus == BatchStatus.COMPLETED
+				|| batchStatus == BatchStatus.INCOMPLETE) {
 
 			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
 			endBuilder.addConstructorArgValue(batchStatus);
 
 			boolean exitCodeExists = StringUtils.hasText(exitCode);
-			endBuilder.addConstructorArgValue(new ExitStatus(exitCodeExists ? exitCode : batchStatus.toString()));
+			endBuilder.addConstructorArgValue(exitCodeExists ? new ExitStatus(exitCode)
+					: convertToExitStatus(batchStatus));
 
 			String endName = "end" + (endCounter++);
 			endBuilder.addConstructorArgValue(endName);
@@ -256,7 +257,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 */
 	private static BatchStatus getBatchStatusFromEndTransitionName(String elementName) {
 		if (PAUSE.equals(elementName)) {
-			return BatchStatus.STOPPED;
+			return BatchStatus.INCOMPLETE;
 		}
 		else if (END.equals(elementName)) {
 			return BatchStatus.COMPLETED;
@@ -266,6 +267,19 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		}
 		else {
 			return BatchStatus.UNKNOWN;
+		}
+	}
+
+	/**
+	 * @param batchStatus A BatchStatus
+	 * @return the ExitStatus corresponding to the BatchStatus
+	 */
+	private static ExitStatus convertToExitStatus(BatchStatus batchStatus) {
+		if (batchStatus == BatchStatus.INCOMPLETE) {
+			return ExitStatus.FAILED;
+		}
+		else {
+			return new ExitStatus(batchStatus.toString());
 		}
 	}
 

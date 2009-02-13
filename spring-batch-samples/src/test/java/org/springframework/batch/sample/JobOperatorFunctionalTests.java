@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.batch.core.BatchStatus.STARTED;
-import static org.springframework.batch.core.BatchStatus.STOPPED;
+import static org.springframework.batch.core.BatchStatus.FAILED;
 
 import java.util.List;
 import java.util.Map;
@@ -91,12 +91,12 @@ public class JobOperatorFunctionalTests {
 		}
 
 		assertFalse(tested.getRunningExecutions(job.getName()).contains(executionId));
-		assertTrue(tested.getSummary(executionId).contains(STOPPED.toString()));
+		assertTrue(tested.getSummary(executionId).contains(FAILED.toString()));
 
 		// there is just a single step in the test job
 		Map<Long, String> summaries = tested.getStepExecutionSummaries(executionId);
 		assertEquals(1, summaries.size());
-		assertTrue(summaries.values().toString().contains(STOPPED.toString()));
+		assertTrue(summaries.values().toString().contains(FAILED.toString()));
 	}
 
 	@Test

@@ -58,7 +58,7 @@ public class EndState extends AbstractState {
 
 	/**
 	 * Return the {@link BatchStatus} and {@link ExitStatus} stored. If the
-	 * {@link BatchStatus} is {@link BatchStatus#STOPPED}, then mark it on the
+	 * {@link BatchStatus} is {@link BatchStatus#FAILED}, then mark it on the
 	 * {@link JobExecution} so that the job will know to stop.
 	 * 
 	 * @see State#handle(FlowExecutor)
@@ -70,7 +70,7 @@ public class EndState extends AbstractState {
 		// restart
 		synchronized (jobExecution) {
 			if (!jobExecution.getStepExecutions().isEmpty()) {
-				if (status == BatchStatus.STOPPED) {
+				if (status == BatchStatus.INCOMPLETE) {
 					jobExecution.upgradeStatus(status);
 					jobExecution.setExitStatus(exitStatus);
 				}
@@ -79,4 +79,24 @@ public class EndState extends AbstractState {
 		}
 	}
 
+
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
+	 */
+	public void validate(String nextState) {
+		if (status != BatchStatus.INCOMPLETE && nextState != null) {
+			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
+					+ "] may not have a 'next' state.");
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return super.toString() + " status=[" + status + "] exitcode=[" + exitStatus.getExitCode() + "] ";
+	}
 }

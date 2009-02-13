@@ -55,7 +55,7 @@ public class NextAttributeDefaultFailureJobParserTests {
 		assertNotNull(job);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 	}
 

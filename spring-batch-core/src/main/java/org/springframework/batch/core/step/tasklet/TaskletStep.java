@@ -257,7 +257,7 @@ public class TaskletStep extends AbstractStep {
 						locked = true;
 					}
 					catch (InterruptedException e) {
-						stepExecution.setStatus(BatchStatus.STOPPED);
+						stepExecution.setStatus(BatchStatus.FAILED);
 						Thread.currentThread().interrupt();
 					}
 

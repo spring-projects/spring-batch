@@ -45,4 +45,10 @@ public interface State {
 	 */
 	FlowExecutionStatus handle(FlowExecutor executor) throws Exception;
 
+	/**
+	 * Validate that the nextState is appropriate for this State.
+	 * 
+	 * @param nextState
+	 */
+	void validate(String nextState);
 }

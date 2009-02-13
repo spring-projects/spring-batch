@@ -47,11 +47,11 @@ public class StopIncompleteJobParserTests extends AbstractJobParserTests {
 		assertEquals(1, stepNamesList.size());
 		assertTrue(stepNamesList.contains("fail"));
 
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "fail");
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution1.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution1.getExitStatus().getExitCode());
 
 		//

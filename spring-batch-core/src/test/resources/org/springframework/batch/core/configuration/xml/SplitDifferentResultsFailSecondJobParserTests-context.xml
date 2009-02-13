@@ -17,7 +17,10 @@
 				<step id="s1" ref="step1"/>
 			</flow>
 			<flow>
-				<step id="fail" ref="failingStep"/>
+				<step id="fail" ref="failingStep">
+					<fail on="FAILED"/>
+					<end on="*"/>
+				</step>
 			</flow>
 		</split>
 		<step id="s3" ref="step3"/>

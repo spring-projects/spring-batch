@@ -204,7 +204,7 @@ public class AbstractStepTests {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		tested.execute(execution);
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, execution.getStatus());
 		Throwable expected = execution.getFailureExceptions().get(0);
 		assertEquals("crash!", expected.getMessage());
 
@@ -242,7 +242,7 @@ public class AbstractStepTests {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		tested.execute(execution);
-		assertEquals(BatchStatus.STOPPED, execution.getStatus());
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		Throwable expected = execution.getFailureExceptions().get(0);
 		assertEquals("JobExecution interrupted.", expected.getMessage());
 

@@ -112,7 +112,9 @@ public class SimpleJobRepository implements JobRepository {
 					throw new JobExecutionAlreadyRunningException("A job execution for this job is already running: "
 							+ jobInstance);
 				}
-				if (execution.getStatus() == BatchStatus.COMPLETED) {
+				
+				BatchStatus status = execution.getStatus();
+				if (status == BatchStatus.COMPLETED || status == BatchStatus.FAILED) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
 									+ ".  If you want to run this job again, change the parameters.");

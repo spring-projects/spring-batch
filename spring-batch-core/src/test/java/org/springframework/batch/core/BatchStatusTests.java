@@ -45,17 +45,17 @@ public class BatchStatusTests {
 
 	@Test
 	public void testMaxStatus() {
-		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED,BatchStatus.COMPLETED));
-		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.FAILED));
-		assertEquals(BatchStatus.FAILED, BatchStatus.max(BatchStatus.FAILED, BatchStatus.FAILED));
+		assertEquals(BatchStatus.INCOMPLETE, BatchStatus.max(BatchStatus.INCOMPLETE,BatchStatus.COMPLETED));
+		assertEquals(BatchStatus.INCOMPLETE, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.INCOMPLETE));
+		assertEquals(BatchStatus.INCOMPLETE, BatchStatus.max(BatchStatus.INCOMPLETE, BatchStatus.INCOMPLETE));
 		assertEquals(BatchStatus.STARTED, BatchStatus.max(BatchStatus.STARTED, BatchStatus.STARTING));
 		assertEquals(BatchStatus.STARTED, BatchStatus.max(BatchStatus.COMPLETED, BatchStatus.STARTED));
 	}
 
 	@Test
 	public void testUpgradeStatusFinished() {
-		assertEquals(BatchStatus.FAILED, BatchStatus.FAILED.upgradeTo(BatchStatus.COMPLETED));
-		assertEquals(BatchStatus.FAILED, BatchStatus.COMPLETED.upgradeTo(BatchStatus.FAILED));
+		assertEquals(BatchStatus.INCOMPLETE, BatchStatus.INCOMPLETE.upgradeTo(BatchStatus.COMPLETED));
+		assertEquals(BatchStatus.INCOMPLETE, BatchStatus.COMPLETED.upgradeTo(BatchStatus.INCOMPLETE));
 	}
 
 	@Test
@@ -68,7 +68,7 @@ public class BatchStatusTests {
 
 	@Test
 	public void testIsRunning() {
-		assertFalse(BatchStatus.FAILED.isRunning());
+		assertFalse(BatchStatus.INCOMPLETE.isRunning());
 		assertFalse(BatchStatus.COMPLETED.isRunning());
 		assertTrue(BatchStatus.STARTED.isRunning());
 		assertTrue(BatchStatus.STARTING.isRunning());
@@ -76,7 +76,7 @@ public class BatchStatusTests {
 
 	@Test
 	public void testIsUnsuccessful() {
-		assertTrue(BatchStatus.FAILED.isUnsuccessful());
+		assertTrue(BatchStatus.INCOMPLETE.isUnsuccessful());
 		assertFalse(BatchStatus.COMPLETED.isUnsuccessful());
 		assertFalse(BatchStatus.STARTED.isUnsuccessful());
 		assertFalse(BatchStatus.STARTING.isUnsuccessful());
@@ -84,7 +84,7 @@ public class BatchStatusTests {
 
 	@Test
 	public void testGetStatus() {
-		assertEquals(BatchStatus.FAILED, BatchStatus.valueOf(BatchStatus.FAILED.toString()));
+		assertEquals(BatchStatus.INCOMPLETE, BatchStatus.valueOf(BatchStatus.INCOMPLETE.toString()));
 	}
 
 	@Test

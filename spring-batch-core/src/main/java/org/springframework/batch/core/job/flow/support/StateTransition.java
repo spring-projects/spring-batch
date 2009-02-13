@@ -18,6 +18,7 @@ package org.springframework.batch.core.job.flow.support;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.support.PatternMatcher;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -97,6 +98,10 @@ public class StateTransition implements Comparable<StateTransition> {
 		else {
 			this.pattern = pattern;
 		}
+
+		Assert.notNull(state, "A state is required for a StateTransition");
+		state.validate(next);
+
 		this.next = next;
 		this.state = state;
 	}

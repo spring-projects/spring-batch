@@ -47,7 +47,7 @@ public class StopJobParserTests extends AbstractJobParserTests {
 		assertEquals(1, stepNamesList.size());
 		assertTrue(stepNamesList.contains("s1"));
 
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");

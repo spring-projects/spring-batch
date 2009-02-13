@@ -343,7 +343,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());	
+		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());	
 			
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
@@ -439,7 +439,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
 		
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
@@ -488,7 +488,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
 		
 		// We added a bogus cache so no items are actually skipped
 		// because they aren't recognised as eligible

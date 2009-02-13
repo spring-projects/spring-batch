@@ -20,7 +20,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.batch.core.job.flow.support.StateTransition;
+import org.springframework.batch.core.job.flow.State;
 
 /**
  * @author Dave Syer
@@ -28,98 +28,100 @@ import org.springframework.batch.core.job.flow.support.StateTransition;
  */
 public class StateTransitionTests {
 
+	State state = new StateSupport("state1");
+	
 	@Test
 	public void testIsEnd() {
-		StateTransition transition = StateTransition.createEndStateTransition(null, "");
+		StateTransition transition = StateTransition.createEndStateTransition(state, "");
 		assertTrue(transition.isEnd());
 		assertNull(transition.getNext());
 	}
 
 	@Test
 	public void testMatchesStar() {
-		StateTransition transition = StateTransition.createStateTransition(null, "*", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
 	public void testMatchesNull() {
-		StateTransition transition = StateTransition.createStateTransition(null, null, "start");
+		StateTransition transition = StateTransition.createStateTransition(state, null, "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
 	public void testMatchesEmpty() {
-		StateTransition transition = StateTransition.createStateTransition(null, "", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
 	public void testMatchesExact() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CONTINUABLE", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
 	public void testMatchesWildcard() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CONTIN*", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN*", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
 	public void testMatchesPlaceholder() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CONTIN???LE", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		assertTrue(transition.matches("CONTINUABLE"));
 	}
 
 	@Test
 	public void testSimpleOrderingEqual() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CONTIN???LE", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		assertEquals(0, transition.compareTo(transition));
 	}
 
 	@Test
 	public void testSimpleOrderingMoreGeneral() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CONTIN???LE", "start");
-		StateTransition other = StateTransition.createStateTransition(null, "CONTINUABLE", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
+		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertEquals(1, transition.compareTo(other));
 		assertEquals(-1, other.compareTo(transition));
 	}
 
 	@Test
 	public void testSimpleOrderingMostGeneral() {
-		StateTransition transition = StateTransition.createStateTransition(null, "*", "start");
-		StateTransition other = StateTransition.createStateTransition(null, "CONTINUABLE", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
+		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertEquals(1, transition.compareTo(other));
 		assertEquals(-1, other.compareTo(transition));
 	}
 
 	@Test
 	public void testSubstringAndWildcard() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CONTIN*", "start");
-		StateTransition other = StateTransition.createStateTransition(null, "CONTINUABLE", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN*", "start");
+		StateTransition other = StateTransition.createStateTransition(state, "CONTINUABLE", "start");
 		assertEquals(1, transition.compareTo(other));
 		assertEquals(-1, other.compareTo(transition));
 	}
 
 	@Test
 	public void testSimpleOrderingMostToNextGeneral() {
-		StateTransition transition = StateTransition.createStateTransition(null, "*", "start");
-		StateTransition other = StateTransition.createStateTransition(null, "C?", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "*", "start");
+		StateTransition other = StateTransition.createStateTransition(state, "C?", "start");
 		assertEquals(1, transition.compareTo(other));
 		assertEquals(-1, other.compareTo(transition));
 	}
 
 	@Test
 	public void testSimpleOrderingAdjacent() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CON*", "start");
-		StateTransition other = StateTransition.createStateTransition(null, "CON?", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CON*", "start");
+		StateTransition other = StateTransition.createStateTransition(state, "CON?", "start");
 		assertEquals(1, transition.compareTo(other));
 		assertEquals(-1, other.compareTo(transition));
 	}
 
 	@Test
 	public void testToString() {
-		StateTransition transition = StateTransition.createStateTransition(null, "CONTIN???LE", "start");
+		StateTransition transition = StateTransition.createStateTransition(state, "CONTIN???LE", "start");
 		String string = transition.toString();
 		assertTrue("Wrong string: " + string, string.contains("Transition"));
 		assertTrue("Wrong string: " + string, string.contains("start"));

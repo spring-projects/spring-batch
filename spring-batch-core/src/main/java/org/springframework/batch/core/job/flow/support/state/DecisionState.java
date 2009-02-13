@@ -41,4 +41,13 @@ public class DecisionState extends AbstractState {
 		return new FlowExecutionStatus(decider.decide(executor.getJobExecution(), executor.getStepExecution()));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
+	 */
+	public void validate(String nextState) {
+		if (nextState == null) {
+			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
+					+ "] requires a 'next' state.");
+		}
+	}
 }

@@ -251,7 +251,7 @@ public class SimpleJobTests {
 		assertEquals(2, jobExecution.getAllFailureExceptions().size());
 		assertEquals(exception, jobExecution.getStepExecutions().iterator().next().getFailureExceptions().get(0));
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, ExitStatus.FAILED);
+		checkRepository(BatchStatus.INCOMPLETE, ExitStatus.FAILED);
 	}
 
 	@Test
@@ -265,8 +265,8 @@ public class SimpleJobTests {
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(0, list.size());
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		checkRepository(BatchStatus.INCOMPLETE, ExitStatus.FAILED);
 	}
 
 	@Test
@@ -283,7 +283,7 @@ public class SimpleJobTests {
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(1, list.size());
-		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
+		checkRepository(BatchStatus.INCOMPLETE, ExitStatus.FAILED);
 	}
 
 	@Test
@@ -297,7 +297,7 @@ public class SimpleJobTests {
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		assertEquals(exception, jobExecution.getAllFailureExceptions().get(0));
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, ExitStatus.FAILED);
+		checkRepository(BatchStatus.INCOMPLETE, ExitStatus.FAILED);
 	}
 
 	@Test
@@ -352,7 +352,7 @@ public class SimpleJobTests {
 		job.execute(jobExecution);
 
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
+		checkRepository(BatchStatus.FAILED, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
 	}
@@ -386,7 +386,7 @@ public class SimpleJobTests {
 		job.setJobExecutionListeners(new JobExecutionListener[] { listener });
 
 		job.execute(jobExecution);
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
 
 		verify(listener);
 	}
@@ -438,7 +438,7 @@ public class SimpleJobTests {
 
 		job.setSteps(Arrays.asList(new Step[] { step1, step2 }));
 		job.execute(jobExecution);
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getAllFailureExceptions().size());
 		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
 		assertTrue("Wrong exception " + expected, expected instanceof JobInterruptedException);
@@ -536,19 +536,19 @@ public class SimpleJobTests {
 
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setStatus(BatchStatus.INCOMPLETE);
 				stepExecution.addFailureException(exception);
 				return;
 			}
 			if (exception instanceof Error) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setStatus(BatchStatus.INCOMPLETE);
 				stepExecution.addFailureException(exception);
 				return;
 			}
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.STOPPED);
+				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.addFailureException(exception);
 				return;
 			}

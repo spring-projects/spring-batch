@@ -241,7 +241,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 				// The job was already stopped before we even got this far. Deal
 				// with it in the same way as any other interruption.
-				execution.setStatus(BatchStatus.STOPPED);
+				execution.setStatus(BatchStatus.FAILED);
 				execution.setExitStatus(ExitStatus.COMPLETED);
 
 			}
@@ -250,13 +250,13 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 		catch (JobInterruptedException e) {
 			logger.error("Encountered interruption executing job", e);
 			execution.setExitStatus(ExitStatus.FAILED);
-			execution.setStatus(BatchStatus.STOPPED);
+			execution.setStatus(BatchStatus.INCOMPLETE);
 			execution.addFailureException(e);
 		}
 		catch (Throwable t) {
 			logger.error("Encountered error executing job", t);
 			execution.setExitStatus(ExitStatus.FAILED);
-			execution.setStatus(BatchStatus.FAILED);
+			execution.setStatus(BatchStatus.INCOMPLETE);
 			execution.addFailureException(t);
 		}
 		finally {
@@ -293,7 +293,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @return the {@link StepExecution} corresponding to this step
 	 * 
 	 * @throws JobInterruptedException if the {@link JobExecution} has been
-	 * interrupted, and in particular if {@link BatchStatus#STOPPED} or
+	 * interrupted, and in particular if {@link BatchStatus#FAILED} or
 	 * {@link BatchStatus#STOPPING} is detected
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step
@@ -302,7 +302,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 */
 	protected final StepExecution handleStep(Step step, JobExecution execution) throws JobInterruptedException,
 			JobRestartException, StartLimitExceededException {
-		if (execution.getStatus() == BatchStatus.STOPPING || execution.getStatus() == BatchStatus.STOPPED) {
+		if (execution.getStatus() == BatchStatus.STOPPING || execution.getStatus() == BatchStatus.INCOMPLETE) {
 			throw new JobInterruptedException("JobExecution interrupted.");
 		}
 
@@ -331,7 +331,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 			jobRepository.updateExecutionContext(execution);
 
-			if (currentStepExecution.getStatus() == BatchStatus.STOPPED
+			if (currentStepExecution.getStatus() == BatchStatus.FAILED
 					|| currentStepExecution.getStatus() == BatchStatus.STOPPING) {
 				throw new JobInterruptedException("Job interrupted by step execution");
 			}
@@ -382,7 +382,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 					+ "so it may be dangerous to proceed.  " + "Manual intervention is probably necessary.");
 		}
 
-		if (stepStatus.isLessThanOrEqualTo(BatchStatus.COMPLETED) && step.isAllowStartIfComplete() == false) {
+		if ((stepStatus == BatchStatus.COMPLETED && step.isAllowStartIfComplete() == false) 
+				|| stepStatus == BatchStatus.FAILED) {
 			// step is complete, false should be returned, indicating that the
 			// step should not be started
 			return false;

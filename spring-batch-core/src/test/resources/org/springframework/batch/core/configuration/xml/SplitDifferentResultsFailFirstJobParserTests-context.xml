@@ -11,7 +11,10 @@
 	<job id="job">
 		<split id="split1">
 			<flow>
-				<step id="fail" ref="failingStep"/>
+				<step id="fail" ref="failingStep">
+					<fail on="FAILED"/>
+					<end on="*"/>
+				</step>
 			</flow>
 			<flow>
 				<step id="s1" ref="step1"/>

@@ -87,7 +87,7 @@ public class EndStateTests {
 	@Test
 	public void testHandleOngoingAttemptedDowngrade() throws Exception {
 
-		jobExecution.setStatus(BatchStatus.FAILED);
+		jobExecution.setStatus(BatchStatus.INCOMPLETE);
 		jobExecution.createStepExecution("foo");
 	
 		EndState state = new EndState(BatchStatus.COMPLETED, "end");
@@ -99,7 +99,7 @@ public class EndStateTests {
 		});
 		
 		// Can't downgrade a status - if it failed then it failed
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
 
 	}
 

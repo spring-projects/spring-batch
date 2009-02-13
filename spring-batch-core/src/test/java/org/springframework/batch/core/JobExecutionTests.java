@@ -113,9 +113,9 @@ public class JobExecutionTests {
 	 */
 	@Test
 	public void testDowngradeStatus() {
-		execution.setStatus(BatchStatus.FAILED);
+		execution.setStatus(BatchStatus.INCOMPLETE);
 		execution.upgradeStatus(BatchStatus.COMPLETED);
-		assertEquals(BatchStatus.FAILED, execution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, execution.getStatus());
 	}
 
 	/**

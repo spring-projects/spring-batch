@@ -44,15 +44,15 @@ public class DefaultFailureJobParserTests extends AbstractJobParserTests {
 		assertTrue(stepNamesList.contains("s1"));
 		assertTrue(stepNamesList.contains("fail"));
 
-		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
 		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
-		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
 
 	}

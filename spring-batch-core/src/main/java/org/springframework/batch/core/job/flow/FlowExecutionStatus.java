@@ -26,7 +26,7 @@ import org.springframework.batch.core.ExitStatus;
  */
 public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 
-	private final String status;
+	private final BatchStatus batchStatus;
 	private final ExitStatus exitStatus;
 
 	/**
@@ -38,7 +38,12 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	/**
 	 * Special well-known status value.
 	 */
-	public static final FlowExecutionStatus STOPPED = new FlowExecutionStatus(BatchStatus.STOPPED, ExitStatus.FAILED);
+	public static final FlowExecutionStatus STOPPED = new FlowExecutionStatus(BatchStatus.FAILED, ExitStatus.FAILED);
+
+	/**
+	 * Special well-known status value.
+	 */
+	public static final FlowExecutionStatus INCOMPLETE = new FlowExecutionStatus(BatchStatus.INCOMPLETE, ExitStatus.FAILED);
 
 	/**
 	 * Special well-known status value.
@@ -51,19 +56,11 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	public static final FlowExecutionStatus UNKNOWN = new FlowExecutionStatus(BatchStatus.UNKNOWN, ExitStatus.UNKNOWN);
 
 	/**
-	 * @param status
-	 */
-	public FlowExecutionStatus(String status) {
-		this(status, null);
-	}
-
-	/**
-	 * @param status
 	 * @param exitStatus
 	 */
-	public FlowExecutionStatus(String status, ExitStatus exitStatus) {
-		this.status = status;
-		this.exitStatus = exitStatus;
+	public FlowExecutionStatus(String exitStatus) {
+		this.batchStatus = null;
+		this.exitStatus = new ExitStatus(exitStatus);
 	}
 
 	/**
@@ -74,16 +71,8 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * @param exitStatus
 	 */
 	public FlowExecutionStatus(BatchStatus batchStatus, ExitStatus exitStatus) {
-		this(batchStatus.toString(), exitStatus);
-	}
-
-	/**
-	 * Convenience getter for the {@link BatchStatus}.
-	 * 
-	 * @return a {@link BatchStatus} representing the status
-	 */
-	public BatchStatus getBatchStatus() {
-		return BatchStatus.match(status);
+		this.batchStatus = batchStatus;
+		this.exitStatus = exitStatus;
 	}
 
 	/**
@@ -96,13 +85,13 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * @return negative, zero or positive as per the contract
 	 */
 	public int compareTo(FlowExecutionStatus other) {
-		BatchStatus one = this.getBatchStatus();
-		BatchStatus two = other.getBatchStatus();
-		int comparison = one.compareTo(two);
-		if (comparison == 0) {
-			return status.compareTo(other.getStatus());
+		if (batchStatus != null && other.getBatchStatus() != null) {
+			int order = batchStatus.compareTo(other.getBatchStatus());
+			if (order != 0) {
+				return order;
+			}
 		}
-		return comparison;
+		return exitStatus.compareTo(other.getExitStatus());		
 	}
 
 	/**
@@ -118,15 +107,15 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 			return false;
 		}
 		FlowExecutionStatus flowExecutionStatus = (FlowExecutionStatus) other;
-		return status.equals(flowExecutionStatus.getStatus());
+		return batchStatus.equals(flowExecutionStatus.getBatchStatus());
 	}
 
 	public String toString() {
-		return "FlowExecutionStatus: status=[" + status + "] exitstatus=[" + exitStatus + "]";
+		return "FlowExecutionStatus: status=[" + batchStatus + "] exitcode=[" + exitStatus.getExitCode() + "]";
 	}
 
-	public String getStatus() {
-		return status;
+	public BatchStatus getBatchStatus() {
+		return batchStatus;
 	}
 
 	public ExitStatus getExitStatus() {

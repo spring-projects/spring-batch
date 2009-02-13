@@ -99,11 +99,11 @@ public class ChunkMessageChannelItemWriter<T> extends StepExecutionListenerSuppo
 		}
 		catch (RuntimeException e) {
 			logger.debug("Detected failure waiting for results in step listener.", e);
-			stepExecution.setStatus(BatchStatus.FAILED);
+			stepExecution.setStatus(BatchStatus.INCOMPLETE);
 			return ExitStatus.FAILED.addExitDescription(e.getClass().getName() + ": " + e.getMessage());
 		}
 		if (timedOut) {
-			stepExecution.setStatus(BatchStatus.FAILED);
+			stepExecution.setStatus(BatchStatus.INCOMPLETE);
 			throw new ItemStreamException("Timed out waiting for back log at end of step");
 		}
 		return ExitStatus.COMPLETED.addExitDescription("Waited for " + expecting + " results.");

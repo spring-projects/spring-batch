@@ -194,7 +194,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			// Check if someone is trying to stop us
 			if (stepExecution.isTerminateOnly()) {
-				stepExecution.setStatus(BatchStatus.STOPPED);
+				stepExecution.setStatus(BatchStatus.FAILED);
 				throw new JobInterruptedException("JobExecution interrupted.");
 			}
 
@@ -263,10 +263,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			return BatchStatus.UNKNOWN;
 		}
 		else if (e instanceof JobInterruptedException || e.getCause() instanceof JobInterruptedException) {
-			return BatchStatus.STOPPED;
+			return BatchStatus.FAILED;
 		}
 		else {
-			return BatchStatus.FAILED;
+			return BatchStatus.INCOMPLETE;
 		}
 	}
 

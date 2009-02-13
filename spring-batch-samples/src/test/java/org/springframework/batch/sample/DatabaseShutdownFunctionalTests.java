@@ -69,7 +69,7 @@ public class DatabaseShutdownFunctionalTests extends AbstractBatchLauncherTests 
 		}
 		
 		assertFalse("Timed out waiting for job to end.", jobExecution.isRunning());
-		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
 
 	}
 	

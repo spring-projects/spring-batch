@@ -158,8 +158,9 @@ public class SimpleFlow implements Flow, InitializingBean {
 		}
 
 		String next = null;
+		String exitCode = status.getExitStatus().getExitCode();
 		for (StateTransition stateTransition : set) {
-			if (stateTransition.matches(status.getStatus())) {
+			if (stateTransition.matches(exitCode)) {
 				if (stateTransition.isEnd()) {
 					// End of job
 					return null;

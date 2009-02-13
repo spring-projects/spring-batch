@@ -114,7 +114,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		assertTrue("Timed out waiting for step to be interrupted.", count < 1000);
 		assertFalse(processingThread.isAlive());
-		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 
 	}
 
@@ -170,7 +170,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 
 		assertTrue("Timed out waiting for step to be interrupted.", count < 1000);
 		assertFalse(processingThread.isAlive());
-		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 
 	}
 
@@ -201,7 +201,7 @@ public class StepExecutorInterruptionTests extends TestCase {
 		step.execute(stepExecution);
 
 		assertEquals("Planned!", stepExecution.getFailureExceptions().get(0).getMessage());
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
 	}
 
 	/**

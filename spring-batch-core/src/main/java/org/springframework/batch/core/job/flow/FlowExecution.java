@@ -35,16 +35,6 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	}
 
 	/**
-	 * Convenience constructor that converts a String status to a {@link FlowExecutionStatus}.
-	 *
-	 * @param name
-	 * @param status
-	 */
-	public FlowExecution(String name, String status) {
-		this(name, new FlowExecutionStatus(status));
-	}
-
-	/**
 	 * @return the name of the end state reached
 	 */
 	public String getName() {
@@ -52,7 +42,7 @@ public class FlowExecution implements Comparable<FlowExecution> {
 	}
 
 	/**
-	 * @return the exit status
+	 * @return the FlowExecutionStatus
 	 */
 	public FlowExecutionStatus getStatus() {
 		return status;
