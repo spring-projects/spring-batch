@@ -38,11 +38,6 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	/**
 	 * Special well-known status value.
 	 */
-	public static final FlowExecutionStatus STOPPED = new FlowExecutionStatus(BatchStatus.FAILED, ExitStatus.FAILED);
-
-	/**
-	 * Special well-known status value.
-	 */
 	public static final FlowExecutionStatus INCOMPLETE = new FlowExecutionStatus(BatchStatus.INCOMPLETE, ExitStatus.FAILED);
 
 	/**

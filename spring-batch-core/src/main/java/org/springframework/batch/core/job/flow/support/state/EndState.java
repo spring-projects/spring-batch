@@ -58,7 +58,7 @@ public class EndState extends AbstractState {
 
 	/**
 	 * Return the {@link BatchStatus} and {@link ExitStatus} stored. If the
-	 * {@link BatchStatus} is {@link BatchStatus#FAILED}, then mark it on the
+	 * {@link BatchStatus} is {@link BatchStatus#INCOMPLETE}, then mark it on the
 	 * {@link JobExecution} so that the job will know to stop.
 	 * 
 	 * @see State#handle(FlowExecutor)
