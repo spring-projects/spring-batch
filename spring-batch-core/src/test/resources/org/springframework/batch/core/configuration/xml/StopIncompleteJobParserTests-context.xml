@@ -10,7 +10,7 @@
 
 	<job id="job">
 		<step id="fail" ref="failingStep">
-			<pause on="FAILED" to="s2"/>
+			<stop on="FAILED" restart="s2"/>
 		</step>
 		<step id="s2" ref="step2"/>
 	</job>

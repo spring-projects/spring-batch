@@ -588,7 +588,7 @@
 						</xsd:attribute>
 					</xsd:complexType>
 				</xsd:element>		
-				<xsd:element name="pause">
+				<xsd:element name="stop">
 					<xsd:annotation>
 						<xsd:documentation>
 							Declares job should be stop at this point and provides pointer where execution should continue when
@@ -601,9 +601,9 @@
 								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
 								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
 							</xsd:annotation></xsd:attribute>
-						<xsd:attribute name="to" type="xsd:string" use="required" >
+						<xsd:attribute name="restart" type="xsd:string" use="required" >
 							<xsd:annotation>
-								<xsd:documentation>The name of the step to go to next.  
+								<xsd:documentation>The name of the step to start on when the stopped job is restarted.  
 								Must resolve to one of the other steps in this job.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>

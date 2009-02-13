@@ -43,7 +43,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	private static final String NEXT = "next";
 	private static final String END = "end";
 	private static final String FAIL = "fail";
-	private static final String PAUSE = "pause";
+	private static final String STOP = "stop";
 
 	// For generating unique state names for end transitions
 	private static int endCounter = 0;
@@ -138,7 +138,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 		boolean transitionElementExists = false;
 		List<String> patterns = new ArrayList<String>();
-		for (String transitionName : new String[] { NEXT, PAUSE, END, FAIL }) {
+		for (String transitionName : new String[] { NEXT, STOP, END, FAIL }) {
 			@SuppressWarnings("unchecked")
 			List<Element> transitionElements = (List<Element>) DomUtils.getChildElementsByTagName(element,
 					transitionName);
@@ -194,6 +194,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		BatchStatus batchStatus = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
 		String onAttribute = transitionElement.getAttribute("on");
 		String nextAttribute = transitionElement.getAttribute("to");
+		nextAttribute = StringUtils.hasText(nextAttribute) ? nextAttribute : transitionElement.getAttribute("restart");
 		String statusAttribute = transitionElement.getAttribute("status");
 
 		return createTransition(batchStatus, onAttribute, nextAttribute, statusAttribute, stateDef, parserContext);
@@ -256,7 +257,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @return the BatchStatus corresponding to the transition name
 	 */
 	private static BatchStatus getBatchStatusFromEndTransitionName(String elementName) {
-		if (PAUSE.equals(elementName)) {
+		if (STOP.equals(elementName)) {
 			return BatchStatus.INCOMPLETE;
 		}
 		else if (END.equals(elementName)) {

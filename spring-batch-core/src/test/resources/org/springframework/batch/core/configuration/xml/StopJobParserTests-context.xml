@@ -10,7 +10,7 @@
 
 	<job id="job">
 		<step id="s1" ref="step1">
-			<pause on="COMPLETED" to="decision"/>
+			<stop on="COMPLETED" restart="decision"/>
 		</step>
 		<decision id="decision" decider="decider">
 			<next on="FOO" to="s2"/>
