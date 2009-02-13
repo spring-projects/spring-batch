@@ -50,6 +50,6 @@ public class StateSupport extends AbstractState {
 		return this.status;
 	}
 
-	public void validate(String nextState) {
+	public void validate(String pattern, String nextState) {
 	}
 }

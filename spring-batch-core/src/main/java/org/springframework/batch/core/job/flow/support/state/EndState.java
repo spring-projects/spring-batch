@@ -83,10 +83,14 @@ public class EndState extends AbstractState {
 	/* (non-Javadoc)
 	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
 	 */
-	public void validate(String nextState) {
+	public void validate(String pattern, String nextState) {
 		if (status != BatchStatus.INCOMPLETE && nextState != null) {
 			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
 					+ "] may not have a 'next' state.");
+		}
+		if (pattern != null) {
+			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
+					+ "] may not have a 'pattern'.");
 		}
 	}
 

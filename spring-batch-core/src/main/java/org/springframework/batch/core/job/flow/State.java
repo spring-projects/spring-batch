@@ -46,9 +46,10 @@ public interface State {
 	FlowExecutionStatus handle(FlowExecutor executor) throws Exception;
 
 	/**
-	 * Validate that the nextState is appropriate for this State.
+	 * Validate that the transition attributes are appropriate for this State.
 	 * 
+	 * @param pattern
 	 * @param nextState
 	 */
-	void validate(String nextState);
+	void validate(String pattern, String nextState);
 }

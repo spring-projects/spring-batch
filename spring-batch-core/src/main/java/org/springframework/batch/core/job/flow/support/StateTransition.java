@@ -100,7 +100,7 @@ public class StateTransition implements Comparable<StateTransition> {
 		}
 
 		Assert.notNull(state, "A state is required for a StateTransition");
-		state.validate(next);
+		state.validate(pattern, next);
 
 		this.next = next;
 		this.state = state;
