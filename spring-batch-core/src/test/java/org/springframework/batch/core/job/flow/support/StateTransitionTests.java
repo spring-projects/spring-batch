@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.springframework.batch.core.job.flow.State;
+import org.springframework.batch.core.job.flow.StateSupport;
 
 /**
  * @author Dave Syer
