@@ -57,7 +57,6 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserBeanNameTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopIncompleteJobParserTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopRestartOnFailedStepJobParserTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
