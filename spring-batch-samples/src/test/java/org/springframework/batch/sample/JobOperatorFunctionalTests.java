@@ -3,8 +3,6 @@ package org.springframework.batch.sample;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.batch.core.BatchStatus.STARTED;
-import static org.springframework.batch.core.BatchStatus.FAILED;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.configuration.ListableJobRegistry;
@@ -79,7 +78,7 @@ public class JobOperatorFunctionalTests {
 		Thread.sleep(1000);
 
 		assertTrue(tested.getRunningExecutions(job.getName()).contains(executionId));
-		assertTrue(tested.getSummary(executionId).contains(STARTED.toString()));
+		assertTrue(tested.getSummary(executionId).contains(BatchStatus.STARTED.toString()));
 
 		tested.stop(executionId);
 
@@ -91,12 +90,12 @@ public class JobOperatorFunctionalTests {
 		}
 
 		assertFalse(tested.getRunningExecutions(job.getName()).contains(executionId));
-		assertTrue(tested.getSummary(executionId).contains(FAILED.toString()));
+		assertTrue(tested.getSummary(executionId).contains(BatchStatus.INCOMPLETE.toString()));
 
 		// there is just a single step in the test job
 		Map<Long, String> summaries = tested.getStepExecutionSummaries(executionId);
 		assertEquals(1, summaries.size());
-		assertTrue(summaries.values().toString().contains(FAILED.toString()));
+		assertTrue(summaries.values().toString().contains(BatchStatus.INCOMPLETE.toString()));
 	}
 
 	@Test

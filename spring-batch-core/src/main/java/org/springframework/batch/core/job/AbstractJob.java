@@ -241,8 +241,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 				// The job was already stopped before we even got this far. Deal
 				// with it in the same way as any other interruption.
-				execution.setStatus(BatchStatus.FAILED);
-				execution.setExitStatus(ExitStatus.COMPLETED);
+				execution.setExitStatus(ExitStatus.FAILED);
+				execution.setStatus(BatchStatus.INCOMPLETE);
 
 			}
 
@@ -293,7 +293,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @return the {@link StepExecution} corresponding to this step
 	 * 
 	 * @throws JobInterruptedException if the {@link JobExecution} has been
-	 * interrupted, and in particular if {@link BatchStatus#FAILED} or
+	 * interrupted, and in particular if {@link BatchStatus#INCOMPLETE} or
 	 * {@link BatchStatus#STOPPING} is detected
 	 * @throws StartLimitExceededException if the start limit has been exceeded
 	 * for this step
@@ -331,8 +331,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 			jobRepository.updateExecutionContext(execution);
 
-			if (currentStepExecution.getStatus() == BatchStatus.FAILED
-					|| currentStepExecution.getStatus() == BatchStatus.STOPPING) {
+			if (currentStepExecution.getStatus() == BatchStatus.STOPPING) {
 				throw new JobInterruptedException("Job interrupted by step execution");
 			}
 

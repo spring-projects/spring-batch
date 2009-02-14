@@ -541,7 +541,7 @@ public class TaskletStepTests {
 		stepExecution.setExecutionContext(foobarEc);
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg,
 				"JobInterruptedException"));

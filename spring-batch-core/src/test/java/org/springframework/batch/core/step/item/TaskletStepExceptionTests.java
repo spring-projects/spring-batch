@@ -80,7 +80,7 @@ public class TaskletStepExceptionTests {
 	public void testInterrupted() throws Exception {
 		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new InterruptionListener() });
 		taskletStep.execute(stepExecution);
-		assertEquals(FAILED, stepExecution.getStatus());
+		assertEquals(INCOMPLETE, stepExecution.getStatus());
 	}
 
 	@Test

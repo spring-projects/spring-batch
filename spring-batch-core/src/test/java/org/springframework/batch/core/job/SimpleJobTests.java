@@ -352,7 +352,7 @@ public class SimpleJobTests {
 		job.execute(jobExecution);
 
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, ExitStatus.NOOP);
+		checkRepository(BatchStatus.INCOMPLETE, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
 	}
@@ -548,7 +548,7 @@ public class SimpleJobTests {
 			}
 			if (exception instanceof JobInterruptedException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
-				stepExecution.setStatus(BatchStatus.FAILED);
+				stepExecution.setStatus(BatchStatus.STOPPING);
 				stepExecution.addFailureException(exception);
 				return;
 			}
