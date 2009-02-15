@@ -136,6 +136,16 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		assertNotNull(props);
 		assertEquals(1.38, props.getDouble("value").doubleValue(), Double.MIN_VALUE);
 	}
+	
+	
+	public void testGetParametersWithRoundDouble() throws Exception {
+
+		String[] args = new String[] { "value(double)=1.0" };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertEquals((double) 1.0, props.getDouble("value").doubleValue(), Double.MIN_VALUE);
+	}
 
 	public void testGetProperties() throws Exception {
 
