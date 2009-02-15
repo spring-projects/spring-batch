@@ -1858,7 +1858,7 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/cursorExample.png"
-                     scale="80" scale="66%" />
+                     scale="80" width="66%" />
         </imageobject>
 
         <imageobject role="fo">
