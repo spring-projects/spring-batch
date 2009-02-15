@@ -108,13 +108,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 				propertiesBuilder.addLong(StringUtils.replace(key, LONG_TYPE, ""), result);
 			}
 			else if (key.endsWith(DOUBLE_TYPE)) {
-				Double result;
-				try {
-					result = (Double) parseNumber(value);
-				}
-				catch (ClassCastException ex) {
-					throw new IllegalArgumentException("Number format is invalid for double value: [" + value + "]");
-				}
+				Double result = parseNumber(value).doubleValue();
 				propertiesBuilder.addDouble(StringUtils.replace(key, DOUBLE_TYPE, ""), result);
 			}
 			else if (StringUtils.endsWithIgnoreCase(key, STRING_TYPE)) {
@@ -157,7 +151,7 @@ public class DefaultJobParametersConverter implements JobParametersConverter {
 		Map<String, JobParameter> parameters = params.getParameters();
 		Properties result = new Properties();
 		for (Entry<String, JobParameter> entry : parameters.entrySet()) {
-			
+
 			String key = entry.getKey();
 			JobParameter jobParameter = entry.getValue();
 			Object value = jobParameter.getValue();

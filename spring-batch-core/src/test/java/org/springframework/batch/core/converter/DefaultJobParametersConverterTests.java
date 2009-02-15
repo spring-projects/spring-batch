@@ -137,6 +137,14 @@ public class DefaultJobParametersConverterTests extends TestCase {
 		assertEquals(1.38, props.getDouble("value"), Double.MIN_VALUE);
 	}
 
+	public void testGetParametersWithRoundDouble() throws Exception {
+
+		String[] args = new String[] { "value(double)=1.0" };
+
+		JobParameters props = factory.getJobParameters(StringUtils.splitArrayElementsIntoProperties(args, "="));
+		assertNotNull(props);
+		assertEquals((double) 1.0, props.getDouble("value"), Double.MIN_VALUE);
+	}
 	public void testGetProperties() throws Exception {
 
 		JobParameters parameters = new JobParametersBuilder().addDate("schedule.date", dateFormat.parse("01/23/2008"))
