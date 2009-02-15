@@ -1858,13 +1858,13 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/cursorExample.png"
-                     scale="80" width="66%" />
+                     scale="60"/>
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center"
                      fileref="images/cursorExample.png"
-                     scale="60" width="66%" />
+                     scale="60" />
         </imageobject>
       </mediaobject>
 
