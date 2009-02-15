@@ -353,7 +353,7 @@
       <imageobject role="fo">
         <imagedata align="center"
                    fileref="images/job-launcher-sequence-sync.png" scale="70"
-                   scale="80" width="66%" />
+                   width="66%" />
       </imageobject>
     </mediaobject>
 
@@ -375,7 +375,7 @@
       <imageobject role="fo">
         <imagedata align="center"
                    fileref="images/job-launcher-sequence-async.png" scale="70"
-                   scale="80" width="66%" />
+                   width="66%" />
       </imageobject>
     </mediaobject>
 
@@ -590,7 +590,7 @@
 
     <mediaobject>
       <imageobject role="html">
-        <imagedata align="center" fileref="images/job-repository.png" scale=""
+        <imagedata align="center" fileref="images/job-repository.png"
                    width="40%" />
       </imageobject>
 
@@ -614,7 +614,7 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   scale="" width="65%" />
+                   width="65%" />
       </imageobject>
 
       <imageobject role="fo">

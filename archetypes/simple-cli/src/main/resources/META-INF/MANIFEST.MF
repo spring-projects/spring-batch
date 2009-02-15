@@ -7,7 +7,7 @@ Export-Package: example;version="2.0.0.CI-SNAPSHOT";uses:="org.springf
 Bundle-Classpath: .
 Bundle-Version: 2.0.0.CI-SNAPSHOT
 Built-By: dsyer
-Build-Jdk: 1.6.0_03
+Build-Jdk: 1.6.0_10
 Bundle-Name: Spring Batch Cammand Line Archetype
 Bundle-ManifestVersion: 2
 Created-By: Apache Maven
