@@ -66,4 +66,19 @@ public interface FlowExecutor {
 	 */
 	void updateStepExecutionStatus();
 
+	/**
+	 * Push a token onto a stack to indicate that the context is being nested.
+	 */
+	void nest();
+
+	/**
+	 * Pop a token off a stack to indicate that the context is being un-nested.
+	 */
+	void unnest();
+	
+	/**
+	 * @return indicate whether the execution context is nested
+	 */
+	boolean isNested();
+
 }

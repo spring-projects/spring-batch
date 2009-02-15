@@ -31,6 +31,8 @@ import org.springframework.batch.core.repository.JobRestartException;
  */
 public class JobFlowExecutorSupport implements FlowExecutor {
 
+	private volatile boolean nested = false;
+
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
 			StartLimitExceededException {
 		return ExitStatus.COMPLETED.getExitCode();
@@ -48,6 +50,18 @@ public class JobFlowExecutorSupport implements FlowExecutor {
 	}
 
 	public void updateStepExecutionStatus() {
+	}
+
+	public boolean isNested() {
+		return nested;
+	}
+
+	public void nest() {
+		nested= true;
+	}
+
+	public void unnest() {
+		nested = false;
 	}
 
 }

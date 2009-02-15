@@ -71,6 +71,10 @@ public class SplitState extends AbstractState {
 	@Override
 	public FlowExecutionStatus handle(final FlowExecutor executor) throws Exception {
 
+		try {
+			
+			executor.nest();
+			
 		// TODO: collect the last StepExecution from the flows as well, so they
 		// can be abandoned if necessary
 		Collection<Future<FlowExecution>> tasks = new ArrayList<Future<FlowExecution>>();
@@ -102,6 +106,10 @@ public class SplitState extends AbstractState {
 		}
 
 		return aggregator.aggregate(results);
+
+		} finally {
+			executor.unnest();
+		}
 
 	}
 

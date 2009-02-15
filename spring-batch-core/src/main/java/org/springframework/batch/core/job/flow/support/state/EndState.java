@@ -77,25 +77,25 @@ public class EndState extends AbstractState {
 				/*
 				 * If there are step executions, then we are not at the
 				 * beginning of a restart.
-				 * 
-				 * N.B. EndState has to be able to set the status directly, but
-				 * only because the internal flows inside SplitStates contain
-				 * EndState (which maybe they should not, since the JobExecution
-				 * is not ending).
 				 */
-				jobExecution.setStatus(status);
-				jobExecution.setExitStatus(exitStatus);
+				if (!executor.isNested()) {
+					jobExecution.setStatus(status);
+					jobExecution.setExitStatus(exitStatus);
+				}
 				if (status == BatchStatus.STOPPED) {
+					if (abandon) {
+						/*
+						 * Only if instructed to do so upgrade the status of
+						 * last step execution so it is not replayed on a
+						 * restart...
+						 */
+						executor.updateStepExecutionStatus();
+					}
 					/*
 					 * If we are in flight (not a restart) and we are supposed
 					 * to signal a stop, then make sure that happens
 					 * irrespective of the exit status.
 					 */
-					if (abandon) {
-						// Only if instructed to do so upgrade the status of
-						// last step execution...
-						executor.updateStepExecutionStatus();
-					}
 					return FlowExecutionStatus.STOPPED;
 				}
 			}

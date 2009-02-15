@@ -100,6 +100,8 @@ public class FlowJob extends AbstractJob {
 
 		private final JobExecution execution;
 
+		private volatile boolean nested = false;
+
 		/**
 		 * @param execution
 		 */
@@ -136,6 +138,18 @@ public class FlowJob extends AbstractJob {
 
 		public void close(FlowExecution result) {
 			stepExecutionHolder.set(null);
+		}
+
+		public boolean isNested() {
+			return nested;
+		}
+
+		public void nest() {
+			nested = true;
+		}
+
+		public void unnest() {
+			nested = false;
 		}
 
 	}
