@@ -8,12 +8,14 @@
 	
 	<job id="job">
 		<step id="s1" ref="taskletStep">
+			<!-- On normal step status: stop the job, but restart with the same step. -->
 			<stop on="COMPLETED" restart="s1"/>
 			<end on="*"/>
 		</step>
 	</job>
 
 	<beans:bean id="taskletStep" parent="step1">
+		<!-- On restart this step will be re-executed: effect is infinitely re-runnable job --> 
 		<beans:property name="allowStartIfComplete" value="true"/>
 	</beans:bean>
 

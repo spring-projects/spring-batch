@@ -41,20 +41,27 @@ import org.w3c.dom.NodeList;
 public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 	private static final String NEXT = "next";
+
 	private static final String END = "end";
+
 	private static final String FAIL = "fail";
+
 	private static final String STOP = "stop";
 
 	// For generating unique state names for end transitions
 	private static int endCounter = 0;
 
 	private final String flowName;
+
 	private final String jobRepositoryRef;
 
 	/**
-	 * Construct a {@link FlowParser} with the specified name and using the provided job repository ref.
+	 * Construct a {@link FlowParser} with the specified name and using the
+	 * provided job repository ref.
+	 * 
 	 * @param flowName the name of the flow
-	 * @param jobRepositoryRef the reference to the jobRepository from the enclosing tag
+	 * @param jobRepositoryRef the reference to the jobRepository from the
+	 * enclosing tag
 	 */
 	public FlowParser(String flowName, String jobRepositoryRef) {
 		this.flowName = flowName;
@@ -122,11 +129,26 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @param stateDef The bean definition for the current state
 	 * @param element the &lt;step/gt; element to parse
 	 * @return a collection of
-	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *         references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
 	 */
 	protected static Collection<BeanDefinition> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
 			Element element) {
+		return getNextElements(parserContext, null, stateDef, element);
+	}
+
+	/**
+	 * @param parserContext the parser context for the bean factory
+	 * @param stepId the id of the current state if it is a step state, null
+	 * otherwise
+	 * @param stateDef The bean definition for the current state
+	 * @param element the &lt;step/gt; element to parse
+	 * @return a collection of
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
+	 */
+	protected static Collection<BeanDefinition> getNextElements(ParserContext parserContext, String stepId,
+			BeanDefinition stateDef, Element element) {
 
 		Collection<BeanDefinition> list = new ArrayList<BeanDefinition>();
 
@@ -144,16 +166,16 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 					transitionName);
 			for (Element transitionElement : transitionElements) {
 				verifyUniquePattern(transitionElement, patterns, element, parserContext);
-				list.addAll(parseTransitionElement(transitionElement, stateDef, parserContext));
+				list.addAll(parseTransitionElement(transitionElement, stepId, stateDef, parserContext));
 				transitionElementExists = true;
 			}
 		}
 
 		if (!transitionElementExists) {
-			list.addAll(createTransition(BatchStatus.INCOMPLETE, ExitStatus.FAILED.getExitCode(), null, null,
-					stateDef, parserContext));
+			list.addAll(createTransition(BatchStatus.FAILED, ExitStatus.FAILED.getExitCode(), null, null, stateDef,
+					parserContext, false));
 			if (!hasNextAttribute) {
-				list.addAll(createTransition(BatchStatus.COMPLETED, null, null, null, stateDef, parserContext));
+				list.addAll(createTransition(BatchStatus.COMPLETED, null, null, null, stateDef, parserContext, false));
 			}
 		}
 		else if (hasNextAttribute) {
@@ -185,43 +207,50 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
 	 * @param a collection of
-	 *            {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *            references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
 	 */
-	private static Collection<BeanDefinition> parseTransitionElement(Element transitionElement,
+	private static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
 			BeanDefinition stateDef, ParserContext parserContext) {
 
 		BatchStatus batchStatus = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
 		String onAttribute = transitionElement.getAttribute("on");
 		String nextAttribute = transitionElement.getAttribute("to");
-		nextAttribute = StringUtils.hasText(nextAttribute) ? nextAttribute : transitionElement.getAttribute("restart");
+		String restartAttribute = transitionElement.getAttribute("restart");
+		nextAttribute = StringUtils.hasText(nextAttribute) ? nextAttribute : restartAttribute;
+		boolean abandon = false;
+		if (stateId != null && StringUtils.hasText(restartAttribute) && !restartAttribute.equals(stateId)) {
+			abandon = true;
+		}
 		String statusAttribute = transitionElement.getAttribute("status");
 
-		return createTransition(batchStatus, onAttribute, nextAttribute, statusAttribute, stateDef, parserContext);
+		return createTransition(batchStatus, onAttribute, nextAttribute, statusAttribute, stateDef, parserContext,
+				abandon);
 	}
 
 	/**
 	 * @param batchStatus The batch status that this transition will set. Use
-	 *            BatchStatus.UNKNOWN if not applicable.
+	 * BatchStatus.UNKNOWN if not applicable.
 	 * @param on The pattern that this transition should match. Use null for
-	 *            "no restriction" (same as "*").
+	 * "no restriction" (same as "*").
 	 * @param next The state to which this transition should go. Use null if not
-	 *            applicable.
+	 * applicable.
 	 * @param exitCode The exit code that this transition will set. Use null to
-	 *            default to batchStatus.
+	 * default to batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
 	 * @param a collection of
-	 *            {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *            references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
 	 */
 	private static Collection<BeanDefinition> createTransition(BatchStatus batchStatus, String on, String next,
-			String exitCode, BeanDefinition stateDef, ParserContext parserContext) {
+			String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
 
 		BeanDefinition endState = null;
 
-		if (batchStatus == BatchStatus.FAILED || batchStatus == BatchStatus.COMPLETED
-				|| batchStatus == BatchStatus.INCOMPLETE) {
+		// TODO: revise this for clarity
+		if (batchStatus == BatchStatus.STOPPED || batchStatus == BatchStatus.COMPLETED
+				|| batchStatus == BatchStatus.FAILED) {
 
 			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
@@ -231,8 +260,11 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 			endBuilder.addConstructorArgValue(exitCodeExists ? new ExitStatus(exitCode)
 					: convertToExitStatus(batchStatus));
 
-			String endName = "end" + (endCounter++);
+			String endName = (batchStatus == BatchStatus.STOPPED ? STOP : batchStatus == BatchStatus.FAILED ? FAIL : END)
+					+ (endCounter++);
 			endBuilder.addConstructorArgValue(endName);
+
+			endBuilder.addConstructorArgValue(abandon);
 
 			String nextOnEnd = exitCodeExists ? null : next;
 			endState = getStateTransitionReference(parserContext, endBuilder.getBeanDefinition(), null, nextOnEnd);
@@ -258,7 +290,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 */
 	private static BatchStatus getBatchStatusFromEndTransitionName(String elementName) {
 		if (STOP.equals(elementName)) {
-			return BatchStatus.INCOMPLETE;
+			return BatchStatus.STOPPED;
 		}
 		else if (END.equals(elementName)) {
 			return BatchStatus.COMPLETED;
@@ -276,7 +308,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @return the ExitStatus corresponding to the BatchStatus
 	 */
 	private static ExitStatus convertToExitStatus(BatchStatus batchStatus) {
-		if (batchStatus == BatchStatus.INCOMPLETE) {
+		if (batchStatus == BatchStatus.FAILED) {
 			return ExitStatus.FAILED;
 		}
 		else {
@@ -289,13 +321,14 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @param stateDefinition a reference to the state implementation
 	 * @param on the pattern value
 	 * @param next the next step id
-	 * @return a bean definition for a {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * @return a bean definition for a
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 */
 	public static BeanDefinition getStateTransitionReference(ParserContext parserContext,
 			BeanDefinition stateDefinition, String on, String next) {
 
-		BeanDefinitionBuilder nextBuilder = 
-			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.StateTransition");
+		BeanDefinitionBuilder nextBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.StateTransition");
 		nextBuilder.addConstructorArgValue(stateDefinition);
 
 		if (StringUtils.hasText(on)) {

@@ -159,7 +159,7 @@ public class SimpleStepFactoryBeanTests {
 		job.execute(jobExecution);
 		assertEquals("Error!", jobExecution.getAllFailureExceptions().get(0).getMessage());
 
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(0, written.size());
 		// provider should be at second item
 		assertEquals("bar", reader.read());
@@ -182,7 +182,7 @@ public class SimpleStepFactoryBeanTests {
 
 		job.execute(jobExecution);
 		assertEquals("Foo", jobExecution.getAllFailureExceptions().get(0).getMessage());
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 	}
 
 	@Test

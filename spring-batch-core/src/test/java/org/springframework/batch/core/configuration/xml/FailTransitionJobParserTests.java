@@ -17,7 +17,6 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +24,6 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -50,28 +48,27 @@ public class FailTransitionJobParserTests extends AbstractJobParserTests {
 		assertTrue(stepNamesList.contains("fail"));
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus().getExitCode());
+		assertEquals("EARLY TERMINATION (FAIL)", jobExecution.getExitStatus()
+				.getExitCode());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
 		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution2.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
+		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2
+				.getExitStatus().getExitCode());
 
 		//
 		// Second Launch
 		//
 		stepNamesList.clear();
-		try {
-			jobExecution = createJobExecution();
-			fail("JobInstanceAlreadyCompleteException expected");
-		} catch (JobInstanceAlreadyCompleteException e) {
-			//
-			// Expected
-			//
-		}
+		jobExecution = createJobExecution();
+		job.execute(jobExecution);
+		assertEquals(1, stepNamesList.size());
+		assertTrue(stepNamesList.contains("fail"));
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 
 	}
 

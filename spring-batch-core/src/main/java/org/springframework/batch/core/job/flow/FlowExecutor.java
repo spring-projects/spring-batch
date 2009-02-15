@@ -32,13 +32,15 @@ import org.springframework.batch.core.repository.JobRestartException;
 public interface FlowExecutor {
 
 	/**
-	 * @param step a {@link Step} to execute
+	 * @param step
+	 *            a {@link Step} to execute
 	 * @return the exit status that drives the surrounding {@link Flow}
 	 * @throws StartLimitExceededException
 	 * @throws JobRestartException
 	 * @throws JobInterruptedException
 	 */
-	String executeStep(Step step) throws JobInterruptedException, JobRestartException, StartLimitExceededException;
+	String executeStep(Step step) throws JobInterruptedException,
+			JobRestartException, StartLimitExceededException;
 
 	/**
 	 * @return the current {@link JobExecution}
@@ -49,11 +51,19 @@ public interface FlowExecutor {
 	 * @return the latest {@link StepExecution} or null if there is none
 	 */
 	StepExecution getStepExecution();
-	
+
 	/**
-	 * Chance to clean up resources at the end of a flow (whether it completed successfully or not).
-	 * @param result the final {@link FlowExecution}
+	 * Chance to clean up resources at the end of a flow (whether it completed
+	 * successfully or not).
+	 * 
+	 * @param result
+	 *            the final {@link FlowExecution}
 	 */
 	void close(FlowExecution result);
+
+	/**
+	 * Handle any status changes that might be needed at the start of a state.
+	 */
+	void updateStepExecutionStatus();
 
 }

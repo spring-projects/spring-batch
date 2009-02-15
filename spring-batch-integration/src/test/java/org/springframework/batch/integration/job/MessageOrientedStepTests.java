@@ -105,7 +105,7 @@ public class MessageOrientedStepTests {
 		step.setPollingInterval(100);
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Wrong message: " + message, message.contains("StepExecutionTimeoutException"));
@@ -134,7 +134,7 @@ public class MessageOrientedStepTests {
 		});
 		StepExecution stepExecution = jobExecution.createStepExecution(step.getName());
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Wrong message: " + message, message.contains("Planned failure"));

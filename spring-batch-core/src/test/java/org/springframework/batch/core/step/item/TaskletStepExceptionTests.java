@@ -7,8 +7,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.batch.core.BatchStatus.COMPLETED;
-import static org.springframework.batch.core.BatchStatus.INCOMPLETE;
 import static org.springframework.batch.core.BatchStatus.FAILED;
+import static org.springframework.batch.core.BatchStatus.STOPPED;
 import static org.springframework.batch.core.BatchStatus.UNKNOWN;
 
 import org.junit.Before;
@@ -73,14 +73,14 @@ public class TaskletStepExceptionTests {
 	public void testApplicationException() throws Exception {
 
 		taskletStep.execute(stepExecution);
-		assertEquals(INCOMPLETE, stepExecution.getStatus());
+		assertEquals(FAILED, stepExecution.getStatus());
 	}
 
 	@Test
 	public void testInterrupted() throws Exception {
 		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new InterruptionListener() });
 		taskletStep.execute(stepExecution);
-		assertEquals(INCOMPLETE, stepExecution.getStatus());
+		assertEquals(STOPPED, stepExecution.getStatus());
 	}
 
 	@Test
@@ -94,7 +94,7 @@ public class TaskletStepExceptionTests {
 		} });
 
 		taskletStep.execute(stepExecution);
-		assertEquals(INCOMPLETE, stepExecution.getStatus());
+		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
 		assertEquals(2, jobRepository.getUpdateCount());
 	}
@@ -110,7 +110,7 @@ public class TaskletStepExceptionTests {
 			}
 		} });
 		taskletStep.execute(stepExecution);
-		assertEquals(INCOMPLETE, stepExecution.getStatus());
+		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
 		assertEquals(2, jobRepository.getUpdateCount());
 	}
@@ -152,7 +152,7 @@ public class TaskletStepExceptionTests {
 			}
 		} });
 		taskletStep.execute(stepExecution);
-		assertEquals(INCOMPLETE, stepExecution.getStatus());
+		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
 		assertFalse(stepExecution.getFailureExceptions().contains(exception));
 		assertEquals(2, jobRepository.getUpdateCount());
@@ -170,7 +170,7 @@ public class TaskletStepExceptionTests {
 		} });
 
 		taskletStep.execute(stepExecution);
-		assertEquals(INCOMPLETE, stepExecution.getStatus());
+		assertEquals(FAILED, stepExecution.getStatus());
 		assertTrue(stepExecution.getFailureExceptions().contains(taskletException));
 		assertTrue(stepExecution.getFailureExceptions().contains(exception));
 		assertEquals(2, jobRepository.getUpdateCount());

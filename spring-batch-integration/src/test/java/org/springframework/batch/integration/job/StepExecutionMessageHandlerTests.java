@@ -123,7 +123,7 @@ public class StepExecutionMessageHandlerTests {
 		JobRepositorySupport jobRepository = new JobRepositorySupport();
 		StepExecutionMessageHandler handler = createHandler(jobRepository);
 		JobExecution jobExecution = jobRepository.createJobExecution("job", new JobParameters());
-		jobExecution.setStatus(BatchStatus.INCOMPLETE);
+		jobExecution.setStatus(BatchStatus.FAILED);
 		JobExecutionRequest message = handler.handle(new JobExecutionRequest(jobExecution));
 		assertEquals(0, message.getJobExecution().getStepExecutions().size());
 	}
@@ -134,7 +134,7 @@ public class StepExecutionMessageHandlerTests {
 			@Override
 			public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
 				StepExecution stepExecution = new StepExecution(stepName, new JobExecution(jobInstance));
-				stepExecution.setStatus(BatchStatus.INCOMPLETE);
+				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.setExecutionContext(new ExecutionContext() {
 					{
 						put("foo", "bar");
@@ -205,7 +205,7 @@ public class StepExecutionMessageHandlerTests {
 		assertNotNull(message);
 		assertEquals(1, jobExecution.getStepExecutions().size());
 		JobExecutionRequest payload = message;
-		assertEquals(BatchStatus.INCOMPLETE, payload.getStatus());
+		assertEquals(BatchStatus.FAILED, payload.getStatus());
 		assertTrue(payload.hasErrors());
 		Throwable error = payload.getLastThrowable();
 		assertTrue(error instanceof StartLimitExceededException);

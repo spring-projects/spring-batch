@@ -286,9 +286,9 @@ public class StepExecutionTests {
 	 */
 	@Test
 	public void testDowngradeStatus() {
-		execution.setStatus(BatchStatus.INCOMPLETE);
+		execution.setStatus(BatchStatus.FAILED);
 		execution.upgradeStatus(BatchStatus.COMPLETED);
-		assertEquals(BatchStatus.INCOMPLETE, execution.getStatus());
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
 	}
 
 	private StepExecution newStepExecution(Step step, Long long2) {

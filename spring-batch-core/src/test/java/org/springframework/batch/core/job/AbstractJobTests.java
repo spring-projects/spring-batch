@@ -140,7 +140,7 @@ public class AbstractJobTests {
 
 		// simulate restart and check the job execution context's content survives
 		execution.setEndTime(new Date());
-		execution.setStatus(BatchStatus.INCOMPLETE);
+		execution.setStatus(BatchStatus.FAILED);
 		repository.update(execution);
 
 		JobExecution restarted = repository.createJobExecution("testHandleStepJob", new JobParameters());

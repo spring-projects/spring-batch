@@ -113,10 +113,10 @@ public class SimpleJobRepositoryIntegrationTests {
 		// first execution failed
 		firstJobExec.setStartTime(new Date(4));
 		firstStepExec.setStartTime(new Date(5));
-		firstStepExec.setStatus(BatchStatus.INCOMPLETE);
+		firstStepExec.setStatus(BatchStatus.FAILED);
 		firstStepExec.setEndTime(new Date(6));
 		jobRepository.update(firstStepExec);
-		firstJobExec.setStatus(BatchStatus.INCOMPLETE);
+		firstJobExec.setStatus(BatchStatus.FAILED);
 		firstJobExec.setEndTime(new Date(7));
 		jobRepository.update(firstJobExec);
 
@@ -182,7 +182,7 @@ public class SimpleJobRepositoryIntegrationTests {
 	@Test
 	public void testGetLastJobExecution() throws Exception {
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), jobParameters);
-		jobExecution.setStatus(BatchStatus.INCOMPLETE);
+		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.setEndTime(new Date());
 		jobRepository.update(jobExecution);
 		Thread.sleep(10);

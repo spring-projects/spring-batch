@@ -136,7 +136,7 @@ public class StepExecutionMessageHandler {
 	 * @return
 	 */
 	private boolean isComplete(JobExecutionRequest request) {
-		return request.getStatus() == BatchStatus.INCOMPLETE || request.getStatus() == BatchStatus.FAILED
+		return request.getStatus() == BatchStatus.FAILED || request.getStatus() == BatchStatus.ABANDONED
 				|| request.getStatus() == BatchStatus.STOPPING;
 	}
 
@@ -146,7 +146,7 @@ public class StepExecutionMessageHandler {
 	 */
 	private void handleFailure(JobExecutionRequest request, Throwable e) {
 		request.registerThrowable(e);
-		request.setStatus(BatchStatus.INCOMPLETE);
+		request.setStatus(BatchStatus.FAILED);
 	}
 
 	/*

@@ -71,6 +71,8 @@ public class SplitState extends AbstractState {
 	@Override
 	public FlowExecutionStatus handle(final FlowExecutor executor) throws Exception {
 
+		// TODO: collect the last StepExecution from the flows as well, so they
+		// can be abandoned if necessary
 		Collection<Future<FlowExecution>> tasks = new ArrayList<Future<FlowExecution>>();
 
 		for (final Flow flow : flows) {
@@ -103,8 +105,11 @@ public class SplitState extends AbstractState {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.job.flow.State#validate(java.lang.String)
 	 */
 	public void validate(String pattern, String nextState) {
 		if (nextState == null) {

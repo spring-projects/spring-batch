@@ -15,59 +15,60 @@
  */
 package org.springframework.batch.core.job.flow;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 
 /**
  * This class is used as a holder for a BatchStatus/ExitStatus pair.
  * 
  * @author Dan Garrette
+ * @author Dave Syer
  * @since 2.0
  */
 public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 
-	private final BatchStatus batchStatus;
-	private final ExitStatus exitStatus;
+	/**
+	 * Special well-known status value.
+	 */
+	public static final FlowExecutionStatus COMPLETED = new FlowExecutionStatus(Status.COMPLETED.toString());
 
 	/**
 	 * Special well-known status value.
 	 */
-	public static final FlowExecutionStatus COMPLETED = new FlowExecutionStatus(BatchStatus.COMPLETED,
-			ExitStatus.COMPLETED);
+	public static final FlowExecutionStatus STOPPED = new FlowExecutionStatus(Status.STOPPED.toString());
 
 	/**
 	 * Special well-known status value.
 	 */
-	public static final FlowExecutionStatus INCOMPLETE = new FlowExecutionStatus(BatchStatus.INCOMPLETE, ExitStatus.FAILED);
+	public static final FlowExecutionStatus FAILED = new FlowExecutionStatus(Status.FAILED.toString());
 
 	/**
 	 * Special well-known status value.
 	 */
-	public static final FlowExecutionStatus FAILED = new FlowExecutionStatus(BatchStatus.FAILED, ExitStatus.FAILED);
+	public static final FlowExecutionStatus UNKNOWN = new FlowExecutionStatus(Status.UNKNOWN.toString());
+
+	private final String status;
+
+	private enum Status {
+
+		COMPLETED, STOPPED, FAILED, UNKNOWN;
+
+		static Status match(String value) {
+			for (int i = 0; i < values().length; i++) {
+				Status status = values()[i];
+				if (value.startsWith(status.toString())) {
+					return status;
+				}
+			}
+			// Default match should be the lowest priority
+			return COMPLETED;
+		}
+
+	};
 
 	/**
-	 * Special well-known status value.
+	 * @param status
 	 */
-	public static final FlowExecutionStatus UNKNOWN = new FlowExecutionStatus(BatchStatus.UNKNOWN, ExitStatus.UNKNOWN);
-
-	/**
-	 * @param exitStatus
-	 */
-	public FlowExecutionStatus(String exitStatus) {
-		this.batchStatus = null;
-		this.exitStatus = new ExitStatus(exitStatus);
-	}
-
-	/**
-	 * Convenience constructor that accepts a {@link BatchStatus} and
-	 * {@link ExitStatus}.
-	 * 
-	 * @param batchStatus
-	 * @param exitStatus
-	 */
-	public FlowExecutionStatus(BatchStatus batchStatus, ExitStatus exitStatus) {
-		this.batchStatus = batchStatus;
-		this.exitStatus = exitStatus;
+	public FlowExecutionStatus(String status) {
+		this.status = status;
 	}
 
 	/**
@@ -80,13 +81,13 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * @return negative, zero or positive as per the contract
 	 */
 	public int compareTo(FlowExecutionStatus other) {
-		if (batchStatus != null && other.getBatchStatus() != null) {
-			int order = batchStatus.compareTo(other.getBatchStatus());
-			if (order != 0) {
-				return order;
-			}
+		Status one = Status.match(this.status);
+		Status two = Status.match(other.status);
+		int comparison = one.compareTo(two);
+		if (comparison == 0) {
+			return this.status.compareTo(other.status);
 		}
-		return exitStatus.compareTo(other.getExitStatus());		
+		return comparison;
 	}
 
 	/**
@@ -94,26 +95,23 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
-	public boolean equals(Object other) {
-		if (other == this) {
+	public boolean equals(Object object) {
+		if (object == this) {
 			return true;
 		}
-		if (!(other instanceof FlowExecutionStatus)) {
+		if (!(object instanceof FlowExecutionStatus)) {
 			return false;
 		}
-		FlowExecutionStatus flowExecutionStatus = (FlowExecutionStatus) other;
-		return batchStatus.equals(flowExecutionStatus.getBatchStatus());
+		FlowExecutionStatus other = (FlowExecutionStatus) object;
+		return status.equals(other.status);
 	}
 
 	public String toString() {
-		return "FlowExecutionStatus: status=[" + batchStatus + "] exitcode=[" + exitStatus.getExitCode() + "]";
+		return "FlowExecutionStatus: " + status;
 	}
 
-	public BatchStatus getBatchStatus() {
-		return batchStatus;
+	public String getStatus() {
+		return status;
 	}
 
-	public ExitStatus getExitStatus() {
-		return exitStatus;
-	}
 }

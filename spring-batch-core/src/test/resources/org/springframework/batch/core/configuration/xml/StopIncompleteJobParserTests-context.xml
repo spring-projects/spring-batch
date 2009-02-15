@@ -6,8 +6,6 @@
 
 	<beans:import resource="common-context.xml" />
 	
-	<beans:bean id="decider" class="org.springframework.batch.core.configuration.xml.StopJobParserTests$TestDecider"/>
-
 	<job id="job">
 		<step id="fail" ref="failingStep">
 			<stop on="FAILED" restart="s2"/>

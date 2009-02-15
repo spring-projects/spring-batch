@@ -24,7 +24,6 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -34,10 +33,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
-public class StopJobParserTests extends AbstractJobParserTests {
+public class StopAndRestartJobParserTests extends AbstractJobParserTests {
 
 	@Test
-	public void testStopState() throws Exception {
+	public void testStopIncomplete() throws Exception {
 
 		//
 		// First Launch
@@ -52,7 +51,7 @@ public class StopJobParserTests extends AbstractJobParserTests {
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());
-		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
+		assertEquals(ExitStatus.COMPLETED.getExitCode(), stepExecution1.getExitStatus().getExitCode());
 
 		//
 		// Second Launch
@@ -70,12 +69,6 @@ public class StopJobParserTests extends AbstractJobParserTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.COMPLETED, stepExecution2.getExitStatus());
 
-	}
-
-	public static class TestDecider implements JobExecutionDecider {
-		public String decide(JobExecution jobExecution, StepExecution stepExecution) {
-			return "FOO";
-		}
 	}
 
 }

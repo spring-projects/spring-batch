@@ -184,7 +184,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		dao.saveStepExecution(stepExecution);
 		Integer versionAfterSave = stepExecution.getVersion();
 
-		stepExecution.setStatus(BatchStatus.FAILED);
+		stepExecution.setStatus(BatchStatus.ABANDONED);
 		stepExecution.setLastUpdated(new Date(System.currentTimeMillis()));
 		dao.updateStepExecution(stepExecution);
 		assertEquals(versionAfterSave + 1, stepExecution.getVersion().intValue());
@@ -192,7 +192,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		StepExecution retrieved = dao.getStepExecution(jobExecution, stepExecution.getId());
 		assertEquals(stepExecution, retrieved);
 		assertEquals(stepExecution.getLastUpdated(), retrieved.getLastUpdated());
-		assertEquals(BatchStatus.FAILED, retrieved.getStatus());
+		assertEquals(BatchStatus.ABANDONED, retrieved.getStatus());
 	}
 
 	/**

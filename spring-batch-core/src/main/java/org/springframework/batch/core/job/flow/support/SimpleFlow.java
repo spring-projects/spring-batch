@@ -121,7 +121,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 		State state = stateMap.get(stateName);
 
 		// Terminate if there are no more states
-		while (state != null) {
+		while (state != null && status!=FlowExecutionStatus.STOPPED) {
 
 			stateName = state.getName();
 
@@ -158,7 +158,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 		}
 
 		String next = null;
-		String exitCode = status.getExitStatus().getExitCode();
+		String exitCode = status.getStatus();
 		for (StateTransition stateTransition : set) {
 			if (stateTransition.matches(exitCode)) {
 				if (stateTransition.isEnd()) {

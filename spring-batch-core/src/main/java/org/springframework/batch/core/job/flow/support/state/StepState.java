@@ -52,6 +52,7 @@ public class StepState extends AbstractState implements StepHolder {
 
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
+		executor.updateStepExecutionStatus();
 		return new FlowExecutionStatus(executor.executeStep(step));
 	}
 

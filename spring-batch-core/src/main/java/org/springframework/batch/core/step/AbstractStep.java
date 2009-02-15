@@ -34,6 +34,7 @@ import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
@@ -189,12 +190,15 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			getCompositeListener().beforeStep(stepExecution);
 			open(stepExecution.getExecutionContext());
 
-			doExecute(stepExecution);
+			try {
+				doExecute(stepExecution);
+			} catch (RepeatException e) {
+				throw e.getCause();
+			}
 			exitStatus = stepExecution.getExitStatus();
 
 			// Check if someone is trying to stop us
 			if (stepExecution.isTerminateOnly()) {
-				stepExecution.setStatus(BatchStatus.INCOMPLETE);
 				throw new JobInterruptedException("JobExecution interrupted.");
 			}
 
@@ -263,10 +267,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			return BatchStatus.UNKNOWN;
 		}
 		else if (e instanceof JobInterruptedException || e.getCause() instanceof JobInterruptedException) {
-			return BatchStatus.INCOMPLETE;
+			return BatchStatus.STOPPED;
 		}
 		else {
-			return BatchStatus.INCOMPLETE;
+			return BatchStatus.FAILED;
 		}
 	}
 
@@ -321,7 +325,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	private ExitStatus getDefaultExitStatusForFailure(Throwable ex) {
 		ExitStatus exitStatus;
 		if (ex instanceof JobInterruptedException || ex.getCause() instanceof JobInterruptedException) {
-			exitStatus = ExitStatus.INTERRUPTED.addExitDescription(JobInterruptedException.class.getName());
+			exitStatus = ExitStatus.STOPPED.addExitDescription(JobInterruptedException.class.getName());
 		}
 		else if (ex instanceof NoSuchJobException || ex.getCause() instanceof NoSuchJobException) {
 			exitStatus = new ExitStatus(ExitCodeMapper.NO_SUCH_JOB, ex.getClass().getName());

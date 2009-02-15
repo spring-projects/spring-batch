@@ -37,7 +37,7 @@ public enum BatchStatus {
 	 * steps that have finished processing, but were not successful, and where
 	 * they should be skipped on a restart (so FAILED is the wrong status).
 	 */
-	COMPLETED, STARTING, STARTED, FAILED, INCOMPLETE, STOPPING, UNKNOWN;
+	COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED, UNKNOWN;
 
 	public static BatchStatus max(BatchStatus status1, BatchStatus status2) {
 		if (status1.isLessThan(status2)) {
@@ -66,7 +66,7 @@ public enum BatchStatus {
 	 * @return true if the status is FAILED or greater
 	 */
 	public boolean isUnsuccessful() {
-		return this == INCOMPLETE || this.isGreaterThan(INCOMPLETE);
+		return this == FAILED || this.isGreaterThan(FAILED);
 	}
 
 	/**

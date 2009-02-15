@@ -47,4 +47,7 @@ public class JobFlowExecutorSupport implements FlowExecutor {
 	public void close(FlowExecution result) {
 	}
 
+	public void updateStepExecutionStatus() {
+	}
+
 }

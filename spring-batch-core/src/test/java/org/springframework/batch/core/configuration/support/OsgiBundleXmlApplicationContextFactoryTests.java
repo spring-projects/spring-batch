@@ -46,7 +46,7 @@ public class OsgiBundleXmlApplicationContextFactoryTests {
 		expect(bundleContext.getBundle()).andReturn(bundle).anyTimes();
 		replay(bundleContext, bundle);
 		factory.setBundleContext(bundleContext);
-		// TODO: finish this...
+		// TODO: mock out the OSGi bundle resource...
 		// factory.createApplicationContext();
 		verify(bundleContext, bundle);
 	}

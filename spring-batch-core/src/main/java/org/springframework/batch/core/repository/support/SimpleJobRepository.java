@@ -114,7 +114,7 @@ public class SimpleJobRepository implements JobRepository {
 				}
 				
 				BatchStatus status = execution.getStatus();
-				if (status == BatchStatus.COMPLETED || status == BatchStatus.FAILED) {
+				if (status == BatchStatus.COMPLETED || status == BatchStatus.ABANDONED) {
 					throw new JobInstanceAlreadyCompleteException(
 							"A job instance already exists and is complete for parameters=" + jobParameters
 									+ ".  If you want to run this job again, change the parameters.");
@@ -237,7 +237,7 @@ public class SimpleJobRepository implements JobRepository {
 	private void checkForInterruption(StepExecution stepExecution) {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		jobExecutionDao.synchronizeStatus(jobExecution);
-		if (jobExecution.getStatus() == BatchStatus.STOPPING) {
+		if (jobExecution.isStopping()) {
 			stepExecution.setTerminateOnly();
 		}
 	}

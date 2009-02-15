@@ -122,7 +122,7 @@ public class TaskExecutorPartitionHandler implements PartitionHandler, Initializ
 				 * Set the status in case the caller is tracking it through the
 				 * JobExecution.
 				 */
-				stepExecution.setStatus(BatchStatus.INCOMPLETE);
+				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.setExitStatus(exitStatus);
 				result.add(stepExecution);
 			}

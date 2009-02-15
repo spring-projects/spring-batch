@@ -27,6 +27,7 @@ public class DummyItemWriter implements ItemWriter<Object> {
 
 	public void write(List<? extends Object> item) throws Exception {
 		// NO-OP
+		Thread.sleep(500);
 	}
 
 }

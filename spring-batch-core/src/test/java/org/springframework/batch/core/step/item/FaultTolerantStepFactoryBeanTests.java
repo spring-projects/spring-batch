@@ -112,7 +112,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("Non-skippable exception during read"));
 
@@ -141,7 +141,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(1, reader.processed.size());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("non-skippable exception"));
@@ -335,7 +335,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 
 		assertEquals(3, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
@@ -374,7 +374,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 
 		// listeners are called only once chunk is about to commit, so
@@ -408,7 +408,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("oops", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(0, stepExecution.getReadSkipCount());
@@ -521,7 +521,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals("bad skip count", 3, stepExecution.getSkipCount());
 		assertEquals("bad read skip count", 2, stepExecution.getReadSkipCount());
 		assertEquals("bad write skip count", 1, stepExecution.getWriteSkipCount());

@@ -88,7 +88,7 @@ public class PartitionStepTests {
 					throws Exception {
 				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
 				for (StepExecution execution : executions) {
-					execution.setStatus(BatchStatus.INCOMPLETE);
+					execution.setStatus(BatchStatus.FAILED);
 					execution.setExitStatus(ExitStatus.FAILED);
 				}
 				return executions;
@@ -101,7 +101,7 @@ public class PartitionStepTests {
 		step.execute(stepExecution);
 		// one master and two workers
 		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 	}
 
 }

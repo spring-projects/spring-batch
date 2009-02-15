@@ -20,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
@@ -47,7 +48,7 @@ public class EndStateTests {
 
 		BatchStatus status = jobExecution.getStatus();
 	
-		EndState state = new EndState(BatchStatus.UNKNOWN, "end");
+		EndState state = new EndState(BatchStatus.UNKNOWN, ExitStatus.UNKNOWN, "end");
 		state.handle(new JobFlowExecutorSupport() {
 			@Override
 			public JobExecution getJobExecution() {
@@ -68,7 +69,7 @@ public class EndStateTests {
 
 		jobExecution.createStepExecution("foo");
 	
-		EndState state = new EndState(BatchStatus.UNKNOWN, "end");
+		EndState state = new EndState(BatchStatus.UNKNOWN, ExitStatus.UNKNOWN, "end");
 		state.handle(new JobFlowExecutorSupport() {
 			@Override
 			public JobExecution getJobExecution() {
@@ -76,7 +77,7 @@ public class EndStateTests {
 			}
 		});
 		
-		assertEquals(BatchStatus.STARTING, jobExecution.getStatus());
+		assertEquals(BatchStatus.UNKNOWN, jobExecution.getStatus());
 
 	}
 
@@ -87,10 +88,10 @@ public class EndStateTests {
 	@Test
 	public void testHandleOngoingAttemptedDowngrade() throws Exception {
 
-		jobExecution.setStatus(BatchStatus.INCOMPLETE);
+		jobExecution.setStatus(BatchStatus.FAILED);
 		jobExecution.createStepExecution("foo");
 	
-		EndState state = new EndState(BatchStatus.COMPLETED, "end");
+		EndState state = new EndState(BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end");
 		state.handle(new JobFlowExecutorSupport() {
 			@Override
 			public JobExecution getJobExecution() {
@@ -98,8 +99,8 @@ public class EndStateTests {
 			}
 		});
 		
-		// Can't downgrade a status - if it failed then it failed
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		// An EndState can downgrade a status - if it failed then it can be unfailed
+		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 	}
 

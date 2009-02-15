@@ -541,7 +541,7 @@ public class TaskletStepTests {
 		stepExecution.setExecutionContext(foobarEc);
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg,
 				"JobInterruptedException"));
@@ -565,7 +565,7 @@ public class TaskletStepTests {
 		// step.setLastExecution(stepExecution);
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		// The original rollback was caused by this one:
 		assertEquals("Foo", stepExecution.getFailureExceptions().get(0).getMessage());
 	}
@@ -588,7 +588,7 @@ public class TaskletStepTests {
 		// step.setLastExecution(stepExecution);
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		// The original rollback was caused by this one:
 		assertEquals("Foo", stepExecution.getFailureExceptions().get(0).getMessage());
 	}
@@ -723,7 +723,7 @@ public class TaskletStepTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		Throwable expected = stepExecution.getFailureExceptions().get(0);
 		assertEquals("CRASH!", expected.getMessage());
 		assertFalse(stepExecution.getExecutionContext().isEmpty());

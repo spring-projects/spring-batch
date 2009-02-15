@@ -51,7 +51,9 @@ public class FlowJob extends AbstractJob {
 
 	/**
 	 * Public setter for the flow.
-	 * @param flow the flow to set
+	 * 
+	 * @param flow
+	 *            the flow to set
 	 */
 	public void setFlow(Flow flow) {
 		this.flow = flow;
@@ -75,21 +77,16 @@ public class FlowJob extends AbstractJob {
 	 * @see AbstractJob#doExecute(JobExecution)
 	 */
 	@Override
-	protected void doExecute(final JobExecution execution) throws JobExecutionException {
+	protected void doExecute(final JobExecution execution)
+			throws JobExecutionException {
 		try {
-			FlowExecution flowExecution = flow.start(new JobFlowExecutor(execution));
-
-			synchronized (execution) {
-				FlowExecutionStatus status = flowExecution.getStatus();
-				execution.upgradeStatus(status.getBatchStatus());
-				execution.setExitStatus(status.getExitStatus());
-			}
-		}
-		catch (FlowExecutionException e) {
+			flow.start(new JobFlowExecutor(execution));
+		} catch (FlowExecutionException e) {
 			if (e.getCause() instanceof JobExecutionException) {
 				throw (JobExecutionException) e.getCause();
 			}
-			throw new JobExecutionException("Flow execution ended unexpectedly", e);
+			throw new JobExecutionException(
+					"Flow execution ended unexpectedly", e);
 		}
 	}
 
@@ -111,17 +108,22 @@ public class FlowJob extends AbstractJob {
 			stepExecutionHolder.set(null);
 		}
 
-		public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
-				StartLimitExceededException {
-			StepExecution lastStepExecution = stepExecutionHolder.get();
-			if (lastStepExecution != null && lastStepExecution.getStatus() == BatchStatus.INCOMPLETE) {
-				lastStepExecution.setStatus(BatchStatus.FAILED);
-				updateStepExecution(lastStepExecution);
-			}
+		public String executeStep(Step step) throws JobInterruptedException,
+				JobRestartException, StartLimitExceededException {
 			StepExecution stepExecution = handleStep(step, execution);
 			stepExecutionHolder.set(stepExecution);
-			return stepExecution == null ? ExitStatus.COMPLETED.getExitCode() : stepExecution.getExitStatus()
-					.getExitCode();
+			return stepExecution == null ? ExitStatus.COMPLETED.getExitCode()
+					: stepExecution.getExitStatus().getExitCode();
+		}
+
+		public void updateStepExecutionStatus() {
+			StepExecution lastStepExecution = stepExecutionHolder.get();
+			if (lastStepExecution != null
+					&& lastStepExecution.getStatus().isGreaterThan(
+							BatchStatus.STOPPING)) {
+				lastStepExecution.upgradeStatus(BatchStatus.ABANDONED);
+				updateStepExecution(lastStepExecution);
+			}
 		}
 
 		public JobExecution getJobExecution() {

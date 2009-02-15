@@ -33,17 +33,10 @@ import org.springframework.batch.core.job.flow.State;
 public class EndState extends AbstractState {
 
 	private final BatchStatus status;
+
 	private final ExitStatus exitStatus;
 
-	/**
-	 * ExitStatus will be defaulted to the given BatchStatus
-	 * 
-	 * @param status The BatchStatus to end with
-	 * @param name The name of the state
-	 */
-	public EndState(BatchStatus status, String name) {
-		this(status, new ExitStatus(status.toString()), name);
-	}
+	private final boolean abandon;
 
 	/**
 	 * @param status The BatchStatus to end with
@@ -51,14 +44,27 @@ public class EndState extends AbstractState {
 	 * @param name The name of the state
 	 */
 	public EndState(BatchStatus status, ExitStatus exitStatus, String name) {
+		this(status, exitStatus, name, false);
+	}
+
+	/**
+	 * @param status The BatchStatus to end with
+	 * @param exitStatus The ExitStatus to end with
+	 * @param name The name of the state
+	 * @param abandon flag to indicate that previous step execution can be
+	 * marked as abandoned (if there is one)
+	 * 
+	 */
+	public EndState(BatchStatus status, ExitStatus exitStatus, String name, boolean abandon) {
 		super(name);
 		this.status = status;
 		this.exitStatus = exitStatus;
+		this.abandon = abandon;
 	}
 
 	/**
 	 * Return the {@link BatchStatus} and {@link ExitStatus} stored. If the
-	 * {@link BatchStatus} is {@link BatchStatus#INCOMPLETE}, then mark it on the
+	 * {@link BatchStatus} is {@link BatchStatus#FAILED}, then mark it on the
 	 * {@link JobExecution} so that the job will know to stop.
 	 * 
 	 * @see State#handle(FlowExecutor)
@@ -66,25 +72,45 @@ public class EndState extends AbstractState {
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		JobExecution jobExecution = executor.getJobExecution();
-		// If there are no step executions, then we are at the beginning of a
-		// restart
 		synchronized (jobExecution) {
 			if (!jobExecution.getStepExecutions().isEmpty()) {
-				if (status == BatchStatus.INCOMPLETE) {
-					jobExecution.upgradeStatus(status);
-					jobExecution.setExitStatus(exitStatus);
+				/*
+				 * If there are step executions, then we are not at the
+				 * beginning of a restart.
+				 * 
+				 * N.B. EndState has to be able to set the status directly, but
+				 * only because the internal flows inside SplitStates contain
+				 * EndState (which maybe they should not, since the JobExecution
+				 * is not ending).
+				 */
+				jobExecution.setStatus(status);
+				jobExecution.setExitStatus(exitStatus);
+				if (status == BatchStatus.STOPPED) {
+					/*
+					 * If we are in flight (not a restart) and we are supposed
+					 * to signal a stop, then make sure that happens
+					 * irrespective of the exit status.
+					 */
+					if (abandon) {
+						// Only if instructed to do so upgrade the status of
+						// last step execution...
+						executor.updateStepExecutionStatus();
+					}
+					return FlowExecutionStatus.STOPPED;
 				}
 			}
-			return new FlowExecutionStatus(status, exitStatus);
+			return new FlowExecutionStatus(exitStatus.getExitCode());
 		}
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.job.flow.State#validate(java.lang.String)
 	 */
 	public void validate(String pattern, String nextState) {
-		if (status != BatchStatus.INCOMPLETE && nextState != null) {
+		if (status != BatchStatus.STOPPED && nextState != null) {
 			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
 					+ "] may not have a 'next' state.");
 		}

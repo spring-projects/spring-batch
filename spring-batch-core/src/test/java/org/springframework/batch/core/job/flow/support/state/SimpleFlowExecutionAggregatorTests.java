@@ -36,10 +36,10 @@ public class SimpleFlowExecutionAggregatorTests {
 	@Test
 	public void testFailed() throws Exception {
 		FlowExecution first = new FlowExecution("foo", FlowExecutionStatus.COMPLETED);
-		FlowExecution second = new FlowExecution("foo", FlowExecutionStatus.INCOMPLETE);
+		FlowExecution second = new FlowExecution("foo", FlowExecutionStatus.FAILED);
 		assertTrue("Should be negative", first.compareTo(second)<0);
 		assertTrue("Should be positive", second.compareTo(first)>0);
-		assertEquals(FlowExecutionStatus.INCOMPLETE, aggregator.aggregate(Arrays.asList(first, second)));
+		assertEquals(FlowExecutionStatus.FAILED, aggregator.aggregate(Arrays.asList(first, second)));
 	}
 
 	@Test

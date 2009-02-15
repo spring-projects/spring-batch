@@ -112,7 +112,7 @@ public class SimpleJobLauncher implements JobLauncher, InitializingBean {
 							+ "] and the following status: [" + jobExecution.getStatus() + "]");
 				}
 				catch (Throwable t) {
-					logger.info("Job: [" + job + "] failed with the following parameters: [" + jobParameters + "]", t);
+					logger.info("Job: [" + job + "] failed unexpectedly and fatally with the following parameters: [" + jobParameters + "]", t);
 					rethrow(t);
 				}
 			}

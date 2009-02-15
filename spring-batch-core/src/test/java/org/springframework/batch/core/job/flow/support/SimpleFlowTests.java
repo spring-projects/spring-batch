@@ -163,7 +163,7 @@ public class SimpleFlowTests {
 		flow.setStateTransitions(collect(StateTransition.createStateTransition(new StubState("step1") {
 			@Override
 			public FlowExecutionStatus handle(FlowExecutor executor) {
-				return FlowExecutionStatus.INCOMPLETE;
+				return FlowExecutionStatus.FAILED;
 			}
 		}, "step2"), StateTransition.createEndStateTransition(new StubState("step2"))));
 		flow.afterPropertiesSet();

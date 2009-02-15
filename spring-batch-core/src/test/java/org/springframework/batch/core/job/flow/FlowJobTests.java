@@ -53,7 +53,7 @@ public class FlowJobTests {
 	private JobExecution jobExecution;
 
 	private JobRepository jobRepository;
-	
+
 	private boolean fail = false;
 
 	@Before
@@ -64,18 +64,26 @@ public class FlowJobTests {
 		factory.afterPropertiesSet();
 		jobRepository = (JobRepository) factory.getObject();
 		job.setJobRepository(jobRepository);
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		jobExecution = jobRepository.createJobExecution("job",
+				new JobParameters());
 	}
 
 	@Test
 	public void testTwoSteps() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end1")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "step2"));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step2")),
+						ExitStatus.FAILED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(),
+				"end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end1")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
@@ -89,11 +97,18 @@ public class FlowJobTests {
 	public void testFailedStep() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StateSupport("step1", FlowExecutionStatus.INCOMPLETE), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end1")));
+		transitions.add(StateTransition.createStateTransition(new StateSupport(
+				"step1", FlowExecutionStatus.FAILED), "step2"));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step2")),
+						ExitStatus.FAILED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(),
+				"end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end1")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
@@ -108,24 +123,30 @@ public class FlowJobTests {
 	public void testFailedStepRestarted() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "step2"));
 		State step2State = new StateSupport("step2") {
 			@Override
-			public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
+			public FlowExecutionStatus handle(FlowExecutor executor)
+					throws Exception {
 				JobExecution jobExecution = executor.getJobExecution();
-				jobExecution.getStepExecutions().add(new StepExecution(getName(), jobExecution));
+				jobExecution.getStepExecutions().add(
+						new StepExecution(getName(), jobExecution));
 				if (fail) {
-					return FlowExecutionStatus.INCOMPLETE;
-				}
-				else {
+					return FlowExecutionStatus.FAILED;
+				} else {
 					return FlowExecutionStatus.COMPLETED;
 				}
 			}
 		};
-		transitions.add(StateTransition.createStateTransition(step2State, ExitStatus.COMPLETED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(step2State, ExitStatus.FAILED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end1")));
+		transitions.add(StateTransition.createStateTransition(step2State,
+				ExitStatus.COMPLETED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(step2State,
+				ExitStatus.FAILED.getExitCode(), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end1")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
@@ -134,7 +155,8 @@ public class FlowJobTests {
 		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		jobRepository.update(jobExecution);
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		jobExecution = jobRepository.createJobExecution("job",
+				new JobParameters());
 		fail = false;
 		job.execute(jobExecution);
 		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
@@ -145,64 +167,77 @@ public class FlowJobTests {
 	public void testStoppingStep() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
-		State state2 = new StateSupport("step2", FlowExecutionStatus.INCOMPLETE);
-		transitions.add(StateTransition.createStateTransition(state2, ExitStatus.FAILED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(state2, ExitStatus.COMPLETED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end0"), "step3"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end1")));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step3")), "end2"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end2")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "step2"));
+		State state2 = new StateSupport("step2", FlowExecutionStatus.FAILED);
+		transitions.add(StateTransition.createStateTransition(state2,
+				ExitStatus.FAILED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(state2,
+				ExitStatus.COMPLETED.getExitCode(), "end1"));
+		transitions.add(StateTransition.createStateTransition(new EndState(
+				BatchStatus.STOPPED, ExitStatus.STOPPED, "end0"), "step3"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end1")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step3")), "end2"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end2")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
-		try {
-			job.doExecute(jobExecution);
-			fail("Expected JobInterruptedException");
-		}
-		catch (JobInterruptedException e) {
-			// expected
-		}
+		job.doExecute(jobExecution);
 		assertEquals(2, jobExecution.getStepExecutions().size());
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 	}
 
 	@Test
 	public void testEndStateStopped() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
-		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end"), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end1")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "end"));
+		transitions.add(StateTransition.createStateTransition(new EndState(
+				BatchStatus.STOPPED, ExitStatus.STOPPED, "end"), "step2"));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step2")),
+						ExitStatus.FAILED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(),
+				"end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end1")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
-		try {
-			job.doExecute(jobExecution);
-			fail("Expected JobInterruptedException");
-		}
-		catch (JobInterruptedException e) {
-			// expected
-		}
+		job.doExecute(jobExecution);
 		assertEquals(1, jobExecution.getStepExecutions().size());
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 	}
 
 	public void testEndStateFailed() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
-		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end"), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end1")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "end"));
+		transitions.add(StateTransition.createStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end"), "step2"));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step2")),
+						ExitStatus.FAILED.getExitCode(), "end0"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(),
+				"end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end1")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 		job.doExecute(jobExecution);
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 	}
 
@@ -210,22 +245,31 @@ public class FlowJobTests {
 	public void testEndStateStoppedWithRestart() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "end"));
-		transitions.add(StateTransition.createStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end"), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end1")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "end"));
+		transitions.add(StateTransition.createStateTransition(new EndState(
+				BatchStatus.STOPPED, ExitStatus.STOPPED, "end"), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(),
+				"end0"));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step2")),
+						ExitStatus.FAILED.getExitCode(), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end1")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
 
 		// To test a restart we have to use the AbstractJob.execute()...
 		job.execute(jobExecution);
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 
-		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
+		jobExecution = jobRepository.createJobExecution("job",
+				new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
@@ -236,16 +280,30 @@ public class FlowJobTests {
 	public void testBranching() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "COMPLETED", "step3"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end1")));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step3")), ExitStatus.FAILED.getExitCode(), "end2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step3")), ExitStatus.COMPLETED.getExitCode(), "end3"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end2")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end3")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "COMPLETED", "step3"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(),
+				"end0"));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step2")),
+						ExitStatus.FAILED.getExitCode(), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end1")));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step3")),
+						ExitStatus.FAILED.getExitCode(), "end2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step3")), ExitStatus.COMPLETED.getExitCode(),
+				"end3"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end2")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end3")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.afterPropertiesSet();
@@ -259,8 +317,10 @@ public class FlowJobTests {
 	public void testBasicFlow() throws Throwable {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step")), "end0"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		job.setFlow(flow);
 		job.execute(jobExecution);
@@ -275,24 +335,40 @@ public class FlowJobTests {
 
 		SimpleFlow flow = new SimpleFlow("job");
 		JobExecutionDecider decider = new JobExecutionDecider() {
-			public String decide(JobExecution jobExecution, StepExecution stepExecution) {
+			public String decide(JobExecution jobExecution,
+					StepExecution stepExecution) {
 				assertNotNull(stepExecution);
 				return "SWITCH";
 			}
 		};
 
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "decision"));
-		transitions.add(StateTransition.createStateTransition(new DecisionState(decider, "decision"), "step2"));
-		transitions.add(StateTransition.createStateTransition(new DecisionState(decider, "decision"), "SWITCH", "step3"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(), "end0"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), ExitStatus.FAILED.getExitCode(), "end1"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end1")));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step3")), ExitStatus.FAILED.getExitCode(), "end2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step3")), ExitStatus.COMPLETED.getExitCode(), "end3"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.INCOMPLETE, ExitStatus.FAILED, "end2")));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end3")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "decision"));
+		transitions.add(StateTransition.createStateTransition(
+				new DecisionState(decider, "decision"), "step2"));
+		transitions.add(StateTransition.createStateTransition(
+				new DecisionState(decider, "decision"), "SWITCH", "step3"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), ExitStatus.COMPLETED.getExitCode(),
+				"end0"));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step2")),
+						ExitStatus.FAILED.getExitCode(), "end1"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end1")));
+		transitions.add(StateTransition
+				.createStateTransition(new StepState(new StubStep("step3")),
+						ExitStatus.FAILED.getExitCode(), "end2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step3")), ExitStatus.COMPLETED.getExitCode(),
+				"end3"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.FAILED, ExitStatus.FAILED, "end2")));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end3")));
 		flow.setStateTransitions(transitions);
 
 		job.setFlow(flow);
@@ -311,14 +387,17 @@ public class FlowJobTests {
 	public void testGetStepExists() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
 		job.setFlow(flow);
 		job.afterPropertiesSet();
-		
+
 		Step step = job.getStep("step2");
 		assertNotNull(step);
 		assertEquals("step2", step.getName());
@@ -328,9 +407,12 @@ public class FlowJobTests {
 	public void testGetStepNotExists() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
 		job.setFlow(flow);
@@ -339,14 +421,17 @@ public class FlowJobTests {
 		Step step = job.getStep("foo");
 		assertNull(step);
 	}
-	
+
 	@Test
 	public void testGetStepNotStepState() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
-		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
-		transitions.add(StateTransition.createEndStateTransition(new EndState(BatchStatus.COMPLETED, "end0")));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(
+				new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(
+				BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end0")));
 		flow.setStateTransitions(transitions);
 		flow.afterPropertiesSet();
 		job.setFlow(flow);
@@ -355,7 +440,7 @@ public class FlowJobTests {
 		Step step = job.getStep("end0");
 		assertNull(step);
 	}
-	
+
 	/**
 	 * @author Dave Syer
 	 * 
@@ -366,7 +451,8 @@ public class FlowJobTests {
 			super(name);
 		}
 
-		public void execute(StepExecution stepExecution) throws JobInterruptedException {
+		public void execute(StepExecution stepExecution)
+				throws JobInterruptedException {
 			stepExecution.setStatus(BatchStatus.COMPLETED);
 			stepExecution.setExitStatus(ExitStatus.COMPLETED);
 			jobRepository.update(stepExecution);
@@ -379,15 +465,15 @@ public class FlowJobTests {
 	 * @param stepName
 	 * @return the StepExecution corresponding to the specified step
 	 */
-	private StepExecution getStepExecution(JobExecution jobExecution, String stepName)
-	{
-		for(StepExecution stepExecution : jobExecution.getStepExecutions()) {
-			if(stepExecution.getStepName().equals(stepName)) {
+	private StepExecution getStepExecution(JobExecution jobExecution,
+			String stepName) {
+		for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
+			if (stepExecution.getStepName().equals(stepName)) {
 				return stepExecution;
 			}
 		}
 		fail("No stepExecution found with name: [" + stepName + "]");
 		return null;
 	}
-	
+
 }

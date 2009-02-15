@@ -66,7 +66,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * Convenient constant value representing finished processing with
 	 * interrupted status.
 	 */
-	public static final ExitStatus INTERRUPTED = new ExitStatus("INTERRUPTED");
+	public static final ExitStatus STOPPED = new ExitStatus("STOPPED");
 
 	private final String exitCode;
 
@@ -159,7 +159,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 		if (status.exitCode.startsWith(NOOP.exitCode)) {
 			return 3;
 		}
-		if (status.exitCode.startsWith(INTERRUPTED.exitCode)) {
+		if (status.exitCode.startsWith(STOPPED.exitCode)) {
 			return 4;
 		}
 		if (status.exitCode.startsWith(FAILED.exitCode)) {

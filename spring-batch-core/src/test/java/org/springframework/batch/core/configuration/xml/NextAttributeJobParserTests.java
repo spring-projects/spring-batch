@@ -45,7 +45,7 @@ public class NextAttributeJobParserTests extends AbstractJobParserTests {
 		assertTrue(stepNamesList.contains("s1"));
 		assertTrue(stepNamesList.contains("fail"));
 
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		assertEquals("FAILED", jobExecution.getExitStatus().getExitCode());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
@@ -53,7 +53,7 @@ public class NextAttributeJobParserTests extends AbstractJobParserTests {
 		assertEquals(ExitStatus.COMPLETED, stepExecution1.getExitStatus());
 
 		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution2.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
 	}
 

@@ -30,7 +30,7 @@ public class JobOperatorFunctionalTests {
 	private static final Log logger = LogFactory.getLog(JobOperatorFunctionalTests.class);
 
 	@Autowired
-	private JobOperator tested;
+	private JobOperator operator;
 
 	@Autowired
 	private Job job;
@@ -49,19 +49,19 @@ public class JobOperatorFunctionalTests {
 
 		String params = new JobParametersBuilder().addLong("jobOperatorTestParam", 7L).toJobParameters().toString();
 
-		long executionId = tested.start(job.getName(), params);
-		assertEquals(params, tested.getParameters(executionId));
+		long executionId = operator.start(job.getName(), params);
+		assertEquals(params, operator.getParameters(executionId));
 		stopAndCheckStatus(executionId);
 
-		long resumedExecutionId = tested.restart(executionId);
-		assertEquals(params, tested.getParameters(resumedExecutionId));
+		long resumedExecutionId = operator.restart(executionId);
+		assertEquals(params, operator.getParameters(resumedExecutionId));
 		stopAndCheckStatus(resumedExecutionId);
 
-		List<Long> instances = tested.getJobInstances(job.getName(), 0, 1);
+		List<Long> instances = operator.getJobInstances(job.getName(), 0, 1);
 		assertEquals(1, instances.size());
 		long instanceId = instances.get(0);
 
-		List<Long> executions = tested.getExecutions(instanceId);
+		List<Long> executions = operator.getExecutions(instanceId);
 		assertEquals(2, executions.size());
 		// latest execution is the first in the returned list
 		assertEquals(resumedExecutionId, executions.get(0).longValue());
@@ -77,47 +77,49 @@ public class JobOperatorFunctionalTests {
 		// wait to the job to get up and running
 		Thread.sleep(1000);
 
-		assertTrue(tested.getRunningExecutions(job.getName()).contains(executionId));
-		assertTrue(tested.getSummary(executionId).contains(BatchStatus.STARTED.toString()));
+		Set<Long> runningExecutions = operator.getRunningExecutions(job.getName());
+		assertTrue("Wrong executions: "+runningExecutions+" expected: "+executionId, runningExecutions.contains(executionId));
+		assertTrue("Wrong summary: "+operator.getSummary(executionId), operator.getSummary(executionId).contains(BatchStatus.STARTED.toString()));
 
-		tested.stop(executionId);
+		operator.stop(executionId);
 
 		int count = 0;
-		while (tested.getRunningExecutions(job.getName()).contains(executionId) && count <= 10) {
+		while (operator.getRunningExecutions(job.getName()).contains(executionId) && count <= 10) {
 			logger.info("Checking for running JobExecution: count=" + count);
 			Thread.sleep(100);
 			count++;
 		}
 
-		assertFalse(tested.getRunningExecutions(job.getName()).contains(executionId));
-		assertTrue(tested.getSummary(executionId).contains(BatchStatus.INCOMPLETE.toString()));
+		runningExecutions = operator.getRunningExecutions(job.getName());
+		assertFalse("Wrong executions: "+runningExecutions+" expected: "+executionId, runningExecutions.contains(executionId));
+		assertTrue("Wrong summary: "+operator.getSummary(executionId), operator.getSummary(executionId).contains(BatchStatus.STOPPED.toString()));
 
 		// there is just a single step in the test job
-		Map<Long, String> summaries = tested.getStepExecutionSummaries(executionId);
-		assertEquals(1, summaries.size());
-		assertTrue(summaries.values().toString().contains(BatchStatus.INCOMPLETE.toString()));
+		Map<Long, String> summaries = operator.getStepExecutionSummaries(executionId);
+		System.err.println(summaries);
+		assertTrue(summaries.values().toString().contains(BatchStatus.STOPPED.toString()));
 	}
 
 	@Test
 	public void testMultipleSimultaneousInstances() throws Exception {
 		String jobName = job.getName();
 
-		Set<String> names = tested.getJobNames();
+		Set<String> names = operator.getJobNames();
 		assertEquals(1, names.size());
 		assertTrue(names.contains(jobName));
 
-		long exec1 = tested.startNextInstance(jobName);
-		long exec2 = tested.startNextInstance(jobName);
+		long exec1 = operator.startNextInstance(jobName);
+		long exec2 = operator.startNextInstance(jobName);
 
 		assertTrue(exec1 != exec2);
-		assertTrue(tested.getParameters(exec1) != tested.getParameters(exec2));
+		assertTrue(operator.getParameters(exec1) != operator.getParameters(exec2));
 
-		Set<Long> executions = tested.getRunningExecutions(jobName);
+		Set<Long> executions = operator.getRunningExecutions(jobName);
 		assertTrue(executions.contains(exec1));
 		assertTrue(executions.contains(exec2));
 
-		tested.stop(exec1);
-		tested.stop(exec2);
+		operator.stop(exec1);
+		operator.stop(exec2);
 
 	}
 

@@ -170,7 +170,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		// And make the back log real
 		requests.send(getSimpleMessage("foo", 4321L));
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Message does not contain 'wrong job': " + message, message.contains("wrong job"));
@@ -207,7 +207,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 
 		StepExecution stepExecution = getStepExecution(step);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Message does not contain 'bad': " + message, message.contains("bad"));
@@ -219,7 +219,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertTrue(1 <= TestItemWriter.count);
 		assertTrue(6 >= TestItemWriter.count);
 		// But it should fail the step in any case
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 
 	}
 
@@ -242,7 +242,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		 * loop would be bad, so the best we can do is fail as fast as possible.
 		 */
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 		String message = stepExecution.getExitStatus().getExitDescription();
 		assertTrue("Message did not contain 'timed out': " + message, message.toLowerCase().contains("timed out"));
@@ -276,7 +276,7 @@ public class ChunkMessageItemWriterIntegrationTests {
 		assertTrue(1 <= TestItemWriter.count);
 		assertTrue(6 >= TestItemWriter.count);
 
-		assertEquals(BatchStatus.INCOMPLETE, stepExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
 
 		String exitDescription = stepExecution.getExitStatus().getExitDescription();

@@ -204,7 +204,7 @@ public class AbstractStepTests {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		tested.execute(execution);
-		assertEquals(BatchStatus.INCOMPLETE, execution.getStatus());
+		assertEquals(BatchStatus.FAILED, execution.getStatus());
 		Throwable expected = execution.getFailureExceptions().get(0);
 		assertEquals("crash!", expected.getMessage());
 
@@ -242,7 +242,7 @@ public class AbstractStepTests {
 		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
 
 		tested.execute(execution);
-		assertEquals(BatchStatus.INCOMPLETE, execution.getStatus());
+		assertEquals(BatchStatus.STOPPED, execution.getStatus());
 		Throwable expected = execution.getFailureExceptions().get(0);
 		assertEquals("JobExecution interrupted.", expected.getMessage());
 
@@ -256,7 +256,7 @@ public class AbstractStepTests {
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
-		assertEquals("INTERRUPTED", execution.getExitStatus().getExitCode());
+		assertEquals("STOPPED", execution.getExitStatus().getExitCode());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("afterStep"));

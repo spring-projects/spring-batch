@@ -61,8 +61,8 @@ public class StopRestartOnCompletedStepJobParserTests extends AbstractJobParserT
 		assertEquals(1, stepNamesList.size());
 		assertTrue(stepNamesList.contains("s1"));
 
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
-		assertEquals(ExitStatus.FAILED.getExitCode(), jobExecution.getExitStatus().getExitCode());
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans 
-	xmlns="http://www.springframework.org/schema/batch" 
-	xmlns:beans="http://www.springframework.org/schema/beans"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
@@ -9,24 +7,10 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-
-		<split id="split1">
-
-			<next on="FAILED" to="s3"/>
-			<fail on="COMPLETED" />
-
-			<flow>
-				<step id="s1" ref="step1"/>
-			</flow>
-
-			<flow>
-				<step id="fail" ref="failingStep"/>
-			</flow>
-
-		</split>
-
-		<step id="s3" ref="step3"/>
-
+		<step id="s1" ref="step1">
+			<stop on="*" restart="s2"/>
+		</step>
+		<step id="s2" ref="step2"/>
 	</job>
 
 </beans:beans>

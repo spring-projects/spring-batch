@@ -70,7 +70,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();
-		assertEquals(BatchStatus.INCOMPLETE, jobExecution.getStatus());
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		
 		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
 		assertTrue("Not planned exception: " + expected.getMessage(), expected.getMessage().toLowerCase().indexOf(

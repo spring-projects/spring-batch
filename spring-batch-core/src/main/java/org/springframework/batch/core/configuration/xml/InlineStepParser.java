@@ -101,7 +101,7 @@ public class InlineStepParser extends AbstractStepParser {
 		else {
 			parserContext.getReaderContext().error("Incomplete configuration detected while creating step with name " + stepRef, element);
 		}
-		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
+		return FlowParser.getNextElements(parserContext, stepId, stateBuilder.getBeanDefinition(), element);
 
 	}
 
