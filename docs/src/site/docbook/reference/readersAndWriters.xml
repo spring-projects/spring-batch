@@ -1946,7 +1946,7 @@
   JdbcCursorItemReader itemReader = new JdbcCursorItemReader();
   itemReader.setDataSource(dataSource);
   itemReader.setSql("SELECT ID, NAME, CREDIT from CUSTOMER");
-  itemReader.setMapper(new CustomerCreditRowMapper());
+  itemReader.setRowMapper(new CustomerCreditRowMapper());
   int counter = 0;
   ExecutionContext executionContext = new ExecutionContext();
   itemReader.open(executionContext);
@@ -1977,7 +1977,7 @@
   &lt;bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource"/&gt;
     &lt;property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/&gt;
-    &lt;property name="mapper"&gt;
+    &lt;property name="rowMapper"&gt;
       &lt;bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper"/&gt;
     &lt;/property&gt;
   &lt;/bean&gt;
@@ -2534,7 +2534,7 @@
   &lt;bean id="playerSummarizationSource"
         class="org.springframework.batch.item.database.JdbcCursorItemReader"&gt;
     &lt;property name="dataSource" ref="dataSource" /&gt;
-    &lt;property name="mapper"&gt;
+    &lt;property name="rowMapper"&gt;
       &lt;bean class="org.springframework.batch.sample.mapping.PlayerSummaryMapper" /&gt;
     &lt;/property&gt;
     <emphasis role="bold">&lt;property name="saveState" value="false" /&gt;</emphasis>
