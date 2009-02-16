@@ -24,12 +24,8 @@ import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 /**
- * Internal parser for the &lt;step/&gt; elements inside a job. A step element
- * references a bean definition for a {@link org.springframework.batch.core.Step} and goes on to (optionally)
- * list a set of transitions from that step to others with &lt;next on="pattern"
- * to="stepName"/&gt;. Used by the {@link JobParser}.
- * 
- * @see JobParser
+ * Internal parser for the &lt;step/&gt; elements for a job. A step element
+ * references a bean definition for a {@link org.springframework.batch.core.Step}.
  * 
  * @author Dave Syer
  * @author Thomas Risberg
