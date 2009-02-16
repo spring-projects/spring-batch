@@ -39,6 +39,20 @@ import org.springframework.batch.core.repository.JobRestartException;
 public class SimpleJob extends AbstractJob {
 
 	private List<Step> steps = new ArrayList<Step>();
+	
+	/**
+	 * Default constructor for job with null name
+	 */
+	public SimpleJob() {
+		this(null);
+	}
+
+	/**
+	 * @param name
+	 */
+	public SimpleJob(String name) {
+		super(name);
+	}
 
 	/**
 	 * Public setter for the steps in this job. Overrides any calls to

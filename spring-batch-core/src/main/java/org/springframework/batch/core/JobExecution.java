@@ -319,4 +319,14 @@ public class JobExecution extends Entity {
 						startTime, endTime, lastUpdated, status, exitStatus, jobInstance);
 	}
 
+	/**
+	 * Setter for the step executions.  For internal use only.
+	 * @param stepExecutions
+	 */
+	public void addStepExecutions(List<StepExecution> stepExecutions) {
+		if (stepExecutions!=null) {
+			this.stepExecutions.addAll(stepExecutions);
+		}
+	}
+
 }

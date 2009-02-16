@@ -52,6 +52,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 	}
 
 	public void saveStepExecution(StepExecution stepExecution) {
+
 		Assert.isTrue(stepExecution.getId() == null);
 		Assert.isTrue(stepExecution.getVersion() == null);
 		Assert.notNull(stepExecution.getJobExecutionId(), "JobExecution must be saved already.");
@@ -61,11 +62,13 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			executions = TransactionAwareProxyFactory.createTransactionalMap();
 			executionsByJobExecutionId.put(stepExecution.getJobExecutionId(), executions);
 		}
+		
 		stepExecution.setId(currentId++);
 		stepExecution.incrementVersion();
 		StepExecution copy = copy(stepExecution);
 		executions.put(stepExecution.getId(), copy);
 		executionsByStepExecutionId.put(stepExecution.getId(), copy);
+
 	}
 
 	public void updateStepExecution(StepExecution stepExecution) {
@@ -113,6 +116,7 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		for (StepExecution exec : result) {
 			copy.add(copy(exec));
 		}
+		jobExecution.addStepExecutions(copy);
 		return copy;
 	}
 }

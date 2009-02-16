@@ -43,6 +43,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.util.Assert;
 
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet},
@@ -100,6 +101,15 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public TaskletStep(String name) {
 		super(name);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.step.AbstractStep#afterPropertiesSet()
+	 */
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		Assert.notNull(transactionManager, "TransactionManager is mandatory");		
 	}
 
 	/**

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -168,6 +169,13 @@ public class JobExecutionTests {
 	public void testAddAndRemoveStepExecution() throws Exception {
 		assertEquals(0, execution.getStepExecutions().size());
 		execution.createStepExecution("step");
+		assertEquals(1, execution.getStepExecutions().size());
+	}
+
+	@Test
+	public void testSetStepExecutions() throws Exception {
+		assertEquals(0, execution.getStepExecutions().size());
+		execution.addStepExecutions(Arrays.asList(new StepExecution("step", execution)));
 		assertEquals(1, execution.getStepExecutions().size());
 	}
 
