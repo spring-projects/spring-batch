@@ -2217,13 +2217,13 @@
             &lt;/map&gt;
         &lt;/property&gt;
         &lt;property name="pageSize" value="1000"/&gt;
-        &lt;property name="parameterizedRowMapper" ref="customerMapper"/&gt;
+        &lt;property name="rowMapper" ref="customerMapper"/&gt;
     &lt;/bean&gt; 
 </programlisting>
 
         <para>This configured <classname>ItemReader</classname> will return
         <classname>CustomerCredit</classname> objects using the
-        <classname>ParameterizedRowMapper</classname> that must be specified.
+        <classname>RowMapper</classname> that must be specified.
         The 'pageSize' property determines the number of entities read from
         the database for each query execution.</para>
 
