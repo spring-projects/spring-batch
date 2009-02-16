@@ -115,7 +115,7 @@ public class FlatFileItemReaderTests {
 
 		reader.open(executionContext);
 		assertNull(reader.read());
-
+		reader.close();
 	}
 
 	@Test

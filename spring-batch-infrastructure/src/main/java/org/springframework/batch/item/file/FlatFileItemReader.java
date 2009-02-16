@@ -211,8 +211,10 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	@Override
 	protected void doClose() throws Exception {
 		lineCount = 0;
-		reader.close();
-
+		if(resource.exists())
+		{
+			reader.close();
+		}
 	}
 
 	@Override
