@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -38,7 +37,10 @@ public class NextAttributeJobParserTests extends AbstractJobParserTests {
 
 	@Test
 	public void testNextAttributeFailedDefault() throws Exception {
-		assertNotNull(job);
+
+		//
+		// Launch 1
+		//
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
 		assertEquals(2, stepNamesList.size()); //s2 is not executed
@@ -55,6 +57,23 @@ public class NextAttributeJobParserTests extends AbstractJobParserTests {
 		StepExecution stepExecution2 = getStepExecution(jobExecution, "fail");
 		assertEquals(BatchStatus.FAILED, stepExecution2.getStatus());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution2.getExitStatus().getExitCode());
+
+		//
+		// Launch 2
+		//
+		stepNamesList.clear();
+		jobExecution = createJobExecution();
+		job.execute(jobExecution);
+		assertEquals(1, stepNamesList.size()); //s1,s2 are not executed
+		assertTrue(stepNamesList.contains("fail"));
+
+		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
+		assertEquals("FAILED", jobExecution.getExitStatus().getExitCode());
+
+		StepExecution stepExecution3 = getStepExecution(jobExecution, "fail");
+		assertEquals(BatchStatus.FAILED, stepExecution3.getStatus());
+		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution3.getExitStatus().getExitCode());
+		
 	}
 
 }
