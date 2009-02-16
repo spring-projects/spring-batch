@@ -31,7 +31,7 @@ public class JdbcPagingItemReaderCommonTests extends AbstractItemStreamItemReade
 		queryProvider.setFromClause("from T_FOOS");
 		queryProvider.setSortKey("ID");
 		reader.setQueryProvider(queryProvider);
-		reader.setParameterizedRowMapper(
+		reader.setRowMapper(
 				new ParameterizedRowMapper<Foo>() {
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();

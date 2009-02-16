@@ -27,7 +27,7 @@ public class JdbcPagingItemReaderNamedParameterTests extends AbstractPagingItemR
 		queryProvider.setSortKey("ID");
 		reader.setParameterValues(Collections.<String, Object>singletonMap("limit", 3));
 		reader.setQueryProvider(queryProvider);
-		reader.setParameterizedRowMapper(
+		reader.setRowMapper(
 				new ParameterizedRowMapper<Foo>() {
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();

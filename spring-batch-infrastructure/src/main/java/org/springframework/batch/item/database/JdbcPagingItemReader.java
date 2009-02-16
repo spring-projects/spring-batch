@@ -23,7 +23,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 
 	private SimpleJdbcTemplate simpleJdbcTemplate;
 
-	private ParameterizedRowMapper<T> parameterizedRowMapper;
+	private RowMapper rowMapper;
 
 	private String firstPageSql;
 
@@ -105,10 +104,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	/**
 	 * The row mapper implementation to be used by this reader
 	 *
-	 * @param parameterizedRowMapper a {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper} implementation
+	 * @param rowMapper a {@link org.springframework.jdbc.core.simple.ParameterizedRowMapper} implementation
 	 */
-	public void setParameterizedRowMapper(ParameterizedRowMapper<T> parameterizedRowMapper) {
-		this.parameterizedRowMapper = parameterizedRowMapper;
+	public void setRowMapper(RowMapper rowMapper) {
+		this.rowMapper = rowMapper;
 	}
 
 	/**
@@ -161,9 +160,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 					simpleJdbcTemplate.getNamedParameterJdbcOperations().query(firstPageSql,
 							getParameterMap(parameterValues, null),
 							new RowCallbackHandler() {
+								@SuppressWarnings("unchecked")
 								public void processRow(ResultSet rs) throws SQLException {
 									startAfterValue = rs.getObject(1);
-									results.add(parameterizedRowMapper.mapRow(rs, results.size()));
+									results.add((T) rowMapper.mapRow(rs, results.size()));
 								}
 							});
 				}
@@ -251,9 +251,10 @@ public class JdbcPagingItemReader<T> extends AbstractPagingItemReader<T> impleme
 	}
 
 	private class PagingRowCallbackHandler implements RowCallbackHandler {
+		@SuppressWarnings("unchecked")
 		public void processRow(ResultSet rs) throws SQLException {
 			startAfterValue = rs.getObject(1);
-			results.add(parameterizedRowMapper.mapRow(rs, results.size()));
+			results.add((T) rowMapper.mapRow(rs, results.size()));
 		}
 	}
 

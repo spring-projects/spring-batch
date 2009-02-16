@@ -29,7 +29,7 @@ public class JdbcPagingItemReaderIntegrationTests extends AbstractDataSourceItem
 		queryProvider.setFromClause("from T_FOOS");
 		queryProvider.setSortKey("ID");
 		inputSource.setQueryProvider(queryProvider);
-		inputSource.setParameterizedRowMapper(
+		inputSource.setRowMapper(
 				new ParameterizedRowMapper<Foo>() {
 					public Foo mapRow(ResultSet rs, int i) throws SQLException {
 						Foo foo = new Foo();
