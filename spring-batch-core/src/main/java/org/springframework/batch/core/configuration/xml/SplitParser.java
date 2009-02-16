@@ -20,9 +20,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
@@ -69,6 +71,12 @@ public class SplitParser {
 
 		BeanDefinitionBuilder stateBuilder = 
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.SplitState");
+
+        String taskExecutorBeanId = element.getAttribute("task-executor");
+        if (StringUtils.hasText(taskExecutorBeanId)) {
+            RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
+            stateBuilder.addPropertyValue("taskExecutor", taskExecutorRef);
+        }
 
 		Collection<BeanDefinition> flows = new ArrayList<BeanDefinition>();
 		int i = 0;
