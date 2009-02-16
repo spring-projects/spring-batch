@@ -142,7 +142,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 
 	private SQLExceptionTranslator exceptionTranslator;
 
-	private RowMapper mapper;
+	private RowMapper rowMapper;
 
 	private boolean initialized = false;
 
@@ -163,7 +163,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(dataSource, "DataSource must be provided");
 		Assert.notNull(sql, "The SQL query must be provided");
-		Assert.notNull(mapper, "RowMapper must be provided");
+		Assert.notNull(rowMapper, "RowMapper must be provided");
 	}
 
 	/**
@@ -359,10 +359,10 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 	/**
 	 * Set the RowMapper to be used for all calls to read().
 	 * 
-	 * @param mapper
+	 * @param rowMapper
 	 */
-	public void setMapper(RowMapper mapper) {
-		this.mapper = mapper;
+	public void setRowMapper(RowMapper rowMapper) {
+		this.rowMapper = rowMapper;
 	}
 
 	/**
@@ -474,7 +474,7 @@ public class JdbcCursorItemReader<T> extends AbstractItemCountingItemStreamItemR
 				return null;
 			}
 			int currentRow = getCurrentItemCount();
-			T item = (T) mapper.mapRow(rs, currentRow);
+			T item = (T) rowMapper.mapRow(rs, currentRow);
 			verifyCursorPosition(currentRow);
 			return item;
 		}

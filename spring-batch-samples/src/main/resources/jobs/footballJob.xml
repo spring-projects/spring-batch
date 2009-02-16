@@ -78,7 +78,7 @@
 
 	<beans:bean id="playerSummarizationSource" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<beans:property name="dataSource" ref="dataSource" />
-		<beans:property name="mapper">
+		<beans:property name="rowMapper">
 			<beans:bean class="org.springframework.batch.sample.domain.football.internal.PlayerSummaryMapper" />
 		</beans:property>
 		<beans:property name="sql">

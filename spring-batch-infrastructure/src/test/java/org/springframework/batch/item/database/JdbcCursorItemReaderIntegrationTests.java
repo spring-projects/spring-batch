@@ -22,7 +22,7 @@ public class JdbcCursorItemReaderIntegrationTests extends AbstractDataSourceItem
 		result.setIgnoreWarnings(true);
 		result.setVerifyCursorPosition(true);
 		
-		result.setMapper(new FooRowMapper());
+		result.setRowMapper(new FooRowMapper());
 		result.setFetchSize(10);
 		result.setMaxRows(100);
 		result.setQueryTimeout(1000);

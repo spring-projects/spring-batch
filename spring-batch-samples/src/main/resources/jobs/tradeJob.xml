@@ -51,7 +51,7 @@
 	<beans:bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<beans:property name="dataSource" ref="dataSource" />
 		<beans:property name="sql" value="SELECT id, quantity, price, customer from TRADE" />
-		<beans:property name="mapper">
+		<beans:property name="rowMapper">
 			<beans:bean class="org.springframework.batch.sample.domain.trade.internal.TradeRowMapper" />
 		</beans:property>
 	</beans:bean>
@@ -59,7 +59,7 @@
 	<beans:bean id="customerSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<beans:property name="dataSource" ref="dataSource" />
 		<beans:property name="sql" value="SELECT id, name, credit FROM customer " />
-		<beans:property name="mapper">
+		<beans:property name="rowMapper">
 			<beans:bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper" />
 		</beans:property>
 	</beans:bean>

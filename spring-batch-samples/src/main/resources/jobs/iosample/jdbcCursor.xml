@@ -14,7 +14,7 @@
 	<bean id="itemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<property name="dataSource" ref="dataSource"/>
 		<property name="sql" value="select ID, NAME, CREDIT from CUSTOMER"/>
-		<property name="mapper">
+		<property name="rowMapper">
 			<bean class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditRowMapper"/>
 		</property>
 	</bean>

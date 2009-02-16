@@ -44,7 +44,7 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		itemReader.setIgnoreWarnings(true);
 		itemReader.setVerifyCursorPosition(true);
 		
-		itemReader.setMapper(new FooRowMapper());
+		itemReader.setRowMapper(new FooRowMapper());
 		itemReader.setFetchSize(10);
 		itemReader.setMaxRows(100);
 		itemReader.setQueryTimeout(1000);
