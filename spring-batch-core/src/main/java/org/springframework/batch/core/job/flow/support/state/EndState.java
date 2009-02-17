@@ -16,8 +16,6 @@
 
 package org.springframework.batch.core.job.flow.support.state;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
@@ -32,40 +30,33 @@ import org.springframework.batch.core.job.flow.State;
  */
 public class EndState extends AbstractState {
 
-	private final BatchStatus status;
-
-	private final ExitStatus exitStatus;
+	private final FlowExecutionStatus status;
 
 	private final boolean abandon;
 
 	/**
-	 * @param status The BatchStatus to end with
-	 * @param exitStatus The ExitStatus to end with
+	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
 	 */
-	public EndState(BatchStatus status, ExitStatus exitStatus, String name) {
-		this(status, exitStatus, name, false);
+	public EndState(FlowExecutionStatus status, String name) {
+		this(status, name, false);
 	}
 
 	/**
-	 * @param status The BatchStatus to end with
-	 * @param exitStatus The ExitStatus to end with
+	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
 	 * @param abandon flag to indicate that previous step execution can be
 	 * marked as abandoned (if there is one)
 	 * 
 	 */
-	public EndState(BatchStatus status, ExitStatus exitStatus, String name, boolean abandon) {
+	public EndState(FlowExecutionStatus status, String name, boolean abandon) {
 		super(name);
 		this.status = status;
-		this.exitStatus = exitStatus;
 		this.abandon = abandon;
 	}
 
 	/**
-	 * Return the {@link BatchStatus} and {@link ExitStatus} stored. If the
-	 * {@link BatchStatus} is {@link BatchStatus#FAILED}, then mark it on the
-	 * {@link JobExecution} so that the job will know to stop.
+	 * Return the {@link FlowExecutionStatus} stored.
 	 * 
 	 * @see State#handle(FlowExecutor)
 	 */
@@ -73,51 +64,41 @@ public class EndState extends AbstractState {
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
 		JobExecution jobExecution = executor.getJobExecution();
 		synchronized (jobExecution) {
-			if (!jobExecution.getStepExecutions().isEmpty()) {
-				/*
-				 * If there are step executions, then we are not at the
-				 * beginning of a restart.
-				 */
-				if (!executor.isNested()) {
-					jobExecution.setStatus(status);
-					jobExecution.setExitStatus(exitStatus);
-				}
-				if (status == BatchStatus.STOPPED) {
+
+			if (status.isStop()) {
+				if (!jobExecution.getStepExecutions().isEmpty()) {
+					/*
+					 * If there are step executions, then we are not at the
+					 * beginning of a restart.
+					 */
 					if (abandon) {
 						/*
-						 * Only if instructed to do so upgrade the status of
+						 * Only if instructed to do so, upgrade the status of
 						 * last step execution so it is not replayed on a
 						 * restart...
 						 */
-						executor.updateStepExecutionStatus();
+						executor.abandonStepExecution();
 					}
+				}
+				else {
 					/*
-					 * If we are in flight (not a restart) and we are supposed
-					 * to signal a stop, then make sure that happens
-					 * irrespective of the exit status.
+					 * If we are a stop state and we got this far then it must
+					 * be a restart, so return COMPLETED.
 					 */
-					return FlowExecutionStatus.STOPPED;
+					return FlowExecutionStatus.COMPLETED;
 				}
 			}
-			return new FlowExecutionStatus(exitStatus.getExitCode());
+
+			return status;
+
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.job.flow.State#validate(java.lang.String)
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
-	public void validate(String pattern, String nextState) {
-		if (status != BatchStatus.STOPPED && nextState != null) {
-			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
-					+ "] may not have a 'next' state.");
-		}
-		if (pattern != null) {
-			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
-					+ "] may not have a 'pattern'.");
-		}
+	public boolean isEndState() {
+		return !status.isStop();
 	}
 
 	/*
@@ -127,6 +108,6 @@ public class EndState extends AbstractState {
 	 */
 	@Override
 	public String toString() {
-		return super.toString() + " status=[" + status + "] exitcode=[" + exitStatus.getExitCode() + "] ";
+		return super.toString() + " status=[" + status + "]";
 	}
 }

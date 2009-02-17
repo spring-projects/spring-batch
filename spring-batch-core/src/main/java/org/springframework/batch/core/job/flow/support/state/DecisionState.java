@@ -38,16 +38,14 @@ public class DecisionState extends AbstractState {
 
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
-		return new FlowExecutionStatus(decider.decide(executor.getJobExecution(), executor.getStepExecution()));
+		return decider.decide(executor.getJobExecution(), executor.getStepExecution());
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.springframework.batch.core.job.flow.State#isEndState()
+	 */
+	public boolean isEndState() {
+		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
-	 */
-	public void validate(String pattern, String nextState) {
-		if (nextState == null) {
-			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
-					+ "] requires a 'next' state.");
-		}
-	}
 }

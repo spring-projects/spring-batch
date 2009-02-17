@@ -33,6 +33,6 @@ public interface JobExecutionDecider {
 	 * @param stepExecution the latest step execution (may be null)
 	 * @return the exit status code
 	 */
-	String decide(JobExecution jobExecution, StepExecution stepExecution);
+	FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution);
 
 }

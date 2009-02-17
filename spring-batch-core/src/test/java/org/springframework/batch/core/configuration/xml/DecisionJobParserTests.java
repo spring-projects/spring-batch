@@ -26,6 +26,7 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
@@ -34,22 +35,21 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-
 /**
  * @author Dave Syer
- *
+ * 
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class DecisionJobParserTests {
-	
+
 	@Autowired
 	@Qualifier("job")
 	private Job job;
 
 	@Autowired
 	private JobRepository jobRepository;
-	
+
 	@Before
 	public void setUp() {
 		MapJobRepositoryFactoryBean.clear();
@@ -63,10 +63,10 @@ public class DecisionJobParserTests {
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 		assertEquals(1, jobExecution.getStepExecutions().size());
 	}
-	
+
 	public static class TestDecider implements JobExecutionDecider {
-		public String decide(JobExecution jobExecution, StepExecution stepExecution) {
-			return "FOO";
+		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+			return new FlowExecutionStatus("FOO");
 		}
 	}
 

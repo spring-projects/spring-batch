@@ -32,15 +32,13 @@ import org.springframework.batch.core.repository.JobRestartException;
 public interface FlowExecutor {
 
 	/**
-	 * @param step
-	 *            a {@link Step} to execute
+	 * @param step a {@link Step} to execute
 	 * @return the exit status that drives the surrounding {@link Flow}
 	 * @throws StartLimitExceededException
 	 * @throws JobRestartException
 	 * @throws JobInterruptedException
 	 */
-	String executeStep(Step step) throws JobInterruptedException,
-			JobRestartException, StartLimitExceededException;
+	String executeStep(Step step) throws JobInterruptedException, JobRestartException, StartLimitExceededException;
 
 	/**
 	 * @return the current {@link JobExecution}
@@ -56,29 +54,19 @@ public interface FlowExecutor {
 	 * Chance to clean up resources at the end of a flow (whether it completed
 	 * successfully or not).
 	 * 
-	 * @param result
-	 *            the final {@link FlowExecution}
+	 * @param result the final {@link FlowExecution}
 	 */
 	void close(FlowExecution result);
 
 	/**
 	 * Handle any status changes that might be needed at the start of a state.
 	 */
-	void updateStepExecutionStatus();
+	void abandonStepExecution();
 
 	/**
-	 * Push a token onto a stack to indicate that the context is being nested.
+	 * Handle any status changes that might be needed in the
+	 * {@link JobExecution}.
 	 */
-	void nest();
-
-	/**
-	 * Pop a token off a stack to indicate that the context is being un-nested.
-	 */
-	void unnest();
-	
-	/**
-	 * @return indicate whether the execution context is nested
-	 */
-	boolean isNested();
+	void updateJobExecutionStatus(FlowExecutionStatus status);
 
 }

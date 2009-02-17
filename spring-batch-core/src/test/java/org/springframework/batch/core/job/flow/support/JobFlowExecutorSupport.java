@@ -22,6 +22,7 @@ import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.repository.JobRestartException;
 
@@ -30,8 +31,6 @@ import org.springframework.batch.core.repository.JobRestartException;
  * 
  */
 public class JobFlowExecutorSupport implements FlowExecutor {
-
-	private volatile boolean nested = false;
 
 	public String executeStep(Step step) throws JobInterruptedException, JobRestartException,
 			StartLimitExceededException {
@@ -49,19 +48,10 @@ public class JobFlowExecutorSupport implements FlowExecutor {
 	public void close(FlowExecution result) {
 	}
 
-	public void updateStepExecutionStatus() {
+	public void abandonStepExecution() {
 	}
-
-	public boolean isNested() {
-		return nested;
-	}
-
-	public void nest() {
-		nested= true;
-	}
-
-	public void unnest() {
-		nested = false;
+	
+	public void updateJobExecutionStatus(FlowExecutionStatus status) {		
 	}
 
 }

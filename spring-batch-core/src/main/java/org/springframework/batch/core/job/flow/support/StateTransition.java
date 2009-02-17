@@ -100,7 +100,9 @@ public class StateTransition implements Comparable<StateTransition> {
 		}
 
 		Assert.notNull(state, "A state is required for a StateTransition");
-		state.validate(pattern, next);
+		if (state.isEndState() && StringUtils.hasText(next)) {
+			throw new IllegalStateException("End state cannot have next: "+state);
+		}
 
 		this.next = next;
 		this.state = state;

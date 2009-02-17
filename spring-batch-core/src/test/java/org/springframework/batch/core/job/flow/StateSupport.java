@@ -17,13 +17,10 @@ package org.springframework.batch.core.job.flow;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.job.flow.FlowExecutionStatus;
-import org.springframework.batch.core.job.flow.FlowExecutor;
-import org.springframework.batch.core.job.flow.State;
 import org.springframework.batch.core.job.flow.support.state.AbstractState;
 
 /**
- * Base class for {@link State} implementations.
+ * Base class for {@link State} implementations in test cases.
  * 
  * @author Dave Syer
  *
@@ -49,7 +46,9 @@ public class StateSupport extends AbstractState {
 		}
 		return this.status;
 	}
-
-	public void validate(String pattern, String nextState) {
+	
+	public boolean isEndState() {
+		return false;
 	}
+
 }

@@ -70,7 +70,21 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	public FlowExecutionStatus(String status) {
 		this.status = status;
 	}
+	
+	/**
+	 * @return true if the status starts with "STOPPED"
+	 */
+	public boolean isStop() {
+		return status.startsWith(STOPPED.getStatus());
+	}
 
+	/**
+	 * @return true if the status starts with "FAILED"
+	 */
+	public boolean isFail() {
+		return status.startsWith(FAILED.toString());
+	}
+	
 	/**
 	 * Create an ordering on {@link FlowExecutionStatus} instances by comparing
 	 * their statuses.
@@ -107,7 +121,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	}
 
 	public String toString() {
-		return "FlowExecutionStatus: " + status;
+		return status;
 	}
 
 	public String getStatus() {

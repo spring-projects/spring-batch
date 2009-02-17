@@ -52,7 +52,11 @@ public class StepState extends AbstractState implements StepHolder {
 
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
-		executor.updateStepExecutionStatus();
+		/*
+		 * On starting a new step, possibly upgrade the last execution to make
+		 * sure it is abandoned on restart if it failed.
+		 */
+		executor.abandonStepExecution();
 		return new FlowExecutionStatus(executor.executeStep(step));
 	}
 
@@ -62,14 +66,12 @@ public class StepState extends AbstractState implements StepHolder {
 	public Step getStep() {
 		return step;
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.springframework.batch.core.job.flow.State#validate(java.lang.String)
+	 * @see org.springframework.batch.core.job.flow.State#isEndState()
 	 */
-	public void validate(String pattern, String nextState) {
-		if (nextState == null) {
-			throw new IllegalStateException("The transition for " + getClass().getSimpleName() + " [" + getName()
-					+ "] requires a 'next' state.");
-		}
+	public boolean isEndState() {
+		return false;
 	}
+
 }

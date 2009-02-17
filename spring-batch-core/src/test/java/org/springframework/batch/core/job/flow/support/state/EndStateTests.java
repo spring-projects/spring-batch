@@ -20,11 +20,10 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.support.JobFlowExecutorSupport;
-import org.springframework.batch.core.job.flow.support.state.EndState;
 
 /**
  * @author Dave Syer
@@ -48,7 +47,7 @@ public class EndStateTests {
 
 		BatchStatus status = jobExecution.getStatus();
 	
-		EndState state = new EndState(BatchStatus.UNKNOWN, ExitStatus.UNKNOWN, "end");
+		EndState state = new EndState(FlowExecutionStatus.UNKNOWN, "end");
 		state.handle(new JobFlowExecutorSupport() {
 			@Override
 			public JobExecution getJobExecution() {
@@ -69,38 +68,15 @@ public class EndStateTests {
 
 		jobExecution.createStepExecution("foo");
 	
-		EndState state = new EndState(BatchStatus.UNKNOWN, ExitStatus.UNKNOWN, "end");
-		state.handle(new JobFlowExecutorSupport() {
+		EndState state = new EndState(FlowExecutionStatus.UNKNOWN, "end");
+		FlowExecutionStatus status = state.handle(new JobFlowExecutorSupport() {
 			@Override
 			public JobExecution getJobExecution() {
 				return jobExecution;
 			}
 		});
 		
-		assertEquals(BatchStatus.UNKNOWN, jobExecution.getStatus());
-
-	}
-
-	/**
-	 * Test method for {@link EndState#handle(FlowExecutor)}.
-	 * @throws Exception 
-	 */
-	@Test
-	public void testHandleOngoingAttemptedDowngrade() throws Exception {
-
-		jobExecution.setStatus(BatchStatus.FAILED);
-		jobExecution.createStepExecution("foo");
-	
-		EndState state = new EndState(BatchStatus.COMPLETED, ExitStatus.COMPLETED, "end");
-		state.handle(new JobFlowExecutorSupport() {
-			@Override
-			public JobExecution getJobExecution() {
-				return jobExecution;
-			}
-		});
-		
-		// An EndState can downgrade a status - if it failed then it can be unfailed
-		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
+		assertEquals(FlowExecutionStatus.UNKNOWN, status);
 
 	}
 

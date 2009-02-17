@@ -80,7 +80,8 @@ public class FlowJob extends AbstractJob {
 	protected void doExecute(final JobExecution execution)
 			throws JobExecutionException {
 		try {
-			flow.start(new JobFlowExecutor(execution));
+			JobFlowExecutor executor = new JobFlowExecutor(execution);
+			executor.updateJobExecutionStatus(flow.start(executor).getStatus());
 		} catch (FlowExecutionException e) {
 			if (e.getCause() instanceof JobExecutionException) {
 				throw (JobExecutionException) e.getCause();
@@ -100,8 +101,6 @@ public class FlowJob extends AbstractJob {
 
 		private final JobExecution execution;
 
-		private volatile boolean nested = false;
-
 		/**
 		 * @param execution
 		 */
@@ -118,7 +117,7 @@ public class FlowJob extends AbstractJob {
 					: stepExecution.getExitStatus().getExitCode();
 		}
 
-		public void updateStepExecutionStatus() {
+		public void abandonStepExecution() {
 			StepExecution lastStepExecution = stepExecutionHolder.get();
 			if (lastStepExecution != null
 					&& lastStepExecution.getStatus().isGreaterThan(
@@ -126,6 +125,11 @@ public class FlowJob extends AbstractJob {
 				lastStepExecution.upgradeStatus(BatchStatus.ABANDONED);
 				updateStepExecution(lastStepExecution);
 			}
+		}
+		
+		public void updateJobExecutionStatus(FlowExecutionStatus status) {
+			execution.setStatus(findBatchStatus(status));
+			execution.setExitStatus(new ExitStatus(status.getStatus()));
 		}
 
 		public JobExecution getJobExecution() {
@@ -140,16 +144,17 @@ public class FlowJob extends AbstractJob {
 			stepExecutionHolder.set(null);
 		}
 
-		public boolean isNested() {
-			return nested;
-		}
-
-		public void nest() {
-			nested = true;
-		}
-
-		public void unnest() {
-			nested = false;
+		/**
+		 * @param status
+		 * @return
+		 */
+		private BatchStatus findBatchStatus(FlowExecutionStatus status) {
+			for (BatchStatus batchStatus : BatchStatus.values()) {
+				if (status.getStatus().startsWith(batchStatus.toString())) {
+					return batchStatus;
+				}
+			}
+			return BatchStatus.UNKNOWN;
 		}
 
 	}

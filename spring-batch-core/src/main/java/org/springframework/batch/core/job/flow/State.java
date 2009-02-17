@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.job.flow;
 
-
-
 /**
  * @author Dave Syer
  * 
@@ -46,10 +44,12 @@ public interface State {
 	FlowExecutionStatus handle(FlowExecutor executor) throws Exception;
 
 	/**
-	 * Validate that the transition attributes are appropriate for this State.
+	 * Inquire as to whether a {@link State} is an end state. Implementations
+	 * should return false if processing can continue, even if that would
+	 * require a restart.
 	 * 
-	 * @param pattern
-	 * @param nextState
+	 * @return true if this {@link State} is the end of processing
 	 */
-	void validate(String pattern, String nextState);
+	boolean isEndState();
+
 }

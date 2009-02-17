@@ -24,6 +24,7 @@ import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -73,8 +74,8 @@ public class StopJobParserTests extends AbstractJobParserTests {
 	}
 
 	public static class TestDecider implements JobExecutionDecider {
-		public String decide(JobExecution jobExecution, StepExecution stepExecution) {
-			return "FOO";
+		public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
+			return new FlowExecutionStatus("FOO");
 		}
 	}
 

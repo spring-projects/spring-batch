@@ -19,8 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -172,10 +171,10 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		if (!transitionElementExists) {
-			list.addAll(createTransition(BatchStatus.FAILED, ExitStatus.FAILED.getExitCode(), null, null, stateDef,
-					parserContext, false));
+			list.addAll(createTransition(FlowExecutionStatus.FAILED, FlowExecutionStatus.FAILED.toString(), null, null, stateDef, parserContext, false));
 			if (!hasNextAttribute) {
-				list.addAll(createTransition(BatchStatus.COMPLETED, null, null, null, stateDef, parserContext, false));
+				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, null, null, null, stateDef, parserContext,
+						false));
 			}
 		}
 		else if (hasNextAttribute) {
@@ -213,7 +212,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	private static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
 			BeanDefinition stateDef, ParserContext parserContext) {
 
-		BatchStatus batchStatus = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
+		FlowExecutionStatus batchStatus = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
 		String onAttribute = transitionElement.getAttribute("on");
 		String nextAttribute = transitionElement.getAttribute("to");
 		String restartAttribute = transitionElement.getAttribute("restart");
@@ -243,24 +242,28 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */
-	private static Collection<BeanDefinition> createTransition(BatchStatus batchStatus, String on, String next,
+	private static Collection<BeanDefinition> createTransition(FlowExecutionStatus batchStatus, String on, String next,
 			String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
 
 		BeanDefinition endState = null;
 
 		// TODO: revise this for clarity
-		if (batchStatus == BatchStatus.STOPPED || batchStatus == BatchStatus.COMPLETED
-				|| batchStatus == BatchStatus.FAILED) {
+		if (batchStatus == FlowExecutionStatus.STOPPED || batchStatus == FlowExecutionStatus.COMPLETED
+				|| batchStatus == FlowExecutionStatus.FAILED) {
 
 			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
-			endBuilder.addConstructorArgValue(batchStatus);
 
 			boolean exitCodeExists = StringUtils.hasText(exitCode);
-			endBuilder.addConstructorArgValue(exitCodeExists ? new ExitStatus(exitCode)
-					: convertToExitStatus(batchStatus));
+			// Make sure exit code is consistent with status for aggregation
+			// purposes
+			if (exitCodeExists && !exitCode.startsWith(batchStatus.toString())) {
+				exitCode = batchStatus.toString() + (exitCode.contains(" ") ? " " : "_") + exitCode;
+			}
+			endBuilder.addConstructorArgValue(exitCodeExists ? new FlowExecutionStatus(exitCode) : batchStatus);
 
-			String endName = (batchStatus == BatchStatus.STOPPED ? STOP : batchStatus == BatchStatus.FAILED ? FAIL : END)
+			String endName = (batchStatus == FlowExecutionStatus.STOPPED ? STOP
+					: batchStatus == FlowExecutionStatus.FAILED ? FAIL : END)
 					+ (endCounter++);
 			endBuilder.addConstructorArgValue(endName);
 
@@ -288,31 +291,18 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @param elementName An end transition element name
 	 * @return the BatchStatus corresponding to the transition name
 	 */
-	private static BatchStatus getBatchStatusFromEndTransitionName(String elementName) {
+	private static FlowExecutionStatus getBatchStatusFromEndTransitionName(String elementName) {
 		if (STOP.equals(elementName)) {
-			return BatchStatus.STOPPED;
+			return FlowExecutionStatus.STOPPED;
 		}
 		else if (END.equals(elementName)) {
-			return BatchStatus.COMPLETED;
+			return FlowExecutionStatus.COMPLETED;
 		}
 		else if (FAIL.equals(elementName)) {
-			return BatchStatus.FAILED;
+			return FlowExecutionStatus.FAILED;
 		}
 		else {
-			return BatchStatus.UNKNOWN;
-		}
-	}
-
-	/**
-	 * @param batchStatus A BatchStatus
-	 * @return the ExitStatus corresponding to the BatchStatus
-	 */
-	private static ExitStatus convertToExitStatus(BatchStatus batchStatus) {
-		if (batchStatus == BatchStatus.FAILED) {
-			return ExitStatus.FAILED;
-		}
-		else {
-			return new ExitStatus(batchStatus.toString());
+			return FlowExecutionStatus.UNKNOWN;
 		}
 	}
 
