@@ -46,6 +46,9 @@ public class MapJobExplorerIntegrationTests {
 
 	@Test
 	public void testRunningJobExecution() throws Exception {
+
+		MapJobRepositoryFactoryBean.clear();
+
 		SimpleJobLauncher jobLauncher = new SimpleJobLauncher();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
 		ResourcelessTransactionManager transactionManager = new ResourcelessTransactionManager();
@@ -55,6 +58,7 @@ public class MapJobExplorerIntegrationTests {
 		jobLauncher.setJobRepository(jobRepository);
 		jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
 		jobLauncher.afterPropertiesSet();
+
 		SimpleJob job = new SimpleJob("job");
 		TaskletStep step = new TaskletStep("step");
 		step.setTasklet(new Tasklet() {
@@ -71,12 +75,16 @@ public class MapJobExplorerIntegrationTests {
 		job.addStep(step);
 		job.setJobRepository(jobRepository);
 		job.afterPropertiesSet();
+
 		jobLauncher.run(job, new JobParametersBuilder().addString("test", getClass().getName()).toJobParameters());
+
 		Thread.sleep(500L);
 		JobExplorer explorer = (JobExplorer) new MapJobExplorerFactoryBean().getObject();
 		Set<JobExecution> executions = explorer.findRunningJobExecutions("job");
 		assertEquals(1, executions.size());
 		assertEquals(1, executions.iterator().next().getStepExecutions().size());
+
 		block = false;
+
 	}
 }

@@ -21,9 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -131,8 +131,9 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 		stepExecution.setRollbackCount(3);
 		dao.saveStepExecution(stepExecution);
 
-		List<StepExecution> retrieved = dao.getStepExecutions(jobExecution);
-		assertStepExecutionsAreEqual(stepExecution, retrieved.get(0));
+		dao.addStepExecutions(jobExecution);
+		Collection<StepExecution> retrieved = jobExecution.getStepExecutions();
+		assertStepExecutionsAreEqual(stepExecution, retrieved.iterator().next());
 	}
 
 	@Transactional
@@ -229,8 +230,9 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 	@Test
 	public void testGetStepExecutionsWhenNoneExist() throws Exception {
-		assertEquals("empty list is returned if no stepExecutions exist for given jobExecution", Collections
-				.emptyList(), dao.getStepExecutions(jobExecution));
+		int count = jobExecution.getStepExecutions().size();
+		dao.addStepExecutions(jobExecution);
+		assertEquals("Incorrect size of collection", count, jobExecution.getStepExecutions().size());
 	}
 
 	private void assertStepExecutionsAreEqual(StepExecution expected, StepExecution actual) {

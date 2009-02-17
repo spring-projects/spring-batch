@@ -186,8 +186,8 @@ public class SimpleJobRepository implements JobRepository {
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		List<StepExecution> stepExecutions = new ArrayList<StepExecution>(jobExecutions.size());
 		for (JobExecution jobExecution : jobExecutions) {
-			List<StepExecution> allStepExecutions = stepExecutionDao.getStepExecutions(jobExecution);
-			for (StepExecution stepExecution : allStepExecutions) {
+			stepExecutionDao.addStepExecutions(jobExecution);
+			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 				if (stepName.equals(stepExecution.getStepName())) {
 					stepExecutions.add(stepExecution);
 				}
@@ -216,8 +216,8 @@ public class SimpleJobRepository implements JobRepository {
 		int count = 0;
 		List<JobExecution> jobExecutions = jobExecutionDao.findJobExecutions(jobInstance);
 		for (JobExecution jobExecution : jobExecutions) {
-			List<StepExecution> allStepExecutions = stepExecutionDao.getStepExecutions(jobExecution);
-			for (StepExecution stepExecution : allStepExecutions) {
+			stepExecutionDao.addStepExecutions(jobExecution);
+			for (StepExecution stepExecution : jobExecution.getStepExecutions()) {
 				if (stepName.equals(stepExecution.getStepName())) {
 					count++;
 				}

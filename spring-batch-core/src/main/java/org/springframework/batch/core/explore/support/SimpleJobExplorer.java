@@ -126,7 +126,7 @@ public class SimpleJobExplorer implements JobExplorer {
 	private void getJobExecutionDependencies(JobExecution jobExecution){
 		
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
-		stepExecutionDao.getStepExecutions(jobExecution);
+		stepExecutionDao.addStepExecutions(jobExecution);
 		jobExecution.setJobInstance(jobInstance);
 	}
 

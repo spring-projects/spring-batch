@@ -220,10 +220,9 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 		}
 	}
 
-	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
-		List<StepExecution> executions = getJdbcTemplate().query(getQuery(GET_STEP_EXECUTIONS),
-				new StepExecutionRowMapper(jobExecution), jobExecution.getId());
-		return executions;
+	public void addStepExecutions(JobExecution jobExecution) {
+		getJdbcTemplate().query(getQuery(GET_STEP_EXECUTIONS), new StepExecutionRowMapper(jobExecution),
+				jobExecution.getId());
 	}
 
 	private static class StepExecutionRowMapper implements ParameterizedRowMapper<StepExecution> {

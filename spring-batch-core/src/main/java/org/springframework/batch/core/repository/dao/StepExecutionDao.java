@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.repository.dao;
 
-import java.util.List;
 
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -56,8 +55,7 @@ public interface StepExecutionDao {
 	 * Retrieve all the {@link StepExecution} for the parent {@link JobExecution}.
 	 * 
 	 * @param jobExecution the parent job execution
-	 * @return a list of {@link StepExecution}
 	 */
-	List<StepExecution> getStepExecutions(JobExecution jobExecution);
+	void addStepExecutions(JobExecution jobExecution);
 
 }

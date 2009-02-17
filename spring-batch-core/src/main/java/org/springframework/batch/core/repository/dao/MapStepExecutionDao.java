@@ -99,10 +99,10 @@ public class MapStepExecutionDao implements StepExecutionDao {
 		return executionsByStepExecutionId.get(stepExecutionId);
 	}
 
-	public List<StepExecution> getStepExecutions(JobExecution jobExecution) {
+	public void addStepExecutions(JobExecution jobExecution) {
 		Map<Long, StepExecution> executions = executionsByJobExecutionId.get(jobExecution.getId());
 		if (executions == null || executions.isEmpty()) {
-			return Collections.emptyList();
+			return;
 		}
 		List<StepExecution> result = new ArrayList<StepExecution>(executions.values());
 		Collections.sort(result, new Comparator<Entity>() {
@@ -117,6 +117,5 @@ public class MapStepExecutionDao implements StepExecutionDao {
 			copy.add(copy(exec));
 		}
 		jobExecution.addStepExecutions(copy);
-		return copy;
 	}
 }
