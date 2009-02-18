@@ -27,7 +27,7 @@ import org.springframework.batch.item.ItemProcessor;
  * @author Dave Syer
  * 
  */
-public class PassthroughItemProcessor<T> implements ItemProcessor<T, T> {
+public class PassThroughItemProcessor<T> implements ItemProcessor<T, T> {
 
 	/**
 	 * Just returns the item back to the caller.
