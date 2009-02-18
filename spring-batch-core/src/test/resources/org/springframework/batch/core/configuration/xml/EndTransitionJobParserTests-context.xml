@@ -11,7 +11,7 @@
 	<job id="job">
 		<step id="s1" ref="step1" next="fail"/>
 		<step id="fail" ref="failingStep">
-			<end on="*" status="COMPLETED EARLY TERMINATION"/>
+			<end on="*" exit-code="COMPLETED EARLY TERMINATION"/>
 		</step>
 	</job>
 

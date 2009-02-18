@@ -221,9 +221,9 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		if (stateId != null && StringUtils.hasText(restartAttribute) && !restartAttribute.equals(stateId)) {
 			abandon = true;
 		}
-		String statusAttribute = transitionElement.getAttribute("status");
+		String exitCodeAttribute = transitionElement.getAttribute("exit-code");
 
-		return createTransition(batchStatus, onAttribute, nextAttribute, statusAttribute, stateDef, parserContext,
+		return createTransition(batchStatus, onAttribute, nextAttribute, exitCodeAttribute, stateDef, parserContext,
 				abandon);
 	}
 

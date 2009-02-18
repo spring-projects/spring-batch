@@ -619,9 +619,9 @@
 								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
-						<xsd:attribute name="status" use="optional" type="xsd:string" default="COMPLETED">
+						<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="COMPLETED">
 							<xsd:annotation>
-								<xsd:documentation>The ExitStatus value to end on, defaults to COMPLETED.</xsd:documentation>
+								<xsd:documentation>The exit code value to end on, defaults to COMPLETED.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
 					</xsd:complexType>		
@@ -639,9 +639,9 @@
 								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
-						<xsd:attribute name="status" use="optional" type="xsd:string" default="FAILED">
+						<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="FAILED">
 							<xsd:annotation>
-								<xsd:documentation>The ExitStatus value to end on, defaults to FAILED.</xsd:documentation>
+								<xsd:documentation>The exit code value to end on, defaults to FAILED.</xsd:documentation>
 							</xsd:annotation>
 						</xsd:attribute>
 					</xsd:complexType>		

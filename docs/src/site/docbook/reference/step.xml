@@ -1295,9 +1295,9 @@
         <classname>Job</classname> that has finished with status COMPLETED
         cannot be restarted (the framework will throw a
         <classname>JobInstanceAlreadyCompleteException</classname>). The 'end'
-        element also allows for an optional 'status' attribute that can be
+        element also allows for an optional 'exit-code' attribute that can be
         used to customize the <classname>ExitStatus</classname> of the
-        <classname>Job</classname>. If no 'status' attribute is given, then
+        <classname>Job</classname>. If no 'exit-code' attribute is given, then
         the <classname>ExitStatus</classname> will be "COMPLETED" by default,
         to match the <classname>BatchStatus</classname>.</para>
 
@@ -1324,9 +1324,9 @@
         stop with a <classname>BatchStatus</classname> of FAILED. Unlike the
         'end' element, the 'fail' element will not prevent the
         <classname>Job</classname> from being restarted. The 'fail' element
-        also allows for an optional 'status' attribute that can be used to
+        also allows for an optional 'exit-code' attribute that can be used to
         customize the <classname>ExitStatus</classname> of the
-        <classname>Job</classname>. If no 'status' attribute is given, then
+        <classname>Job</classname>. If no 'exit-code' attribute is given, then
         the <classname>ExitStatus</classname> will be "FAILED" by default, to
         match the <classname>BatchStatus</classname>.</para>
 
@@ -1340,7 +1340,7 @@
 
         <programlisting><![CDATA[  <step id="step1" next="step2">
   <step id="step2">
-    <fail on="FAILED" status="EARLY TERMINATION"/>
+    <fail on="FAILED" exit-code="EARLY TERMINATION"/>
     <next on="*" to="step3"/>
   </step>
   <step id="step3">]]></programlisting>

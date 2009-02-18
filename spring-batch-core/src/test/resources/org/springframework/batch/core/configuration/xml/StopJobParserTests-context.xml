@@ -14,7 +14,7 @@
 		</step>
 		<decision id="decision" decider="decider">
 			<next on="FOO" to="s2"/>
-			<end on="*" status="FAILED"/>
+			<end on="*" exit-code="FAILED"/>
 		</decision>
 		<step id="s2" ref="step2"/>
 	</job>

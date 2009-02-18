@@ -27,7 +27,7 @@
 		</step>
 		<decision id="limitDecision" decider="limitDecider">
 			<next on="CONTINUE" to="step2" />
-			<end on="COMPLETE" status="COMPLETED" />
+			<end on="COMPLETED" />
 		</decision>
 	</job>
 
