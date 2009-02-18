@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.configuration.support;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,51 +32,54 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 
 /**
- * Implementation of the {@link ListableJobRegistry} interface that assumes all Jobs will be loaded from
- * ClassPathXml resources.
+ * Implementation of the {@link ListableJobRegistry} interface that assumes all
+ * Jobs will be loaded from ClassPathXml resources.
  * 
  * @author Lucas Ward
+ * @author Dave Syer
  * @since 2.0
  */
 public class ClassPathXmlJobRegistry implements ListableJobRegistry, ApplicationContextAware, InitializingBean {
 
-	List<Resource> jobPaths;
-	ApplicationContext parent;
-	ListableJobRegistry jobRegistry;
-	
-	public ClassPathXmlJobRegistry(List<Resource> jobPaths) {
-		this.jobPaths = jobPaths;
+	private List<Resource> jobPaths;
+
+	private ApplicationContext parent;
+
+	private ListableJobRegistry jobRegistry = new MapJobRegistry();
+
+	public void setJobPaths(Resource[] jobPaths) {
+		this.jobPaths = Arrays.asList(jobPaths);
 	}
-	
+
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		parent = applicationContext;
+	}
+
 	public Job getJob(String name) throws NoSuchJobException {
 		return jobRegistry.getJob(name);
 	}
 
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
-		parent = applicationContext;
-	}
-
 	public void afterPropertiesSet() throws Exception {
-		
-		jobRegistry = new MapJobRegistry();
-		for(Resource resource:jobPaths){
+
+		for (Resource resource : jobPaths) {
 			ClassPathXmlApplicationContextFactory applicationContextFactory = new ClassPathXmlApplicationContextFactory();
 			applicationContextFactory.setPath(resource);
 			applicationContextFactory.setApplicationContext(parent);
 			ApplicationContext context = applicationContextFactory.createApplicationContext();
 			String[] names = context.getBeanNamesForType(Job.class);
-			
-			if(names.length > 1){
+
+			if (names.length > 1) {
 				throw new DuplicateJobException("More than one Job found for resource: [" + resource + "]");
 			}
-			else if(names.length == 0){
+			else if (names.length == 0) {
 				throw new NoSuchJobException("No Jobs found in resource: [" + resource + "]");
 			}
-			
-			ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(applicationContextFactory, names[0]);
+
+			ApplicationContextJobFactory jobFactory = new ApplicationContextJobFactory(applicationContextFactory,
+					names[0]);
 			jobRegistry.register(jobFactory);
 		}
+
 	}
 
 	public Collection<String> getJobNames() {
