@@ -182,7 +182,7 @@ public class StateTransition implements Comparable<StateTransition> {
 	 */
 	@Override
 	public String toString() {
-		return String.format("StateTransition: state=%s, pattern=%s, next=%s", state == null ? null : state.getName(),
+		return String.format("StateTransition: [state=%s, pattern=%s, next=%s]", state == null ? null : state.getName(),
 				pattern, next);
 	}
 
