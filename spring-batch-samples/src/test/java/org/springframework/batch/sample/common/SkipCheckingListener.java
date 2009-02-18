@@ -2,20 +2,24 @@ package org.springframework.batch.sample.common;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.annotation.AfterStep;
+import org.springframework.batch.core.annotation.BeforeStep;
 
-public class SkipCheckingListener implements StepExecutionListener {
+public class SkipCheckingListener {
 
-	public ExitStatus afterStep(StepExecution stepExecution) {
+	@AfterStep
+	public ExitStatus checkForSkips(StepExecution stepExecution) {
 		if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
 				&& stepExecution.getSkipCount() > 0) {
 			return new ExitStatus("COMPLETED WITH SKIPS");
-		} else {
+		}
+		else {
 			return null;
 		}
 	}
 
-	public void beforeStep(StepExecution stepExecution) {
+	@BeforeStep
+	public void saveStepName(StepExecution stepExecution) {
 		stepExecution.getExecutionContext().put("stepName", stepExecution.getStepName());
 	}
 }
