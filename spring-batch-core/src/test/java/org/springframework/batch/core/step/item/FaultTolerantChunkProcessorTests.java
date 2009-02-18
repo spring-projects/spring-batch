@@ -10,7 +10,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.PassthroughItemProcessor;
+import org.springframework.batch.item.support.PassThroughItemProcessor;
 
 public class FaultTolerantChunkProcessorTests {
 
@@ -21,7 +21,7 @@ public class FaultTolerantChunkProcessorTests {
 	@Test
 	public void testWrite() throws Exception {
 		FaultTolerantChunkProcessor<String, String> processor = new FaultTolerantChunkProcessor<String, String>(
-				new PassthroughItemProcessor<String>(), new ItemWriter<String>() {
+				new PassThroughItemProcessor<String>(), new ItemWriter<String>() {
 					public void write(List<? extends String> items) throws Exception {
 						list.addAll(items);
 					}

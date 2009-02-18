@@ -20,7 +20,7 @@ import org.springframework.batch.core.step.item.SimpleChunkProcessor;
 import org.springframework.batch.core.step.item.SimpleChunkProvider;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.PassthroughItemProcessor;
+import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
@@ -45,7 +45,7 @@ public class TestingChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T> {
 	}
 
 	/**
-	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
+	 * Creates a {@link PassThroughItemProcessor} and uses it to create an
 	 * instance of {@link Tasklet}.
 	 */
 	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter) {
@@ -53,13 +53,13 @@ public class TestingChunkOrientedTasklet<T> extends ChunkOrientedTasklet<T> {
 	}
 
 	/**
-	 * Creates a {@link PassthroughItemProcessor} and uses it to create an
+	 * Creates a {@link PassThroughItemProcessor} and uses it to create an
 	 * instance of {@link Tasklet}.
 	 */
 	public TestingChunkOrientedTasklet(ItemReader<T> itemReader, ItemWriter<T> itemWriter,
 			RepeatOperations repeatOperations) {
 		super(new SimpleChunkProvider<T>(itemReader, repeatOperations), new SimpleChunkProcessor<T, T>(
-				new PassthroughItemProcessor<T>(), itemWriter));
+				new PassThroughItemProcessor<T>(), itemWriter));
 	}
 
 }

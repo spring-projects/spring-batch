@@ -13,7 +13,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.PassthroughItemProcessor;
+import org.springframework.batch.item.support.PassThroughItemProcessor;
 
 public class SimpleChunkProcessorTests {
 
@@ -26,7 +26,7 @@ public class SimpleChunkProcessorTests {
 
 	@Before
 	public void setUp() {
-		processor = new SimpleChunkProcessor<String,String>(new PassthroughItemProcessor<String>(), new ItemWriter<String>() {
+		processor = new SimpleChunkProcessor<String,String>(new PassThroughItemProcessor<String>(), new ItemWriter<String>() {
 			public void write(List<? extends String> items) throws Exception {
 				list.addAll(items);
 			}
