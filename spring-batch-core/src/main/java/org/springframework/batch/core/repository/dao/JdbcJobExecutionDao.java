@@ -73,8 +73,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	private static final String GET_EXECUTION_BY_ID = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION"
 			+ " from %PREFIX%JOB_EXECUTION where JOB_EXECUTION_ID = ?";
 
-	private static final String GET_RUNNING_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION "
-			+ "JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION where END_TIME is NULL order by JOB_EXECUTION_ID desc";
+	private static final String GET_RUNNING_EXECUTIONS = "SELECT JOB_EXECUTION_ID, START_TIME, END_TIME, STATUS, EXIT_CODE, EXIT_MESSAGE, CREATE_TIME, LAST_UPDATED, VERSION, "
+			+ "JOB_INSTANCE_ID from %PREFIX%JOB_EXECUTION E, %PREFIX%JOB_INSTANCE I where E.JOB_INSTANCE_ID=I.JOB_INSTANCE_ID and I.JOB_NAME=? and E.END_TIME is NULL order by E.JOB_EXECUTION_ID desc";
 
 	private static final String CURRENT_VERSION_JOB_EXECUTION = "SELECT VERSION FROM %PREFIX%JOB_EXECUTION WHERE JOB_EXECUTION_ID=?";
 
@@ -265,7 +265,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 				result.add(mapper.mapRow(rs, 0));
 			}
 		};
-		getJdbcTemplate().getJdbcOperations().query(getQuery(GET_RUNNING_EXECUTIONS), handler);
+		getJdbcTemplate().getJdbcOperations()
+				.query(getQuery(GET_RUNNING_EXECUTIONS), new Object[] { jobName }, handler);
 
 		return result;
 	}

@@ -20,22 +20,23 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-public abstract class AbstractJobExecutionDaoTests extends AbstractTransactionalJUnit4SpringContextTests {
+public abstract class AbstractJobExecutionDaoTests {
 
 	protected JobExecutionDao dao;
 
-	protected JobInstance jobInstance = new JobInstance(1L, new JobParameters(), "execTestJob");
+	protected JobInstance jobInstance;
 
-	protected JobExecution execution = new JobExecution(jobInstance);
+	protected JobExecution execution;
 
 	/**
 	 * @return tested object ready for use
 	 */
 	protected abstract JobExecutionDao getJobExecutionDao();
+
+	protected abstract JobInstanceDao getJobInstanceDao();
 
 	/**
 	 * @return tested object ready for use
@@ -47,6 +48,8 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	@Before
 	public void onSetUp() throws Exception {
 		dao = getJobExecutionDao();
+		jobInstance = getJobInstanceDao().createJobInstance("execTestJob", new JobParameters());
+		execution = new JobExecution(jobInstance);
 	}
 
 	/**
@@ -172,27 +175,32 @@ public abstract class AbstractJobExecutionDaoTests extends AbstractTransactional
 	@Transactional
 	@Test
 	public void testFindRunningExecutions() {
+
 		JobExecution exec = new JobExecution(jobInstance);
 		exec.setCreateTime(new Date(0));
 		exec.setEndTime(new Date(1L));
 		exec.setLastUpdated(new Date(5L));
 		dao.saveJobExecution(exec);
+
 		exec = new JobExecution(jobInstance);
 		exec.setLastUpdated(new Date(5L));
 		exec.createStepExecution("step");
 		dao.saveJobExecution(exec);
+
 		StepExecutionDao stepExecutionDao = getStepExecutionDao();
 		if (stepExecutionDao != null) {
 			for (StepExecution stepExecution : exec.getStepExecutions()) {
 				stepExecutionDao.saveStepExecution(stepExecution);
 			}
 		}
+
 		Set<JobExecution> values = dao.findRunningJobExecutions(exec.getJobInstance().getJobName());
 
 		assertEquals(1, values.size());
 		JobExecution value = values.iterator().next();
 		assertEquals(exec, value);
 		assertEquals(5L, value.getLastUpdated().getTime());
+
 	}
 
 	/**

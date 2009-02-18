@@ -22,7 +22,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 
 import org.junit.Before;

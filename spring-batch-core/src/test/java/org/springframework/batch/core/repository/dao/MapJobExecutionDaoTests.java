@@ -14,10 +14,16 @@ import static org.junit.Assert.*;
 @RunWith(JUnit4ClassRunner.class)
 public class MapJobExecutionDaoTests extends AbstractJobExecutionDaoTests {
 
+	@Override
 	protected JobExecutionDao getJobExecutionDao() {
 		MapJobExecutionDao.clear();
 		MapJobInstanceDao.clear();
 		return new MapJobExecutionDao();
+	}
+	
+	@Override
+	protected JobInstanceDao getJobInstanceDao() {
+		return new MapJobInstanceDao();
 	}
 
 	/**
