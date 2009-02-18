@@ -158,7 +158,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 		}
 
 		String next = null;
-		String exitCode = status.getStatus();
+		String exitCode = status.getName();
 		for (StateTransition stateTransition : set) {
 			if (stateTransition.matches(exitCode)) {
 				if (stateTransition.isEnd()) {
@@ -172,7 +172,7 @@ public class SimpleFlow implements Flow, InitializingBean {
 
 		if (next == null) {
 			throw new FlowExecutionException(String.format(
-					"Next state not found in flow=%s for state=%s with exit status=%s", getName(), stateName, status));
+					"Next state not found in flow=%s for state=%s with exit status=%s", getName(), stateName, status.getName()));
 		}
 
 		if (!stateMap.containsKey(next)) {

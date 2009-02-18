@@ -129,7 +129,7 @@ public class FlowJob extends AbstractJob {
 		
 		public void updateJobExecutionStatus(FlowExecutionStatus status) {
 			execution.setStatus(findBatchStatus(status));
-			execution.setExitStatus(new ExitStatus(status.getStatus()));
+			execution.setExitStatus(new ExitStatus(status.getName()));
 		}
 
 		public JobExecution getJobExecution() {
@@ -150,7 +150,7 @@ public class FlowJob extends AbstractJob {
 		 */
 		private BatchStatus findBatchStatus(FlowExecutionStatus status) {
 			for (BatchStatus batchStatus : BatchStatus.values()) {
-				if (status.getStatus().startsWith(batchStatus.toString())) {
+				if (status.getName().startsWith(batchStatus.toString())) {
 					return batchStatus;
 				}
 			}

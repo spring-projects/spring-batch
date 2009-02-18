@@ -45,7 +45,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 */
 	public static final FlowExecutionStatus UNKNOWN = new FlowExecutionStatus(Status.UNKNOWN.toString());
 
-	private final String status;
+	private final String name;
 
 	private enum Status {
 
@@ -68,21 +68,21 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * @param status
 	 */
 	public FlowExecutionStatus(String status) {
-		this.status = status;
+		this.name = status;
 	}
 	
 	/**
 	 * @return true if the status starts with "STOPPED"
 	 */
 	public boolean isStop() {
-		return status.startsWith(STOPPED.getStatus());
+		return name.startsWith(STOPPED.getName());
 	}
 
 	/**
 	 * @return true if the status starts with "FAILED"
 	 */
 	public boolean isFail() {
-		return status.startsWith(FAILED.toString());
+		return name.startsWith(FAILED.getName());
 	}
 	
 	/**
@@ -95,11 +95,11 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * @return negative, zero or positive as per the contract
 	 */
 	public int compareTo(FlowExecutionStatus other) {
-		Status one = Status.match(this.status);
-		Status two = Status.match(other.status);
+		Status one = Status.match(this.name);
+		Status two = Status.match(other.name);
 		int comparison = one.compareTo(two);
 		if (comparison == 0) {
-			return this.status.compareTo(other.status);
+			return this.name.compareTo(other.name);
 		}
 		return comparison;
 	}
@@ -109,6 +109,7 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 	 * 
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object object) {
 		if (object == this) {
 			return true;
@@ -117,15 +118,27 @@ public class FlowExecutionStatus implements Comparable<FlowExecutionStatus> {
 			return false;
 		}
 		FlowExecutionStatus other = (FlowExecutionStatus) object;
-		return status.equals(other.status);
+		return name.equals(other.name);
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode();
 	}
 
+	/**
+	 * @see Object#toString()
+	 */
+	@Override
 	public String toString() {
-		return status;
+		return name;
 	}
 
-	public String getStatus() {
-		return status;
+	/**
+	 * @return the name of this status
+	 */
+	public String getName() {
+		return name;
 	}
 
 }

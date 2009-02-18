@@ -31,7 +31,7 @@ public class FlowExecutionTests {
 	public void testBasicProperties() throws Exception {
 		FlowExecution execution = new FlowExecution("foo", new FlowExecutionStatus("BAR"));
 		assertEquals("foo",execution.getName());
-		assertEquals("BAR",execution.getStatus().getStatus());
+		assertEquals("BAR",execution.getStatus().getName());
 	}
 
 	@Test

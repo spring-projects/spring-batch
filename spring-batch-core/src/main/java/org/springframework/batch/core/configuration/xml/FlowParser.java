@@ -171,7 +171,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		}
 
 		if (!transitionElementExists) {
-			list.addAll(createTransition(FlowExecutionStatus.FAILED, FlowExecutionStatus.FAILED.toString(), null, null, stateDef, parserContext, false));
+			list.addAll(createTransition(FlowExecutionStatus.FAILED, FlowExecutionStatus.FAILED.getName(), null, null, stateDef, parserContext, false));
 			if (!hasNextAttribute) {
 				list.addAll(createTransition(FlowExecutionStatus.COMPLETED, null, null, null, stateDef, parserContext,
 						false));
@@ -212,7 +212,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	private static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
 			BeanDefinition stateDef, ParserContext parserContext) {
 
-		FlowExecutionStatus batchStatus = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
+		FlowExecutionStatus status = getBatchStatusFromEndTransitionName(transitionElement.getNodeName());
 		String onAttribute = transitionElement.getAttribute("on");
 		String nextAttribute = transitionElement.getAttribute("to");
 		String restartAttribute = transitionElement.getAttribute("restart");
@@ -223,12 +223,12 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		}
 		String exitCodeAttribute = transitionElement.getAttribute("exit-code");
 
-		return createTransition(batchStatus, onAttribute, nextAttribute, exitCodeAttribute, stateDef, parserContext,
+		return createTransition(status, onAttribute, nextAttribute, exitCodeAttribute, stateDef, parserContext,
 				abandon);
 	}
 
 	/**
-	 * @param batchStatus The batch status that this transition will set. Use
+	 * @param status The batch status that this transition will set. Use
 	 * BatchStatus.UNKNOWN if not applicable.
 	 * @param on The pattern that this transition should match. Use null for
 	 * "no restriction" (same as "*").
@@ -242,14 +242,14 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 * references
 	 */
-	private static Collection<BeanDefinition> createTransition(FlowExecutionStatus batchStatus, String on, String next,
+	private static Collection<BeanDefinition> createTransition(FlowExecutionStatus status, String on, String next,
 			String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
 
 		BeanDefinition endState = null;
 
 		// TODO: revise this for clarity
-		if (batchStatus == FlowExecutionStatus.STOPPED || batchStatus == FlowExecutionStatus.COMPLETED
-				|| batchStatus == FlowExecutionStatus.FAILED) {
+		if (status == FlowExecutionStatus.STOPPED || status == FlowExecutionStatus.COMPLETED
+				|| status == FlowExecutionStatus.FAILED) {
 
 			BeanDefinitionBuilder endBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
@@ -257,13 +257,13 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 			boolean exitCodeExists = StringUtils.hasText(exitCode);
 			// Make sure exit code is consistent with status for aggregation
 			// purposes
-			if (exitCodeExists && !exitCode.startsWith(batchStatus.toString())) {
-				exitCode = batchStatus.toString() + (exitCode.contains(" ") ? " " : "_") + exitCode;
+			if (exitCodeExists && !exitCode.startsWith(status.getName())) {
+				exitCode = status.getName() + (exitCode.contains(" ") ? " " : "_") + exitCode;
 			}
-			endBuilder.addConstructorArgValue(exitCodeExists ? new FlowExecutionStatus(exitCode) : batchStatus);
+			endBuilder.addConstructorArgValue(exitCodeExists ? new FlowExecutionStatus(exitCode) : status);
 
-			String endName = (batchStatus == FlowExecutionStatus.STOPPED ? STOP
-					: batchStatus == FlowExecutionStatus.FAILED ? FAIL : END)
+			String endName = (status == FlowExecutionStatus.STOPPED ? STOP
+					: status == FlowExecutionStatus.FAILED ? FAIL : END)
 					+ (endCounter++);
 			endBuilder.addConstructorArgValue(endName);
 
