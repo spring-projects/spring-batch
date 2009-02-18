@@ -31,7 +31,7 @@
 		p:dataSource-ref="dataSource" />
 		
 	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry" >
-	 	<constructor-arg value="jobs/skipSampleJob.xml" />
+	 	<property name="jobPaths" value="jobs/skipSampleJob.xml" />
 	</bean>
 	
 	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
