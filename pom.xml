@@ -60,11 +60,18 @@
 			</activation>
 		</profile>
 		<profile>
-			<id>deployment</id>
+			<id>all</id>
+			<modules>
+				<module>spring-batch-infrastructure-tests</module>
+				<module>spring-batch-integration</module>
+				<module>build-central</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>release</id>
 			<modules>
 				<module>spring-batch-samples</module>
 				<module>archetypes</module>
-				<module>docs</module>
 			</modules>
 			<build>
 				<plugins>
@@ -75,19 +82,232 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
 					</plugin>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2-beta-3</version>
+						<inherited>false</inherited>
+						<executions>
+							<execution>
+								<id>zip-files</id>
+								<inherited>false</inherited>
+								<goals>
+									<goal>single</goal>
+								</goals>
+								<configuration>
+									<descriptors>
+										<descriptor>src/assembly/no-dependencies.xml</descriptor>
+										<descriptor>src/assembly/with-dependencies.xml</descriptor>
+									</descriptors>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.agilejava.docbkx</groupId>
+						<artifactId>docbkx-maven-plugin</artifactId>
+						<version>2.0.8</version>
+						<executions>
+							<execution>
+								<id>single-page</id>
+								<goals>
+									<goal>generate-html</goal>
+								</goals>
+								<configuration>
+									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+									<postProcess>
+										<move todir="${basedir}/target/site/reference/html-single">
+											<fileset dir="${basedir}/target/docbkx/html">
+												<include name="index.html" />
+											</fileset>
+										</move>
+										<copy todir="${basedir}/target/site/reference/html-single">
+											<fileset dir="${basedir}/src/docbkx/resources">
+												<include name="**/*.css" />
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
+											</fileset>
+										</copy>
+										<copy todir="${basedir}/target/site/reference/html-single">
+											<fileset dir="${basedir}/src/site/docbook/reference">
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
+											</fileset>
+										</copy>
+									</postProcess>
+								</configuration>
+								<phase>pre-site</phase>
+							</execution>
+							<execution>
+								<id>single-pdf</id>
+								<goals>
+									<goal>generate-pdf</goal>
+								</goals>
+								<configuration>
+									<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
+									<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
+									<postProcess>
+										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
+											failonerror="false" />
+									</postProcess>
+								</configuration>
+								<phase>pre-site</phase>
+							</execution>
+							<execution>
+								<id>multi-page</id>
+								<goals>
+									<goal>generate-html</goal>
+								</goals>
+								<configuration>
+									<chunkedOutput>true</chunkedOutput>
+									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+									<postProcess>
+										<move todir="${basedir}/target/site/reference">
+											<fileset dir="${basedir}/target/docbkx">
+												<include name="**/*.html" />
+											</fileset>
+										</move>
+										<copy todir="${basedir}/target/site/reference/html">
+											<fileset dir="${basedir}/src/docbkx/resources">
+												<include name="**/*.css" />
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
+											</fileset>
+										</copy>
+										<copy todir="${basedir}/target/site/reference/html">
+											<fileset dir="${basedir}/src/site/docbook/reference">
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
+											</fileset>
+										</copy>
+									</postProcess>
+								</configuration>
+								<phase>pre-site</phase>
+							</execution>
+						</executions>
+						<dependencies>
+							<dependency>
+								<groupId>org.docbook</groupId>
+								<artifactId>docbook-xml</artifactId>
+								<version>4.4</version>
+								<scope>runtime</scope>
+							</dependency>
+							<dependency>
+								<!-- This is a downgrade for the 2.0.8 plugin (was 0.94) but prevents ArrayOutOfBounds exception on xi:includes -->
+								<groupId>org.apache.xmlgraphics</groupId>
+								<artifactId>fop</artifactId>
+								<version>0.93</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<includes>index.xml</includes>
+							<chunkedOutput>false</chunkedOutput>
+							<draftWatermarkImage></draftWatermarkImage>
+							<htmlStylesheet>css/html.css</htmlStylesheet>
+							<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
+							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
+							<xincludeSupported>true</xincludeSupported>
+							<entities>
+								<entity>
+									<name>version</name>
+									<value>${project.version}</value>
+								</entity>
+							</entities>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-parent-pom</id>
+								<phase>generate-sources</phase>
+								<configuration>
+									<tasks>
+										<copy file="pom.xml" todir="target" />
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
 		<profile>
-			<id>all</id>
-			<modules>
-				<module>spring-batch-samples</module>
-				<module>archetypes</module>
-				<module>spring-batch-infrastructure-tests</module>
-				<module>spring-batch-integration</module>
-				<module>docs</module>
-				<module>build-central</module>
-			</modules>
+			<id>verify</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>extract</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<unzip dest="target/it/with-dep">
+											<fileset dir="target">
+												<include name="*with-dep*.zip" />
+											</fileset>
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
+										</unzip>
+										<unzip dest="target/it/no-dep">
+											<fileset dir="target">
+												<include name="*no-dep*.zip" />
+											</fileset>
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
+										</unzip>
+										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
+											<condition>
+												<not>
+													<resourcecount count="3">
+														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
+													</resourcecount>
+												</not>
+											</condition>
+										</fail>
+										<fail message="Failed integration test of zip distro: dependency jar files are missing.">
+											<condition>
+												<not>
+													<resourcecount count="1">
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar" />
+													</resourcecount>
+												</not>
+											</condition>
+										</fail>
+										<fail message="Failed integration test of zip distro: test dependency jar files are missing.">
+											<condition>
+												<not>
+													<resourcecount count="1">
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar" />
+													</resourcecount>
+												</not>
+											</condition>
+										</fail>
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-invoker-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>samples</id>
@@ -134,12 +354,6 @@
 					<id>apache-snapshots</id>
 					<url>http://people.apache.org/maven-snapshot-repository</url>
 				</pluginRepository>
-				<!-- Clover 2 is still a snapshot plugin -->
-				<pluginRepository>
-					<id>atlassian-m2-repository</id>
-					<name>Atlassian Maven 2.x Repository</name>
-					<url>http://repository.atlassian.com/maven2</url>
-				</pluginRepository>
 			</pluginRepositories>
 			<repositories>
 				<repository>
@@ -152,8 +366,7 @@
 				<pluginManagement>
 					<plugins>
 						<!--
-							This seems to work better than the default (2008/03/19) because
-							links on sub-module sites are not broken
+							This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken
 						-->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
@@ -203,57 +416,6 @@
 								</property>
 							</systemProperties>
 						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>xsl-aggregation</id>
-			<activation>
-				<file>
-					<exists>src/main/xsl/emma.xsl</exists>
-				</file>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<inherited>false</inherited>
-						<executions>
-							<execution>
-								<id>xsl</id>
-								<phase>site</phase>
-								<configuration>
-									<tasks>
-										<echo>Aggregating XSL reports</echo>
-										<mkdir dir="target/emma-reports" />
-										<concat destfile="target/site/emma-reports/emma-report.xml">
-											<fileset dir="." includes="**/coverage.fragment" />
-											<filterchain>
-												<linecontainsregexp>
-													<regexp pattern="[a-zA-Z]" />
-												</linecontainsregexp>
-											</filterchain>
-											<header trimleading="yes">
-												<![CDATA[<summary>]]>
-											</header>
-											<footer trimleading="yes">
-												<![CDATA[</summary>]]>
-											</footer>
-										</concat>
-										<xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html"
-											style="src/main/xsl/emma2html.xsl">
-											<param name="project" expression="${project.name}" />
-											<param name="version" expression="${project.version}" />
-										</xslt>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
@@ -316,44 +478,11 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
-					<executions>
-						<execution>
-							<id>junitreport</id>
-							<phase>site</phase>
-							<configuration>
-								<tasks>
-									<echo>Creating JUnit reports</echo>
-									<mkdir dir="target/surefire-reports" />
-									<junitreport todir="target/surefire-reports">
-										<fileset dir=".">
-											<filename name="**/target/surefire-reports/TEST-*.xml" />
-										</fileset>
-										<report todir="target/site/junit-reports" />
-									</junitreport>
-									<echo>Creating Emma reports</echo>
-									<mkdir dir="target/site/emma-reports" />
-									<xslt includes="target/emma/coverage.xml" destdir="target/emma-reports"
-										style="${project.parent.basedir}/src/main/xsl/emma.xsl">
-										<mapper type="glob" from="*.xml" to="*.fragment" />
-										<param name="project" expression="${project.name}" />
-									</xslt>
-								</tasks>
-							</configuration>
-							<goals>
-								<goal>run</goal>
-							</goals>
-						</execution>
-					</executions>
 					<dependencies>
 						<dependency>
 							<groupId>org.apache.ant</groupId>
 							<artifactId>ant</artifactId>
 							<version>1.7.0</version>
-						</dependency>
-						<dependency>
-							<groupId>ant</groupId>
-							<artifactId>ant-junit</artifactId>
-							<version>1.6.5</version>
 						</dependency>
 						<dependency>
 							<groupId>org.apache.ant</groupId>
@@ -371,6 +500,31 @@
 							<version>2.2.1</version>
 						</dependency>
 					</dependencies>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-invoker-plugin</artifactId>
+					<configuration>
+						<projectsDirectory>target/it/no-dep</projectsDirectory>
+						<localRepositoryPath>target/local-repo</localRepositoryPath>
+						<debug>true</debug>
+						<settingsFile>${basedir}/src/it/settings.xml</settingsFile>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<pomIncludes>
+							<pomInclude>samples/*/pom.xml</pomInclude>
+						</pomIncludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<artifactId>maven-javadoc-plugin</artifactId>
@@ -784,16 +938,6 @@
 				<version>2.3</version>
 			</plugin>
 			<plugin>
-				<groupId>com.interface21.maven</groupId>
-				<artifactId>maven-external-report-plugin</artifactId>
-				<version>1.0</version>
-				<configuration>
-					<name>JUnit Report</name>
-					<description>JUnit test results for this project</description>
-					<base>junit-reports</base>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jdepend-maven-plugin</artifactId>
 			</plugin>
@@ -922,6 +1066,13 @@
 			<url>http://snapshots.repository.codehaus.org/</url>
 			<snapshots>
 				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>agilejava</id>
+			<url>http://agilejava.com/maven</url>
+			<snapshots>
+				<enabled>false</enabled>
 			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
