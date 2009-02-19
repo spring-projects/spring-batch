@@ -25,9 +25,9 @@ Spring Batch Maven Central Build - used to build Maven artifacts for the central
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.springframework.build</groupId>
+						<groupId>org.springframework.build.repository</groupId>
 						<artifactId>org.springframework.build.repository.maven</artifactId>
-						<version>1.0-SNAPSHOT</version>
+						<version>1.0.0.CI-SNAPSHOT</version>
 						<executions>
 							<execution>
 								<id>create-build</id>

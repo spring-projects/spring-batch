@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.springframework.batch</groupId>
@@ -9,6 +10,7 @@
   <version>2.0.0.CI-SNAPSHOT</version>
   <packaging>pom</packaging>
   <modules>
+    <module>spring-batch-parent</module>
     <module>spring-batch-infrastructure</module>
     <module>spring-batch-core</module>
     <module>spring-batch-test</module>
@@ -46,24 +48,22 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
-  <properties>
-    <maven.test.failure.ignore>true</maven.test.failure.ignore>
-    <spring.framework.version>2.5.6</spring.framework.version>
-    <bundlor.version>1.0.0.M1</bundlor.version>
-  </properties>
   <profiles>
     <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-    </profile>
-    <profile>
-      <id>deployment</id>
+      <id>all</id>
       <modules>
         <module>spring-batch-samples</module>
         <module>archetypes</module>
-        <module>docs</module>
+        <module>spring-batch-infrastructure-tests</module>
+        <module>spring-batch-integration</module>
+        <module>build-central</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>release</id>
+      <modules>
+        <module>spring-batch-samples</module>
+        <module>archetypes</module>
       </modules>
       <build>
         <plugins>
@@ -74,24 +74,180 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
           </plugin>
+          <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <inherited>false</inherited>
+            <executions>
+              <execution>
+                <id>zip-files</id>
+                <inherited>false</inherited>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>src/assembly/no-dependencies.xml</descriptor>
+                    <descriptor>src/assembly/with-dependencies.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.agilejava.docbkx</groupId>
+            <artifactId>docbkx-maven-plugin</artifactId>
+            <version>2.0.8</version>
+            <executions>
+              <execution>
+                <id>single-page</id>
+                <goals>
+                  <goal>generate-html</goal>
+                </goals>
+                <configuration>
+                  <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+                  <postProcess>                    <move todir="${basedir}/target/site/reference/html-single">                      <fileset dir="${basedir}/target/docbkx/html">                        <include name="index.html"/>
+                      </fileset>
+                    </move>                    <copy todir="${basedir}/target/site/reference/html-single">                      <fileset dir="${basedir}/src/docbkx/resources">                        <include name="**/*.css"/>                        <include name="**/*.png"/>                        <include name="**/*.gif"/>                        <include name="**/*.jpg"/>
+                      </fileset>
+                    </copy>                    <copy todir="${basedir}/target/site/reference/html-single">                      <fileset dir="${basedir}/src/site/docbook/reference">                        <include name="**/*.png"/>                        <include name="**/*.gif"/>                        <include name="**/*.jpg"/>
+                      </fileset>
+                    </copy>
+                  </postProcess>
+                </configuration>
+                <phase>pre-site</phase>
+              </execution>
+              <execution>
+                <id>single-pdf</id>
+                <goals>
+                  <goal>generate-pdf</goal>
+                </goals>
+                <configuration>
+                  <imgSrcPath>src/site/docbook/reference/</imgSrcPath>
+                  <admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
+                  <postProcess>                    <copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf" failonerror="false"/>
+                  </postProcess>
+                </configuration>
+                <phase>pre-site</phase>
+              </execution>
+              <execution>
+                <id>multi-page</id>
+                <goals>
+                  <goal>generate-html</goal>
+                </goals>
+                <configuration>
+                  <chunkedOutput>true</chunkedOutput>
+                  <htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+                  <postProcess>                    <move todir="${basedir}/target/site/reference">                      <fileset dir="${basedir}/target/docbkx">                        <include name="**/*.html"/>
+                      </fileset>
+                    </move>                    <copy todir="${basedir}/target/site/reference/html">                      <fileset dir="${basedir}/src/docbkx/resources">                        <include name="**/*.css"/>                        <include name="**/*.png"/>                        <include name="**/*.gif"/>                        <include name="**/*.jpg"/>
+                      </fileset>
+                    </copy>                    <copy todir="${basedir}/target/site/reference/html">                      <fileset dir="${basedir}/src/site/docbook/reference">                        <include name="**/*.png"/>                        <include name="**/*.gif"/>                        <include name="**/*.jpg"/>
+                      </fileset>
+                    </copy>
+                  </postProcess>
+                </configuration>
+                <phase>pre-site</phase>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.docbook</groupId>
+                <artifactId>docbook-xml</artifactId>
+                <version>4.4</version>
+                <scope>runtime</scope>
+              </dependency>
+              <dependency>
+                <groupId>org.apache.xmlgraphics</groupId>
+                <artifactId>fop</artifactId>
+                <version>0.93</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <includes>index.xml</includes>
+              <chunkedOutput>false</chunkedOutput>
+              <draftWatermarkImage/>
+              <htmlStylesheet>css/html.css</htmlStylesheet>
+              <sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
+              <foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
+              <xincludeSupported>true</xincludeSupported>
+              <entities>
+                <entity>
+                  <name>version</name>
+                  <value>${project.version}</value>
+                </entity>
+              </entities>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-parent-pom</id>
+                <phase>generate-sources</phase>
+                <configuration>
+                  <tasks>                    <copy file="pom.xml" todir="target"/>
+                  </tasks>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
     </profile>
     <profile>
-      <id>dist</id>
+      <id>verify</id>
       <activation>
-        <file>
-          <exists>dist.txt</exists>
-        </file>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <build>
         <plugins>
           <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>extract</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>                    <unzip dest="target/it/with-dep">                      <fileset dir="target">                        <include name="*with-dep*.zip"/>
+                      </fileset>                      <regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true"/>
+                    </unzip>                    <unzip dest="target/it/no-dep">                      <fileset dir="target">                        <include name="*no-dep*.zip"/>
+                      </fileset>                      <regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true"/>
+                    </unzip>                    <fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
+                      <condition>
+                        <not>                          <resourcecount count="3">                            <fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar"/>
+                          </resourcecount>
+                        </not>
+                      </condition>
+                    </fail>                    <fail message="Failed integration test of zip distro: dependency jar files are missing.">
+                      <condition>
+                        <not>                          <resourcecount count="1">                            <fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar"/>
+                          </resourcecount>
+                        </not>
+                      </condition>
+                    </fail>                    <fail message="Failed integration test of zip distro: test dependency jar files are missing.">
+                      <condition>
+                        <not>                          <resourcecount count="1">                            <fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar"/>
+                          </resourcecount>
+                        </not>
+                      </condition>
+                    </fail>
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
+            <artifactId>maven-invoker-plugin</artifactId>
           </plugin>
         </plugins>
       </build>
@@ -111,20 +267,15 @@
           <id>staging</id>
           <url>file:///${user.dir}/target/staging</url>
         </site>
+        <repository>
+          <id>staging</id>
+          <url>file:///${user.dir}/target/staging</url>
+        </repository>
+        <snapshotRepository>
+          <id>staging</id>
+          <url>file:///${user.dir}/target/staging</url>
+        </snapshotRepository>
       </distributionManagement>
-    </profile>
-    <profile>
-      <id>strict</id>
-      <properties>
-        <maven.test.failure.ignore>false</maven.test.failure.ignore>
-      </properties>
-    </profile>
-    <profile>
-      <id>fast</id>
-      <properties>
-        <maven.test.skip>true</maven.test.skip>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-      </properties>
     </profile>
     <profile>
       <id>snapshots</id>
@@ -132,12 +283,6 @@
         <pluginRepository>
           <id>apache-snapshots</id>
           <url>http://people.apache.org/maven-snapshot-repository</url>
-        </pluginRepository>
-        <pluginRepository>
-          <id>atlassian-m2-repository</id>
-          <name>            Atlassian Maven 2.x Repository
-          </name>
-          <url>http://repository.atlassian.com/maven2</url>
         </pluginRepository>
       </pluginRepositories>
       <repositories>
@@ -182,67 +327,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>mysql</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <systemProperties>
-                <property>
-                  <name>environment</name>
-                  <value>mysql</value>
-                </property>
-              </systemProperties>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>xsl-aggregation</id>
-      <activation>
-        <file>
-          <exists>src/main/xsl/emma.xsl</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <inherited>false</inherited>
-            <executions>
-              <execution>
-                <id>xsl</id>
-                <phase>site</phase>
-                <configuration>
-                  <tasks>
-                    <echo>                      Aggregating XSL reports
-                    </echo>                    <mkdir dir="target/emma-reports"/>                    <concat destfile="target/site/emma-reports/emma-report.xml">                      <fileset dir="." includes="**/coverage.fragment"/>
-                      <filterchain>
-                        <linecontainsregexp>                          <regexp pattern="[a-zA-Z]"/>
-                        </linecontainsregexp>
-                      </filterchain>                      <header trimleading="yes">                        &lt;summary&gt;
-                      </header>                      <footer trimleading="yes">                        &lt;/summary&gt;
-                      </footer>
-                    </concat>                    <xslt in="target/site/emma-reports/emma-report.xml" out="target/site/emma-reports/index.html" style="src/main/xsl/emma2html.xsl">                      <param name="project" expression="${project.name}"/>                      <param name="version" expression="${project.version}"/>
-                    </xslt>
-                  </tasks>
-                </configuration>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
   <distributionManagement>
     <downloadUrl>http://www.springframework.org/download</downloadUrl>
@@ -274,52 +358,8 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>emma-maven-plugin</artifactId>
-          <version>1.0-20070912.011112-4</version>
-        </plugin>
-        <plugin>
-          <groupId>com.springsource.bundlor</groupId>
-          <artifactId>com.springsource.bundlor.maven</artifactId>
-          <version>${bundlor.version}</version>
-          <inherited>true</inherited>
-          <configuration>
-            <manifestTemplatePath>${project.basedir}/template.mf</manifestTemplatePath>
-            <outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
-          </configuration>
-          <executions>
-            <execution>
-              <id>bundlor-transform</id>
-              <phase>package</phase>
-              <goals>
-                <goal>transform</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>junitreport</id>
-              <phase>site</phase>
-              <configuration>
-                <tasks>
-                  <echo>                    Creating JUnit reports
-                  </echo>                  <mkdir dir="target/surefire-reports"/>                  <junitreport todir="target/surefire-reports">                    <fileset dir=".">                      <filename name="**/target/surefire-reports/TEST-*.xml"/>
-                    </fileset>                    <report todir="target/site/junit-reports"/>
-                  </junitreport>
-                  <echo>                    Creating Emma reports
-                  </echo>                  <mkdir dir="target/site/emma-reports"/>                  <xslt includes="target/emma/coverage.xml" destdir="target/emma-reports" style="${project.parent.basedir}/src/main/xsl/emma.xsl">                    <mapper type="glob" from="*.xml" to="*.fragment"/>                    <param name="project" expression="${project.name}"/>
-                  </xslt>
-                </tasks>
-              </configuration>
-              <goals>
-                <goal>run</goal>
-              </goals>
-            </execution>
-          </executions>
           <dependencies>
             <dependency>
               <groupId>org.apache.ant</groupId>
@@ -327,26 +367,36 @@
               <version>1.7.0</version>
             </dependency>
             <dependency>
-              <groupId>ant</groupId>
-              <artifactId>ant-junit</artifactId>
-              <version>1.6.5</version>
-            </dependency>
-            <dependency>
-              <groupId>org.apache.ant</groupId>
-              <artifactId>ant-trax</artifactId>
-              <version>1.7.0</version>
-            </dependency>
-            <dependency>
               <groupId>org.apache.ant</groupId>
               <artifactId>ant-apache-regexp</artifactId>
               <version>1.7.0</version>
             </dependency>
-            <dependency>
-              <groupId>foundrylogic.vpp</groupId>
-              <artifactId>vpp</artifactId>
-              <version>2.2.1</version>
-            </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-invoker-plugin</artifactId>
+          <configuration>
+            <projectsDirectory>target/it/no-dep</projectsDirectory>
+            <localRepositoryPath>target/local-repo</localRepositoryPath>
+            <debug>true</debug>
+            <settingsFile>${basedir}/src/it/settings.xml</settingsFile>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <pomIncludes>
+              <pomInclude>samples/*/pom.xml</pomInclude>
+            </pomIncludes>
+          </configuration>
+          <executions>
+            <execution>
+              <id>integration-test</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
@@ -384,6 +434,10 @@
               <link>http://static.springframework.org/spring-batch/apidocs/</link>
               <link>http://static.springframework.org/spring-ws/site/apidocs/</link>
             </links>
+            <header>              &lt;!-- Begin Google Analytics code --&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var gaJsHost = ((&quot;https:&quot; == document.location.protocol) ? &quot;https://ssl.&quot; : &quot;http://www.&quot;);		document.write(unescape(&quot;%3Cscript src='&quot; + gaJsHost + &quot;google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E&quot;));	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var pageTracker = _gat._getTracker(&quot;UA-2728886-3&quot;);		pageTracker._setDomainName(&quot;none&quot;);		pageTracker._setAllowLinker(true);		pageTracker._trackPageview();	&lt;/script&gt;	&lt;!-- End Google Analytics code --&gt;
+            </header>
+            <bottom>              &lt;!-- Begin LoopFuse code --&gt;	&lt;script src=&quot;http://loopfuse.net/webrecorder/js/listen.js&quot; type=&quot;text/javascript&quot;&gt;	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt; 		_lf_cid = &quot;LF_48be82fa&quot;;		_lf_remora();	&lt;/script&gt;	&lt;!-- End LoopFuse code --&gt;
+            </bottom>
             <aggregate>true</aggregate>
             <excludePackageNames>*.batch.sample,*.batch.container,example,test</excludePackageNames>
           </configuration>
@@ -400,327 +454,16 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <junitArtifactName>junit:junit</junitArtifactName>
+          </configuration>
+        </plugin>
       </plugins>
     </pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Tests.java</include>
-          </includes>
-          <excludes>
-            <exclude>**/Abstract*.java</exclude>
-          </excludes>
-          <junitArtifactName>junit:junit</junitArtifactName>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>${basedir}</directory>
-              <includes>
-                <include>activemq-data</include>
-                <include>derby-home</include>
-                <include>amqstore</include>
-                <include>.clover</include>
-                <include>surefire*</include>
-                <include>derby.log</include>
-              </includes>
-              <followSymlinks>false</followSymlinks>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
-    </plugins>
   </build>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>aspectj</groupId>
-        <artifactId>aspectjrt</artifactId>
-        <version>1.5.4</version>
-      </dependency>
-      <dependency>
-        <groupId>aspectj</groupId>
-        <artifactId>aspectjweaver</artifactId>
-        <version>1.5.4</version>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.4</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <version>2.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jms_1.1_spec</artifactId>
-        <version>1.1</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jta_1.1_spec</artifactId>
-        <version>1.1</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>jsr250-api</artifactId>
-        <version>1.0</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>javax.xml.stream</groupId>
-        <artifactId>javax.xml.stream</artifactId>
-        <version>1.0.1</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate</artifactId>
-        <version>3.2.6.ga</version>
-        <optional>true</optional>
-        <exclusions>
-          <exclusion>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>asm</groupId>
-            <artifactId>asm-attrs</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.transaction</groupId>
-            <artifactId>jta</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-entitymanager</artifactId>
-        <version>3.3.2.GA</version>
-        <optional>true</optional>
-        <exclusions>
-          <exclusion>
-            <groupId>edu.oswego.cs.concurrent</groupId>
-            <artifactId>edu.oswego.cs.dl.util.concurrent</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-annotations</artifactId>
-        <version>3.3.1.GA</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>cglib</groupId>
-        <artifactId>cglib-nodep</artifactId>
-        <version>2.1_3</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.1</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>1.4</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.2</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>commons-dbcp</groupId>
-        <artifactId>commons-dbcp</artifactId>
-        <version>1.2.2</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.14</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>1.8.0.7</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.derby</groupId>
-        <artifactId>org.apache.derby</artifactId>
-        <version>10.3.2000001.599110</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.thoughtworks.xstream</groupId>
-        <artifactId>xstream</artifactId>
-        <version>1.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.jettison</groupId>
-        <artifactId>jettison</artifactId>
-        <version>1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.ibatis</groupId>
-        <artifactId>ibatis-sqlmap</artifactId>
-        <version>2.3.0</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>javax.persistence</groupId>
-        <artifactId>persistence-api</artifactId>
-        <version>1.0</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>osgi_R4_core</artifactId>
-        <version>1.0</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>asm</groupId>
-        <artifactId>asm</artifactId>
-        <version>2.2.3</version>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>asm</groupId>
-        <artifactId>asm-attrs</artifactId>
-        <version>2.2.3</version>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>asm</groupId>
-        <artifactId>asm-commons</artifactId>
-        <version>2.2.3</version>
-        <scope>runtime</scope>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>javax.servlet</groupId>
-        <artifactId>servlet-api</artifactId>
-        <version>2.5</version>
-        <scope>provided</scope>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>stax</groupId>
-        <artifactId>stax</artifactId>
-        <version>1.2.0</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-aop</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-beans</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context-support</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-core</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-expression</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jms</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-orm</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-test</artifactId>
-        <version>${spring.framework.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-tx</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-web</artifactId>
-        <version>${spring.framework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.ws</groupId>
-        <artifactId>spring-oxm</artifactId>
-        <version>1.5.5</version>
-        <optional>true</optional>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.osgi</groupId>
-        <artifactId>spring-osgi-core</artifactId>
-        <version>1.1.2</version>
-        <optional>true</optional>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <reporting>
     <excludeDefaults>true</excludeDefaults>
     <plugins>
@@ -728,18 +471,6 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.3</version>
-      </plugin>
-      <plugin>
-        <groupId>com.interface21.maven</groupId>
-        <artifactId>maven-external-report-plugin</artifactId>
-        <version>1.0</version>
-        <configuration>
-          <name>            JUnit Report
-          </name>
-          <description>            JUnit test results for this project
-          </description>
-          <base>junit-reports</base>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -787,7 +518,7 @@
       <id>robokaso</id>
       <name>        Robert Kasanicky
       </name>
-      <email>robert.kasanicky@accenture.com</email>
+      <email>robokaso@gmail.com</email>
     </developer>
     <developer>
       <id>trisberg</id>
@@ -795,18 +526,13 @@
       </name>
       <email>thomas.risberg@springsource.com</email>
     </developer>
-  </developers>
-  <repositories>
-    <repository>
-      <id>objectstyle</id>
-      <name>        ObjectStyle.org Repository
+    <developer>
+      <id>dhgarrette</id>
+      <name>        Dan Garrette
       </name>
-      <url>http://objectstyle.org/maven2/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+      <email>daniel.h.garrette@accenture.com</email>
+    </developer>
+  </developers>
   <pluginRepositories>
     <pluginRepository>
       <id>com.springsource.repository.bundles.milestone</id>
@@ -816,6 +542,12 @@
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>com.springsource.repository.bundles.snapshot</id>
+      <name>        SpringSource Enterprise Bundle Repository -				SpringSource Bundle Snapshots
+      </name>
+      <url>http://repository.springsource.com/maven/bundles/snapshot</url>
     </pluginRepository>
     <pluginRepository>
       <id>spring-external</id>
@@ -832,6 +564,13 @@
       <url>http://snapshots.repository.codehaus.org/</url>
       <snapshots>
         <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>agilejava</id>
+      <url>http://agilejava.com/maven</url>
+      <snapshots>
+        <enabled>false</enabled>
       </snapshots>
     </pluginRepository>
     <pluginRepository>

@@ -1,16 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>spring-batch-infrastructure</artifactId>
-  <version>2.0.0.CI-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Infrastructure</name>
   <description>    The Spring Batch Infrastructure is a set of low-level components, interfaces and tools for batch processing applications and optimisations.
   </description>
   <parent>
     <groupId>org.springframework.batch</groupId>
-    <artifactId>spring-batch</artifactId>
+    <artifactId>spring-batch-parent</artifactId>
     <version>2.0.0.CI-SNAPSHOT</version>
-    <relativePath>..</relativePath>
+    <relativePath>../spring-batch-parent</relativePath>
   </parent>
   <properties>
     <bundle.symbolic.name>${pom.groupId}.infrastructure</bundle.symbolic.name>
@@ -40,6 +40,17 @@
         <artifactId>maven-antrun-plugin</artifactId>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <junitArtifactName>junit:junit</junitArtifactName>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
   <dependencies>
     <dependency>
@@ -51,12 +62,12 @@
       <artifactId>easymock</artifactId>
     </dependency>
     <dependency>
-      <groupId>aspectj</groupId>
+      <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>aspectj</groupId>
+      <groupId>org.aspectj</groupId>
       <artifactId>aspectjweaver</artifactId>
       <scope>test</scope>
     </dependency>
