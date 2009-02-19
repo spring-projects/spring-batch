@@ -143,15 +143,15 @@
 						<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
 						<manifestTemplatePath>${project.basedir}/template.mf</manifestTemplatePath>
 					</configuration>
-					<executions>
-						<execution>
-							<id>bundlor-manifest</id>
-							<phase>package</phase>
-							<goals>
-								<goal>manifest</goal>
-							</goals>
-						</execution>
-					</executions>
+				</plugin>
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<inherited>false</inherited>
+					<configuration>
+						<descriptorRefs>
+							<descriptorRef>project</descriptorRef>
+						</descriptorRefs>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -256,12 +256,12 @@
 		<repository>
 			<id>spring-milestone</id>
 			<name>Spring Milestone Repository</name>
-			<url>s3://maven.springframework.org/milestone</url>
+			<url>file:///${user.dir}/target/staging/milestone</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
 			<name>Spring Snapshot Repository</name>
-			<url>s3://maven.springframework.org/snapshot</url>
+			<url>file:///${user.dir}/target/staging/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 

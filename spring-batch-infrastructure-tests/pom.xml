@@ -7,9 +7,9 @@
 	<description> Integration tests for the Spring Batch Infrastructure </description>
 	<parent>
 		<groupId>org.springframework.batch</groupId>
+		<artifactId>org.springframework.batch.parent</artifactId>
 		<version>2.0.0.CI-SNAPSHOT</version>
-		<artifactId>org.springframework.batch</artifactId>
-		<relativePath>..</relativePath>
+		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
 	<profiles>
 		<profile>

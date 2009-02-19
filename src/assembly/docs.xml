@@ -2,9 +2,11 @@
 <component>
 	<fileSets>
 		<fileSet>
+			<directory>src/assembly</directory>
+			<outputDirectory></outputDirectory>
 			<includes>
-				<include>src/assembly/license.txt</include>
-				<include>src/assembly/notice.txt</include>
+				<include>license.txt</include>
+				<include>notice.txt</include>
 			</includes>
 		</fileSet>
 	 	<fileSet>

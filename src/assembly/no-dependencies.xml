@@ -11,6 +11,9 @@
 		<moduleSet>
 			<includes>
 				<include>
+					org.springframework.batch:org.springframework.batch.parent
+				</include>
+				<include>
 					org.springframework.batch:org.springframework.batch.test
 				</include>
 				<include>

@@ -11,6 +11,9 @@
 		<moduleSet>
 			<includes>
 				<include>
+					org.springframework.batch:org.springframework.batch.parent
+				</include>
+				<include>
 					org.springframework.batch:org.springframework.batch.test
 				</include>
 				<include>
@@ -59,6 +62,9 @@
 		<moduleSet>
 			<includes>
 				<include>
+					org.springframework.batch:org.springframework.batch.parent
+				</include>
+				<include>
 					org.springframework.batch:org.springframework.batch.test
 				</include>
 				<include>
@@ -85,6 +91,9 @@
 		<moduleSet>
 			<includes>
 				<include>
+					org.springframework.batch:org.springframework.batch.parent
+				</include>
+				<include>
 					org.springframework.batch:org.springframework.batch.test
 				</include>
 				<include>
@@ -106,7 +115,7 @@
 						<scope>runtime</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:org.springframework.batch
+								org.springframework.batch:org.springframework.batch.parent
 							</exclude>
 							<exclude>
 								org.springframework.batch:org.springframework.batch.test
@@ -146,7 +155,7 @@
 						<scope>runtime</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:org.springframework.batch
+								org.springframework.batch:org.springframework.batch.parent
 							</exclude>
 							<exclude>
 								org.springframework.batch:org.springframework.batch.test
@@ -166,7 +175,7 @@
 						<scope>provided</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:org.springframework.batch
+								org.springframework.batch:org.springframework.batch.parent
 							</exclude>
 							<exclude>
 								org.springframework.batch:org.springframework.batch.test
@@ -186,7 +195,7 @@
 						<scope>test</scope>
 						<excludes>
 							<exclude>
-								org.springframework.batch:org.springframework.batch
+								org.springframework.batch:org.springframework.batch.parent
 							</exclude>
 							<exclude>
 								org.springframework.batch:org.springframework.batch.test
