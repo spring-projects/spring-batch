@@ -1,17 +1,9 @@
 Manifest-Version: 1.0
-Export-Package: example;version="2.0.0.CI-SNAPSHOT";uses:="org.springf
- ramework.batch.item",test.jdbc.datasource;version="2.0.0.CI-SNAPSHOT"
- ;uses:="javax.sql,org.apache.commons.logging,org.springframework.bean
- s.factory,org.springframework.core.io,org.springframework.transaction
- ,org.springframework.transaction.support"
-Bundle-Classpath: .
-Bundle-Version: 2.0.0.CI-SNAPSHOT
-Built-By: dsyer
-Build-Jdk: 1.6.0_10
 Bundle-Name: Spring Batch Cammand Line Archetype
-Bundle-ManifestVersion: 2
+Archiver-Version: Plexus Archiver
+Build-Jdk: 1.5.0_09
+Built-By: dsyer
 Created-By: Apache Maven
-Bundle-SymbolicName: org.springframework.batch.archetype.simple.cli
 Import-Package: javax.sql,org.apache.commons.io;version="[1.4.0, 2.0.0
  )";resolution:=optional,org.apache.commons.logging;version="[1.1.0, 2
  .0.0)",org.springframework.batch.core.job;version="[2.0.0, 3.0.0)",or
@@ -27,5 +19,11 @@ Import-Package: javax.sql,org.apache.commons.io;version="[1.4.0, 2.0.0
  on="[2.5.5, 3.0.0)";resolution:=optional,org.springframework.transact
  ion.support;version="[2.5.5, 3.0.0)";resolution:=optional,org.springf
  ramework.util;version="[2.5.5, 3.0.0)";resolution:=optional
-Archiver-Version: Plexus Archiver
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.batch.archetype.simple.cli
+Export-Package: example;version="${version}";uses:="org.springframewor
+ k.batch.item",test.jdbc.datasource;version="${version}";uses:="javax.
+ sql,org.apache.commons.logging,org.springframework.core.io,org.spring
+ framework.transaction"
+Bundle-Version: ${version}
 

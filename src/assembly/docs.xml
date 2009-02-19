@@ -3,8 +3,8 @@
 	<fileSets>
 		<fileSet>
 			<includes>
-				<include>license.txt</include>
-				<include>notice.txt</include>
+				<include>src/assembly/license.txt</include>
+				<include>src/assembly/notice.txt</include>
 			</includes>
 		</fileSet>
 	 	<fileSet>

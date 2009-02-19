@@ -22,7 +22,7 @@
 		<link>
 			<name>central-pom.xml</name>
 			<type>1</type>
-			<location>SPRING_BATCH/central-pom.xml</location>
+			<locationURI>SPRING_BATCH/central-pom.xml</locationURI>
 		</link>
 		<link>
 			<name>pom.xml</name>
