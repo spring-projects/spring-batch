@@ -7,13 +7,13 @@
 
 Spring Batch Getting Started
 
-  A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  The source code for the samples (and the other modules) is available either from the {{{downloads.html}.Zip assembly}} or from {{{source-repository.html}Subversion}}.
+  A convenient way to get started quickly with Spring Batch is to run the samples which are packaged in the samples module.  There is also a simple command line sample (or "archetype") which has a bare bones but complete implementation of a simpel job.  The source code for the samples (and the other modules) is available either from the {{{downloads.html}.Zip assembly}} or from {{{source-repository.html}Subversion}}.
 
 * Using the .Zip Distribution
 
 ** With Maven and Eclipse
 
-  * Download the "no-dependencies" version of the distribution and unzip to create a directory <<<spring-batch-<versionId>>>>.
+  * Download the "no-dependencies" version of the distribution and unzip to create a directory <<<org.springframework.batch-<versionId>>>>.
 
   * Get the Q4E Eclipse-plugin
   (http://q4e.googlecode.com/svn/trunk/updatesite).  If you can't or
@@ -23,9 +23,11 @@ Spring Batch Getting Started
 
   * Open Eclipse and create a workspace as for the non-Mavenized version.
 
-  * Import the samples project as above.
+  * Import the samples and archetype projects from the samples sub-directory in the directory you just unpacked.
 
   * The project should build cleanly without having to fix the dependencies.  If it doesn't, make sure you are online, and maybe try building on the command line first to make sure all the dependencies are downloaded.  See the {{{building.html}building instructions}} if you run into difficulty.
+
+  (N.B. the "archetype" is not a real Maven archetype, just a template project that can be used as a starting point for a self-contained batch job.)
 
 ** With Maven on the Command Line
 
@@ -87,11 +89,11 @@ The Original 1.0-{m3} Distribution
 
     * hsqldb (1.8.0.7)
 
-  If you are using Maven get the parent project pom by downloading it from Subversion (export from {{{https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0.m3/parent}here}}):
+  If you are using Maven get the parent project pom by downloading it from Subversion (export from {{{https://src.springframework.org/svn/spring-batch/tags/spring-batch-1.0.0.m3/parent}here}}):
 
 +---
 $ cd samples
-$ svn export https://springframework.svn.sourceforge.net/svnroot/springframework/spring-batch/tags/spring-batch-1.0.0.m3/parent parent
+$ svn export https://src.springframework.org/svn/spring-batch/tags/spring-batch-1.0.0.m3/parent parent
 +---
 
 
