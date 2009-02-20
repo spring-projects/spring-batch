@@ -14,7 +14,7 @@
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
 		<spring.framework.version>2.5.6.A</spring.framework.version>
-		<bundlor.version>1.0.0.BUILD-SNAPSHOT</bundlor.version>
+		<bundlor.version>1.0.0.M1A</bundlor.version>
 	</properties>
 	<profiles>
 		<profile>

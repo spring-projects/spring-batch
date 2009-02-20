@@ -129,7 +129,7 @@
 						<outputFileNameMapping>
 							lib/${module.artifactId}-${module.version}.${module.extension}
 						</outputFileNameMapping>
-						<scope>runtime</scope>
+						<scope>test</scope>
 						<excludes>
 							<exclude>
 								org.springframework.batch:org.springframework.batch.parent
@@ -144,12 +144,6 @@
 								org.springframework.batch:org.springframework.batch.infrastructure
 							</exclude>
 						</excludes>
-					</dependencySet>
-					<dependencySet>
-						<outputFileNameMapping>
-							lib/${module.artifactId}-${module.version}.${module.extension}
-						</outputFileNameMapping>
-						<scope>provided</scope>
 					</dependencySet>
 				</dependencySets>
 			</binaries>
@@ -165,46 +159,6 @@
 				<outputDirectory>samples</outputDirectory>
 				<unpack>false</unpack>
 				<dependencySets>
-					<dependencySet>
-						<outputFileNameMapping>
-							lib/${module.artifactId}-${module.version}.${module.extension}
-						</outputFileNameMapping>
-						<scope>runtime</scope>
-						<excludes>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.parent
-							</exclude>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.test
-							</exclude>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.core
-							</exclude>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.infrastructure
-							</exclude>
-						</excludes>
-					</dependencySet>
-					<dependencySet>
-						<outputFileNameMapping>
-							lib/${module.artifactId}-${module.version}.${module.extension}
-						</outputFileNameMapping>
-						<scope>provided</scope>
-						<excludes>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.parent
-							</exclude>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.test
-							</exclude>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.core
-							</exclude>
-							<exclude>
-								org.springframework.batch:org.springframework.batch.infrastructure
-							</exclude>
-						</excludes>
-					</dependencySet>
 					<dependencySet>
 						<outputFileNameMapping>
 							lib/${module.artifactId}-${module.version}.${module.extension}
