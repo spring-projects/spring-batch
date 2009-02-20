@@ -609,31 +609,8 @@
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
 		</pluginRepository>
 		<pluginRepository>
-			<id>spring-external</id>
-			<name>Spring External Repository</name>
-			<url>http://s3.amazonaws.com/maven.springframework.org/external</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>Codehaus Snapshots</id>
-			<url>http://snapshots.repository.codehaus.org/</url>
-			<snapshots>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
 			<id>agilejava</id>
 			<url>http://agilejava.com/maven</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>spring-external-svn</id>
-			<name>Spring External SVN Repository</name>
-			<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>

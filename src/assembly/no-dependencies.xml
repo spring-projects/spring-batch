@@ -59,5 +59,25 @@
 				</fileSets>
 			</sources>
 		</moduleSet>
+		<moduleSet>
+			<includes>
+				<include>
+					org.springframework.batch:org.springframework.batch.parent
+				</include>
+			</includes>
+			<sources>
+				<outputDirectoryMapping>
+					samples/spring-batch-parent
+				</outputDirectoryMapping>
+				<fileSets>
+					<fileSet>
+						<excludes>
+							<exclude>bin/**</exclude>
+							<exclude>target/**</exclude>
+						</excludes>
+					</fileSet>
+				</fileSets>
+			</sources>
+		</moduleSet>
 	</moduleSets>
 </assembly>
