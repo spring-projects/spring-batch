@@ -4,7 +4,7 @@
 <chapter id="configureStep">
   <title>Configuring a Step</title>
 
-  <para>As discussed in <xref linkend="domain" />, a
+  <para>As discussed in <xref linkend="domain"/>, a
   <classname>Step</classname> is a domain object that encapsulates an
   independent, sequential phase of a batch job and contains all of the
   information necessary to define and control the actual batch processing.
@@ -406,6 +406,7 @@
     </section>
 
     <section>
+      <title>Configuring Fatal Exceptions</title>
       <para>One problem with the example above is that any other exception
       besides a <classname>FlatFileParseException</classname> will cause the
       <classname>Job</classname> to fail. In certain scenarios this may be the
@@ -1414,7 +1415,7 @@
 ]]></programlisting></para>
     </section>
 
-    <section>
+    <section id="split-flows">
       <title>Split Flows</title>
 
       <para>Every scenario described so far has involved a

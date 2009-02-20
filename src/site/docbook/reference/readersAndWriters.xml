@@ -2511,7 +2511,7 @@
     how a validator could be added.</para>
   </section>
 
-  <section>
+  <section id="process-indicator">
     <title>Preventing state persistence</title>
 
     <para>By default, all of the <classname>ItemReader</classname> and

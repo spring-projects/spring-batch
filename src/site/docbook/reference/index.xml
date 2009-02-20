@@ -58,6 +58,8 @@
 
   <xi:include href="readersAndWriters.xml" />
 
+  <xi:include href="scalability.xml" />
+
   <xi:include href="repeat.xml" />
 
   <xi:include href="retry.xml" />

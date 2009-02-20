@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<chapter id="scalability">
+  <title>Scaling and Parallel Processing</title>
+
+  <para>Many batch processing problems can be solved with single threaded,
+  single process jobs, so it is always a good idea to properly check if that
+  meets your needs before thinking about more complex implementations. Measure
+  the performance of a realistic job and see if the simplest implementation
+  meets your needs first: you can read and write a file of several hundred
+  megabytes in well under a minute, even with bog standard hardware.</para>
+
+  <para>When you are ready to start implementing a job with some parallel
+  processing, Spring Batch offers a range of options, which are described in
+  this chapter, although some features are covered elsewhere. At a high level
+  there are two modes of parallel processing: single process, multi-threaded;
+  and multi-process. These break down into categories as well, as
+  follows:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Multi-threaded Step (single process)</para>
+    </listitem>
+
+    <listitem>
+      <para>Parallel Steps (single process)</para>
+    </listitem>
+
+    <listitem>
+      <para>Remote Chunking of Step (multi process)</para>
+    </listitem>
+
+    <listitem>
+      <para>Partitioning a Step (single or multi process)</para>
+    </listitem>
+  </itemizedlist>
+
+  <para>Next we review the single-process options first, and then the
+  multi-process options.</para>
+
+  <section>
+    <title>Multi-threaded Step</title>
+
+    <para>The simplest way to start parallel processing is to add a
+    <classname>TaskExecutor</classname> to your Step configuration, e.g. as an
+    attribute of the <literal>tasklet</literal>:</para>
+
+    <programlisting><![CDATA[<step id="loading">
+   <tasklet reader="stagingReader" 
+         processor="stagingProcessor" 
+         writer="tradeWriter" 
+         commit-interval="1" 
+         task-executor="taskExecutor"/>
+</step>]]></programlisting>
+
+    <para>In this example the taskExecutor is a reference to another bean
+    definition, implementing the <classname>TaskExecutor</classname>
+    interface. <classname>TaskExecutor</classname> is a standard Spring
+    interface, so consult the Spring User Guide for details of available
+    implementations. The simplest multi-threaded
+    <classname>TaskExecutor</classname> is a
+    <classname>SimpleAsyncTaskExecutor</classname>.</para>
+
+    <para>The result of the above configuration will be that the Step executes
+    by reading, processing and writing each chunk of items (each commit
+    interval) in a separate thread of execution.</para>
+
+    <para>There are some practical limitations of using multi-threaded Steps
+    for some common Batch use cases. Many participants in a Step (e.g. readers
+    and writers) are stateful, and if the state is not segregated by thread,
+    then those components are not usable in a multi-threaded Step. In
+    particular most of the off-the-shelf readers and writers from Spring Batch
+    are not designed for multi-threaded use. It is, however, possible to work
+    with stateless or thread safe readers and writers, and there is a sample
+    (parallelJob) in the Spring Batch Samples that show the use of a process
+    indicator (see <xref linkend="process-indicator" xreflabel="" />) to keep
+    track of items that have been processed in a database input table.</para>
+  </section>
+
+  <section>
+    <title>Parallel Steps</title>
+
+    <para>As long as the application logic that needs to be parallelised can
+    be split into distinct responsibilities, and assigned to individual steps
+    then it can be parallelised in a single process. Parallel Step execution
+    is easy to configure and use, for example, to execute steps
+    <literal>(step1,step2)</literal> in parallel with
+    <literal>step3</literal>, you could configure a flow like this:</para>
+
+    <para><programlisting><![CDATA[  <split id="split1" next="step4">
+    <flow>
+      <step id="step1" next="step2"/>
+      <step id="step2"/>
+    </flow>
+    <flow>
+      <step id="step3"/>
+    </flow>
+  </split>
+  <step id="step4"/>]]></programlisting></para>
+
+    <para>See the section on <xref linkend="split-flows" /> for more
+    detail.</para>
+  </section>
+
+  <section>
+    <title>Remote Chunking</title>
+
+    <para>In Remote Chunking the Step processing is split across multiple
+    processes, communicating with each other through some middleware. Here is
+    a picture of the pattern in action:</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata align="center" fileref="images/remote-chunking.png"
+                   scale="70" width="75%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The Master component is a single process, and the Slaves are
+    multiple remote processes. Clearly this pattern works best if the Master
+    is not a bottleneck, so the processing must be more expensive than the
+    reading of items (this is often the case in practice).</para>
+
+    <para>The Master is just an implementation of a Spring Batch
+    <classname>Step</classname>, with the ItemWriter replaced with a generic
+    version that knows how to send chunks of items to the middleware as
+    messages. The Slaves are standard listeners for whatever middleware is
+    being used (e.g. with JMS they would be
+    <classname>MesssageListeners</classname>), and their role is to process
+    the chunks of items using a standard <classname>ItemWriter</classname> or
+    <classname>ItemProcessor</classname> plus
+    <classname>ItemWriter</classname>, through the
+    <classname>ChunkProcessor</classname> interface. One of the advantages of
+    using this pattern is that the reader, processor and writer components are
+    off-the-shelf (the same as would be used for a local execution of the
+    step). The items are divided up dynamically and work is shared through the
+    middleware, so if the listeners are all eager consumers, then load
+    balancing is automatic.</para>
+
+    <para>The middleware has to be durable, with guaranteed delivery and
+    single consumer for each message. JMS is the obvious candidate, but other
+    options exist in the grid computing and shared memory product space (e.g.
+    Java Spaces).</para>
+
+    <para>Spring Batch has a sub-project (Spring Batch Integration), providing
+    implementations of various patterns like this one using Spring
+    Integration. Spring Batch Integration is available in subversion for
+    people to use, but is not intended to be part of the official general
+    release of Spring Batch until it builds up more of a community of
+    users.</para>
+  </section>
+
+  <section>
+    <title>Partitioning</title>
+
+    <para>Spring Batch also provides an SPI for partitioning a Step execution
+    and executing it remotely. In this case the remote participants are simply
+    Step instances that could just as easily have been configured and used for
+    local processing. Here is a picture of the pattern in action:</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata align="center" fileref="images/partitioning-overview.png"
+                   scale="70" width="75%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The Job is executing on the left hand side as a sequence of Steps,
+    and one of the Steps is labelled as a Master. The Slaves in this picture
+    are all identical instances of a Step, which could in fact take the place
+    of the Master resulting in the same outcome for the Job. The Slaves are
+    typically going to be remote services, but could also be local threads of
+    execution. The messages sent by the Master to the Slaves in this pattern
+    do not need to be durable, or have guaranteed delivery: Spring Batch
+    meta-data in the <classname>JobRepository</classname> will ensure that
+    each Slave is executed once and only once for each Job execution.</para>
+
+    <para>The SPI in Spring Batch consists of a special implementation of Step
+    (the <classname>PartitionStep</classname>), and two strategy interfaces
+    that need to be implemented for the specific environment. The strategy
+    interfaces are <classname>PartitionHandler</classname> and
+    <classname>StepExecutionSplitter</classname>, and their role is show in
+    the sequence diagram below:</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata align="center" fileref="images/partitioning-spi.png"
+                   scale="70" width="75%" />
+      </imageobject>
+    </mediaobject>
+
+    <para>The Step on the right in this case is the "remote" Slave, so
+    potentially there are many objects and or processes playing this role, and
+    the PartitionStep is shown driving the execution. The PartitionStep
+    configuration looks like this:</para>
+
+    <para><programlisting><![CDATA[<bean name="step1:master" class="org.sfw...PartitionStep">
+    <property name="partitionHandler" ref="partitionHandler"/>
+    <property name="stepExecutionSplitter" ref="stepExecutionSplitter"/>
+    <property name="jobRepository" ref="jobRepository" />
+</bean>]]></programlisting></para>
+
+    <para>There is a simple example which can be copied and extended in the
+    unit test suite for Spring Batch Core (see
+    <classname>org.springframework.batch.core.partition</classname>
+    package).</para>
+
+    <section>
+      <title>PartitionHandler</title>
+
+      <para>The <classname>PartitionHandler</classname> is the component that
+      knows about the fabric of the remoting or grid environment. It is able
+      to send <classname>StepExecution</classname> requests to the remote
+      Steps, wrapped in some fabric-specific format, like a DTO. It does not
+      have to know how to split up the input data, or how to aggregate the
+      result of multiple Step executions. Generally speaking it probably also
+      doesn't need to know about resilience or failover, since those are
+      features of the fabric in many cases, and anyway Spring Batch always
+      provides restartability independent of the fabric: a failed Job can
+      always be restarted and only the failed Steps will be
+      re-executed.</para>
+
+      <para><classname>The PartitionHandler</classname> interface can have
+      specialised implementations for a variety of fabric types: e.g. simple
+      RMI remoting, EJB remoting, custom web service, JMS, Java Spaces, shared
+      memory grids (like Terracotta or Coherence), grid execution fabrics
+      (like GridGain). Spring Batch does not contain implementations for any
+      proprietary grid or remoting fabrics.</para>
+
+      <para>Spring Batch does however provide a useful implementation of
+      <classname>PartitionHandler</classname> that executes Steps locally in
+      separate threads of execution, using the
+      <classname>TaskExecutor</classname> strategy from Spring. The
+      implementation is called
+      <classname>TaskExecutorPartitionHandler</classname>, and it can be
+      configured like this:</para>
+
+      <para><programlisting><![CDATA[<bean class="org.sfw..TaskExecutorPartitionHandler">
+  <property name="taskExecutor" ref="taskExecutor"/>
+  <property name="step" ref="step1" />
+  <property name="gridSize" value="10" />
+</bean>]]></programlisting></para>
+
+      <para>The <literal>gridSize</literal> determines the number of separate
+      step executions to create, so it can be matched to the size of the
+      thread pool in the <classname>TaskExecutor</classname>, or else it can
+      be set to be larger than the number of threads available, in which case
+      the blocks of work are smaller.</para>
+
+      <para>The <classname>TaskExecutorPartitionHandler</classname> is quite
+      useful for IO intensive Steps, like copying large numbers of files or
+      replicating filesystems into content management systems.</para>
+    </section>
+
+    <section>
+      <title>StepExecutionSplitter</title>
+
+      <para>The <classname>StepExecutionSplitter</classname> is responsible
+      for splitting up a <classname>StepExecution</classname> into blocks of
+      work, and providing input parameters for the remote Slaves in the form
+      of an <classname>ExecutionContext</classname> for each one. The
+      principal method for this in the interface is</para>
+
+      <programlisting><![CDATA[public interface StepExecutionSplitter {
+  ...
+  Set<StepExecution> split(StepExecution stepExecution, int gridSize) 
+    throws JobExecutionException;
+}]]></programlisting>
+
+      <para>So an execution instance for the Master step is passed in, along
+      with a hint about the grid size, and the splitter has to create a set of
+      partitioned <classname>StepExecution</classname> instances, each with a
+      different <classname>ExecutionContext</classname>.</para>
+
+      <para>A convenient generic implementation of StepExecutionSplitter is
+      provided by Spring Batch, which handles concerns like interpreting the
+      grid size and handling restart. It is recommended that you use this
+      implementation (the <classname>SimpleStepExecutionSplitter</classname>)
+      and inject specific knowledge of the input data through its
+      <classname>Partitioner</classname> property. The Partitioner has a
+      simpler responsibility: to generate execution contexts as input
+      parameters for new step executions only (no need to worry about
+      restarts). It has a single method:</para>
+
+      <programlisting><![CDATA[public interface Partitioner {
+  Map<String, ExecutionContext> partition(int gridSize);
+}]]></programlisting>
+
+      <para>The return value from this method associates a unique name for
+      each step execution (the <classname>String</classname>), with input
+      parameters in the form of an <classname>ExecutionContext</classname>.
+      The names show up later in the Batch meta data as the step name in the
+      partitioned <classname>StepExecutions</classname>. The
+      <classname>ExecutionContext</classname> is just a bag of name-value
+      pairs, so it might contain a range of primary keys, or line numbers, or
+      the location of an input file. The remote <classname>Step</classname>
+      then normally binds to the context input using <literal>#{...}</literal>
+      placeholders (late binding in step scope).</para>
+    </section>
+  </section>
+</chapter>

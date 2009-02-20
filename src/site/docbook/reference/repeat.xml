@@ -234,7 +234,7 @@ template.iterate(new RepeatCallback() {
     <classname>TaskExecutorRepeatTemplate</classname>, which uses the Spring
     <classname>TaskExecutor</classname> strategy to run the
     <classname>RepeatCallback</classname>. The default is to use a
-    SynchronousTaskExecutor, which has the effect of executing the whole
+    <classname>SynchronousTaskExecutor</classname>, which has the effect of executing the whole
     iteration in the same thread (the same as a normal
     <classname>RepeatTemplate</classname>).</para>
   </section>
