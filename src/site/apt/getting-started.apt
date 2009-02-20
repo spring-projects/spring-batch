@@ -49,9 +49,9 @@ $ mvn test
 
     * Open Eclipse and make a workspace in the directory you just created.
 
-    * Import the samples project from the samples directory.
+    * Import the <<<org.springframework.batch.samples>>> project from the samples directory.
 
-    * Add all the jar files in the distribution as library dependencies (except <<<spring-batch-samples-<versionId>.jar>>>).  There are jars in <<<samples/lib>>> and in <<<sources/lib>>>,  including some duplicates.
+    * Add all the jar files in the distribution as library dependencies (except <<<spring-batch-samples-<versionId>.jar>>>).  There are jars in <<<samples/lib>>>, <<<sources>>> and in <<<sources/lib>>>,  including some duplicates.
 
     * Force the workspace to build (e.g. Project -> Clean...)
 
