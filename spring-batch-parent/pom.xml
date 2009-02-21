@@ -417,6 +417,14 @@
 	</dependencyManagement>
 	<repositories>
 		<repository>
+			<id>objectstyle</id>
+			<name>ObjectStyle.org Repository</name>
+			<url>http://objectstyle.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>com.springsource.repository.bundles.release</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Releases</name>
