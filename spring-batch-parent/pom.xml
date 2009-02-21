@@ -415,6 +415,25 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+	<distributionManagement>
+		<downloadUrl>http://www.springframework.org/download</downloadUrl>
+		<site>
+			<id>static.springframework.org</id>
+			<url>
+				scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk
+			</url>
+		</site>
+		<repository>
+			<id>spring-milestone</id>
+			<name>Spring Milestone Repository</name>
+			<url>s3://repository.springsource.com/maven/bundles/milestone</url>
+		</repository>
+		<snapshotRepository>
+			<id>spring-snapshot</id>
+			<name>Spring Snapshot Repository</name>
+			<url>s3://repository.springsource.com/maven/bundles/snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>objectstyle</id>
