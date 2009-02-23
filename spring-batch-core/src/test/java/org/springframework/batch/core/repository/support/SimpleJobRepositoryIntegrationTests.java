@@ -32,16 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/sql-dao-test.xml")
 public class SimpleJobRepositoryIntegrationTests {
 
+	@Autowired
 	private SimpleJobRepository jobRepository;
 
 	private JobSupport job = new JobSupport("SimpleJobRepositoryIntegrationTestsJob");
 
 	private JobParameters jobParameters = new JobParameters();
-
-	@Autowired
-	public void setJobRepository(SimpleJobRepository jobRepository) {
-		this.jobRepository = jobRepository;
-	}
 
 	/*
 	 * Create two job executions for same job+parameters tuple. Check both

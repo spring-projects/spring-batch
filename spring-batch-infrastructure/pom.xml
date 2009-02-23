@@ -21,8 +21,8 @@
 			</activation>
 			<dependencies>
 				<dependency>
-				<groupId>javax.xml.stream</groupId>
-				<artifactId>com.springsource.javax.xml.stream</artifactId>
+				<groupId>stax</groupId>
+				<artifactId>stax</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>
