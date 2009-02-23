@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>org.springframework.batch.parent</artifactId>
-	<version>2.0.1.CI-SNAPSHOT</version>
+	<version>2.0.0.CI-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
+	<url>http://static.springframework.org/spring-batch</url>
 	<description>
 		Spring Batch parent project.  Defines dependencies and common configuration for the 
 		build process.
@@ -30,6 +32,53 @@
 			</properties>
 		</profile>
 		<profile>
+			<id>staging</id>
+			<distributionManagement>
+				<site>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</site>
+				<repository>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</repository>
+				<snapshotRepository>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>javadoc</id>
+								<phase>package</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>snapshots</id>
 			<pluginRepositories>
 				<pluginRepository>
@@ -48,11 +97,12 @@
 				<pluginManagement>
 					<plugins>
 						<!--
-							This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken
+							This seems to work better than the default (2008/03/19) because
+							links on sub-module sites are not broken
 						-->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
-							<version>2.0-beta-7-SNAPSHOT</version>
+							<version>2.0-beta-8-SNAPSHOT</version>
 						</plugin>
 					</plugins>
 				</pluginManagement>
@@ -134,6 +184,38 @@
 			</plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-report-plugin</artifactId>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<quiet>true</quiet>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -437,7 +519,7 @@
 		<repository>
 			<id>objectstyle</id>
 			<name>ObjectStyle.org Repository</name>
-			<url>http://objectstyle.org/maven2/</url>
+			<url>http://objectstyle.org/maven2</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>

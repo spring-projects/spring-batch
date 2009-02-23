@@ -10,9 +10,23 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>org.springframework.batch.parent</artifactId>
-		<version>2.0.1.CI-SNAPSHOT</version>
+		<version>2.0.0.CI-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
+	<profiles>
+		<profile>
+			<id>tiger</id>
+			<activation>
+				<jdk>1.5</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+				<groupId>javax.xml.stream</groupId>
+				<artifactId>com.springsource.javax.xml.stream</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -178,12 +192,6 @@
 			<artifactId>db2jcc</artifactId> <version>9.5.0</version>
 			<scope>test</scope> </dependency>
 		-->
-		<dependency>
-			<groupId>stax</groupId>
-			<artifactId>stax</artifactId>
-			<!-- optional for Java 6 -->
-			<optional>true</optional>
-		</dependency>
 		<!-- Spring Dependencies -->
 		<dependency>
 			<groupId>org.springframework</groupId>

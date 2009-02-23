@@ -1442,7 +1442,7 @@
     </section>
   </section>
 
-  <section>
+  <section id="late-binding" xreflabel="Late Binding">
     <title>Late binding of Job and Step Attributes</title>
 
     <para>Both the XML and Flat File examples above use the Spring
@@ -1520,7 +1520,7 @@
 
 ]]></programlisting>
 
-    <section>
+    <section id="step-scope">
       <title>Step Scope</title>
 
       <para>All of the late binding examples from above have a scope of "step"
@@ -1538,12 +1538,25 @@
       to use late binding since the bean cannot actually be instantiated until
       the <classname>Step</classname> starts, which allows the attributes to
       be found. Because it is not part of the Spring container by default, it
-      must be added explicitly:</para>
+      must be added explicitly, either by using the <literal>batch</literal> 
+      namespace: </para>
+
+      <programlisting><![CDATA[
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:batch="http://www.springframework.org/schema/batch" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="...">
+...
+</beans>
+]]></programlisting>
+
+     <para>or by including a bean definition explicitly for the<classname>Step</classname> (but not both):</para>
 
       <programlisting><![CDATA[
   <bean class="org.springframework.batch.core.scope.StepScope" />
 
 ]]></programlisting>
+
     </section>
   </section>
 </chapter>

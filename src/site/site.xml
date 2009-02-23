@@ -41,7 +41,12 @@
             <item name="1.0.x" href="http://www.springframework.org/spring-batch/1.0.x/index.html"/>
             <item name="1.1.x" href="http://www.springframework.org/spring-batch/1.1.x/index.html"/>
 		</menu>
-		<menu ref="modules"/>
+		<menu name="Modules" inherit="none">
+			<item name="Infrastructure" href="org.springframework.batch.infrastructure/index.html"/>
+			<item name="Core" href="org.springframework.batch.core/index.html"/>
+			<item name="Test" href="org.springframework.batch.test/index.html"/>
+			<item name="Samples" href="org.springframework.batch.samples/index.html"/>
+		</menu>
 		<menu ref="reports"/>
 	</body>
 </project>

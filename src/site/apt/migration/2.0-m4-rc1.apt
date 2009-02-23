@@ -1,0 +1,135 @@
+Spring Batch 2.0.0.RC1 Release Notes
+
+* Bug
+
+
+  * {{{http://jira.springframework.org/browse/BATCH-1089}BATCH-1089}} - 	Getting Started page should be updated 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1088}BATCH-1088}} - 	NamespaceHandler no handle all XML tags 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1087}BATCH-1087}} - 	ClassPathXmlJobRegistry does not accept patterns for resources 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1086}BATCH-1086}} - 	JdbcJobExecutionDao.getRunningJobExecutions() ignores jobName 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1085}BATCH-1085}} - 	Should adding next entities mean that the next attribute cannot be used? 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1084}BATCH-1084}} - 	Change "status" attribute of <end> and <fail> to "exit-code" 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1083}BATCH-1083}} - 	Use RowMapper instead of ParameterizedRowMapper for public API 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1082}BATCH-1082}} - 	If file reader is lenient about resource existing on startup, it should also check when it is closed 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1081}BATCH-1081}} - 	Add task-executor= to <split/> 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1080}BATCH-1080}} - 	make <tasklet> a top-level element 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1078}BATCH-1078}} - 	Maven Build - ClassNotFoundException: com.springsource.util.math.Sets 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1077}BATCH-1077}} - 	Update docs to reflect changes in statuses
+
+  * {{{http://jira.springframework.org/browse/Update}Update}} - docs to reflect changes in statuses 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1076}BATCH-1076}} - 	Add a test case to show how a <stop> can restart on the step it failed on 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1075}BATCH-1075}} - 	allow-start-if-complete and start-limit should be on <step/>, not <tasklet/> 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1073}BATCH-1073}} - 	on <step> element, "listeners" must be disallowed when "ref" attribute is specified 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1071}BATCH-1071}} - 	JobInterruptedException needs to be on the fatal list 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1070}BATCH-1070}} - 	Add 'strict' property to BeanWrapperFieldSetMapper to allow suppression of errors 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1069}BATCH-1069}} -      Update docs to show top-level <step> element 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1068}BATCH-1068}} -     	Update samples to use <step> top-level element 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1067}BATCH-1067}} - 	Problems with the way 'split' element handles EndStates 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1066}BATCH-1066}} - 	Modify namespace so that if "next" attribute is used, then no transition elements will be allowed. 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1064}BATCH-1064}} - 	Namespace end transition names don't match their corresponding statuses 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1063}BATCH-1063}} - 	Fix image sizes 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1062}BATCH-1062}} - 	Add namespace declaration information to docs 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1061}BATCH-1061}} - 	FlowJob.getLastStepExecution() puts arguments into isLater() in the wrong order 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1059}BATCH-1059}} - 	BATCH_JOB_INSTANCE.JOB_KEY ignores Date milliseconds 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1057}BATCH-1057}} - 	Residual from 1.x left over in AbstractItemWriter 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1056}BATCH-1056}} - 	Proofread documentation 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1055}BATCH-1055}} - 	Add section on filtering to docs 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1054}BATCH-1054}} - 	Maven Build - incompatible bundle manifest version 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1053}BATCH-1053}} - 	Add getStep(String) to Job interface 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1052}BATCH-1052}} - 	Write Common Pattern section about SystemCommandTasklet 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1051}BATCH-1051}} - 	Write Common Pattern section about multi-line records 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1050}BATCH-1050}} - 	SimpleJobExplorer doesn't retrieve StepExecutions of running JobExecutions using MapStepExecutionDao 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1049}BATCH-1049}} - 	Add compile scope to spring-test in spring-batch-test 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1048}BATCH-1048}} - 	Add site docos for the Test project 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1047}BATCH-1047}} - 	CommandLineJobRunner should use JobOperator 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1043}BATCH-1043}} - 	Add chapter on scaling (partitioning, etc) to docs 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1041}BATCH-1041}} - 	Create section in documentation about launching from within a web container 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1040}BATCH-1040}} - 	Add cross referencing to documentation 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1037}BATCH-1037}} - 	Change namespace to set job-repository only on job 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1034}BATCH-1034}} - 	Add StepScope to application context automatically in the parser 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1030}BATCH-1030}} - 	FlowJob replays failed steps on restart, even if the failure did not fail the job 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1028}BATCH-1028}} - 	JdbcCursorItemReader driverSupportsAbsolute property defaults to false 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1027}BATCH-1027}} - 	PassThroughFieldExtractor should have a unit test 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1023}BATCH-1023}} - 	File writing related interfaces need more javadoc 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1013}BATCH-1013}} - 	Using the batch namespace, steps can't be defined outside of the "job" tag. 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1011}BATCH-1011}} - 	Need distinction between "stop" and "end" transitions? 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1010}BATCH-1010}} - 	StepFactoryBeans cleanup 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1008}BATCH-1008}} - 	Elements in namespace are order-dependent 
+
+  * {{{http://jira.springframework.org/browse/BATCH-1000}BATCH-1000}} - 	Add timeout to TaskExecutorPartitionHandler 
+
+  * {{{http://jira.springframework.org/browse/BATCH-955}BATCH-955}} - 	Update XML schema to be tooling friendly 
+
+  * {{{http://jira.springframework.org/browse/BATCH-949}BATCH-949}} - 	JdbcCursorItemReader: property name for "mapper"? 
+
+  * {{{http://jira.springframework.org/browse/BATCH-942}BATCH-942}} - 	Obvious JobLocator implementation 
+
+  * {{{http://jira.springframework.org/browse/BATCH-909}BATCH-909}} - 	Turn off getWarnings() call in JdbcCursorItemReader when ignoreWarnings is true 
+
+  * {{{http://jira.springframework.org/browse/BATCH-882}BATCH-882}} - 	Create section in documentation highlighting key changes between 1.x and 2.0 
+
+  * {{{http://jira.springframework.org/browse/BATCH-851}BATCH-851}} - 	Remove DrivingQueryItemReader support in favor of PagingItemReaders 
+
+  * {{{http://jira.springframework.org/browse/BATCH-819	Create}BATCH-819	Create}} - separate CI builds for artifacts in Maven Central and Enterprise Repository 
+
+  * {{{http://jira.springframework.org/browse/BATCH-818	Create}BATCH-818	Create}} - and test ivy and maven files needed for build 
+
+  * {{{http://jira.springframework.org/browse/BATCH-793}BATCH-793}} - 	Creating a new ApplicationContext per Job needs refactoring 
+
+  * {{{http://jira.springframework.org/browse/BATCH-690}BATCH-690}} - 	Move drop table statements to separate script 
+
+  * {{{http://jira.springframework.org/browse/BATCH-659}BATCH-659}} - 	unused classes deprecation/removal 
+
+  * {{{http://jira.springframework.org/browse/BATCH-618}BATCH-618}} - 	DefaultJobParametersConverter does not parse parameters of type double 
+
+  * {{{http://jira.springframework.org/browse/BATCH-583}BATCH-583}} - 	Figures missing from PDF docs 
+

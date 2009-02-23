@@ -296,7 +296,77 @@
       pairs, so it might contain a range of primary keys, or line numbers, or
       the location of an input file. The remote <classname>Step</classname>
       then normally binds to the context input using <literal>#{...}</literal>
-      placeholders (late binding in step scope).</para>
+      placeholders (late binding in step scope), as illustrated in the next
+      section.</para>
+
+      <para>The names of the step executions (the keys in the
+      <classname>Map</classname> returned by
+      <classname>Partitioner</classname>) need to be unique amongst the step
+      executions of a Job, but do not have any other specific requirements.
+      The easiest way to do this, and to make the names meaningful for users,
+      is to use a prefix+suffix naming convention, where the prefix is the
+      name of the step that is being executed (which itself is unique in the
+      <classname>Job</classname>), and the suffix is just a counter. There is
+      a <classname>SimplePartitioner</classname> in the framework that uses
+      this convention.</para>
+    </section>
+
+    <section>
+      <title>Binding Input Data to Steps</title>
+
+      <para>It is very efficient for the steps that are executed by the
+      PartitionHandler to have identical configuration, and for their input
+      parameters to be bound at runtime from the ExecutionContext. This is
+      easy to do with the StepScope feature of Spring Batch (covered in more
+      detail in the section on <xref linkend="late-binding" />). For example
+      if the <classname>Partitioner</classname> creates
+      <classname>ExecutionContext</classname> instances with an attribute key
+      <literal>fileName</literal>, pointing to a different file (or
+      directlory) for each step invocation, the
+      <classname>Partitioner</classname> output might look like this:</para>
+
+      <table>
+        <title>Example step execution name to execution context provided by
+        Partitioner targeting directory processing</title>
+
+        <tgroup cols="2">
+          <tbody>
+            <row>
+              <entry><emphasis role="bold">Step Execution Name
+              (key)</emphasis></entry>
+
+              <entry><emphasis role="bold">ExecutionContext
+              (value)</emphasis></entry>
+            </row>
+
+            <row>
+              <entry>filecopy:partition0</entry>
+
+              <entry>fileName=/home/data/one</entry>
+            </row>
+
+            <row>
+              <entry>filecopy:partition1</entry>
+
+              <entry>fileName=/home/data/two</entry>
+            </row>
+
+            <row>
+              <entry>filecopy:partition2</entry>
+
+              <entry>fileName=/home/data/three</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+
+      <para>Then the file name can be bound to a step using late binding to
+      the execution context:</para>
+
+      <programlisting><![CDATA[  <bean id="itemReader" scope="step"
+        class="org.sfw...MultiResourceItemReader">
+    <property name="resource" value="]]><emphasis role="bold">#{stepExecutionContext.fileName}/*</emphasis><![CDATA["/>
+  </bean>]]></programlisting>
     </section>
   </section>
 </chapter>

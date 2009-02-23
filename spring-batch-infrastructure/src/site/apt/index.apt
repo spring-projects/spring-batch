@@ -8,7 +8,7 @@
 Introduction
 
   This module provides framework code for the Spring Batch project.
-  The core interfaces are <<<ItemReader>>>, <<<ItemWriter>>>,
+  The core interfaces are <<<ItemReader>>>, <<<ItemProcessor>>>, <<<ItemWriter>>>,
   <<<RepeatOperations>>> and <<<RetryOperations>>>.
 
   The reader and writer interfaces are implemented in some generic
@@ -26,16 +26,16 @@ template.setCompletionPolicy(new FixedChunkSizeCompletionPolicy(2));
 
 template.iterate(new RepeatCallback() {
 
-    public ExitStatus doInIteration(RepeatContext context) {
+    public RepeatStatus doInIteration(RepeatContext context) {
         // Do stuff in batch...
-        return ExitStatus.CONTINUABLE; // Return ExitStatus.FINISHED to signal exhausted data
+        return RepeatStatus.CONTINUABLE; // Return RepeatStatus.FINISHED to signal exhausted data
     }
 
 });
 +---
 
   The callback is executed repeatedly, until the completion policy
-  determines that the batch should end.
+  determines that the batch should end (in the example, twice).
 
   The framework provides <<<RetryOperations>>> for automatic retry of
   a business operation.  This is independent of the batching support,

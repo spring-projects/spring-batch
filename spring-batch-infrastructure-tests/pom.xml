@@ -7,10 +7,22 @@
 	<parent>
 		<groupId>org.springframework.batch</groupId>
 		<artifactId>org.springframework.batch.parent</artifactId>
-		<version>2.0.1.CI-SNAPSHOT</version>
+		<version>2.0.0.CI-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
 	<profiles>
+		<profile>
+			<id>tiger</id>
+			<activation>
+				<jdk>1.5</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+				<groupId>javax.xml.stream</groupId>
+				<artifactId>com.springsource.javax.xml.stream</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
 		<profile>
 			<id>default</id>
 			<activation>
@@ -52,10 +64,6 @@
 		</profile>
 	</profiles>
 
-	<!--
-		Temporary measure while we get to the bottom of the test failures on
-		Bamboo
-	-->
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.batch</groupId>
@@ -97,11 +105,6 @@
 		<dependency>
 			<groupId>javax.jms</groupId>
 			<artifactId>com.springsource.javax.jms</artifactId>
-		</dependency>
-		<dependency>
-			<!-- TODO: remove this or find a replacement in Java 5 / BRITS -->
-			<groupId>stax</groupId>
-			<artifactId>stax</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>

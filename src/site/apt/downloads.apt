@@ -57,7 +57,7 @@ Spring Batch Downloads
 +---------------
 <repository>
     <id>spring-releases</id>
-    <name>Spring Portfolio Maven RELEASE Repository</name>
+    <name>Spring Maven RELEASE Repository</name>
     <url>http://s3.amazonaws.com/maven.springframework.org/release</url>
 </repository>
 +---------------
@@ -111,7 +111,7 @@ Spring Batch Downloads
 +---------------
 <repository>
     <id>spring-s3</id>
-    <name>Spring Portfolio Maven MILESTONE Repository</name>
+    <name>Spring Maven MILESTONE Repository</name>
     <url>http://s3.amazonaws.com/maven.springframework.org/milestone</url>
 </repository>
 +---------------
