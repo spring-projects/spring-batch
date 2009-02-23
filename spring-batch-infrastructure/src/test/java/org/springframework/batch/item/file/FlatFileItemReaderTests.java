@@ -8,6 +8,7 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.file.mapping.PassThroughLineMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.core.io.AbstractResource;
@@ -133,6 +134,22 @@ public class FlatFileItemReaderTests {
 		reader.setResource(getInputResource(TEST_STRING));
 		reader.open(executionContext);
 		assertEquals(TEST_STRING, reader.read());
+	}
+
+	/**
+	 * In strict mode, resource must exist at the time reader is opened.
+	 */
+	@Test(expected = ItemStreamException.class)
+	public void testStrictness() throws Exception {
+
+		Resource resource = new NonExistentResource();
+
+		reader.setResource(resource);
+		reader.setStrict(true);
+
+		reader.afterPropertiesSet();
+
+		reader.open(executionContext);
 	}
 
 	private Resource getInputResource(String input) {

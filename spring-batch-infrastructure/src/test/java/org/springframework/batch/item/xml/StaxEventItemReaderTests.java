@@ -231,10 +231,9 @@ public class StaxEventItemReaderTests {
 		source.setResource(new NonExistentResource());
 		source.afterPropertiesSet();
 
-		
 		source.open(executionContext);
 		assertNull(source.read());
-		
+
 	}
 
 	@Test
@@ -246,6 +245,17 @@ public class StaxEventItemReaderTests {
 		source.setResource(new ByteArrayResource(xml.getBytes()));
 		source.open(executionContext);
 		source.read();
+	}
+
+	@Test(expected = ItemStreamException.class)
+	public void testStrictness() throws Exception {
+
+		source.setResource(new NonExistentResource());
+		source.setStrict(true);
+		source.afterPropertiesSet();
+
+		source.open(executionContext);
+
 	}
 
 	private StaxEventItemReader<List<XMLEvent>> createNewInputSouce() {

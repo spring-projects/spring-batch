@@ -70,13 +70,25 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private LineCallbackHandler skippedLinesCallback;
 
+	private boolean strict = false;
+
 	public FlatFileItemReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
 	}
 
 	/**
-	 * @param skippedLinesCallback will be called for each one of the initial skipped
-	 * lines before any items are read.
+	 * In strict mode the reader will throw an exception on
+	 * {@link #open(org.springframework.batch.item.ExecutionContext)} if the
+	 * input resource does not exist.
+	 * @param strict false by default
+	 */
+	public void setStrict(boolean strict) {
+		this.strict = strict;
+	}
+	
+	/**
+	 * @param skippedLinesCallback will be called for each one of the initial
+	 * skipped lines before any items are read.
 	 */
 	public void setSkippedLinesCallback(LineCallbackHandler skippedLinesCallback) {
 		this.skippedLinesCallback = skippedLinesCallback;
@@ -194,7 +206,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			}
 		}
 		catch (IOException e) {
-			throw new FlatFileParseException("Unable to read from resource: [" + resource + "]", e, line, lineCount );
+			throw new FlatFileParseException("Unable to read from resource: [" + resource + "]", e, line, lineCount);
 		}
 		return line;
 	}
@@ -211,8 +223,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 	@Override
 	protected void doClose() throws Exception {
 		lineCount = 0;
-		if(resource.exists())
-		{
+		if (resource.exists()) {
 			reader.close();
 		}
 	}
@@ -224,6 +235,9 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 		noInput = false;
 		if (!resource.exists()) {
+			if (strict) {
+				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode)");
+			}
 			noInput = true;
 			logger.warn("Input resource does not exist " + resource.getDescription());
 			return;
