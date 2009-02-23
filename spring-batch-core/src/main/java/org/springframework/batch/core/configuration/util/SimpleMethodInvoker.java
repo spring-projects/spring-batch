@@ -95,7 +95,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 			return method.invoke(object, invokeArgs);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Unable to invoke method: [" + method + "] on object: [" + 
-					object + "] with arguments: [" + Arrays.toString(args) + "]");
+					object + "] with arguments: [" + Arrays.toString(args) + "]", e);
 		} 
 	}
 	
