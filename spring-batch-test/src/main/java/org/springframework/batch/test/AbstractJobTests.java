@@ -124,7 +124,7 @@ public abstract class AbstractJobTests {
 	 * @return a new JobParameters object containing only a parameter for the
 	 *         current timestamp, to ensure that the job instance will be unique
 	 */
-	private JobParameters makeUniqueJobParameters() {
+	public JobParameters makeUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
 		parameters.put("timestamp", new JobParameter(new Date().getTime()));
 		return new JobParameters(parameters);
