@@ -101,6 +101,8 @@ public class FlowJob extends AbstractJob {
 
 		private final JobExecution execution;
 
+		private ExitStatus exitStatus = ExitStatus.EXECUTING;
+
 		/**
 		 * @param execution
 		 */
@@ -129,7 +131,8 @@ public class FlowJob extends AbstractJob {
 		
 		public void updateJobExecutionStatus(FlowExecutionStatus status) {
 			execution.setStatus(findBatchStatus(status));
-			execution.setExitStatus(new ExitStatus(status.getName()));
+			exitStatus = exitStatus.and(new ExitStatus(status.getName()));
+			execution.setExitStatus(exitStatus);
 		}
 
 		public JobExecution getJobExecution() {
@@ -142,6 +145,14 @@ public class FlowJob extends AbstractJob {
 
 		public void close(FlowExecution result) {
 			stepExecutionHolder.set(null);
+		}
+		
+		public boolean isRestart() {
+			return execution.getStepExecutions().isEmpty();
+		}
+		
+		public void addExitStatus(String code) {
+			exitStatus = exitStatus.and(new ExitStatus(code));
 		}
 
 		/**

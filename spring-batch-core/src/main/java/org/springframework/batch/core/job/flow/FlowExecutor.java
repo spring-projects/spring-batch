@@ -69,4 +69,14 @@ public interface FlowExecutor {
 	 */
 	void updateJobExecutionStatus(FlowExecutionStatus status);
 
+	/**
+	 * @return true if the flow is at the beginning of a restart
+	 */
+	boolean isRestart();
+
+	/**
+	 * @param code the label for the exit status when a flow or sub-flow ends
+	 */
+	void addExitStatus(String code);
+
 }

@@ -53,5 +53,12 @@ public class JobFlowExecutorSupport implements FlowExecutor {
 	
 	public void updateJobExecutionStatus(FlowExecutionStatus status) {		
 	}
+	
+	public boolean isRestart() {
+		return false;
+	}
+	
+	public void addExitStatus(String code) {
+	}
 
 }

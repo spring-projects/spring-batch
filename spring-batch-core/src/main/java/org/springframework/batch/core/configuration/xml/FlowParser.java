@@ -255,13 +255,11 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 					.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.EndState");
 
 			boolean exitCodeExists = StringUtils.hasText(exitCode);
-			// Make sure exit code is consistent with status for aggregation
-			// purposes
-			if (exitCodeExists && !exitCode.startsWith(status.getName())) {
-				exitCode = status.getName() + (exitCode.contains(" ") ? " " : "_") + exitCode;
-			}
-			endBuilder.addConstructorArgValue(exitCodeExists ? new FlowExecutionStatus(exitCode) : status);
 
+			endBuilder.addConstructorArgValue(status);
+
+			endBuilder.addConstructorArgValue(exitCodeExists ? exitCode : status.getName());
+			
 			String endName = (status == FlowExecutionStatus.STOPPED ? STOP
 					: status == FlowExecutionStatus.FAILED ? FAIL : END)
 					+ (endCounter++);

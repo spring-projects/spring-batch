@@ -40,13 +40,14 @@ public class SplitDifferentResultsFailSecondJobParserTests extends AbstractJobPa
 
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
-		assertEquals("Wrong step anmes: "+stepNamesList, 3, stepNamesList.size());
+		assertEquals("Wrong step names: "+stepNamesList, 3, stepNamesList.size());
 		assertTrue(stepNamesList.contains("s1"));
 		assertTrue(stepNamesList.contains("fail"));
 		assertTrue(stepNamesList.contains("s3"));
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		assertEquals(ExitStatus.COMPLETED, jobExecution.getExitStatus());
+		// You can't suppress a FAILED exit status
+		assertEquals(ExitStatus.FAILED, jobExecution.getExitStatus());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");
 		assertEquals(BatchStatus.COMPLETED, stepExecution1.getStatus());

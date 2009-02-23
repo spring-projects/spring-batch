@@ -108,14 +108,14 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * 
 	 * Severity is defined by the exit code:
 	 * <ul>
-	 * <li>Codes beginning with EXECUTING have severity 0</li>
+	 * <li>Codes beginning with EXECUTING have severity 1</li>
 	 * <li>Codes beginning with COMPLETED have severity 2</li>
 	 * <li>Codes beginning with NOOP have severity 3</li>
-	 * <li>Codes beginning with INTERRUPTED have severity 4</li>
+	 * <li>Codes beginning with STOPPED have severity 4</li>
 	 * <li>Codes beginning with FAILED have severity 5</li>
 	 * <li>Codes beginning with UNKNOWN have severity 6</li>
 	 * </ul>
-	 * Others have severity 1.<br/>
+	 * Others have severity 7, so custom exit codes always win.<br/>
 	 * 
 	 * If the input is null just return this.
 	 * 
@@ -153,6 +153,9 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 	 * @return
 	 */
 	private int severity(ExitStatus status) {
+		if (status.exitCode.startsWith(EXECUTING.exitCode)) {
+			return 1;
+		}
 		if (status.exitCode.startsWith(COMPLETED.exitCode)) {
 			return 2;
 		}
@@ -168,10 +171,7 @@ public class ExitStatus implements Serializable, Comparable<ExitStatus> {
 		if (status.exitCode.startsWith(UNKNOWN.exitCode)) {
 			return 6;
 		}
-		if (!status.exitCode.startsWith(EXECUTING.exitCode)) {
-			return 1;
-		}
-		return 0;
+		return 7;
 	}
 
 	/*

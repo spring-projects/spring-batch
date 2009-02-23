@@ -134,7 +134,8 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenCustomCompletedAddedToCompleted() {
-		assertEquals("COMPLETED_CUSTOM", ExitStatus.COMPLETED.and(ExitStatus.EXECUTING.replaceExitCode("COMPLETED_CUSTOM")).getExitCode());
+		assertEquals("COMPLETED_CUSTOM", ExitStatus.COMPLETED.and(
+				ExitStatus.EXECUTING.replaceExitCode("COMPLETED_CUSTOM")).getExitCode());
 	}
 
 	/**
@@ -155,8 +156,7 @@ public class ExitStatusTests {
 	 */
 	@Test
 	public void testAndExitStatusWhenCustomContinuableAddedToFinished() {
-		assertEquals(ExitStatus.COMPLETED.getExitCode(), ExitStatus.COMPLETED.and(
-				ExitStatus.EXECUTING.replaceExitCode("CUSTOM")).getExitCode());
+		assertEquals("CUSTOM", ExitStatus.COMPLETED.and(ExitStatus.EXECUTING.replaceExitCode("CUSTOM")).getExitCode());
 	}
 
 	@Test

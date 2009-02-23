@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.job.flow.support.state;
 
-import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.State;
@@ -34,12 +33,22 @@ public class EndState extends AbstractState {
 
 	private final boolean abandon;
 
+	private final String code;
+
 	/**
 	 * @param status The {@link FlowExecutionStatus} to end with
 	 * @param name The name of the state
 	 */
 	public EndState(FlowExecutionStatus status, String name) {
-		this(status, name, false);
+		this(status, status.getName(), name);
+	}
+
+	/**
+	 * @param status The {@link FlowExecutionStatus} to end with
+	 * @param name The name of the state
+	 */
+	public EndState(FlowExecutionStatus status, String code, String name) {
+		this(status, code, name, false);
 	}
 
 	/**
@@ -49,9 +58,10 @@ public class EndState extends AbstractState {
 	 * marked as abandoned (if there is one)
 	 * 
 	 */
-	public EndState(FlowExecutionStatus status, String name, boolean abandon) {
+	public EndState(FlowExecutionStatus status, String code, String name, boolean abandon) {
 		super(name);
 		this.status = status;
+		this.code = code;
 		this.abandon = abandon;
 	}
 
@@ -62,11 +72,10 @@ public class EndState extends AbstractState {
 	 */
 	@Override
 	public FlowExecutionStatus handle(FlowExecutor executor) throws Exception {
-		JobExecution jobExecution = executor.getJobExecution();
-		synchronized (jobExecution) {
+		synchronized (executor) {
 
 			if (status.isStop()) {
-				if (!jobExecution.getStepExecutions().isEmpty()) {
+				if (!executor.isRestart()) {
 					/*
 					 * If there are step executions, then we are not at the
 					 * beginning of a restart.
@@ -89,6 +98,7 @@ public class EndState extends AbstractState {
 				}
 			}
 
+			executor.addExitStatus(code);
 			return status;
 
 		}
