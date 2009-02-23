@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.custommonkey.xmlunit.XMLAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
@@ -14,13 +16,22 @@ import org.junit.Test;
 import org.springframework.batch.io.oxm.domain.Trade;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StopWatch;
 
 public abstract class AbstractStaxEventWriterItemWriterTests {
+	
+	private Log logger = LogFactory.getLog(getClass());
+
+	private static final int MAX_WRITE = 100;
 
 	private StaxEventItemWriter<Trade> writer = new StaxEventItemWriter<Trade>();
 
@@ -28,8 +39,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 
 	File outputFile;
 
-	protected Resource expected = new ClassPathResource("expected-output.xml",
-			getClass());
+	protected Resource expected = new ClassPathResource("expected-output.xml", getClass());
 
 	protected List<Trade> objects = new ArrayList<Trade>() {
 		{
@@ -44,11 +54,26 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 	 */
 	@Test
 	public void testWrite() throws Exception {
-		writer.write(objects);
+		StopWatch stopWatch = new StopWatch(getClass().getSimpleName());
+		stopWatch.start();
+		for (int i = 0; i < MAX_WRITE; i++) {
+			new TransactionTemplate(new ResourcelessTransactionManager()).execute(new TransactionCallback() {
+				public Object doInTransaction(TransactionStatus status) {
+					try {
+						writer.write(objects);
+					}
+					catch (Exception e) {
+						status.setRollbackOnly();
+					}
+					return null;
+				}
+			});
+		}
 		writer.close();
+		stopWatch.stop();
+		logger.info("Timing for XML writer: " + stopWatch);
 		XMLUnit.setIgnoreWhitespace(true);
-		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()),
-				new FileReader(resource.getFile()));
+		XMLAssert.assertXMLEqual(new FileReader(expected.getFile()), new FileReader(resource.getFile()));
 
 	}
 
@@ -57,8 +82,7 @@ public abstract class AbstractStaxEventWriterItemWriterTests {
 		// File outputFile =
 		// File.createTempFile("AbstractStaxStreamWriterOutputSourceTests",
 		// "xml");
-		outputFile = File.createTempFile(ClassUtils.getShortName(this
-				.getClass()), ".xml");
+		outputFile = File.createTempFile(ClassUtils.getShortName(this.getClass()), ".xml");
 		resource = new FileSystemResource(outputFile);
 		writer.setResource(resource);
 
