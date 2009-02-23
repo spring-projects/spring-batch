@@ -15,7 +15,7 @@
 
     <imageobject role="fo">
       <imagedata align="center"
-                 fileref="images/spring-batch-reference-model.png" scale="70" 
+                 fileref="images/spring-batch-reference-model.png" scale="70"
                  width="75%" />
     </imageobject>
   </mediaobject>
@@ -323,7 +323,7 @@
     </section>
   </section>
 
-  <section>
+  <section id="configuringJobLauncher">
     <title>Configuring a JobLauncher</title>
 
     <para>The most basic implementation of the
@@ -575,9 +575,55 @@
     </section>
 
     <section>
-      <title>Running Jobs from within a container</title>
+      <title>Running Jobs from within a web container</title>
 
-      <para></para>
+      <para>Historically, offline processing such as batch jobs have been
+      launched from the command-line, as described above. However, there are
+      many cases where launching from an <classname>HttpRequest</classname> is
+      a better option. Many such use cases include reporting, ad-hoc job
+      running, and web application support. Because a batch job by definition
+      is long running, the most important concern is ensuring to launch the
+      job asynchronously:<mediaobject>
+          <imageobject role="html">
+            <imagedata align="center" fileref="images/launch-from-request.png"
+                       width="40%" />
+          </imageobject>
+
+          <imageobject role="fo">
+            <imagedata align="center" fileref="images/launch-from-request.png"
+                       scale="80" width="40%" />
+          </imageobject>
+        </mediaobject></para>
+
+      <para>The controller in this case is a Spring MVC controller. More
+      information on Spring MVC can be found here: <ulink
+      url="http://static.springframework.org/spring/docs/2.5.x/reference/mvc.html">http://static.springframework.org/spring/docs/2.5.x/reference/mvc.html</ulink>.
+      The controller launches a <classname>Job</classname> using a
+      <classname>JobLauncher</classname> that has been configured to launch
+      <link linkend="configureJobLauncher">asynchronously</link>, which
+      immediately returns a <classname>JobExecution</classname>. The
+      <classname>Job</classname> will likely still be running, however, this
+      nonblocking behaviour allows the controller to return immediately, which
+      is required when handling an <classname>HttpRequest</classname>. An
+      example is below:</para>
+
+      <programlisting> 
+  @Controller
+  public class JobLauncherController {
+
+    @Autowired
+    JobLauncher jobLauncher;
+
+    @Autowired
+    Job job;
+
+    @RequestMapping("/jobLauncher.html")
+    public void handle() throws Exception{
+      jobLauncher.run(job, new JobParameters());
+    }
+  }
+
+</programlisting>
     </section>
   </section>
 
@@ -595,8 +641,7 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/job-repository.png"
+        <imagedata align="center" fileref="images/job-repository.png"
                    scale="80" width="40%" />
       </imageobject>
     </mediaobject>
@@ -618,8 +663,7 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/job-repository-advanced.png"
+        <imagedata align="center" fileref="images/job-repository-advanced.png"
                    scale="70" width="65%" />
       </imageobject>
     </mediaobject>
