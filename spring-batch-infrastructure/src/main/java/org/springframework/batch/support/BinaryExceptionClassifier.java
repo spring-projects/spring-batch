@@ -34,15 +34,19 @@ import java.util.Map;
 public class BinaryExceptionClassifier extends SubclassClassifier<Throwable, Boolean> {
 
 	/**
-	 * Create a binary exception classifier with the provided default value.
-	 * @param defaultValue
+	 * Create a binary exception classifier with the provided default value. All
+	 * exceptions will classify as this value unless
+	 * {@link #setTypes(Collection)} is used to narrow the field.
+	 * 
+	 * @param defaultValue defaults to false
 	 */
 	public BinaryExceptionClassifier(boolean defaultValue) {
 		super(defaultValue);
 	}
 
 	/**
-	 * Create a binary exception classifier with the default value false.
+	 * Create a binary exception classifier with the default value (false). All
+	 * exceptions will classify as false.
 	 */
 	public BinaryExceptionClassifier() {
 		this(false);
