@@ -3,6 +3,7 @@ package org.springframework.batch.sample;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -17,6 +18,7 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter;
+import org.springframework.batch.sample.domain.trade.internal.TradeWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,6 +42,9 @@ public class SkipSampleFunctionalTests {
 	@Autowired
 	private JobOperator jobOperator;
 
+	@Autowired
+	private TradeWriter tradeWriter;
+	
 	@Autowired
 	private ItemTrackingTradeItemWriter itemTrackingWriter;
 
@@ -169,6 +174,8 @@ public class SkipSampleFunctionalTests {
 			assertEquals(1, simpleJdbcTemplate.queryForInt(
 					"SELECT Count(*) from ERROR_LOG where JOB_NAME = ? and STEP_NAME = ?", "skipJob", "step" + i));
 		}
+		
+		assertEquals(new BigDecimal("252.63"), tradeWriter.getTotalPrice());
 	}
 
 	private void validateLaunchWithoutSkips() {
@@ -180,6 +187,8 @@ public class SkipSampleFunctionalTests {
 
 		// Neither step contained skips
 		assertEquals(0, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "ERROR_LOG"));
+
+		assertEquals(new BigDecimal("270.75"), tradeWriter.getTotalPrice());
 	}
 
 	private Map<String, Object> getJobExecution(long jobExecutionId) {

@@ -57,9 +57,6 @@
 	</step>
 
 	<beans:bean id="tradeProcessor" class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"/>
-	<beans:bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
-		<beans:property name="dao" ref="tradeDao"/>
-	</beans:bean>
 	
 	<beans:bean id="skipCheckingListener" class="org.springframework.batch.sample.common.SkipCheckingListener"/>
 	
@@ -88,15 +85,6 @@
 	</beans:bean>
 
 	<beans:bean class="org.springframework.batch.core.scope.StepScope" />
-
-	<beans:bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
-		<beans:property name="dataSource" ref="dataSource"/>
-		<beans:property name="incrementer">
-			<beans:bean parent="incrementerParent">
-				<beans:property name="incrementerName" value="TRADE_SEQ" />
-			</beans:bean>
-		</beans:property>
-	</beans:bean>
 
 	<beans:bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<beans:property name="dataSource" ref="dataSource" />

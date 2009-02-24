@@ -40,6 +40,19 @@
 	
 	<bean id="logAdvice" class="org.springframework.batch.sample.common.LogAdvice" />
 
+	<bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
+		<property name="dao">
+			<bean class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
+				<property name="dataSource" ref="dataSource"/>
+				<property name="incrementer">
+					<bean parent="incrementerParent">
+						<property name="incrementerName" value="TRADE_SEQ" />
+					</bean>
+				</property>
+			</bean>
+		</property>
+	</bean>
+
 	<bean id="itemTrackingWriter" class="org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter" />
 
 </beans>
