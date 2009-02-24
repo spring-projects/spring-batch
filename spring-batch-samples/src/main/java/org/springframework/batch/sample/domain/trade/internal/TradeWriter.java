@@ -22,12 +22,14 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.core.annotation.AfterWrite;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
+import org.springframework.util.Assert;
 
 /**
  * Delegates the actual writing to custom DAO delegate. Allows configurable
@@ -47,23 +49,26 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 	public void write(List<? extends Trade> trades) {
 
-		BigDecimal amount = BigDecimal.ZERO;
-
 		for (Trade trade : trades) {
 
 			log.debug(trade);
 
 			dao.writeTrade(trade);
 
-			amount = amount.add(trade.getPrice());
+			Assert.notNull(trade.getPrice()); // There must be a price to total
 
 			if (this.failingCustomers.contains(trade.getCustomer())) {
 				throw new RuntimeException("Something unexpected happened!");
 			}
 		}
 
-		this.totalPrice = this.totalPrice.add(amount);
+	}
 
+	@AfterWrite
+	public void updateTotalPrice(List<Trade> trades) {
+		for (Trade trade : trades) {
+			this.totalPrice = this.totalPrice.add(trade.getPrice());
+		}
 	}
 
 	@Override
