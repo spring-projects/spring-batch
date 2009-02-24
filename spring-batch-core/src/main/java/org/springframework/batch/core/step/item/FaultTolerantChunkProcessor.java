@@ -30,6 +30,7 @@ import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.support.DefaultRetryState;
+import org.springframework.batch.support.BinaryExceptionClassifier;
 import org.springframework.batch.support.Classifier;
 
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
@@ -40,11 +41,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 	private final BatchRetryTemplate batchRetryTemplate;
 
-	private Classifier<Throwable, Boolean> rollbackClassifier;
+	private Classifier<Throwable, Boolean> rollbackClassifier = new BinaryExceptionClassifier(true);
 
 	private Log logger = LogFactory.getLog(getClass());
 
-	private boolean buffering;
+	private boolean buffering = true;
 
 	public void setProcessSkipPolicy(SkipPolicy SkipPolicy) {
 		this.itemProcessSkipPolicy = SkipPolicy;
@@ -155,7 +156,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					}
 
 					try {
-						doWrite(Collections.singletonList(item));
+						writeItems(Collections.singletonList(item));
 						contribution.incrementWriteCount(1);
 					}
 					catch (Exception e) {

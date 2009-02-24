@@ -9,9 +9,8 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<bean id="itemReader"
-		class="org.springframework.batch.item.file.MultiResourceItemReader">
-		<property name="resources" value="classpath:data/iosample/input/delimited*.csv" />
+	<bean id="itemReaderParent"
+		class="org.springframework.batch.item.file.MultiResourceItemReader" abstract="true">
 		<property name="delegate">
 			<bean class="org.springframework.batch.item.file.FlatFileItemReader">
 				<property name="lineMapper">
@@ -36,6 +35,14 @@
 			</bean>
 
 		</property>
+	</bean>
+
+	<bean id="itemReader" parent="itemReaderParent" scope="step" autowire-candidate="false">
+		<property name="resources" value="#{jobParameters[file.path]}/delimited*.csv" />
+	</bean>
+
+	<bean id="itemReaderForTest" parent="itemReaderParent">
+		<property name="resources" value="classpath:data/iosample/input/delimited*.csv" />
 	</bean>
 
 	<bean id="itemWriter"

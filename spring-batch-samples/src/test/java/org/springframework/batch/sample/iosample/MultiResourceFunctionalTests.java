@@ -17,6 +17,8 @@
 package org.springframework.batch.sample.iosample;
 
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.MultiResourceItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
@@ -41,6 +43,12 @@ public class MultiResourceFunctionalTests extends AbstractIoSampleTests {
 				new FileSystemResource("target/test-outputs/multiResourceOutput.csv.1"),
 				new FileSystemResource("target/test-outputs/multiResourceOutput.csv.2") });
 
+	}
+	
+	@Override
+	protected JobParameters getUniqueJobParameters() {
+		JobParametersBuilder builder = new JobParametersBuilder(super.getUniqueJobParameters());
+		return builder.addString("file.path", "classpath:data/iosample/input/").toJobParameters();
 	}
 
 }

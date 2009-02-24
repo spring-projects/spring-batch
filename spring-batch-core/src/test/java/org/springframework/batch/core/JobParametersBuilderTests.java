@@ -28,6 +28,13 @@ public class JobParametersBuilderTests extends TestCase {
 		assertEquals("string value", parameters.getString("STRING"));
 	}
 
+	public void testCopy(){	
+		parametersBuilder.addString("STRING", "string value");
+		parametersBuilder = new JobParametersBuilder(parametersBuilder.toJobParameters());
+		Iterator<String> parameters = parametersBuilder.toJobParameters().getParameters().keySet().iterator();
+		assertEquals("STRING", parameters.next());
+	}
+
 	public void testOrderedTypes(){	
 		parametersBuilder.addDate("SCHEDULE_DATE", date);
 		parametersBuilder.addLong("LONG", new Long(1));

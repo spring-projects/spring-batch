@@ -22,15 +22,19 @@ public class SimpleChunkProcessorTests {
 	private StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(
 			new JobInstance(123L, new JobParameters(), "job"))));
 
-	protected List<String> list = new ArrayList<String>();
+	private List<String> list = new ArrayList<String>();
 
 	@Before
 	public void setUp() {
-		processor = new SimpleChunkProcessor<String,String>(new PassThroughItemProcessor<String>(), new ItemWriter<String>() {
-			public void write(List<? extends String> items) throws Exception {
-				list.addAll(items);
-			}
-		});
+		processor = new SimpleChunkProcessor<String, String>(new PassThroughItemProcessor<String>(),
+				new ItemWriter<String>() {
+					public void write(List<? extends String> items) throws Exception {
+						if (items.contains("fail")) {
+							throw new RuntimeException("Planned failure!");
+						}
+						list.addAll(items);
+					}
+				});
 	}
 
 	@Test

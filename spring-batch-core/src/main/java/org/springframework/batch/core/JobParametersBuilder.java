@@ -39,11 +39,18 @@ public class JobParametersBuilder {
 	private final Map<String, JobParameter> parameterMap;
 
 	/**
-	 * Default constructor. Initializes the builder
+	 * Default constructor. Initializes the builder with empty parameters.
 	 */
 	public JobParametersBuilder() {
 
 		this.parameterMap = new LinkedHashMap<String, JobParameter>();
+	}
+
+	/**
+	 * Copy constructor. Initializes the builder with the supplied parameters.
+	 */
+	public JobParametersBuilder(JobParameters jobParameters) {
+		this.parameterMap = new LinkedHashMap<String, JobParameter>(jobParameters.getParameters());
 	}
 
 	/**

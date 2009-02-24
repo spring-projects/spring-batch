@@ -121,13 +121,17 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	protected final void doWrite(List<O> items) throws Exception {
 		try {
 			listener.beforeWrite(items);
-			itemWriter.write(items);
+			writeItems(items);
 			listener.afterWrite(items);
 		}
 		catch (Exception e) {
 			listener.onWriteError(e, items);
 			throw e;
 		}
+	}
+
+	protected void writeItems(List<O> items) throws Exception {
+		itemWriter.write(items);
 	}
 
 	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {

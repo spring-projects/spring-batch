@@ -17,6 +17,8 @@
 package org.springframework.batch.sample.iosample;
 
 import org.junit.runner.RunWith;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.sample.domain.trade.CustomerCredit;
@@ -36,11 +38,17 @@ public class DelimitedFunctionalTests extends AbstractIoSampleTests {
 
 	@Autowired
 	private Resource outputResource;
-	
+
 	@Override
 	protected void pointReaderToOutput(ItemReader<CustomerCredit> reader) {
 		FlatFileItemReader<CustomerCredit> fileReader = (FlatFileItemReader<CustomerCredit>) reader;
 		fileReader.setResource(outputResource);
 	}
-	
+
+	@Override
+	protected JobParameters getUniqueJobParameters() {
+		return new JobParametersBuilder(super.getUniqueJobParameters()).addString("fileName",
+				"data/iosample/input/delimited.csv").toJobParameters();
+	}
+
 }

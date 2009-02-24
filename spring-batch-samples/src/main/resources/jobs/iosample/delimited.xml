@@ -11,8 +11,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<bean id="itemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
-		<property name="resource" value="data/iosample/input/delimited.csv" />
+	<bean id="itemReaderParent" class="org.springframework.batch.item.file.FlatFileItemReader" abstract="true">
 		<property name="lineMapper">
 			<bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<property name="lineTokenizer">
@@ -28,6 +27,14 @@
 				</property>
 			</bean>
 		</property>
+	</bean>
+
+	<bean id="itemReader" parent="itemReaderParent" scope="step" autowire-candidate="false">
+		<property name="resource" value="#{jobParameters[fileName]}" />
+	</bean>
+
+	<bean id="itemReaderForTest" parent="itemReaderParent" >
+		<property name="resource" value="data/iosample/input/delimited.csv" />
 	</bean>
 
 	<bean id="itemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">

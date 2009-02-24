@@ -41,8 +41,8 @@ import org.springframework.context.ApplicationContext;
  * entire {@link AbstractJob}, allowing for end to end testing of individual
  * steps, without having to run every step in the job. Any test classes
  * inheriting from this class should make sure they are part of an
- * {@link ApplicationContext}, which is generally expected to be done as part
- * of the Spring test framework. Furthermore, the {@link ApplicationContext} in
+ * {@link ApplicationContext}, which is generally expected to be done as part of
+ * the Spring test framework. Furthermore, the {@link ApplicationContext} in
  * which it is a part of is expected to have one {@link JobLauncher},
  * {@link JobRepository}, and a single {@link AbstractJob} implementation.
  * 
@@ -79,14 +79,14 @@ public abstract class AbstractJobTests {
 	private StepRunner stepRunner;
 
 	/**
-	 * @return the job repository
+	 * @return the job repository which is autowired by type
 	 */
 	public JobRepository getJobRepository() {
 		return jobRepository;
 	}
 
 	/**
-	 * @return the job
+	 * @return the job which is autowired by type
 	 */
 	public AbstractJob getJob() {
 		return job;
@@ -102,34 +102,40 @@ public abstract class AbstractJobTests {
 	/**
 	 * Launch the entire job, including all steps.
 	 * 
-	 * @return JobExecution, so that the test may validate the exit status
+	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception
 	 */
-	public JobExecution launchJob() throws Exception {
-		return this.launchJob(this.makeUniqueJobParameters());
+	protected JobExecution launchJob() throws Exception {
+		return this.launchJob(this.getUniqueJobParameters());
 	}
 
 	/**
 	 * Launch the entire job, including all steps
 	 * 
 	 * @param jobParameters
-	 * @return JobExecution, so that the test may validate the exit status
+	 * @return JobExecution, so that the test can validate the exit status
 	 * @throws Exception
 	 */
-	public JobExecution launchJob(JobParameters jobParameters) throws Exception {
+	protected JobExecution launchJob(JobParameters jobParameters) throws Exception {
 		return getJobLauncher().run(this.job, jobParameters);
 	}
 
 	/**
 	 * @return a new JobParameters object containing only a parameter for the
-	 *         current timestamp, to ensure that the job instance will be unique
+	 * current timestamp, to ensure that the job instance will be unique.
 	 */
-	public JobParameters makeUniqueJobParameters() {
+	protected JobParameters getUniqueJobParameters() {
 		Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
 		parameters.put("timestamp", new JobParameter(new Date().getTime()));
 		return new JobParameters(parameters);
 	}
 
+	/**
+	 * Convenient method for subclasses to grab a {@link StepRunner} for running
+	 * steps by name.
+	 * 
+	 * @return a {@link StepRunner}
+	 */
 	protected StepRunner getStepRunner() {
 		if (this.stepRunner == null) {
 			this.stepRunner = new StepRunner(getJobLauncher(), getJobRepository());
@@ -138,16 +144,15 @@ public abstract class AbstractJobTests {
 	}
 
 	/**
-	 * Launch just the specified step in the job. An IllegalStateException is thrown
-	 * if there is no Step with the given name.
+	 * Launch just the specified step in the job. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
 	 * 
 	 * @param stepName
 	 * @return JobExecution
 	 */
 	public JobExecution launchStep(String stepName) {
 		Step step = this.job.getStep(stepName);
-		if(step == null)
-		{
+		if (step == null) {
 			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
 		}
 		return getStepRunner().launchStep(step);
