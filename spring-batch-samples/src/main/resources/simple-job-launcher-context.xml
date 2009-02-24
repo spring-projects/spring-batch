@@ -47,6 +47,4 @@
 	<bean id="eventAdvice"
 		class="org.springframework.batch.sample.jmx.StepExecutionApplicationEventAdvice" />
 
-	<bean class="org.springframework.batch.core.scope.StepScope" />
-
 </beans>
