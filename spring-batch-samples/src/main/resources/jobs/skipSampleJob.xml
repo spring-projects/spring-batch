@@ -33,7 +33,7 @@
 
 	<step id="firstPass" >
 		<tasklet reader="fileItemReader" processor="tradeProcessor" writer="tradeWriter" 
-		         commit-interval="1" skip-limit="1">
+		         commit-interval="3" skip-limit="10">
 		</tasklet>
 
 		<listeners>
@@ -44,7 +44,7 @@
 	
 	<step id="secondPass">
 		<tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="itemTrackingWriter"
-				 commit-interval="2" skip-limit="1">
+				 commit-interval="2" skip-limit="10">
 			<skippable-exception-classes>
 				org.springframework.batch.item.validator.ValidationException
 				java.lang.RuntimeException

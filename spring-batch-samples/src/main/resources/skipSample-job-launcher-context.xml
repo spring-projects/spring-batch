@@ -51,6 +51,11 @@
 				</property>
 			</bean>
 		</property>
+		<property name="failingCustomers">
+			<list>
+				<value>customer6</value>
+			</list>
+		</property>
 	</bean>
 
 	<bean id="itemTrackingWriter" class="org.springframework.batch.sample.domain.trade.internal.ItemTrackingTradeItemWriter" />

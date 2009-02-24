@@ -17,6 +17,7 @@
 package org.springframework.batch.sample.domain.trade.internal;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -40,40 +41,29 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 	private TradeDao dao;
 
-	private int failure = -1;
-
-	private int index = 0;
+	private List<String> failingCustomers = new ArrayList<String>();
 
 	private BigDecimal totalPrice = BigDecimal.ZERO;
-
-	/**
-	 * Public setter for the the index on which failure should occur.
-	 * 
-	 * @param failure the failure to set
-	 */
-	public void setFailure(int failure) {
-		this.failure = failure;
-	}
 
 	public void write(List<? extends Trade> trades) {
 
 		BigDecimal amount = BigDecimal.ZERO;
-		
+
 		for (Trade trade : trades) {
 
 			log.debug(trade);
-			
+
 			dao.writeTrade(trade);
-			
+
 			amount = amount.add(trade.getPrice());
-			
-			if (index++ == failure) {
+
+			if (this.failingCustomers.contains(trade.getCustomer())) {
 				throw new RuntimeException("Something unexpected happened!");
 			}
 		}
-		
+
 		this.totalPrice = this.totalPrice.add(amount);
-		
+
 	}
 
 	@Override
@@ -81,8 +71,10 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 		if (executionContext.containsKey(TOTAL_AMOUNT_KEY)) {
 			this.totalPrice = (BigDecimal) executionContext.get(TOTAL_AMOUNT_KEY);
 		}
-		else
-		{
+		else {
+			//
+			// Fresh run. Disregard old state.
+			//
 			this.totalPrice = BigDecimal.ZERO;
 		}
 	}
@@ -98,5 +90,14 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 
 	public void setDao(TradeDao dao) {
 		this.dao = dao;
+	}
+
+	/**
+	 * Public setter for the the customers on which failure should occur.
+	 * 
+	 * @param failingCustomers The customers to fail on
+	 */
+	public void setFailingCustomers(List<String> failingCustomers) {
+		this.failingCustomers = failingCustomers;
 	}
 }
