@@ -85,7 +85,6 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;	
 	}
