@@ -15,11 +15,14 @@
  */
 package org.springframework.batch.sample.common;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -34,15 +37,15 @@ import org.springframework.batch.item.UnexpectedInputException;
  * @author Lucas Ward
  *
  */
-public class CustomItemReaderTests extends TestCase {
+public class CustomItemReaderTests {
 
 	ItemReader<String> itemReader;
 	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 		
 		List<String> items = new ArrayList<String>();
 		items.add("1");
@@ -52,6 +55,7 @@ public class CustomItemReaderTests extends TestCase {
 		itemReader = new CustomItemReader<String>(items);
 	}
 	
+	@Test
 	public void testRead() throws Exception{
 	
 		assertEquals("1", itemReader.read());
@@ -60,6 +64,7 @@ public class CustomItemReaderTests extends TestCase {
 		assertNull(itemReader.read());
 	}
 	
+	@Test
 	public void testRestart() throws Exception{
 		
 		ExecutionContext executionContext = new ExecutionContext();

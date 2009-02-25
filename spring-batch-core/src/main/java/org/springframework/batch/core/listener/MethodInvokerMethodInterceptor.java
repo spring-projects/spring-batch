@@ -25,48 +25,68 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.util.MethodInvoker;
 
 /**
- * {@link MethodInterceptor} that, given a map of method names and {@link MethodInvoker}s,
- * will execute all methods tied to a particular method name, with the provided 
- * arguments.  The only possible return value that is handled is of type ExitStatus, since
- * the only StepListener implementation that isn't void is 
- * {@link StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)}, which
- * returns ExitStatus.
+ * {@link MethodInterceptor} that, given a map of method names and
+ * {@link MethodInvoker}s, will execute all methods tied to a particular method
+ * name, with the provided arguments. The only possible return value that is
+ * handled is of type ExitStatus, since the only StepListener implementation
+ * that isn't void is
+ * {@link StepExecutionListener#afterStep(org.springframework.batch.core.StepExecution)}
+ * , which returns ExitStatus.
  * 
  * @author Lucas Ward
  * @since 2.0
  * @see MethodInvoker
  */
-public class MethodInvokerMethodInterceptor implements MethodInterceptor{
+public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 
 	private final Map<String, Set<MethodInvoker>> invokerMap;
 
 	public MethodInvokerMethodInterceptor(Map<String, Set<MethodInvoker>> invokerMap) {
 		this.invokerMap = invokerMap;
 	}
-	
+
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		
+
 		String methodName = invocation.getMethod().getName();
 		Set<MethodInvoker> invokers = invokerMap.get(methodName);
-		
-		if(invokers == null){
+
+		if (invokers == null) {
 			return null;
 		}
 		ExitStatus status = null;
-		for(MethodInvoker invoker : invokers){
+		for (MethodInvoker invoker : invokers) {
 			Object retVal = invoker.invokeMethod(invocation.getArguments());
-			if(retVal instanceof ExitStatus){
-				if(status != null){
+			if (retVal instanceof ExitStatus) {
+				if (status != null) {
 					status = status.and((ExitStatus) retVal);
 				}
-				else{
+				else {
 					status = (ExitStatus) retVal;
 				}
 			}
 		}
-		
+
 		return status;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof MethodInvokerMethodInterceptor)) {
+			return false;
+		}
+		MethodInvokerMethodInterceptor other = (MethodInvokerMethodInterceptor) obj;
+		return invokerMap.equals(other.invokerMap);
+	}
 	
-	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return invokerMap.hashCode();
+	}
+
 }

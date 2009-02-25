@@ -39,7 +39,6 @@
 		<listeners>
 			<listener ref="skipCheckingListener"/>
 			<listener ref="promotionListener"/>
-			<listener ref="tradeWriter"/>
 		</listeners>
 	</step>
 	

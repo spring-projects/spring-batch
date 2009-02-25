@@ -17,12 +17,11 @@ package org.springframework.batch.core;
 
 import java.io.Serializable;
 
-import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.util.StringUtils;
 
 /**
  * Value object used to carry information about the status of a
- * {@link RepeatOperations}.
+ * job or step execution.
  * 
  * ExitStatus is immutable and therefore thread-safe.
  * 

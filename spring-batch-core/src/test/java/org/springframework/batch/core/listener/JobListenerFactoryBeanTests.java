@@ -15,7 +15,11 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.*;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,19 +30,19 @@ import org.springframework.batch.core.annotation.BeforeJob;
 
 /**
  * @author Lucas Ward
- *
+ * 
  */
 public class JobListenerFactoryBeanTests {
 
 	JobListenerFactoryBean factoryBean;
-	
+
 	@Before
-	public void setUp(){
+	public void setUp() {
 		factoryBean = new JobListenerFactoryBean();
 	}
-	
+
 	@Test
-	public void testWithInterface() throws Exception{
+	public void testWithInterface() throws Exception {
 		JobListenerWithInterface delegate = new JobListenerWithInterface();
 		factoryBean.setDelegate(delegate);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
@@ -48,9 +52,9 @@ public class JobListenerFactoryBeanTests {
 		assertTrue(delegate.beforeJobCalled);
 		assertTrue(delegate.afterJobCalled);
 	}
-	
+
 	@Test
-	public void testWithAnnotations() throws Exception{
+	public void testWithAnnotations() throws Exception {
 		AnnotatedTestClass delegate = new AnnotatedTestClass();
 		factoryBean.setDelegate(delegate);
 		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
@@ -60,34 +64,81 @@ public class JobListenerFactoryBeanTests {
 		assertTrue(delegate.beforeJobCalled);
 		assertTrue(delegate.afterJobCalled);
 	}
-	
-	private class JobListenerWithInterface implements JobExecutionListener{
+
+	@Test
+	public void testFactoryMethod() throws Exception {
+		JobListenerWithInterface delegate = new JobListenerWithInterface();
+		Object listener = JobListenerFactoryBean.getListener(delegate);
+		assertTrue(listener instanceof JobExecutionListener);
+		((JobExecutionListener) listener).afterJob(new JobExecution(11L));
+		assertTrue(delegate.afterJobCalled);
+	}
+
+	@Test
+	public void testUseInHashSet() throws Exception {
+		JobListenerWithInterface delegate = new JobListenerWithInterface();
+		Object listener = JobListenerFactoryBean.getListener(delegate);
+		Object other = JobListenerFactoryBean.getListener(delegate);
+		assertTrue(listener instanceof JobExecutionListener);
+		Set<JobExecutionListener> listeners = new HashSet<JobExecutionListener>();
+		listeners.add((JobExecutionListener) listener);
+		listeners.add((JobExecutionListener) other);
+		assertTrue(listeners.contains(listener));
+		assertEquals(1, listeners.size());
+	}
+
+	@Test
+	public void testAnnotationsIsListener() throws Exception {
+		assertTrue(JobListenerFactoryBean.isListener(new Object() {
+			@SuppressWarnings("unused")
+			@BeforeJob
+			public void foo(JobExecution execution) {
+			}
+		}));
+	}
+
+	@Test
+	public void testInterfaceIsListener() throws Exception {
+		assertTrue(JobListenerFactoryBean.isListener(new JobListenerWithInterface()));
+	}
+
+	@Test
+	public void testEqualityOfProxies() throws Exception {
+		JobListenerWithInterface delegate = new JobListenerWithInterface();
+		Object listener1 = JobListenerFactoryBean.getListener(delegate);
+		Object listener2 = JobListenerFactoryBean.getListener(delegate);
+		assertEquals(listener1, listener2);
+	}
+
+	private class JobListenerWithInterface implements JobExecutionListener {
 
 		boolean beforeJobCalled = false;
+
 		boolean afterJobCalled = false;
-		
+
 		public void afterJob(JobExecution jobExecution) {
-			beforeJobCalled = true;
+			afterJobCalled = true;
 		}
 
 		public void beforeJob(JobExecution jobExecution) {
-			afterJobCalled = true;
-		}
-		
-	}
-	
-	private class AnnotatedTestClass {
-		
-		boolean beforeJobCalled = false;
-		boolean afterJobCalled = false;
-		
-		@BeforeJob
-		public void before(){
 			beforeJobCalled = true;
 		}
-		
+
+	}
+
+	private class AnnotatedTestClass {
+
+		boolean beforeJobCalled = false;
+
+		boolean afterJobCalled = false;
+
+		@BeforeJob
+		public void before() {
+			beforeJobCalled = true;
+		}
+
 		@AfterJob
-		public void after(){
+		public void after() {
 			afterJobCalled = true;
 		}
 	}

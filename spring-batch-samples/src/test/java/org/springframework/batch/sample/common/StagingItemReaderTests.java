@@ -41,7 +41,7 @@ public class StagingItemReaderTests {
 	@Autowired
 	private StagingItemReader<String> reader;
 
-	private Long jobId = 11L;
+	private Long jobId = 113L;
 
 	@Autowired
 	public void setDataSource(DataSource dataSource) {

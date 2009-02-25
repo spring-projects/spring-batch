@@ -29,6 +29,7 @@ import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
+import org.springframework.batch.core.listener.StepListenerFactoryBean;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
@@ -121,10 +122,21 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		super();
 	}
 
+	/**
+	 * Flag to signal that the reader is transactional (usually a JMS consumer)
+	 * so that items are re-presented after a rollback. The default is false and
+	 * readers are assumed to be forward-only.
+	 * 
+	 * @param isReaderTransactionalQueue the value of the flag
+	 */
 	public void setIsReaderTransactionalQueue(boolean isReaderTransactionalQueue) {
 		this.isReaderTransactionalQueue = isReaderTransactionalQueue;
 	}
 
+	/**
+	 * Convenience method for subclasses.
+	 * @return true if the flag is set (default false)
+	 */
 	protected boolean isReaderTransactionalQueue() {
 		return isReaderTransactionalQueue;
 	}
@@ -142,7 +154,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public getter for the String.
+	 * Public getter for the name of the step.
 	 * @return the name
 	 */
 	public String getName() {
@@ -150,7 +162,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the startLimit.
+	 * Public setter for the start limit for the step.
 	 * 
 	 * @param startLimit the startLimit to set
 	 */
@@ -159,7 +171,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the shouldAllowStartIfComplete.
+	 * Public setter for the flag to indicate that the step should be replayed
+	 * on a restart, even if successful the first time.
 	 * 
 	 * @param allowStartIfComplete the shouldAllowStartIfComplete to set
 	 */
@@ -168,21 +181,21 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * @param itemReader the itemReader to set
+	 * @param itemReader the {@link ItemReader} to set
 	 */
 	public void setItemReader(ItemReader<? extends T> itemReader) {
 		this.itemReader = itemReader;
 	}
 
 	/**
-	 * @param itemWriter the itemWriter to set
+	 * @param itemWriter the {@link ItemWriter} to set
 	 */
 	public void setItemWriter(ItemWriter<? super S> itemWriter) {
 		this.itemWriter = itemWriter;
 	}
 
 	/**
-	 * @param itemProcessor the itemProcessor to set
+	 * @param itemProcessor the {@link ItemProcessor} to set
 	 */
 	public void setItemProcessor(ItemProcessor<? super T, ? extends S> itemProcessor) {
 		this.itemProcessor = itemProcessor;
@@ -516,11 +529,14 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 			if (itemHandler instanceof ItemStream) {
 				step.registerStream((ItemStream) itemHandler);
 			}
-			if (itemHandler instanceof StepExecutionListener) {
-				step.registerStepExecutionListener((StepExecutionListener) itemHandler);
-			}
-			if (itemHandler instanceof ChunkListener) {
-				chunkListeners.add((StepListener) itemHandler);
+			if (StepListenerFactoryBean.isListener(itemHandler)) {
+				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
+				if (listener instanceof StepExecutionListener) {
+					step.registerStepExecutionListener((StepExecutionListener) listener);
+				}
+				if (listener instanceof ChunkListener) {
+					chunkListeners.add((StepListener) listener);
+				}
 			}
 		}
 
@@ -551,17 +567,20 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		// auto-register reader, processor and writer
 		for (Object itemHandler : new Object[] { getItemReader(), getItemWriter(), getItemProcessor() }) {
 
-			if (itemHandler instanceof SkipListener) {
-				chunkProvider.registerListener((StepListener) itemHandler);
-				chunkProcessor.registerListener((StepListener) itemHandler);
-				// already registered with both so avoid double-registering
-				continue;
-			}
-			if (itemHandler instanceof ItemReadListener) {
-				chunkProvider.registerListener((StepListener) itemHandler);
-			}
-			if (itemHandler instanceof ItemProcessListener || itemHandler instanceof ItemWriteListener) {
-				chunkProcessor.registerListener((StepListener) itemHandler);
+			if (StepListenerFactoryBean.isListener(itemHandler)) {
+				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
+				if (listener instanceof SkipListener) {
+					chunkProvider.registerListener(listener);
+					chunkProcessor.registerListener(listener);
+					// already registered with both so avoid double-registering
+					continue;
+				}
+				if (listener instanceof ItemReadListener) {
+					chunkProvider.registerListener(listener);
+				}
+				if (listener instanceof ItemProcessListener || listener instanceof ItemWriteListener) {
+					chunkProcessor.registerListener(listener);
+				}
 			}
 		}
 	}
