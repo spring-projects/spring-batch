@@ -365,7 +365,7 @@
 
       <programlisting><![CDATA[  <bean id="itemReader" scope="step"
         class="org.sfw...MultiResourceItemReader">
-    <property name="resource" value="]]><emphasis role="bold">#{stepExecutionContext.fileName}/*</emphasis><![CDATA["/>
+    <property name="resource" value="]]><emphasis role="bold">#{stepExecutionContext[fileName]}/*</emphasis><![CDATA["/>
   </bean>]]></programlisting>
     </section>
   </section>
