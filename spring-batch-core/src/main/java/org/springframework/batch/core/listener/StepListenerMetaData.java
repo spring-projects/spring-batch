@@ -17,6 +17,7 @@ package org.springframework.batch.core.listener;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.batch.core.ChunkListener;
@@ -62,11 +63,11 @@ public enum StepListenerMetaData {
 	AFTER_READ("afterRead", "after-read-method", AfterRead.class, ItemReadListener.class, Object.class),
 	ON_READ_ERROR("onReadError", "on-read-error-method", OnReadError.class, ItemReadListener.class, Exception.class),
 	BEFORE_PROCESS("beforeProcess", "before-process-method", BeforeProcess.class, ItemProcessListener.class, Object.class),
-	AFTER_PROCESS("afterProcess", "after-process-method", AfterProcess.class, ItemProcessListener.class, Object.class),
+	AFTER_PROCESS("afterProcess", "after-process-method", AfterProcess.class, ItemProcessListener.class, Object.class, Object.class),
 	ON_PROCESS_ERROR("onProcessError", "on-process-error-method", OnProcessError.class, ItemProcessListener.class, Object.class, Exception.class),
-	BEFORE_WRITE("beforeWrite", "before-write-method", BeforeWrite.class, ItemWriteListener.class, Object.class),
-	AFTER_WRITE("afterWrite", "after-write-method", AfterWrite.class, ItemWriteListener.class, Object.class),
-	ON_WRITE_ERROR("onWriteError", "on-write-error-method", OnWriteError.class, ItemWriteListener.class, Object.class, Exception.class),
+	BEFORE_WRITE("beforeWrite", "before-write-method", BeforeWrite.class, ItemWriteListener.class, List.class),
+	AFTER_WRITE("afterWrite", "after-write-method", AfterWrite.class, ItemWriteListener.class, List.class),
+	ON_WRITE_ERROR("onWriteError", "on-write-error-method", OnWriteError.class, ItemWriteListener.class, Exception.class, List.class),
 	ON_SKIP_IN_READ("onSkipInRead", "on-skip-in-read-method", OnSkipInRead.class, SkipListener.class, Throwable.class),
 	ON_SKIP_IN_PROCESS("onSkipInProcess", "on-skip-in-process-method", OnSkipInProcess.class, SkipListener.class, Object.class, Throwable.class),
 	ON_SKIP_IN_WRITE("onSkipInWrite", "on-skip-in-write-method", OnSkipInWrite.class, SkipListener.class, Object.class, Throwable.class);

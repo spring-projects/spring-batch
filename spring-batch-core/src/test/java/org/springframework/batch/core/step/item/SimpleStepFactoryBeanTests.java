@@ -299,7 +299,7 @@ public class SimpleStepFactoryBeanTests {
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(new String[] { "foo", "bar", "spam" });
 
-		final List<Integer> listenerCalls = new ArrayList<Integer>();
+		final List<String> listenerCalls = new ArrayList<String>();
 
 		class TestItemListenerWriter implements ItemWriter<String>, ItemReadListener<String>,
 				ItemWriteListener<String>, ItemProcessListener<String, String>, ChunkListener {
@@ -307,7 +307,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			public void afterRead(String item) {
-				listenerCalls.add(1);
+				listenerCalls.add("read");
 			}
 
 			public void beforeRead() {
@@ -317,7 +317,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			public void afterWrite(List<? extends String> items) {
-				listenerCalls.add(2);
+				listenerCalls.add("write");
 			}
 
 			public void beforeWrite(List<? extends String> items) {
@@ -327,7 +327,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			public void afterProcess(String item, String result) {
-				listenerCalls.add(3);
+				listenerCalls.add("process");
 			}
 
 			public void beforeProcess(String item) {
@@ -337,7 +337,7 @@ public class SimpleStepFactoryBeanTests {
 			}
 
 			public void afterChunk() {
-				listenerCalls.add(4);
+				listenerCalls.add("chunk");
 			}
 
 			public void beforeChunk() {
@@ -356,8 +356,8 @@ public class SimpleStepFactoryBeanTests {
 		job.execute(jobExecution);
 
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
-		for (int i = 1; i <= 4; i++) {
-			assertTrue(listenerCalls.contains(i));
+		for (String type : new String[] { "read", "write", "process", "chunk" }) {
+			assertTrue("Missing listener call: " + type + " from " + listenerCalls, listenerCalls.contains(type));
 		}
 	}
 
