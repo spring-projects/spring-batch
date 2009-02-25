@@ -160,9 +160,7 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 			return true;
 		}
 		for (StepListenerMetaData metaData : StepListenerMetaData.values()) {
-			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
-			invokers.add(getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate));
-			if (!invokers.isEmpty()) {
+			if (getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate) != null) {
 				return true;
 			}
 		}
