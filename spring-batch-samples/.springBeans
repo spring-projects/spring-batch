@@ -48,6 +48,26 @@
 		<config>src/main/resources/jobs/iosample/jpa.xml</config>
 		<config>src/main/resources/jobs/iosample/ibatis.xml</config>
 		<config>src/test/resources/org/springframework/batch/sample/JobOperatorFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/BeanWrapperMapperSampleJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/CompositeItemWriterSampleFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/CustomerFilterJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/DatabaseShutdownFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/DelegatingJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/FootballJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/GracefulShutdownFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/HeaderFooterSampleFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/HibernateFailureJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/domain/trade/internal/JdbcCustomerDebitDaoTests-context.xml</config>
+		<config>src/main/resources/jobs/loopFlowSample.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/MultilineJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/MultilineOrderJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/ParallelJobFunctionalTests-context.xml</config>
+		<config>src/main/resources/jobs/partitionJob.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/RestartFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/RetrySampleFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemReaderTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemWriterTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/TradeJobFunctionalTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>

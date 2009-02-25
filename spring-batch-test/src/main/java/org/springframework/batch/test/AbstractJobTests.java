@@ -32,8 +32,10 @@ import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * <p>
@@ -62,7 +64,7 @@ import org.springframework.context.ApplicationContext;
  * @author Dan Garrette
  * @since 2.0
  */
-public abstract class AbstractJobTests {
+public abstract class AbstractJobTests implements ApplicationContextAware {
 
 	/** Logger */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -77,6 +79,23 @@ public abstract class AbstractJobTests {
 	private JobRepository jobRepository;
 
 	private StepRunner stepRunner;
+
+	private ApplicationContext applicationContext;
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;	
+	}
+	
+	/**
+	 * @return the applicationContext
+	 */
+	protected ApplicationContext getApplicationContext() {
+		return applicationContext;
+	}
 
 	/**
 	 * @return the job repository which is autowired by type

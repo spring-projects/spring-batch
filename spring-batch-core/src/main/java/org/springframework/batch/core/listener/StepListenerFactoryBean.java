@@ -78,7 +78,7 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean{
 		
 		Set<Class<? extends StepListener>> listenerInterfaces = new HashSet<Class<? extends StepListener>>();
 		
-		//For every entry in th emap, try and find a method by interface, name, or annotation.  If the same
+		//For every entry in the map, try and find a method by interface, name, or annotation.  If the same
 		for(Entry<String, String> entry : metaDataMap.entrySet()){
 			StepListenerMetaData metaData = StepListenerMetaData.fromPropertyName(entry.getKey());
 			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
