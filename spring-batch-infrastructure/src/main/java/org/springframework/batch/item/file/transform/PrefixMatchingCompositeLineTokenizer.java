@@ -31,10 +31,11 @@ import org.springframework.util.Assert;
  * are sorted starting with the most specific, and the first match always
  * succeeds.
  * 
- * @see PatternMatcher#matchPrefix(String, Map)
+ * @see PatternMatcher#match(String, Map)
  * 
  * @author Ben Hale
  * @author Dan Garrette
+ * @author Dave Syer
  */
 public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
 
@@ -46,7 +47,7 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, Init
 	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
 	 */
 	public FieldSet tokenize(String line) {
-		return PatternMatcher.matchPrefix(line, this.tokenizers).tokenize(line);
+		return PatternMatcher.match(line, this.tokenizers).tokenize(line);
 	}
 
 	/*
@@ -60,6 +61,13 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, Init
 	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
-		this.tokenizers = new LinkedHashMap<String, LineTokenizer>(tokenizers);
+		this.tokenizers = new LinkedHashMap<String, LineTokenizer>();
+		for (String key : tokenizers.keySet()) {
+			LineTokenizer value = tokenizers.get(key);
+			if (!key.endsWith("*")) {
+				key = key + "*";
+			}
+			this.tokenizers.put(key, value);
+		}
 	}
 }

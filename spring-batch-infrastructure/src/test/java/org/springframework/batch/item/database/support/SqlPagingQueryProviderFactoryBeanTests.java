@@ -83,6 +83,13 @@ public class SqlPagingQueryProviderFactoryBeanTests {
 		assertTrue("Wrong query: "+query, query.contains("x=y"));
 	}
 
+	@Test
+	public void testAscending() throws Exception {
+		PagingQueryProvider provider = (PagingQueryProvider) factory.getObject();
+		String query = provider.generateFirstPageQuery(100);
+		assertTrue("Wrong query: "+query, query.contains("ASC"));
+	}
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testWrongDatabaseType() throws Exception {
 		factory.setDatabaseType("NoSuchDb");

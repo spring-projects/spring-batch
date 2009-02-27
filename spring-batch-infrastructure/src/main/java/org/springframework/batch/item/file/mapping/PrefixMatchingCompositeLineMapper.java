@@ -39,7 +39,7 @@ import org.springframework.util.Assert;
  * with the most specific, and the first match always succeeds.
  * 
  * @see PrefixMatchingCompositeLineTokenizer
- * @see PatternMatcher#matchPrefix(String, Map)
+ * @see PatternMatcher#match(String, Map)
  * 
  * @author Dan Garrette
  * @since 2.0
@@ -56,7 +56,7 @@ public class PrefixMatchingCompositeLineMapper<T> implements LineMapper<T>, Init
 	 *      int)
 	 */
 	public T mapLine(String line, int lineNumber) throws Exception {
-		return PatternMatcher.matchPrefix(line, this.fieldSetMappers).mapFieldSet(this.tokenizer.tokenize(line));
+		return PatternMatcher.match(line, this.fieldSetMappers).mapFieldSet(this.tokenizer.tokenize(line));
 	}
 
 	/*
@@ -75,6 +75,13 @@ public class PrefixMatchingCompositeLineMapper<T> implements LineMapper<T>, Init
 	}
 
 	public void setFieldSetMappers(Map<String, FieldSetMapper<T>> fieldSetMappers) {
-		this.fieldSetMappers = new LinkedHashMap<String, FieldSetMapper<T>>(fieldSetMappers);
+		this.fieldSetMappers = new LinkedHashMap<String, FieldSetMapper<T>>();
+		for (String key : fieldSetMappers.keySet()) {
+			FieldSetMapper<T> value = fieldSetMappers.get(key);
+			if (!key.endsWith("*")) {
+				key = key + "*";
+			}
+			this.fieldSetMappers.put(key, value);
+		}
 	}
 }

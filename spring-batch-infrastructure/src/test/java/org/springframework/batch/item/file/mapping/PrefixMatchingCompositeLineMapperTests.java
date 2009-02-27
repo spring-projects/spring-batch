@@ -31,6 +31,7 @@ import org.springframework.batch.item.file.transform.Name;
 
 /**
  * @author Dan Garrette
+ * @author Dave Syer
  * @since 2.0
  */
 public class PrefixMatchingCompositeLineMapperTests {

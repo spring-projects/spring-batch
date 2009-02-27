@@ -58,9 +58,11 @@ public class SqlPagingQueryProviderFactoryBean implements FactoryBean {
 
 	private String sortKey;
 
+	private boolean ascending = true;
+
 	private Map<DatabaseType, AbstractSqlPagingQueryProvider> providers = new HashMap<DatabaseType, AbstractSqlPagingQueryProvider>();
 
-	private boolean ascending;
+
 	{
 		providers.put(DB2, new Db2PagingQueryProvider());
 		providers.put(DB2ZOS, new Db2PagingQueryProvider());

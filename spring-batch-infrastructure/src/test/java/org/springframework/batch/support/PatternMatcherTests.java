@@ -32,81 +32,87 @@ public class PatternMatcherTests {
 
 	private static Map<String, Integer> map = new HashMap<String, Integer>();
 	static {
-		map.put("an", 3);
-		map.put("a", 2);
-		map.put("big", 4);
+		map.put("an*", 3);
+		map.put("a*", 2);
+		map.put("big*", 4);
 	}
 
 	private static Map<String, Integer> defaultMap = new HashMap<String, Integer>();
 	static {
 		defaultMap.put("an", 3);
 		defaultMap.put("a", 2);
-		defaultMap.put("big", 4);
-		defaultMap.put("", 1);
+		defaultMap.put("big*", 4);
+		defaultMap.put("big?*", 5);
+		defaultMap.put("*", 1);
 	}
 
 	@Test
-	public void testMatch_noWildcard_yes() {
+	public void testMatchNoWildcardYes() {
 		assertTrue(PatternMatcher.match("abc", "abc"));
 	}
 
 	@Test
-	public void testMatch_noWildcard_no() {
+	public void testMatchNoWildcardNo() {
 		assertFalse(PatternMatcher.match("abc", "ab"));
 	}
 
 	@Test
-	public void testMatch_qMark_yes() {
+	public void testMatchSingleYes() {
 		assertTrue(PatternMatcher.match("a?c", "abc"));
 	}
 
 	@Test
-	public void testMatch_qMark_no() {
+	public void testMatchSingleNo() {
 		assertFalse(PatternMatcher.match("a?c", "ab"));
 	}
 
 	@Test
-	public void testMatch_star_yes() {
+	public void testMatchSingleWildcardNo() {
+		assertTrue(PatternMatcher.match("a?*", "abc"));
+	}
+
+	@Test
+	public void testMatchStarYes() {
 		assertTrue(PatternMatcher.match("a*c", "abdegc"));
 	}
 
 	@Test
-	public void testMatch_star_no() {
+	public void testMatchStarNo() {
 		assertFalse(PatternMatcher.match("a*c", "abdeg"));
 	}
 
 	@Test
-	public void testMatchPrefix_subsumed() {
-		assertEquals(2, PatternMatcher.matchPrefix("apple", map).intValue());
+	public void testMatchPrefixSubsumed() {
+		assertEquals(2, PatternMatcher.match("apple", map).intValue());
 	}
 
 	@Test
-	public void testMatchPrefix_subsuming() {
-		assertEquals(3, PatternMatcher.matchPrefix("animal", map).intValue());
+	public void testMatchPrefixSubsuming() {
+		assertEquals(3, PatternMatcher.match("animal", map).intValue());
 	}
 
 	@Test
-	public void testMatchPrefix_unrelated() {
-		assertEquals(4, PatternMatcher.matchPrefix("biggest", map).intValue());
+	public void testMatchPrefixUnrelated() {
+		assertEquals(4, PatternMatcher.match("biggest", map).intValue());
 	}
 
 	@Test(expected = IllegalStateException.class)
 	public void testMatchPrefix_noMatch() {
-		PatternMatcher.matchPrefix("bat", map);
+		PatternMatcher.match("bat", map);
 	}
 
 	@Test
-	public void testMatchPrefix_defaultValue_unrelated() {
-		assertEquals(4, PatternMatcher.matchPrefix("biggest", defaultMap).intValue());
+	public void testMatchPrefixDefaultValueUnrelated() {
+		assertEquals(5, PatternMatcher.match("biggest", defaultMap).intValue());
 	}
 
 	@Test
-	public void testMatchPrefix_defaultValue_emptyString() {
-		assertEquals(1, PatternMatcher.matchPrefix("", defaultMap).intValue());
+	public void testMatchPrefixDefaultValueEmptyString() {
+		assertEquals(1, PatternMatcher.match("", defaultMap).intValue());
 	}
 
 	@Test
-	public void testMatchPrefix_defaultValue_noMatch() {
-		assertEquals(1, PatternMatcher.matchPrefix("bat", defaultMap).intValue());
+	public void testMatchPrefixDefaultValueNoMatch() {
+		assertEquals(1, PatternMatcher.match("bat", defaultMap).intValue());
 	}
 }
