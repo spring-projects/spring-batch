@@ -64,7 +64,7 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 	private Map<String, Object> map = Collections.singletonMap("foo.foo", (Object) "bar");
 
-	private Date date = new Date(0L);
+	private Date date = new Date(1L);
 
 	public Object getContext() {
 		return this;
@@ -167,7 +167,7 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	@Test
 	public void testGetDate() {
 		Node target = (Node) withDate.getTarget();
-		assertEquals(0L, target.getDate().getTime());
+		assertEquals(1L, target.getDate().getTime());
 	}
 
 	@Test
