@@ -39,7 +39,7 @@ public class PrefixMatchingCompositeLineMapperTests {
 	private PrefixMatchingCompositeLineMapper<Name> mapper = new PrefixMatchingCompositeLineMapper<Name>();
 
 	@Test(expected = IllegalArgumentException.class)
-	public void test_NoMappers() throws Exception {
+	public void testNoMappers() throws Exception {
 		mapper.setTokenizers(Collections.singletonMap("", (LineTokenizer) new DelimitedLineTokenizer()));
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = Collections.emptyMap();
 		mapper.setFieldSetMappers(fieldSetMappers);
@@ -47,7 +47,7 @@ public class PrefixMatchingCompositeLineMapperTests {
 	}
 
 	@Test
-	public void test_KeyFound() throws Exception {
+	public void testKeyFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
 		tokenizers.put("foo", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
@@ -79,7 +79,7 @@ public class PrefixMatchingCompositeLineMapperTests {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void test_MapperKeyNotFound() throws Exception {
+	public void testMapperKeyNotFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
 		tokenizers.put("foo", new LineTokenizer() {
 			public FieldSet tokenize(String line) {

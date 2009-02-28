@@ -16,23 +16,31 @@
 
 package org.springframework.batch.item.file.transform;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.Test;
 
-import org.springframework.batch.item.file.transform.DefaultFieldSet;
-import org.springframework.batch.item.file.transform.FieldSet;
+public class FieldSetTests {
 
-public class FieldSetTests extends TestCase {
-	FieldSet fieldSet;
+	DefaultFieldSet fieldSet;
 
 	String[] tokens;
 
 	String[] names;
 
-	protected void setUp() throws Exception {
-		super.setUp();
+	@Before
+	public void setUp() throws Exception {
 
 		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "324",
 				null, "2007-10-12", "12-10-2007", "" };
@@ -44,11 +52,13 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testNames() throws Exception {
 		assertTrue(fieldSet.hasNames());
 		assertEquals(fieldSet.getFieldCount(), fieldSet.getNames().length);
 	}
 
+	@Test
 	public void testNamesNotKnown() throws Exception {
 		fieldSet = new DefaultFieldSet(new String[] { "foo" });
 		assertFalse(fieldSet.hasNames());
@@ -61,6 +71,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testReadString() throws ParseException {
 
 		assertEquals(fieldSet.readString(0), "TestString");
@@ -68,6 +79,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadChar() throws Exception {
 
 		assertTrue(fieldSet.readChar(2) == 'C');
@@ -75,6 +87,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadBooleanTrue() throws Exception {
 
 		assertTrue(fieldSet.readBoolean(1));
@@ -82,6 +95,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadByte() throws Exception {
 
 		assertTrue(fieldSet.readByte(3) == 10);
@@ -89,6 +103,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadShort() throws Exception {
 
 		assertTrue(fieldSet.readShort(4) == -472);
@@ -96,6 +111,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadFloat() throws Exception {
 
 		assertTrue(fieldSet.readFloat(7) == 124.3F);
@@ -103,6 +119,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadDouble() throws Exception {
 
 		assertTrue(fieldSet.readDouble(8) == 424.3);
@@ -110,6 +127,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadBigDecimal() throws Exception {
 
 		BigDecimal bd = new BigDecimal(324);
@@ -118,6 +136,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadBigDecimalWithDefaultvalue() throws Exception {
 
 		BigDecimal bd = new BigDecimal(324);
@@ -126,6 +145,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadNonExistentField() throws Exception {
 
 		try {
@@ -138,6 +158,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadIndexOutOfRange() throws Exception {
 
 		try {
@@ -157,6 +178,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testReadBooleanWithTrueValue() {
 		assertTrue(fieldSet.readBoolean(1, "true"));
 		assertFalse(fieldSet.readBoolean(1, "incorrect trueValue"));
@@ -165,11 +187,13 @@ public class FieldSetTests extends TestCase {
 		assertFalse(fieldSet.readBoolean("Boolean", "incorrect trueValue"));
 	}
 
+	@Test
 	public void testReadBooleanFalse() {
 		fieldSet = new DefaultFieldSet(new String[] { "false" });
 		assertFalse(fieldSet.readBoolean(0));
 	}
 
+	@Test
 	public void testReadCharException() {
 		try {
 			fieldSet.readChar(1);
@@ -188,11 +212,26 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testReadInt() throws Exception {
 		assertEquals(354224, fieldSet.readInt(5));
 		assertEquals(354224, fieldSet.readInt("Integer"));
 	}
 
+	@Test
+	public void testReadIntWithSeparator() throws Exception {
+		fieldSet = new DefaultFieldSet(new String[] {"354,224"});
+		assertEquals(354224, fieldSet.readInt(0));
+	}
+
+	@Test
+	public void testReadIntWithSeparatorAndFormat() throws Exception {
+		fieldSet = new DefaultFieldSet(new String[] {"354.224"});
+		fieldSet.setNumberFormat(NumberFormat.getInstance(Locale.GERMAN));
+		assertEquals(354224, fieldSet.readInt(0));
+	}
+
+	@Test
 	public void testReadBlankInt() {
 
 		// Trying to parse a blank field as an integer, but without a default
@@ -215,26 +254,31 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadLong() throws Exception {
 		assertEquals(543, fieldSet.readLong(6));
 		assertEquals(543, fieldSet.readLong("Long"));
 	}
 
+	@Test
 	public void testReadLongWithPadding() throws Exception {
 		fieldSet = new DefaultFieldSet(new String[] { "000009" });
 		assertEquals(9, fieldSet.readLong(0));
 	}
 
+	@Test
 	public void testReadIntWithNullValue() {
 		assertEquals(5, fieldSet.readInt(10, 5));
 		assertEquals(5, fieldSet.readInt("Null", 5));
 	}
 
+	@Test
 	public void testReadIntWithDefaultAndNotNull() throws Exception {
 		assertEquals(354224, fieldSet.readInt(5, 5));
 		assertEquals(354224, fieldSet.readInt("Integer", 5));
 	}
 
+	@Test
 	public void testReadLongWithNullValue() {
 		int defaultValue = 5;
 		int indexOfNull = 10;
@@ -250,6 +294,7 @@ public class FieldSetTests extends TestCase {
 		assertEquals(fieldSet.readLong(nameNotNull, defaultValue), longValueAtIndex);
 	}
 
+	@Test
 	public void testReadBigDecimalInvalid() {
 		int index = 0;
 
@@ -263,6 +308,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadBigDecimalByNameInvalid() throws Exception {
 		try {
 			fieldSet.readBigDecimal("String");
@@ -274,11 +320,21 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testReadDate() throws Exception {
 		assertNotNull(fieldSet.readDate(11));
 		assertNotNull(fieldSet.readDate("Date"));
 	}
 
+	@Test
+	public void testReadDateWithFormat() throws Exception {
+		fieldSet = new DefaultFieldSet(new String[] {"13/01/1999"});
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		fieldSet.setDateFormat(dateFormat);
+		assertEquals(dateFormat.parse("13/01/1999"), fieldSet.readDate(0));
+	}
+
+	@Test
 	public void testReadDateInvalid() throws Exception {
 
 		try {
@@ -291,6 +347,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadDateInvalidByName() throws Exception {
 
 		try {
@@ -303,6 +360,7 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testReadDateInvalidWithPattern() throws Exception {
 
 		try {
@@ -314,6 +372,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStrictReadDateWithPattern() throws Exception {
 
 		fieldSet = new DefaultFieldSet(new String[] {"50-2-13"});
@@ -327,6 +386,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testStrictReadDateWithPatternAndStrangeDate() throws Exception {
 
 		fieldSet = new DefaultFieldSet(new String[] {"5550212"});
@@ -340,6 +400,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testReadDateByNameInvalidWithPattern() throws Exception {
 
 		try {
@@ -352,6 +413,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testEquals() {
 
 		assertEquals(fieldSet, fieldSet);
@@ -364,18 +426,22 @@ public class FieldSetTests extends TestCase {
 		assertEquals(fs1, fs2);
 	}
 
+	@Test
 	public void testNullField() {
 		assertEquals(null, fieldSet.readString(10));
 	}
 
+	@Test
 	public void testEqualsNull() {
 		assertFalse(fieldSet.equals(null));
 	}
 
+	@Test
 	public void testEqualsNullTokens() {
 		assertFalse(new DefaultFieldSet(null).equals(fieldSet));
 	}
 
+	@Test
 	public void testEqualsNotEqual() throws Exception {
 
 		String[] tokens1 = new String[] { "token1" };
@@ -386,14 +452,17 @@ public class FieldSetTests extends TestCase {
 
 	}
 
+	@Test
 	public void testHashCode() throws Exception {
 		assertEquals(fieldSet.hashCode(), new DefaultFieldSet(tokens).hashCode());
 	}
 
+	@Test
 	public void testHashCodeWithNullTokens() throws Exception {
 		assertEquals(0, new DefaultFieldSet(null).hashCode());
 	}
 
+	@Test
 	public void testConstructor() throws Exception {
 		try {
 			new DefaultFieldSet(new String[] { "1", "2" }, new String[] { "a" });
@@ -404,26 +473,31 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testToStringWithNames() throws Exception {
 		fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" });
 		assertTrue(fieldSet.toString().indexOf("Foo=foo") >= 0);
 	}
 
+	@Test
 	public void testToStringWithoutNames() throws Exception {
 		fieldSet = new DefaultFieldSet(new String[] { "foo", "bar" });
 		assertTrue(fieldSet.toString().indexOf("foo") >= 0);
 	}
 
+	@Test
 	public void testToStringNullTokens() throws Exception {
 		fieldSet = new DefaultFieldSet(null);
 		assertEquals("", fieldSet.toString());
 	}
 
+	@Test
 	public void testProperties() throws Exception {
 		assertEquals("foo", new DefaultFieldSet(new String[] { "foo", "bar" }, new String[] { "Foo", "Bar" })
 				.getProperties().getProperty("Foo"));
 	}
 
+	@Test
 	public void testPropertiesWithNoNames() throws Exception {
 		try {
 			new DefaultFieldSet(new String[] { "foo", "bar" }).getProperties();
@@ -434,12 +508,14 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testPropertiesWithWhiteSpace() throws Exception {
 
 		assertEquals("bar", new DefaultFieldSet(new String[] { "foo", "bar   " }, new String[] { "Foo", "Bar" })
 				.getProperties().getProperty("Bar"));
 	}
 
+	@Test
 	public void testPropertiesWithNullValues() throws Exception {
 
 		fieldSet = new DefaultFieldSet(new String[] { null, "bar" }, new String[] { "Foo", "Bar" });
@@ -447,6 +523,7 @@ public class FieldSetTests extends TestCase {
 		assertEquals(null, fieldSet.getProperties().getProperty("Foo"));
 	}
 
+	@Test
 	public void testAccessByNameWhenNamesMissing() throws Exception {
 		try {
 			new DefaultFieldSet(new String[] { "1", "2" }).readInt("a");
@@ -457,6 +534,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testGetValues() {
 		String[] values = fieldSet.getValues();
 		assertEquals(tokens.length, values.length);
@@ -465,6 +543,7 @@ public class FieldSetTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testPaddedLong() {
 		FieldSet fs = new DefaultFieldSet(new String[] { "00000009" });
 
@@ -472,6 +551,7 @@ public class FieldSetTests extends TestCase {
 		assertEquals(value, 9);
 	}
 
+	@Test
 	public void testReadRawString() {
 		String name = "fieldName";
 		String value = " string with trailing whitespace   ";

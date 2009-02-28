@@ -19,11 +19,10 @@ package org.springframework.batch.item.file.transform;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 /**
- * Abstract class handling common concerns of various {@link LineTokenizer} implementations
- * such as dealing with names and actual construction of {@link FieldSet}
+ * Abstract class handling common concerns of various {@link LineTokenizer}
+ * implementations such as dealing with names and actual construction of
+ * {@link FieldSet}
  * 
  * @author Dave Syer
  * @author Robert Kasanicky
@@ -32,6 +31,18 @@ import java.util.List;
 public abstract class AbstractLineTokenizer implements LineTokenizer {
 
 	protected String[] names = new String[0];
+
+	private FieldSetFactory fieldSetFactory = new DefaultFieldSetFactory();
+
+	/**
+	 * Factory for {@link FieldSet} instances. Can be injected by clients to
+	 * customize the default number and date formats.
+	 * 
+	 * @param fieldSetFactory the {@link FieldSetFactory} to set
+	 */
+	public void setFieldSetFactory(FieldSetFactory fieldSetFactory) {
+		this.fieldSetFactory = fieldSetFactory;
+	}
 
 	/**
 	 * Setter for column names. Optional, but if set, then all lines must have
@@ -42,7 +53,7 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	public void setNames(String[] names) {
 		this.names = names;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if column names have been specified
 	 * @see #setNames(String[])
@@ -63,24 +74,24 @@ public abstract class AbstractLineTokenizer implements LineTokenizer {
 	 * @return the resulting tokens
 	 */
 	public FieldSet tokenize(String line) {
-		
-		if(line == null){
+
+		if (line == null) {
 			line = "";
 		}
 
 		List<String> tokens = new ArrayList<String>(doTokenize(line));
 
 		String[] values = (String[]) tokens.toArray(new String[tokens.size()]);
-		
-		if (names.length==0) {
-			return new DefaultFieldSet(values);
+
+		if (names.length == 0) {
+			return fieldSetFactory.create(values);
 		}
-		else if(values.length != names.length){
+		else if (values.length != names.length) {
 			throw new IncorrectTokenCountException(names.length, values.length);
 		}
-		return new DefaultFieldSet(values, names);
+		return fieldSetFactory.create(values, names);
 	}
-	
+
 	protected abstract List<String> doTokenize(String line);
 
 }
