@@ -15,11 +15,15 @@
  */
 package org.springframework.batch.core.scope.util;
 
+import java.beans.PropertyEditor;
+import java.util.Date;
+
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.target.SimpleBeanTargetSource;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.PropertyEditorRegistrySupport;
 import org.springframework.beans.TypeConverter;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.InitializingBean;
@@ -93,7 +97,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(listableBeanFactory);
 		beanFactory.copyConfigurationFrom(listableBeanFactory);
 
-		beanFactory.setTypeConverter(new TypeConverter() {
+		final TypeConverter contextTypeConverter = new TypeConverter() {
 			@SuppressWarnings("unchecked")
 			public Object convertIfNecessary(Object value, Class requiredType, MethodParameter methodParam)
 					throws TypeMismatchException {
@@ -105,6 +109,39 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 						result = convertFromContext(key, requiredType);
 					}
 				}
+				else if (requiredType.isAssignableFrom(value.getClass())) {
+					result = value;
+				}
+				else if (requiredType.isAssignableFrom(String.class)) {
+					if (typeConverter instanceof PropertyEditorRegistrySupport) {
+						/*
+						 * PropertyEditorRegistrySupport is de rigeur with
+						 * TypeConverter instances used internally by Spring. If
+						 * we have one of those then we can convert to String
+						 * but the TypeConverter doesn't know how to.
+						 */
+						PropertyEditorRegistrySupport registry = (PropertyEditorRegistrySupport) typeConverter;
+						PropertyEditor editor = registry.findCustomEditor(value.getClass(), null);
+						if (editor != null) {
+							if (registry.isSharedEditor(editor)) {
+								// Synchronized access to shared editor
+								// instance.
+								synchronized (editor) {
+									editor.setValue(value);
+									result = editor.getAsText();
+								}
+							}
+							else {
+								editor.setValue(value);
+								result = editor.getAsText();
+							}
+						}
+					}
+					if (result == null) {
+						logger.debug("Falling back on toString for conversion of : [" + value.getClass() + "]");
+						result = value.toString();
+					}
+				}
 				return result != null ? result : typeConverter.convertIfNecessary(value, requiredType, methodParam);
 			}
 
@@ -112,7 +149,8 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			public Object convertIfNecessary(Object value, Class requiredType) throws TypeMismatchException {
 				return convertIfNecessary(value, requiredType, null);
 			}
-		});
+		};
+		beanFactory.setTypeConverter(contextTypeConverter);
 
 		String beanName = getTargetBeanName() + "#" + contextFactory.getContextId();
 
@@ -133,7 +171,16 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 					if (!strVal.contains(PLACEHOLDER_PREFIX)) {
 						return strVal;
 					}
-					return replacePlaceholders(strVal, typeConverter);
+					if (strVal.startsWith(PLACEHOLDER_PREFIX) && strVal.endsWith(PLACEHOLDER_SUFFIX)) {
+						// If the whole value is a placeholder it might be
+						// possible to replace it all in one go as a String
+						// (e.g. if it's a ref=#{})
+						StringBuilder result = new StringBuilder(strVal);
+						String key = extractKey(strVal);
+						replaceIfTypeMatches(result, 0, strVal.length() - 1, key, String.class, typeConverter);
+						return result.toString();
+					}
+					return replacePlaceholders(strVal, contextTypeConverter);
 				}
 			}) {
 				protected Object resolveValue(Object value) {
@@ -216,10 +263,9 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			replaceIfTypeMatches(result, first, next, key, Integer.class, typeConverter);
 			// Spring cannot convert from String to Date, so there is an error
 			// here.
-			// replaceIfTypeMatches(result, first, next, key, Date.class,
-			// typeConverter);
-			first = result.indexOf(PLACEHOLDER_PREFIX, first + 1);;
-			next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);;
+			replaceIfTypeMatches(result, first, next, key, Date.class, typeConverter);
+			first = result.indexOf(PLACEHOLDER_PREFIX, first + 1);
+			next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);
 
 		}
 

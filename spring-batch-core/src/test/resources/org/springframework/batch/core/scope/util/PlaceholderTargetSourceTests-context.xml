@@ -60,6 +60,12 @@
 		<property name="targetBeanName" value="withDateTarget" />
 	</bean>
 
+	<bean id="withEmbeddedDate"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
+		<property name="contextFactory" ref="context" />
+		<property name="targetBeanName" value="withEmbeddedDateTarget" />
+	</bean>
+
 	<bean id="context"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests" />
 
@@ -110,10 +116,16 @@
 		<property name="name" value="bar-#{integer}-#{integer}" />
 	</bean>
 
-	<bean id="withDateTarget"
+	<bean id="withEmbeddedDateTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
 		<property name="name" value="bar-#{date}" />
+	</bean>
+
+	<bean id="withDateTarget"
+		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
+		lazy-init="true">
+		<property name="date" value="#{date}" />
 	</bean>
 
 	<bean id="withNull"

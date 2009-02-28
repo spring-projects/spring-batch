@@ -39,6 +39,10 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	private PlaceholderTargetSource withMultiple;
 
 	@Autowired
+	@Qualifier("withEmbeddedDate")
+	private PlaceholderTargetSource withEmbeddedDate;
+
+	@Autowired
 	@Qualifier("withDate")
 	private PlaceholderTargetSource withDate;
 
@@ -60,7 +64,7 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 	private Map<String, Object> map = Collections.singletonMap("foo.foo", (Object) "bar");
 
-	private Date date = new Date();
+	private Date date = new Date(0L);
 
 	public Object getContext() {
 		return this;
@@ -155,10 +159,15 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	}
 
 	@Test
+	public void testGetEmbeddedDate() {
+		Node target = (Node) withEmbeddedDate.getTarget();
+		assertEquals("bar-1970/01/01", target.getName());
+	}
+
+	@Test
 	public void testGetDate() {
 		Node target = (Node) withDate.getTarget();
-		// Remains unconverted because Spring cannot convert from Date to String
-		assertEquals("bar-#{date}", target.getName());
+		assertEquals(0L, target.getDate().getTime());
 	}
 
 	@Test
@@ -171,12 +180,16 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	public static interface Node {
 		String getName();
 
+		Date getDate();
+
 		Node getParent();
 	}
 
 	public static class Foo implements Node {
 
 		private String name;
+
+		private Date date;
 
 		private Node parent;
 
@@ -189,6 +202,14 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 		public String getName() {
 			return name;
+		}
+
+		public Date getDate() {
+			return date;
+		}
+
+		public void setDate(Date date) {
+			this.date = date;
 		}
 
 		public void setName(String name) {
