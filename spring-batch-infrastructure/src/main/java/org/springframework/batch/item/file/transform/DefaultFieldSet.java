@@ -24,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 import org.springframework.util.Assert;
@@ -50,7 +51,7 @@ public class DefaultFieldSet implements FieldSet {
 		dateFormat.setLenient(false);
 	}
 
-	private NumberFormat numberFormat = NumberFormat.getInstance();
+	private NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
 
 	/**
 	 * The fields wrapped by this '<code>FieldSet</code>' instance.
@@ -60,8 +61,8 @@ public class DefaultFieldSet implements FieldSet {
 	private List<String> names;
 
 	/**
-	 * The {@link NumberFormat} to use for parsing numbers. If unset the default
-	 * locale will be used.
+	 * The {@link NumberFormat} to use for parsing numbers. If unset the
+	 * US locale will be used ('.' as decimal place).
 	 * @param numberFormat the {@link NumberFormat} to use for number parsing
 	 */
 	public void setNumberFormat(NumberFormat numberFormat) {
@@ -632,12 +633,12 @@ public class DefaultFieldSet implements FieldSet {
 			String pattern;
 			if (dateFormat instanceof SimpleDateFormat) {
 				pattern = ((SimpleDateFormat) dateFormat).toPattern();
-			} else {
+			}
+			else {
 				pattern = dateFormat.toString();
 			}
 			throw new IllegalArgumentException(e.getMessage() + ", format: [" + pattern + "]");
 		}
 	}
-
 
 }
