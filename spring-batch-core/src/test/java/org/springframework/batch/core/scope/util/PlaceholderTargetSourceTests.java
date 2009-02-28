@@ -3,6 +3,7 @@ package org.springframework.batch.core.scope.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -161,7 +162,8 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	@Test
 	public void testGetEmbeddedDate() {
 		Node target = (Node) withEmbeddedDate.getTarget();
-		assertEquals("bar-1970/01/01", target.getName());
+		String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date(1L));
+		assertEquals("bar-"+date, target.getName());
 	}
 
 	@Test
