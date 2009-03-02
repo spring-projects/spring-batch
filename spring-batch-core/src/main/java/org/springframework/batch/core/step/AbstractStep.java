@@ -57,7 +57,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	private boolean allowStartIfComplete = false;
 
-	private CompositeStepExecutionListener listener = new CompositeStepExecutionListener();
+	private CompositeStepExecutionListener stepExecutionListener = new CompositeStepExecutionListener();
 
 	private JobRepository jobRepository;
 
@@ -192,7 +192,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			try {
 				doExecute(stepExecution);
-			} catch (RepeatException e) {
+			}
+			catch (RepeatException e) {
 				throw e.getCause();
 			}
 			exitStatus = stepExecution.getExitStatus();
@@ -281,7 +282,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * @param listener a {@link StepExecutionListener}
 	 */
 	public void registerStepExecutionListener(StepExecutionListener listener) {
-		this.listener.register(listener);
+		this.stepExecutionListener.register(listener);
 	}
 
 	/**
@@ -299,7 +300,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 * @return composite listener that delegates to all registered listeners.
 	 */
 	protected StepExecutionListener getCompositeListener() {
-		return listener;
+		return stepExecutionListener;
 	}
 
 	/**

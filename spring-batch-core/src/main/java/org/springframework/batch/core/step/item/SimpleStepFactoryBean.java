@@ -15,10 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ChunkListener;
@@ -524,7 +520,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 */
 	private void registerStepListeners(TaskletStep step, RepeatOperations chunkOperations) {
 
-		List<StepListener> chunkListeners = new ArrayList<StepListener>(Arrays.asList(getListeners()));
 		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
 			if (itemHandler instanceof ItemStream) {
 				step.registerStream((ItemStream) itemHandler);
@@ -535,14 +530,15 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 					step.registerStepExecutionListener((StepExecutionListener) listener);
 				}
 				if (listener instanceof ChunkListener) {
-					chunkListeners.add((StepListener) listener);
+					step.registerChunkListener((ChunkListener) listener);
 				}
 			}
 		}
 
-		BatchListenerFactoryHelper.addChunkListeners(chunkOperations, chunkListeners.toArray(new StepListener[] {}));
 		step.setStepExecutionListeners(BatchListenerFactoryHelper.getListeners(listeners, StepExecutionListener.class)
 				.toArray(new StepExecutionListener[] {}));
+		step.setChunkListeners(BatchListenerFactoryHelper.getListeners(listeners, ChunkListener.class).toArray(
+				new ChunkListener[] {}));
 	}
 
 	/**

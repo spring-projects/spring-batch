@@ -39,6 +39,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.ItemListenerSupport;
+import org.springframework.batch.core.listener.StepListenerSupport;
 import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
@@ -217,21 +218,46 @@ public class SimpleStepFactoryBeanTests {
 		int commitInterval = 3;
 
 		SimpleStepFactoryBean<String, String> factory = getStepFactory(items);
+		class AssertingWriteListener extends StepListenerSupport<Object, Object> {
+
+			String trail = "";
+
+			@Override
+			public void beforeWrite(List<? extends Object> items) {
+				trail = trail + "2";
+			}
+
+			@Override
+			public void afterWrite(List<? extends Object> items) {
+				trail = trail + "3";
+			}
+
+		}
 		class CountingChunkListener implements ChunkListener {
 			int beforeCount = 0;
 
 			int afterCount = 0;
 
+			private AssertingWriteListener writeListener;
+
+			public CountingChunkListener(AssertingWriteListener writeListener) {
+				super();
+				this.writeListener = writeListener;
+			}
+
 			public void afterChunk() {
+				writeListener.trail = writeListener.trail + "4";
 				afterCount++;
 			}
 
 			public void beforeChunk() {
+				writeListener.trail = writeListener.trail + "1";
 				beforeCount++;
 			}
 		}
-		CountingChunkListener chunkListener = new CountingChunkListener();
-		factory.setListeners(new StepListener[] { chunkListener });
+		AssertingWriteListener writeListener = new AssertingWriteListener();
+		CountingChunkListener chunkListener = new CountingChunkListener(writeListener);
+		factory.setListeners(new StepListener[] { chunkListener, writeListener });
 		factory.setCommitInterval(commitInterval);
 
 		AbstractStep step = (AbstractStep) factory.getObject();
@@ -248,6 +274,7 @@ public class SimpleStepFactoryBeanTests {
 		int expectedListenerCallCount = (items.length / commitInterval) + 1;
 		assertEquals(expectedListenerCallCount, chunkListener.afterCount);
 		assertEquals(expectedListenerCallCount, chunkListener.beforeCount);
+		assertTrue("Llistener order not as expected: " + writeListener.trail, writeListener.trail.startsWith("1234"));
 	}
 
 	/**

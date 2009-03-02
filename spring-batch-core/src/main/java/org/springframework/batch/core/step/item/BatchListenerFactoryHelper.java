@@ -18,14 +18,7 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.listener.CompositeChunkListener;
-import org.springframework.batch.repeat.RepeatContext;
-import org.springframework.batch.repeat.RepeatOperations;
-import org.springframework.batch.repeat.listener.RepeatListenerSupport;
-import org.springframework.batch.repeat.support.RepeatTemplate;
-import org.springframework.util.Assert;
 
 /**
  * Package private helper for step factory beans.
@@ -34,47 +27,6 @@ import org.springframework.util.Assert;
  * 
  */
 abstract class BatchListenerFactoryHelper {
-
-	/**
-	 * @param chunkOperations
-	 * @param listeners
-	 */
-	public static RepeatOperations addChunkListeners(RepeatOperations chunkOperations, StepListener[] listeners) {
-
-		final CompositeChunkListener multicaster = new CompositeChunkListener();
-
-		boolean hasChunkListener = false;
-
-		for (int i = 0; i < listeners.length; i++) {
-			StepListener listener = listeners[i];
-			if (listener instanceof ChunkListener) {
-				hasChunkListener = true;
-				multicaster.register((ChunkListener) listener);
-			}
-		}
-
-		if (hasChunkListener) {
-
-			Assert.state(chunkOperations instanceof RepeatTemplate,
-					"Chunk operations is injected but not a RepeatTemplate, so chunk listeners cannot also be registered. "
-							+ "Either inject a RepeatTemplate, or remove the ChunkListener.");
-
-			RepeatTemplate stepTemplate = (RepeatTemplate) chunkOperations;
-			stepTemplate.registerListener(new RepeatListenerSupport() {
-				public void open(RepeatContext context) {
-					multicaster.beforeChunk();
-				}
-
-				public void close(RepeatContext context) {
-					multicaster.afterChunk();
-				}
-			});
-
-		}
-
-		return chunkOperations;
-
-	}
 
 	public static <T> List<T> getListeners(StepListener[] listeners, Class<? super T> cls) {
 		List<T> list = new ArrayList<T>();

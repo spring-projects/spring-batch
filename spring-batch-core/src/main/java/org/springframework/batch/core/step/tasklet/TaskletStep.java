@@ -20,10 +20,12 @@ import java.util.concurrent.Semaphore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.BatchStatus;
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.listener.CompositeChunkListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
@@ -68,6 +70,8 @@ public class TaskletStep extends AbstractStep {
 	private static final Log logger = LogFactory.getLog(TaskletStep.class);
 
 	private RepeatOperations stepOperations = new RepeatTemplate();
+
+	private CompositeChunkListener chunkListener = new CompositeChunkListener();
 
 	// default to checking current thread for interruption.
 	private StepInterruptionPolicy interruptionPolicy = new ThreadStepInterruptionPolicy();
@@ -143,17 +147,23 @@ public class TaskletStep extends AbstractStep {
 	}
 
 	/**
-	 * Register each of the objects as listeners. If the {@link ItemReader} or
-	 * {@link ItemWriter} themselves implements this interface they will be
-	 * registered automatically, but their injected dependencies will not be.
-	 * This is a good way to get access to job parameters and execution context
-	 * if the tasklet is parameterised.
+	 * Register a chunk listener for callbacks at the appropriate stages in a
+	 * step execution.
+	 * 
+	 * @param listener a {@link ChunkListener}
+	 */
+	public void registerChunkListener(ChunkListener listener) {
+		this.chunkListener.register(listener);
+	}
+
+	/**
+	 * Register each of the objects as listeners.
 	 * 
 	 * @param listeners an array of listener objects of known types.
 	 */
-	public void setStepExecutionListeners(StepExecutionListener[] listeners) {
+	public void setChunkListeners(ChunkListener[] listeners) {
 		for (int i = 0; i < listeners.length; i++) {
-			registerStepExecutionListener(listeners[i]);
+			registerChunkListener(listeners[i]);
 		}
 	}
 
@@ -242,6 +252,8 @@ public class TaskletStep extends AbstractStep {
 				RepeatStatus result = RepeatStatus.CONTINUABLE;
 
 				TransactionStatus transaction = transactionManager.getTransaction(transactionAttribute);
+				
+				chunkListener.beforeChunk();
 
 				boolean locked = false;
 
@@ -249,6 +261,7 @@ public class TaskletStep extends AbstractStep {
 
 					try {
 						result = tasklet.execute(contribution, chunkContext);
+						chunkListener.afterChunk();
 					}
 					finally {
 						// Apply the contribution to the step
