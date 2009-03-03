@@ -17,6 +17,7 @@
 package org.springframework.batch.core.job;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
@@ -39,7 +40,7 @@ import org.springframework.batch.core.repository.JobRestartException;
 public class SimpleJob extends AbstractJob {
 
 	private List<Step> steps = new ArrayList<Step>();
-	
+
 	/**
 	 * Default constructor for job with null name
 	 */
@@ -66,6 +67,15 @@ public class SimpleJob extends AbstractJob {
 	}
 
 	/**
+	 * Convenience method for clients to inspect the steps for this job.
+	 * 
+	 * @return an unmodifiable copy of the steps for this job
+	 */
+	public List<Step> getSteps() {
+		return Collections.unmodifiableList(steps);
+	}
+
+	/**
 	 * Convenience method for adding a single step to the job.
 	 * 
 	 * @param step a {@link Step} to add
@@ -73,21 +83,22 @@ public class SimpleJob extends AbstractJob {
 	public void addStep(Step step) {
 		this.steps.add(step);
 	}
-	
-	/* 
+
+	/*
 	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
+	 * 
+	 * @see
+	 * org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
 	 */
-	public Step getStep(String stepName){
+	public Step getStep(String stepName) {
 		for (Step step : this.steps) {
-			if(step.getName().equals(stepName))
-			{
+			if (step.getName().equals(stepName)) {
 				return step;
 			}
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Handler of steps sequentially as provided, checking each one for success
 	 * before moving to the next. Returns the last {@link StepExecution}
@@ -114,8 +125,8 @@ public class SimpleJob extends AbstractJob {
 		//
 		// Update the job status to be the same as the last step
 		//
-		if(stepExecution != null) {
-			logger.debug("Upgrading JobExecution status: "+stepExecution);
+		if (stepExecution != null) {
+			logger.debug("Upgrading JobExecution status: " + stepExecution);
 			execution.upgradeStatus(stepExecution.getStatus());
 			execution.setExitStatus(stepExecution.getExitStatus());
 		}
