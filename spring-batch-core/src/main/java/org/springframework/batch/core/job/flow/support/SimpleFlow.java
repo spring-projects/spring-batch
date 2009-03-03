@@ -16,7 +16,9 @@
 package org.springframework.batch.core.job.flow.support;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,12 +85,18 @@ public class SimpleFlow implements Flow, InitializingBean {
 		this.stateTransitions = stateTransitions;
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.springframework.batch.core.job.flow.Flow#getState(java.lang.String)
+	/**
+	 * {@inheritDoc}
 	 */
 	public State getState(String stateName) {
 		return stateMap.get(stateName);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public Collection<State> getStates() {
+		return new HashSet<State>(stateMap.values());
 	}
 
 	/**

@@ -148,6 +148,14 @@ public class SimpleJobTests {
 	}
 
 	/**
+	 * Test method for {@link SimpleJob#setSteps(java.util.List)}.
+	 */
+	@Test
+	public void testGetSteps() {
+		assertEquals(2, job.getStepNames().size());
+	}
+
+	/**
 	 * Test method for
 	 * {@link SimpleJob#addStep(org.springframework.batch.core.Step)}.
 	 */

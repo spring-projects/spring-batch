@@ -1,5 +1,7 @@
 package org.springframework.batch.core.step;
 
+import java.util.Collection;
+
 import org.springframework.batch.core.Step;
 
 /**
@@ -9,6 +11,8 @@ import org.springframework.batch.core.Step;
  *
  */
 public interface StepLocator {
+	
+	Collection<String> getStepNames();
 	
 	Step getStep(String stepName);
 

@@ -17,7 +17,7 @@
 package org.springframework.batch.core.job;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.batch.core.BatchStatus;
@@ -69,10 +69,14 @@ public class SimpleJob extends AbstractJob {
 	/**
 	 * Convenience method for clients to inspect the steps for this job.
 	 * 
-	 * @return an unmodifiable copy of the steps for this job
+	 * @return the step names for this job
 	 */
-	public List<Step> getSteps() {
-		return Collections.unmodifiableList(steps);
+	public Collection<String> getStepNames() {
+		List<String> names = new ArrayList<String>();
+		for (Step step : steps) {
+			names.add(step.getName());
+		}
+		return names;
 	}
 
 	/**

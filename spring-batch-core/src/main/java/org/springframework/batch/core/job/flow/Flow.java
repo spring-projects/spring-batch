@@ -15,10 +15,11 @@
  */
 package org.springframework.batch.core.job.flow;
 
+import java.util.Collection;
 
 /**
  * @author Dave Syer
- *
+ * 
  */
 public interface Flow {
 
@@ -34,8 +35,8 @@ public interface Flow {
 	 * @param stateName
 	 * @return the State
 	 */
-	public State getState(String stateName);
-	
+	State getState(String stateName);
+
 	/**
 	 * @throws FlowExecutionException
 	 */
@@ -48,5 +49,12 @@ public interface Flow {
 	 * @throws FlowExecutionException
 	 */
 	FlowExecution resume(String stateName, FlowExecutor executor) throws FlowExecutionException;
+
+	/**
+	 * Convenient accessor for clients needing to explore the states of this
+	 * flow.
+	 * @return the states
+	 */
+	Collection<State> getStates();
 
 }

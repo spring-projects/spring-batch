@@ -15,8 +15,14 @@
  */
 package org.springframework.batch.core.job;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 import org.junit.Test;
@@ -173,6 +179,11 @@ public class AbstractJobTests {
 		@Override
 		public Step getStep(String stepName) {
 			return null;
+		}
+		
+		@Override
+		public Collection<String> getStepNames() {
+			return Collections.<String> emptySet();
 		}
 
 	}

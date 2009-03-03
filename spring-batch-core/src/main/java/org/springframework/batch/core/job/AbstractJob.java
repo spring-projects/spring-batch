@@ -16,6 +16,7 @@
 
 package org.springframework.batch.core.job;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
@@ -135,6 +136,13 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 * @return the Step
 	 */
 	public abstract Step getStep(String stepName);
+	
+	/**
+	 * Retrieve the step names.
+	 * 
+	 * @return the step names
+	 */
+	public abstract Collection<String> getStepNames();
 	
 	/**
 	 * Boolean flag to prevent categorically a job from restarting, even if it

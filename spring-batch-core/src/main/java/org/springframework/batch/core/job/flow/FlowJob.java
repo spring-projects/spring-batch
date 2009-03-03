@@ -15,6 +15,9 @@
  */
 package org.springframework.batch.core.job.flow;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
@@ -59,18 +62,30 @@ public class FlowJob extends AbstractJob {
 		this.flow = flow;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.job.AbstractJob#getStep(java.lang.String)
+	/**
+	 * {@inheritDoc}
 	 */
+	@Override
 	public Step getStep(String stepName) {
 		State state = this.flow.getState(stepName);
 		if (state instanceof StepHolder) {
 			return ((StepHolder) state).getStep();
 		}
 		return null;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Collection<String> getStepNames() {
+		Collection<String> steps = new HashSet<String>();
+		for (State state: flow.getStates()) {
+			if (state instanceof StepHolder) {
+				steps.add(state.getName());
+			}
+		}
+		return steps;
 	}
 
 	/**

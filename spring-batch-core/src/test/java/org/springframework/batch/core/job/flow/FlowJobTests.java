@@ -68,6 +68,20 @@ public class FlowJobTests {
 	}
 
 	@Test
+	public void testGetSteps() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1")), "step2"));
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step2")), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		assertEquals(2, job.getStepNames().size());
+	}
+
+	@Test
 	public void testTwoSteps() throws Exception {
 		SimpleFlow flow = new SimpleFlow("job");
 		List<StateTransition> transitions = new ArrayList<StateTransition>();
