@@ -15,8 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.springframework.batch.core.configuration.util.MethodInvokerUtils.getMethodInvokerByAnnotation;
-import static org.springframework.batch.core.configuration.util.MethodInvokerUtils.getMethodInvokerForInterface;
+import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerByAnnotation;
+import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,8 +27,8 @@ import java.util.Map.Entry;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.core.configuration.util.MethodInvoker;
-import org.springframework.batch.core.configuration.util.MethodInvokerUtils;
+import org.springframework.batch.support.MethodInvoker;
+import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;

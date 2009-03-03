@@ -31,43 +31,45 @@ import org.springframework.util.Assert;
  * are sorted starting with the most specific, and the first match always
  * succeeds.
  * 
- * @see PatternMatcher#match(String, Map)
- * 
  * @author Ben Hale
  * @author Dan Garrette
  * @author Dave Syer
  */
 public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
 
-	private Map<String, LineTokenizer> tokenizers = null;
+	private PatternMatcher<LineTokenizer> tokenizers = null;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.file.transform.LineTokenizer#tokenize(java.lang.String)
+	 * @see
+	 * org.springframework.batch.item.file.transform.LineTokenizer#tokenize(
+	 * java.lang.String)
 	 */
 	public FieldSet tokenize(String line) {
-		return PatternMatcher.match(line, this.tokenizers).tokenize(line);
+		return tokenizers.match(line).tokenize(line);
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see
+	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
-		Assert.isTrue(this.tokenizers != null && this.tokenizers.size() > 0,
-				"The 'tokenizers' property must be non-empty");
+		Assert.isTrue(this.tokenizers != null, "The 'tokenizers' property must be non-empty");
 	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
-		this.tokenizers = new LinkedHashMap<String, LineTokenizer>();
+		Assert.isTrue(!tokenizers.isEmpty(), "The 'tokenizers' property must be non-empty");
+		LinkedHashMap<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
 		for (String key : tokenizers.keySet()) {
 			LineTokenizer value = tokenizers.get(key);
 			if (!key.endsWith("*")) {
 				key = key + "*";
 			}
-			this.tokenizers.put(key, value);
+			map.put(key, value);
 		}
+		this.tokenizers = new PatternMatcher<LineTokenizer>(map);
 	}
 }

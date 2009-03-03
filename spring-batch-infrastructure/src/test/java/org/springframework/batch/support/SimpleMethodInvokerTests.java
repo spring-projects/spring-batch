@@ -29,16 +29,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration.util;
+package org.springframework.batch.support;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.util.Assert;
 
 /**
@@ -48,8 +48,7 @@ import org.springframework.util.Assert;
 public class SimpleMethodInvokerTests {
 
 	TestClass testClass;
-	JobExecution jobExecution = new JobExecution(11L);
-	
+	String value = "foo";
 	@Before
 	public void setUp(){
 		testClass = new TestClass();
@@ -58,48 +57,48 @@ public class SimpleMethodInvokerTests {
 	@Test
 	public void testMethod() throws Exception{
 		
-		Method method = TestClass.class.getMethod("beforeJob");
+		Method method = TestClass.class.getMethod("before");
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
-		methodInvoker.invokeMethod(jobExecution);
-		assertTrue(testClass.beforeJobCalled);
+		methodInvoker.invokeMethod(value);
+		assertTrue(testClass.beforeCalled);
 	}
 	
 	@Test
 	public void testMethodByName() throws Exception{
 		
-		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "beforeJob", JobExecutionListener.class);
-		methodInvoker.invokeMethod(jobExecution);
-		assertTrue(testClass.beforeJobCalled);
+		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "before", String.class);
+		methodInvoker.invokeMethod(value);
+		assertTrue(testClass.beforeCalled);
 	}
 	
 	@Test
 	public void testMethodWithExecution() throws Exception{
-		Method method = TestClass.class.getMethod("beforeJobWithExecution", JobExecution.class);
+		Method method = TestClass.class.getMethod("beforeWithArgument", String.class);
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
-		methodInvoker.invokeMethod(jobExecution);
-		assertTrue(testClass.beforeJobCalled);
+		methodInvoker.invokeMethod(value);
+		assertTrue(testClass.beforeCalled);
 	}
 	
 	@Test
 	public void testMethodByNameWithExecution() throws Exception{
-		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "beforeJobWithExecution", JobExecution.class);
-		methodInvoker.invokeMethod(jobExecution);
-		assertTrue(testClass.beforeJobCalled);
+		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "beforeWithArgument", String.class);
+		methodInvoker.invokeMethod(value);
+		assertTrue(testClass.beforeCalled);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testMethodWithTooManyArguments() throws Exception{
-		Method method = TestClass.class.getMethod("beforeJobWithTooManyArguments", JobExecution.class, int.class);
+		Method method = TestClass.class.getMethod("beforeWithTooManyArguments", String.class, int.class);
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
-		methodInvoker.invokeMethod(jobExecution);
-		assertFalse(testClass.beforeJobCalled);
+		methodInvoker.invokeMethod(value);
+		assertFalse(testClass.beforeCalled);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testMethodByNameWithTooManyArguments() throws Exception{
-		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "beforeJobWithTooManyArguments", JobExecution.class);
-		methodInvoker.invokeMethod(jobExecution);
-		assertFalse(testClass.beforeJobCalled);
+		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, "beforeWithTooManyArguments", String.class);
+		methodInvoker.invokeMethod(value);
+		assertFalse(testClass.beforeCalled);
 	}
 	
 	@Test
@@ -111,29 +110,29 @@ public class SimpleMethodInvokerTests {
 	
 	@Test
 	public void testEquals() throws Exception{
-		Method method = TestClass.class.getMethod("beforeJobWithExecution", JobExecution.class);
+		Method method = TestClass.class.getMethod("beforeWithArgument", String.class);
 		MethodInvoker methodInvoker = new SimpleMethodInvoker(testClass, method);
 		
-		method = TestClass.class.getMethod("beforeJobWithExecution", JobExecution.class);
+		method = TestClass.class.getMethod("beforeWithArgument", String.class);
 		MethodInvoker methodInvoker2 = new SimpleMethodInvoker(testClass, method);
 		assertEquals(methodInvoker, methodInvoker2);
 	}
 	
 	private class TestClass{
 		
-		boolean beforeJobCalled = false;
+		boolean beforeCalled = false;
 		boolean argumentTestCalled = false;
 		
-		public void beforeJob(){
-			beforeJobCalled = true;
+		public void before(){
+			beforeCalled = true;
 		}
 		
-		public void beforeJobWithExecution(JobExecution jobExecution){
-			beforeJobCalled = true;
+		public void beforeWithArgument(String value){
+			beforeCalled = true;
 		}
 		
-		public void beforeJobWithTooManyArguments(JobExecution jobExecution, int someInt){
-			beforeJobCalled = true;
+		public void beforeWithTooManyArguments(String value, int someInt){
+			beforeCalled = true;
 		}
 		
 		public void argumentTest(Object object){

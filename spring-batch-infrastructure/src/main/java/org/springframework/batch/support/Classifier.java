@@ -26,8 +26,8 @@ package org.springframework.batch.support;
 public interface Classifier<C, T> {
 
 	/**
-	 * Classify the given object and return an object. The return type depends
-	 * on the implementation.
+	 * Classify the given object and return an object of a different type,
+	 * possibly an enumerated type.
 	 * 
 	 * @param classifiable the input object. Can be null.
 	 * @return an object. Can be null, but implementations should declare if

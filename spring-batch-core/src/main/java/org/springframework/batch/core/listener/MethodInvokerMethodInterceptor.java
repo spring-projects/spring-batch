@@ -22,7 +22,7 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.configuration.util.MethodInvoker;
+import org.springframework.batch.support.MethodInvoker;
 
 /**
  * {@link MethodInterceptor} that, given a map of method names and

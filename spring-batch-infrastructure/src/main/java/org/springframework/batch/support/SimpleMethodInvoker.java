@@ -29,7 +29,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.core.configuration.util;
+package org.springframework.batch.support;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -82,7 +82,7 @@ public class SimpleMethodInvoker implements MethodInvoker {
 		if(parameterTypes.length == 0){
 			invokeArgs = new Object[]{};
 		}
-		else if(parameterTypes.length > args.length){
+		else if(parameterTypes.length != args.length){
 			throw new IllegalArgumentException("Wrong number of arguments, expected no more than: [" + parameterTypes.length + "]");
 		}
 		else{

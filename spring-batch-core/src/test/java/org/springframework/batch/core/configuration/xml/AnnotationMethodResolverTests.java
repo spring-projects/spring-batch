@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
 import org.junit.Test;
-import org.springframework.batch.core.configuration.util.AnnotationMethodResolver;
+import org.springframework.batch.support.AnnotationMethodResolver;
 
 /**
  * @author Mark Fisher

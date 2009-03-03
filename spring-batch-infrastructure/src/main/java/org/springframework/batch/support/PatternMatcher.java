@@ -18,6 +18,7 @@ package org.springframework.batch.support;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,28 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * @author Dan Garrette
  */
-public class PatternMatcher {
+public class PatternMatcher<S> {
+
+	private Map<String, S> map = new HashMap<String, S>();
+	private List<String> sorted = new ArrayList<String>();
+
+	/**
+	 * Initialize a new {@link PatternMatcher} with a map of patterns to values
+	 * @param map a map from String patterns to values
+	 */
+	public PatternMatcher(Map<String, S> map) {
+		super();
+		this.map = map;
+		// Sort keys to start with the most specific
+		sorted = new ArrayList<String>(map.keySet());
+		Collections.sort(sorted, new Comparator<String>() {
+			public int compare(String o1, String o2) {
+				String s1 = o1; // .replace('?', '{');
+				String s2 = o2; // .replace('*', '}');
+				return s2.compareTo(s1);
+			}
+		});
+	}
 
 	/**
 	 * Lifted from AntPathMatcher in Spring Core. Tests whether or not a string
@@ -174,8 +196,8 @@ public class PatternMatcher {
 	 * type. During processing, the method will identify the most specific key
 	 * in the map that matches the line. Once the correct is identified, its
 	 * value is returned. Note that if the map contains the wildcard string "*"
-	 * as a key, then it will serve as the "default" case, matching every
-	 * line that does not match anything else.
+	 * as a key, then it will serve as the "default" case, matching every line
+	 * that does not match anything else.
 	 * 
 	 * <p>
 	 * If no matching prefix is found, a {@link IllegalStateException} will be
@@ -185,22 +207,13 @@ public class PatternMatcher {
 	 * Null keys are not allowed in the map.
 	 * 
 	 * @param line An input string
-	 * @param map A map with String prefixes as keys.
 	 * @return the value whose prefix matches the given line
 	 */
-	public static <S> S match(String line, Map<String, S> map) {
-		S value = null;
-		Assert.notNull(line, "A non-null key must be provided.");
+	public S match(String line) {
 
-		// Sort keys to start with the most specific
-		List<String> sorted = new ArrayList<String>(map.keySet());
-		Collections.sort(sorted, new Comparator<String>() {
-			public int compare(String o1, String o2) {
-				String s1 = o1; // .replace('?', '{');
-				String s2 = o2; // .replace('*', '}');
-				return s2.compareTo(s1);
-			}
-		});
+		S value = null;
+		Assert.notNull(line, "A non-null key must be provided to match against.");
+
 		for (String key : sorted) {
 			if (PatternMatcher.match(key, line)) {
 				value = map.get(key);
@@ -212,6 +225,7 @@ public class PatternMatcher {
 			throw new IllegalStateException("Could not find a matching pattern for key=[" + line + "]");
 		}
 		return value;
+
 	}
 
 }

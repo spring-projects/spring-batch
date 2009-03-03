@@ -136,7 +136,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 	 * Validate StepExecution. At a minimum, JobId, StartTime, and Status cannot
 	 * be null. EndTime can be null for an unfinished job.
 	 * 
-	 * @param jobExecution
+	 * @param value
 	 * @throws IllegalArgumentException
 	 */
 	private void validateStepExecution(StepExecution stepExecution) {

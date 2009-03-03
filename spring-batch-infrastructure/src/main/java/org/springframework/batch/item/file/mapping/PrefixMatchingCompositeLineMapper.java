@@ -28,9 +28,9 @@ import org.springframework.util.Assert;
 /**
  * <p>
  * A {@link LineMapper} implementation that stores a mapping of String prefixes
- * to delegate {@link LineTokenizer}s as well as a mapping of String prefixes
- * to delegate {@link FieldSetMapper}s. Each line received will be tokenized
- * and then mapped to a field set.
+ * to delegate {@link LineTokenizer}s as well as a mapping of String prefixes to
+ * delegate {@link FieldSetMapper}s. Each line received will be tokenized and
+ * then mapped to a field set.
  * 
  * <p>
  * Both the tokenizing and the mapping work in a similar way. The line will be
@@ -39,7 +39,6 @@ import org.springframework.util.Assert;
  * with the most specific, and the first match always succeeds.
  * 
  * @see PrefixMatchingCompositeLineTokenizer
- * @see PatternMatcher#match(String, Map)
  * 
  * @author Dan Garrette
  * @since 2.0
@@ -47,27 +46,29 @@ import org.springframework.util.Assert;
 public class PrefixMatchingCompositeLineMapper<T> implements LineMapper<T>, InitializingBean {
 
 	private PrefixMatchingCompositeLineTokenizer tokenizer = new PrefixMatchingCompositeLineTokenizer();
-	private Map<String, FieldSetMapper<T>> fieldSetMappers = null;
+
+	private PatternMatcher<FieldSetMapper<T>> patternMatcher;
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.item.file.mapping.LineMapper#mapLine(java.lang.String,
-	 *      int)
+	 * @see
+	 * org.springframework.batch.item.file.mapping.LineMapper#mapLine(java.lang
+	 * .String, int)
 	 */
 	public T mapLine(String line, int lineNumber) throws Exception {
-		return PatternMatcher.match(line, this.fieldSetMappers).mapFieldSet(this.tokenizer.tokenize(line));
+		return patternMatcher.match(line).mapFieldSet(this.tokenizer.tokenize(line));
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+	 * @see
+	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
 	public void afterPropertiesSet() throws Exception {
 		this.tokenizer.afterPropertiesSet();
-		Assert.isTrue(this.fieldSetMappers != null && this.fieldSetMappers.size() > 0,
-				"The 'fieldSetMappers' property must be non-empty");
+		Assert.isTrue(this.patternMatcher != null, "The 'fieldSetMappers' property must be non-empty");
 	}
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
@@ -75,13 +76,15 @@ public class PrefixMatchingCompositeLineMapper<T> implements LineMapper<T>, Init
 	}
 
 	public void setFieldSetMappers(Map<String, FieldSetMapper<T>> fieldSetMappers) {
-		this.fieldSetMappers = new LinkedHashMap<String, FieldSetMapper<T>>();
+		Assert.isTrue(!fieldSetMappers.isEmpty(), "The 'fieldSetMappers' property must be non-empty");
+		LinkedHashMap<String, FieldSetMapper<T>> map = new LinkedHashMap<String, FieldSetMapper<T>>();
 		for (String key : fieldSetMappers.keySet()) {
 			FieldSetMapper<T> value = fieldSetMappers.get(key);
 			if (!key.endsWith("*")) {
 				key = key + "*";
 			}
-			this.fieldSetMappers.put(key, value);
+			map.put(key, value);
 		}
+		this.patternMatcher = new PatternMatcher<FieldSetMapper<T>>(map);
 	}
 }

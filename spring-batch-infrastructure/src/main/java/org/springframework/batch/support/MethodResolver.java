@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.configuration.util;
+package org.springframework.batch.support;
 
 import java.lang.reflect.Method;
 

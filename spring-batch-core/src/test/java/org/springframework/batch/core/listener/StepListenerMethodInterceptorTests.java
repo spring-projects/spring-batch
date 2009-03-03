@@ -13,9 +13,9 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
-import org.springframework.batch.core.configuration.util.MethodInvoker;
-import org.springframework.batch.core.configuration.util.MethodInvokerUtils;
-import org.springframework.batch.core.configuration.util.SimpleMethodInvoker;
+import org.springframework.batch.support.MethodInvoker;
+import org.springframework.batch.support.MethodInvokerUtils;
+import org.springframework.batch.support.SimpleMethodInvoker;
 
 public class StepListenerMethodInterceptorTests {
 
