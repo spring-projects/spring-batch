@@ -16,22 +16,25 @@
 
 package org.springframework.batch.support;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collections;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.beans.propertyeditors.PropertiesEditor;
 
-public class DefaultPropertEditorRegistrarTests extends TestCase {
+public class DefaultPropertEditorRegistrarTests {
 
+	@Test
 	public void testIntArray() throws Exception {
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
 		BeanWithIntArray result = new BeanWithIntArray();
-		BeanWrapperImpl wrapper = new BeanWrapperImpl(result);
 		mapper.setCustomEditors(Collections.singletonMap(int[].class, new IntArrayPropertyEditor()));
+		BeanWrapperImpl wrapper = new BeanWrapperImpl(result);
 		mapper.registerCustomEditors(wrapper);
 		PropertiesEditor editor = new PropertiesEditor();
 		editor.setAsText("numbers=1,2,3, 4");
@@ -40,31 +43,44 @@ public class DefaultPropertEditorRegistrarTests extends TestCase {
 		assertEquals(4, result.numbers[3]);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
 	public void testSetCustomEditorsWithInvalidTypeName() throws Exception {
 
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
-		try {
-			mapper.setCustomEditors(Collections.singletonMap("FOO", new CustomNumberEditor(Long.class, true)));		
-		} catch (IllegalArgumentException e) {	
-			// expected
-		}
+		mapper.setCustomEditors(Collections.singletonMap("FOO", new CustomNumberEditor(Long.class, true)));
 	}
 
+	@Test
+	public void testSetCustomEditorsWithStringTypeName() throws Exception {
+
+		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
+		mapper.setCustomEditors(Collections.singletonMap("java.lang.Long", new CustomNumberEditor(Long.class, true)));
+		BeanWithIntArray result = new BeanWithIntArray();
+		BeanWrapperImpl wrapper = new BeanWrapperImpl(result);
+		mapper.registerCustomEditors(wrapper);
+		wrapper.setPropertyValues(new MutablePropertyValues(Collections.singletonMap("number", "123")));
+		assertEquals(123L, result.number);
+
+	}
+
+	@Test(expected = IllegalArgumentException.class)
 	public void testSetCustomEditorsWithInvalidType() throws Exception {
 
 		DefaultPropertyEditorRegistrar mapper = new DefaultPropertyEditorRegistrar();
-		try {
-			mapper.setCustomEditors(Collections.singletonMap(new Object(), new CustomNumberEditor(Long.class, true)));		
-		} catch (IllegalArgumentException e) {	
-			// expected
-		}
+		mapper.setCustomEditors(Collections.singletonMap(new Object(), new CustomNumberEditor(Long.class, true)));
 	}
 
 	private static class BeanWithIntArray {
 		private int[] numbers;
 
+		private long number;
+
 		public void setNumbers(int[] numbers) {
 			this.numbers = numbers;
+		}
+
+		public void setNumber(long number) {
+			this.number = number;
 		}
 	}
 

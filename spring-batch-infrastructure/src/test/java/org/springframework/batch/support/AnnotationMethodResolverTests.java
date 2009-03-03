@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.configuration.xml;
+package org.springframework.batch.support;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

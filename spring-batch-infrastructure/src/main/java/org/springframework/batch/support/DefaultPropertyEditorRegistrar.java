@@ -74,12 +74,8 @@ public class DefaultPropertyEditorRegistrar implements PropertyEditorRegistrar {
 				throw new IllegalArgumentException("Invalid key [" + key
 						+ "] for custom editor: needs to be Class or String.");
 			}
-			Object value = entry.getValue();
-			if (!(value instanceof PropertyEditor)) {
-				throw new IllegalArgumentException("Mapped value [" + value + "] for custom editor key [" + key
-						+ "] is not of required type [" + PropertyEditor.class.getName() + "]");
-			}
-			this.customEditors.put(requiredType, (PropertyEditor) value);
+			PropertyEditor value = entry.getValue();
+			this.customEditors.put(requiredType, value);
 		}
 	}
 
