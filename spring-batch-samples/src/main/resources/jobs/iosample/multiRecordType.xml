@@ -25,17 +25,17 @@
 	</bean>
 
 	<bean id="prefixMatchingLineMapper"
-		class="org.springframework.batch.item.file.mapping.PrefixMatchingCompositeLineMapper">
+		class="org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper">
 		<property name="tokenizers">
 			<map>
-				<entry key="TRAD" value-ref="tradeLineTokenizer" />
-				<entry key="CUST" value-ref="customerLineTokenizer" />
+				<entry key="TRAD*" value-ref="tradeLineTokenizer" />
+				<entry key="CUST*" value-ref="customerLineTokenizer" />
 			</map>
 		</property>
 		<property name="fieldSetMappers">
 			<map>
-				<entry key="TRAD" value-ref="tradeFieldSetMapper" />
-				<entry key="CUST" value-ref="customerFieldSetMapper" />
+				<entry key="TRAD*" value-ref="tradeFieldSetMapper" />
+				<entry key="CUST*" value-ref="customerFieldSetMapper" />
 			</map>
 		</property>
 	</bean>

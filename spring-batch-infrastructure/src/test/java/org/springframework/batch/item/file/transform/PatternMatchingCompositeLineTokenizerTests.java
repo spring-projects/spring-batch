@@ -28,10 +28,11 @@ import org.junit.Test;
 /**
  * @author Ben Hale
  * @author Dan Garrette
+ * @author Dave Syer
  */
-public class PrefixMatchingCompositeLineTokenizerTests {
+public class PatternMatchingCompositeLineTokenizerTests {
 
-	private PrefixMatchingCompositeLineTokenizer tokenizer = new PrefixMatchingCompositeLineTokenizer();
+	private PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoTokenizers() throws Exception {
@@ -42,7 +43,7 @@ public class PrefixMatchingCompositeLineTokenizerTests {
 	@Test
 	public void testEmptyKeyMatchesAnyLine() throws Exception {
 		Map<String, LineTokenizer> map = new HashMap<String, LineTokenizer>();
-		map.put("", new DelimitedLineTokenizer());
+		map.put("*", new DelimitedLineTokenizer());
 		map.put("foo", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return null;
@@ -58,12 +59,12 @@ public class PrefixMatchingCompositeLineTokenizerTests {
 	public void testEmptyKeyDoesNotMatchWhenAlternativeAvailable() throws Exception {
 
 		Map<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
-		map.put("", new LineTokenizer() {
+		map.put("*", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return null;
 			}
 		});
-		map.put("foo", new DelimitedLineTokenizer());
+		map.put("foo*", new DelimitedLineTokenizer());
 		tokenizer.setTokenizers(map);
 		tokenizer.afterPropertiesSet();
 		FieldSet fields = tokenizer.tokenize("foo,bar");
@@ -79,7 +80,7 @@ public class PrefixMatchingCompositeLineTokenizerTests {
 
 	@Test
 	public void testMatchWithPrefix() throws Exception {
-		tokenizer.setTokenizers(Collections.singletonMap("foo", (LineTokenizer) new LineTokenizer() {
+		tokenizer.setTokenizers(Collections.singletonMap("foo*", (LineTokenizer) new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { line });
 			}

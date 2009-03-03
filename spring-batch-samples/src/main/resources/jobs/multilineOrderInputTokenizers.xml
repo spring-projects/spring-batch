@@ -4,19 +4,19 @@
        	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<bean id="orderFileTokenizer"
-		class="org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer">
+		class="org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer">
 		<property name="tokenizers">
 			<map>
-				<entry key="HEA" value-ref="headerRecordTokenizer" />
-				<entry key="FOT" value-ref="footerRecordTokenizer" />
-				<entry key="BCU" value-ref="businessCustomerLineTokenizer" />
-				<entry key="NCU" value-ref="customerLineTokenizer" />
-				<entry key="BAD" value-ref="billingAddressLineTokenizer" />
-				<entry key="SAD" value-ref="shippingAddressLineTokenizer" />
-				<entry key="BIN" value-ref="billingLineTokenizer" />
-				<entry key="SIN" value-ref="shippingLineTokenizer" />
-				<entry key="LIT" value-ref="itemLineTokenizer" />
-				<entry key="" value-ref="defaultLineTokenizer" />
+				<entry key="HEA*" value-ref="headerRecordTokenizer" />
+				<entry key="FOT*" value-ref="footerRecordTokenizer" />
+				<entry key="BCU*" value-ref="businessCustomerLineTokenizer" />
+				<entry key="NCU*" value-ref="customerLineTokenizer" />
+				<entry key="BAD*" value-ref="billingAddressLineTokenizer" />
+				<entry key="SAD*" value-ref="shippingAddressLineTokenizer" />
+				<entry key="BIN*" value-ref="billingLineTokenizer" />
+				<entry key="SIN*" value-ref="shippingLineTokenizer" />
+				<entry key="LIT*" value-ref="itemLineTokenizer" />
+				<entry key="*" value-ref="defaultLineTokenizer" />
 			</map>
 		</property>
 	</bean>

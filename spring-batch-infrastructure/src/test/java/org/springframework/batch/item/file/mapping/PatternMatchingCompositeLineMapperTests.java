@@ -34,9 +34,9 @@ import org.springframework.batch.item.file.transform.Name;
  * @author Dave Syer
  * @since 2.0
  */
-public class PrefixMatchingCompositeLineMapperTests {
+public class PatternMatchingCompositeLineMapperTests {
 
-	private PrefixMatchingCompositeLineMapper<Name> mapper = new PrefixMatchingCompositeLineMapper<Name>();
+	private PatternMatchingCompositeLineMapper<Name> mapper = new PatternMatchingCompositeLineMapper<Name>();
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testNoMappers() throws Exception {
@@ -49,12 +49,12 @@ public class PrefixMatchingCompositeLineMapperTests {
 	@Test
 	public void testKeyFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
-		tokenizers.put("foo", new LineTokenizer() {
+		tokenizers.put("foo*", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
-		tokenizers.put("bar", new LineTokenizer() {
+		tokenizers.put("bar*", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
@@ -62,12 +62,12 @@ public class PrefixMatchingCompositeLineMapperTests {
 		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<String, FieldSetMapper<Name>>();
-		fieldSetMappers.put("foo", new FieldSetMapper<Name>() {
+		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);
 			}
 		});
-		fieldSetMappers.put("bar", new FieldSetMapper<Name>() {
+		fieldSetMappers.put("bar*", new FieldSetMapper<Name>() {
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(1), fs.readString(0), 0);
 			}
@@ -81,12 +81,12 @@ public class PrefixMatchingCompositeLineMapperTests {
 	@Test(expected = IllegalStateException.class)
 	public void testMapperKeyNotFound() throws Exception {
 		Map<String, LineTokenizer> tokenizers = new HashMap<String, LineTokenizer>();
-		tokenizers.put("foo", new LineTokenizer() {
+		tokenizers.put("foo*", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "a", "b" });
 			}
 		});
-		tokenizers.put("bar", new LineTokenizer() {
+		tokenizers.put("bar*", new LineTokenizer() {
 			public FieldSet tokenize(String line) {
 				return new DefaultFieldSet(new String[] { "c", "d" });
 			}
@@ -94,7 +94,7 @@ public class PrefixMatchingCompositeLineMapperTests {
 		mapper.setTokenizers(tokenizers);
 
 		Map<String, FieldSetMapper<Name>> fieldSetMappers = new HashMap<String, FieldSetMapper<Name>>();
-		fieldSetMappers.put("foo", new FieldSetMapper<Name>() {
+		fieldSetMappers.put("foo*", new FieldSetMapper<Name>() {
 			public Name mapFieldSet(FieldSet fs) {
 				return new Name(fs.readString(0), fs.readString(1), 0);
 			}

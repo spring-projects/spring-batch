@@ -16,36 +16,36 @@
 
 package org.springframework.batch.item.file.mapping;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.batch.item.file.transform.LineTokenizer;
-import org.springframework.batch.item.file.transform.PrefixMatchingCompositeLineTokenizer;
+import org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer;
 import org.springframework.batch.support.PatternMatcher;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
  * <p>
- * A {@link LineMapper} implementation that stores a mapping of String prefixes
- * to delegate {@link LineTokenizer}s as well as a mapping of String prefixes to
+ * A {@link LineMapper} implementation that stores a mapping of String patterns
+ * to delegate {@link LineTokenizer}s as well as a mapping of String patterns to
  * delegate {@link FieldSetMapper}s. Each line received will be tokenized and
  * then mapped to a field set.
  * 
  * <p>
  * Both the tokenizing and the mapping work in a similar way. The line will be
- * checked for its prefix. If the prefix matches a key in the map of delegates,
- * then the corresponding delegate will be used. Prefixes are sorted starting
- * with the most specific, and the first match always succeeds.
+ * checked for its matching pattern. If the key matches a pattern in the map of
+ * delegates, then the corresponding delegate will be used. Patterns are sorted
+ * starting with the most specific, and the first match succeeds.
  * 
- * @see PrefixMatchingCompositeLineTokenizer
+ * @see PatternMatchingCompositeLineTokenizer
  * 
  * @author Dan Garrette
+ * @author Dave Syer
  * @since 2.0
  */
-public class PrefixMatchingCompositeLineMapper<T> implements LineMapper<T>, InitializingBean {
+public class PatternMatchingCompositeLineMapper<T> implements LineMapper<T>, InitializingBean {
 
-	private PrefixMatchingCompositeLineTokenizer tokenizer = new PrefixMatchingCompositeLineTokenizer();
+	private PatternMatchingCompositeLineTokenizer tokenizer = new PatternMatchingCompositeLineTokenizer();
 
 	private PatternMatcher<FieldSetMapper<T>> patternMatcher;
 
@@ -77,14 +77,6 @@ public class PrefixMatchingCompositeLineMapper<T> implements LineMapper<T>, Init
 
 	public void setFieldSetMappers(Map<String, FieldSetMapper<T>> fieldSetMappers) {
 		Assert.isTrue(!fieldSetMappers.isEmpty(), "The 'fieldSetMappers' property must be non-empty");
-		LinkedHashMap<String, FieldSetMapper<T>> map = new LinkedHashMap<String, FieldSetMapper<T>>();
-		for (String key : fieldSetMappers.keySet()) {
-			FieldSetMapper<T> value = fieldSetMappers.get(key);
-			if (!key.endsWith("*")) {
-				key = key + "*";
-			}
-			map.put(key, value);
-		}
-		this.patternMatcher = new PatternMatcher<FieldSetMapper<T>>(map);
+		this.patternMatcher = new PatternMatcher<FieldSetMapper<T>>(fieldSetMappers);
 	}
 }

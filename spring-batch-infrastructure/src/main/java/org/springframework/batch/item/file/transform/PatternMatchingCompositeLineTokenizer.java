@@ -16,7 +16,6 @@
 
 package org.springframework.batch.item.file.transform;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.batch.support.PatternMatcher;
@@ -25,17 +24,17 @@ import org.springframework.util.Assert;
 
 /**
  * A {@link LineTokenizer} implementation that stores a mapping of String
- * prefixes to delegate {@link LineTokenizer}s. Each line tokenizied will be
- * checked for its prefix. If the prefix matches a key in the map of delegates,
- * then the corresponding delegate {@link LineTokenizer} will be used. Prefixes
- * are sorted starting with the most specific, and the first match always
- * succeeds.
+ * patterns to delegate {@link LineTokenizer}s. Each line tokenizied will be
+ * checked to see if it matches a pattern. If the line matches a key in the map
+ * of delegates, then the corresponding delegate {@link LineTokenizer} will be
+ * used. Patterns are sorted starting with the most specific, and the first
+ * match succeeds.
  * 
  * @author Ben Hale
  * @author Dan Garrette
  * @author Dave Syer
  */
-public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
+public class PatternMatchingCompositeLineTokenizer implements LineTokenizer, InitializingBean {
 
 	private PatternMatcher<LineTokenizer> tokenizers = null;
 
@@ -62,14 +61,6 @@ public class PrefixMatchingCompositeLineTokenizer implements LineTokenizer, Init
 
 	public void setTokenizers(Map<String, LineTokenizer> tokenizers) {
 		Assert.isTrue(!tokenizers.isEmpty(), "The 'tokenizers' property must be non-empty");
-		LinkedHashMap<String, LineTokenizer> map = new LinkedHashMap<String, LineTokenizer>();
-		for (String key : tokenizers.keySet()) {
-			LineTokenizer value = tokenizers.get(key);
-			if (!key.endsWith("*")) {
-				key = key + "*";
-			}
-			map.put(key, value);
-		}
-		this.tokenizers = new PatternMatcher<LineTokenizer>(map);
+		this.tokenizers = new PatternMatcher<LineTokenizer>(tokenizers);
 	}
 }
