@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.database.support;
+package org.springframework.batch.item.database;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.springframework.batch.item.database.JdbcParameterUtils;
 
 import java.util.List;
 import java.util.ArrayList;
