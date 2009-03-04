@@ -26,13 +26,13 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
+import org.springframework.batch.support.transaction.FlushFailedException;
 import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;

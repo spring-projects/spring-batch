@@ -21,8 +21,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.support.transaction.FlushFailedException;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.beans.factory.InitializingBean;
 

@@ -19,9 +19,9 @@ package org.springframework.batch.sample.domain.football.internal;
 import java.util.List;
 
 import org.springframework.batch.item.ClearFailedException;
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
+import org.springframework.batch.support.transaction.FlushFailedException;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 

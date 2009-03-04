@@ -18,7 +18,6 @@ package org.springframework.batch.support.transaction;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.springframework.batch.item.FlushFailedException;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
