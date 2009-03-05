@@ -131,4 +131,91 @@
 
 </programlisting>
   </section>
+
+  <section>
+    <title>Mocking Domain Objects</title>
+
+    <para>Another common issue encountered while writing unit and integration
+    tests for Spring Batch components is how to mock domain objects. A good
+    example is a <classname>StepExecutionListener</classname>, as illustrated
+    below: </para>
+
+    <programlisting>
+  public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+
+    public ExitStatus afterStep(StepExecution stepExecution) {  
+      if (stepExecution.getReadCount() == 0) {
+        throw new NoWorkFoundException("Step has not processed any items");
+      }
+      return stepExecution.getExitStatus();
+    }
+  }
+
+</programlisting>
+
+    <para>The above listener is provided by the framework and checks a
+    <classname>StepExecution</classname> for an empty read count, thus
+    signifying that no work was done. While this example is fairly simple, it
+    serves to illustrate the types of problems that may be encountered when
+    attempting to unit test classes that implement interfaces requiring Spring
+    Batch domain objects. Consider the above listener's unit test:</para>
+
+    <programlisting>    
+    private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+
+    @Test
+    public void testAfterStep() {
+        <emphasis role="bold">StepExecution stepExecution = new StepExecution("NoProcessingStep",
+                new JobExecution(
+                new JobInstance(1L, new JobParameters(), "NoProcessingJob")));</emphasis>
+
+        stepExecution.setReadCount(0);
+
+        try {
+            tested.afterStep(stepExecution);
+            fail();
+        } catch (NoWorkFoundException e) {
+           assertEquals("Step has not processed any items", e.getMessage());
+        }
+    }
+
+</programlisting>
+
+    <para>Because the Spring Batch domain model follows good object orientated
+    principles, the StepExecution requires a
+    <classname>JobExecution</classname>, which requires a
+    <classname>JobInstance</classname> and
+    <classname>JobParameters</classname> in order to create a valid
+    <classname>StepExecution</classname>. While this is good in a solid domain
+    model, it does make creating stub objects for unit testing verbose. To
+    address this issue, the Spring Batch test module includes a factory for
+    creating domain objects: <classname>MetaDataInstanceFactory</classname>.
+    Given this factory, the unit test can be updated to be more concise:
+    </para>
+
+    <programlisting>    
+    private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+
+    @Test
+    public void testAfterStep() {
+        <emphasis role="bold">StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();</emphasis>
+
+        stepExecution.setReadCount(0);
+
+        try {
+            tested.afterStep(stepExecution);
+            fail();
+        } catch (NoWorkFoundException e) {
+           assertEquals("Step has not processed any items", e.getMessage());
+        }
+    }
+
+</programlisting>
+
+    <para>The above method for creating a simple
+    <classname>StepExecution</classname> is just one convenience method
+    available within the factory. A full method listing can be found in its
+    <ulink
+    url="http://static.springframework.org/spring-batch/apidocs/org/springframework/batch/test/MetaDataInstanceFactory.html">Javadoc</ulink>.</para>
+  </section>
 </chapter>
