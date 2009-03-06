@@ -38,7 +38,8 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
  * 
  * Additionally, an optional list of statuses can be set to indicate for which
  * exit status codes the promotion should occur. These statuses will be checked
- * using the {@link PatternMatcher}, so wildcards are allowed.
+ * using the {@link PatternMatcher}, so wildcards are allowed. By default,
+ * promotion will only occur for steps with an exit code of "COMPLETED".
  * 
  * @author Dan Garrette
  * @since 2.0
@@ -57,15 +58,10 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 	 * stepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		if (statuses == null) {
-			this.performPromotion(stepExecution);
-		}
-		else {
-			String exitCode = stepExecution.getExitStatus().getExitCode();
-			for (String statusPattern : statuses) {
-				if (PatternMatcher.match(statusPattern, exitCode)) {
-					this.performPromotion(stepExecution);
-				}
+		String exitCode = stepExecution.getExitStatus().getExitCode();
+		for (String statusPattern : statuses) {
+			if (PatternMatcher.match(statusPattern, exitCode)) {
+				this.performPromotion(stepExecution);
 			}
 		}
 
@@ -89,7 +85,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 
 	/**
 	 * @param keys A list of keys corresponding to items in the {@link Step}
-	 * {@link ExecutionContext} that must be promoted.
+	 *            {@link ExecutionContext} that must be promoted.
 	 */
 	public void setKeys(String[] keys) {
 		this.keys = Arrays.asList(keys);
@@ -97,8 +93,8 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 
 	/**
 	 * @param statuses A list of statuses for which the promotion should occur.
-	 * Statuses can may contain wildcards recognizable by a
-	 * {@link PatternMatcher}.
+	 *            Statuses can may contain wildcards recognizable by a
+	 *            {@link PatternMatcher}.
 	 */
 	public void setStatuses(String[] statuses) {
 		this.statuses = Arrays.asList(statuses);
