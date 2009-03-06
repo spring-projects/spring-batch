@@ -57,17 +57,21 @@ public class LastModifiedResourceComparatorTests {
 	}
 
 	@Test
-	public void testCompareNewWithOldAfterCopy() throws IOException {
-		File temp1 = File.createTempFile(getClass().getSimpleName(), ".txt");
-		temp1.deleteOnExit();
-		File temp2 = File.createTempFile(getClass().getSimpleName(), ".txt");
-		temp2.deleteOnExit();
-		assertTrue(temp1.exists() && temp2.exists());
+	public void testCompareNewWithOldAfterCopy() throws Exception {
+		File temp1 = new File("target/temp1.txt");
+		File temp2 = new File("target/temp2.txt");
+		if (temp1.exists()) temp1.delete();
+		if (temp2.exists()) temp2.delete();
+		temp1.getParentFile().mkdirs();
+		temp2.createNewFile();
+		assertTrue(!temp1.exists() && temp2.exists());
+		// For Linux sleep here otherwise files show same
+		// modified date
+		Thread.sleep(1000);
 		// Need to explicitly ask not to preserve the last modified date when we
 		// copy...
 		FileUtils.copyFile(new File("pom.xml"), temp1, false);
-		// TODO: fails on Linux.  Remove this whole class?
-		// assertEquals(1, comparator.compare(new FileSystemResource(temp1), new FileSystemResource(temp2)));
+		assertEquals(1, comparator.compare(new FileSystemResource(temp1), new FileSystemResource(temp2)));
 	}
 
 }
