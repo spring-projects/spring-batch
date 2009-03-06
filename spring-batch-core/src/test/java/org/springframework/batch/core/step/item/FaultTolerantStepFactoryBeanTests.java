@@ -1,6 +1,8 @@
 package org.springframework.batch.core.step.item;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +33,6 @@ import org.springframework.batch.core.repository.support.MapJobRepositoryFactory
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
@@ -730,7 +731,7 @@ public class FaultTolerantStepFactoryBeanTests {
 			this.failures = failures;
 		}
 
-		public String read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
+		public String read() throws Exception, UnexpectedInputException, ParseException {
 			counter++;
 			if (counter >= items.length) {
 				logger.debug("Returning null at count=" + counter);

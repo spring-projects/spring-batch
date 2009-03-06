@@ -15,35 +15,43 @@
  */
 package org.springframework.batch.core.step;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.NoWorkFoundException;
 
 /**
  * Tests for {@link NoWorkFoundStepExecutionListener}.
  */
-public class NoWorkFoundStepExecutionListenerTests extends TestCase {
+public class NoWorkFoundStepExecutionListenerTests {
 
-    private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+	private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
-    /**
-     *  If item count is zero exception is thrown
-     */
-    public void testAfterStep() {
-        StepExecution stepExecution = new StepExecution("NoProcessingStep",
-                new JobExecution(
-                new JobInstance(1L, new JobParameters(), "NoProcessingJob")));
+	@Test
+	public void noWork() {
+		StepExecution stepExecution = new StepExecution("NoProcessingStep", new JobExecution(new JobInstance(1L,
+				new JobParameters(), "NoProcessingJob")));
 
-        stepExecution.setReadCount(0);
+		stepExecution.setExitStatus(ExitStatus.COMPLETED);
+		stepExecution.setReadCount(0);
 
-        try {
-            tested.afterStep(stepExecution);
-            fail();
-        } catch (NoWorkFoundException e) {
-           assertEquals("Step has not processed any items", e.getMessage());
-        }
-    }
+		ExitStatus exitStatus = tested.afterStep(stepExecution);
+		assertEquals(ExitStatus.FAILED.getExitCode(), exitStatus.getExitCode());
+	}
+
+	@Test
+	public void workDone() {
+		StepExecution stepExecution = new StepExecution("NoProcessingStep", new JobExecution(new JobInstance(1L,
+				new JobParameters(), "NoProcessingJob")));
+
+		stepExecution.setReadCount(1);
+
+		ExitStatus exitStatus = tested.afterStep(stepExecution);
+		assertNull(exitStatus);
+	}
 }

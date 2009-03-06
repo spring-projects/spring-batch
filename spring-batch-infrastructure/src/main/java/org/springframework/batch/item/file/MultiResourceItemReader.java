@@ -25,7 +25,6 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
-import org.springframework.batch.item.NoWorkFoundException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
@@ -81,7 +80,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	/**
 	 * Reads the next item, jumping to next resource if necessary.
 	 */
-	public T read() throws Exception, UnexpectedInputException, NoWorkFoundException, ParseException {
+	public T read() throws Exception, UnexpectedInputException, ParseException {
 
 		if (noInput) {
 			return null;
