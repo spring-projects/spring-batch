@@ -18,10 +18,8 @@ package org.springframework.batch.sample.domain.football.internal;
 
 import java.util.List;
 
-import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.football.Game;
-import org.springframework.batch.support.transaction.FlushFailedException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
@@ -54,12 +52,6 @@ public class JdbcGameDao extends SimpleJdbcDaoSupport implements ItemWriter<Game
 
 		}
 
-	}
-
-	public void clear() throws ClearFailedException {
-	}
-
-	public void flush() throws FlushFailedException {
 	}
 
 }

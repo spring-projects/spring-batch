@@ -18,12 +18,10 @@ package org.springframework.batch.sample.domain.football.internal;
 
 import java.util.List;
 
-import org.springframework.batch.item.ClearFailedException;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.sample.domain.football.PlayerSummary;
-import org.springframework.batch.support.transaction.FlushFailedException;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 
 public class JdbcPlayerSummaryDao extends SimpleJdbcDaoSupport implements ItemWriter<PlayerSummary> {
 
@@ -48,15 +46,6 @@ public class JdbcPlayerSummaryDao extends SimpleJdbcDaoSupport implements ItemWr
 
 		}
 
-	}
-
-	public void close() throws Exception {
-	}
-
-	public void clear() throws ClearFailedException {
-	}
-
-	public void flush() throws FlushFailedException {
 	}
 
 }

@@ -22,25 +22,25 @@ package org.springframework.batch.item;
  * @author Lucas Ward
  * @author Ben Hale
  */
-public class ClearFailedException extends ItemWriterException {
+public class WriteFailedException extends ItemWriterException {
 
 	/**
-	 * Create a new {@link ClearFailedException} based on a message and another
+	 * Create a new {@link WriteFailedException} based on a message and another
 	 * exception.
 	 * 
 	 * @param message the message for this exception
 	 * @param cause the other exception
 	 */
-	public ClearFailedException(String message, Throwable cause) {
+	public WriteFailedException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
 	/**
-	 * Create a new {@link ClearFailedException} based on a message.
+	 * Create a new {@link WriteFailedException} based on a message.
 	 * 
 	 * @param message the message for this exception
 	 */
-	public ClearFailedException(String message) {
+	public WriteFailedException(String message) {
 		super(message);
 	}
 

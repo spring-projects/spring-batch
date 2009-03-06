@@ -21,7 +21,7 @@ package org.springframework.batch.item;
  * 
  * @author Lucas Ward
  */
-public class WriterNotOpenException extends ItemReaderException {
+public class WriterNotOpenException extends ItemWriterException {
 
 	/**
 	 * Create a new {@link WriterNotOpenException} based on a message.

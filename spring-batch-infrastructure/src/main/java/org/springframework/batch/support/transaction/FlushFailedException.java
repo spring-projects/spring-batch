@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.support.transaction;
 
-import org.springframework.batch.item.ItemWriterException;
 
 /**
  * Unchecked exception indicating that an error has occurred while trying to flush a buffer.
@@ -23,7 +22,7 @@ import org.springframework.batch.item.ItemWriterException;
  * @author Lucas Ward
  * @author Ben Hale
  */
-public class FlushFailedException extends ItemWriterException {
+public class FlushFailedException extends RuntimeException {
 
 	/**
 	 * Create a new {@link FlushFailedException} based on a message and another exception.
