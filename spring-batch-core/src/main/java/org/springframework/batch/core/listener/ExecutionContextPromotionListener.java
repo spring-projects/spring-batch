@@ -62,6 +62,7 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 		for (String statusPattern : statuses) {
 			if (PatternMatcher.match(statusPattern, exitCode)) {
 				this.performPromotion(stepExecution);
+				break;
 			}
 		}
 
