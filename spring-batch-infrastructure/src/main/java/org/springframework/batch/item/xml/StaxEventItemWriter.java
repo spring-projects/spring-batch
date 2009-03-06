@@ -344,7 +344,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 	 * @param writer XML event writer
 	 * @throws XMLStreamException
 	 */
-	private void startDocument(XMLEventWriter writer) throws XMLStreamException {
+	protected void startDocument(XMLEventWriter writer) throws XMLStreamException {
 
 		XMLEventFactory factory = XMLEventFactory.newInstance();
 
