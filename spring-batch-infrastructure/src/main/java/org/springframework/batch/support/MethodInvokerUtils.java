@@ -41,7 +41,8 @@ public class MethodInvokerUtils {
 	 * @param object to be invoked
 	 * @param methodName of the method to be invoked
 	 * @param paramsRequired boolean indicating whether the parameters are
-	 * required, if false, a no args version of the method will be searched for.
+	 *            required, if false, a no args version of the method will be
+	 *            searched for.
 	 * @param paramTypes - parameter types of the method to search for.
 	 * @return MethodInvoker if the method is found, null if it is not.
 	 */
@@ -105,8 +106,9 @@ public class MethodInvokerUtils {
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 				if (annotation != null) {
-					Assert.isNull(annotatedMethod.get(), "found more than one method on target class [" + candidate
-							+ "] with the annotation type [" + candidate + "]");
+					Assert.isNull(annotatedMethod.get(), "found more than one method on target class ["
+							+ candidate.getClass().getSimpleName() + "] with the annotation type ["
+							+ annotationType.getSimpleName() + "].");
 					annotatedMethod.set(method);
 				}
 			}
