@@ -474,7 +474,7 @@
   </section>
 
   <section>
-    <title>Handling ItemReaders when no input is found</title>
+    <title>Handling Step completion when no input is found</title>
 
     <para>In many batch scenarios, finding no rows in a database or file to
     process is not exceptional. The <classname>Step</classname> is simply
