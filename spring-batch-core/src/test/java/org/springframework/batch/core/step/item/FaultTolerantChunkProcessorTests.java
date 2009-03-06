@@ -1,6 +1,7 @@
 package org.springframework.batch.core.step.item;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ import org.springframework.batch.retry.policy.NeverRetryPolicy;
 
 public class FaultTolerantChunkProcessorTests {
 
-	private BatchRetryTemplate batchRetryTemplate = new BatchRetryTemplate();
+	private BatchRetryTemplate batchRetryTemplate;
 
 	private List<String> list = new ArrayList<String>();
 
@@ -32,6 +33,7 @@ public class FaultTolerantChunkProcessorTests {
 
 	@Before
 	public void setUp() {
+		batchRetryTemplate = new BatchRetryTemplate();
 		processor = new FaultTolerantChunkProcessor<String, String>(new PassThroughItemProcessor<String>(),
 				new ItemWriter<String>() {
 					public void write(List<? extends String> items) throws Exception {
@@ -75,14 +77,14 @@ public class FaultTolerantChunkProcessorTests {
 		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
 		try {
 			processor.process(contribution, chunk);
-		}
-		catch (RuntimeException e) {
+			fail();
+		} catch (RuntimeException e) {
 			assertEquals("Planned failure!", e.getMessage());
 		}
 		try {
 			processor.process(contribution, chunk);
-		}
-		catch (RuntimeException e) {
+			fail();
+		} catch (RuntimeException e) {
 			assertEquals("Planned failure!", e.getMessage());
 		}
 		assertEquals(2, chunk.getItems().size());
@@ -94,4 +96,36 @@ public class FaultTolerantChunkProcessorTests {
 		assertEquals(2, after.size());
 	}
 
+	@Test
+	public void testAfterWriteAllPassedInRecovery() throws Exception {
+		Chunk<String> chunk = new Chunk<String>(Arrays.asList("foo", "bar"));
+		processor = new FaultTolerantChunkProcessor<String, String>(new PassThroughItemProcessor<String>(),
+				new ItemWriter<String>() {
+					public void write(List<? extends String> items) throws Exception {
+						// Fail is there is more than one item
+						if (items.size() > 1) {
+							throw new RuntimeException("Planned failure!");
+						}
+						list.addAll(items);
+					}
+				}, batchRetryTemplate);
+		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
+			@Override
+			public void afterWrite(List<? extends String> item) {
+				after.addAll(item);
+			}
+		}));
+		processor.setWriteSkipPolicy(new AlwaysSkipItemSkipPolicy());
+
+		try {
+			processor.process(contribution, chunk);
+			fail();
+		} catch (RuntimeException e) {
+			assertEquals("Planned failure!", e.getMessage());
+		}
+		processor.process(contribution, chunk);
+
+		assertEquals("[foo, bar]", list.toString());
+		assertEquals("[foo, bar]", after.toString());
+	}
 }

@@ -129,6 +129,16 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			throw e;
 		}
 	}
+	
+	/**
+	 * Call the listener's after write method.
+	 * 
+	 * @param items
+	 */
+	protected final void doAfterWrite(List<O> items)
+	{
+		listener.afterWrite(items);
+	}
 
 	protected void writeItems(List<O> items) throws Exception {
 		itemWriter.write(items);

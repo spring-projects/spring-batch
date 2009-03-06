@@ -173,6 +173,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 				}
 
+				doAfterWrite(outputs.getItems());
+				
 				return null;
 
 			}
