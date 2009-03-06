@@ -1,8 +1,7 @@
 package org.springframework.batch.core.listener;
 
-import static org.junit.Assert.*;
-
-import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
@@ -16,11 +15,17 @@ import org.springframework.util.Assert;
 public class ExecutionContextPromotionListenerTests {
 
 	private static final String key = "testKey";
+
 	private static final String value = "testValue";
+
 	private static final String key2 = "testKey2";
+
 	private static final String value2 = "testValue2";
+
 	private static final String status = "COMPLETED WITH SKIPS";
+
 	private static final String status2 = "FAILURE";
+
 	private static final String statusWildcard = "COMPL*SKIPS";
 
 	/**
@@ -43,7 +48,7 @@ public class ExecutionContextPromotionListenerTests {
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
 
-		listener.setKeys(Collections.singletonList(key));
+		listener.setKeys(new String[] { key });
 		listener.afterPropertiesSet();
 
 		listener.afterStep(stepExecution);
@@ -71,8 +76,8 @@ public class ExecutionContextPromotionListenerTests {
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
 
-		listener.setKeys(Collections.singletonList(key));
-		listener.setStatuses(Collections.singletonList(status));
+		listener.setKeys(new String[] { key });
+		listener.setStatuses(new String[] { status });
 		listener.afterPropertiesSet();
 
 		listener.afterStep(stepExecution);
@@ -100,8 +105,8 @@ public class ExecutionContextPromotionListenerTests {
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
 
-		listener.setKeys(Collections.singletonList(key));
-		listener.setStatuses(Collections.singletonList(status));
+		listener.setKeys(new String[] { key });
+		listener.setStatuses(new String[] { status });
 		listener.afterPropertiesSet();
 
 		listener.afterStep(stepExecution);
@@ -130,8 +135,8 @@ public class ExecutionContextPromotionListenerTests {
 		stepExecution.getExecutionContext().putString(key, value);
 		stepExecution.getExecutionContext().putString(key2, value2);
 
-		listener.setKeys(Collections.singletonList(key));
-		listener.setStatuses(Collections.singletonList(statusWildcard));
+		listener.setKeys(new String[] { key });
+		listener.setStatuses(new String[] { statusWildcard });
 		listener.afterPropertiesSet();
 
 		listener.afterStep(stepExecution);

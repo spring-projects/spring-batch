@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.listener;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,14 +45,16 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
  */
 public class ExecutionContextPromotionListener extends StepExecutionListenerSupport implements InitializingBean {
 
-	private List<String> keys = null;
+	private Collection<String> keys = null;
+
 	private List<String> statuses = Collections.singletonList(ExitStatus.COMPLETED.getExitCode());
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
-	 *      stepExecution)
+	 * @see
+	 * org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
+	 * stepExecution)
 	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
 		if (statuses == null) {
@@ -84,21 +88,19 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 	}
 
 	/**
-	 * @param keys
-	 *            A list of keys corresponding to items in the {@link Step}
-	 *            {@link ExecutionContext} that must be promoted.
+	 * @param keys A list of keys corresponding to items in the {@link Step}
+	 * {@link ExecutionContext} that must be promoted.
 	 */
-	public void setKeys(List<String> keys) {
-		this.keys = keys;
+	public void setKeys(String[] keys) {
+		this.keys = Arrays.asList(keys);
 	}
 
 	/**
-	 * @param statuses
-	 *            A list of statuses for which the promotion should occur.
-	 *            Statuses can may contain wildcards recognizable by the
-	 *            {@link PatternMatcher} class.
+	 * @param statuses A list of statuses for which the promotion should occur.
+	 * Statuses can may contain wildcards recognizable by a
+	 * {@link PatternMatcher}.
 	 */
-	public void setStatuses(List<String> statuses) {
-		this.statuses = statuses;
+	public void setStatuses(String[] statuses) {
+		this.statuses = Arrays.asList(statuses);
 	}
 }
