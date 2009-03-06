@@ -472,4 +472,41 @@
     &lt;property name="timeout" value="5000" /&gt;
   &lt;/bean&gt;</programlisting>
   </section>
+
+  <section>
+    <title>Handling ItemReaders when no input is found</title>
+
+    <para>In many batch scenarios, finding no rows in a database or file to
+    process is not exceptional. The <classname>Step</classname> is simply
+    considered to have found no work and completes with 0 items read. All of
+    the <classname>ItemReader</classname> implementations provided out of the
+    box in Spring Batch default to this approach. This can lead to some
+    confusion if nothing is written out even when input is present. (which
+    usually happens if a file was misnamed, etc) For this reason, the meta
+    data itself should be inspected to determine how much work the framework
+    found to be processed. However, what if finding no input is considered
+    exceptional? In this case, programmatically checking the meta data for no
+    items processed and causing failure is the best solution. Because this is
+    a common use case, a listener is provided with just this
+    functionality:</para>
+
+    <programlisting>
+  public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+
+    public ExitStatus afterStep(StepExecution stepExecution) {
+      if (stepExecution.getReadCount() == 0) {
+        throw new NoWorkFoundException("Step has not processed any items");
+      }
+      return stepExecution.getExitStatus();  
+    }
+  }
+
+</programlisting>
+
+    <para>The above <classname>StepExecutionListener</classname> inspects the
+    readCount property of the <classname>StepExecution</classname> during the
+    'afterStep' phase to determine if no items were read. If that is the case,
+    an exception is thrown, causing the <classname>Step</classname> to
+    fail.</para>
+  </section>
 </chapter>
