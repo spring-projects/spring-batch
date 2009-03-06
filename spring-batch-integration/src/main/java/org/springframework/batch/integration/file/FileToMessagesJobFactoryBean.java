@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Properties;
 
 import org.springframework.batch.core.Job;
@@ -33,9 +34,9 @@ import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
-import org.springframework.batch.integration.item.MessageChannelItemWriter;
 import org.springframework.batch.integration.launch.JobLaunchingMessageHandler;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.beans.factory.BeanNameAware;
@@ -47,6 +48,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageChannel;
+import org.springframework.integration.message.GenericMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.Assert;
 
@@ -56,8 +58,8 @@ import org.springframework.util.Assert;
  * ensure that failures propagate up to the step and fail the job execution.
  * Normally this job will be used in conjunction with a
  * {@link JobLaunchingMessageHandler} and a
- * {@link ResourcePayloadAsJobParameterStrategy}, so that the user can just
- * send a message to a request channel listing the files to be processed, and
+ * {@link ResourcePayloadAsJobParameterStrategy}, so that the user can just send
+ * a message to a request channel listing the files to be processed, and
  * everything else just happens by magic. After a failure the job will be
  * restarted just by sending it the same message.
  * 
@@ -79,7 +81,9 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
+	 * @see
+	 * org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang
+	 * .String)
 	 */
 	public void setBeanName(String name) {
 		this.name = name;
@@ -91,8 +95,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	 * case there is no need to set the resource property as it will be set by
 	 * this factory.
 	 * 
-	 * @param itemReader
-	 *            the itemReader to set
+	 * @param itemReader the itemReader to set
 	 */
 	@Required
 	public void setItemReader(ItemReader<? extends T> itemReader) {
@@ -103,8 +106,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	 * Public setter for the channel. Each item from the item reader will be
 	 * sent to this channel.
 	 * 
-	 * @param channel
-	 *            the channel to set
+	 * @param channel the channel to set
 	 */
 	@Required
 	public void setChannel(MessageChannel channel) {
@@ -114,8 +116,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	/**
 	 * Public setter for the {@link JobRepository}.
 	 * 
-	 * @param jobRepository
-	 *            the job repository to set
+	 * @param jobRepository the job repository to set
 	 */
 	@Required
 	public void setJobRepository(JobRepository jobRepository) {
@@ -125,8 +126,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 	/**
 	 * Public setter for the {@link PlatformTransactionManager}.
 	 * 
-	 * @param transactionManager
-	 *            the transaction manager to set
+	 * @param transactionManager the transaction manager to set
 	 */
 	@Required
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
@@ -160,8 +160,7 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 		Assert.notNull(channel, "A channel must be provided");
 		Assert.state(channel instanceof DirectChannel,
 				"The channel must be a DirectChannel (otherwise failures can not be recovered from)");
-		MessageChannelItemWriter<? super T> itemWriter = new MessageChannelItemWriter<T>();
-		itemWriter.setChannel(channel);
+		MessageChannelItemWriter<? super T> itemWriter = new MessageChannelItemWriter<T>(channel);
 		stepFactory.setItemWriter(itemWriter);
 
 		Assert.notNull(transactionManager, "A transaction manager must be provided");
@@ -331,8 +330,8 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 		 * translate {@link JobParameters} into {@link Properties}. Defaults to
 		 * a {@link DefaultJobParametersConverter}.
 		 * 
-		 * @param jobParametersConverter
-		 *            the {@link JobParametersConverter} to set
+		 * @param jobParametersConverter the {@link JobParametersConverter} to
+		 * set
 		 */
 		public void setJobParametersFactory(JobParametersConverter jobParametersConverter) {
 			this.jobParametersConverter = jobParametersConverter;
@@ -369,5 +368,22 @@ public class FileToMessagesJobFactoryBean<T> implements FactoryBean, BeanNameAwa
 					.getJobParameters());
 			delegate = resourceLoader.getResource(properties.getProperty(this.key));
 		}
+	}
+
+	private static class MessageChannelItemWriter<T> implements ItemWriter<T> {
+
+		private MessageChannel channel;
+
+		public MessageChannelItemWriter(MessageChannel channel) {
+			super();
+			this.channel = channel;
+		}
+
+		public void write(List<? extends T> items) throws Exception {
+			for (T item : items) {
+				channel.send(new GenericMessage<T>(item));
+			}
+		}
+
 	}
 }

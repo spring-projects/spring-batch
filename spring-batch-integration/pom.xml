@@ -9,6 +9,9 @@
 		<version>2.0.0.CI-SNAPSHOT</version>
 		<relativePath>../spring-batch-parent</relativePath>
 	</parent>
+	<properties>
+		<spring.integration.version>1.0.2.BUILD-SNAPSHOT</spring.integration.version>
+	</properties>
 	<profiles>
 		<profile>
 			<activation>
@@ -133,7 +136,4 @@
 			</artifactId>
 		</dependency>
 	</dependencies>
-	<properties>
-		<spring.integration.version>1.0.1.RELEASE</spring.integration.version>
-	</properties>
 </project>
