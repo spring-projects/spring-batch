@@ -395,21 +395,21 @@
 
     <para>To ensure that each line is tokenized properly, which is especially
     important for fixed length input, the
-    <classname>PrefixMatchingCompositeLineTokenizer</classname> can be used on
-    the delegate <classname>FlatFileItemReader</classname>. See <xref
+    <classname>PatternMatchingCompositeLineTokenizer</classname> can be used
+    on the delegate <classname>FlatFileItemReader</classname>. See <xref
     linkend="prefixMatchingLineMapper" /> for more details. The delegate
     reader will then use a <classname>PassThroughFieldSetMapper</classname> to
     deliver a <classname>FieldSet</classname> for each line back to the
     wrapping <classname>ItemReader</classname>.</para>
 
     <programlisting>  &lt;bean id="orderFileTokenizer"
-        class="org.springframework.batch.io.file.transform.PrefixMatchingCompositeLineTokenizer"&gt;
+        class="org.springframework.batch.io.file.transform.PatternMatchingCompositeLineTokenizer"&gt;
     &lt;property name="tokenizers"&gt;
       &lt;map&gt;
-        &lt;entry key="HEA" value-ref="headerRecordTokenizer" /&gt;
-        &lt;entry key="FOT" value-ref="footerRecordTokenizer" /&gt;
-        &lt;entry key="NCU" value-ref="customerLineTokenizer" /&gt;
-        &lt;entry key="BAD" value-ref="billingAddressLineTokenizer" /&gt;
+        &lt;entry key="HEA*" value-ref="headerRecordTokenizer" /&gt;
+        &lt;entry key="FOT*" value-ref="footerRecordTokenizer" /&gt;
+        &lt;entry key="NCU*" value-ref="customerLineTokenizer" /&gt;
+        &lt;entry key="BAD*" value-ref="billingAddressLineTokenizer" /&gt;
       &lt;/map&gt;
     &lt;/property&gt;
   &lt;/bean&gt;</programlisting>

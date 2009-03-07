@@ -636,10 +636,10 @@
           </listitem>
 
           <listitem>
-            <para><classname>PrefixMatchingCompositeLineTokenizer</classname>
+            <para><classname>PatternMatchingCompositeLineTokenizer</classname>
             - Determines which among a list of
             <classname>LineTokenizer</classname>s should be used on a
-            particular line by checking against a prefix.</para>
+            particular line by checking against a pattern.</para>
           </listitem>
         </itemizedlist>
       </section>
@@ -995,25 +995,25 @@
         <classname>LineTokenizer</classname> and
         <classname>FieldSetMapper</classname> objects so that the
         <classname>ItemWriter</classname> will recieve the correct items. The
-        <classname>PrefixMatchingCompositeLineMapper</classname> makes this
-        easy by allowing maps of prefixes to
-        <classname>LineTokenizer</classname>s and prefixes to
+        <classname>PatternMatchingCompositeLineMapper</classname> makes this
+        easy by allowing maps of patterns to
+        <classname>LineTokenizer</classname>s and patterns to
         <classname>FieldSetMapper</classname>s to be configured:</para>
 
         <programlisting>  
   &lt;bean id="orderFileLineMapper"
-        class="org.springframework.batch.item.file.mapping.PrefixMatchingCompositeLineMapper"&gt;
+        class="org.springframework.batch.item.file.mapping.PatternMatchingCompositeLineMapper"&gt;
     &lt;property name="tokenizers"&gt;
       &lt;map&gt;
-        &lt;entry key="USER" value-ref="userTokenizer" /&gt;
-        &lt;entry key="LINEA" value-ref="lineATokenizer" /&gt;
-        &lt;entry key="LINEB" value-ref="lineBTokenizer" /&gt;
+        &lt;entry key="USER*" value-ref="userTokenizer" /&gt;
+        &lt;entry key="LINEA*" value-ref="lineATokenizer" /&gt;
+        &lt;entry key="LINEB*" value-ref="lineBTokenizer" /&gt;
       &lt;/map&gt;
     &lt;/property&gt;
     &lt;property name="fieldSetMappers"&gt;
       &lt;map&gt;
-        &lt;entry key="USER" value-ref="userFieldSetMapper" /&gt;
-        &lt;entry key="LINE" value-ref="lineFieldSetMapper" /&gt;
+        &lt;entry key="USER*" value-ref="userFieldSetMapper" /&gt;
+        &lt;entry key="LINE*" value-ref="lineFieldSetMapper" /&gt;
       &lt;/map&gt;
     &lt;/property&gt;
   &lt;/bean&gt;
@@ -1024,23 +1024,29 @@
         <classname>LineTokenizer</classname>s but they both use the same
         <classname>FieldSetMapper</classname>.</para>
 
-        <para>The <classname>PrefixMatchingCompositeLineMapper</classname>
+        <para>The <classname>PatternMatchingCompositeLineMapper</classname>
         makes use of the <classname>PatternMatcher</classname>'s
-        <classname>matchPattern</classname> method in order to select the
-        correct delegate for each line. The pattern will always match the most
-        specific pattern possible, regardless of the order in the
-        configuration. So if "LINE" and "LINEA" were both listed as prefixes,
-        "LINEA" would match prefix "LINEA", while "LINEB" would match prefix
-        "LINE". Additionally, the empty string ("") can serve as a default
-        prefix by matching any line not matched by any other prefix.</para>
+        <classname>match</classname> method in order to select the correct
+        delegate for each line. The <classname>PatternMatcher</classname>
+        allows for two wildcard characters with special meaning: the question
+        mark ("?") will match exactly one character, while the asterisk ("*")
+        will match zero or more characters. Note that in the configuration
+        above, all paterns end with an asterisk, making them effectively
+        prefixes to lines. The <classname>PatternMatcher</classname> will
+        always match the most specific pattern possible, regardless of the
+        order in the configuration. So if "LINE*" and "LINEA*" were both
+        listed as patterns, "LINEA" would match pattern "LINEA*", while
+        "LINEB" would match pattern "LINE*". Additionally, a single asterisk
+        ("*") can serve as a default by matching any line not matched by any
+        other pattern.</para>
 
         <programlisting>
- &lt;entry key="" value-ref="defaultLineTokenizer" /&gt;
+ &lt;entry key="*" value-ref="defaultLineTokenizer" /&gt;
 
 </programlisting>
 
         <para>There is also a
-        <classname>PrefixMatchingCompositeLineTokenizer</classname> that can
+        <classname>PatternMatchingCompositeLineTokenizer</classname> that can
         be used for tokenization alone.</para>
 
         <para>It is also common for a flat file to contain records that each
@@ -1520,9 +1526,8 @@
 
     <para><mediaobject>
         <imageobject role="fo">
-          <imagedata align="center"
-                     fileref="images/xmlinput.png"
-                     scale="80" format="PNG" width="40%" />
+          <imagedata align="center" fileref="images/xmlinput.png" format="PNG"
+                     scale="80" width="40%" />
         </imageobject>
 
         <imageobject role="html">
@@ -1547,9 +1552,8 @@
 
     <para><mediaobject>
         <imageobject role="fo">
-          <imagedata align="center"
-                     fileref="images/oxm-fragments.png"
-                     scale="80" format="PNG" width="40%" />
+          <imagedata align="center" fileref="images/oxm-fragments.png"
+                     format="PNG" scale="80" width="40%" />
         </imageobject>
 
         <imageobject role="html">
@@ -1858,12 +1862,11 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/cursorExample.png"
-                     scale="60"/>
+                     scale="60" />
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center"
-                     fileref="images/cursorExample.png"
+          <imagedata align="center" fileref="images/cursorExample.png"
                      scale="60" />
         </imageobject>
       </mediaobject>
@@ -2223,9 +2226,9 @@
 
         <para>This configured <classname>ItemReader</classname> will return
         <classname>CustomerCredit</classname> objects using the
-        <classname>RowMapper</classname> that must be specified.
-        The 'pageSize' property determines the number of entities read from
-        the database for each query execution.</para>
+        <classname>RowMapper</classname> that must be specified. The
+        'pageSize' property determines the number of entities read from the
+        database for each query execution.</para>
 
         <para>The 'parameterValues' property can be used to specify a Map of
         parameter values for the query. If you use named parameters in the
@@ -2354,8 +2357,8 @@
           </imageobject>
 
           <imageobject role="fo">
-            <imagedata align="center"
-                       scale="80" fileref="images/errorOnFlush.png" />
+            <imagedata align="center" fileref="images/errorOnFlush.png"
+                       scale="80" />
           </imageobject>
         </mediaobject>If items are buffered before being written out, any
       errors encountered will not be thrown until the buffer is flushed just
@@ -2380,8 +2383,7 @@
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center"
-                     fileref="images/errorOnWrite.jpg" 
+          <imagedata align="center" fileref="images/errorOnWrite.jpg"
                      scale="80" />
         </imageobject>
       </mediaobject>
