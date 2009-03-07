@@ -493,12 +493,11 @@
     <programlisting>
   public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
-    public ExitStatus afterStep(StepExecution stepExecution) {
-      if (stepExecution.getReadCount() == 0) {
-        throw new NoWorkFoundException("Step has not processed any items");
-      }
-      return stepExecution.getExitStatus();  
+  public ExitStatus afterStep(StepExecution stepExecution) {
+    if (stepExecution.getReadCount() == 0) {
+      return ExitStatus.FAILED;
     }
+    return null;
   }
 
 </programlisting>
@@ -506,7 +505,9 @@
     <para>The above <classname>StepExecutionListener</classname> inspects the
     readCount property of the <classname>StepExecution</classname> during the
     'afterStep' phase to determine if no items were read. If that is the case,
-    an exception is thrown, causing the <classname>Step</classname> to
-    fail.</para>
+    an exit code of FAILED is returned, indicating that the
+    <classname>Step</classname> should fail. Otherwise, null is returned,
+    which will not affect the status of the
+    <classname>Step</classname>.</para>
   </section>
 </chapter>
