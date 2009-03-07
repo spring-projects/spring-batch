@@ -14,7 +14,7 @@
 
 	<job id="skipJob" incrementer="incrementer">
 		<step id="step1" ref="firstPass">
-			<end on="FAILED" exit-code="FAILED"/>
+			<fail on="FAILED" exit-code="FAILED"/>
 			<next on="COMPLETED WITH SKIPS" to="errorPrint1" />
 			<next on="*" to="step2" />
 		</step>
