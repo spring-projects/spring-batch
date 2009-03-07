@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
@@ -17,9 +16,21 @@
 
 	<bean id="proxied" class="org.springframework.batch.core.scope.TestStep">
 		<property name="collaborator">
-			<bean class="org.springframework.batch.core.scope.TestCollaborator"
-				scope="step">
+			<bean class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
 				<property name="name" value="bar" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="nested" class="org.springframework.batch.core.scope.TestStep">
+		<property name="collaborator">
+			<bean class="org.springframework.batch.core.scope.TestCollaborator">
+				<property name="name" value="foo" />
+				<property name="parent">
+					<bean class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
+						<property name="name" value="bar" />
+					</bean>
+				</property>
 			</bean>
 		</property>
 	</bean>
@@ -32,8 +43,7 @@
 		<property name="collaborator" ref="collaborator" />
 	</bean>
 
-	<bean id="collaborator" class="org.springframework.batch.core.scope.TestCollaborator"
-		scope="step">
+	<bean id="collaborator" class="org.springframework.batch.core.scope.TestCollaborator" scope="step">
 		<property name="name" value="bar" />
 	</bean>
 

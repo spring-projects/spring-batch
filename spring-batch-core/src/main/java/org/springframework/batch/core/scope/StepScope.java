@@ -273,6 +273,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				BeanDefinition definition = (BeanDefinition) value;
 				if (scope.equals(definition.getScope())) {
 					String beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
+					// Exit here so that nested inner bean definitions are not analysed
 					return createScopedProxy(beanName, definition, registry, proxyTargetClass);
 				}
 			}
@@ -280,9 +281,11 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				BeanDefinitionHolder holder = (BeanDefinitionHolder) value;
 				BeanDefinition definition = holder.getBeanDefinition();
 				if (scope.equals(definition.getScope())) {
+					// Exit here so that nested inner bean definitions are not analysed
 					return createScopedProxy(holder.getBeanName(), definition, registry, proxyTargetClass);
 				}
 			}
+			// Nested inner bean definitions are recursively analysed here
 			value = super.resolveValue(value);
 			return value;
 		}
