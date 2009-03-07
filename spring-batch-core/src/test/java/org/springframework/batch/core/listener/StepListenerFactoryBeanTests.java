@@ -20,8 +20,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_CHUNK;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
+import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,7 @@ import org.springframework.batch.core.annotation.BeforeWrite;
 import org.springframework.batch.core.annotation.OnProcessError;
 import org.springframework.batch.core.annotation.OnReadError;
 import org.springframework.batch.core.annotation.OnWriteError;
+import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
 import org.springframework.util.Assert;
 
 /**
@@ -189,6 +192,109 @@ public class StepListenerFactoryBeanTests {
 		assertTrue(listener instanceof StepListener);
 	}
 	
+	@Test
+	public void testEmptySignatureAnnotation() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterWrite
+			public void aMethod() {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		@SuppressWarnings("unchecked")
+		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
+		listener.afterWrite(Arrays.asList("foo", "bar"));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test
+	public void testRightSignatureAnnotation() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterWrite
+			public void aMethod(List<String> items) {
+				executed = true;
+				assertEquals("foo", items.get(0));
+				assertEquals("bar", items.get(1));
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		@SuppressWarnings("unchecked")
+		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
+		listener.afterWrite(Arrays.asList("foo", "bar"));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testWrongSignatureAnnotation() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterWrite
+			public void aMethod(Integer item) {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		factoryBean.getObject();
+	}
+
+	@Test
+	public void testEmptySignatureNamedMethod() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterWrite
+			public void aMethod() {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		Map<String, String> metaDataMap = new HashMap<String, String>();
+		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
+		factoryBean.setMetaDataMap(metaDataMap);
+		@SuppressWarnings("unchecked")
+		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
+		listener.afterWrite(Arrays.asList("foo", "bar"));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test
+	public void testRightSignatureNamedMethod() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterWrite
+			public void aMethod(List<String> items) {
+				executed = true;
+				assertEquals("foo", items.get(0));
+				assertEquals("bar", items.get(1));
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		Map<String, String> metaDataMap = new HashMap<String, String>();
+		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
+		factoryBean.setMetaDataMap(metaDataMap);
+		@SuppressWarnings("unchecked")
+		ItemWriteListener<String> listener = (ItemWriteListener<String>) factoryBean.getObject();
+		listener.afterWrite(Arrays.asList("foo", "bar"));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testWrongSignatureNamedMethod() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterWrite
+			public void aMethod(Integer item) {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		Map<String, String> metaDataMap = new HashMap<String, String>();
+		metaDataMap.put(AFTER_WRITE.getPropertyName(), "aMethod");
+		factoryBean.setMetaDataMap(metaDataMap);
+		factoryBean.getObject();
+	}
+
 	private class MultipleAfterStep implements StepExecutionListener {
 
 		int callcount = 0;

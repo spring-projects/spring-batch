@@ -50,18 +50,34 @@ public class MethodInvokerUtils {
 			Class<?>... paramTypes) {
 		Assert.notNull(object, "Object to invoke must not be null");
 		Method method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
-		// if no method was found for the given parameters, and the parameters
-		// aren't required
-		if (method == null && !paramsRequired) {
-			// try with no params
-			method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, new Class[] {});
-		}
 		if (method == null) {
-			return null;
+			String errorMsg = "no method found with name [" + methodName + "] on class ["
+					+ object.getClass().getSimpleName() + "] compatable with the signature ["
+					+ getParamTypesString(paramTypes) + "].";
+			Assert.isTrue(!paramsRequired, errorMsg);
+			// if no method was found for the given parameters, and the
+			// parameters aren't required, then try with no params
+			method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, new Class[] {});
+			Assert.notNull(method, errorMsg);
 		}
-		else {
-			return new SimpleMethodInvoker(object, method);
+		return new SimpleMethodInvoker(object, method);
+	}
+
+	/**
+	 * Create a String representation of the array of parameter types.
+	 * 
+	 * @param paramTypes
+	 * @return String
+	 */
+	public static String getParamTypesString(Class<?>... paramTypes) {
+		StringBuffer paramTypesList = new StringBuffer("(");
+		for (int i = 0; i < paramTypes.length; i++) {
+			paramTypesList.append(paramTypes[i].getSimpleName());
+			if (i + 1 < paramTypes.length) {
+				paramTypesList.append(", ");
+			}
 		}
+		return paramTypesList.append(")").toString();
 	}
 
 	/**

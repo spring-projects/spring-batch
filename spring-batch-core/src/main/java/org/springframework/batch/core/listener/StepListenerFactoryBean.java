@@ -15,9 +15,11 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerByAnnotation;
 import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
+import static org.springframework.batch.support.MethodInvokerUtils.getParamTypesString;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,13 +33,15 @@ import org.springframework.batch.support.MethodInvoker;
 import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * {@link FactoryBean} implementation that builds a {@link StepListener} based
  * on the various lifecycle methods or annotations that are provided. There are
  * three possible ways of having a method called as part of a
- * {@link StepListener} lifecyle:
+ * {@link StepListener} lifecycle:
  * 
  * <ul>
  * <li>Interface implementation: By implementing any of the subclasses of
@@ -86,12 +90,12 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 		// For every entry in the map, try and find a method by interface, name,
 		// or annotation. If the same
 		for (Entry<String, String> entry : metaDataMap.entrySet()) {
-			StepListenerMetaData metaData = StepListenerMetaData.fromPropertyName(entry.getKey());
+			final StepListenerMetaData metaData = StepListenerMetaData.fromPropertyName(entry.getKey());
 			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
 			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
 			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(),
 					delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate));
+			invokers.add(getMethodInvokerByAnnotation(metaData, metaData.getAnnotation()));
 			if (!invokers.isEmpty()) {
 				invokerMap.put(metaData.getMethodName(), invokers);
 				listenerInterfaces.add(metaData.getListenerInterface());
@@ -108,6 +112,43 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 		proxyFactory.setInterfaces(listenerInterfaces.toArray(new Class[0]));
 		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap)));
 		return proxyFactory.getProxy();
+	}
+
+	/**
+	 * Create a MethodInvoker from the delegate based on the annotationType.
+	 * Ensure that the annotated method has a valid set of parameters.
+	 * 
+	 * @param metaData
+	 * @param annotationType
+	 * @return
+	 */
+	private MethodInvoker getMethodInvokerByAnnotation(final StepListenerMetaData metaData,
+			final Class<? extends Annotation> annotationType) {
+		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, delegate);
+		if (mi != null) {
+			ReflectionUtils.doWithMethods(delegate.getClass(), new ReflectionUtils.MethodCallback() {
+				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+					Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
+					if (annotation != null) {
+						Class<?>[] paramTypes = method.getParameterTypes();
+						if (paramTypes.length > 0) {
+							Class<?>[] expectedParamTypes = metaData.getParamTypes();
+
+							String errorMsg = "The method [" + method.getName() + "] on target class ["
+									+ delegate.getClass().getSimpleName() + "] is incompatable with the signature ["
+									+ getParamTypesString(expectedParamTypes) + "] expected for the annotation ["
+									+ metaData.getAnnotation().getSimpleName() + "].";
+
+							Assert.isTrue(paramTypes.length == expectedParamTypes.length, errorMsg);
+							for (int i = 0; i < paramTypes.length; i++) {
+								Assert.isTrue(paramTypes[i].equals(expectedParamTypes[i]), errorMsg);
+							}
+						}
+					}
+				}
+			});
+		}
+		return mi;
 	}
 
 	private MethodInvoker getMethodInvokerByName(String methodName, Object candidate, Class<?>... params) {
@@ -139,6 +180,7 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 	/**
 	 * Convenience method to wrap any object and expose the appropriate
 	 * {@link StepListener} interfaces.
+	 * 
 	 * @param delegate a delegate object
 	 * @return a StepListener instance constructed from the delegate
 	 */
@@ -151,16 +193,18 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 	/**
 	 * Convenience method to check whether the given object is or can be made
 	 * into a {@link StepListener}.
+	 * 
 	 * @param delegate the object to check
 	 * @return true if the delegate is an instance of any of the
-	 * {@link StepListener} interfaces, or contains the marker annotations
+	 *         {@link StepListener} interfaces, or contains the marker
+	 *         annotations
 	 */
 	public static boolean isListener(Object delegate) {
 		if (delegate instanceof StepListener) {
 			return true;
 		}
 		for (StepListenerMetaData metaData : StepListenerMetaData.values()) {
-			if (getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate) != null) {
+			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate) != null) {
 				return true;
 			}
 		}
