@@ -353,7 +353,7 @@
       The major differences between platforms are mainly accounted for
       by the strategy for incrementing primary keys, so often it might
       be necessary to override
-      the <literal>incrementerFactory</literal> as well (using one fo
+      the <literal>incrementerFactory</literal> as well (using one of
       the standard implementations from the Spring Framework).</para>
 
       <para>If even that doesn't work, or you are not using an RDBMS,
