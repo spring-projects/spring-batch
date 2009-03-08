@@ -320,6 +320,48 @@
 
       <programlisting>  &lt;bean id="jobRepository" 
         class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
+
+      <para>Note that the in-memory repository is volatile and so does
+      not allow restart between JVM instances.  It also cannot
+      guarantee that two job instances with the same parameters are
+      launched simultaneously.  So use the database version of the
+      repository wherever you need quality of service.</para>
+
+    </section>
+
+    <section>
+      <title>Non-standard Database Types in a Repository</title>
+
+      <para>If you are using a database platform that is not in the
+      list of supported platforms, you may be able to use one of the
+      supported types, if the SQL variant is close enough.  To do this
+      you can use the
+      raw <classname>JobRepositoryFactoryBean</classname> instead of
+      the namespace shortcut and use it to set the database type to
+      the closest match:</para>
+
+      <programlisting><![CDATA[
+<bean id="jobRepository" class="org...JobRepositoryFactoryBean">
+  <property name="databaseType" value="db2"/>
+  <property name="dataSource" ref="dataSource"/>
+</bean>
+]]></programlisting>
+
+      <para>(The <classname>JobRepositoryFactoryBean</classname> tries
+      to auto-detect the database type from
+      the <classname>DataSource</classname> if it is not specified.)
+      The major differences between platforms are mainly accounted for
+      by the strategy for incrementing primary keys, so often it might
+      be necessary to override
+      the <literal>incrementerFactory</literal> as well (using one fo
+      the standard implementations from the Spring Framework).</para>
+
+      <para>If even that doesn't work, or you are not using an RDBMS,
+      then the only option may be to implement the
+      various <classname>Dao</classname> interfaces that
+      the <classname>SimpleJobRepository</classname> depends on and
+      wire one up manually in the normal Spring way.</para>
+
     </section>
   </section>
 
