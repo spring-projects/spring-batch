@@ -157,7 +157,6 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 					try {
 						writeItems(Collections.singletonList(item));
-						contribution.incrementWriteCount(1);
 					}
 					catch (Exception e) {
 						checkSkipPolicy(inputIterator, outputIterator, e, contribution);
@@ -174,7 +173,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				}
 
 				doAfterWrite(outputs.getItems());
-				
+				contribution.incrementWriteCount(outputs.size());				
 				return null;
 
 			}

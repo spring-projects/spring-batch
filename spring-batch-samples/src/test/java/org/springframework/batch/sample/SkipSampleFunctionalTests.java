@@ -134,7 +134,7 @@ public class SkipSampleFunctionalTests {
 		Map<String, Object> execution1 = this.getJobExecution(id1);
 		assertEquals("COMPLETED", execution1.get("STATUS"));
 
-		this.validateLaunchWithSkips();
+		this.validateLaunchWithSkips(id1);
 
 		//
 		// Clear the data
@@ -148,7 +148,7 @@ public class SkipSampleFunctionalTests {
 		Map<String, Object> execution2 = this.getJobExecution(id2);
 		assertEquals("COMPLETED", execution2.get("STATUS"));
 
-		this.validateLaunchWithoutSkips();
+		this.validateLaunchWithoutSkips(id2);
 
 		//
 		// Make sure that the launches were separate executions and separate
@@ -158,7 +158,7 @@ public class SkipSampleFunctionalTests {
 		assertTrue(!execution1.get("JOB_INSTANCE_ID").equals(execution2.get("JOB_INSTANCE_ID")));
 	}
 
-	private void validateLaunchWithSkips() {
+	private void validateLaunchWithSkips(long jobExecutionId) {
 		// Step1: 9 input records, 1 skipped in process, 1 skipped in write =>
 		// 7 written to output
 		assertEquals(7, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "TRADE"));
@@ -175,9 +175,14 @@ public class SkipSampleFunctionalTests {
 		}
 
 		assertEquals(new BigDecimal("340.45"), tradeWriter.getTotalPrice());
+
+		Map<String, Object> step1Execution = this.getStepExecution(jobExecutionId, "step1");
+		assertEquals(new Long(3), step1Execution.get("COMMIT_COUNT"));
+		assertEquals(new Long(8), step1Execution.get("READ_COUNT"));
+		assertEquals(new Long(7), step1Execution.get("WRITE_COUNT"));
 	}
 
-	private void validateLaunchWithoutSkips() {
+	private void validateLaunchWithoutSkips(long jobExecutionId) {
 		// Step1: 5 input records => 5 written to output
 		assertEquals(5, SimpleJdbcTestUtils.countRowsInTable(simpleJdbcTemplate, "TRADE"));
 
@@ -193,6 +198,17 @@ public class SkipSampleFunctionalTests {
 	private Map<String, Object> getJobExecution(long jobExecutionId) {
 		return simpleJdbcTemplate.queryForMap("SELECT * from BATCH_JOB_EXECUTION where JOB_EXECUTION_ID = ?",
 				jobExecutionId);
+	}
+
+	private Map<String, Object> getStepExecution(long jobExecutionId, String stepName) {
+		for (Map<String, Object> rs : simpleJdbcTemplate.queryForList(
+				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
+				stepName)) {
+			System.err.println(rs);
+		}
+		return simpleJdbcTemplate.queryForMap(
+				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
+				stepName);
 	}
 
 	/**
