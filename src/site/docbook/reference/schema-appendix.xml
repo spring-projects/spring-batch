@@ -39,6 +39,19 @@
     </mediaobject>
 
     <section>
+      <title>Example DDL Scripts</title>
+
+      <para>The root of the Spring Batch Core JAR file contains
+      example scripts tp create the relational tables for a number of
+      database platforms (which are in turn auto-detected by the job
+      repository factory bean or namespace equivalent).  These scripts
+      can be used as is, or modified with additional indexes and
+      constraints as desired.  The file names are in the
+      form <literal>schema-*.sql</literal>, where "*" is the short
+      name of the target database platform.</para>
+    </section>
+
+    <section>
       <title>Version</title>
 
       <para>Many of the database tables discussed in this appendix contain a
