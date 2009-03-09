@@ -176,7 +176,14 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 			return null;
 		}
 		else {
-			return lineMapper.mapLine(logicalLine, lineCount);
+			try{
+				return lineMapper.mapLine(logicalLine, lineCount);
+			}
+			catch(Exception ex){
+				logger.error("Parsing error at line: " + lineCount + " in resource=" + 
+						resource.getDescription() + ", input=[" + line + "]", ex);
+				throw ex;
+			}
 		}
 	}
 
