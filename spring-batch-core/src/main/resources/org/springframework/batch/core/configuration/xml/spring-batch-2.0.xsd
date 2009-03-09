@@ -356,10 +356,11 @@
 				</xsd:simpleType>
 			</xsd:element>
 		</xsd:all>
-		<xsd:attribute name="commit-interval" type="xsd:string" use="required">
+		<xsd:attribute name="commit-interval" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-				The number of items that will be processed before commit is called for the transaction.
+				The number of items that will be processed before commit is called for the transaction.  
+				Either set this or the chunk-completion-policy but not both.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
@@ -437,12 +438,28 @@
 			<xsd:annotation>
 				<xsd:documentation
 					source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
-				The task executor responsible for executing the task..
+				The task executor responsible for executing the task.
 				]]></xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref">
 						<tool:expected-type
 							type="org.springframework.core.task.TaskExecutor" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="chunk-completion-policy" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation
+					source="java:org.springframework.batch.repeat.CompletionPolicy"><![CDATA[
+				A transaction will be committed when this policy decides to
+				complete. Defaults to a SimpleCompletionPolicy with chunk size
+				equal to the commit-interval attribute.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type
+							type="java:org.springframework.batch.repeat.CompletionPolicy" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>

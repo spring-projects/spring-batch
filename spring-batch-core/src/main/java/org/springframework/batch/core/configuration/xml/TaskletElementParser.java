@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -77,56 +78,70 @@ public class TaskletElementParser {
         else {
         	bd = new RootBeanDefinition("org.springframework.batch.core.step.item.SimpleStepFactoryBean", null, null);
         }
+        
+        MutablePropertyValues propertyValues = bd.getPropertyValues();
 
         String readerBeanId = element.getAttribute("reader");
         if (StringUtils.hasText(readerBeanId)) {
             RuntimeBeanReference readerRef = new RuntimeBeanReference(readerBeanId);
-            bd.getPropertyValues().addPropertyValue("itemReader", readerRef);
+            propertyValues.addPropertyValue("itemReader", readerRef);
         }
 
         String processorBeanId = element.getAttribute("processor");
         if (StringUtils.hasText(processorBeanId)) {
             RuntimeBeanReference processorRef = new RuntimeBeanReference(processorBeanId);
-            bd.getPropertyValues().addPropertyValue("itemProcessor", processorRef);
+            propertyValues.addPropertyValue("itemProcessor", processorRef);
         }
 
         String writerBeanId = element.getAttribute("writer");
         if (StringUtils.hasText(writerBeanId)) {
             RuntimeBeanReference writerRef = new RuntimeBeanReference(writerBeanId);
-            bd.getPropertyValues().addPropertyValue("itemWriter", writerRef);
+            propertyValues.addPropertyValue("itemWriter", writerRef);
         }
 
         String taskExecutorBeanId = element.getAttribute("task-executor");
         if (StringUtils.hasText(taskExecutorBeanId)) {
             RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
-            bd.getPropertyValues().addPropertyValue("taskExecutor", taskExecutorRef);
+            propertyValues.addPropertyValue("taskExecutor", taskExecutorRef);
         }
 
         String commitInterval = element.getAttribute("commit-interval");
         if (StringUtils.hasText(commitInterval)) {
-            bd.getPropertyValues().addPropertyValue("commitInterval", commitInterval);
+            propertyValues.addPropertyValue("commitInterval", commitInterval);
         }
 
-        if (StringUtils.hasText(skipLimit)) {
-            bd.getPropertyValues().addPropertyValue("skipLimit", skipLimit);
+        String completionPolicyRef = element.getAttribute("chunk-completion-policy");
+		if (StringUtils.hasText(completionPolicyRef)) {
+			RuntimeBeanReference completionPolicy = new RuntimeBeanReference(completionPolicyRef);
+			propertyValues.addPropertyValue("chunkCompletionPolicy", completionPolicy);
+		}
+
+		if (propertyValues.contains("commitInterval") == propertyValues.contains("chunkCompletionPolicy")) {
+			parserContext.getReaderContext().error(
+					"The 'tasklet' element must contain either 'commit-interval' "
+							+ "or 'chunk-completion-policy', but not both.", element);
+		}
+
+		if (StringUtils.hasText(skipLimit)) {
+            propertyValues.addPropertyValue("skipLimit", skipLimit);
         }
 
         if (StringUtils.hasText(retryLimit)) {
-            bd.getPropertyValues().addPropertyValue("retryLimit", retryLimit);
+            propertyValues.addPropertyValue("retryLimit", retryLimit);
         }
 
         if (StringUtils.hasText(cacheCapacity)) {
-            bd.getPropertyValues().addPropertyValue("cacheCapacity", cacheCapacity);
+            propertyValues.addPropertyValue("cacheCapacity", cacheCapacity);
         }
 
         String transactionAttribute = element.getAttribute("transaction-attribute");
         if (StringUtils.hasText(transactionAttribute)) {
-            bd.getPropertyValues().addPropertyValue("transactionAttribute", transactionAttribute);
+            propertyValues.addPropertyValue("transactionAttribute", transactionAttribute);
         }
 
         if (StringUtils.hasText(isReaderTransactionalQueue)) {
         	if (isFaultTolerant) {
-        		bd.getPropertyValues().addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
+        		propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
         	}
         }
 

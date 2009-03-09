@@ -34,4 +34,7 @@
 
 	<bean id="stepNamesList" class="java.util.ArrayList"/>
 
+	<bean id="reader" class="org.springframework.batch.core.configuration.xml.DummyItemReader"/>
+	<bean id="writer" class="org.springframework.batch.core.configuration.xml.DummyItemWriter"/>
+
 </beans>
