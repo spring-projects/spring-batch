@@ -42,7 +42,7 @@
       <title>Example DDL Scripts</title>
 
       <para>The root of the Spring Batch Core JAR file contains
-      example scripts tp create the relational tables for a number of
+      example scripts to create the relational tables for a number of
       database platforms (which are in turn auto-detected by the job
       repository factory bean or namespace equivalent).  These scripts
       can be used as is, or modified with additional indexes and
