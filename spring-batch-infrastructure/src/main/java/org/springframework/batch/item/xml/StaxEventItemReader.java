@@ -69,7 +69,7 @@ public class StaxEventItemReader<T> extends AbstractItemCountingItemStreamItemRe
 
 	private boolean noInput;
 
-	private boolean strict = false;
+	private boolean strict = true;
 	
 	public StaxEventItemReader() {
 		setName(ClassUtils.getShortName(StaxEventItemReader.class));
