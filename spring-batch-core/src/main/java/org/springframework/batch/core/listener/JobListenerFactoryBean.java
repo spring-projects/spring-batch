@@ -15,20 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
-import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.support.DefaultPointcutAdvisor;
-import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
-import org.springframework.batch.support.MethodInvoker;
-import org.springframework.core.Ordered;
-import org.springframework.batch.core.listener.MethodInvokerMethodInterceptor;
 
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
@@ -42,41 +29,16 @@ import org.springframework.batch.core.listener.MethodInvokerMethodInterceptor;
  */
 public class JobListenerFactoryBean extends AbstractListenerFactoryBean {
 
-	public Object doGetObject(Object delegate, Map<String, String> metaDataMap) {
-
-		// For every entry in the map, try and find a method by interface, name,
-		// or annotation. If the same
-		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
-		for (Entry<String, String> entry : metaDataMap.entrySet()) {
-			JobListenerMetaData metaData = JobListenerMetaData.fromPropertyName(entry.getKey());
-			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
-			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerForInterface(JobExecutionListener.class, metaData.getMethodName(), delegate,
-					JobExecution.class));
-			invokers.add(getMethodInvokerByAnnotation(metaData));
-			if (!invokers.isEmpty()) {
-				invokerMap.put(metaData.getMethodName(), invokers);
-			}
-		}
-
-		// create a proxy listener for only the interfaces that have methods to
-		// be called
-		ProxyFactory proxyFactory = new ProxyFactory();
-		proxyFactory.setTarget(delegate);
-		
-		boolean ordered = false;
-		if (delegate instanceof Ordered) {
-			ordered = true;
-			proxyFactory.addInterface(Ordered.class);
-		}
-
-		proxyFactory.addInterface(JobExecutionListener.class);
-		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap, ordered)));
-		return proxyFactory.getProxy();
+	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
+		return JobListenerMetaData.fromPropertyName(propertyName);
 	}
 
-	protected AbstractListenerMetaData[] getMetaDataValues() {
+	protected ListenerMetaData[] getMetaDataValues() {
 		return JobListenerMetaData.values();
+	}
+
+	protected Class<?> getDefaultListenerClass() {
+		return JobExecutionListener.class;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -15,19 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
-import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
-import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.batch.core.StepListener;
-import org.springframework.batch.support.MethodInvoker;
-import org.springframework.core.Ordered;
 
 /**
  * This {@link AbstractListenerFactoryBean} implementation is used to create a
@@ -41,47 +29,16 @@ import org.springframework.core.Ordered;
  */
 public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 
-	public Object doGetObject(Object delegate, Map<String, String> metaDataMap) {
-
-		Set<Class<?>> listenerInterfaces = new HashSet<Class<?>>();
-
-		// For every entry in the map, try and find a method by interface, name,
-		// or annotation. If the same
-		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
-		for (Entry<String, String> entry : metaDataMap.entrySet()) {
-			final StepListenerMetaData metaData = StepListenerMetaData.fromPropertyName(entry.getKey());
-			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
-			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(),
-					delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerByAnnotation(metaData));
-			if (!invokers.isEmpty()) {
-				invokerMap.put(metaData.getMethodName(), invokers);
-				listenerInterfaces.add(metaData.getListenerInterface());
-			}
-		}
-
-		if (listenerInterfaces.isEmpty()) {
-			listenerInterfaces.add(StepListener.class);
-		}
-
-		boolean ordered = false;
-		if (delegate instanceof Ordered) {
-			ordered = true;
-			listenerInterfaces.add(Ordered.class);
-		}
-
-		// create a proxy listener for only the interfaces that have methods to
-		// be called
-		ProxyFactory proxyFactory = new ProxyFactory();
-		proxyFactory.setTarget(delegate);
-		proxyFactory.setInterfaces(listenerInterfaces.toArray(new Class[0]));
-		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap, ordered)));
-		return proxyFactory.getProxy();
+	protected ListenerMetaData getMetaDataFromPropertyName(String propertyName) {
+		return StepListenerMetaData.fromPropertyName(propertyName);
 	}
 
-	protected AbstractListenerMetaData[] getMetaDataValues() {
+	protected ListenerMetaData[] getMetaDataValues() {
 		return StepListenerMetaData.values();
+	}
+
+	protected Class<?> getDefaultListenerClass() {
+		return StepListener.class;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -108,7 +65,8 @@ public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 	 * 
 	 * @param delegate the object to check
 	 * @return true if the delegate is an instance of any of the
-	 * {@link StepListener} interfaces, or contains the marker annotations
+	 *         {@link StepListener} interfaces, or contains the marker
+	 *         annotations
 	 */
 	public static boolean isListener(Object delegate) {
 		return AbstractListenerFactoryBean.isListener(delegate, StepListener.class, StepListenerMetaData.values());

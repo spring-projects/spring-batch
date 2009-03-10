@@ -18,18 +18,20 @@ package org.springframework.batch.core.listener;
 import java.lang.annotation.Annotation;
 
 /**
- * A common interface for ListenerMetaData enumerations.
+ * A common interface for listener meta data enumerations.
  * 
  * @author Dan Garrette
  * @since 2.0
  * @see JobListenerMetaData
  * @see StepListenerMetaData
  */
-public interface AbstractListenerMetaData {
+public interface ListenerMetaData {
 
 	public String getMethodName();
 
 	public Class<? extends Annotation> getAnnotation();
+
+	public Class<?> getListenerInterface();
 
 	public String getPropertyName();
 

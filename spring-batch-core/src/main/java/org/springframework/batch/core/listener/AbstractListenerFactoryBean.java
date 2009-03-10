@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.listener;
 
+import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
 import static org.springframework.batch.support.MethodInvokerUtils.getParamTypesString;
 
 import java.lang.annotation.Annotation;
@@ -22,14 +23,19 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.Advised;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.batch.support.MethodInvoker;
 import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -43,8 +49,8 @@ import org.springframework.util.ReflectionUtils;
  * <li>Interface implementation: By implementing any of the subclasses of a
  * listener interface, methods on said interface will be called
  * <li>Annotations: Annotating a method will result in registration.
- * <li>String name of the method to be called, which is tied to an
- * {@link AbstractListenerMetaData} in the metaDatMap.
+ * <li>String name of the method to be called, which is tied to a
+ * {@link ListenerMetaData} value in the metaDataMap.
  * </ul>
  * 
  * It should be noted that methods obtained by name or annotation that don't
@@ -59,11 +65,11 @@ import org.springframework.util.ReflectionUtils;
  * @author Lucas Ward
  * @author Dan Garrette
  * @since 2.0
- * @see StepListenerMetaData
+ * @see ListenerMetaData
  */
 public abstract class AbstractListenerFactoryBean implements FactoryBean, InitializingBean {
 
-	private static Log logger = LogFactory.getLog(StepListenerFactoryBean.class);
+	private static Log logger = LogFactory.getLog(AbstractListenerFactoryBean.class);
 
 	private Object delegate;
 
@@ -77,19 +83,56 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		// Because all annotations and interfaces should be checked for, make
 		// sure that each meta data
 		// entry is represented.
-		for (AbstractListenerMetaData metaData : this.getMetaDataValues()) {
+		for (ListenerMetaData metaData : this.getMetaDataValues()) {
 			if (!metaDataMap.containsKey(metaData.getPropertyName())) {
 				// put null so that the annotation and interface is checked
 				metaDataMap.put(metaData.getPropertyName(), null);
 			}
 		}
 
-		return this.doGetObject(delegate, metaDataMap);
+		Set<Class<?>> listenerInterfaces = new HashSet<Class<?>>();
+
+		// For every entry in the map, try and find a method by interface, name,
+		// or annotation. If the same
+		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
+		for (Entry<String, String> entry : metaDataMap.entrySet()) {
+			final ListenerMetaData metaData = this.getMetaDataFromPropertyName(entry.getKey());
+			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
+			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
+			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(),
+					delegate, metaData.getParamTypes()));
+			invokers.add(getMethodInvokerByAnnotation(metaData));
+			if (!invokers.isEmpty()) {
+				invokerMap.put(metaData.getMethodName(), invokers);
+				listenerInterfaces.add(metaData.getListenerInterface());
+			}
+		}
+
+		if (listenerInterfaces.isEmpty()) {
+			listenerInterfaces.add(this.getDefaultListenerClass());
+		}
+
+		boolean ordered = false;
+		if (delegate instanceof Ordered) {
+			ordered = true;
+			listenerInterfaces.add(Ordered.class);
+		}
+
+		// create a proxy listener for only the interfaces that have methods to
+		// be called
+		ProxyFactory proxyFactory = new ProxyFactory();
+		proxyFactory.setTarget(delegate);
+		proxyFactory.setInterfaces(listenerInterfaces.toArray(new Class[0]));
+		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap, ordered)));
+		return proxyFactory.getProxy();
+
 	}
 
-	protected abstract Object doGetObject(Object delegate, Map<String, String> metaDataMap);
-
-	protected abstract AbstractListenerMetaData[] getMetaDataValues();
+	protected abstract ListenerMetaData getMetaDataFromPropertyName(String propertyName);
+	
+	protected abstract ListenerMetaData[] getMetaDataValues();
+	
+	protected abstract Class<?> getDefaultListenerClass();
 
 	/**
 	 * Create a MethodInvoker from the delegate based on the annotationType.
@@ -98,7 +141,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	 * @param metaData
 	 * @return a MethodInvoker
 	 */
-	protected MethodInvoker getMethodInvokerByAnnotation(final AbstractListenerMetaData metaData) {
+	protected MethodInvoker getMethodInvokerByAnnotation(final ListenerMetaData metaData) {
 		final Class<? extends Annotation> annotationType = metaData.getAnnotation();
 		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, delegate);
 		if (mi != null) {
@@ -186,7 +229,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	 * @return true if the delegate is an instance of any of the listener
 	 *         interface, or contains the marker annotations
 	 */
-	public static boolean isListener(Object delegate, Class<?> listenerType, AbstractListenerMetaData[] metaDataValues) {
+	public static boolean isListener(Object delegate, Class<?> listenerType, ListenerMetaData[] metaDataValues) {
 		if (listenerType.isInstance(delegate)) {
 			return true;
 		}
@@ -198,7 +241,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 				return false;
 			}
 		}
-		for (AbstractListenerMetaData metaData : metaDataValues) {
+		for (ListenerMetaData metaData : metaDataValues) {
 			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate) != null) {
 				return true;
 			}

@@ -32,7 +32,7 @@ import org.springframework.batch.core.annotation.BeforeJob;
  * @since 2.0
  * @see JobListenerFactoryBean
  */
-public enum JobListenerMetaData implements AbstractListenerMetaData {
+public enum JobListenerMetaData implements ListenerMetaData {
 
 	BEFORE_JOB("beforeJob", "before-job-method", BeforeJob.class),
 	AFTER_JOB("afterJob", "after-job-method", AfterJob.class);
@@ -64,6 +64,10 @@ public enum JobListenerMetaData implements AbstractListenerMetaData {
 		return annotation;
 	}
 
+	public Class<?> getListenerInterface() {
+		return JobExecutionListener.class;
+	}
+	
 	public String getPropertyName() {
 		return propertyName;
 	}
