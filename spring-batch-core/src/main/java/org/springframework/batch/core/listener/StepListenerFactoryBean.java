@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.batch.core.StepListener;
@@ -33,6 +36,7 @@ import org.springframework.batch.support.MethodInvoker;
 import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
@@ -65,6 +69,8 @@ import org.springframework.util.ReflectionUtils;
  */
 public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 
+	private static Log logger = LogFactory.getLog(StepListenerFactoryBean.class);
+
 	private Object delegate;
 
 	private Map<String, String> metaDataMap;
@@ -85,7 +91,7 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 			}
 		}
 
-		Set<Class<? extends StepListener>> listenerInterfaces = new HashSet<Class<? extends StepListener>>();
+		Set<Class<?>> listenerInterfaces = new HashSet<Class<?>>();
 
 		// For every entry in the map, try and find a method by interface, name,
 		// or annotation. If the same
@@ -106,11 +112,18 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 			listenerInterfaces.add(StepListener.class);
 		}
 
+		boolean ordered = false;
+		if (delegate instanceof Ordered) {
+			ordered = true;
+			listenerInterfaces.add(Ordered.class);
+		}
+
 		// create a proxy listener for only the interfaces that have methods to
 		// be called
 		ProxyFactory proxyFactory = new ProxyFactory();
+		proxyFactory.setTarget(delegate);
 		proxyFactory.setInterfaces(listenerInterfaces.toArray(new Class[0]));
-		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap)));
+		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap, ordered)));
 		return proxyFactory.getProxy();
 	}
 
@@ -170,7 +183,17 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 	}
 
 	public void setDelegate(Object delegate) {
-		this.delegate = delegate;
+		if (delegate instanceof Advised) {
+			try {
+				setDelegate(((Advised) delegate).getTargetSource().getTarget());
+			}
+			catch (Exception e) {
+				throw new IllegalStateException("Cannot generate listener for proxy with no target", e);
+			}
+		}
+		else {
+			this.delegate = delegate;
+		}
 	}
 
 	public void setMetaDataMap(Map<String, String> metaDataMap) {
@@ -196,12 +219,20 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 	 * 
 	 * @param delegate the object to check
 	 * @return true if the delegate is an instance of any of the
-	 *         {@link StepListener} interfaces, or contains the marker
-	 *         annotations
+	 * {@link StepListener} interfaces, or contains the marker annotations
 	 */
 	public static boolean isListener(Object delegate) {
 		if (delegate instanceof StepListener) {
 			return true;
+		}
+		if (delegate instanceof Advised) {
+			try {
+				return isListener(((Advised) delegate).getTargetSource().getTarget());
+			}
+			catch (Exception e) {
+				logger.debug("Error obtaining target for Proxy.  Assume not a listener.", e);
+				return false;
+			}
 		}
 		for (StepListenerMetaData metaData : StepListenerMetaData.values()) {
 			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate) != null) {

@@ -40,14 +40,24 @@ import org.springframework.batch.support.MethodInvoker;
 public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 
 	private final Map<String, Set<MethodInvoker>> invokerMap;
+	private final boolean ordered;
 
 	public MethodInvokerMethodInterceptor(Map<String, Set<MethodInvoker>> invokerMap) {
+		this(invokerMap, false);
+	}
+
+	public MethodInvokerMethodInterceptor(Map<String, Set<MethodInvoker>> invokerMap, boolean ordered) {
+		this.ordered = ordered;
 		this.invokerMap = invokerMap;
 	}
 
 	public Object invoke(MethodInvocation invocation) throws Throwable {
 
 		String methodName = invocation.getMethod().getName();
+		if (ordered && methodName.equals("getOrder")) {
+			return invocation.proceed();
+		}
+
 		Set<MethodInvoker> invokers = invokerMap.get(methodName);
 
 		if (invokers == null) {
@@ -66,6 +76,7 @@ public class MethodInvokerMethodInterceptor implements MethodInterceptor {
 			}
 		}
 
+		// The only possible return values are ExitStatus or int (from Ordered)
 		return status;
 	}
 
