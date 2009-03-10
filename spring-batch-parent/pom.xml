@@ -557,9 +557,6 @@
 			<name>SpringSource Enterprise Bundle Repository -
 				Snapshot Bundle Releases</name>
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
-			<snapshots>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
 		</repository>
 	</repositories>
 	<pluginRepositories>
