@@ -231,6 +231,7 @@ public class StaxEventItemReaderTests {
 		source.setResource(new NonExistentResource());
 		source.afterPropertiesSet();
 
+		source.setStrict(false);
 		source.open(executionContext);
 		assertNull(source.read());
 

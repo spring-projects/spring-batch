@@ -104,7 +104,7 @@ public class FlatFileItemReaderTests {
 	}
 
 	@Test
-	public void testNonExistantResource() throws Exception {
+	public void testNonExistentResource() throws Exception {
 
 		Resource resource = new NonExistentResource();
 
@@ -114,6 +114,7 @@ public class FlatFileItemReaderTests {
 		// null
 		reader.afterPropertiesSet();
 
+		reader.setStrict(false);
 		reader.open(executionContext);
 		assertNull(reader.read());
 		reader.close();
