@@ -16,7 +16,10 @@
 
 package org.springframework.batch.core.step.tasklet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -298,7 +301,7 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 
 		// context saved before looping and updated once for every processing
-		// loop (once in this case) 
+		// loop (once in this case)
 		assertEquals(3, list.size());
 	}
 
@@ -543,8 +546,8 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain 'JobInterruptedException': " + msg, contains(msg,
-				"JobInterruptedException"));
+		assertTrue("Message does not contain 'JobInterruptedException': " + msg, msg
+				.contains("JobInterruptedException"));
 	}
 
 	@Test
@@ -619,7 +622,7 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.UNKNOWN, stepExecution.getStatus());
 		String msg = stepExecution.getExitStatus().getExitDescription();
-		assertTrue("Message does not contain ResetFailedException: " + msg, contains(msg, "ResetFailedException"));
+		assertTrue("Message does not contain ResetFailedException: " + msg, msg.contains("ResetFailedException"));
 		// The original rollback was caused by this one:
 		assertEquals("Bar", stepExecution.getFailureExceptions().get(0).getCause().getMessage());
 	}
@@ -765,28 +768,6 @@ public class TaskletStepTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-	}
-
-//	This doesn't make sense for concurrent tasklet execution scenario.
-//	@Test
-//	public void testModifyingExecutionContextMidProcessCausesException() throws Exception {
-//		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
-//		final ExecutionContext ec = stepExecution.getExecutionContext();
-//		step.setTasklet(new Tasklet() {
-//			public RepeatStatus execute(StepContribution contribution, AttributeAccessor attributes) throws Exception {
-//				ec.putString("test", "test");
-//				return RepeatStatus.FINISHED;
-//			}
-//		});
-//
-//		step.execute(stepExecution);
-//		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-//		assertEquals(1, stepExecution.getFailureExceptions().size());
-//		assertTrue(stepExecution.getFailureExceptions().get(0) instanceof IllegalStateException);
-//	}
-
-	private boolean contains(String str, String searchStr) {
-		return str.indexOf(searchStr) != -1;
 	}
 
 	private static class JobRepositoryStub extends JobRepositorySupport {

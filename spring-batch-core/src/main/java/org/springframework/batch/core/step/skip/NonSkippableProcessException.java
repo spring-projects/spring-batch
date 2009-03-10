@@ -17,14 +17,14 @@
 package org.springframework.batch.core.step.skip;
 
 /**
- * Fatal exception to be thrown when a read operation could not be skipped.
+ * Fatal exception to be thrown when a process operation could not be skipped.
  * 
  * @author Dave Syer
  * 
  */
-public class NonSkippableReadException extends SkipException {
+public class NonSkippableProcessException extends SkipException {
 
-	public NonSkippableReadException(String msg, Throwable cause) {
+	public NonSkippableProcessException(String msg, Throwable cause) {
 		super(msg, cause);
 	}
 

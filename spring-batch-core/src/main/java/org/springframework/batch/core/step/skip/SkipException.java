@@ -13,19 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.batch.core.step.skip;
 
+import org.springframework.batch.core.UnexpectedJobExecutionException;
+
 /**
- * Fatal exception to be thrown when a read operation could not be skipped.
+ * Base exception indicating that the skip has failed or caused a failure.
  * 
  * @author Dave Syer
- * 
  */
-public class NonSkippableReadException extends SkipException {
+public abstract class SkipException extends UnexpectedJobExecutionException {
 
-	public NonSkippableReadException(String msg, Throwable cause) {
-		super(msg, cause);
+	/**
+	 * @param msg the message
+	 * @param nested the cause
+	 */
+	public SkipException(String msg, Throwable nested) {
+		super(msg, nested);
 	}
+
+	/**
+	 * @param msg the message
+	 */
+	public SkipException(String msg) {
+		super(msg);
+	}
+	
+	
 
 }

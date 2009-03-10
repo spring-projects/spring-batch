@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -18,6 +19,8 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
+import org.springframework.batch.support.BinaryExceptionClassifier;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public class FaultTolerantChunkProcessorTests {
 
@@ -66,6 +69,21 @@ public class FaultTolerantChunkProcessorTests {
 	}
 
 	@Test
+	public void testTransformWithExceptionAndNoRollback() throws Exception {
+		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			public String process(String item) throws Exception {
+				if (item.equals("1")) throw new DataIntegrityViolationException("Planned");
+				return item;
+			}
+		});
+		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		processor.setRollbackClassifier(new BinaryExceptionClassifier(Collections.<Class<? extends Throwable>> singleton(DataIntegrityViolationException.class), false));
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("1", "2"));
+		processor.process(contribution, inputs);
+		assertEquals(1, list.size());
+	}
+
+	@Test
 	public void testAfterWrite() throws Exception {
 		Chunk<String> chunk = new Chunk<String>(Arrays.asList("foo", "fail", "bar"));
 		processor.setListeners(Arrays.asList(new ItemListenerSupport<String, String>() {
@@ -78,13 +96,15 @@ public class FaultTolerantChunkProcessorTests {
 		try {
 			processor.process(contribution, chunk);
 			fail();
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Planned failure!", e.getMessage());
 		}
 		try {
 			processor.process(contribution, chunk);
 			fail();
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Planned failure!", e.getMessage());
 		}
 		assertEquals(2, chunk.getItems().size());
@@ -120,7 +140,8 @@ public class FaultTolerantChunkProcessorTests {
 		try {
 			processor.process(contribution, chunk);
 			fail();
-		} catch (RuntimeException e) {
+		}
+		catch (RuntimeException e) {
 			assertEquals("Planned failure!", e.getMessage());
 		}
 		processor.process(contribution, chunk);

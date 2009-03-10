@@ -22,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
+import org.springframework.batch.core.step.skip.NonSkippableProcessException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
@@ -81,7 +82,31 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			RetryCallback<O> retryCallback = new RetryCallback<O>() {
 
 				public O doWithRetry(RetryContext context) throws Exception {
-					O output = doProcess(item);
+					O output = null;
+					try {
+						output = doProcess(item);
+					}
+					catch (Exception e) {
+						if (rollbackClassifier.classify(e)) {
+							// Default is to rollback unless the classifier
+							// allows us to continue
+							throw e;
+						}
+						else if (itemProcessSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
+							// If we are not re-throwing then we should check if
+							// this is skippable
+							contribution.incrementProcessSkipCount();
+							logger.debug("Skipping after failed process with no rollback", e);
+						}
+						else {
+							// If it's not skippable that's an error in
+							// configuration - it doesn't make sense to not roll
+							// back if we are also not allowed to skip
+							throw new NonSkippableProcessException(
+									"Non-skippable exception in processor.  Make sure any exceptions that do not cause a rollback are skippable.",
+									e);
+						}
+					}
 					if (output == null) {
 						// No need to re-process filtered items
 						iterator.remove();
@@ -173,7 +198,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				}
 
 				doAfterWrite(outputs.getItems());
-				contribution.incrementWriteCount(outputs.size());				
+				contribution.incrementWriteCount(outputs.size());
 				return null;
 
 			}

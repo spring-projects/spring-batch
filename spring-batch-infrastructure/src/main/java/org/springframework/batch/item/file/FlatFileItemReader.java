@@ -70,7 +70,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 
 	private LineCallbackHandler skippedLinesCallback;
 
-	private boolean strict = false;
+	private boolean strict = true;
 
 	public FlatFileItemReader() {
 		setName(ClassUtils.getShortName(FlatFileItemReader.class));
@@ -243,7 +243,7 @@ public class FlatFileItemReader<T> extends AbstractItemCountingItemStreamItemRea
 		noInput = false;
 		if (!resource.exists()) {
 			if (strict) {
-				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode)");
+				throw new IllegalStateException("Input resource must exist (reader is in 'strict' mode): "+resource);
 			}
 			noInput = true;
 			logger.warn("Input resource does not exist " + resource.getDescription());

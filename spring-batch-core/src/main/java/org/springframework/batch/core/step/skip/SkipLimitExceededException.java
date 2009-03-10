@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.step.skip;
 
-import org.springframework.batch.core.UnexpectedJobExecutionException;
 
 /**
  * Exception indicating that the skip limit for a particular {@Step} has
@@ -23,8 +22,9 @@ import org.springframework.batch.core.UnexpectedJobExecutionException;
  * 
  * @author Ben Hale
  * @author Lucas Ward
+ * @author Dave Syer
  */
-public class SkipLimitExceededException extends UnexpectedJobExecutionException {
+public class SkipLimitExceededException extends SkipException {
 
 	private final int skipLimit;
 	
