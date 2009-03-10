@@ -9,8 +9,8 @@
 	<job id="job" incrementer="testIncrementer" job-repository="jobRepository">
 		<step id="s1" ref="step1"/>
 		<listeners>
-			<listener after-method="afterJob" ref="testListener"/>
-			<listener after-method="afterJob" class="org.springframework.batch.core.configuration.xml.TestJobListener"/>
+			<listener after-job-method="afterJob" ref="testListener"/>
+			<listener after-job-method="afterJob" class="org.springframework.batch.core.configuration.xml.TestJobListener"/>
 			<listener class="org.springframework.batch.core.configuration.xml.JobExecutionListenerParserTests$TestComponent"/>
 		</listeners>
 	</job>

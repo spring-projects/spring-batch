@@ -17,8 +17,11 @@ package org.springframework.batch.core.listener;
 
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.batch.core.listener.JobListenerMetaData.AFTER_JOB;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.junit.Before;
@@ -28,6 +31,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
+import org.springframework.batch.core.configuration.xml.AbstractTestComponent;
 import org.springframework.core.Ordered;
 
 /**
@@ -136,6 +140,100 @@ public class JobListenerFactoryBeanTests {
 		Object listener1 = JobListenerFactoryBean.getListener(delegate);
 		Object listener2 = JobListenerFactoryBean.getListener(delegate);
 		assertEquals(listener1, listener2);
+	}
+
+	@Test
+	public void testEmptySignatureAnnotation() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterJob
+			public void aMethod() {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
+		listener.afterJob(new JobExecution(1L));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test
+	public void testRightSignatureAnnotation() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterJob
+			public void aMethod(JobExecution jobExecution) {
+				executed = true;
+				assertEquals(new Long(25), jobExecution.getId());
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
+		listener.afterJob(new JobExecution(25L));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testWrongSignatureAnnotation() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			@AfterJob
+			public void aMethod(Integer item) {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		factoryBean.getObject();
+	}
+
+	@Test
+	public void testEmptySignatureNamedMethod() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			public void aMethod() {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		Map<String, String> metaDataMap = new HashMap<String, String>();
+		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
+		factoryBean.setMetaDataMap(metaDataMap);
+		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
+		listener.afterJob(new JobExecution(1L));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test
+	public void testRightSignatureNamedMethod() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			public void aMethod(JobExecution jobExecution) {
+				executed = true;
+				assertEquals(new Long(25), jobExecution.getId());
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		Map<String, String> metaDataMap = new HashMap<String, String>();
+		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
+		factoryBean.setMetaDataMap(metaDataMap);
+		JobExecutionListener listener = (JobExecutionListener) factoryBean.getObject();
+		listener.afterJob(new JobExecution(25L));
+		assertTrue(delegate.isExecuted());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testWrongSignatureNamedMethod() {
+		AbstractTestComponent delegate = new AbstractTestComponent() {
+			@SuppressWarnings("unused")
+			public void aMethod(Integer item) {
+				executed = true;
+			}
+		};
+		factoryBean.setDelegate(delegate);
+		Map<String, String> metaDataMap = new HashMap<String, String>();
+		metaDataMap.put(AFTER_JOB.getPropertyName(), "aMethod");
+		factoryBean.setMetaDataMap(metaDataMap);
+		factoryBean.getObject();
 	}
 
 	private class JobListenerWithInterface implements JobExecutionListener {

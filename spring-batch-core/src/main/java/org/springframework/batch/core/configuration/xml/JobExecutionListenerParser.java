@@ -83,14 +83,15 @@ public class JobExecutionListenerParser {
 			}
 
 			ManagedMap metaDataMap = new ManagedMap();
-			String beforeMethod = listenerElement.getAttribute("before-method");
-			if (StringUtils.hasText(beforeMethod)) {
-				metaDataMap.put("beforeMethod", beforeMethod);
-			}
-
-			String afterMethod = listenerElement.getAttribute("after-method");
-			if (StringUtils.hasText(beforeMethod)) {
-				metaDataMap.put("afterMethod", afterMethod);
+			String[] methodNameAttributes = new String[] {
+					"before-job-method",
+					"after-job-method"
+			};
+			for (String metaDataPropertyName : methodNameAttributes) {
+				String listenerMethod = listenerElement.getAttribute(metaDataPropertyName);
+				if(StringUtils.hasText(listenerMethod)){
+					metaDataMap.put(metaDataPropertyName, listenerMethod);
+				}
 			}
 			listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
 			AbstractBeanDefinition beanDef = listenerBuilder.getBeanDefinition();

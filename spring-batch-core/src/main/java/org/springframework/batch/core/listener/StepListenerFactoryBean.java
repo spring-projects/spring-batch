@@ -16,92 +16,45 @@
 package org.springframework.batch.core.listener;
 
 import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
-import static org.springframework.batch.support.MethodInvokerUtils.getParamTypesString;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.support.MethodInvoker;
-import org.springframework.batch.support.MethodInvokerUtils;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 
 /**
- * {@link FactoryBean} implementation that builds a {@link StepListener} based
- * on the various lifecycle methods or annotations that are provided. There are
- * three possible ways of having a method called as part of a
- * {@link StepListener} lifecycle:
- * 
- * <ul>
- * <li>Interface implementation: By implementing any of the subclasses of
- * StepListener, methods on said interface will be called
- * <li>Annotations: Annotating a method will result in registration.
- * <li>String name of the method to be called, which is tied to
- * {@link StepListenerMetaData} in the metaDatMap.
- * </ul>
- * 
- * It should be noted that methods obtained by name or annotation that don't
- * match the StepListener method signatures to which they belong, will cause
- * errors. However, it is acceptable to have no parameters at all. If the same
- * method is marked in more than one way. (i.e. the method name is given and
- * it's annotated) the method will only be called once. However, if the same
- * class has multiple methods tied to a particular listener, each method will be
- * called.
+ * This {@link AbstractListenerFactoryBean} implementation is used to create a
+ * {@link StepListener}.
  * 
  * @author Lucas Ward
+ * @author Dan Garrette
  * @since 2.0
+ * @see AbstractListenerFactoryBean
  * @see StepListenerMetaData
  */
-public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
+public class StepListenerFactoryBean extends AbstractListenerFactoryBean {
 
-	private static Log logger = LogFactory.getLog(StepListenerFactoryBean.class);
-
-	private Object delegate;
-
-	private Map<String, String> metaDataMap;
-
-	public Object getObject() {
-
-		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
-		if (metaDataMap == null) {
-			metaDataMap = new HashMap<String, String>();
-		}
-		// Because all annotations and interfaces should be checked for, make
-		// sure that each meta data
-		// entry is represented.
-		for (StepListenerMetaData metaData : StepListenerMetaData.values()) {
-			if (!metaDataMap.containsKey(metaData.getPropertyName())) {
-				// put null so that the annotation and interface is checked
-				metaDataMap.put(metaData.getPropertyName(), null);
-			}
-		}
+	public Object doGetObject(Object delegate, Map<String, String> metaDataMap) {
 
 		Set<Class<?>> listenerInterfaces = new HashSet<Class<?>>();
 
 		// For every entry in the map, try and find a method by interface, name,
 		// or annotation. If the same
+		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
 		for (Entry<String, String> entry : metaDataMap.entrySet()) {
 			final StepListenerMetaData metaData = StepListenerMetaData.fromPropertyName(entry.getKey());
 			Set<MethodInvoker> invokers = new NullIgnoringSet<MethodInvoker>();
 			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
 			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(),
 					delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerByAnnotation(metaData, metaData.getAnnotation()));
+			invokers.add(getMethodInvokerByAnnotation(metaData));
 			if (!invokers.isEmpty()) {
 				invokerMap.put(metaData.getMethodName(), invokers);
 				listenerInterfaces.add(metaData.getListenerInterface());
@@ -127,77 +80,13 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 		return proxyFactory.getProxy();
 	}
 
-	/**
-	 * Create a MethodInvoker from the delegate based on the annotationType.
-	 * Ensure that the annotated method has a valid set of parameters.
-	 * 
-	 * @param metaData
-	 * @param annotationType
-	 * @return
-	 */
-	private MethodInvoker getMethodInvokerByAnnotation(final StepListenerMetaData metaData,
-			final Class<? extends Annotation> annotationType) {
-		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, delegate);
-		if (mi != null) {
-			ReflectionUtils.doWithMethods(delegate.getClass(), new ReflectionUtils.MethodCallback() {
-				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-					Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
-					if (annotation != null) {
-						Class<?>[] paramTypes = method.getParameterTypes();
-						if (paramTypes.length > 0) {
-							Class<?>[] expectedParamTypes = metaData.getParamTypes();
-
-							String errorMsg = "The method [" + method.getName() + "] on target class ["
-									+ delegate.getClass().getSimpleName() + "] is incompatable with the signature ["
-									+ getParamTypesString(expectedParamTypes) + "] expected for the annotation ["
-									+ metaData.getAnnotation().getSimpleName() + "].";
-
-							Assert.isTrue(paramTypes.length == expectedParamTypes.length, errorMsg);
-							for (int i = 0; i < paramTypes.length; i++) {
-								Assert.isTrue(paramTypes[i].equals(expectedParamTypes[i]), errorMsg);
-							}
-						}
-					}
-				}
-			});
-		}
-		return mi;
-	}
-
-	private MethodInvoker getMethodInvokerByName(String methodName, Object candidate, Class<?>... params) {
-		if (methodName != null) {
-			return MethodInvokerUtils.createMethodInvokerByName(candidate, methodName, false, params);
-		}
-		else {
-			return null;
-		}
+	protected AbstractListenerMetaData[] getMetaDataValues() {
+		return StepListenerMetaData.values();
 	}
 
 	@SuppressWarnings("unchecked")
 	public Class getObjectType() {
 		return StepListener.class;
-	}
-
-	public boolean isSingleton() {
-		return false;
-	}
-
-	public void setDelegate(Object delegate) {
-		if (delegate instanceof Advised) {
-			try {
-				setDelegate(((Advised) delegate).getTargetSource().getTarget());
-			}
-			catch (Exception e) {
-				throw new IllegalStateException("Cannot generate listener for proxy with no target", e);
-			}
-		}
-		else {
-			this.delegate = delegate;
-		}
-	}
-
-	public void setMetaDataMap(Map<String, String> metaDataMap) {
-		this.metaDataMap = metaDataMap;
 	}
 
 	/**
@@ -222,44 +111,6 @@ public class StepListenerFactoryBean implements FactoryBean, InitializingBean {
 	 * {@link StepListener} interfaces, or contains the marker annotations
 	 */
 	public static boolean isListener(Object delegate) {
-		if (delegate instanceof StepListener) {
-			return true;
-		}
-		if (delegate instanceof Advised) {
-			try {
-				return isListener(((Advised) delegate).getTargetSource().getTarget());
-			}
-			catch (Exception e) {
-				logger.debug("Error obtaining target for Proxy.  Assume not a listener.", e);
-				return false;
-			}
-		}
-		for (StepListenerMetaData metaData : StepListenerMetaData.values()) {
-			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate) != null) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/*
-	 * Extension of HashSet that ignores nulls, rather than putting them into
-	 * the set.
-	 */
-	private static class NullIgnoringSet<E> extends HashSet<E> {
-
-		@Override
-		public boolean add(E e) {
-			if (e == null) {
-				return false;
-			}
-			else {
-				return super.add(e);
-			}
-		};
-	}
-
-	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(delegate, "Delegate must not be null");
+		return AbstractListenerFactoryBean.isListener(delegate, StepListener.class, StepListenerMetaData.values());
 	}
 }

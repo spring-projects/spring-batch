@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
@@ -31,7 +32,7 @@ import org.springframework.batch.core.annotation.BeforeJob;
  * @since 2.0
  * @see JobListenerFactoryBean
  */
-public enum JobListenerMetaData {
+public enum JobListenerMetaData implements AbstractListenerMetaData {
 
 	BEFORE_JOB("beforeJob", "before-job-method", BeforeJob.class),
 	AFTER_JOB("afterJob", "after-job-method", AfterJob.class);
@@ -63,11 +64,14 @@ public enum JobListenerMetaData {
 		return annotation;
 	}
 
-
 	public String getPropertyName() {
 		return propertyName;
 	}
 	
+	public Class<?>[] getParamTypes() {
+		return new Class<?>[]{ JobExecution.class };
+	}
+
 	/**
 	 * Return the relevant meta data for the provided property name.
 	 * 

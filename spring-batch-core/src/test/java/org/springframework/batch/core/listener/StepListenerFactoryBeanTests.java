@@ -311,7 +311,6 @@ public class StepListenerFactoryBeanTests {
 	public void testEmptySignatureNamedMethod() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
 			@SuppressWarnings("unused")
-			@AfterWrite
 			public void aMethod() {
 				executed = true;
 			}
@@ -330,7 +329,6 @@ public class StepListenerFactoryBeanTests {
 	public void testRightSignatureNamedMethod() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
 			@SuppressWarnings("unused")
-			@AfterWrite
 			public void aMethod(List<String> items) {
 				executed = true;
 				assertEquals("foo", items.get(0));
@@ -351,7 +349,6 @@ public class StepListenerFactoryBeanTests {
 	public void testWrongSignatureNamedMethod() {
 		AbstractTestComponent delegate = new AbstractTestComponent() {
 			@SuppressWarnings("unused")
-			@AfterWrite
 			public void aMethod(Integer item) {
 				executed = true;
 			}

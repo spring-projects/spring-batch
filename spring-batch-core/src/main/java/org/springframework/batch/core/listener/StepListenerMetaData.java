@@ -53,7 +53,7 @@ import org.springframework.batch.core.annotation.OnWriteError;
  * @since 2.0
  * @see StepListenerFactoryBean
  */
-public enum StepListenerMetaData {
+public enum StepListenerMetaData implements AbstractListenerMetaData {
 
 	BEFORE_STEP("beforeStep", "before-step-method", BeforeStep.class, StepExecutionListener.class, StepExecution.class),
 	AFTER_STEP("afterStep", "after-step-method", AfterStep.class, StepExecutionListener.class, StepExecution.class),

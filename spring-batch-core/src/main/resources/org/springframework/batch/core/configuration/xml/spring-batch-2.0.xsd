@@ -229,7 +229,8 @@
 								<xsd:attribute name="ref" type="xsd:string">
 									<xsd:annotation>
 										<xsd:documentation>
-										A reference to a JobExecutionListener or a POJO (with before-method / after-method).
+										A reference to a JobExecutionListener or a POJO 
+										(with before-job-method / after-job-method).
 										</xsd:documentation>
 										<xsd:appinfo>
 											<tool:annotation kind="ref"/>
@@ -248,8 +249,8 @@
 										</xsd:appinfo>
 									</xsd:annotation>
 								</xsd:attribute>
-								<xsd:attribute name="before-method" type="xsd:string" />
-								<xsd:attribute name="after-method" type="xsd:string" />
+								<xsd:attribute name="before-job-method" type="xsd:string" />
+								<xsd:attribute name="after-job-method" type="xsd:string" />
 							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
