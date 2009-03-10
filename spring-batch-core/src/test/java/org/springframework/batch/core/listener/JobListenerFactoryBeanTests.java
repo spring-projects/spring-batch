@@ -23,10 +23,12 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.annotation.AfterJob;
 import org.springframework.batch.core.annotation.BeforeJob;
+import org.springframework.core.Ordered;
 
 /**
  * @author Lucas Ward
@@ -75,6 +77,15 @@ public class JobListenerFactoryBeanTests {
 	}
 
 	@Test
+	public void testVanillaInterfaceWithProxy() throws Exception {
+		JobListenerWithInterface delegate = new JobListenerWithInterface();
+		ProxyFactory factory = new ProxyFactory(delegate);
+		factoryBean.setDelegate(factory.getProxy());
+		Object listener = factoryBean.getObject();
+		assertTrue(listener instanceof JobExecutionListener);
+	}
+
+	@Test
 	public void testUseInHashSet() throws Exception {
 		JobListenerWithInterface delegate = new JobListenerWithInterface();
 		Object listener = JobListenerFactoryBean.getListener(delegate);
@@ -100,6 +111,23 @@ public class JobListenerFactoryBeanTests {
 	@Test
 	public void testInterfaceIsListener() throws Exception {
 		assertTrue(JobListenerFactoryBean.isListener(new JobListenerWithInterface()));
+	}
+
+	@Test
+	public void testAnnotationsWithOrdered() throws Exception {
+		Object delegate = new Ordered() {
+			@SuppressWarnings("unused")
+			@BeforeJob
+			public void foo(JobExecution execution) {
+			}
+
+			public int getOrder() {
+				return 3;
+			}
+		};
+		JobExecutionListener listener = JobListenerFactoryBean.getListener(delegate);
+		assertTrue("Listener is not of correct type", listener instanceof Ordered);
+		assertEquals(3, ((Ordered) listener).getOrder());
 	}
 
 	@Test

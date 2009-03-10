@@ -32,6 +32,7 @@ import org.springframework.batch.support.MethodInvoker;
 import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 
 /**
@@ -107,8 +108,15 @@ public class JobListenerFactoryBean implements FactoryBean, InitializingBean {
 		// be called
 		ProxyFactory proxyFactory = new ProxyFactory();
 		proxyFactory.setTarget(delegate);
-		proxyFactory.setInterfaces(new Class[] { JobExecutionListener.class });
-		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap)));
+
+		boolean ordered = false;
+		if (delegate instanceof Ordered) {
+			ordered = true;
+			proxyFactory.addInterface(Ordered.class);
+		}
+
+		proxyFactory.addInterface(JobExecutionListener.class);
+		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap, ordered)));
 		return proxyFactory.getProxy();
 	}
 
