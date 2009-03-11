@@ -16,92 +16,26 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import static org.springframework.util.StringUtils.hasText;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.support.ManagedMap;
-import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.factory.xml.BeanDefinitionParser;
-import org.springframework.beans.factory.xml.ParserContext;
-import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
+import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
+import org.springframework.batch.core.listener.JobListenerFactoryBean;
+import org.springframework.batch.core.listener.JobListenerMetaData;
+import org.springframework.batch.core.listener.ListenerMetaData;
 
 /**
- * {@link BeanDefinitionParser} for
- * {@link org.springframework.batch.core.JobExecutionListener}s
+ * Parser for a step listener element. Builds a {@link JobListenerFactoryBean}
+ * using attributes from the configuration.
  * 
- * @author Lucas Ward
- * @author Dave Syer
- * 
+ * @author Dan Garrette
+ * @since 2.0
  */
-public class JobExecutionListenerParser {
+public class JobExecutionListenerParser extends AbstractListenerParser {
 
-	@SuppressWarnings("unchecked")
-	public ManagedList parse(Element element, ParserContext parserContext) {
-		List<BeanDefinition> listeners = new ArrayList<BeanDefinition>();
-		List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "listener");
-		for (Element listenerElement : listenerElements) {
-			BeanDefinitionBuilder listenerBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition("org.springframework.batch.core.listener.JobListenerFactoryBean");
-			String id = listenerElement.getAttribute("id");
-			String listenerRef = listenerElement.getAttribute("ref");
-			String className = listenerElement.getAttribute("class");
-			if ((StringUtils.hasText(id) || StringUtils.hasText(className)) && StringUtils.hasText(listenerRef)) {
-				NamedNodeMap attributeNodes = listenerElement.getAttributes();
-				StringBuilder attributes = new StringBuilder();
-				for (int i = 0; i < attributeNodes.getLength(); i++) {
-					if (i > 0) {
-						attributes.append(" ");
-					}
-					attributes.append(attributeNodes.item(i));
-				}
-				parserContext.getReaderContext().error(
-						"Both 'ref' and 'class' specified; use 'class' with an optional 'id' or just 'ref' for <"
-								+ listenerElement.getTagName() + "> element with attributes: " + attributes,
-						listenerElement);
-			}
+	protected Class<? extends AbstractListenerFactoryBean> getFactoryClass() {
+		return JobListenerFactoryBean.class;
+	}
 
-			if (hasText(listenerRef)) {
-				listenerBuilder.addPropertyReference("delegate", listenerRef);
-			}
-			else if (hasText(className)) {
-				RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-				listenerBuilder.addPropertyValue("delegate", beanDef);
-			}
-			else {
-				parserContext.getReaderContext().error(
-						"Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element",
-						listenerElement);
-			}
-
-			ManagedMap metaDataMap = new ManagedMap();
-			String[] methodNameAttributes = new String[] {
-					"before-job-method",
-					"after-job-method"
-			};
-			for (String metaDataPropertyName : methodNameAttributes) {
-				String listenerMethod = listenerElement.getAttribute(metaDataPropertyName);
-				if(StringUtils.hasText(listenerMethod)){
-					metaDataMap.put(metaDataPropertyName, listenerMethod);
-				}
-			}
-			listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
-			AbstractBeanDefinition beanDef = listenerBuilder.getBeanDefinition();
-			listeners.add(beanDef);
-		}
-
-		ManagedList managedList = new ManagedList();
-		managedList.addAll(listeners);
-
-		return managedList;
+	protected ListenerMetaData[] getMetaDataValues() {
+		return JobListenerMetaData.values();
 	}
 
 }
