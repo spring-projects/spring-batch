@@ -753,6 +753,9 @@
 				<xsd:documentation>
 					The name of the parent step from which the configuration should inherit.
 				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref"/>
+				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:attributeGroup>

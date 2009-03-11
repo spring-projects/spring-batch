@@ -18,12 +18,15 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -46,8 +49,6 @@ public class TaskletElementParser {
 	 */
 	protected AbstractBeanDefinition parseTaskletElement(Element element, ParserContext parserContext) {
 
-    	RootBeanDefinition bd;
-    	
     	boolean isFaultTolerant = false;
 
         String skipLimit = element.getAttribute("skip-limit");
@@ -72,11 +73,12 @@ public class TaskletElementParser {
         checkExceptionElementForFaultToleranceNeeded(element, "retryable-exception-classes");
         checkExceptionElementForFaultToleranceNeeded(element, "fatal-exception-classes");
 		
+    	GenericBeanDefinition bd = new GenericBeanDefinition();
         if (isFaultTolerant) {
-        	bd = new RootBeanDefinition("org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean", null, null);
+        	bd.setBeanClass(FaultTolerantStepFactoryBean.class);
         }
         else {
-        	bd = new RootBeanDefinition("org.springframework.batch.core.step.item.SimpleStepFactoryBean", null, null);
+        	bd.setBeanClass(SimpleStepFactoryBean.class);
         }
         
         MutablePropertyValues propertyValues = bd.getPropertyValues();

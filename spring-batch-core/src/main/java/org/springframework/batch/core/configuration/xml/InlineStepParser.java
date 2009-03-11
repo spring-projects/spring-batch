@@ -74,6 +74,9 @@ public class InlineStepParser extends AbstractStepParser {
 			if (listOfListenersElements.size() > 0) {
 				parserContext.getReaderContext().error("The 'listeners' element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
 			}
+			if (StringUtils.hasText(element.getAttribute("parent"))) {
+				parserContext.getReaderContext().error("The 'parent' element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);				
+			}
 			BeanDefinitionBuilder stepBuilder = 
 				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.configuration.xml.DelegatingStep");
 			stepBuilder.addConstructorArgValue(stepId);

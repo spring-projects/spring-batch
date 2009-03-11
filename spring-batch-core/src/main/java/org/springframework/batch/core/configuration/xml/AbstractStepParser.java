@@ -18,11 +18,13 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -55,7 +57,8 @@ public abstract class AbstractStepParser {
 	 */
 	protected AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext, String jobRepositoryRef) {
 
-    	RootBeanDefinition bd = new RootBeanDefinition("org.springframework.batch.core.step.tasklet.TaskletStep", null, null);
+		GenericBeanDefinition bd = new GenericBeanDefinition();
+		bd.setBeanClass(TaskletStep.class);
 
         if (StringUtils.hasText(taskletRef)) {
             RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
@@ -117,6 +120,10 @@ public abstract class AbstractStepParser {
         String allowStartIfComplete = stepElement.getAttribute("allow-start-if-complete");
         if (StringUtils.hasText(allowStartIfComplete)) {
             bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
+        }
+		String parentRef = stepElement.getAttribute("parent");
+        if (StringUtils.hasText(parentRef)) {
+        	bd.setParentName(parentRef);
         }
 	}
 

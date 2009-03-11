@@ -201,11 +201,6 @@ public class SkipSampleFunctionalTests {
 	}
 
 	private Map<String, Object> getStepExecution(long jobExecutionId, String stepName) {
-		for (Map<String, Object> rs : simpleJdbcTemplate.queryForList(
-				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
-				stepName)) {
-			System.err.println(rs);
-		}
 		return simpleJdbcTemplate.queryForMap(
 				"SELECT * from BATCH_STEP_EXECUTION where JOB_EXECUTION_ID = ? and STEP_NAME = ?", jobExecutionId,
 				stepName);

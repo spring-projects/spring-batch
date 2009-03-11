@@ -54,6 +54,7 @@ public class StandaloneStepParser extends AbstractStepParser {
 			Element taskElement = processTaskElements.get(0);
 			bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
 		}
+		bd.setAbstract(Boolean.valueOf(element.getAttribute("abstract")));
 		
 		return bd;
 		
