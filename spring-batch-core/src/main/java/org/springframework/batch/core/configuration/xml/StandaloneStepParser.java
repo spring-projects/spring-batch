@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.List;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
@@ -25,7 +26,8 @@ import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;step/&gt; elements for a job. A step element
- * references a bean definition for a {@link org.springframework.batch.core.Step}.
+ * references a bean definition for a
+ * {@link org.springframework.batch.core.Step}.
  * 
  * @author Dave Syer
  * @author Thomas Risberg
@@ -42,7 +44,7 @@ public class StandaloneStepParser extends AbstractStepParser {
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
 
 		String taskletRef = element.getAttribute("tasklet");
-        String jobRepositoryRef = element.getAttribute("job-repository");
+		String jobRepositoryRef = element.getAttribute("job-repository");
 
 		@SuppressWarnings("unchecked")
 		List<Element> processTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
@@ -54,10 +56,14 @@ public class StandaloneStepParser extends AbstractStepParser {
 			Element taskElement = processTaskElements.get(0);
 			bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
 		}
+		else {
+			bd = new GenericBeanDefinition();
+			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef, "listeners");
+		}
 		bd.setAbstract(Boolean.valueOf(element.getAttribute("abstract")));
-		
+
 		return bd;
-		
+
 	}
 
 }

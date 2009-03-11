@@ -18,9 +18,9 @@
 			         commit-interval="3" skip-limit="10">
 			</tasklet>
 
-			<fail on="FAILED" exit-code="FAILED"/>
-			<next on="COMPLETED WITH SKIPS" to="errorPrint1" />
 			<next on="*" to="step2" />
+			<next on="COMPLETED WITH SKIPS" to="errorPrint1" />
+			<fail on="FAILED" exit-code="FAILED"/>
 		</step>
 
 		<step id="errorPrint1" tasklet="errorLogTasklet" next="step2"/>
@@ -28,8 +28,9 @@
 		<step id="step2" ref="secondPass" next="skipCheckingDecision"/>
 
 		<decision id="skipCheckingDecision" decider="skipCheckingDecider">
-			<next on="COMPLETED WITH SKIPS" to="errorPrint2" />
 			<end on="*"/>
+			<next on="COMPLETED WITH SKIPS" to="errorPrint2" />
+			<fail on="FAILED" exit-code="FAILED"/>
 		</decision>
 		
 		<step id="errorPrint2" tasklet="errorLogTasklet"/>
@@ -45,16 +46,12 @@
 		</tasklet>
 	</step>
 	
-	<beans:bean id="baseStep" abstract="true">
-		<beans:property name="listeners">
-			<beans:list>
-				<beans:ref bean="skipCheckingListener"/>
-				<step-listener ref="promotionListener"/>
-			</beans:list>
-		</beans:property>
-	</beans:bean>
-
-	<step-listener id="skipCheckingListener" class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+	<step id="baseStep" abstract="true">
+		<listeners>
+			<listener id="skipCheckingListener" class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+			<listener ref="promotionListener"/>
+		</listeners>
+	</step>
 
 	<beans:bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
 		<beans:property name="keys" value="stepName"/>

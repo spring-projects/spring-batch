@@ -32,8 +32,9 @@ import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
- * references a bean definition for a {@link org.springframework.batch.core.Step} and goes on to (optionally)
- * list a set of transitions from that step to others with &lt;next on="pattern"
+ * references a bean definition for a
+ * {@link org.springframework.batch.core.Step} and goes on to (optionally) list
+ * a set of transitions from that step to others with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
  * @see JobParser
@@ -43,9 +44,9 @@ import org.w3c.dom.Element;
  * @since 2.0
  */
 public abstract class AbstractStepParser {
-	
+
 	private TaskletElementParser taskletElementParser = new TaskletElementParser();
-	
+
 	private StepListenerParser stepListenerParser = new StepListenerParser();
 
 	/**
@@ -53,102 +54,88 @@ public abstract class AbstractStepParser {
 	 * @param taskletRef
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext, String jobRepositoryRef) {
+	protected AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef,
+			ParserContext parserContext, String jobRepositoryRef) {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setBeanClass(TaskletStep.class);
 
-        if (StringUtils.hasText(taskletRef)) {
-            RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
-            bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
-        }
+		if (StringUtils.hasText(taskletRef)) {
+			RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
+			bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
+		}
 
-        checkStepAttributes(stepElement, bd);
+		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef, "stepExecutionListeners");
 
-        RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
-        bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
+		return bd;
 
-        String transactionManagerRef = stepElement.getAttribute("transaction-manager");
-        RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
-        bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
-		
-        handleListenersElement(stepElement, bd, parserContext, "stepExecutionListeners");
-        
-        bd.setRole(BeanDefinition.ROLE_SUPPORT);
-        
-        bd.setSource(parserContext.extractSource(stepElement));
-        
-        return bd;
-
-    }
+	}
 
 	/**
 	 * @param element
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition parseTaskletElement(Element stepElement, Element element, ParserContext parserContext, String jobRepositoryRef) {
+	protected AbstractBeanDefinition parseTaskletElement(Element stepElement, Element element,
+			ParserContext parserContext, String jobRepositoryRef) {
 
-    	AbstractBeanDefinition bd = taskletElementParser.parseTaskletElement(element, parserContext);
+		AbstractBeanDefinition bd = taskletElementParser.parseTaskletElement(element, parserContext);
+		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef, "listeners");
+		return bd;
 
-		// now, set the properties on the new bean 
-        checkStepAttributes(stepElement, bd);
+	}
 
-        RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
-        bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
+	protected void setUpBeanDefinition(Element stepElement, AbstractBeanDefinition bd, ParserContext parserContext,
+			String jobRepositoryRef, String listenersPropertyNames) {
+		checkStepAttributes(stepElement, bd);
 
-        String transactionManagerRef = stepElement.getAttribute("transaction-manager");
-        RuntimeBeanReference tx = new RuntimeBeanReference(transactionManagerRef);
-        bd.getPropertyValues().addPropertyValue("transactionManager", tx);
-        
-        handleListenersElement(stepElement, bd, parserContext, "listeners");
-        
-        bd.setRole(BeanDefinition.ROLE_SUPPORT);
-        
-        bd.setSource(parserContext.extractSource(stepElement));
+		RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
+		bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
 
-        return bd;
-        
+		String transactionManagerRef = stepElement.getAttribute("transaction-manager");
+		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
+		bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
+
+		handleListenersElement(stepElement, bd, parserContext, listenersPropertyNames);
+
+		bd.setRole(BeanDefinition.ROLE_SUPPORT);
+
+		bd.setSource(parserContext.extractSource(stepElement));
 	}
 
 	private void checkStepAttributes(Element stepElement, AbstractBeanDefinition bd) {
 		String startLimit = stepElement.getAttribute("start-limit");
-        if (StringUtils.hasText(startLimit)) {
-            bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
-        }
-        String allowStartIfComplete = stepElement.getAttribute("allow-start-if-complete");
-        if (StringUtils.hasText(allowStartIfComplete)) {
-            bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
-        }
-		setParent(stepElement, bd);
-	}
-
-	protected void setParent(Element stepElement, AbstractBeanDefinition bd) {
+		if (StringUtils.hasText(startLimit)) {
+			bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
+		}
+		String allowStartIfComplete = stepElement.getAttribute("allow-start-if-complete");
+		if (StringUtils.hasText(allowStartIfComplete)) {
+			bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
+		}
 		String parentRef = stepElement.getAttribute("parent");
-        if (StringUtils.hasText(parentRef)) {
-        	bd.setParentName(parentRef);
-        }
+		if (StringUtils.hasText(parentRef)) {
+			bd.setParentName(parentRef);
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleListenersElement(Element element, BeanDefinition bd, ParserContext parserContext, String property) {
-		Element listenersElement = 
-        	DomUtils.getChildElementByTagName(element, "listeners");
+	private void handleListenersElement(Element element, BeanDefinition bd, ParserContext parserContext,
+			String propertyName) {
+		Element listenersElement = DomUtils.getChildElementByTagName(element, "listeners");
 		if (listenersElement != null) {
-			CompositeComponentDefinition compositeDef =
-				new CompositeComponentDefinition(listenersElement.getTagName(), parserContext.extractSource(element));
+			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
+					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			List<Object> listenerBeans = new ArrayList<Object>(); 
-			List<Element> listenerElements = 
-				DomUtils.getChildElementsByTagName(listenersElement, "listener");
+			List<Object> listenerBeans = new ArrayList<Object>();
+			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {
 					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
 				}
 			}
-	        ManagedList arguments = new ManagedList();
-	        arguments.addAll(listenerBeans);
-        	bd.getPropertyValues().addPropertyValue(property, arguments);
-        	parserContext.popAndRegisterContainingComponent();
+			ManagedList arguments = new ManagedList();
+			arguments.addAll(listenerBeans);
+			bd.getPropertyValues().addPropertyValue(propertyName, arguments);
+			parserContext.popAndRegisterContainingComponent();
 		}
 	}
 
