@@ -33,6 +33,6 @@ public class CoreNamespaceHandler extends NamespaceHandlerSupport {
 		this.registerBeanDefinitionParser("job", new JobParser());
 		this.registerBeanDefinitionParser("step", new TopLevelStepParser());
 		this.registerBeanDefinitionParser("job-repository", new JobRepositoryParser());
-		this.registerBeanDefinitionParser("step-listener", new StepListenerParser());
+		this.registerBeanDefinitionParser("step-listener", new TopLevelStepListenerParser());
 	}
 }

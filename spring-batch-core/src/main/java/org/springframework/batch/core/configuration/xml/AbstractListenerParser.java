@@ -5,11 +5,10 @@ import java.util.List;
 
 import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
 import org.springframework.batch.core.listener.ListenerMetaData;
-import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
@@ -19,16 +18,11 @@ import org.w3c.dom.NamedNodeMap;
  * @author Dan Garrette
  * @since 2.0
  */
-public abstract class AbstractListenerParser extends AbstractSingleBeanDefinitionParser {
-
-	public BeanDefinition internalParse(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(getBeanClass(null));
-		this.doParse(element, parserContext, builder);
-		return builder.getBeanDefinition();
-	}
+public abstract class AbstractListenerParser {
 
 	@SuppressWarnings("unchecked")
-	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(getBeanClass(null));
 		String id = element.getAttribute("id");
 		String listenerRef = element.getAttribute("ref");
 		String className = element.getAttribute("class");
@@ -54,6 +48,7 @@ public abstract class AbstractListenerParser extends AbstractSingleBeanDefinitio
 			}
 		}
 		builder.addPropertyValue("metaDataMap", metaDataMap);
+		return builder.getBeanDefinition();
 	}
 
 	private void checkListenerElementAttributes(ParserContext parserContext, Element element, String id,

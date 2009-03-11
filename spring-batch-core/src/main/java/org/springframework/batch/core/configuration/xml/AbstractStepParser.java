@@ -119,6 +119,10 @@ public abstract class AbstractStepParser {
         if (StringUtils.hasText(allowStartIfComplete)) {
             bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
         }
+		setParent(stepElement, bd);
+	}
+
+	protected void setParent(Element stepElement, AbstractBeanDefinition bd) {
 		String parentRef = stepElement.getAttribute("parent");
         if (StringUtils.hasText(parentRef)) {
         	bd.setParentName(parentRef);
@@ -138,7 +142,7 @@ public abstract class AbstractStepParser {
 				DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {
-					listenerBeans.add(stepListenerParser.internalParse(listenerElement, parserContext));
+					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
 				}
 			}
 	        ManagedList arguments = new ManagedList();
