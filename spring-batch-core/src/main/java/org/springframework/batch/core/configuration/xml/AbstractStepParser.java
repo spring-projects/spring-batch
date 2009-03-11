@@ -23,16 +23,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
-import org.springframework.beans.factory.support.ManagedMap;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
@@ -48,7 +44,9 @@ import org.w3c.dom.NamedNodeMap;
  */
 public abstract class AbstractStepParser {
 	
-	TaskletElementParser taskletElementParser = new TaskletElementParser();
+	private TaskletElementParser taskletElementParser = new TaskletElementParser();
+	
+	private StepListenerParser stepListenerParser = new StepListenerParser();
 
 	/**
 	 * @param stepElement
@@ -136,93 +134,17 @@ public abstract class AbstractStepParser {
 				new CompositeComponentDefinition(listenersElement.getTagName(), parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
 			List<Object> listenerBeans = new ArrayList<Object>(); 
-			handleStepListenerElements(parserContext, listenersElement,
-					listenerBeans);
+			List<Element> listenerElements = 
+				DomUtils.getChildElementsByTagName(listenersElement, "listener");
+			if (listenerElements != null) {
+				for (Element listenerElement : listenerElements) {
+					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
+				}
+			}
 	        ManagedList arguments = new ManagedList();
 	        arguments.addAll(listenerBeans);
         	bd.getPropertyValues().addPropertyValue(property, arguments);
         	parserContext.popAndRegisterContainingComponent();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void handleStepListenerElements(ParserContext parserContext,
-			Element element, List<Object> beans) {
-		List<Element> listenerElements = 
-			DomUtils.getChildElementsByTagName(element, "listener");
-		if (listenerElements != null) {
-			for (Element listenerElement : listenerElements) {
-				BeanDefinitionBuilder listenerBuilder = 
-					BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.listener.StepListenerFactoryBean");
-				String id = listenerElement.getAttribute("id");
-				String listenerRef = listenerElement.getAttribute("ref");
-				String className = listenerElement.getAttribute("class");
-				checkListenerElementAttributes(parserContext, element,
-						listenerElement, id, listenerRef, className);
-				if (StringUtils.hasText(listenerRef)) {
-			        listenerBuilder.addPropertyReference("delegate", listenerRef);
-				}
-				else if (StringUtils.hasText(className)) {
-					RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-					listenerBuilder.addPropertyValue("delegate", beanDef);
-				}
-				else {
-					parserContext.getReaderContext().error("Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element", element);
-				}
-				
-				ManagedMap metaDataMap = new ManagedMap();
-				String[] methodNameAttributes = new String[] {
-						"before-step-method",
-						"after-step-method",
-						"before-chunk-method",
-						"after-chunk-method",
-						"before-read-method",
-						"after-read-method",
-						"on-read-error-method",
-						"before-process-method",
-						"after-process-method",
-						"on-process-error-method",
-						"before-write-method",
-						"after-write-method",
-						"on-write-error-method",
-						"on-skip-in-read-method",
-						"on-skip-in-process-method",
-						"on-skip-in-write-method"
-				};
-				for (String metaDataPropertyName : methodNameAttributes) {
-					String listenerMethod = listenerElement.getAttribute(metaDataPropertyName);
-					if(StringUtils.hasText(listenerMethod)){
-						metaDataMap.put(metaDataPropertyName, listenerMethod);
-					}
-				}
-				listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
-				
-				AbstractBeanDefinition beanDef = listenerBuilder.getBeanDefinition();
-				if (!StringUtils.hasText(id)) {
-					id = parserContext.getReaderContext().generateBeanName(beanDef);
-				}
-				beans.add(beanDef);
-			}
-		}
-	}
-
-	private void checkListenerElementAttributes(ParserContext parserContext,
-			Element element, Element listenerElement, String id,
-			String listenerRef, String className) {
-		if ((StringUtils.hasText(id) || StringUtils.hasText(className)) 
-				&& StringUtils.hasText(listenerRef)) {
-			NamedNodeMap attributeNodes = listenerElement.getAttributes();
-			StringBuilder attributes = new StringBuilder();
-			for (int i = 0; i < attributeNodes.getLength(); i++) {
-				if (i > 0) {
-					attributes.append(" ");
-				}
-				attributes.append(attributeNodes.item(i));
-			}
-			parserContext.getReaderContext().error("Both 'ref' and " +
-					(StringUtils.hasText(id) ? "'id'" : "'class'") +
-					" specified; use 'class' with an optional 'id' or just 'ref' for <" + 
-					listenerElement.getTagName() + "> element specified with attributes: " + attributes, element);
 		}
 	}
 
