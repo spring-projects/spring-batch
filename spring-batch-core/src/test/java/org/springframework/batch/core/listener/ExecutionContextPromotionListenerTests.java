@@ -29,8 +29,8 @@ public class ExecutionContextPromotionListenerTests {
 	private static final String statusWildcard = "COMPL*SKIPS";
 
 	/**
-	 * CONDITION: keys = {key1, key2}. statuses is not set (defaults to
-	 * {COMPLETED}).
+	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key}. statuses
+	 * is not set (defaults to {COMPLETED}).
 	 * 
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
@@ -58,7 +58,8 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
-	 * CONDITION: keys = {key1, key2}. statuses = {status}. ExitStatus = status
+	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}.
+	 * statuses = {status}. ExitStatus = status
 	 * 
 	 * EXPECTED: key is promoted. key2 is not.
 	 */
@@ -87,7 +88,8 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
-	 * CONDITION: keys = {key1, key2}. statuses = {status}. ExitStatus = status2
+	 * CONDITION: ExecutionContext contains {key, key2}. keys = {key, key2}.
+	 * statuses = {status}. ExitStatus = status2
 	 * 
 	 * EXPECTED: no promotions.
 	 */
@@ -116,7 +118,7 @@ public class ExecutionContextPromotionListenerTests {
 	}
 
 	/**
-	 * CONDITION: keys = {key1, key2}. statuses = {statusWildcard}. ExitStatus =
+	 * CONDITION: keys = {key, key2}. statuses = {statusWildcard}. ExitStatus =
 	 * status
 	 * 
 	 * EXPECTED: key is promoted. key2 is not.
@@ -137,6 +139,33 @@ public class ExecutionContextPromotionListenerTests {
 
 		listener.setKeys(new String[] { key });
 		listener.setStatuses(new String[] { statusWildcard });
+		listener.afterPropertiesSet();
+
+		listener.afterStep(stepExecution);
+
+		assertEquals(value, jobExecution.getExecutionContext().getString(key));
+		assertFalse(jobExecution.getExecutionContext().containsKey(key2));
+	}
+
+	/**
+	 * CONDITION: keys = {key, key2}. Only {key} exists in the ExecutionContext.
+	 * 
+	 * EXPECTED: key is promoted. key2 is not.
+	 */
+	@Test
+	public void promoteEntries_keyNotFound() throws Exception {
+		ExecutionContextPromotionListener listener = new ExecutionContextPromotionListener();
+
+		JobExecution jobExecution = new JobExecution(1L);
+		StepExecution stepExecution = jobExecution.createStepExecution("step1");
+		stepExecution.setExitStatus(ExitStatus.COMPLETED);
+
+		Assert.state(jobExecution.getExecutionContext().isEmpty());
+		Assert.state(stepExecution.getExecutionContext().isEmpty());
+
+		stepExecution.getExecutionContext().putString(key, value);
+
+		listener.setKeys(new String[] { key, key2 });
 		listener.afterPropertiesSet();
 
 		listener.afterStep(stepExecution);
