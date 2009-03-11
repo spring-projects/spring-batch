@@ -138,7 +138,7 @@ public abstract class AbstractStepParser {
 				DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {
-					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
+					listenerBeans.add(stepListenerParser.internalParse(listenerElement, parserContext));
 				}
 			}
 	        ManagedList arguments = new ManagedList();

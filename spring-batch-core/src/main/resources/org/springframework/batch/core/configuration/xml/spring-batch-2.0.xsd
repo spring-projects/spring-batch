@@ -84,6 +84,19 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="step-listener">
+		<xsd:annotation>
+			<xsd:documentation>
+				A bean definition for a step listener (or POJO if using *-method attributes)
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="stepListenerType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
 	<xsd:element name="job-repository">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[

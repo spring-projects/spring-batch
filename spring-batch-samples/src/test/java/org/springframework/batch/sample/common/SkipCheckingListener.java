@@ -5,6 +5,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.AfterStep;
 import org.springframework.batch.core.annotation.BeforeStep;
 
+/**
+ * @author Dan Garrette
+ * @since 2.0
+ */
 public class SkipCheckingListener {
 
 	@AfterStep

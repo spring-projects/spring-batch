@@ -89,7 +89,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			List<BeanDefinition> listeners = new ArrayList<BeanDefinition>();
 			List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			for (Element listenerElement : listenerElements) {
-				listeners.add(listenerParser.parse(listenerElement, parserContext));
+				listeners.add(listenerParser.internalParse(listenerElement, parserContext));
 			}
 			ManagedList managedList = new ManagedList();
 			managedList.addAll(listeners);

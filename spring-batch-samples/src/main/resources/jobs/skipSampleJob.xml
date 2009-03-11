@@ -48,20 +48,14 @@
 	<beans:bean id="baseStep" abstract="true">
 		<beans:property name="listeners">
 			<beans:list>
-				<beans:bean class="org.springframework.batch.core.listener.StepListenerFactoryBean">
-					<beans:property name="delegate" ref="skipCheckingListener"/>
-				</beans:bean>
-				<beans:bean class="org.springframework.batch.core.listener.StepListenerFactoryBean">
-					<beans:property name="delegate" ref="promotionListener"/>
-				</beans:bean>
+				<beans:ref bean="skipCheckingListener"/>
+				<step-listener ref="promotionListener"/>
 			</beans:list>
 		</beans:property>
 	</beans:bean>
 
-	<beans:bean id="tradeProcessor" class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"/>
-	
-	<beans:bean id="skipCheckingListener" class="org.springframework.batch.sample.common.SkipCheckingListener"/>
-	
+	<step-listener id="skipCheckingListener" class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+
 	<beans:bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
 		<beans:property name="keys" value="stepName"/>
 	</beans:bean>
@@ -82,6 +76,8 @@
 		</beans:property>
 	</beans:bean>
 
+	<beans:bean id="tradeProcessor" class="org.springframework.batch.sample.domain.trade.internal.TradeProcessor"/>
+	
 	<beans:bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
 		<beans:property name="dataSource" ref="dataSource" />
 		<beans:property name="sql" value="SELECT isin, quantity, price, customer from TRADE" />

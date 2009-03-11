@@ -5,10 +5,11 @@ import java.util.List;
 
 import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
 import org.springframework.batch.core.listener.ListenerMetaData;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedMap;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
@@ -18,22 +19,27 @@ import org.w3c.dom.NamedNodeMap;
  * @author Dan Garrette
  * @since 2.0
  */
-public abstract class AbstractListenerParser {
+public abstract class AbstractListenerParser extends AbstractSingleBeanDefinitionParser {
+
+	public BeanDefinition internalParse(Element element, ParserContext parserContext) {
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(getBeanClass(null));
+		this.doParse(element, parserContext, builder);
+		return builder.getBeanDefinition();
+	}
 
 	@SuppressWarnings("unchecked")
-	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder listenerBuilder = BeanDefinitionBuilder.genericBeanDefinition(getFactoryClass());
+	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		String id = element.getAttribute("id");
 		String listenerRef = element.getAttribute("ref");
 		String className = element.getAttribute("class");
 		checkListenerElementAttributes(parserContext, element, id, listenerRef, className);
 
 		if (StringUtils.hasText(listenerRef)) {
-			listenerBuilder.addPropertyReference("delegate", listenerRef);
+			builder.addPropertyReference("delegate", listenerRef);
 		}
 		else if (StringUtils.hasText(className)) {
 			RootBeanDefinition beanDef = new RootBeanDefinition(className, null, null);
-			listenerBuilder.addPropertyValue("delegate", beanDef);
+			builder.addPropertyValue("delegate", beanDef);
 		}
 		else {
 			parserContext.getReaderContext().error(
@@ -47,9 +53,7 @@ public abstract class AbstractListenerParser {
 				metaDataMap.put(metaDataPropertyName, listenerMethod);
 			}
 		}
-		listenerBuilder.addPropertyValue("metaDataMap", metaDataMap);
-
-		return listenerBuilder.getBeanDefinition();
+		builder.addPropertyValue("metaDataMap", metaDataMap);
 	}
 
 	private void checkListenerElementAttributes(ParserContext parserContext, Element element, String id,
@@ -78,7 +82,7 @@ public abstract class AbstractListenerParser {
 		return methodNameAttributes;
 	}
 
-	protected abstract Class<? extends AbstractListenerFactoryBean> getFactoryClass();
+	protected abstract Class<? extends AbstractListenerFactoryBean> getBeanClass(Element element);
 
 	protected abstract ListenerMetaData[] getMetaDataValues();
 
