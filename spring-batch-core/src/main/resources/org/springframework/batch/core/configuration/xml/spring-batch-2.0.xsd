@@ -66,6 +66,19 @@
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="jobRepositoryAttribute"/>
 					<xsd:attributeGroup ref="stepAttributes"/>
+					<xsd:attribute name="abstract" type="xsd:boolean" default="false">
+						<xsd:annotation>
+							<xsd:documentation>
+								Is this bean "abstract", that is, not meant to be instantiated itself
+								but rather just serving as parent for concrete child bean definitions?
+								The default is "false". Specify "true" to tell the bean factory to not
+								try to instantiate that particular bean in any case.
+							
+								Note: This attribute will not be inherited by child bean definitions.
+								Hence, it needs to be specified per abstract bean definition.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -733,6 +746,13 @@
 				<xsd:documentation><![CDATA[
 				Set to true to allow a step to be started even if it is already complete.
 				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="parent" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+					The name of the parent step from which the configuration should inherit.
+				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:attributeGroup>
