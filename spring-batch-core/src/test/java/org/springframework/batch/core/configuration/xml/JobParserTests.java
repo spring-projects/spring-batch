@@ -28,7 +28,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.job.AbstractJob;
-import org.springframework.batch.core.listener.CompositeExecutionJobListener;
+import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -83,7 +83,7 @@ public class JobParserTests {
 		listenerField.setAccessible(true);
 		Object compositeListener = listenerField.get(job);
 
-		Field compositeField = CompositeExecutionJobListener.class.getDeclaredField("listeners");
+		Field compositeField = CompositeJobExecutionListener.class.getDeclaredField("listeners");
 		compositeField.setAccessible(true);
 		Object composite = compositeField.get(compositeListener);
 

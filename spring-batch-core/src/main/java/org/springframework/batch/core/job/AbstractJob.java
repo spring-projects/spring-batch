@@ -33,7 +33,7 @@ import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.StartLimitExceededException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.listener.CompositeExecutionJobListener;
+import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepLocator;
@@ -63,7 +63,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 	private JobRepository jobRepository;
 
-	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
+	private CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
 
 	private JobParametersIncrementer jobParametersIncrementer;
 

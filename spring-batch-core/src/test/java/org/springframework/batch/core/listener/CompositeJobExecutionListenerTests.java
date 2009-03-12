@@ -30,13 +30,13 @@ import org.springframework.batch.core.JobInstance;
  */
 public class CompositeJobExecutionListenerTests extends TestCase {
 
-	private CompositeExecutionJobListener listener = new CompositeExecutionJobListener();
+	private CompositeJobExecutionListener listener = new CompositeJobExecutionListener();
 
 	private List<String> list = new ArrayList<String>();
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#setListeners(List)}
+	 * {@link org.springframework.batch.core.listener.CompositeJobExecutionListener#setListeners(List)}
 	 */
 	public void testSetListeners() {
 		listener.setListeners(Arrays.asList(new JobExecutionListenerSupport() {
@@ -54,7 +54,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#register(org.springframework.batch.core.JobExecutionListener)}
+	 * {@link org.springframework.batch.core.listener.CompositeJobExecutionListener#register(org.springframework.batch.core.JobExecutionListener)}
 	 * .
 	 */
 	public void testSetListener() {
@@ -69,7 +69,7 @@ public class CompositeJobExecutionListenerTests extends TestCase {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.core.listener.CompositeExecutionJobListener#beforeJob(JobExecution)}
+	 * {@link org.springframework.batch.core.listener.CompositeJobExecutionListener#beforeJob(JobExecution)}
 	 * .
 	 */
 	public void testOpen() {
