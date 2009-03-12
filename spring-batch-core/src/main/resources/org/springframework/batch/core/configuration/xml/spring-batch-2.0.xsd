@@ -25,6 +25,7 @@
 		<xsd:complexType>
 			<xsd:complexContent>
 				<xsd:extension base="flowType">
+					<xsd:group ref="jobListeners"/>
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="jobRepositoryAttribute" />
 					<xsd:attribute name="incrementer" type="xsd:string" use="optional">
@@ -262,6 +263,11 @@
 					</xsd:complexType>
 				</xsd:element>			
 			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:group name="jobListeners">
+		<xsd:sequence>
 			<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
@@ -271,8 +277,7 @@
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="listener" minOccurs="1"
-							maxOccurs="unbounded">
+						<xsd:element name="listener" minOccurs="1" maxOccurs="unbounded">
 							<xsd:complexType>
 								<xsd:attribute name="id" type="xsd:ID" />
 								<xsd:attribute name="ref" type="xsd:string">
@@ -314,8 +319,8 @@
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
-	</xsd:complexType>
-	
+	</xsd:group>
+
 	<xsd:complexType name="stepType">
 		<xsd:sequence>
 			<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1"/>
