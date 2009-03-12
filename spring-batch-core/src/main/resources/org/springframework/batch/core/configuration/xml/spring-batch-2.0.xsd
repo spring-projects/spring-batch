@@ -47,29 +47,8 @@
 							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attribute name="parent" type="xsd:string" use="optional">
-						<xsd:annotation>
-							<xsd:documentation>
-								The name of the parent job from which the configuration should inherit.
-							</xsd:documentation>
-							<xsd:appinfo>
-								<tool:annotation kind="ref"/>
-							</xsd:appinfo>
-						</xsd:annotation>
-					</xsd:attribute>
-					<xsd:attribute name="abstract" type="xsd:boolean" default="false" use="optional">
-						<xsd:annotation>
-							<xsd:documentation>
-								Is this bean "abstract", that is, not meant to be instantiated itself
-								but rather just serving as parent for concrete child bean definitions?
-								The default is "false". Specify "true" to tell the bean factory to not
-								try to instantiate that particular bean in any case.
-							
-								Note: This attribute will not be inherited by child bean definitions.
-								Hence, it needs to be specified per abstract bean definition.
-							</xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
+					<xsd:attributeGroup ref="parentAttribute"/>
+					<xsd:attributeGroup ref="abstractAttribute"/>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -90,19 +69,7 @@
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="jobRepositoryAttribute"/>
 					<xsd:attributeGroup ref="stepAttributes"/>
-					<xsd:attribute name="abstract" type="xsd:boolean" default="false" use="optional">
-						<xsd:annotation>
-							<xsd:documentation>
-								Is this bean "abstract", that is, not meant to be instantiated itself
-								but rather just serving as parent for concrete child bean definitions?
-								The default is "false". Specify "true" to tell the bean factory to not
-								try to instantiate that particular bean in any case.
-							
-								Note: This attribute will not be inherited by child bean definitions.
-								Hence, it needs to be specified per abstract bean definition.
-							</xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
+					<xsd:attributeGroup ref="abstractAttribute"/>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -805,6 +772,10 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attributeGroup ref="parentAttribute"/>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="parentAttribute">
 		<xsd:attribute name="parent" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
@@ -813,6 +784,22 @@
 				<xsd:appinfo>
 					<tool:annotation kind="ref"/>
 				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="abstractAttribute">
+		<xsd:attribute name="abstract" type="xsd:boolean" default="false" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					Is this bean "abstract", that is, not meant to be instantiated itself
+					but rather just serving as parent for concrete child bean definitions?
+					The default is "false". Specify "true" to tell the bean factory to not
+					try to instantiate that particular bean in any case.
+				
+					Note: This attribute will not be inherited by child bean definitions.
+					Hence, it needs to be specified per abstract bean definition.
+				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:attributeGroup>
