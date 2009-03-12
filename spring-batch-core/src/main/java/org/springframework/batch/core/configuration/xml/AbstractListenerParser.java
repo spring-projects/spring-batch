@@ -17,12 +17,19 @@ import org.w3c.dom.NamedNodeMap;
 /**
  * @author Dan Garrette
  * @since 2.0
+ * @see StepListenerParser
+ * @see JobExecutionListenerParser
  */
 public abstract class AbstractListenerParser {
 
-	@SuppressWarnings("unchecked")
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(getBeanClass(null));
+		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(getBeanClass());
+		doParse(element, parserContext, builder);
+		return builder.getBeanDefinition();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		String id = element.getAttribute("id");
 		String listenerRef = element.getAttribute("ref");
 		String className = element.getAttribute("class");
@@ -48,7 +55,6 @@ public abstract class AbstractListenerParser {
 			}
 		}
 		builder.addPropertyValue("metaDataMap", metaDataMap);
-		return builder.getBeanDefinition();
 	}
 
 	private void checkListenerElementAttributes(ParserContext parserContext, Element element, String id,
@@ -77,7 +83,7 @@ public abstract class AbstractListenerParser {
 		return methodNameAttributes;
 	}
 
-	protected abstract Class<? extends AbstractListenerFactoryBean> getBeanClass(Element element);
+	protected abstract Class<? extends AbstractListenerFactoryBean> getBeanClass();
 
 	protected abstract ListenerMetaData[] getMetaDataValues();
 

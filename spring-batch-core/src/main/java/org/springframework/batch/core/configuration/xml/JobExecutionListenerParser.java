@@ -20,7 +20,6 @@ import org.springframework.batch.core.listener.AbstractListenerFactoryBean;
 import org.springframework.batch.core.listener.JobListenerFactoryBean;
 import org.springframework.batch.core.listener.JobListenerMetaData;
 import org.springframework.batch.core.listener.ListenerMetaData;
-import org.w3c.dom.Element;
 
 /**
  * Parser for a step listener element. Builds a {@link JobListenerFactoryBean}
@@ -28,10 +27,11 @@ import org.w3c.dom.Element;
  * 
  * @author Dan Garrette
  * @since 2.0
+ * @see AbstractListenerParser
  */
 public class JobExecutionListenerParser extends AbstractListenerParser {
 
-	protected Class<? extends AbstractListenerFactoryBean> getBeanClass(Element element) {
+	protected Class<? extends AbstractListenerFactoryBean> getBeanClass() {
 		return JobListenerFactoryBean.class;
 	}
 

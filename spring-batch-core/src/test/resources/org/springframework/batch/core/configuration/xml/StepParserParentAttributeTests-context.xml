@@ -36,6 +36,4 @@
 		</beans:property>
 	</beans:bean>
 
-	<beans:bean id="dummyTasklet" class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
-
 </beans:beans>
