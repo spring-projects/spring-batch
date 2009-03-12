@@ -46,6 +46,29 @@
 							]]></xsd:documentation>
 						</xsd:annotation>
 					</xsd:attribute>
+					<xsd:attribute name="parent" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>
+								The name of the parent job from which the configuration should inherit.
+							</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref"/>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="abstract" type="xsd:boolean" default="false" use="optional">
+						<xsd:annotation>
+							<xsd:documentation>
+								Is this bean "abstract", that is, not meant to be instantiated itself
+								but rather just serving as parent for concrete child bean definitions?
+								The default is "false". Specify "true" to tell the bean factory to not
+								try to instantiate that particular bean in any case.
+							
+								Note: This attribute will not be inherited by child bean definitions.
+								Hence, it needs to be specified per abstract bean definition.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
@@ -66,7 +89,7 @@
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attributeGroup ref="jobRepositoryAttribute"/>
 					<xsd:attributeGroup ref="stepAttributes"/>
-					<xsd:attribute name="abstract" type="xsd:boolean" default="false">
+					<xsd:attribute name="abstract" type="xsd:boolean" default="false" use="optional">
 						<xsd:annotation>
 							<xsd:documentation>
 								Is this bean "abstract", that is, not meant to be instantiated itself
@@ -146,7 +169,7 @@
 
 	<xsd:complexType name="flowType">
 		<xsd:sequence>
-			<xsd:choice minOccurs="1" maxOccurs="unbounded">
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
 				<xsd:element name="step">
 					<xsd:annotation>
 						<xsd:documentation>
@@ -280,6 +303,14 @@
 							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
+					<xsd:attribute name="merge" type="xsd:boolean" use="optional" default="false">
+						<xsd:annotation>
+							<xsd:documentation>
+								Should this list be merged with the corresponding list provided 
+								by the parent?  If not, it will overwrite the parent list.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
@@ -597,7 +628,7 @@
 					<xsd:attribute name="merge" type="xsd:boolean" use="optional" default="false">
 						<xsd:annotation>
 							<xsd:documentation>
-								Should this list of listeners be merged with the list provided 
+								Should this list be merged with the corresponding list provided 
 								by the parent?  If not, it will overwrite the parent list.
 							</xsd:documentation>
 						</xsd:annotation>
@@ -769,7 +800,7 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="parent" type="xsd:string">
+		<xsd:attribute name="parent" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
 					The name of the parent step from which the configuration should inherit.

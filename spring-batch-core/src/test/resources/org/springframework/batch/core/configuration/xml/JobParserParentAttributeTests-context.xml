@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job1" parent="baseJob">
+		<step id="s1" tasklet="dummyTasklet"/>
+		
+		<listeners merge="true">
+			<listener class="org.springframework.batch.core.listener.JobExecutionListenerSupport"/>
+		</listeners>
+	</job>
+
+	<job id="job2" parent="baseJob">
+		<step id="s2" tasklet="dummyTasklet"/>
+		
+		<listeners>
+			<listener class="org.springframework.batch.core.listener.JobExecutionListenerSupport"/>
+		</listeners>
+	</job>
+
+	<job id="baseJob" abstract="true">
+		<listeners>
+			<listener class="org.springframework.batch.core.configuration.xml.DummyAnnotationJobExecutionListener"/>
+		</listeners>
+	</job>
+
+</beans:beans>

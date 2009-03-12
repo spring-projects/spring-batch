@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.job.flow.FlowJob;
@@ -37,29 +36,39 @@ import org.w3c.dom.Element;
  * 
  */
 public class JobParser extends AbstractSingleBeanDefinitionParser {
-	
+
 	@Override
 	protected Class<FlowJob> getBeanClass(Element element) {
 		return FlowJob.class;
 	}
 
 	/**
-	 * Create a bean definition for a {@link org.springframework.batch.core.job.flow.FlowJob}. The
+	 * Create a bean definition for a
+	 * {@link org.springframework.batch.core.job.flow.FlowJob}. The
 	 * <code>jobRepository</code> attribute is a reference to a
-	 * {@link org.springframework.batch.core.repository.JobRepository} and defaults to "jobRepository". Nested step
-	 * elements are delegated to an {@link InlineStepParser}.
+	 * {@link org.springframework.batch.core.repository.JobRepository} and
+	 * defaults to "jobRepository". Nested step elements are delegated to an
+	 * {@link InlineStepParser}.
 	 * 
-	 * @see AbstractSingleBeanDefinitionParser#doParse(Element, ParserContext, BeanDefinitionBuilder)
+	 * @see AbstractSingleBeanDefinitionParser#doParse(Element, ParserContext,
+	 *      BeanDefinitionBuilder)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		
+
 		CoreNamespaceUtils.checkForStepScope(parserContext, parserContext.extractSource(element));
 
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
-		
+
+		builder.setAbstract(Boolean.valueOf(element.getAttribute("abstract")));
+
+		String parentRef = element.getAttribute("parent");
+		if (StringUtils.hasText(parentRef)) {
+			builder.setParentName(parentRef);
+		}
+
 		String repositoryAttribute = element.getAttribute("job-repository");
 		if (!StringUtils.hasText(repositoryAttribute)) {
 			repositoryAttribute = "jobRepository";
@@ -70,33 +79,33 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		if (StringUtils.hasText(restartableAttribute)) {
 			builder.addPropertyValue("restartable", restartableAttribute);
 		}
-		
+
 		String incrementer = (element.getAttribute("incrementer"));
-		if(StringUtils.hasText(incrementer)){
+		if (StringUtils.hasText(incrementer)) {
 			builder.addPropertyReference("jobParametersIncrementer", incrementer);
 		}
 
 		FlowParser flowParser = new FlowParser(jobName, repositoryAttribute);
 		BeanDefinition flowDef = flowParser.parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
-		
+
 		JobExecutionListenerParser listenerParser = new JobExecutionListenerParser();
-		Element listenersElement = (Element)DomUtils.getChildElementByTagName(element, "listeners");
-		if(listenersElement != null){
-			CompositeComponentDefinition compositeDef =
-				new CompositeComponentDefinition(listenersElement.getTagName(), parserContext.extractSource(element));
+		Element listenersElement = (Element) DomUtils.getChildElementByTagName(element, "listeners");
+		if (listenersElement != null) {
+			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
+					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			List<BeanDefinition> listeners = new ArrayList<BeanDefinition>();
-			List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(listenersElement, "listener");
+			ManagedList listeners = new ManagedList();
+			listeners.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute("merge")));
+			List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(listenersElement,
+					"listener");
 			for (Element listenerElement : listenerElements) {
 				listeners.add(listenerParser.parse(listenerElement, parserContext));
 			}
-			ManagedList managedList = new ManagedList();
-			managedList.addAll(listeners);
-			builder.addPropertyValue("jobExecutionListeners", managedList);
+			builder.addPropertyValue("jobExecutionListeners", listeners);
 			parserContext.popAndRegisterContainingComponent();
 		}
 
 	}
-	
+
 }
