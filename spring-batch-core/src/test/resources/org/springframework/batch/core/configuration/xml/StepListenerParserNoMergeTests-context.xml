@@ -8,14 +8,14 @@
 	
 	<job id="job">
 		<step id="s1" tasklet="dummyTasklet" parent="baseStep">
-			<listeners merge="true">
-				<listener class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener"/>
+			<listeners>
+				<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
 				<listener ref="toplevel"/>
 			</listeners>
 		</step>
 	</job>
 	
-	<step-listener id="toplevel" class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+	<step-listener id="toplevel" class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener"/>
 
 	<beans:bean id="baseStep" abstract="true">
 		<beans:property name="stepExecutionListeners">

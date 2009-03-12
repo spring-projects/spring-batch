@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -125,16 +124,15 @@ public abstract class AbstractStepParser {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
-			List<Object> listenerBeans = new ArrayList<Object>();
+			ManagedList listenerBeans = new ManagedList();
+			listenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute("merge")));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {
 					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
 				}
 			}
-			ManagedList arguments = new ManagedList();
-			arguments.addAll(listenerBeans);
-			bd.getPropertyValues().addPropertyValue(propertyName, arguments);
+			bd.getPropertyValues().addPropertyValue(propertyName, listenerBeans);
 			parserContext.popAndRegisterContainingComponent();
 		}
 	}

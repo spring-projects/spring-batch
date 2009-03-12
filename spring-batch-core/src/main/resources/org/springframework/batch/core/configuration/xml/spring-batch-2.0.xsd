@@ -594,6 +594,14 @@
 					<xsd:sequence>
 						<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded"/>
 					</xsd:sequence>
+					<xsd:attribute name="merge" type="xsd:boolean" use="optional" default="false">
+						<xsd:annotation>
+							<xsd:documentation>
+								Should this list of listeners be merged with the list provided 
+								by the parent?  If not, it will overwrite the parent list.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
