@@ -64,7 +64,7 @@ public abstract class AbstractStepParser {
 			bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
 		}
 
-		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef, "stepExecutionListeners");
+		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
 
 		return bd;
 
@@ -78,13 +78,13 @@ public abstract class AbstractStepParser {
 			ParserContext parserContext, String jobRepositoryRef) {
 
 		AbstractBeanDefinition bd = taskletElementParser.parseTaskletElement(element, parserContext);
-		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef, "listeners");
+		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
 		return bd;
 
 	}
 
 	protected void setUpBeanDefinition(Element stepElement, AbstractBeanDefinition bd, ParserContext parserContext,
-			String jobRepositoryRef, String listenersPropertyNames) {
+			String jobRepositoryRef) {
 		checkStepAttributes(stepElement, bd);
 
 		RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
@@ -94,7 +94,7 @@ public abstract class AbstractStepParser {
 		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
 		bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
 
-		handleListenersElement(stepElement, bd, parserContext, listenersPropertyNames);
+		handleListenersElement(stepElement, bd, parserContext);
 
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
 
@@ -117,8 +117,7 @@ public abstract class AbstractStepParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleListenersElement(Element element, BeanDefinition bd, ParserContext parserContext,
-			String propertyName) {
+	private void handleListenersElement(Element element, BeanDefinition bd, ParserContext parserContext) {
 		Element listenersElement = DomUtils.getChildElementByTagName(element, "listeners");
 		if (listenersElement != null) {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
@@ -132,7 +131,7 @@ public abstract class AbstractStepParser {
 					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
 				}
 			}
-			bd.getPropertyValues().addPropertyValue(propertyName, listenerBeans);
+			bd.getPropertyValues().addPropertyValue("listeners", listenerBeans);
 			parserContext.popAndRegisterContainingComponent();
 		}
 	}

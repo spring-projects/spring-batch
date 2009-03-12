@@ -32,6 +32,7 @@ import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
+import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -216,6 +217,20 @@ public class TaskletStep extends AbstractStep {
 		this.interruptionPolicy = interruptionPolicy;
 	}
 
+	/**
+	 * Variation on
+	 * {@link AbstractStep#setStepExecutionListeners(StepExecutionListener[])}.
+	 * This method exists because the parser requires a "listeners" property
+	 * setter to match the one on {@link SimpleStepFactoryBean}.
+	 * 
+	 * @param listeners
+	 * @see AbstractStep#setStepExecutionListeners(StepExecutionListener[])
+	 * @see SimpleStepFactoryBean#setListeners(org.springframework.batch.core.StepListener[])
+	 */
+	public void setListeners(StepExecutionListener[] listeners) { 
+        this.setStepExecutionListeners(listeners); 
+    } 
+	
 	/**
 	 * Process the step and update its context so that progress can be monitored
 	 * by the caller. The step is broken down into chunks, each one executing in

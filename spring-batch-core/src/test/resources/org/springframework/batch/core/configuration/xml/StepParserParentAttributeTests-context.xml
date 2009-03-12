@@ -11,7 +11,7 @@
 			<tasklet reader="reader" writer="writer" commit-interval="5"/>
 		</step>
 		<step id="s2" ref="standalone2" next="s3"/>
-		<step id="s3" parent="baseTaskletStep" tasklet="dummyTasklet" next="s4"/>
+		<step id="s3" parent="baseStep" tasklet="dummyTasklet" next="s4"/>
 		<step id="s4" ref="standalone4"/>
 	</job>
 
@@ -19,7 +19,7 @@
 		<tasklet reader="reader" writer="writer" commit-interval="5"/>
 	</step>
 	
-	<step id="standalone4" tasklet="dummyTasklet" parent="baseTaskletStep">
+	<step id="standalone4" tasklet="dummyTasklet" parent="baseStep">
 		<tasklet reader="reader" writer="writer" commit-interval="5"/>
 	</step>
 
@@ -28,12 +28,5 @@
 			<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
 		</listeners>
 	</step>
-	
-	<!-- TODO: Use baseStep instead once BATCH-1136 is implemented -->
-	<beans:bean id="baseTaskletStep" abstract="true">
-		<beans:property name="stepExecutionListeners">
-			<beans:bean class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
-		</beans:property>
-	</beans:bean>
 
 </beans:beans>

@@ -58,7 +58,7 @@ public class StandaloneStepParser extends AbstractStepParser {
 		}
 		else {
 			bd = new GenericBeanDefinition();
-			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef, "listeners");
+			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef);
 		}
 		bd.setAbstract(Boolean.valueOf(element.getAttribute("abstract")));
 

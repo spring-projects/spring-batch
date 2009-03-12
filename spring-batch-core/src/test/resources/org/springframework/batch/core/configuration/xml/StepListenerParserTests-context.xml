@@ -18,7 +18,7 @@
 	<step-listener id="toplevel" class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
 
 	<beans:bean id="baseStep" abstract="true">
-		<beans:property name="stepExecutionListeners">
+		<beans:property name="listeners">
 			<beans:list>
 				<step-listener class="org.springframework.batch.core.listener.CompositeStepExecutionListener"/>
 			</beans:list>
