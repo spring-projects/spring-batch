@@ -17,12 +17,15 @@
 			<tasklet reader="fileItemReader" 
 			         processor="validatingProcessor" 
 			         writer="tradeWriter" 
-			         commit-interval="1"
-			         transaction-attribute="PROPAGATION_REQUIRED,ISOLATION_READ_COMMITTED">
+			         commit-interval="1">
 				<streams>
 					<stream ref="fileItemReader"/>
 				</streams>
 			</tasklet>
+			<transaction-attributes>
+				PROPAGATION_REQUIRED
+				ISOLATION_READ_COMMITTED
+			</transaction-attributes>
 		</step>
 		<step id="step2" next="step3">
 			<tasklet reader="tradeSqlItemReader" writer="customerWriter" commit-interval="1"/>

@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.batch.core.step.tasklet.TaskletStep;
@@ -76,7 +77,7 @@ public abstract class AbstractStepParser {
 			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef);
 		}
 		return bd;
-	
+
 	}
 
 	/**
@@ -84,8 +85,8 @@ public abstract class AbstractStepParser {
 	 * @param taskletRef
 	 * @param parserContext
 	 */
-	private AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef,
-			ParserContext parserContext, String jobRepositoryRef) {
+	private AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext,
+			String jobRepositoryRef) {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setBeanClass(TaskletStep.class);
@@ -99,6 +100,7 @@ public abstract class AbstractStepParser {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void setUpBeanDefinition(Element stepElement, AbstractBeanDefinition bd, ParserContext parserContext,
 			String jobRepositoryRef) {
 		checkStepAttributes(stepElement, bd);
@@ -109,6 +111,20 @@ public abstract class AbstractStepParser {
 		String transactionManagerRef = stepElement.getAttribute("transaction-manager");
 		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
 		bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
+
+		Element child = DomUtils.getChildElementByTagName(stepElement, "transaction-attributes");
+		if (child != null) {
+			String attributes = DomUtils.getTextValue(child);
+			if (StringUtils.hasLength(attributes)) {
+				String[] attributesArray = StringUtils.tokenizeToStringArray(attributes, ",\n");
+				if (attributesArray.length > 0) {
+					ManagedList managedList = new ManagedList();
+					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
+					managedList.addAll(Arrays.asList(attributesArray));
+					bd.getPropertyValues().addPropertyValue("transactionAttributeList", managedList);
+				}
+			}
+		}
 
 		handleListenersElement(stepElement, bd, parserContext);
 

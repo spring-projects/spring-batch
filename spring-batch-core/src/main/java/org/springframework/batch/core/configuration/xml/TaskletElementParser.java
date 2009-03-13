@@ -146,11 +146,6 @@ public class TaskletElementParser {
 			propertyValues.addPropertyValue("cacheCapacity", cacheCapacity);
 		}
 
-		String transactionAttribute = element.getAttribute("transaction-attribute");
-		if (StringUtils.hasText(transactionAttribute)) {
-			propertyValues.addPropertyValue("transactionAttribute", transactionAttribute);
-		}
-
 		if (StringUtils.hasText(isReaderTransactionalQueue)) {
 			if (isFaultTolerant) {
 				propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
@@ -198,19 +193,21 @@ public class TaskletElementParser {
 		Element child = DomUtils.getChildElementByTagName(element, subElementName);
 		if (child != null) {
 			String exceptions = DomUtils.getTextValue(child);
-			if (StringUtils.hasLength(exceptions) && (isFaultTolerant || isAbstract)) {
-				String[] exceptionArray = StringUtils.tokenizeToStringArray(StringUtils.delete(exceptions, ","), "\n");
-				if (exceptionArray.length > 0) {
-					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
-					managedList.addAll(Arrays.asList(exceptionArray));
-					bd.getPropertyValues().addPropertyValue(propertyName, managedList);
+			if (StringUtils.hasLength(exceptions)) {
+				if (isFaultTolerant || isAbstract) {
+					String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
+					if (exceptionArray.length > 0) {
+						ManagedList managedList = new ManagedList();
+						managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
+						managedList.addAll(Arrays.asList(exceptionArray));
+						bd.getPropertyValues().addPropertyValue(propertyName, managedList);
+					}
 				}
-			}
-			else {
-				parserContext.getReaderContext().error(
-						subElementName + " can only be specified for fault-tolerant "
-								+ "configurations providing skip-limit, retry-limit or cache-capacity", element);
+				else {
+					parserContext.getReaderContext().error(
+							subElementName + " can only be specified for fault-tolerant "
+									+ "configurations providing skip-limit, retry-limit or cache-capacity", element);
+				}
 			}
 		}
 	}

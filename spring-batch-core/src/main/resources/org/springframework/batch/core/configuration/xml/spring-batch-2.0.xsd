@@ -181,8 +181,7 @@
 						<xsd:documentation>
 							Defines a stage in job processing backed by a
 							Step. The id attribute must be specified and
-							can
-							match the id of a bean definition
+							can match the id of a bean definition
 							for a Step. If it does not, then you must provide
 							a tasklet definition or a
 							reference to a Step defined elsewhere.
@@ -255,8 +254,7 @@
 									<xsd:annotation>
 										<xsd:documentation>
 											The decider is a reference to a JobExecutionDecider that can produce a status to base
-											the
-											next transition on.
+											the next transition on.
 										</xsd:documentation>
 										<xsd:appinfo>
 											<tool:annotation kind="ref">
@@ -295,6 +293,7 @@
 	<xsd:complexType name="stepType">
 		<xsd:sequence>
 			<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
+			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
 			<xsd:group ref="stepListeners" />
 		</xsd:sequence>
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
@@ -305,6 +304,7 @@
 			<xsd:extension base="nextType">
 				<xsd:sequence>
 					<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
+					<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
 					<xsd:group ref="stepListeners" />
 					<xsd:group ref="transitions" />
 				</xsd:sequence>
@@ -361,7 +361,8 @@
 			<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					The newline-separated, list of exception classes that are skippable
+					List of exception classes that are skippable.  
+					Separate each attribute with a comma or a newline.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
@@ -376,7 +377,8 @@
 			<xsd:element name="retryable-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					The newline-separated, list of exception classes that are retryable
+					List of exception classes that are retryable.
+					Separate each attribute with a newline or a comma.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
@@ -391,7 +393,8 @@
 			<xsd:element name="fatal-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					The newline-separated, list of exception classes that are fatal
+					List of exception classes that are fatal.
+					Separate each attribute with a newline or a comma.
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
@@ -466,14 +469,6 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="transaction-attribute" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				The transaction attributes to be used for the transaction used during the execution
-				of the task within the step.
-				]]></xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
 		<xsd:attribute name="is-reader-transactional-queue" type="xsd:string" default="false" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -511,13 +506,28 @@
 		<xsd:attributeGroup ref="parentAttribute" />
 	</xsd:complexType>
 
+	<xsd:complexType name="transaction-attributesType">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+				The transaction attributes to be used for the transaction used 
+				during the execution of the task within the step.  Separate 
+				each attribute with a comma or a newline.
+			]]></xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attributeGroup ref="mergeAttribute" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
 	<xsd:complexType name="nextType">
 		<xsd:attribute name="next" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				A shortcut for specifying the next step to execute after this one, if there is only one choice.    The next
 				attribute is a synonym for &lt;next on="*"/&gt; plus &lt;fail on="FAILED"/&gt; in a transition.
-				If this attribute is specified, then there should be no other transition with a nested &lt;next .../&gt;]]>
+				If this attribute is specified, then there should be no nested transition elements]]>
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
