@@ -68,10 +68,12 @@ public abstract class AbstractStepParser {
 								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
 			}
 			bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
+			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef);
 		}
 		else if (taskletElementExists) {
 			Element taskElement = taskletElements.get(0);
-			bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
+			bd = taskletElementParser.parse(taskElement, parserContext);
+			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef);
 		}
 		return bd;
 	
@@ -93,21 +95,6 @@ public abstract class AbstractStepParser {
 			bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
 		}
 
-		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
-
-		return bd;
-
-	}
-
-	/**
-	 * @param element
-	 * @param parserContext
-	 */
-	private AbstractBeanDefinition parseTaskletElement(Element stepElement, Element element,
-			ParserContext parserContext, String jobRepositoryRef) {
-
-		AbstractBeanDefinition bd = taskletElementParser.parse(element, parserContext);
-		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
 		return bd;
 
 	}
