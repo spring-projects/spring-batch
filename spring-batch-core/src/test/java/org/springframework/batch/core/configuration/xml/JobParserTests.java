@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +27,11 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.job.AbstractJob;
-import org.springframework.batch.core.listener.CompositeJobExecutionListener;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dan Garrette
@@ -39,16 +39,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class JobParserTests {
 
-	@SuppressWarnings("unchecked")
 	@Test
-	public void testJobParserParentAttribute() throws Exception {
+	public void testInheritListeners() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(Job.class);
-
-		assertTrue(beans.containsKey("job1"));
-		Job job1 = (Job) ctx.getBean("job1");
-		List<?> job1Listeners = getListeners(job1);
+		List<?> job1Listeners = getListeners("job1", ctx);
 		assertEquals(2, job1Listeners.size());
 		boolean a = false;
 		boolean b = false;
@@ -62,10 +57,13 @@ public class JobParserTests {
 		}
 		assertTrue(a);
 		assertTrue(b);
+	}
 
-		assertTrue(beans.containsKey("job2"));
-		Job job2 = (Job) ctx.getBean("job2");
-		List<?> job2Listeners = getListeners(job2);
+	@Test
+	public void testInheritListeners_NoMerge() throws Exception {
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
+		List<?> job2Listeners = getListeners("job2", ctx);
 		assertEquals(1, job2Listeners.size());
 		boolean c = false;
 		for (Object l : job2Listeners) {
@@ -77,20 +75,15 @@ public class JobParserTests {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<?> getListeners(Job job) throws Exception {
+	private List<?> getListeners(String jobName, ApplicationContext ctx) throws Exception {
+		Map<String, Object> beans = ctx.getBeansOfType(Job.class);
+		assertTrue(beans.containsKey(jobName));
+		Job job = (Job) ctx.getBean(jobName);
+
 		assertTrue(job instanceof AbstractJob);
-		Field listenerField = AbstractJob.class.getDeclaredField("listener");
-		listenerField.setAccessible(true);
-		Object compositeListener = listenerField.get(job);
-
-		Field compositeField = CompositeJobExecutionListener.class.getDeclaredField("listeners");
-		compositeField.setAccessible(true);
-		Object composite = compositeField.get(compositeListener);
-
-		Class cls = Class.forName("org.springframework.batch.core.listener.OrderedComposite");
-		Field listField = cls.getDeclaredField("list");
-		listField.setAccessible(true);
-		List<JobExecutionListener> list = (List<JobExecutionListener>) listField.get(composite);
+		Object compositeListener = ReflectionTestUtils.getField(job, "listener");
+		Object composite = ReflectionTestUtils.getField(compositeListener, "listeners");
+		List<JobExecutionListener> list = (List<JobExecutionListener>) ReflectionTestUtils.getField(composite, "list");
 
 		List<Object> listeners = new ArrayList<Object>();
 		for (Object listener : list) {

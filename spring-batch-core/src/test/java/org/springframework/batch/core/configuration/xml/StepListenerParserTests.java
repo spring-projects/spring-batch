@@ -18,36 +18,30 @@ package org.springframework.batch.core.configuration.xml;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Dan Garrette
  * @since 2.0
  */
-@ContextConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
 public class StepListenerParserTests {
 
 	@Test
-	public void testStepListenerParser() throws Exception {
+	public void testInheritListeners() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepListenerParserTests-context.xml");
 		List<?> list = getListeners("s1", ctx);
@@ -73,10 +67,10 @@ public class StepListenerParserTests {
 	}
 
 	@Test
-	public void testStepListenerParserNoMerge() throws Exception {
+	public void testInheritListeners_NoMerge() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepListenerParserNoMergeTests-context.xml");
-		List<?> list = getListeners("s1", ctx);
+				"org/springframework/batch/core/configuration/xml/StepListenerParserTests-context.xml");
+		List<?> list = getListeners("s2", ctx);
 
 		assertEquals(2, list.size());
 		boolean a = false;
@@ -100,18 +94,10 @@ public class StepListenerParserTests {
 		Object step = ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
 
-		Field listenerField = AbstractStep.class.getDeclaredField("stepExecutionListener");
-		listenerField.setAccessible(true);
-		Object compositeListener = listenerField.get(step);
-
-		Field compositeField = CompositeStepExecutionListener.class.getDeclaredField("list");
-		compositeField.setAccessible(true);
-		Object composite = compositeField.get(compositeListener);
-
-		Class cls = Class.forName("org.springframework.batch.core.listener.OrderedComposite");
-		Field listField = cls.getDeclaredField("list");
-		listField.setAccessible(true);
-		List<StepExecutionListener> proxiedListeners = (List<StepExecutionListener>) listField.get(composite);
+		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
+		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
+		List<StepExecutionListener> proxiedListeners = (List<StepExecutionListener>) ReflectionTestUtils.getField(
+				composite, "list");
 		List<Object> r = new ArrayList<Object>();
 		for (Object listener : proxiedListeners) {
 			while (listener instanceof Advised) {

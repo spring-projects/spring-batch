@@ -10,12 +10,20 @@
 		<step id="s1" tasklet="dummyTasklet" parent="baseStep">
 			<listeners merge="true">
 				<listener class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener"/>
-				<listener ref="toplevel"/>
+				<listener ref="toplevel1"/>
+			</listeners>
+		</step>
+
+		<step id="s2" tasklet="dummyTasklet" parent="baseStep">
+			<listeners>
+				<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+				<listener ref="toplevel2"/>
 			</listeners>
 		</step>
 	</job>
 	
-	<step-listener id="toplevel" class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+	<step-listener id="toplevel1" class="org.springframework.batch.core.listener.StepExecutionListenerSupport"/>
+	<step-listener id="toplevel2" class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener"/>
 
 	<beans:bean id="baseStep" abstract="true">
 		<beans:property name="listeners">

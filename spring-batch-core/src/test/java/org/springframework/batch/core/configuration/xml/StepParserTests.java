@@ -19,7 +19,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
@@ -27,22 +26,15 @@ import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.listener.CompositeStepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.AbstractStep;
-import org.springframework.batch.core.step.item.ChunkOrientedTasklet;
-import org.springframework.batch.core.step.item.ChunkProvider;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
-import org.springframework.batch.core.step.item.SimpleChunkProvider;
-import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.CompletionPolicy;
-import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
-import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Thomas Risberg
@@ -89,9 +81,7 @@ public class StepParserTests {
 		Step s1 = (Step) ctx.getBean("s1");
 		CompletionPolicy completionPolicy = getCompletionPolicy(s1);
 		assertTrue(completionPolicy instanceof SimpleCompletionPolicy);
-		Field chunkSizeField = SimpleCompletionPolicy.class.getDeclaredField("chunkSize");
-		chunkSizeField.setAccessible(true);
-		assertEquals(25, chunkSizeField.get(completionPolicy));
+		assertEquals(25, ReflectionTestUtils.getField(completionPolicy, "chunkSize"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -106,20 +96,11 @@ public class StepParserTests {
 		assertTrue(completionPolicy instanceof DummyCompletionPolicy);
 	}
 
-	@SuppressWarnings("unchecked")
 	private CompletionPolicy getCompletionPolicy(Step s1) throws NoSuchFieldException, IllegalAccessException {
-		Field taskletField = TaskletStep.class.getDeclaredField("tasklet");
-		taskletField.setAccessible(true);
-		Tasklet tasklet = (Tasklet) taskletField.get(s1);
-		Field chunkProviderField = ChunkOrientedTasklet.class.getDeclaredField("chunkProvider");
-		chunkProviderField.setAccessible(true);
-		ChunkProvider chunkProvider = (ChunkProvider) chunkProviderField.get(tasklet);
-		Field repeatOperationsField = SimpleChunkProvider.class.getDeclaredField("repeatOperations");
-		repeatOperationsField.setAccessible(true);
-		RepeatOperations repeatOperations = (RepeatOperations) repeatOperationsField.get(chunkProvider);
-		Field completionPolicyField = RepeatTemplate.class.getDeclaredField("completionPolicy");
-		completionPolicyField.setAccessible(true);
-		return (CompletionPolicy) completionPolicyField.get(repeatOperations);
+		Object tasklet = ReflectionTestUtils.getField(s1, "tasklet");
+		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
+		Object repeatOperations = ReflectionTestUtils.getField(chunkProvider, "repeatOperations");
+		return (CompletionPolicy) ReflectionTestUtils.getField(repeatOperations, "completionPolicy");
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
@@ -142,8 +123,7 @@ public class StepParserTests {
 		try {
 			new ClassPathXmlApplicationContext(contextLocation);
 			fail("Context should not load!");
-		}
-		catch (BeanDefinitionParsingException e) {
+		} catch (BeanDefinitionParsingException e) {
 			assertTrue(e.getMessage().contains("'ref' and 'class'"));
 		}
 	}
@@ -156,55 +136,65 @@ public class StepParserTests {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testStepParserParentAttribute() throws Exception {
+	public void testParentOnInlineStep() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
 		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey("s1"));
 		Step s1 = (Step) ctx.getBean("s1");
-		assertTrue(beans.containsKey("s2"));
-		Step s2 = (Step) ctx.getBean("s2");
-		assertTrue(beans.containsKey("s3"));
-		Step s3 = (Step) ctx.getBean("s3");
-		assertTrue(beans.containsKey("s4"));
-		Step s4 = (Step) ctx.getBean("s4");
-
 		assertTrue(s1 instanceof TaskletStep);
 		assertTrue(getListener((TaskletStep) s1) instanceof StepExecutionListenerSupport);
+	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testParentOnStandaloneStep() throws Exception {
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		assertTrue(beans.containsKey("s2"));
+		Step s2 = (Step) ctx.getBean("s2");
 		assertTrue(s2 instanceof DelegatingStep);
 		assertTrue(getListener((DelegatingStep) s2) instanceof StepExecutionListenerSupport);
+	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testParentOnInlineWithTaskletAttributeStep() throws Exception {
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		assertTrue(beans.containsKey("s3"));
+		Step s3 = (Step) ctx.getBean("s3");
 		assertTrue(s3 instanceof TaskletStep);
 		assertTrue(getListener((TaskletStep) s3) instanceof StepExecutionListenerSupport);
+	}
 
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testParentOnStandaloneWithTaskletAttributeStep() throws Exception {
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		assertTrue(beans.containsKey("s4"));
+		Step s4 = (Step) ctx.getBean("s4");
 		assertTrue(s4 instanceof DelegatingStep);
 		assertTrue(getListener((DelegatingStep) s4) instanceof StepExecutionListenerSupport);
 	}
 
 	private StepExecutionListener getListener(DelegatingStep step) throws Exception {
 		assertTrue(step instanceof DelegatingStep);
-		Field delegateField = DelegatingStep.class.getDeclaredField("delegate");
-		delegateField.setAccessible(true);
-		Object delegate = delegateField.get(step);
+		Object delegate = ReflectionTestUtils.getField(step, "delegate");
 		assertTrue(delegate instanceof TaskletStep);
 		return getListener((TaskletStep) delegate);
 	}
 
 	@SuppressWarnings("unchecked")
 	private StepExecutionListener getListener(TaskletStep step) throws Exception {
-		Field listenerField = AbstractStep.class.getDeclaredField("stepExecutionListener");
-		listenerField.setAccessible(true);
-		Object compositeListener = listenerField.get(step);
-
-		Field compositeField = CompositeStepExecutionListener.class.getDeclaredField("list");
-		compositeField.setAccessible(true);
-		Object composite = compositeField.get(compositeListener);
-
-		Class cls = Class.forName("org.springframework.batch.core.listener.OrderedComposite");
-		Field listField = cls.getDeclaredField("list");
-		listField.setAccessible(true);
-		List<StepExecutionListener> list = (List<StepExecutionListener>) listField.get(composite);
+		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
+		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
+		List<StepExecutionListener> list = (List<StepExecutionListener>) ReflectionTestUtils
+				.getField(composite, "list");
 
 		assertEquals(1, list.size());
 		StepExecutionListener listener = list.get(0);

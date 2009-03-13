@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.runner.RunWith;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemStream;
@@ -43,7 +41,6 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Dan Garrette
  * @since 2.0
  */
-@RunWith(JUnit4ClassRunner.class)
 public class TaskletElementParserTests {
 
 	@Test
