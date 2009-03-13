@@ -49,6 +49,35 @@ public abstract class AbstractStepParser {
 	private StepListenerParser stepListenerParser = new StepListenerParser();
 
 	/**
+	 * @param element
+	 * @param parserContext
+	 * @return a BeanDefinition if possible
+	 */
+	protected AbstractBeanDefinition parseTasklet(Element element, ParserContext parserContext) {
+
+		String jobRepositoryRef = element.getAttribute("job-repository");
+		String taskletRef = element.getAttribute("tasklet");
+		@SuppressWarnings("unchecked")
+		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
+		AbstractBeanDefinition bd = null;
+		if (StringUtils.hasText(taskletRef)) {
+			if (taskletElements.size() > 0) {
+				parserContext.getReaderContext().error(
+						"The <" + taskletElements.get(0).getNodeName()
+								+ "> element can't be combined with the 'tasklet=\"" + taskletRef
+								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
+			}
+			bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
+		}
+		else if (taskletElements.size() > 0) {
+			Element taskElement = taskletElements.get(0);
+			bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
+		}
+		return bd;
+	
+	}
+
+	/**
 	 * @param stepElement
 	 * @param taskletRef
 	 * @param parserContext

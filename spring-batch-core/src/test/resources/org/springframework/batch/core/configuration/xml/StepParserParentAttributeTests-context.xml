@@ -11,7 +11,7 @@
 			<tasklet reader="reader" writer="writer" commit-interval="5"/>
 		</step>
 		<step id="s2" ref="standalone2" next="s3"/>
-		<step id="s3" parent="baseStep" tasklet="dummyTasklet" next="s4"/>
+		<step id="s3" tasklet="dummyTasklet" parent="baseStep" next="s4"/>
 		<step id="s4" ref="standalone4"/>
 	</job>
 
@@ -19,9 +19,7 @@
 		<tasklet reader="reader" writer="writer" commit-interval="5"/>
 	</step>
 	
-	<step id="standalone4" tasklet="dummyTasklet" parent="baseStep">
-		<tasklet reader="reader" writer="writer" commit-interval="5"/>
-	</step>
+	<step id="standalone4" tasklet="dummyTasklet" parent="baseStep"/>
 
 	<step id="baseStep" abstract="true">
 		<listeners>
