@@ -15,6 +15,8 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
+import java.beans.PropertyEditor;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.logging.Log;
@@ -46,7 +48,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet},
@@ -124,6 +128,20 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
+	}
+
+	/**
+	 * Public setter for the {@link TransactionAttribute}.
+	 * 
+	 * @param transactionAttributeList A list of all the transaction attributes
+	 *            to set
+	 */
+	public void setTransactionAttributeList(List<String> transactionAttributeList) {
+		String[] stringArray = transactionAttributeList.toArray(new String[0]);
+		String attributeString = StringUtils.arrayToCommaDelimitedString(stringArray);
+		PropertyEditor editor = new TransactionAttributeEditor();
+		editor.setAsText(attributeString);
+		this.setTransactionAttribute((TransactionAttribute) editor.getValue());
 	}
 
 	/**

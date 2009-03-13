@@ -32,9 +32,13 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.interceptor.RollbackRuleAttribute;
+import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 
 /**
  * @author Thomas Risberg
@@ -134,63 +138,78 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserParentAndRefTests-context.xml");
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
-	public void testParentOnInlineStep() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+	public void testParentStep() throws Exception {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey("s1"));
-		Step s1 = (Step) ctx.getBean("s1");
-		assertTrue(s1 instanceof TaskletStep);
-		assertTrue(getListener((TaskletStep) s1) instanceof StepExecutionListenerSupport);
+
+		// Inline Step
+		assertTrue(getListener("s1", ctx) instanceof StepExecutionListenerSupport);
+
+		// Standalone Step
+		assertTrue(getListener("s2", ctx) instanceof StepExecutionListenerSupport);
+
+		// Inline With Tasklet Attribute Step
+		assertTrue(getListener("s3", ctx) instanceof StepExecutionListenerSupport);
+
+		// Standalone With Tasklet Attribute Step
+		assertTrue(getListener("s4", ctx) instanceof StepExecutionListenerSupport);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
-	public void testParentOnStandaloneStep() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+	public void testInheritTransactionAttributes() throws Exception {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey("s2"));
-		Step s2 = (Step) ctx.getBean("s2");
-		assertTrue(s2 instanceof DelegatingStep);
-		assertTrue(getListener((DelegatingStep) s2) instanceof StepExecutionListenerSupport);
+
+		// On Inline - No Merge
+		validateTransactionAttributesInherited("s1", false, ctx);
+
+		// On Standalone - No Merge
+		validateTransactionAttributesInherited("s2", false, ctx);
+
+		// On Inline With Tasklet Ref - No Merge
+		validateTransactionAttributesInherited("s3", false, ctx);
+
+		// On Standalone With Tasklet Ref - No Merge
+		validateTransactionAttributesInherited("s4", false, ctx);
+
+		// On Inline
+		validateTransactionAttributesInherited("s5", true, ctx);
+
+		// On Standalone
+		validateTransactionAttributesInherited("s6", true, ctx);
+
+		// On Inline With Tasklet Ref
+		validateTransactionAttributesInherited("s7", true, ctx);
+
+		// On Standalone With Tasklet Ref
+		validateTransactionAttributesInherited("s8", true, ctx);
+	}
+
+	private void validateTransactionAttributesInherited(String stepName, boolean inherited, ApplicationContext ctx) {
+		RuleBasedTransactionAttribute txa = getTransactionAttribute(ctx, stepName);
+		assertEquals(TransactionDefinition.PROPAGATION_REQUIRED, txa.getPropagationBehavior());
+		assertEquals(TransactionDefinition.ISOLATION_DEFAULT, txa.getIsolationLevel());
+		if (inherited) {
+			assertEquals(10, txa.getTimeout());
+			RollbackRuleAttribute rra = (RollbackRuleAttribute) txa.getRollbackRules().get(0);
+			assertEquals("org.springframework.dao.DataIntegrityViolationException", rra.getExceptionName());
+		}
+		else {
+			assertTrue(10 != txa.getTimeout());
+			assertTrue(txa.getRollbackRules().isEmpty());
+		}
 	}
 
 	@SuppressWarnings("unchecked")
-	@Test
-	public void testParentOnInlineWithTaskletAttributeStep() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+	private StepExecutionListener getListener(String stepName, ApplicationContext ctx) throws Exception {
 		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey("s3"));
-		Step s3 = (Step) ctx.getBean("s3");
-		assertTrue(s3 instanceof TaskletStep);
-		assertTrue(getListener((TaskletStep) s3) instanceof StepExecutionListenerSupport);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testParentOnStandaloneWithTaskletAttributeStep() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey("s4"));
-		Step s4 = (Step) ctx.getBean("s4");
-		assertTrue(s4 instanceof DelegatingStep);
-		assertTrue(getListener((DelegatingStep) s4) instanceof StepExecutionListenerSupport);
-	}
-
-	private StepExecutionListener getListener(DelegatingStep step) throws Exception {
-		assertTrue(step instanceof DelegatingStep);
-		Object delegate = ReflectionTestUtils.getField(step, "delegate");
-		assertTrue(delegate instanceof TaskletStep);
-		return getListener((TaskletStep) delegate);
-	}
-
-	@SuppressWarnings("unchecked")
-	private StepExecutionListener getListener(TaskletStep step) throws Exception {
+		assertTrue(beans.containsKey(stepName));
+		Step step = (Step) ctx.getBean(stepName);
+		if (step instanceof DelegatingStep) {
+			step = (Step) ReflectionTestUtils.getField(step, "delegate");
+		}
+		assertTrue(step instanceof TaskletStep);
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
 		List<StepExecutionListener> list = (List<StepExecutionListener>) ReflectionTestUtils
@@ -203,4 +222,19 @@ public class StepParserTests {
 		}
 		return listener;
 	}
+
+	@SuppressWarnings("unchecked")
+	private RuleBasedTransactionAttribute getTransactionAttribute(ApplicationContext ctx, String stepName) {
+		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		assertTrue(beans.containsKey(stepName));
+		Step step = (Step) ctx.getBean(stepName);
+		if (step instanceof DelegatingStep) {
+			step = (Step) ReflectionTestUtils.getField(step, "delegate");
+		}
+		assertTrue(step instanceof TaskletStep);
+		Object transactionAttribute = ReflectionTestUtils.getField(step, "transactionAttribute");
+		RuleBasedTransactionAttribute txa = (RuleBasedTransactionAttribute) transactionAttribute;
+		return txa;
+	}
+
 }
