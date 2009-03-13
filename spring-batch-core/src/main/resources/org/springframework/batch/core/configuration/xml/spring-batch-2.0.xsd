@@ -88,6 +88,23 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="tasklet">
+		<xsd:annotation>
+			<xsd:documentation>
+				A bean definition for a tasklet.  Useful for creating a "base" 
+				tasklet from which others can extend.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="taskletType">
+					<xsd:attribute name="id" type="xsd:ID" use="required"/>
+					<xsd:attributeGroup ref="abstractAttribute"/>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
 	<xsd:element name="job-repository">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
@@ -143,8 +160,7 @@
 						<xsd:documentation>
 							Defines a stage in job processing backed by a
 							Step. The name attribute must be specified and
-							can
-							match the id of a bean definition
+							can match the id of a bean definition
 							for a Step. If it does not, then you must provide
 							a tasklet definition. The next
 							attribute is a synonym for &lt;next on="*" .../&gt;
@@ -275,14 +291,7 @@
 							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
-					<xsd:attribute name="merge" type="xsd:boolean" use="optional" default="false">
-						<xsd:annotation>
-							<xsd:documentation>
-								Should this list be merged with the corresponding list provided 
-								by the parent?  If not, it will overwrite the parent list.
-							</xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
+					<xsd:attributeGroup ref="mergeAttribute"/>
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
@@ -322,6 +331,7 @@
 					<xsd:sequence>
 						<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded"/>
 					</xsd:sequence>
+					<xsd:attributeGroup ref="mergeAttribute"/>
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="streams" minOccurs="0" maxOccurs="1">
@@ -350,6 +360,7 @@
 							</xsd:complexType>
 						</xsd:element>
 					</xsd:sequence>
+					<xsd:attributeGroup ref="mergeAttribute"/>
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
@@ -359,31 +370,43 @@
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string"/>
-				</xsd:simpleType>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="retryable-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					The newline-separated, list of exception classes that are skippable
+					The newline-separated, list of exception classes that are retryable
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string"/>
-				</xsd:simpleType>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="fatal-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					The newline-separated, list of exception classes that are skippable
+					The newline-separated, list of exception classes that are fatal
 					]]>
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:simpleType>
-					<xsd:restriction base="xsd:string"/>
-				</xsd:simpleType>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
 			</xsd:element>
 		</xsd:all>
 		<xsd:attribute name="commit-interval" type="xsd:string" use="optional">
@@ -394,7 +417,7 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="reader" type="xsd:string" use="required">
+		<xsd:attribute name="reader" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				The bean name of the item reader that is to be used for the process.
@@ -416,7 +439,7 @@
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="writer" type="xsd:string" use="required">
+		<xsd:attribute name="writer" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				The bean name of the item writer that is to be used for the process.
@@ -494,6 +517,7 @@
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attributeGroup ref="parentAttribute"/>
 	</xsd:complexType>
 
 	<xsd:complexType name="nextType">
@@ -597,14 +621,7 @@
 					<xsd:sequence>
 						<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded"/>
 					</xsd:sequence>
-					<xsd:attribute name="merge" type="xsd:boolean" use="optional" default="false">
-						<xsd:annotation>
-							<xsd:documentation>
-								Should this list be merged with the corresponding list provided 
-								by the parent?  If not, it will overwrite the parent list.
-							</xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
+					<xsd:attributeGroup ref="mergeAttribute"/>
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
@@ -779,7 +796,7 @@
 		<xsd:attribute name="parent" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
-					The name of the parent step from which the configuration should inherit.
+					The name of the parent bean from which the configuration should inherit.
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref"/>
@@ -799,6 +816,17 @@
 				
 					Note: This attribute will not be inherited by child bean definitions.
 					Hence, it needs to be specified per abstract bean definition.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:attributeGroup>
+
+	<xsd:attributeGroup name="mergeAttribute">
+		<xsd:attribute name="merge" type="xsd:boolean" default="false" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+					Should this list be merged with the corresponding list provided 
+					by the parent?  If not, it will overwrite the parent list.
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>

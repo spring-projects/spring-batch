@@ -77,7 +77,7 @@ public abstract class AbstractStepParser {
 	protected AbstractBeanDefinition parseTaskletElement(Element stepElement, Element element,
 			ParserContext parserContext, String jobRepositoryRef) {
 
-		AbstractBeanDefinition bd = taskletElementParser.parseTaskletElement(element, parserContext);
+		AbstractBeanDefinition bd = taskletElementParser.parse(element, parserContext);
 		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
 		return bd;
 
