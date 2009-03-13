@@ -88,7 +88,9 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:extension base="jobExecutionListenerType" />
+				<xsd:extension base="jobExecutionListenerType">
+					<xsd:attribute name="id" type="xsd:ID" use="optional" />
+				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
@@ -102,7 +104,9 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:complexContent>
-				<xsd:extension base="stepListenerType" />
+				<xsd:extension base="stepListenerType">
+					<xsd:attribute name="id" type="xsd:ID" use="optional" />
+				</xsd:extension>
 			</xsd:complexContent>
 		</xsd:complexType>
 	</xsd:element>
@@ -539,7 +543,6 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="listenerType">
-		<xsd:attribute name="id" type="xsd:ID" />
 		<xsd:attribute name="ref" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation>

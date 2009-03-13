@@ -48,7 +48,7 @@
 	
 	<step id="baseStep" abstract="true">
 		<listeners>
-			<listener id="skipCheckingListener" class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+			<listener class="org.springframework.batch.sample.common.SkipCheckingListener"/>
 			<listener ref="promotionListener"/>
 		</listeners>
 	</step>
