@@ -53,15 +53,15 @@ public abstract class AbstractStepParser {
 	 * @param parserContext
 	 * @return a BeanDefinition if possible
 	 */
-	protected AbstractBeanDefinition parseTasklet(Element element, ParserContext parserContext) {
+	protected AbstractBeanDefinition parseTasklet(Element element, ParserContext parserContext, String jobRepositoryRef) {
 
-		String jobRepositoryRef = element.getAttribute("job-repository");
 		String taskletRef = element.getAttribute("tasklet");
 		@SuppressWarnings("unchecked")
 		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
+		boolean taskletElementExists = taskletElements.size() > 0;
 		AbstractBeanDefinition bd = null;
 		if (StringUtils.hasText(taskletRef)) {
-			if (taskletElements.size() > 0) {
+			if (taskletElementExists) {
 				parserContext.getReaderContext().error(
 						"The <" + taskletElements.get(0).getNodeName()
 								+ "> element can't be combined with the 'tasklet=\"" + taskletRef
@@ -69,7 +69,7 @@ public abstract class AbstractStepParser {
 			}
 			bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
 		}
-		else if (taskletElements.size() > 0) {
+		else if (taskletElementExists) {
 			Element taskElement = taskletElements.get(0);
 			bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
 		}
@@ -82,7 +82,7 @@ public abstract class AbstractStepParser {
 	 * @param taskletRef
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef,
+	private AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef,
 			ParserContext parserContext, String jobRepositoryRef) {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
@@ -103,7 +103,7 @@ public abstract class AbstractStepParser {
 	 * @param element
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition parseTaskletElement(Element stepElement, Element element,
+	private AbstractBeanDefinition parseTaskletElement(Element stepElement, Element element,
 			ParserContext parserContext, String jobRepositoryRef) {
 
 		AbstractBeanDefinition bd = taskletElementParser.parse(element, parserContext);

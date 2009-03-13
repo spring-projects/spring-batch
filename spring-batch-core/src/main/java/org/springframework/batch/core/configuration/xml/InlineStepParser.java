@@ -29,8 +29,9 @@ import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
- * references a bean definition for a {@link org.springframework.batch.core.Step} and goes on to (optionally)
- * list a set of transitions from that step to others with &lt;next on="pattern"
+ * references a bean definition for a
+ * {@link org.springframework.batch.core.Step} and goes on to (optionally) list
+ * a set of transitions from that step to others with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
  * @see JobParser
@@ -46,14 +47,16 @@ public class InlineStepParser extends AbstractStepParser {
 	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @param jobRepositoryRef the reference to the jobRepository from the enclosing tag
-	 * @return a collection of bean definitions for {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 * instances objects
+	 * @param jobRepositoryRef the reference to the jobRepository from the
+	 *            enclosing tag
+	 * @return a collection of bean definitions for
+	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 *         instances objects
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobRepositoryRef) {
 
-		BeanDefinitionBuilder stateBuilder = 
-			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
 		String stepId = element.getAttribute("id");
 		String stepRef = element.getAttribute("ref");
 		String taskletRef = element.getAttribute("tasklet");
@@ -61,48 +64,50 @@ public class InlineStepParser extends AbstractStepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> listOfTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
 		@SuppressWarnings("unchecked")
-		List<Element> listOfListenersElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "listeners");
+		List<Element> listOfListenersElements = (List<Element>) DomUtils
+				.getChildElementsByTagName(element, "listeners");
 
 		if (StringUtils.hasText(stepRef)) {
 			if (StringUtils.hasText(taskletRef)) {
-				parserContext.getReaderContext().error("The 'tasklet' attribute can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
+				parserContext.getReaderContext().error(
+						"The 'tasklet' attribute can't be combined with the 'ref=\"" + stepRef
+								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
 			}
 			if (listOfTaskElements.size() > 0) {
-				parserContext.getReaderContext().error("The <" + listOfTaskElements.get(0).getNodeName() +
-						"> element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
+				parserContext.getReaderContext().error(
+						"The <" + listOfTaskElements.get(0).getNodeName()
+								+ "> element can't be combined with the 'ref=\"" + stepRef
+								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
 			}
 			if (listOfListenersElements.size() > 0) {
-				parserContext.getReaderContext().error("The 'listeners' element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
+				parserContext.getReaderContext().error(
+						"The 'listeners' element can't be combined with the 'ref=\"" + stepRef
+								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
 			}
 			if (StringUtils.hasText(element.getAttribute("parent"))) {
-				parserContext.getReaderContext().error("The 'parent' element can't be combined with the 'ref=\""+ stepRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);				
+				parserContext.getReaderContext().error(
+						"The 'parent' element can't be combined with the 'ref=\"" + stepRef
+								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
 			}
-			BeanDefinitionBuilder stepBuilder = 
-				BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.configuration.xml.DelegatingStep");
+			BeanDefinitionBuilder stepBuilder = BeanDefinitionBuilder
+					.genericBeanDefinition("org.springframework.batch.core.configuration.xml.DelegatingStep");
 			stepBuilder.addConstructorArgValue(stepId);
 			stepBuilder.addConstructorArgReference(stepRef);
 			AbstractBeanDefinition bd = stepBuilder.getBeanDefinition();
-	        bd.setSource(parserContext.extractSource(element));
+			bd.setSource(parserContext.extractSource(element));
 			parserContext.getRegistry().registerBeanDefinition(stepId, bd);
 			stateBuilder.addConstructorArgReference(stepId);
 		}
-		else if (StringUtils.hasText(taskletRef)) {
-			if (listOfTaskElements.size() > 0) {
-				parserContext.getReaderContext().error("The <" + listOfTaskElements.get(0).getNodeName() +
-						"> element can't be combined with the 'tasklet=\""+ taskletRef +"\"' attribute specification for <" + element.getNodeName() + ">", element);
-			}
-			AbstractBeanDefinition bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
-			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
-			stateBuilder.addConstructorArgReference(stepId);
-		}
-		else if (listOfTaskElements.size() > 0) {
-			Element taskElement = listOfTaskElements.get(0);
-			AbstractBeanDefinition bd = parseTaskletElement(element, taskElement, parserContext, jobRepositoryRef);
-			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
-			stateBuilder.addConstructorArgReference(stepId);
-		}
 		else {
-			parserContext.getReaderContext().error("Incomplete configuration detected while creating step with name " + stepRef, element);
+			AbstractBeanDefinition bd = parseTasklet(element, parserContext, jobRepositoryRef);
+			if (bd != null) {
+				parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
+				stateBuilder.addConstructorArgReference(stepId);
+			}
+			else {
+				parserContext.getReaderContext().error(
+						"Incomplete configuration detected while creating step with name " + stepRef, element);
+			}
 		}
 		return FlowParser.getNextElements(parserContext, stepId, stateBuilder.getBeanDefinition(), element);
 
