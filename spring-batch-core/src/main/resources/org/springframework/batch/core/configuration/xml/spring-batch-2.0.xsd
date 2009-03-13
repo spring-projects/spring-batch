@@ -324,7 +324,7 @@
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="listener" type="retryListenerType" minOccurs="1" maxOccurs="unbounded" />
+						<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded" />
 					</xsd:sequence>
 					<xsd:attributeGroup ref="mergeAttribute" />
 				</xsd:complexType>
@@ -535,85 +535,64 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="retryListenerType">
+	<xsd:complexType name="listenerType">
 		<xsd:attribute name="id" type="xsd:ID" />
-		<xsd:attribute name="ref" type="xsd:string" />
-		<xsd:attribute name="class" type="xsd:string" />
+		<xsd:attribute name="ref" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+					A reference to a listener, a POJO with a 
+					listener-annotated method, or a POJO with
+					a method referenced by a *-method attribute.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref" />
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="class" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+					A class name used to create a listener from the default constructor.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="direct">
+						<tool:expected-type type="java.lang.Class" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="jobExecutionListenerType">
-		<xsd:attribute name="id" type="xsd:ID" />
-		<xsd:attribute name="ref" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					A reference to a JobExecutionListener or a POJO
-					(with before-job-method / after-job-method).
-				</xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref" />
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="class" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					A class name used to create a job execution listener from the default constructor.
-				</xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="direct">
-						<tool:expected-type type="java.lang.Class" />
-					</tool:annotation>
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="before-job-method" type="xsd:string" />
-		<xsd:attribute name="after-job-method" type="xsd:string" />
+		<xsd:complexContent>
+			<xsd:extension base="listenerType">
+				<xsd:attribute name="before-job-method" type="xsd:string" />
+				<xsd:attribute name="after-job-method" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<xsd:complexType name="stepListenerType">
-		<xsd:attribute name="id" type="xsd:ID" />
-		<xsd:attribute name="ref" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				A bean definition for a step listener (or POJO if using *-method attributes)
-				]]></xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref" />
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="class" type="xsd:string">
-			<xsd:annotation>
-				<xsd:documentation>
-					A class name used to create a StepListener from the default constructor. If the class
-					does not
-					implement StepListener then either a *-method attribute must be provided,
-					or source level anntotations must be
-					present for the listener method to be detected. 
-				</xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="direct">
-						<tool:expected-type type="java.lang.Class" />
-					</tool:annotation>
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="before-step-method" type="xsd:string" />
-		<xsd:attribute name="after-step-method" type="xsd:string" />
-		<xsd:attribute name="before-chunk-method" type="xsd:string" />
-		<xsd:attribute name="after-chunk-method" type="xsd:string" />
-		<xsd:attribute name="before-read-method" type="xsd:string" />
-		<xsd:attribute name="after-read-method" type="xsd:string" />
-		<xsd:attribute name="on-read-error-method" type="xsd:string" />
-		<xsd:attribute name="before-process-method" type="xsd:string" />
-		<xsd:attribute name="after-process-method" type="xsd:string" />
-		<xsd:attribute name="on-process-error-method" type="xsd:string" />
-		<xsd:attribute name="before-write-method" type="xsd:string" />
-		<xsd:attribute name="after-write-method" type="xsd:string" />
-		<xsd:attribute name="on-write-error-method" type="xsd:string" />
-		<xsd:attribute name="on-skip-in-read-method" type="xsd:string" />
-		<xsd:attribute name="on-skip-in-process-method" type="xsd:string" />
-		<xsd:attribute name="on-skip-in-write-method" type="xsd:string" />
+		<xsd:complexContent>
+			<xsd:extension base="listenerType">
+				<xsd:attribute name="before-step-method" type="xsd:string" />
+				<xsd:attribute name="after-step-method" type="xsd:string" />
+				<xsd:attribute name="before-chunk-method" type="xsd:string" />
+				<xsd:attribute name="after-chunk-method" type="xsd:string" />
+				<xsd:attribute name="before-read-method" type="xsd:string" />
+				<xsd:attribute name="after-read-method" type="xsd:string" />
+				<xsd:attribute name="on-read-error-method" type="xsd:string" />
+				<xsd:attribute name="before-process-method" type="xsd:string" />
+				<xsd:attribute name="after-process-method" type="xsd:string" />
+				<xsd:attribute name="on-process-error-method" type="xsd:string" />
+				<xsd:attribute name="before-write-method" type="xsd:string" />
+				<xsd:attribute name="after-write-method" type="xsd:string" />
+				<xsd:attribute name="on-write-error-method" type="xsd:string" />
+				<xsd:attribute name="on-skip-in-read-method" type="xsd:string" />
+				<xsd:attribute name="on-skip-in-process-method" type="xsd:string" />
+				<xsd:attribute name="on-skip-in-write-method" type="xsd:string" />
+			</xsd:extension>
+		</xsd:complexContent>
 	</xsd:complexType>
 
 	<xsd:group name="stepListeners">
