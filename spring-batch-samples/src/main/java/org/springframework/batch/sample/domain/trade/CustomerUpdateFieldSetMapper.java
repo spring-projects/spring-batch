@@ -22,20 +22,25 @@ import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 
 /**
- * {@link FieldSetMapper} for mapping the 
+ * {@link FieldSetMapper} for mapping to a {@link CustomerUpdate}.
  * 
  * @author Lucas Ward
- *
+ * 
  */
 public class CustomerUpdateFieldSetMapper implements FieldSetMapper<CustomerUpdate> {
 
 	public CustomerUpdate mapFieldSet(FieldSet fs) {
-		
+
+		if (fs == null) {
+			return null;
+		}
+
 		CustomerOperation operation = CustomerOperation.fromCode(fs.readChar(0));
 		String name = fs.readString(1);
 		BigDecimal credit = fs.readBigDecimal(2);
-		
-		return  new CustomerUpdate(operation, name, credit);
+
+		return new CustomerUpdate(operation, name, credit);
+
 	}
-	
+
 }

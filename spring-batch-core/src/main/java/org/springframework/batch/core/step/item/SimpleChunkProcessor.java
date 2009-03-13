@@ -151,9 +151,11 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			return;
 		}
 
+		int inputSize = inputs.size();
+		
 		Chunk<O> outputs = transform(contribution, inputs);
-
-		contribution.incrementFilterCount(inputs.size() - outputs.size());
+		
+		contribution.incrementFilterCount(inputSize - outputs.size());
 
 		/*
 		 * Need to remember the write skips across transactions, otherwise they
