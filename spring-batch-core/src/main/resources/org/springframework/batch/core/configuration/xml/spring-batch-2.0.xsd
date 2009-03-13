@@ -516,8 +516,8 @@
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				A shortcut for specifying the next step to execute after this one, if there is only one choice.    The next
-				attribute is a synonym for &lt;next on="*" .../&gt; in a transition.
-				If this attribute is specified, then there should be no other transition with a nested &lt;next on="*" .../&gt;]]>
+				attribute is a synonym for &lt;next on="*"/&gt; plus &lt;fail on="FAILED"/&gt; in a transition.
+				If this attribute is specified, then there should be no other transition with a nested &lt;next .../&gt;]]>
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
