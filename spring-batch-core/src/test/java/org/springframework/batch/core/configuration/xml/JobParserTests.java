@@ -74,6 +74,26 @@ public class JobParserTests {
 		assertTrue(c);
 	}
 
+	@Test
+	public void testStandaloneListener() throws Exception {
+		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
+		List<?> jobListeners = getListeners("job3", ctx);
+		assertEquals(2, jobListeners.size());
+		boolean a = false;
+		boolean b = false;
+		for (Object l : jobListeners) {
+			if (l instanceof DummyAnnotationJobExecutionListener) {
+				a = true;
+			}
+			else if (l instanceof JobExecutionListenerSupport) {
+				b = true;
+			}
+		}
+		assertTrue(a);
+		assertTrue(b);
+	}
+
 	@SuppressWarnings("unchecked")
 	private List<?> getListeners(String jobName, ApplicationContext ctx) throws Exception {
 		Map<String, Object> beans = ctx.getBeansOfType(Job.class);

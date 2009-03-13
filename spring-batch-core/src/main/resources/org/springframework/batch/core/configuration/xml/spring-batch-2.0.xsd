@@ -75,6 +75,20 @@
 		</xsd:complexType>
 	</xsd:element>
 
+	<xsd:element name="job-listener">
+		<xsd:annotation>
+			<xsd:documentation>
+				A reference to a JobExecutionListener or a POJO 
+				(with before-job-method / after-job-method).
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="jobExecutionListenerType"/>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
 	<xsd:element name="step-listener">
 		<xsd:annotation>
 			<xsd:documentation>
@@ -260,36 +274,7 @@
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="listener" minOccurs="1" maxOccurs="unbounded">
-							<xsd:complexType>
-								<xsd:attribute name="id" type="xsd:ID" />
-								<xsd:attribute name="ref" type="xsd:string">
-									<xsd:annotation>
-										<xsd:documentation>
-										A reference to a JobExecutionListener or a POJO 
-										(with before-job-method / after-job-method).
-										</xsd:documentation>
-										<xsd:appinfo>
-											<tool:annotation kind="ref"/>
-										</xsd:appinfo>
-									</xsd:annotation>
-								</xsd:attribute>
-								<xsd:attribute name="class" type="xsd:string">
-									<xsd:annotation>
-										<xsd:documentation>
-										A class name used to create a listener from the default constructor.
-										</xsd:documentation>
-										<xsd:appinfo>
-											<tool:annotation kind="direct">
-												<tool:expected-type type="java.lang.Class" />
-											</tool:annotation>
-										</xsd:appinfo>
-									</xsd:annotation>
-								</xsd:attribute>
-								<xsd:attribute name="before-job-method" type="xsd:string" />
-								<xsd:attribute name="after-job-method" type="xsd:string" />
-							</xsd:complexType>
-						</xsd:element>
+						<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="1" maxOccurs="unbounded"/>
 					</xsd:sequence>
 					<xsd:attributeGroup ref="mergeAttribute"/>
 				</xsd:complexType>
@@ -329,7 +314,7 @@
 				</xsd:annotation>
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="listener" type="listenerType" minOccurs="1" maxOccurs="unbounded"/>
+						<xsd:element name="listener" type="retryListenerType" minOccurs="1" maxOccurs="unbounded"/>
 					</xsd:sequence>
 					<xsd:attributeGroup ref="mergeAttribute"/>
 				</xsd:complexType>
@@ -543,12 +528,41 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="listenerType">
+	<xsd:complexType name="retryListenerType">
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="ref" type="xsd:string"/>
 		<xsd:attribute name="class" type="xsd:string"/>
 	</xsd:complexType>
 	
+	<xsd:complexType name="jobExecutionListenerType">
+		<xsd:attribute name="id" type="xsd:ID" />
+		<xsd:attribute name="ref" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+				A reference to a JobExecutionListener or a POJO 
+				(with before-job-method / after-job-method).
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref"/>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="class" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation>
+				A class name used to create a job execution listener from the default constructor.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="direct">
+						<tool:expected-type type="java.lang.Class" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="before-job-method" type="xsd:string" />
+		<xsd:attribute name="after-job-method" type="xsd:string" />
+	</xsd:complexType>
+
 	<xsd:complexType name="stepListenerType">
 		<xsd:attribute name="id" type="xsd:ID"/>
 		<xsd:attribute name="ref" type="xsd:string">
@@ -590,22 +604,6 @@
 		<xsd:attribute name="on-skip-in-read-method" type="xsd:string"/>
 		<xsd:attribute name="on-skip-in-process-method" type="xsd:string"/>
 		<xsd:attribute name="on-skip-in-write-method" type="xsd:string"/>
-	</xsd:complexType>
-
-	<xsd:complexType name="jobExecutionListenerType">
-		<xsd:attribute name="before-method" type="xsd:string"/>
-		<xsd:attribute name="after-method" type="xsd:string"/>
-		<xsd:attribute name="ref" type="xsd:string" use="required">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				A bean definition for a job listener (or POJO if using *-method attributes)
-				]]></xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref"/>
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-		
 	</xsd:complexType>
 
 	<xsd:group name="stepListeners">

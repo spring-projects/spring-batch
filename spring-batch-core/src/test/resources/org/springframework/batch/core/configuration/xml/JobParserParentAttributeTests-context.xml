@@ -22,10 +22,28 @@
 		</listeners>
 	</job>
 
+	<job id="job3" parent="baseJob3">
+		<step id="s3" tasklet="dummyTasklet"/>
+		
+		<listeners merge="true">
+			<listener ref="listener1"/>
+		</listeners>
+	</job>
+
 	<job id="baseJob" abstract="true">
 		<listeners>
 			<listener class="org.springframework.batch.core.configuration.xml.DummyAnnotationJobExecutionListener"/>
 		</listeners>
 	</job>
+
+	<job-listener id="listener1" class="org.springframework.batch.core.configuration.xml.DummyAnnotationJobExecutionListener"/>
+
+	<beans:bean id="baseJob3" abstract="true">
+		<beans:property name="jobExecutionListeners">
+			<beans:list>
+				<job-listener class="org.springframework.batch.core.listener.JobExecutionListenerSupport"/>
+			</beans:list>
+		</beans:property>
+	</beans:bean>
 
 </beans:beans>

@@ -34,6 +34,7 @@ public class CoreNamespaceHandler extends NamespaceHandlerSupport {
 		this.registerBeanDefinitionParser("step", new TopLevelStepParser());
 		this.registerBeanDefinitionParser("tasklet", new TopLevelTaskletElementParser());
 		this.registerBeanDefinitionParser("job-repository", new JobRepositoryParser());
+		this.registerBeanDefinitionParser("job-listener", new TopLevelJobListenerParser());
 		this.registerBeanDefinitionParser("step-listener", new TopLevelStepListenerParser());
 	}
 }
