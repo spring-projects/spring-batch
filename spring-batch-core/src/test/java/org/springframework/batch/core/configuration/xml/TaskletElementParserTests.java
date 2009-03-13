@@ -43,11 +43,13 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 public class TaskletElementParserTests {
 
+	ConfigurableApplicationContext taskletElementParentAttributeParserTestsContext = new ClassPathXmlApplicationContext(
+			"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
+
 	@Test
 	public void testInheritSkippable() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<Class<?>> skippable = getExceptionClasses("s1", "skippable", ctx);
+		Collection<Class<?>> skippable = getExceptionClasses("s1", "skippable",
+				taskletElementParentAttributeParserTestsContext);
 		assertEquals(2, skippable.size());
 		boolean e = false;
 		boolean f = false;
@@ -65,9 +67,7 @@ public class TaskletElementParserTests {
 
 	@Test
 	public void testInheritFatal() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<Class<?>> fatal = getExceptionClasses("s1", "fatal", ctx);
+		Collection<Class<?>> fatal = getExceptionClasses("s1", "fatal", taskletElementParentAttributeParserTestsContext);
 		boolean a = false;
 		boolean b = false;
 		for (Class<?> cls : fatal) {
@@ -84,9 +84,7 @@ public class TaskletElementParserTests {
 
 	@Test
 	public void testInheritStreams() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<ItemStream> streams = getStreams("s1", ctx);
+		Collection<ItemStream> streams = getStreams("s1", taskletElementParentAttributeParserTestsContext);
 		assertEquals(2, streams.size());
 		boolean c = false;
 		boolean d = false;
@@ -104,9 +102,8 @@ public class TaskletElementParserTests {
 
 	@Test
 	public void testInheritRetryListeners() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<RetryListener> retryListeners = getRetryListeners("s1", ctx);
+		Collection<RetryListener> retryListeners = getRetryListeners("s1",
+				taskletElementParentAttributeParserTestsContext);
 		assertEquals(2, retryListeners.size());
 		boolean g = false;
 		boolean h = false;
@@ -124,9 +121,8 @@ public class TaskletElementParserTests {
 
 	@Test
 	public void testInheritSkippable_NoMerge() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<Class<?>> skippable = getExceptionClasses("s2", "skippable", ctx);
+		Collection<Class<?>> skippable = getExceptionClasses("s2", "skippable",
+				taskletElementParentAttributeParserTestsContext);
 		assertEquals(1, skippable.size());
 		boolean e = false;
 		for (Class<?> cls : skippable) {
@@ -139,9 +135,7 @@ public class TaskletElementParserTests {
 
 	@Test
 	public void testInheritFatal_NoMerge() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<Class<?>> fatal = getExceptionClasses("s2", "fatal", ctx);
+		Collection<Class<?>> fatal = getExceptionClasses("s2", "fatal", taskletElementParentAttributeParserTestsContext);
 		boolean a = false;
 		boolean b = false;
 		for (Class<?> cls : fatal) {
@@ -158,9 +152,7 @@ public class TaskletElementParserTests {
 
 	@Test
 	public void testInheritStreams_NoMerge() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<ItemStream> streams = getStreams("s2", ctx);
+		Collection<ItemStream> streams = getStreams("s2", taskletElementParentAttributeParserTestsContext);
 		assertEquals(1, streams.size());
 		boolean c = false;
 		for (ItemStream o : streams) {
@@ -173,9 +165,8 @@ public class TaskletElementParserTests {
 
 	@Test
 	public void testInheritRetryListeners_NoMerge() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
-		Collection<RetryListener> retryListeners = getRetryListeners("s2", ctx);
+		Collection<RetryListener> retryListeners = getRetryListeners("s2",
+				taskletElementParentAttributeParserTestsContext);
 		assertEquals(1, retryListeners.size());
 		boolean h = false;
 		for (RetryListener o : retryListeners) {
