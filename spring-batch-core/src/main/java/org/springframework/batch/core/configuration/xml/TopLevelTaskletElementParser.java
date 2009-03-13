@@ -34,6 +34,11 @@ public class TopLevelTaskletElementParser extends AbstractBeanDefinitionParser {
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
+		if (!Boolean.valueOf(element.getAttribute("abstract"))) {
+			parserContext.getReaderContext().error(
+					"The <tasklet/> element, when not contained with a <step/>, must be abstract", element);
+		}
+
 		return taskletElementParser.parse(element, parserContext);
 
 	}
