@@ -12,9 +12,6 @@
 
 		<split id="split1">
 
-			<next on="FAILED" to="s3"/>
-			<fail on="COMPLETED" />
-
 			<flow>
 				<step id="s1" ref="step1"/>
 			</flow>
@@ -22,6 +19,9 @@
 			<flow>
 				<step id="fail" ref="failingStep"/>
 			</flow>
+
+			<next on="FAILED" to="s3"/>
+			<fail on="COMPLETED" />
 
 		</split>
 

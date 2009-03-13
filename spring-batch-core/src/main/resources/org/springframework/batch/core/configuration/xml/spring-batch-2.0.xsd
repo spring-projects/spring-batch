@@ -213,7 +213,7 @@
 					</xsd:annotation>
 					<xsd:complexType>
 						<xsd:complexContent>
-							<xsd:extension base="transitionWithNextType">
+							<xsd:extension base="nextType">
 								<xsd:sequence minOccurs="2" maxOccurs="unbounded">
 									<xsd:element name="flow" type="flowType">
 										<xsd:annotation>
@@ -222,6 +222,7 @@
 											</xsd:documentation>
 										</xsd:annotation>
 									</xsd:element>
+									<xsd:group ref="transitions" />
 								</xsd:sequence>
 								<xsd:attribute name="id" type="xsd:ID" use="required" />
 								<xsd:attribute name="task-executor" type="xsd:string" use="optional">
@@ -535,14 +536,6 @@
 
 	<xsd:complexType name="transitionType">
 		<xsd:group ref="transitions" />
-	</xsd:complexType>
-
-	<xsd:complexType name="transitionWithNextType">
-		<xsd:complexContent>
-			<xsd:extension base="nextType">
-				<xsd:group ref="transitions" />
-			</xsd:extension>
-		</xsd:complexContent>
 	</xsd:complexType>
 
 	<xsd:complexType name="listenerType">
