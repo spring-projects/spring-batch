@@ -15,8 +15,6 @@
  */
 package org.springframework.batch.core.step.tasklet;
 
-import java.beans.PropertyEditor;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.apache.commons.logging.Log;
@@ -34,7 +32,6 @@ import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.core.step.ThreadStepInterruptionPolicy;
-import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
@@ -48,9 +45,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Simple implementation of executing the step as a call to a {@link Tasklet},
@@ -128,20 +123,6 @@ public class TaskletStep extends AbstractStep {
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
-	}
-
-	/**
-	 * Public setter for the {@link TransactionAttribute}.
-	 * 
-	 * @param transactionAttributeList A list of all the transaction attributes
-	 *            to set
-	 */
-	public void setTransactionAttributeList(List<String> transactionAttributeList) {
-		String[] stringArray = transactionAttributeList.toArray(new String[0]);
-		String attributeString = StringUtils.arrayToCommaDelimitedString(stringArray);
-		PropertyEditor editor = new TransactionAttributeEditor();
-		editor.setAsText(attributeString);
-		this.setTransactionAttribute((TransactionAttribute) editor.getValue());
 	}
 
 	/**
@@ -235,20 +216,6 @@ public class TaskletStep extends AbstractStep {
 		this.interruptionPolicy = interruptionPolicy;
 	}
 
-	/**
-	 * Variation on
-	 * {@link AbstractStep#setStepExecutionListeners(StepExecutionListener[])}.
-	 * This method exists because the parser requires a "listeners" property
-	 * setter to match the one on {@link SimpleStepFactoryBean}.
-	 * 
-	 * @param listeners
-	 * @see AbstractStep#setStepExecutionListeners(StepExecutionListener[])
-	 * @see SimpleStepFactoryBean#setListeners(org.springframework.batch.core.StepListener[])
-	 */
-	public void setListeners(StepExecutionListener[] listeners) { 
-        this.setStepExecutionListeners(listeners); 
-    } 
-	
 	/**
 	 * Process the step and update its context so that progress can be monitored
 	 * by the caller. The step is broken down into chunks, each one executing in

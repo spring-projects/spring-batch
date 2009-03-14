@@ -43,7 +43,7 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 public class TaskletElementParserTests {
 
-	ConfigurableApplicationContext taskletElementParentAttributeParserTestsContext = new ClassPathXmlApplicationContext(
+	private ConfigurableApplicationContext taskletElementParentAttributeParserTestsContext = new ClassPathXmlApplicationContext(
 			"org/springframework/batch/core/configuration/xml/TaskletElementParentAttributeParserTests-context.xml");
 
 	@Test

@@ -15,9 +15,6 @@
  */
 package org.springframework.batch.core.step.item;
 
-import java.beans.PropertyEditor;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ChunkListener;
@@ -48,9 +45,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttributeEditor;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * Most common configuration options for simple steps should be found here. Use
@@ -143,10 +138,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * public void setIsReaderTransactionalQueue(boolean
-	 * isReaderTransactionalQueue) { this.isReaderTransactionalQueue =
-	 * isReaderTransactionalQueue; } Set the bean name property, which will
-	 * become the name of the {@link Step} when it is created.
+	 * Set the bean name property, which will become the name of the
+	 * {@link Step} when it is created.
 	 * 
 	 * @see org.springframework.beans.factory.BeanNameAware#setBeanName(java.lang.String)
 	 */
@@ -272,20 +265,6 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 */
 	public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
-	}
-
-	/**
-	 * Public setter for the {@link TransactionAttribute}.
-	 * 
-	 * @param transactionAttributeList A list of all the transaction attributes
-	 *            to set
-	 */
-	public void setTransactionAttributeList(List<String> transactionAttributeList) {
-		String[] stringArray = transactionAttributeList.toArray(new String[0]);
-		String attributeString = StringUtils.arrayToCommaDelimitedString(stringArray);
-		PropertyEditor editor = new TransactionAttributeEditor();
-		editor.setAsText(attributeString);
-		this.setTransactionAttribute((TransactionAttribute) editor.getValue());
 	}
 
 	/**

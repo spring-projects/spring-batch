@@ -18,8 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
-import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
+import org.springframework.batch.core.step.item.StepFactoryBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
@@ -50,27 +49,13 @@ public class TaskletElementParser {
 	 */
 	protected AbstractBeanDefinition parse(Element element, ParserContext parserContext, boolean underspecified) {
 
-		String skipLimit = element.getAttribute("skip-limit");
-		String retryLimit = element.getAttribute("retry-limit");
-		String cacheCapacity = element.getAttribute("cache-capacity");
-		String isReaderTransactionalQueue = element.getAttribute("is-reader-transactional-queue");
-
-		boolean useFaultTolerant = underspecified
-				|| (StringUtils.hasText(isReaderTransactionalQueue) && Boolean.valueOf(isReaderTransactionalQueue))
-				|| isPositive(skipLimit) || isPositive(retryLimit) || isPositive(cacheCapacity)
-				|| hasElement(element, "skippable-exception-classes")
-				|| hasElement(element, "retryable-exception-classes") || hasElement(element, "fatal-exception-classes");
-
 		GenericBeanDefinition bd = new GenericBeanDefinition();
-		if (useFaultTolerant) {
-			bd.setBeanClass(FaultTolerantStepFactoryBean.class);
-		}
-		else {
-			bd.setBeanClass(SimpleStepFactoryBean.class);
-		}
+		bd.setBeanClass(StepFactoryBean.class);
 
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 
+		propertyValues.addPropertyValue("hasTaskletElement", Boolean.TRUE);
+		
 		String readerBeanId = element.getAttribute("reader");
 		if (StringUtils.hasText(readerBeanId)) {
 			RuntimeBeanReference readerRef = new RuntimeBeanReference(readerBeanId);
@@ -113,32 +98,31 @@ public class TaskletElementParser {
 							+ "or 'chunk-completion-policy', but not both.", element);
 		}
 
+		String skipLimit = element.getAttribute("skip-limit");
 		if (StringUtils.hasText(skipLimit)) {
 			propertyValues.addPropertyValue("skipLimit", skipLimit);
 		}
 
+		String retryLimit = element.getAttribute("retry-limit");
 		if (StringUtils.hasText(retryLimit)) {
 			propertyValues.addPropertyValue("retryLimit", retryLimit);
 		}
 
+		String cacheCapacity = element.getAttribute("cache-capacity");
 		if (StringUtils.hasText(cacheCapacity)) {
 			propertyValues.addPropertyValue("cacheCapacity", cacheCapacity);
 		}
 
+		String isReaderTransactionalQueue = element.getAttribute("is-reader-transactional-queue");
 		if (StringUtils.hasText(isReaderTransactionalQueue)) {
-			if (useFaultTolerant) {
-				propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
-			}
+			propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
 		}
 
-		handleExceptionElement(element, parserContext, bd, "skippable-exception-classes", "skippableExceptionClasses",
-				useFaultTolerant, underspecified);
+		handleExceptionElement(element, parserContext, bd, "skippable-exception-classes", "skippableExceptionClasses");
 
-		handleExceptionElement(element, parserContext, bd, "retryable-exception-classes", "retryableExceptionClasses",
-				useFaultTolerant, underspecified);
+		handleExceptionElement(element, parserContext, bd, "retryable-exception-classes", "retryableExceptionClasses");
 
-		handleExceptionElement(element, parserContext, bd, "fatal-exception-classes", "fatalExceptionClasses",
-				useFaultTolerant, underspecified);
+		handleExceptionElement(element, parserContext, bd, "fatal-exception-classes", "fatalExceptionClasses");
 
 		handleRetryListenersElement(element, bd, parserContext);
 
@@ -148,39 +132,19 @@ public class TaskletElementParser {
 
 	}
 
-	private boolean isPositive(String stringValue) {
-		if (StringUtils.hasText(stringValue)) {
-			if (Integer.valueOf(stringValue) > 0) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private boolean hasElement(Element element, String subElementName) {
-		return StringUtils.hasLength(DomUtils.getChildElementValueByTagName(element, subElementName));
-	}
-
 	@SuppressWarnings("unchecked")
 	private void handleExceptionElement(Element element, ParserContext parserContext, BeanDefinition bd,
-			String subElementName, String propertyName, boolean isFaultTolerant, boolean isAbstract) {
+			String subElementName, String propertyName) {
 		Element child = DomUtils.getChildElementByTagName(element, subElementName);
 		if (child != null) {
 			String exceptions = DomUtils.getTextValue(child);
 			if (StringUtils.hasLength(exceptions)) {
-				if (isFaultTolerant || isAbstract) {
-					String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
-					if (exceptionArray.length > 0) {
-						ManagedList managedList = new ManagedList();
-						managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
-						managedList.addAll(Arrays.asList(exceptionArray));
-						bd.getPropertyValues().addPropertyValue(propertyName, managedList);
-					}
-				}
-				else {
-					parserContext.getReaderContext().error(
-							subElementName + " can only be specified for fault-tolerant "
-									+ "configurations providing skip-limit, retry-limit or cache-capacity", element);
+				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
+				if (exceptionArray.length > 0) {
+					ManagedList managedList = new ManagedList();
+					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
+					managedList.addAll(Arrays.asList(exceptionArray));
+					bd.getPropertyValues().addPropertyValue(propertyName, managedList);
 				}
 			}
 		}

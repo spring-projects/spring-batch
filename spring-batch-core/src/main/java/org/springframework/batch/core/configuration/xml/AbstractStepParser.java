@@ -18,7 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.core.step.item.StepFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -61,6 +61,7 @@ public abstract class AbstractStepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, "tasklet");
 		boolean taskletElementExists = taskletElements.size() > 0;
+		boolean stepUnderspecified = stepUnderspecified(stepElement);
 		AbstractBeanDefinition bd = null;
 		if (StringUtils.hasText(taskletRef)) {
 			if (taskletElementExists) {
@@ -73,11 +74,16 @@ public abstract class AbstractStepParser {
 		}
 		else if (taskletElementExists) {
 			Element taskElement = taskletElements.get(0);
-			bd = taskletElementParser.parse(taskElement, parserContext, stepUnderspecified(stepElement));
+			bd = taskletElementParser.parse(taskElement, parserContext, stepUnderspecified);
 		}
 
 		if (bd != null) {
 			setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
+		}
+		else if (!stepUnderspecified) {
+			parserContext.getReaderContext().error(
+					"Step [" + stepElement.getAttribute("id")
+							+ "] has neither a <tasklet/> element nor a 'tasklet' attribute.", stepElement);
 		}
 
 		return bd;
@@ -105,7 +111,7 @@ public abstract class AbstractStepParser {
 			String jobRepositoryRef) {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
-		bd.setBeanClass(TaskletStep.class);
+		bd.setBeanClass(StepFactoryBean.class);
 
 		if (StringUtils.hasText(taskletRef)) {
 			RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
@@ -121,7 +127,7 @@ public abstract class AbstractStepParser {
 			String jobRepositoryRef) {
 		checkStepAttributes(stepElement, bd);
 
-		bd.setAbstract(stepElement.hasAttribute("abstract") && Boolean.valueOf(stepElement.getAttribute("abstract")));
+		bd.setAbstract(Boolean.valueOf(stepElement.getAttribute("abstract")));
 
 		RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
 		bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
