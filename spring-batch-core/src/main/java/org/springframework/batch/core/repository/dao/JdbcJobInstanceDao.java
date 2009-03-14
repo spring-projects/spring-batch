@@ -16,6 +16,10 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -112,15 +116,29 @@ public class JdbcJobInstanceDao extends AbstractJdbcBatchMetadataDao implements 
 		return jobInstance;
 	}
 
-	private String createJobKey(JobParameters jobParameters) {
+	protected String createJobKey(JobParameters jobParameters) {
 
 		Map<String, JobParameter> props = jobParameters.getParameters();
 		StringBuffer stringBuffer = new StringBuffer();
 		for (Entry<String, JobParameter> entry : props.entrySet()) {
 			stringBuffer.append(entry.toString() + ";");
 		}
-
-		return stringBuffer.toString();
+		
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+		}
+		catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException("MD5 algorithm not available.  Fatal (should be in the JDK).");
+		}
+		
+		try {
+			byte[] bytes = digest.digest(stringBuffer.toString().getBytes("UTF-8"));
+			return String.format("%032x", new BigInteger(1, bytes));
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new IllegalStateException("UTF-8 encoding not available.  Fatal (should be in the JDK).");
+		}
 	}
 
 	/**
