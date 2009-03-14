@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -19,7 +20,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.PassThroughItemProcessor;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
-import org.springframework.batch.support.BinaryExceptionClassifier;
 import org.springframework.dao.DataIntegrityViolationException;
 
 public class FaultTolerantChunkProcessorTests {

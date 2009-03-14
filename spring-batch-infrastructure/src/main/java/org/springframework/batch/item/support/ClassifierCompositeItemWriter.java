@@ -21,9 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.batch.classify.Classifier;
+import org.springframework.batch.classify.ClassifierSupport;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.support.Classifier;
-import org.springframework.batch.support.ClassifierSupport;
 
 /**
  * Calls one of a collection of ItemWriters for each item, based on a router

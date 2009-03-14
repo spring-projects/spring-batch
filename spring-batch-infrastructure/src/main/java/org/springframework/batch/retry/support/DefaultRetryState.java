@@ -15,11 +15,11 @@
  */
 package org.springframework.batch.retry.support;
 
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryOperations;
 import org.springframework.batch.retry.RetryState;
-import org.springframework.batch.support.Classifier;
 
 /**
  * 

@@ -23,9 +23,9 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.apache.log4j.WriterAppender;
+import org.springframework.batch.classify.ClassifierSupport;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.LogOrRethrowExceptionHandler.Level;
-import org.springframework.batch.support.ClassifierSupport;
 
 public class LogOrRethrowExceptionHandlerTests extends TestCase {
 

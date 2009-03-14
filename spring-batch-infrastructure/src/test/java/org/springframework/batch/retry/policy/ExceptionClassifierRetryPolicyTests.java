@@ -20,9 +20,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import junit.framework.TestCase;
 
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
-import org.springframework.batch.support.Classifier;
 
 public class ExceptionClassifierRetryPolicyTests extends TestCase {
 

@@ -20,6 +20,8 @@ import java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.classify.BinaryExceptionClassifier;
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
@@ -31,8 +33,6 @@ import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.support.DefaultRetryState;
-import org.springframework.batch.support.BinaryExceptionClassifier;
-import org.springframework.batch.support.Classifier;
 
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
 

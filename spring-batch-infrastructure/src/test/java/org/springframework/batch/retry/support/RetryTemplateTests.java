@@ -27,6 +27,7 @@ import static org.easymock.EasyMock.*;
 import java.util.Collections;
 
 import org.junit.Test;
+import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
@@ -37,7 +38,6 @@ import org.springframework.batch.retry.backoff.BackOffPolicy;
 import org.springframework.batch.retry.backoff.StatelessBackOffPolicy;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
  * @author Rob Harrop

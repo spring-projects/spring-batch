@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
+import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextSupport;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -40,7 +41,6 @@ import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.support.BinaryExceptionClassifier;
 import org.springframework.dao.DataAccessException;
 
 public class StatefulRecoveryRetryTests {

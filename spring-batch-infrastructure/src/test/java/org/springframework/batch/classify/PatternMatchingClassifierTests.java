@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
 import static org.junit.Assert.*;
 
@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.batch.classify.PatternMatchingClassifier;
 
 /**
  * @author Dave Syer

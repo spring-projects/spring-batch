@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
-import junit.framework.TestCase;
+/**
+ * Interface for a classifier. At its simplest a {@link Classifier} is just a
+ * map from objects of one type to objects of another type.
+ * 
+ * @author Dave Syer
+ * 
+ */
+public interface Classifier<C, T> {
 
-public class ClassifierSupportTests extends TestCase {
-
-	public void testClassifyNullIsDefault() {
-		ClassifierSupport<String,String> classifier = new ClassifierSupport<String,String>("foo");
-		assertEquals(classifier.classify(null), "foo");
-	}
-
-	public void testClassifyRandomException() {
-		ClassifierSupport<Throwable,String> classifier = new ClassifierSupport<Throwable,String>("foo");
-		assertEquals(classifier.classify(new IllegalStateException("Foo")), classifier.classify(null));
-	}
+	/**
+	 * Classify the given object and return an object of a different type,
+	 * possibly an enumerated type.
+	 * 
+	 * @param classifiable the input object. Can be null.
+	 * @return an object. Can be null, but implementations should declare if
+	 * this is the case.
+	 */
+	T classify(C classifiable);
 
 }

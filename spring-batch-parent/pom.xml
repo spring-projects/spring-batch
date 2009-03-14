@@ -117,10 +117,6 @@
 					<artifactId>com.springsource.bundlor.maven</artifactId>
 					<version>${bundlor.version}</version>
 					<inherited>true</inherited>
-					<configuration>
-						<manifestTemplatePath>${project.basedir}/template.mf</manifestTemplatePath>
-						<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
-					</configuration>
 					<executions>
 						<execution>
 							<id>bundlor-transform</id>

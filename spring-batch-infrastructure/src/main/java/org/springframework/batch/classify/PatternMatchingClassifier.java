@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.batch.support.PatternMatcher;
 
 /**
  * A {@link Classifier} that maps from String patterns with wildcards to a set

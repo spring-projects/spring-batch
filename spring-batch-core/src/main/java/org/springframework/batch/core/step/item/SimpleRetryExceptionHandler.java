@@ -19,6 +19,7 @@ import java.util.Collection;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.support.RepeatSynchronizationManager;
@@ -26,7 +27,6 @@ import org.springframework.batch.retry.RetryCallback;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.listener.RetryListenerSupport;
-import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
  * An {@link ExceptionHandler} that is aware of the retry context so that it can

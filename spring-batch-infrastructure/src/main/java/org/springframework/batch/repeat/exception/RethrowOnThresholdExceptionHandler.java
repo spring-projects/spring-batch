@@ -22,10 +22,10 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.batch.classify.Classifier;
+import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.context.RepeatContextCounter;
-import org.springframework.batch.support.Classifier;
-import org.springframework.batch.support.SubclassClassifier;
 import org.springframework.util.ObjectUtils;
 
 /**

@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
+import org.springframework.batch.support.MethodInvoker;
+import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.util.Assert;
 
 /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.springframework.batch.classify.SubclassClassifier;
 
 public class SubclassExceptionClassifierTests {
 

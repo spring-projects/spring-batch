@@ -18,11 +18,12 @@ package org.springframework.batch.core.step.skip;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.Collections;
+
+import org.springframework.batch.classify.BinaryExceptionClassifier;
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.file.FlatFileParseException;
-import org.springframework.batch.support.BinaryExceptionClassifier;
-import org.springframework.batch.support.Classifier;
 
 /**
  * <p>

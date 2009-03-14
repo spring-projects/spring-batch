@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
 import java.util.Collections;
+
+import org.springframework.batch.classify.BinaryExceptionClassifier;
+
 import junit.framework.TestCase;
 
 public class BinaryExceptionClassifierTests extends TestCase {

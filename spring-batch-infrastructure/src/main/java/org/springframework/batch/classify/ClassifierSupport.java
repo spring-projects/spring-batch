@@ -14,25 +14,35 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
 /**
- * Interface for a classifier. At its simplest a {@link Classifier} is just a
- * map from objects of one type to objects of another type.
+ * Base class for {@link Classifier} implementations. Provides default behaviour
+ * and some convenience members, like constants.
  * 
  * @author Dave Syer
  * 
  */
-public interface Classifier<C, T> {
+public class ClassifierSupport<C, T> implements Classifier<C, T> {
+
+	final private T defaultValue;
 
 	/**
-	 * Classify the given object and return an object of a different type,
-	 * possibly an enumerated type.
-	 * 
-	 * @param classifiable the input object. Can be null.
-	 * @return an object. Can be null, but implementations should declare if
-	 * this is the case.
+	 * @param defaultValue
 	 */
-	T classify(C classifiable);
+	public ClassifierSupport(T defaultValue) {
+		super();
+		this.defaultValue = defaultValue;
+	}
+
+	/**
+	 * Always returns the default value. This is the main extension point for
+	 * subclasses, so it must be able to classify null.
+	 * 
+	 * @see org.springframework.batch.classify.Classifier#classify(Object)
+	 */
+	public T classify(C throwable) {
+		return defaultValue;
+	}
 
 }

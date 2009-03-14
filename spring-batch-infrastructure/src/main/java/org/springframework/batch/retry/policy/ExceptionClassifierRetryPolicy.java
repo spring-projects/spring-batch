@@ -19,12 +19,12 @@ package org.springframework.batch.retry.policy;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.batch.classify.Classifier;
+import org.springframework.batch.classify.ClassifierSupport;
+import org.springframework.batch.classify.SubclassClassifier;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.support.Classifier;
-import org.springframework.batch.support.ClassifierSupport;
-import org.springframework.batch.support.SubclassClassifier;
 import org.springframework.util.Assert;
 
 /**

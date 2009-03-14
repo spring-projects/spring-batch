@@ -20,7 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
-import org.springframework.batch.support.Classifier;
+import org.springframework.batch.classify.Classifier;
 
 /**
  * @author Dave Syer
@@ -30,7 +30,7 @@ public class DefaultRetryStateTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.retry.support.DefaultRetryState#DefaultRetryState(java.lang.Object, boolean, org.springframework.batch.support.Classifier)}.
+	 * {@link org.springframework.batch.retry.support.DefaultRetryState#DefaultRetryState(java.lang.Object, boolean, org.springframework.batch.classify.Classifier)}.
 	 */
 	@Test
 	public void testDefaultRetryStateObjectBooleanClassifierOfQsuperThrowableBoolean() {
@@ -46,7 +46,7 @@ public class DefaultRetryStateTests {
 
 	/**
 	 * Test method for
-	 * {@link org.springframework.batch.retry.support.DefaultRetryState#DefaultRetryState(java.lang.Object, org.springframework.batch.support.Classifier)}.
+	 * {@link org.springframework.batch.retry.support.DefaultRetryState#DefaultRetryState(java.lang.Object, org.springframework.batch.classify.Classifier)}.
 	 */
 	@Test
 	public void testDefaultRetryStateObjectClassifierOfQsuperThrowableBoolean() {

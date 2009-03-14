@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.batch.support;
+package org.springframework.batch.classify;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.springframework.batch.classify.ClassifierAdapter;
 import org.springframework.batch.support.annotation.Classifier;
 
 /**
@@ -82,7 +83,7 @@ public class ClassifierAdapterTests {
 	@Test
 	public void testClassifierAdapterClassifier() {
 		adapter = new ClassifierAdapter<String, Integer>(
-				new org.springframework.batch.support.Classifier<String, Integer>() {
+				new org.springframework.batch.classify.Classifier<String, Integer>() {
 					public Integer classify(String classifiable) {
 						return Integer.valueOf(classifiable);
 					}
@@ -116,7 +117,7 @@ public class ClassifierAdapterTests {
 
 	@Test
 	public void testClassifyWithClassifier() {
-		adapter.setDelegate(new org.springframework.batch.support.Classifier<String, Integer>() {
+		adapter.setDelegate(new org.springframework.batch.classify.Classifier<String, Integer>() {
 			public Integer classify(String classifiable) {
 				return Integer.valueOf(classifiable);
 			}

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.retry.ExhaustedRetryException;
 import org.springframework.batch.retry.RecoveryCallback;
 import org.springframework.batch.retry.RetryCallback;
@@ -35,7 +36,6 @@ import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.support.DefaultRetryState;
 import org.springframework.batch.retry.support.RetrySynchronizationManager;
 import org.springframework.batch.retry.support.RetryTemplate;
-import org.springframework.batch.support.Classifier;
 
 /**
  * A special purpose retry template that deals specifically with multi-valued

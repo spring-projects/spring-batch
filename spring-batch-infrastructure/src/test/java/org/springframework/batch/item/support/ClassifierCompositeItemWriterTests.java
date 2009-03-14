@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.springframework.batch.classify.PatternMatchingClassifier;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.support.PatternMatchingClassifier;
 
 /**
  * @author Dave Syer

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
@@ -39,7 +40,6 @@ import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
-import org.springframework.batch.support.Classifier;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.

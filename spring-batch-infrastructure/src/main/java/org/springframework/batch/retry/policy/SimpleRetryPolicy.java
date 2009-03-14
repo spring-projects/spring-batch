@@ -19,10 +19,10 @@ package org.springframework.batch.retry.policy;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryPolicy;
 import org.springframework.batch.retry.context.RetryContextSupport;
-import org.springframework.batch.support.BinaryExceptionClassifier;
 
 /**
  * 
