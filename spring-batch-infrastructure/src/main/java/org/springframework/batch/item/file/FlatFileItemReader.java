@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ReaderNotOpenException;
-import org.springframework.batch.item.file.mapping.LineMapper;
 import org.springframework.batch.item.file.separator.RecordSeparatorPolicy;
 import org.springframework.batch.item.file.separator.SimpleRecordSeparatorPolicy;
 import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;

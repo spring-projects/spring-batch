@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.item.file.mapping;
+package org.springframework.batch.item.file;
 
+import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 
 

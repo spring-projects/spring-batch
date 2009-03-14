@@ -16,6 +16,8 @@
 
 package org.springframework.batch.item.file.mapping;
 
+import org.springframework.batch.item.file.LineMapper;
+
 /**
  * Pass through {@link LineMapper} useful for passing the original
  * {@link String} back directly rather than a mapped object.

@@ -17,6 +17,7 @@
 package org.springframework.batch.item.file.mapping;
 
 import org.springframework.batch.item.file.FlatFileParseException;
+import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.beans.factory.InitializingBean;

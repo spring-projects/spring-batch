@@ -18,6 +18,7 @@ package org.springframework.batch.item.file.mapping;
 
 import java.util.Map;
 
+import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.transform.LineTokenizer;
 import org.springframework.batch.item.file.transform.PatternMatchingCompositeLineTokenizer;
 import org.springframework.batch.support.PatternMatcher;
