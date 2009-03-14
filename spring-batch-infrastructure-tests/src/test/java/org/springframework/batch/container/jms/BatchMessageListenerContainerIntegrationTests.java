@@ -87,7 +87,7 @@ public class BatchMessageListenerContainerIntegrationTests {
 		jmsTemplate.convertAndSend("queue", "foo");
 		jmsTemplate.convertAndSend("queue", "bar");
 		int waiting = 0;
-		while (count < 2 && waiting++ < 10) {
+		while (count < 2 && waiting++ < 20) {
 			Thread.sleep(100L);
 		}
 		if (count < 2) {
