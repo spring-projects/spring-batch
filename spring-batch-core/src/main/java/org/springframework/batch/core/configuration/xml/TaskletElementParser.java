@@ -48,46 +48,25 @@ public class TaskletElementParser {
 	 * @param element
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
-
-		boolean isFaultTolerant = false;
+	protected AbstractBeanDefinition parse(Element element, ParserContext parserContext, boolean underspecified) {
 
 		String skipLimit = element.getAttribute("skip-limit");
-		if (!isFaultTolerant) {
-			isFaultTolerant = checkIntValueForFaultToleranceNeeded(skipLimit);
-		}
 		String retryLimit = element.getAttribute("retry-limit");
-		if (!isFaultTolerant) {
-			isFaultTolerant = checkIntValueForFaultToleranceNeeded(retryLimit);
-		}
 		String cacheCapacity = element.getAttribute("cache-capacity");
-		if (!isFaultTolerant) {
-			isFaultTolerant = checkIntValueForFaultToleranceNeeded(cacheCapacity);
-		}
 		String isReaderTransactionalQueue = element.getAttribute("is-reader-transactional-queue");
-		if (!isFaultTolerant && StringUtils.hasText(isReaderTransactionalQueue)) {
-			if ("true".equals(isReaderTransactionalQueue)) {
-				isFaultTolerant = true;
-			}
-		}
-		checkExceptionElementForFaultToleranceNeeded(element, "skippable-exception-classes");
-		checkExceptionElementForFaultToleranceNeeded(element, "retryable-exception-classes");
-		checkExceptionElementForFaultToleranceNeeded(element, "fatal-exception-classes");
+
+		boolean useFaultTolerant = underspecified
+				|| (StringUtils.hasText(isReaderTransactionalQueue) && Boolean.valueOf(isReaderTransactionalQueue))
+				|| isPositive(skipLimit) || isPositive(retryLimit) || isPositive(cacheCapacity)
+				|| hasElement(element, "skippable-exception-classes")
+				|| hasElement(element, "retryable-exception-classes") || hasElement(element, "fatal-exception-classes");
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
-		if (isFaultTolerant) {
+		if (useFaultTolerant) {
 			bd.setBeanClass(FaultTolerantStepFactoryBean.class);
 		}
 		else {
 			bd.setBeanClass(SimpleStepFactoryBean.class);
-		}
-
-		boolean isAbstract = Boolean.valueOf(element.getAttribute("abstract"));
-		bd.setAbstract(isAbstract);
-
-		String parentRef = element.getAttribute("parent");
-		if (StringUtils.hasText(parentRef)) {
-			bd.setParentName(parentRef);
 		}
 
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
@@ -127,7 +106,7 @@ public class TaskletElementParser {
 			propertyValues.addPropertyValue("chunkCompletionPolicy", completionPolicy);
 		}
 
-		if (!isAbstract
+		if (!underspecified
 				&& propertyValues.contains("commitInterval") == propertyValues.contains("chunkCompletionPolicy")) {
 			parserContext.getReaderContext().error(
 					"The 'tasklet' element must contain either 'commit-interval' "
@@ -147,19 +126,19 @@ public class TaskletElementParser {
 		}
 
 		if (StringUtils.hasText(isReaderTransactionalQueue)) {
-			if (isFaultTolerant) {
+			if (useFaultTolerant) {
 				propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
 			}
 		}
 
 		handleExceptionElement(element, parserContext, bd, "skippable-exception-classes", "skippableExceptionClasses",
-				isFaultTolerant, isAbstract);
+				useFaultTolerant, underspecified);
 
 		handleExceptionElement(element, parserContext, bd, "retryable-exception-classes", "retryableExceptionClasses",
-				isFaultTolerant, isAbstract);
+				useFaultTolerant, underspecified);
 
 		handleExceptionElement(element, parserContext, bd, "fatal-exception-classes", "fatalExceptionClasses",
-				isFaultTolerant, isAbstract);
+				useFaultTolerant, underspecified);
 
 		handleRetryListenersElement(element, bd, parserContext);
 
@@ -169,22 +148,17 @@ public class TaskletElementParser {
 
 	}
 
-	private boolean checkIntValueForFaultToleranceNeeded(String stringValue) {
+	private boolean isPositive(String stringValue) {
 		if (StringUtils.hasText(stringValue)) {
-			int value = Integer.valueOf(stringValue);
-			if (value > 0) {
+			if (Integer.valueOf(stringValue) > 0) {
 				return true;
 			}
 		}
 		return false;
 	}
 
-	private boolean checkExceptionElementForFaultToleranceNeeded(Element element, String subElementName) {
-		String exceptions = DomUtils.getChildElementValueByTagName(element, subElementName);
-		if (StringUtils.hasLength(exceptions)) {
-			return true;
-		}
-		return false;
+	private boolean hasElement(Element element, String subElementName) {
+		return StringUtils.hasLength(DomUtils.getChildElementValueByTagName(element, subElementName));
 	}
 
 	@SuppressWarnings("unchecked")

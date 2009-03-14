@@ -7,10 +7,8 @@
 	<beans:import resource="common-context.xml" />
 
 	<job id="job">
-		<step id="s1">
-			<tasklet reader="reader" writer="writer" 
-			         commit-interval="5" skip-limit="5" 
-			         parent="baseTasklet">
+		<step id="s1" parent="baseStep">
+			<tasklet reader="reader" writer="writer" commit-interval="5" skip-limit="5">
 				<skippable-exception-classes merge="true">
 					java.lang.NullPointerException
 				</skippable-exception-classes>
@@ -26,10 +24,8 @@
 			</tasklet>
 		</step>
 
-		<step id="s2">
-			<tasklet reader="reader" writer="writer" 
-			         commit-interval="5" skip-limit="5" 
-			         parent="baseTasklet">
+		<step id="s2" parent="baseStep">
+			<tasklet reader="reader" writer="writer" commit-interval="5" skip-limit="5">
 				<skippable-exception-classes>
 					java.lang.NullPointerException
 				</skippable-exception-classes>
@@ -46,20 +42,22 @@
 		</step>
 	</job>
 
-	<tasklet id="baseTasklet" abstract="true">
-		<skippable-exception-classes>
-			java.lang.ArithmeticException
-		</skippable-exception-classes>
-		<fatal-exception-classes>
-			org.springframework.dao.DeadlockLoserDataAccessException
-		</fatal-exception-classes>
-		<streams>
-			<stream ref="stream2"/>
-		</streams>
-		<retry-listeners>
-			<listener class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
-		</retry-listeners>
-	</tasklet>
+	<step id="baseStep" abstract="true">
+		<tasklet>
+			<skippable-exception-classes>
+				java.lang.ArithmeticException
+			</skippable-exception-classes>
+			<fatal-exception-classes>
+				org.springframework.dao.DeadlockLoserDataAccessException
+			</fatal-exception-classes>
+			<streams>
+				<stream ref="stream2"/>
+			</streams>
+			<retry-listeners>
+				<listener class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+			</retry-listeners>
+		</tasklet>
+	</step>
 	
 	<beans:bean id="stream1" class="org.springframework.batch.item.support.CompositeItemStream"/>
 	<beans:bean id="stream2" class="org.springframework.batch.core.configuration.xml.TestReader"/>

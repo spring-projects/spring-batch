@@ -111,24 +111,6 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="tasklet">
-		<xsd:annotation>
-			<xsd:documentation>
-				A bean definition for a tasklet that can be injected into a Step.
-				Useful for creating a "base"
-				tasklet from which others can extend.
-			</xsd:documentation>
-		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="taskletType">
-					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attributeGroup ref="abstractAttribute" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
-	</xsd:element>
-
 	<xsd:element name="job-repository">
 		<xsd:annotation>
 			<xsd:documentation><![CDATA[
@@ -508,7 +490,6 @@
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attributeGroup ref="parentAttribute" />
 	</xsd:complexType>
 
 	<xsd:complexType name="transaction-attributesType">

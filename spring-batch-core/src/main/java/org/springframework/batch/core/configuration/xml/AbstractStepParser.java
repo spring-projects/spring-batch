@@ -50,15 +50,16 @@ public abstract class AbstractStepParser {
 	private StepListenerParser stepListenerParser = new StepListenerParser();
 
 	/**
-	 * @param element
+	 * @param stepElement
 	 * @param parserContext
 	 * @return a BeanDefinition if possible
 	 */
-	protected AbstractBeanDefinition parseTasklet(Element element, ParserContext parserContext, String jobRepositoryRef) {
+	protected AbstractBeanDefinition parseTasklet(Element stepElement, ParserContext parserContext,
+			String jobRepositoryRef) {
 
-		String taskletRef = element.getAttribute("tasklet");
+		String taskletRef = stepElement.getAttribute("tasklet");
 		@SuppressWarnings("unchecked")
-		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
+		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, "tasklet");
 		boolean taskletElementExists = taskletElements.size() > 0;
 		AbstractBeanDefinition bd = null;
 		if (StringUtils.hasText(taskletRef)) {
@@ -66,18 +67,33 @@ public abstract class AbstractStepParser {
 				parserContext.getReaderContext().error(
 						"The <" + taskletElements.get(0).getNodeName()
 								+ "> element can't be combined with the 'tasklet=\"" + taskletRef
-								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
+								+ "\"' attribute specification for <" + stepElement.getNodeName() + ">", stepElement);
 			}
-			bd = parseTaskletRef(element, taskletRef, parserContext, jobRepositoryRef);
-			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef);
+			bd = parseTaskletRef(stepElement, taskletRef, parserContext, jobRepositoryRef);
 		}
 		else if (taskletElementExists) {
 			Element taskElement = taskletElements.get(0);
-			bd = taskletElementParser.parse(taskElement, parserContext);
-			setUpBeanDefinition(element, bd, parserContext, jobRepositoryRef);
+			bd = taskletElementParser.parse(taskElement, parserContext, stepUnderspecified(stepElement));
 		}
+
+		if (bd != null) {
+			setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
+		}
+
 		return bd;
 
+	}
+
+	/**
+	 * Should this step should be treated as incomplete? If it has a parent or
+	 * is abstract, then it may not have all properties.
+	 * 
+	 * @param stepElement
+	 * @return TRUE if
+	 */
+	private boolean stepUnderspecified(Element stepElement) {
+		return Boolean.valueOf(stepElement.getAttribute("abstract"))
+				|| StringUtils.hasText(stepElement.getAttribute("parent"));
 	}
 
 	/**
@@ -105,6 +121,8 @@ public abstract class AbstractStepParser {
 			String jobRepositoryRef) {
 		checkStepAttributes(stepElement, bd);
 
+		bd.setAbstract(stepElement.hasAttribute("abstract") && Boolean.valueOf(stepElement.getAttribute("abstract")));
+
 		RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
 		bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
 
@@ -131,6 +149,7 @@ public abstract class AbstractStepParser {
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
 
 		bd.setSource(parserContext.extractSource(stepElement));
+
 	}
 
 	private void checkStepAttributes(Element stepElement, AbstractBeanDefinition bd) {

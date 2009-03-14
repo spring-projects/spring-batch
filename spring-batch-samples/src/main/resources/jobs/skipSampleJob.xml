@@ -36,22 +36,33 @@
 		<step id="errorPrint2" tasklet="errorLogTasklet"/>
 	</job>
 
-	<step id="secondPass" parent="baseStep">
-		<tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="itemTrackingWriter"
-				 commit-interval="2" skip-limit="10">
-			<skippable-exception-classes>
-				org.springframework.batch.item.validator.ValidationException
+	<step id="secondPass" parent="t2">
+		<tasklet writer="itemTrackingWriter">
+			<skippable-exception-classes merge="true">
 				java.lang.RuntimeException
 			</skippable-exception-classes>
 		</tasklet>
 	</step>
-	
+
+	<step id="t2" parent="t3" abstract="true"/>
+
+	<step id="t3" parent="baseStep" abstract="true">
+		<tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="dummyWriter" 
+		         commit-interval="2" skip-limit="10">
+			<skippable-exception-classes>
+				org.springframework.batch.item.validator.ValidationException
+			</skippable-exception-classes>
+		</tasklet>
+	</step>
+
 	<step id="baseStep" abstract="true">
 		<listeners>
 			<listener class="org.springframework.batch.sample.common.SkipCheckingListener"/>
 			<listener ref="promotionListener"/>
 		</listeners>
 	</step>
+	
+	<beans:bean id="dummyWriter" class="org.springframework.batch.sample.support.DummyItemWriter"/>
 
 	<beans:bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
 		<beans:property name="keys" value="stepName"/>
