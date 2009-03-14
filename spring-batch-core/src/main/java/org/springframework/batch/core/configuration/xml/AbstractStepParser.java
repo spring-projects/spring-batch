@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.core.step.item.StepFactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -111,7 +110,7 @@ public abstract class AbstractStepParser {
 			String jobRepositoryRef) {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
-		bd.setBeanClass(StepFactoryBean.class);
+		bd.setBeanClass(StepParserStepFactoryBean.class);
 
 		if (StringUtils.hasText(taskletRef)) {
 			RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);

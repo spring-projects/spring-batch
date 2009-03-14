@@ -29,7 +29,6 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.core.step.item.StepFactoryBean;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +74,7 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 	
 	@SuppressWarnings("unchecked")
 	@Autowired
-	private StepFactoryBean factory;
+	private StepParserStepFactoryBean factory;
 	
 	@Before
 	public void setUp() {

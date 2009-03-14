@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.batch.core.step.item.StepFactoryBean;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
@@ -50,7 +49,7 @@ public class TaskletElementParser {
 	protected AbstractBeanDefinition parse(Element element, ParserContext parserContext, boolean underspecified) {
 
 		GenericBeanDefinition bd = new GenericBeanDefinition();
-		bd.setBeanClass(StepFactoryBean.class);
+		bd.setBeanClass(StepParserStepFactoryBean.class);
 
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 

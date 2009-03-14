@@ -27,7 +27,6 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
-import org.springframework.batch.core.step.item.StepFactoryBean;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -50,9 +49,9 @@ public class StepParserTests {
 	public void testTaskletStepAttributes() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml");
-		Map<String, Object> beans = ctx.getBeansOfType(StepFactoryBean.class);
+		Map<String, Object> beans = ctx.getBeansOfType(StepParserStepFactoryBean.class);
 		String factoryName = (String) beans.keySet().toArray()[0];
-		StepFactoryBean<Object, Object> factory = (StepFactoryBean<Object, Object>) beans.get(factoryName);
+		StepParserStepFactoryBean<Object, Object> factory = (StepParserStepFactoryBean<Object, Object>) beans.get(factoryName);
 		TaskletStep bean = (TaskletStep) factory.getObject();
 		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
 	}

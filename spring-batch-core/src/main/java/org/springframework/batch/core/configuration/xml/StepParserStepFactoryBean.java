@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.core.step.item;
+package org.springframework.batch.core.configuration.xml;
 
 import java.beans.PropertyEditor;
 import java.util.ArrayList;
@@ -25,6 +25,8 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
+import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemProcessor;
@@ -46,14 +48,18 @@ import org.springframework.util.StringUtils;
 
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create
- * {@link Step} objects.
+ * {@link Step} objects. Stores all of the properties that are configurable on
+ * the &lt;step/&gt; (and its inner &lt;tasklet/&gt;). Based on which properties
+ * are configured, the {@link #getObject()} method will delegate to the
+ * appropriate class for generating the {@link Step}.
  * 
  * @author Dan Garrette
  * @since 2.0
  * @see SimpleStepFactoryBean
  * @see FaultTolerantStepFactoryBean
+ * @see TaskletStep
  */
-public class StepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
+class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	//
 	// Step Attributes
