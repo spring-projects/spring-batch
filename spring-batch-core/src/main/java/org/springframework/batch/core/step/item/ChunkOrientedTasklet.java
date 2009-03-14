@@ -48,7 +48,7 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 	/**
 	 * Flag to indicate that items should be buffered once read. Defaults to
 	 * true, which is appropriate for forward-only, non-transactional item
-	 * readers. Main (or only) use case for setting this flag to true is a
+	 * readers. Main (or only) use case for setting this flag to false is a
 	 * transactional JMS item reader.
 	 * 
 	 * @param buffering
