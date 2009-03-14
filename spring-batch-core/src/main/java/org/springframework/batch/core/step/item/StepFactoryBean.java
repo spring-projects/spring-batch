@@ -122,7 +122,6 @@ public class StepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			}
 		}
 		else if (tasklet != null) {
-			validateTaskletStep();
 			TaskletStep ts = new TaskletStep();
 			configureTaskletStep(ts);
 			return ts;
@@ -242,31 +241,11 @@ public class StepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private void validateSimpleStep() {
 		PropertyNamePair[] notPermitted = new PropertyNamePair[] {
-				new PropertyNamePair(cacheCapacity, "cacheCapacity"), new PropertyNamePair(retryLimit, "retryLimit"),
-				new PropertyNamePair(skipLimit, "skipLimit"), new PropertyNamePair(retryListeners, "retryListeners"),
-				new PropertyNamePair(skippableExceptionClasses, "skippableExceptionClasses"),
-				new PropertyNamePair(retryableExceptionClasses, "retryableExceptionClasses"),
-				new PropertyNamePair(fatalExceptionClasses, "fatalExceptionClasses") };
-		validateDisallowedFields("on the simple step [" + name + "].  They can only be specified for fault-tolerant "
-				+ "configurations providing skip-limit, retry-limit, or cache-capacity", notPermitted);
-	}
+				new PropertyNamePair(retryListeners, "retry-listeners"),
+				new PropertyNamePair(skippableExceptionClasses, "skippable-exception-classes"),
+				new PropertyNamePair(retryableExceptionClasses, "retryable-exception-classes"),
+				new PropertyNamePair(fatalExceptionClasses, "fatal-exception-classes") };
 
-	private void validateTaskletStep() {
-		PropertyNamePair[] notPermitted = new PropertyNamePair[] {
-				new PropertyNamePair(cacheCapacity, "cacheCapacity"),
-				new PropertyNamePair(chunkCompletionPolicy, "chunkCompletionPolicy"),
-				new PropertyNamePair(commitInterval, "commitInterval"), new PropertyNamePair(retryLimit, "retryLimit"),
-				new PropertyNamePair(skipLimit, "skipLimit"), new PropertyNamePair(taskExecutor, "taskExecutor"),
-				new PropertyNamePair(itemReader, "itemReader"), new PropertyNamePair(itemProcessor, "itemProcessor"),
-				new PropertyNamePair(itemWriter, "itemWriter"), new PropertyNamePair(retryListeners, "retryListeners"),
-				new PropertyNamePair(skippableExceptionClasses, "skippableExceptionClasses"),
-				new PropertyNamePair(retryableExceptionClasses, "retryableExceptionClasses"),
-				new PropertyNamePair(fatalExceptionClasses, "fatalExceptionClasses"),
-				new PropertyNamePair(streams, "streams") };
-		validateDisallowedFields("when a 'tasklet' attribute is specified, as it is on [" + name + "]", notPermitted);
-	}
-
-	private void validateDisallowedFields(String msg, PropertyNamePair... notPermitted) {
 		List<String> wrong = new ArrayList<String>();
 		for (PropertyNamePair field : notPermitted) {
 			if (field.getProperty() != null) {
@@ -275,7 +254,9 @@ public class StepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 		if (!wrong.isEmpty()) {
 			throw new IllegalArgumentException("The field" + (wrong.size() > 1 ? "s " : " ") + wrong
-					+ (wrong.size() == 1 ? " is" : " are") + " not permitted " + msg);
+					+ (wrong.size() == 1 ? " is" : " are") + " not permitted on the simple step [" + name + "].  "
+					+ (wrong.size() == 1 ? "It" : "They") + " can only be specified for fault-tolerant "
+					+ "configurations providing skip-limit, retry-limit, or cache-capacity");
 		}
 	}
 
