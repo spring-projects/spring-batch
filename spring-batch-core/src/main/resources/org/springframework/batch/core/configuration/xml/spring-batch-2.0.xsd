@@ -184,6 +184,9 @@
 											a reference to
 											another bean definition where business logic is specified.
 										</xsd:documentation>
+										<xsd:appinfo>
+											<tool:annotation kind="ref" />
+										</xsd:appinfo>
 									</xsd:annotation>
 								</xsd:attribute>
 								<xsd:attributeGroup ref="stepAttributes" />
