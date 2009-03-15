@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.retry.policy;
 
+import java.lang.ref.SoftReference;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,12 +24,15 @@ import org.springframework.batch.retry.RetryContext;
 
 /**
  * Map-based implementation of {@link RetryContextCache}. The map backing the
- * cache of contexts is synchronized.
+ * cache of contexts is synchronized and its entries are soft-referenced, so may
+ * be garbage collected under pressure.
+ * 
+ * @see MapRetryContextCache for non-soft referenced version
  * 
  * @author Dave Syer
  * 
  */
-public class MapRetryContextCache implements RetryContextCache {
+public class SoftReferenceMapRetryContextCache implements RetryContextCache {
 
 	/**
 	 * Default value for maximum capacity of the cache. This is set to a
@@ -37,21 +41,22 @@ public class MapRetryContextCache implements RetryContextCache {
 	 */
 	public static final int DEFAULT_CAPACITY = 4096;
 
-	private Map<Object, RetryContext> map = Collections.synchronizedMap(new HashMap<Object, RetryContext>());
+	private Map<Object, SoftReference<RetryContext>> map = Collections
+			.synchronizedMap(new HashMap<Object, SoftReference<RetryContext>>());
 
 	private int capacity;
 
 	/**
-	 * Create a {@link MapRetryContextCache} with default capacity.
+	 * Create a {@link SoftReferenceMapRetryContextCache} with default capacity.
 	 */
-	public MapRetryContextCache() {
+	public SoftReferenceMapRetryContextCache() {
 		this(DEFAULT_CAPACITY);
 	}
 
 	/**
 	 * @param defaultCapacity
 	 */
-	public MapRetryContextCache(int defaultCapacity) {
+	public SoftReferenceMapRetryContextCache(int defaultCapacity) {
 		super();
 		this.capacity = defaultCapacity;
 	}
@@ -70,11 +75,18 @@ public class MapRetryContextCache implements RetryContextCache {
 	}
 
 	public boolean containsKey(Object key) {
+		if (!map.containsKey(key)) {
+			return false;
+		}
+		if (map.get(key).get() == null) {
+			// our reference was garbage collected
+			map.remove(key);
+		}
 		return map.containsKey(key);
 	}
 
 	public RetryContext get(Object key) {
-		return map.get(key);
+		return map.get(key).get();
 	}
 
 	public void put(Object key, RetryContext context) {
@@ -83,7 +95,7 @@ public class MapRetryContextCache implements RetryContextCache {
 					+ "Do you need to re-consider the implementation of the key generator, "
 					+ "or the equals and hashCode of the items that failed?");
 		}
-		map.put(key, context);
+		map.put(key, new SoftReference<RetryContext>(context));
 	}
 
 	public void remove(Object key) {
