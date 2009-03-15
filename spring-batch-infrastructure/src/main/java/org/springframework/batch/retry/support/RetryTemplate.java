@@ -236,7 +236,7 @@ public class RetryTemplate implements RetryOperations {
 					doOnErrorInterceptors(retryCallback, context, e);
 
 					registerThrowable(retryPolicy, state, context, e);
-					
+
 					try {
 						backOffPolicy.backOff(backOffContext);
 					}
@@ -247,7 +247,7 @@ public class RetryTemplate implements RetryOperations {
 						logger.debug("Abort retry because interrupted: count=" + context.getRetryCount());
 						throw ex;
 					}
-					
+
 					if (shouldRethrow(retryPolicy, context, state)) {
 						logger.debug("Rethrow in retry for policy: count=" + context.getRetryCount());
 						throw e;
@@ -350,23 +350,27 @@ public class RetryTemplate implements RetryOperations {
 		if (state.isForceRefresh()) {
 			return doOpenInternal(retryPolicy);
 		}
-		else if (retryContextCache.containsKey(key)) {
 
-			RetryContext context = retryContextCache.get(key);
-			if (context == null) {
+		// If there is no cache hit we can avoid the possible expense of the
+		// cache re-hydration.
+		if (!retryContextCache.containsKey(key)) {
+			// The cache is only used if there is a failure.
+			return doOpenInternal(retryPolicy);
+		}
+
+		RetryContext context = retryContextCache.get(key);
+		if (context == null) {
+			if (retryContextCache.containsKey(key)) {
 				throw new RetryException("Inconsistent state for failed item: no history found. "
 						+ "Consider whether equals() or hashCode() for the item might be inconsistent, "
 						+ "or if you need to supply a better ItemKeyGenerator");
 			}
-			return context;
-
-		}
-		else {
-
-			// The cache is only used if there is a failure.
+			// The cache could have been expired in between calls to
+			// containsKey(), so we have to live with this:
 			return doOpenInternal(retryPolicy);
-
 		}
+
+		return context;
 
 	}
 

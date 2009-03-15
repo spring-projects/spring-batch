@@ -24,7 +24,8 @@ import org.springframework.batch.retry.RetryContext;
 
 /**
  * Map-based implementation of {@link RetryContextCache}. The map backing the
- * cache of contexts is synchronized and its entries are soft-referenced.  
+ * cache of contexts is synchronized and its entries are soft-referenced, so may
+ * be garbage collected under pressure.
  * 
  * @author Dave Syer
  * 
@@ -37,8 +38,9 @@ public class MapRetryContextCache implements RetryContextCache {
 	 * cache with item keys that are inconsistent.
 	 */
 	public static final int DEFAULT_CAPACITY = 4096;
-	
-	private Map<Object, SoftReference<RetryContext>> map = Collections.synchronizedMap(new HashMap<Object, SoftReference<RetryContext>>());
+
+	private Map<Object, SoftReference<RetryContext>> map = Collections
+			.synchronizedMap(new HashMap<Object, SoftReference<RetryContext>>());
 
 	private int capacity;
 
@@ -71,6 +73,13 @@ public class MapRetryContextCache implements RetryContextCache {
 	}
 
 	public boolean containsKey(Object key) {
+		if (!map.containsKey(key)) {
+			return false;
+		}
+		if (map.get(key).get() == null) {
+			// our reference was garbage collected
+			map.remove(key);
+		}
 		return map.containsKey(key);
 	}
 
@@ -80,7 +89,9 @@ public class MapRetryContextCache implements RetryContextCache {
 
 	public void put(Object key, RetryContext context) {
 		if (map.size() >= capacity) {
-			throw new RetryCacheCapacityExceededException("Retry cache capacity limit breached. " + "Do you need to re-consider the implementation of the key generator, " + "or the equals and hashCode of the items that failed?");
+			throw new RetryCacheCapacityExceededException("Retry cache capacity limit breached. "
+					+ "Do you need to re-consider the implementation of the key generator, "
+					+ "or the equals and hashCode of the items that failed?");
 		}
 		map.put(key, new SoftReference<RetryContext>(context));
 	}

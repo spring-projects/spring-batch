@@ -16,20 +16,33 @@
 
 package org.springframework.batch.retry.policy;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.Test;
 import org.springframework.batch.retry.context.RetryContextSupport;
 
-public class MapRetryContextCacheTests extends TestCase {
+public class MapRetryContextCacheTests {
 
 	MapRetryContextCache cache = new MapRetryContextCache();
-
+	
+	@Test
 	public void testPut() {
 		RetryContextSupport context = new RetryContextSupport(null);
 		cache.put("foo", context);
 		assertEquals(context, cache.get("foo"));
 	}
 
+	@Test(expected=RetryCacheCapacityExceededException.class)
+	public void testPutOverLimit() {
+		RetryContextSupport context = new RetryContextSupport(null);
+		cache.setCapacity(1);
+		cache.put("foo", context);
+		cache.put("foo", context);
+	}
+
+	@Test
 	public void testRemove() {
 		assertFalse(cache.containsKey("foo"));
 		RetryContextSupport context = new RetryContextSupport(null);
