@@ -73,7 +73,7 @@
       <classname>JobInstance</classname>. Ideally, all jobs should be able to
       start up where they left off, but there are scenarios where this is not
       possible. <emphasis role="bold">It is entirely up to the developer to
-      ensure that a new JobInstance is created in this scenario</emphasis>.
+      ensure that a new <classname>JobInstance</classname> is created in this scenario</emphasis>.
       However, Spring Batch does provide some help. If a
       <classname>Job</classname> should never be restarted, but should always
       be run as part of a new <classname>JobInstance</classname>, then the
