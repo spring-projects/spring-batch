@@ -1,4 +1,4 @@
-Bundle-SymbolicName: com.springframework.batch.core
+Bundle-SymbolicName: org.springframework.batch.core
 Bundle-Name: Spring Batch Core
 Bundle-Vendor: Spring
 Bundle-Version: ${version}

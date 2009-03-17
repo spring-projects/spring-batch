@@ -1,4 +1,4 @@
-Bundle-SymbolicName: com.springframework.batch.test
+Bundle-SymbolicName: org.springframework.batch.test
 Bundle-Name: Spring Batch Test
 Bundle-Vendor: Spring
 Bundle-Version: ${version}
