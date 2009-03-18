@@ -46,13 +46,13 @@
     <classname>TaskExecutor</classname> to your Step configuration, e.g. as an
     attribute of the <literal>tasklet</literal>:</para>
 
-    <programlisting><![CDATA[<step id="loading">
-   <tasklet reader="stagingReader" 
+    <programlisting>&lt;step id="loading"&gt;
+   &lt;tasklet reader="stagingReader" 
          processor="stagingProcessor" 
          writer="tradeWriter" 
          commit-interval="1" 
-         task-executor="taskExecutor"/>
-</step>]]></programlisting>
+         task-executor="taskExecutor"/&gt;
+&lt;/step&gt;</programlisting>
 
     <para>In this example the taskExecutor is a reference to another bean
     definition, implementing the <classname>TaskExecutor</classname>
@@ -81,23 +81,34 @@
   <section>
     <title>Parallel Steps</title>
 
-    <para>As long as the application logic that needs to be parallelised can
+    <para>As long as the application logic that needs to be parallelized can
     be split into distinct responsibilities, and assigned to individual steps
-    then it can be parallelised in a single process. Parallel Step execution
+    then it can be parallelized in a single process. Parallel Step execution
     is easy to configure and use, for example, to execute steps
     <literal>(step1,step2)</literal> in parallel with
     <literal>step3</literal>, you could configure a flow like this:</para>
 
-    <para><programlisting><![CDATA[  <split id="split1" next="step4">
-    <flow>
-      <step id="step1" next="step2"/>
-      <step id="step2"/>
-    </flow>
-    <flow>
-      <step id="step3"/>
-    </flow>
-  </split>
-  <step id="step4"/>]]></programlisting></para>
+    <para><programlisting>&lt;job id="job1"&gt;
+  &lt;split id="split1" task-executor="taskExecutor" next="step4"&gt;
+    &lt;flow&gt;
+      &lt;step id="step1" ref="s1" next="step2"/&gt;
+      &lt;step id="step2" ref="s2"/&gt;
+    &lt;/flow&gt;
+    &lt;flow&gt;
+      &lt;step id="step3" ref="s3"/&gt;
+    &lt;/flow&gt;
+  &lt;/split&gt;
+  &lt;step id="step4" ref="s4"/&gt;
+&lt;/job&gt;
+
+&lt;beans:bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/&gt;</programlisting></para>
+
+    <para>The configurable "task-executor" attribute is used to specify which
+    TaskExecutor implementation should be used to execute the individual
+    flows. The default is <classname>SyncTaskExecutor</classname>, but an
+    asynchronous TaskExecutor is required to run the steps in parallel. Note
+    that the job will ensure that every flow in the split completes before
+    aggregating the exit statuses and transitioning.</para>
 
     <para>See the section on <xref linkend="split-flows" /> for more
     detail.</para>
@@ -195,11 +206,11 @@
     the PartitionStep is shown driving the execution. The PartitionStep
     configuration looks like this:</para>
 
-    <para><programlisting><![CDATA[<bean name="step1:master" class="org.sfw...PartitionStep">
-    <property name="partitionHandler" ref="partitionHandler"/>
-    <property name="stepExecutionSplitter" ref="stepExecutionSplitter"/>
-    <property name="jobRepository" ref="jobRepository" />
-</bean>]]></programlisting></para>
+    <para><programlisting>&lt;bean name="step1:master" class="org.sfw...PartitionStep"&gt;
+    &lt;property name="partitionHandler" ref="partitionHandler"/&gt;
+    &lt;property name="stepExecutionSplitter" ref="stepExecutionSplitter"/&gt;
+    &lt;property name="jobRepository" ref="jobRepository" /&gt;
+&lt;/bean&gt;</programlisting></para>
 
     <para>There is a simple example which can be copied and extended in the
     unit test suite for Spring Batch Core (see
@@ -222,7 +233,7 @@
       re-executed.</para>
 
       <para><classname>The PartitionHandler</classname> interface can have
-      specialised implementations for a variety of fabric types: e.g. simple
+      specialized implementations for a variety of fabric types: e.g. simple
       RMI remoting, EJB remoting, custom web service, JMS, Java Spaces, shared
       memory grids (like Terracotta or Coherence), grid execution fabrics
       (like GridGain). Spring Batch does not contain implementations for any
@@ -236,11 +247,11 @@
       <classname>TaskExecutorPartitionHandler</classname>, and it can be
       configured like this:</para>
 
-      <para><programlisting><![CDATA[<bean class="org.sfw..TaskExecutorPartitionHandler">
-  <property name="taskExecutor" ref="taskExecutor"/>
-  <property name="step" ref="step1" />
-  <property name="gridSize" value="10" />
-</bean>]]></programlisting></para>
+      <para><programlisting>&lt;bean class="org.sfw..TaskExecutorPartitionHandler"&gt;
+  &lt;property name="taskExecutor" ref="taskExecutor"/&gt;
+  &lt;property name="step" ref="step1" /&gt;
+  &lt;property name="gridSize" value="10" /&gt;
+&lt;/bean&gt;</programlisting></para>
 
       <para>The <literal>gridSize</literal> determines the number of separate
       step executions to create, so it can be matched to the size of the
@@ -262,11 +273,11 @@
       of an <classname>ExecutionContext</classname> for each one. The
       principal method for this in the interface is</para>
 
-      <programlisting><![CDATA[public interface StepExecutionSplitter {
+      <programlisting>public interface StepExecutionSplitter {
   ...
-  Set<StepExecution> split(StepExecution stepExecution, int gridSize) 
+  Set&lt;StepExecution&gt; split(StepExecution stepExecution, int gridSize) 
     throws JobExecutionException;
-}]]></programlisting>
+}</programlisting>
 
       <para>So an execution instance for the Master step is passed in, along
       with a hint about the grid size, and the splitter has to create a set of
@@ -283,9 +294,9 @@
       parameters for new step executions only (no need to worry about
       restarts). It has a single method:</para>
 
-      <programlisting><![CDATA[public interface Partitioner {
-  Map<String, ExecutionContext> partition(int gridSize);
-}]]></programlisting>
+      <programlisting>public interface Partitioner {
+  Map&lt;String, ExecutionContext&gt; partition(int gridSize);
+}</programlisting>
 
       <para>The return value from this method associates a unique name for
       each step execution (the <classname>String</classname>), with input
@@ -363,10 +374,10 @@
       <para>Then the file name can be bound to a step using late binding to
       the execution context:</para>
 
-      <programlisting><![CDATA[  <bean id="itemReader" scope="step"
-        class="org.sfw...MultiResourceItemReader">
-    <property name="resource" value="]]><emphasis role="bold">#{stepExecutionContext[fileName]}/*</emphasis><![CDATA["/>
-  </bean>]]></programlisting>
+      <programlisting>  &lt;bean id="itemReader" scope="step"
+        class="org.sfw...MultiResourceItemReader"&gt;
+    &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext[fileName]}/*</emphasis>"/&gt;
+  &lt;/bean&gt;</programlisting>
     </section>
   </section>
 </chapter>
