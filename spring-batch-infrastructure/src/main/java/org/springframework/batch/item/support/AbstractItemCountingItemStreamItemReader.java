@@ -38,7 +38,11 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 
 	private static final String READ_COUNT = "read.count";
 
+	private static final String READ_COUNT_MAX = "read.count.max";
+
 	private int currentItemCount = 0;
+
+	private int maxItemCount = Integer.MAX_VALUE;
 
 	private ExecutionContextUserSupport ecSupport = new ExecutionContextUserSupport();
 
@@ -68,11 +72,14 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 	 */
 	protected void jumpToItem(int itemIndex) throws Exception {
 		for (int i = 0; i < itemIndex; i++) {
-			doRead();
+			read();
 		}
 	}
 
-	public T read() throws Exception, UnexpectedInputException, ParseException {
+	public final T read() throws Exception, UnexpectedInputException, ParseException {
+		if (currentItemCount >= maxItemCount-1) {
+			return null;
+		}
 		currentItemCount++;
 		return doRead();
 	}
@@ -104,17 +111,23 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 			throw new ItemStreamException("Failed to initialize the reader", e);
 		}
 
+		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT_MAX))) {
+			maxItemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT_MAX));
+		}
+
 		if (executionContext.containsKey(ecSupport.getKey(READ_COUNT))) {
 			int itemCount = executionContext.getInt(ecSupport.getKey(READ_COUNT));
 
-			try {
-				jumpToItem(itemCount);
+			if (itemCount < maxItemCount) {
+				try {
+					jumpToItem(itemCount);
+				}
+				catch (Exception e) {
+					throw new ItemStreamException("Could not move to stored position on restart", e);
+				}
 			}
-			catch (Exception e) {
-				throw new ItemStreamException("Could not move to stored position on restart", e);
-			}
-
 			currentItemCount = itemCount;
+
 		}
 
 	}
@@ -123,6 +136,9 @@ public abstract class AbstractItemCountingItemStreamItemReader<T> implements Ite
 		if (saveState) {
 			Assert.notNull(executionContext, "ExecutionContext must not be null");
 			executionContext.putInt(ecSupport.getKey(READ_COUNT), currentItemCount);
+			if (maxItemCount < Integer.MAX_VALUE) {
+				executionContext.putInt(ecSupport.getKey(READ_COUNT_MAX), maxItemCount);
+			}
 		}
 
 	}

@@ -15,11 +15,9 @@
  */
 package org.springframework.batch.retry.interceptor;
 
-import org.springframework.batch.item.ItemReader;
-
 /**
- * Extension of the {@link ItemReader} interface that allows items to be
- * identified and tagged by a unique key.
+ * Interface that allows method parameters to be identified and tagged by a
+ * unique key.
  * 
  * @author Dave Syer
  * 

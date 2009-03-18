@@ -43,6 +43,19 @@ public class CompositeItemStream implements ItemStream {
 	}
 
 	/**
+	 * Register a {@link ItemStream} as one of the interesting providers under
+	 * the provided key.
+	 * 
+	 */
+	public void register(ItemStream stream) {
+		synchronized (streams) {
+			if (!streams.contains(stream)) {
+				streams.add(stream);
+			}
+		}
+	}
+
+	/**
 	 * 
 	 */
 	public CompositeItemStream() {
@@ -59,19 +72,6 @@ public class CompositeItemStream implements ItemStream {
 		synchronized (streams) {
 			for (ItemStream itemStream : streams) {
 				itemStream.update(executionContext);
-			}
-		}
-	}
-
-	/**
-	 * Register a {@link ItemStream} as one of the interesting providers under
-	 * the provided key.
-	 * 
-	 */
-	public void register(ItemStream stream) {
-		synchronized (streams) {
-			if (!streams.contains(stream)) {
-				streams.add(stream);
 			}
 		}
 	}

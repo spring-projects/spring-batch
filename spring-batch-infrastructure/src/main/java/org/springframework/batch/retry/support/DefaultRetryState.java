@@ -44,6 +44,7 @@ public class DefaultRetryState implements RetryState {
 	 * @param key the key for the state to allow this retry attempt to be
 	 * recognised
 	 * @param forceRefresh true if the attempt is known to be a brand new state
+	 * (could not have previously failed)
 	 * @param rollbackClassifier the rollback classifier to set. The rollback
 	 * classifier answers true if the exception provided should cause a
 	 * rollback.
@@ -55,7 +56,7 @@ public class DefaultRetryState implements RetryState {
 	}
 
 	/**
-	 * Defaults the rollback classifier to null.
+	 * Defaults the force refresh flag to false.
 	 * @see DefaultRetryState#DefaultRetryState(Object, boolean, Classifier)
 	 */
 	public DefaultRetryState(Object key, Classifier<? super Throwable, Boolean> rollbackClassifier) {
@@ -80,22 +81,30 @@ public class DefaultRetryState implements RetryState {
 		this(key, false, null);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.retry.IRetryState#getKey()
 	 */
 	public Object getKey() {
 		return key;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.springframework.batch.retry.IRetryState#isForceRefresh()
 	 */
 	public boolean isForceRefresh() {
 		return forceRefresh;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.springframework.batch.retry.IRetryState#rollbackFor(java.lang.Exception)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.springframework.batch.retry.IRetryState#rollbackFor(java.lang.Exception
+	 * )
 	 */
 	public boolean rollbackFor(Exception exception) {
 		if (rollbackClassifier == null) {
