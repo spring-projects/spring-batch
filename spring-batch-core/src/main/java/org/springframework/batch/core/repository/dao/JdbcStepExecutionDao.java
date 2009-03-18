@@ -62,7 +62,7 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 
 	private static final String UPDATE_STEP_EXECUTION = "UPDATE %PREFIX%STEP_EXECUTION set START_TIME = ?, END_TIME = ?, "
 			+ "STATUS = ?, COMMIT_COUNT = ?, READ_COUNT = ?, FILTER_COUNT = ?, WRITE_COUNT = ?, EXIT_CODE = ?, "
-			+ "EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ?"
+			+ "EXIT_MESSAGE = ?, VERSION = ?, READ_SKIP_COUNT = ?, PROCESS_SKIP_COUNT = ?, WRITE_SKIP_COUNT = ?, ROLLBACK_COUNT = ?, LAST_UPDATED = ?"
 			+ " where STEP_EXECUTION_ID = ? and VERSION = ?";
 
 	private static final String GET_RAW_STEP_EXECUTIONS = "SELECT STEP_EXECUTION_ID, STEP_NAME, START_TIME, END_TIME, STATUS, COMMIT_COUNT,"
@@ -166,15 +166,17 @@ public class JdbcStepExecutionDao extends AbstractJdbcBatchMetadataDao implement
 					stepExecution.getStatus().toString(), stepExecution.getCommitCount(), stepExecution.getReadCount(),
 					stepExecution.getFilterCount(), stepExecution.getWriteCount(),
 					stepExecution.getExitStatus().getExitCode(), exitDescription, version,
-					stepExecution.getReadSkipCount(), stepExecution.getWriteSkipCount(),
-					stepExecution.getRollbackCount(), stepExecution.getLastUpdated(), stepExecution.getId(),
-					stepExecution.getVersion() };
-			int count = getJdbcTemplate().getJdbcOperations().update(
-					getQuery(UPDATE_STEP_EXECUTION),
-					parameters,
-					new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-							Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
-							Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.INTEGER, Types.INTEGER });
+					stepExecution.getReadSkipCount(), stepExecution.getProcessSkipCount(),
+					stepExecution.getWriteSkipCount(), stepExecution.getRollbackCount(),
+					stepExecution.getLastUpdated(), stepExecution.getId(), stepExecution.getVersion() };
+			int count = getJdbcTemplate().getJdbcOperations()
+					.update(
+							getQuery(UPDATE_STEP_EXECUTION),
+							parameters,
+							new int[] { Types.TIMESTAMP, Types.TIMESTAMP, Types.VARCHAR, Types.INTEGER, Types.INTEGER,
+									Types.INTEGER, Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+									Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.INTEGER, Types.TIMESTAMP,
+									Types.INTEGER, Types.INTEGER });
 
 			// Avoid concurrent modifications...
 			if (count == 0) {

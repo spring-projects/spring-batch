@@ -94,6 +94,7 @@ public abstract class AbstractStepExecutionDaoTests extends AbstractTransactiona
 
 		stepExecution.setStatus(BatchStatus.STARTED);
 		stepExecution.setReadSkipCount(7);
+		stepExecution.setProcessSkipCount(2);
 		stepExecution.setWriteSkipCount(5);
 		stepExecution.setProcessSkipCount(11);
 		stepExecution.setRollbackCount(3);
