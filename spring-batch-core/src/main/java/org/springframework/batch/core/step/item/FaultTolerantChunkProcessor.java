@@ -16,7 +16,9 @@
 
 package org.springframework.batch.core.step.item;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +27,7 @@ import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableProcessException;
+import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
@@ -48,18 +51,60 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 	private boolean buffering = true;
 
+	private KeyGenerator keyGenerator;
+
+	private ChunkMonitor chunkMonitor = new ChunkMonitor();
+
+	/**
+	 * The {@link KeyGenerator} to use to identify failed items across rollback.
+	 * Not used in the case of the {@link #setBuffering(boolean) buffering flag}
+	 * being true (the default).
+	 * 
+	 * @param keyGenerator the {@link KeyGenerator} to set
+	 */
+	public void setKeyGenerator(KeyGenerator keyGenerator) {
+		this.keyGenerator = keyGenerator;
+	}
+
+	/**
+	 * @param SkipPolicy the {@link SkipPolicy} for item processing
+	 */
 	public void setProcessSkipPolicy(SkipPolicy SkipPolicy) {
 		this.itemProcessSkipPolicy = SkipPolicy;
 	}
 
+	/**
+	 * @param SkipPolicy the {@link SkipPolicy} for item writing
+	 */
 	public void setWriteSkipPolicy(SkipPolicy SkipPolicy) {
 		this.itemWriteSkipPolicy = SkipPolicy;
 	}
 
+	/**
+	 * A classifier that can distinguish between exceptions that cause rollback
+	 * (return true) or not (return false).
+	 * 
+	 * @param rollbackClassifier
+	 */
 	public void setRollbackClassifier(Classifier<Throwable, Boolean> rollbackClassifier) {
 		this.rollbackClassifier = rollbackClassifier;
 	}
 
+	/**
+	 * @param chunkMonitor
+	 */
+	public void setChunkMonitor(ChunkMonitor chunkMonitor) {
+		this.chunkMonitor = chunkMonitor;
+	}
+
+	/**
+	 * A flag to indicate that items have been buffered and therefore will
+	 * always come back as a chunk after a rollback. Otherwise things are more
+	 * complicated because after a rollback the new chunk might or moght not
+	 * contain items from the previous failed chunk.
+	 * 
+	 * @param buffering
+	 */
 	public void setBuffering(boolean buffering) {
 		this.buffering = buffering;
 	}
@@ -133,9 +178,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 			};
 
-			// TODO: is it OK to use the item as a key for the retry state?
-			O output = batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(item,
-					rollbackClassifier));
+			O output = batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(
+					getInputKey(item), rollbackClassifier));
 			if (output != null) {
 				outputs.add(output);
 			}
@@ -152,99 +196,143 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 		RetryCallback<Object> retryCallback = new RetryCallback<Object>() {
 			public Object doWithRetry(RetryContext context) throws Exception {
-				doWrite(outputs.getItems());
-				contribution.incrementWriteCount(outputs.size());
+
+				if (!inputs.isBusy()) {
+					chunkMonitor.setChunkSize(inputs.size());
+					doWrite(outputs.getItems());
+					contribution.incrementWriteCount(outputs.size());
+				}
+				else {
+					scan(contribution, inputs, outputs, chunkMonitor);
+				}
 				return null;
+
 			}
 		};
 
-		RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
+		if (!buffering) {
 
-			public Object recover(RetryContext context) throws Exception {
+			RecoveryCallback<Object> batchRecoveryCallback = new RecoveryCallback<Object>() {
 
-				Exception le = (Exception) context.getLastThrowable();
-				if (outputs.size() > 1 && !rollbackClassifier.classify(le)) {
-					throw new RetryException("Invalid retry state during write caused by "
-							+ "exception that does not classify for rollback: ", le);
-				}
+				public Object recover(RetryContext context) throws Exception {
 
-				boolean singleton = outputs.size() == 1;
-
-				Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
-				for (Chunk<O>.ChunkIterator outputIterator = outputs.iterator(); outputIterator.hasNext();) {
-
-					inputIterator.next();
-					O item = outputIterator.next();
-					if (singleton) {
-						checkSkipPolicy(inputIterator, outputIterator, le, contribution);
-						return null;
+					Exception e = (Exception) context.getLastThrowable();
+					if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
+						throw new RetryException("Invalid retry state during write caused by "
+								+ "exception that does not classify for rollback: ", e);
 					}
 
-					try {
-						writeItems(Collections.singletonList(item));
-					}
-					catch (Exception e) {
+					Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
+					for (Chunk<O>.ChunkIterator outputIterator = outputs.iterator(); outputIterator.hasNext();) {
+
+						inputIterator.next();
+						outputIterator.next();
+
 						checkSkipPolicy(inputIterator, outputIterator, e, contribution);
-						if (rollbackClassifier.classify(e)) {
-							throw e;
-						}
-						else {
+						if (!rollbackClassifier.classify(e)) {
 							throw new RetryException(
 									"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
 									e);
 						}
+
 					}
 
-				}
-
-				doAfterWrite(outputs.getItems());
-				contribution.incrementWriteCount(outputs.size());
-				return null;
-
-			}
-
-		};
-
-		RecoveryCallback<Object> batchRecoveryCallback = new RecoveryCallback<Object>() {
-
-			public Object recover(RetryContext context) throws Exception {
-
-				Exception e = (Exception) context.getLastThrowable();
-				if (outputs.size() > 1 && !rollbackClassifier.classify(e)) {
-					throw new RetryException("Invalid retry state during write caused by "
-							+ "exception that does not classify for rollback: ", e);
-				}
-
-				Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
-				for (Chunk<O>.ChunkIterator outputIterator = outputs.iterator(); outputIterator.hasNext();) {
-
-					inputIterator.next();
-					outputIterator.next();
-
-					checkSkipPolicy(inputIterator, outputIterator, e, contribution);
-					if (!rollbackClassifier.classify(e)) {
-						throw new RetryException(
-								"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
-								e);
-					}
+					return null;
 
 				}
 
-				return null;
+			};
 
-			}
+			batchRetryTemplate.execute(retryCallback, batchRecoveryCallback, BatchRetryTemplate.createState(
+					getInputKeys(inputs), rollbackClassifier));
 
-		};
-
-		if (!buffering) {
-			batchRetryTemplate.execute(retryCallback, batchRecoveryCallback, BatchRetryTemplate.createState(inputs
-					.getItems(), rollbackClassifier));
 		}
 		else {
+
+			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
+
+				public Object recover(RetryContext context) throws Exception {
+
+					Exception le = (Exception) context.getLastThrowable();
+					if (outputs.size() > 1 && !rollbackClassifier.classify(le)) {
+						throw new RetryException("Invalid retry state during write caused by "
+								+ "exception that does not classify for rollback: ", le);
+					}
+
+					boolean singleton = outputs.size() == 1;
+
+					if (singleton && !inputs.isBusy()) {
+						Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
+						Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
+						checkSkipPolicy(inputIterator, outputIterator, le, contribution);
+						return null;
+					}
+
+					inputs.setBusy(true);
+					scan(contribution, inputs, outputs, chunkMonitor);
+					return null;
+
+				}
+
+			};
+
 			batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
 					rollbackClassifier));
+
+		}
+		
+		callSkipListeners(inputs, outputs);
+
+	}
+
+	private void callSkipListeners(final Chunk<I> inputs, final Chunk<O> outputs) {
+
+		for (SkipWrapper<I> wrapper : inputs.getSkips()) {
+			I item = wrapper.getItem();
+			if (item == null) {
+				continue;
+			}
+			Exception e = wrapper.getException();
+			try {
+				getListener().onSkipInProcess(item, e);
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+			}
 		}
 
+		for (SkipWrapper<O> wrapper : outputs.getSkips()) {
+			Exception e = wrapper.getException();
+			try {
+				getListener().onSkipInWrite(wrapper.getItem(), e);
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
+			}
+		}
+		
+		// Clear skips if we are possibly going to process this chunk again	
+		outputs.clearSkips();
+		inputs.clearSkips();
+
+	}
+
+	private Object getInputKey(I item) {
+		if (keyGenerator == null) {
+			return item;
+		}
+		return keyGenerator.getKey(item);
+	}
+
+	private List<?> getInputKeys(final Chunk<I> inputs) {
+		if (keyGenerator == null) {
+			return inputs.getItems();
+		}
+		List<Object> keys = new ArrayList<Object>();
+		for (I item : inputs.getItems()) {
+			keys.add(keyGenerator.getKey(item));
+		}
+		return keys;
 	}
 
 	private void checkSkipPolicy(Chunk<I>.ChunkIterator inputIterator, Chunk<O>.ChunkIterator outputIterator,
@@ -257,6 +345,45 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 		else {
 			throw new RetryException("Non-skippable exception in recoverer", e);
+		}
+	}
+
+	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs, ChunkMonitor chunkMonitor)
+			throws Exception {
+
+		if (outputs.isEmpty()) {
+			inputs.setBusy(false);
+			return;
+		}
+
+		Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
+		Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
+
+		List<O> items = Collections.singletonList(outputIterator.next());
+		try {
+			writeItems(items);
+		}
+		catch (Exception e) {
+			checkSkipPolicy(inputIterator, outputIterator, e, contribution);
+			if (rollbackClassifier.classify(e)) {
+				throw e;
+			}
+			else {
+				throw new RetryException(
+						"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
+						e);
+			}
+		}
+		// If successful we are going to return and allow
+		// the driver to commit...
+		doAfterWrite(items);
+		contribution.incrementWriteCount(1);
+		inputIterator.remove();
+		outputIterator.remove();
+		chunkMonitor.incrementOffset();
+		if (outputs.isEmpty()) {
+			inputs.setBusy(false);
+			chunkMonitor.resetOffset();
 		}
 	}
 

@@ -21,7 +21,6 @@ import java.util.List;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
-import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
@@ -95,6 +94,13 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	/**
+	 * @return the listener
+	 */
+	protected MulticasterBatchListener<I, O> getListener() {
+		return listener;
+	}
+
+	/**
 	 * @param item the input item
 	 * @return the result of the processing
 	 * @throws Exception
@@ -122,21 +128,20 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 		try {
 			listener.beforeWrite(items);
 			writeItems(items);
-			listener.afterWrite(items);
+			doAfterWrite(items);
 		}
 		catch (Exception e) {
 			listener.onWriteError(e, items);
 			throw e;
 		}
 	}
-	
+
 	/**
 	 * Call the listener's after write method.
 	 * 
 	 * @param items
 	 */
-	protected final void doAfterWrite(List<O> items)
-	{
+	protected final void doAfterWrite(List<O> items) {
 		listener.afterWrite(items);
 	}
 
@@ -145,17 +150,6 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 	}
 
 	public final void process(StepContribution contribution, Chunk<I> inputs) throws Exception {
-
-		// If there is no input we don't have to do anything more
-		if (inputs.isEmpty()) {
-			return;
-		}
-
-		int inputSize = inputs.size();
-		
-		Chunk<O> outputs = transform(contribution, inputs);
-		
-		contribution.incrementFilterCount(inputSize - outputs.size());
 
 		/*
 		 * Need to remember the write skips across transactions, otherwise they
@@ -172,37 +166,37 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 			skips = new Chunk<O>();
 		}
 
+		// If there is no input we don't have to do anything more
+		if (inputs.isEmpty() && skips.getSkips().isEmpty()) {
+			return;
+		}
+
+		int inputsSize = inputs.size();
+
+		Chunk<O> outputs = transform(contribution, inputs);
+
+		contribution.incrementFilterCount(inputsSize  - outputs.size());
+
 		outputs = new Chunk<O>(outputs.getItems(), skips.getSkips());
+
+		// Remember for next time if there are skips accumulating
 		inputs.setUserData(outputs);
 
 		write(contribution, inputs, outputs);
 
-		for (SkipWrapper<I> wrapper : inputs.getSkips()) {
-			I item = wrapper.getItem();
-			if (item == null) {
-				continue;
-			}
-			Exception e = wrapper.getException();
-			try {
-				listener.onSkipInProcess(item, e);
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-			}
-		}
-
-		for (SkipWrapper<O> wrapper : outputs.getSkips()) {
-			Exception e = wrapper.getException();
-			try {
-				listener.onSkipInWrite(wrapper.getItem(), e);
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-			}
-		}
-
 	}
 
+	/**
+	 * Simple implementation delegates to the {@link #doWrite(List)} method and
+	 * increments the write count in the contribution. Subclasses can handle
+	 * more complicated scenarios, e.g.with fault tolerance. If output items are
+	 * skipped they should be removed from the inputs as well.
+	 * 
+	 * @param contribution the current step contribution
+	 * @param inputs the inputs that gave rise to the ouputs
+	 * @param outputs the outputs to write
+	 * @throws Exception if there is a problem
+	 */
 	protected void write(StepContribution contribution, Chunk<I> inputs, Chunk<O> outputs) throws Exception {
 		doWrite(outputs.getItems());
 		contribution.incrementWriteCount(outputs.size());

@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.MulticasterBatchListener;
-import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
@@ -71,6 +70,13 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	public void registerListener(StepListener listener) {
 		this.listener.register(listener);
 	}
+	
+	/**
+	 * @return the listener
+	 */
+	protected MulticasterBatchListener<I, ?> getListener() {
+		return listener;
+	}
 
 	/**
 	 * Surrounds the read call with listener callbacks.
@@ -113,14 +119,7 @@ public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 	}
 	
 	public void postProcess(StepContribution contribution, Chunk<I> chunk) {
-		for (Exception e : chunk.getErrors()) {
-			try {
-				listener.onSkipInRead(e);
-			}
-			catch (RuntimeException ex) {
-				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
-			}
-		}		
+		// do nothing
 	}
 
 	protected I read(StepContribution contribution, Chunk<I> chunk) throws Exception {

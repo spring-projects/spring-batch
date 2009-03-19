@@ -19,6 +19,7 @@ package org.springframework.batch.core.step.item;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
+import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatOperations;
@@ -31,6 +32,10 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 		super(itemReader, repeatOperations);
 	}
 
+	/**
+	 * The policy that determines whether exceptions can be skipped on read.
+	 * @param SkipPolicy
+	 */
 	public void setSkipPolicy(SkipPolicy SkipPolicy) {
 		this.skipPolicy = SkipPolicy;
 	}
@@ -54,6 +59,18 @@ public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 					throw new NonSkippableReadException("Non-skippable exception during read", e);
 				}
 
+			}
+		}
+	}
+
+	@Override
+	public void postProcess(StepContribution contribution, Chunk<I> chunk) {
+		for (Exception e : chunk.getErrors()) {
+			try {
+				getListener().onSkipInRead(e);
+			}
+			catch (RuntimeException ex) {
+				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 			}
 		}
 	}

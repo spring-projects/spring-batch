@@ -29,6 +29,9 @@ import org.springframework.batch.core.step.skip.SkipLimitExceededException;
 import org.springframework.batch.core.step.skip.SkipListenerFailedException;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RetryException;
@@ -40,6 +43,8 @@ import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.NeverRetryPolicy;
 import org.springframework.batch.retry.policy.RetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
+import org.springframework.core.task.SyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 /**
  * Factory bean for step that provides options for configuring skip behaviour.
@@ -87,6 +92,22 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	private RetryPolicy retryPolicy;
 
 	private RetryContextCache retryContextCache;
+
+	private KeyGenerator keyGenerator;
+
+	private ChunkMonitor chunkMonitor = new ChunkMonitor();
+
+	/**
+	 * The {@link KeyGenerator} to use to identify failed items across rollback.
+	 * Not used in the case of the
+	 * {@link #setIsReaderTransactionalQueue(boolean) transactional queue flag}
+	 * being false (the default).
+	 * 
+	 * @param keyGenerator the {@link KeyGenerator} to set
+	 */
+	public void setKeyGenerator(KeyGenerator keyGenerator) {
+		this.keyGenerator = keyGenerator;
+	}
 
 	/**
 	 * Setter for the retry policy. If this is specified the other retry
@@ -207,27 +228,61 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		super.applyConfiguration(step);
 
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void registerStreams(TaskletStep step, ItemStream[] streams) {
+		CompositeItemStream composite = new CompositeItemStream();
+		boolean streamIsReader = false;
+		for (final ItemStream stream : streams) {
+			if (stream instanceof ItemReader) {
+				streamIsReader = true;
+				composite.register(stream);
+			}
+			else {
+				step.registerStream(stream);
+			}
+		}
+		TaskExecutor taskExecutor = getTaskExecutor();
+		// In cases where multiple nested item readers are registered,
+		// they all want to get the open() and close() callbacks.
+		if (streamIsReader) {
+			chunkMonitor.setItemStream(composite);
+			step.registerStream(chunkMonitor);
+			boolean concurrent = taskExecutor != null && !(taskExecutor instanceof SyncTaskExecutor);
+			if (!concurrent) {
+				chunkMonitor.setItemReader(getItemReader());
+			} else {
+				logger.warn("Synchronous TaskExecutor detected (" + taskExecutor.getClass()
+						+ ") with ItemStream reader.  This is probably an error, "
+						+ "and may lead to incorrect restart data being stored.");
+			}
+		}
+	}
+
 	/**
 	 * @return {@link ChunkProvider} configured for fault-tolerance.
 	 */
 	@Override
-	protected FaultTolerantChunkProvider<T> configureChunkProvider() {
-		
+	protected SimpleChunkProvider<T> configureChunkProvider() {
+
 		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
 				fatalExceptionClasses);
 		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 				getChunkOperations());
 		chunkProvider.setSkipPolicy(readSkipPolicy);
-		
+
 		return chunkProvider;
+
 	}
 
 	/**
 	 * @return {@link ChunkProcessor} configured for fault-tolerance.
 	 */
 	@Override
-	protected FaultTolerantChunkProcessor<T, S> configureChunkProcessor() {
+	protected SimpleChunkProcessor<T, S> configureChunkProcessor() {
 
 		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
 				fatalExceptionClasses);
@@ -246,10 +301,12 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setRollbackClassifier(rollbackClassifier);
+		chunkProcessor.setKeyGenerator(keyGenerator);
+		chunkProcessor.setChunkMonitor(chunkMonitor);
 
 		return chunkProcessor;
-	}
 
+	}
 
 	/**
 	 * @return fully configured retry template for item processing phase.

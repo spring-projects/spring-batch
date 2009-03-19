@@ -407,6 +407,14 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
+	
+	/**
+	 * Mkae the {@link TaskExecutor} available to subclasses
+	 * @return the taskExecutor to be used to execute chunks
+	 */
+	protected TaskExecutor getTaskExecutor() {
+		return taskExecutor;
+	}
 
 	/**
 	 * Public setter for the throttle limit. This limits the number of tasks
@@ -437,7 +445,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		step.setStartLimit(startLimit);
 		step.setAllowStartIfComplete(allowStartIfComplete);
 
-		step.setStreams(streams);
+		registerStreams(step, streams);
 
 		if (chunkOperations == null) {
 			RepeatTemplate repeatTemplate = new RepeatTemplate();
@@ -468,12 +476,22 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 		registerItemListeners(chunkProvider, chunkProcessor);
 		registerStepListeners(step, chunkOperations);
+		registerStreams(step, itemReader, itemProcessor, itemWriter);
 
 		ChunkOrientedTasklet<T> tasklet = new ChunkOrientedTasklet<T>(chunkProvider, chunkProcessor);
 		tasklet.setBuffering(!isReaderTransactionalQueue());
 
 		step.setTasklet(tasklet);
 
+	}
+
+	/**
+	 * Register the streams with the step.
+	 * @param step the {@link TaskletStep}
+	 * @param streams the streams to register
+	 */
+	protected void registerStreams(TaskletStep step, ItemStream[] streams) {
+		step.setStreams(streams);
 	}
 
 	/**
@@ -512,16 +530,21 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		}
 		return new SimpleCompletionPolicy(commitInterval);
 	}
+	
+	private void registerStreams(TaskletStep step, ItemReader<? extends T> itemReader, ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter) {
+		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
+			if (itemHandler instanceof ItemStream) {
+				registerStreams(step, new ItemStream[] {(ItemStream) itemHandler});
+			}
+		}		
+	}
 
 	/**
 	 * Register listeners with step and chunk.
 	 */
 	private void registerStepListeners(TaskletStep step, RepeatOperations chunkOperations) {
 
-		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
-			if (itemHandler instanceof ItemStream) {
-				step.registerStream((ItemStream) itemHandler);
-			}
+		for (Object itemHandler : new Object[] { getItemReader(), itemWriter, itemProcessor }) {
 			if (StepListenerFactoryBean.isListener(itemHandler)) {
 				StepListener listener = StepListenerFactoryBean.getListener(itemHandler);
 				if (listener instanceof StepExecutionListener) {
