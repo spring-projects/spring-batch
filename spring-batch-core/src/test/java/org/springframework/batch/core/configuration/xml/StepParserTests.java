@@ -31,9 +31,11 @@ import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
@@ -123,7 +125,7 @@ public class StepParserTests {
 
 	private void loadContextWithBadListener(String contextLocation) {
 		try {
-			new ClassPathXmlApplicationContext(contextLocation);
+			new XmlBeanFactory(new ClassPathResource(contextLocation));
 			fail("Context should not load!");
 		} catch (BeanDefinitionParsingException e) {
 			assertTrue(e.getMessage().contains("'ref' and 'class'"));

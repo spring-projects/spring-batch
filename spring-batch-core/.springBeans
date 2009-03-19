@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.1.v200811281800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.2.RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -43,12 +43,8 @@
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepWithSimpleTaskJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StopJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/EndTransitionJobParserTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/xml/NextAttributeMultipleFinalJobParserTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/DefaultFailureJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/DefaultSuccessJobParserTests-context.xml</config>
-		<config>src/test/resources/org/springframework/batch/core/configuration/xml/DuplicateTransitionJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/EndTransitionDefaultStatusJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/FailTransitionDefaultStatusJobParserTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/core/configuration/xml/FailTransitionJobParserTests-context.xml</config>
