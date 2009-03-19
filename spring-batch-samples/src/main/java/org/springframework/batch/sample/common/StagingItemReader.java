@@ -95,7 +95,7 @@ public class StagingItemReader<T> implements ItemReader<ProcessIndicatorItemWrap
 	public ProcessIndicatorItemWrapper<T> read() throws DataAccessException {
 
 		if (!initialized) {
-			throw new ReaderNotOpenException("ItemStream must be open before it can be read.");
+			throw new ReaderNotOpenException("Reader must be open before it can be used.");
 		}
 
 		Long id = null;

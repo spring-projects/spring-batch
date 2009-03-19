@@ -177,6 +177,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 	 */
 	public final void execute(StepExecution stepExecution) throws JobInterruptedException,
 			UnexpectedJobExecutionException {
+		
+		logger.debug("Executing: id="+stepExecution.getId());
 		stepExecution.setStartTime(new Date());
 		stepExecution.setStatus(BatchStatus.STARTED);
 		getJobRepository().update(stepExecution);
@@ -204,7 +206,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			}
 
 			stepExecution.setStatus(BatchStatus.COMPLETED);
-			logger.debug("Step execution success: " + stepExecution);
+			logger.debug("Step execution success: id=" + stepExecution.getId());
 		}
 		catch (Throwable e) {
 			logger.error("Encountered an error executing the step: " + e.getClass() + ": " + e.getMessage(), e);

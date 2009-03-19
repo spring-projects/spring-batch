@@ -87,17 +87,12 @@ public class TaskletElementParserTests {
 		Collection<ItemStream> streams = getStreams("s1", taskletElementParentAttributeParserTestsContext);
 		assertEquals(2, streams.size());
 		boolean c = false;
-		boolean d = false;
 		for (ItemStream o : streams) {
 			if (o instanceof CompositeItemStream) {
 				c = true;
 			}
-			else if (o instanceof TestReader) {
-				d = true;
-			}
 		}
 		assertTrue(c);
-		assertTrue(d);
 	}
 
 	@Test

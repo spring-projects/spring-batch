@@ -26,8 +26,8 @@ import java.util.List;
  * Encapsulation of a list of items to be processed and possibly a list of
  * failed items to be skipped. To mark an item as skipped clients should iterate
  * over the chunk using the {@link #iterator()} method, and if there is a
- * failure call {@link ChunkIterator#remove(Exception)} on the iterator.
- * The skipped items are then available through the chunk.
+ * failure call {@link ChunkIterator#remove(Exception)} on the iterator. The
+ * skipped items are then available through the chunk.
  * 
  * @author Dave Syer
  * 
@@ -39,25 +39,27 @@ public class Chunk<W> implements Iterable<W> {
 	private List<SkipWrapper<W>> skips = new ArrayList<SkipWrapper<W>>();
 
 	private List<Exception> errors = new ArrayList<Exception>();
-	
+
 	private Object userData;
 
 	private boolean end;
 
+	private boolean busy;
+
 	public Chunk() {
-		this(null,null);
+		this(null, null);
 	}
 
 	public Chunk(Collection<? extends W> items) {
-		this(items,null);
+		this(items, null);
 	}
-	
+
 	public Chunk(Collection<? extends W> items, List<SkipWrapper<W>> skips) {
 		super();
-		if (items!=null) {
+		if (items != null) {
 			this.items = new ArrayList<W>(items);
 		}
-		if (skips!=null) {
+		if (skips != null) {
 			this.skips = new ArrayList<SkipWrapper<W>>(skips);
 		}
 	}
@@ -132,12 +134,48 @@ public class Chunk<W> implements Iterable<W> {
 		return items.size();
 	}
 
+	/**
+	 * Flag to indicate if the source data is exhausted.
+	 * 
+	 * @return true if there is no more data to process
+	 */
 	public boolean isEnd() {
 		return end;
 	}
 
+	/**
+	 * Set the flag to say that this chunk represents an end of stream (there is
+	 * no more data to process).
+	 */
 	public void setEnd() {
 		this.end = true;
+	}
+
+	/**
+	 * Query the chunk to see if anyone has registered an interest in keeping a
+	 * reference to it.
+	 * 
+	 * @return the busy flag
+	 */
+	public boolean isBusy() {
+		return busy;
+	}
+
+	/**
+	 * Register an interest in the chunk to prevent it from being cleaned up
+	 * before the flag is reset to false.
+	 * 
+	 * @param busy the flag to set
+	 */
+	public void setBusy(boolean busy) {
+		this.busy = busy;
+	}
+
+	/**
+	 * Clear only the skips list.
+	 */
+	public void clearSkips() {
+		skips.clear();
 	}
 
 	public Object getUserData() {
@@ -159,9 +197,8 @@ public class Chunk<W> implements Iterable<W> {
 	}
 
 	/**
-	 * Special iterator for a chunk providing the
-	 * {@link #remove(Exception)} method for dynamically removing an
-	 * item and adding it to the skips.
+	 * Special iterator for a chunk providing the {@link #remove(Exception)}
+	 * method for dynamically removing an item and adding it to the skips.
 	 * 
 	 * @author Dave Syer
 	 * 

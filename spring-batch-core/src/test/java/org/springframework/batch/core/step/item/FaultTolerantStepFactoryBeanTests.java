@@ -30,14 +30,18 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.StringUtils;
 
@@ -66,7 +70,11 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	private List<String> processed = new ArrayList<String>();
 
-	protected int count;
+	private int count;
+
+	private boolean opened = false;
+
+	private boolean closed = false;
 
 	private Collection<String> NO_FAILURES = Collections.emptyList();
 
@@ -380,9 +388,10 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		// listeners are called only once chunk is about to commit, so
 		// listener failure does not affect other statistics
-		assertEquals(3, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getReadSkipCount());
-		assertEquals(1, stepExecution.getWriteSkipCount());
+		// but we didn't get as far as the write skip in the scan:
+		assertEquals(0, stepExecution.getWriteSkipCount());
+		assertEquals(2, stepExecution.getSkipCount());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
@@ -599,10 +608,10 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(2, stepExecution.getRollbackCount());
 
-		// 1,2,3,4,3,4,3 - two re-processing attempts until the item is
-		// identified and skipped
+		// 1,2,3,4,3,4,4 - two re-processing attempts until the item is
+		// identified and finally skipped on the third attempt
 		assertEquals(7, processed.size());
-		assertEquals("[1, 2, 3, 4, 3, 4, 3]", processed.toString());
+		assertEquals("[1, 2, 3, 4, 3, 4, 4]", processed.toString());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 
@@ -683,8 +692,42 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 	}
 
-	private static class SkipProcessorStub implements ItemProcessor<String, String> {
+	/**
+	 * Check ItemStream is opened
+	 */
+	@Test
+	public void testItemStreamOpenedEvenWithTaskExecutor() throws Exception {
 
+		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+			public void close() throws ItemStreamException {
+				closed = true;
+			}
+
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
+				opened = true;
+			}
+
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			public String read() throws Exception, UnexpectedInputException, ParseException {
+				return null;
+			}
+		};
+
+		factory.setItemReader(reader);
+		factory.setTaskExecutor(new ConcurrentTaskExecutor());
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+
+		assertTrue(opened);
+		assertTrue(closed);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+	}
+
+	private static class SkipProcessorStub implements ItemProcessor<String, String> {
 		private final Collection<String> failures;
 
 		private boolean rollback = false;

@@ -1,0 +1,161 @@
+                                    ------
+                                    Spring Batch - State and Thread Safety
+                                    ------
+                                    Dave Syer
+                                    ------
+                                    March 2009
+
+State and Thread Safety in Spring Batch
+
+  A stateless component is thread safe, but sometimes not practical (you need to store some state).  A stateful component can be thread safe, if its contract is clearly explained to and met by its clients.  Spring Batch has a lot of stateful components, which by and large are not capable of being used in a thread safe manner, but that doesn't have to be the case for ever. 
+
+  Components with private non-final fields are not necessarily stateful in practice - Spring components often have fields that are injected or initialized after the object is created.  The working definition of "stateless" for the present purposes is a component with fields that do not change after initialization, which has the usual Spring lifecycle meaning (i.e. once "released into the wild" with <<<BeanFactory.getBean()>>, or the equivalent).
+
+  Conversely, even components with only final fields are not necessarily stateless.  They can have the appearance of statelessness (and thread safety), but if they mutate their final fields, then they are stateful by association.  It is not always possible to tell from the implementation of a component whether it is stateful by association, since it depends entirely on the implementation of its fields, whose concrete type may not even be known at compile time.
+
+* Variants of State
+
+  There are two reasons why a Batch component might need to be stateful: rollback and restart.
+
+    * <Rollback>: to support rollback after a transaction, a component might need to detect the rollback (and potentially the start of the original transaction) and rewind to its former state.  This is a single-process (JVM) pattern.  Normally a transaction is managed on a single thread as well, but in principle there might be multiple threads using the same component, which inevitably leads to problems.
+
+    * <Restart>: to support restart of a failed job execution, a component needs to be able to re-hydrate its former state from a previour execution.  This is often a multi-process (JVM) pattern, and needs to work between processes even if it isn't always invoked that way in practice.  To support this requirement Spring Batch uses the <<<ItemStream>>> calback methods and its <<<ExecutionContext>>> to store state.  The framework deals with the state storage and re-hydration, and components only need to provide snapshots of their state through the <<<ItemStream>>> interface.
+
+* ItemReaders
+
+  The most common case in Batch where stateful components are necessary are the item readers, whose job is to provide instances of business data for processing.  At a high level there are three variants, driven by the needs of their client (usually the framework) for rollback and restart.
+
+    * <Transactional>.  A fully transactional reader has its rollback and restart state managed entirely by an external system (middleware) that is driven from a transaction in the batch system.  After a rollback items are returned to the middleware, and represented in a subsequent transaction.  There is no essential difference between rollback and retry: as far as the middleware is concerned they are just failed reads.  The user has to tell Spring Batch explicitly if one of these readers is being used so it can take into account the expected re-presentation of items in a new transaction.  Just about the only example of this is the <<<JmsItemReader>>>.  
+
+    * <Stateless>.  A stateless component doesn't need to do anything special to provide restartability, which is quite a valuable feature. It is also thread safe (by construction), which is at least equally valuable if not more.  Stateless <<<ItemReaders>>> are rare in practice: in the Spring Batch source code the only one is the <<<StagingItemReader>>> from the samples.
+
+    * <Stateful>.  Part of the contract for <<<Step>>> implementations in Batch 2.0 is that <<<ItemReaders>>> do not need to manage state for rollback because each item is only ever read once (and buffered for use on rollback internally).  They do, however still need state if they want to provide restartability, which all the framework implementations do.  A stateful component has to work hard to be thread safe, but it is not ruled out in principle.  In fact none of the stateful <<<ItemReader>>> implementations in Spring Batch is thread safe as of 2.0, but they are all restartable (which is more to the point).
+
+  Because these different categories of <<<ItemReader>>> behave differently with respect to rollback and restart, they have to be recognised and treated differently by the framework.  If a simple fail fast <<<Step>>> is used, then any error leads to immediate failure, so rollback is not important in that case, but restart always is.  If a fault tolerant <<<Step>>> is used, then rollback and restart have to be handled, and differently for each category of reader.  To recognise a <Transactional> reader the framework needs a flag to be set by the user (see <<<SimpleStepFactoryBean.setReaderTransactionalQueue()>>>).  To recognise a <Stateless> or <Stateful> reader the framework uses the <<<ItemStream>>> interface (if present assume <Stateful>).
+
+Rollback and Restart with Skips
+
+* Spring Batch 2.0.0.RC1
+
+** Retry and Skip with a Transactional Reader
+
+  Since the middleware will simply re-present failed items, there is nothing for the framework to do.  We can use this example to establish some notation.  Suppose five items are read in one transaction and there is a deterministic failure while writing the 3rd one.  If skips are allowed, but not retries, the process looks like this:
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[1,2,3,4,5; (1),(2),(3)]*
+[1,2,3,4,5; (1,2,4,5)]
+...
++---
+
+  where parentheses denote a write operation, brackets ([]) represent a transaction, and an asterisk (*) denotes a rollback.  In words we have:
+
+    * Read items 1 through 5, then write them as a chunk, encounter an error and rollback.
+    
+    * Read items 1 through 5 again and write them individually, scanning for errors.  Encounter the error on item 3, then rollback having identified item 3 as skippable
+
+    * Read the 5 items again and skip item 3 on writing the chunk.
+
+  To achieve this, the items from a failed chunk need to be intrinsically identifiable, so that when they show up again the system can throttle back and scan for the error.  In completely general terms this is not a well-defined problem - tere is no generic identifier for the items that can always be used.  Spring Batch by default uses the items themselves as the identifier in this case, leading to possible problems if their identity (equals and hashCode) are not properly defined.  We might be able to pick an identifier in some special cases, like in the JMS case the message ID will be unique, in which case we would need to provide a <<<KeyGenerator>>> implementation.  (This is uncommon enough that in Spring Batch 2.0.0 there is no way to do it using the XML namespace, but you can do it using <<<FaultTolerantStepFactoryBean>>>.)
+
+  There is also the issue of storing the identifiers, waiting for all the failed items to be seen again.  There is no guarantee that the failed items will ever come back to this consumer, so we have to store the identifiers potentially indefinitely, possibly leading to memory leaks.  To help alleviate this problem (at the risk of misidentifying a failed item as a new one) Spring Batch provides the <<<SoftReferenceRetryContextCache>>> which allows cached values to be garabage collected if memory is under pressure.
+
+  With a retry limit of 1, the same execution would look like this
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[1,2,3,4,5; (1,2,3,4,5)]*
+[1,2,3,4,5; (1),(2),(3)]*
+[1,2,3,4,5; (1,2,4,5)]
+...
++---
+
+  (just an extra iteration where the chunk is given a chance to succeed before the error scan starts).
+
+** Retry and Skip with a Non-Transactional Reader
+
+  In this case there is no middleware so the <<<Step>>> has to buffer the items between rollbacks, but otherwise the process looks like very similar.  The internal name for the buffer is a <<<Chunk>>>.  With no retry:
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[; (1),(2),(3)]*
+[; (1,2,4,5)]
+...
++---
+
+  and with retry:
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[; (1,2,3,4,5)]*
+[; (1),(2),(3)]*
+[; (1,2,4,5)]
+...
++---
+
+  In the case of the non-Transactional reader there is no problem with item identifiers: the <<<Chunk>>> can be used to identify the failed items when they are re-processed.
+
+* A More Efficient Approach
+
+  It would be more efficient if we didn't end up processing each item more than twice in the simple case of skip with no retry.
+
+** Skip with a Transactional Reader
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[1; (1)]
+[2; (2)]
+[3; (3)]*
+[4; (4)]
+[5; (5)]
+...
++---
+
+  This is difficult to achieve with the <<<ChunkOrientedTasklet>>> because it requires communication between the <<<ChunkProvider>>> and <<<ChunkProcessor>>> about the failed items: the <<<ChunkProvider>>> has to stop reading when it encounters an item from a previously failed chunk.  This feature is not yet implemented in Spring Batch (as of 2.0.0.RC2).
+
+** Skip with a Stateful Reader
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[; (1)]
+[; (2)]
+[; (3)]*
+[; (4)]
+[; (5)]
+...
++---
+
+  This processing and rollback plan is not difficult to achieve with the <<<ChunkOrientedTasklet>>> but it <is> hard to get the restart data properly aligned.  The main issue is that the <<<ItemReader>>> gets the <<<ItemStream.update()>>> callback before every commit.  It is going to think that all 5 items have been committed after the first (and every) commit, which is wrong, so any subsequent non-skippable failure will lead to a restart on item 6 with all intermediate items lost.  So after a fatal error on item 2 the restart would like this
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[; (1)]
+[; (2)]*
+
+<restart: jump to 6>
+
+[6,7,8,9,10; (6,7,8,9,10)]
+...
++---
+
+  and items (2,3,4,5) are ommitted with no record of attempting to process them.
+
+  To fix this we have to mask the <<<ItemStream.update()>>> callback in the <<<ItemReader>>> and only pass it through if we know we have successfully finished a whole chunk.  In the partial chunk transactions, we need to update the <<<ExecutionContext>>> with some offset data that would prevent the intermediate values being processed on restart.
+
++---
+[1,2,3,4,5; (1,2,3,4,5)]*
+[; (1)]
+[; (2)]*
+
+<restart: jump to 2>
+
+[2,3,4,5,6; (2,3,4,5,6)]*
+[; (2)]
+[; (3)]*
+[; (4)]
+[; (5)]
+[; (6)]
+...
++---
+
+  This can be implemented by storing the offset within a chunk separately from the read count.  In the example above, the offset would be 2 when the fatal exception happened, and the read count would be 0 up to the point where the first chunk successfully commits.  Caveat: only works if the <<<Step>>> is single-threaded (which it has to be for all the existing Stateful readers).  The implementation via <<<ChunkMonitor>>> assumes that the step is single threaded if it finds that the <<<ItemReader>>> is an <<<ItemStream>>>, and the <<<TaskExecutor>>> is a <<<SyncTaskExector>>>.  If the <<<TaskExecutor>>> is concurrent then warnings are logged, and the offset is not stored )the assumption is that the reader is not restartable so it won't care.

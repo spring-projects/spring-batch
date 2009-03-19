@@ -42,8 +42,11 @@ import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.AbstractStep;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.support.AbstractItemCountingItemStreamItemReader;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.batch.retry.policy.SimpleRetryPolicy;
@@ -72,12 +75,14 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	int count = 0;
 
+	boolean fail = false;
+
 	private SimpleJobRepository repository = new SimpleJobRepository(new MapJobInstanceDao(), new MapJobExecutionDao(),
 			new MapStepExecutionDao(), new MapExecutionContextDao());
 
 	JobExecution jobExecution;
 
-	private ItemWriter<String> processor = new ItemWriter<String>() {
+	private ItemWriter<String> writer = new ItemWriter<String>() {
 		public void write(List<? extends String> data) throws Exception {
 			processed.addAll(data);
 		}
@@ -98,7 +103,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		factory.setBeanName("step");
 
 		factory.setItemReader(new ListItemReader<String>(new ArrayList<String>()));
-		factory.setItemWriter(processor);
+		factory.setItemWriter(writer);
 		factory.setJobRepository(repository);
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setRetryableExceptionClasses(new HashSet<Class<? extends Throwable>>() {
@@ -168,8 +173,69 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	}
 
 	@Test
+	public void testRestartAfterFailedWrite() throws Exception {
+
+		factory.setSkipLimit(0);
+		factory.setCommitInterval(3);
+		AbstractItemCountingItemStreamItemReader<String> reader = new AbstractItemCountingItemStreamItemReader<String>() {
+
+			private ItemReader<String> reader;
+
+			@Override
+			protected void doClose() throws Exception {
+				reader = null;
+			}
+
+			@Override
+			protected void doOpen() throws Exception {
+				reader = new ListItemReader<String>(Arrays.asList("a", "b", "c", "d", "e", "f"));
+			}
+
+			@Override
+			protected String doRead() throws Exception {
+				return reader.read();
+			}
+
+		};
+		// Need to set name or else reader will fail to open
+		reader.setName("foo");
+		factory.setItemReader(reader);
+		factory.setStreams(new ItemStream[] { reader });
+		factory.setItemWriter(new ItemWriter<String>() {
+			public void write(List<? extends String> items) throws Exception {
+				if (fail && items.contains("e")) {
+					throw new RuntimeException("Planned failure");
+				}
+				processed.addAll(items);
+			}
+		});
+		factory.setRetryLimit(0);
+		Step step = (Step) factory.getObject();
+
+		fail = true;
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
+		repository.add(stepExecution);
+		step.execute(stepExecution);
+
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+		assertEquals(4, stepExecution.getWriteCount());
+		assertEquals(6, stepExecution.getReadCount());
+
+		fail = false;
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		stepExecution = new StepExecution(step.getName(), jobExecution);
+		stepExecution.setExecutionContext(executionContext);
+		repository.add(stepExecution);
+		step.execute(stepExecution);
+
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertEquals(2, stepExecution.getWriteCount());
+		assertEquals(2, stepExecution.getReadCount());
+	}
+
+	@Test
 	public void testSkipAndRetry() throws Exception {
-		
+
 		factory.setSkipLimit(2);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("a", "b", "c", "d", "e", "f")) {
 			public String read() {
@@ -198,7 +264,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	@Test
 	public void testSkipAndRetryWithWriteFailure() throws Exception {
 
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
@@ -258,7 +324,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 	public void testSkipAndRetryWithWriteFailureAndNonTrivialCommitInterval() throws Exception {
 
 		factory.setCommitInterval(3);
-		factory.setListeners(new StepListener[] { new SkipListenerSupport<String,String>() {
+		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			public void onSkipInWrite(String item, Throwable t) {
 				recovered.add(item);
 				assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
@@ -308,16 +374,17 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 		// [a, b, c, d, e, f, null]
 		assertEquals(7, provided.size());
-		// [a, b, c, a, b, c, a, b, c, a, b, c, a, b, c, a, b, a, c, d, e, f, d,
+		// [a, b, c, a, b, c, a, b, c, a, b, c, a, b, c, a, b, c, d, e, f, d,
 		// e, f, d, e, f, d, e, f, d, e, f, d, e, f]
-		assertEquals(37, processed.size());
+		System.err.println(processed);
+		assertEquals(36, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());
 	}
 
 	@Test
 	public void testRetryWithNoSkip() throws Exception {
-		
+
 		factory.setRetryLimit(4);
 		factory.setSkipLimit(0);
 		ItemReader<String> provider = new ListItemReader<String>(Arrays.asList("b")) {
@@ -343,8 +410,8 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecution);
 		repository.add(stepExecution);
 		step.execute(stepExecution);
-		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());	
-			
+		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
+
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
 
@@ -440,7 +507,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		repository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		
+
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray(""));
 		assertEquals(expectedOutput, written);
 
@@ -489,7 +556,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		repository.add(stepExecution);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
-		
+
 		// We added a bogus cache so no items are actually skipped
 		// because they aren't recognised as eligible
 		assertEquals(0, stepExecution.getSkipCount());

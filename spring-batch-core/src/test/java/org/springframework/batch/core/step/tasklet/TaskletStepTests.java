@@ -126,13 +126,28 @@ public class TaskletStepTests {
 
 	@Test
 	public void testStepExecutor() throws Exception {
-
 		JobExecution jobExecutionContext = new JobExecution(jobInstance);
 		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
-
 		step.execute(stepExecution);
 		assertEquals(1, processed.size());
 		assertEquals(1, stepExecution.getReadCount());
+		assertEquals(1, stepExecution.getCommitCount());
+	}
+
+	@Test
+	public void testEmptyReader() throws Exception {
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
+		step = getStep(new String[0]);
+		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(new String[0]), itemWriter,
+				new RepeatTemplate()));
+		step.setStepOperations(new RepeatTemplate());
+		step.execute(stepExecution);
+		assertEquals(0, processed.size());
+		assertEquals(0, stepExecution.getReadCount());
+		// Commit after end of data detected (this leads to the commit count
+		// being one greater than people expect if the commit interval is
+		// commensurate with the total number of items).h
 		assertEquals(1, stepExecution.getCommitCount());
 	}
 
