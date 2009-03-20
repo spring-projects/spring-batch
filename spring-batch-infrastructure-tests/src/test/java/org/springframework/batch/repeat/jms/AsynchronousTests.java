@@ -95,7 +95,7 @@ public class AsynchronousTests {
 		}
 	}
 
-	List<String> list = new ArrayList<String>();
+	private volatile List<String> list = new ArrayList<String>();
 
 	private void assertInitialState() {
 		int count = simpleJdbcTemplate.queryForInt("select count(*) from T_FOOS");
@@ -120,7 +120,7 @@ public class AsynchronousTests {
 		container.start();
 
 		// Need to sleep for at least a second here...
-		Thread.sleep(1000L);
+		waitFor(list,2,2000);
 
 		System.err.println(simpleJdbcTemplate.queryForList("select * from T_FOOS"));
 
@@ -161,7 +161,7 @@ public class AsynchronousTests {
 		// Need to sleep here, but not too long or the
 		// container goes into its own recovery cycle and spits out the bad
 		// message...
-		Thread.sleep(1000L);
+		waitFor(list,2,2000);
 
 		container.stop();
 
@@ -180,6 +180,19 @@ public class AsynchronousTests {
 
 		assertTrue("Foo not on queue", msgs.contains("foo"));
 
+	}
+
+	/**
+	 * @param list
+	 * @param timeout
+	 * @throws InterruptedException 
+	 */
+	private void waitFor(List<String> list, int size, int timeout) throws InterruptedException {
+		int count = 0;
+		int max = timeout / 100;
+		while (count<max && list.size()<size) {
+			Thread.sleep(100);
+		}
 	}
 
 }
