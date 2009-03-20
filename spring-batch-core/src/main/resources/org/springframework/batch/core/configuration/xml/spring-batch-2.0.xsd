@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
-	xmlns:tx="http://www.springframework.org/schema/tx" targetNamespace="http://www.springframework.org/schema/batch"
-	elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
+	version="2.0">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
-	<xsd:import namespace="http://www.springframework.org/schema/tx" />
 
 	<xsd:annotation>
 		<xsd:documentation><![CDATA[
@@ -289,7 +288,7 @@
 	<xsd:group name="stepElements">
 		<xsd:choice>
 			<xsd:element name="tasklet" type="taskletType" />
-			<xsd:element name="transaction-attributes" type="transaction-attributesType"/>
+			<xsd:element name="transaction-attributes" type="transaction-attributesType" />
 			<xsd:element name="listeners" type="stepListenersType" />
 		</xsd:choice>
 	</xsd:group>
