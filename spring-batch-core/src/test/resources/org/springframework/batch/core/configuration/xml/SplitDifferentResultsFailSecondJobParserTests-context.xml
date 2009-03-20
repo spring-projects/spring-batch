@@ -11,17 +11,17 @@
 	<job id="job">
 
 		<split id="split1">
+			<next on="FAILED" to="s3"/>
 
 			<flow>
 				<step id="s1" ref="step1"/>
 			</flow>
+			<fail on="COMPLETED" />
 
 			<flow>
 				<step id="fail" ref="failingStep"/>
 			</flow>
 
-			<next on="FAILED" to="s3"/>
-			<fail on="COMPLETED" />
 
 		</split>
 

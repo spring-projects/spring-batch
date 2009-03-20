@@ -160,100 +160,98 @@
 	</xsd:element>
 
 	<xsd:complexType name="flowType">
-		<xsd:sequence>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element name="step">
-					<xsd:annotation>
-						<xsd:documentation>
-							Defines a stage in job processing backed by a
-							Step. The id attribute must be specified.  The
-							step requires either a tasklet definition, a 
-							tasklet reference, a reference to a step defined
-							elsewhere, or a reference to a (possibly 
-							abstract) parent step.
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:complexContent>
-							<xsd:extension base="flowStepType">
-								<xsd:attribute name="id" type="xsd:ID" use="required" />
-								<xsd:attribute name="ref" type="xsd:string" use="optional">
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="step">
+				<xsd:annotation>
+					<xsd:documentation>
+						Defines a stage in job processing backed by a
+						Step. The id attribute must be specified.  The
+						step requires either a tasklet definition, a 
+						tasklet reference, a reference to a step defined
+						elsewhere, or a reference to a (possibly 
+						abstract) parent step.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="flowStepType">
+							<xsd:attribute name="id" type="xsd:ID" use="required" />
+							<xsd:attribute name="ref" type="xsd:string" use="optional">
+								<xsd:annotation>
+									<xsd:documentation>
+										A reference to a step defined elsewhere.
+									</xsd:documentation>
+									<xsd:appinfo>
+										<tool:annotation kind="ref" />
+									</xsd:appinfo>
+								</xsd:annotation>
+							</xsd:attribute>
+							<xsd:attributeGroup ref="stepAttributes" />
+						</xsd:extension>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="split">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should split here into two or more subflows.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:complexContent>
+						<xsd:extension base="nextType">
+							<xsd:choice minOccurs="0" maxOccurs="unbounded">
+								<xsd:element name="flow" type="flowType">
 									<xsd:annotation>
 										<xsd:documentation>
-											A reference to a step defined elsewhere.
+											A subflow within a job, having the same format as a job, but without a separate identity.
 										</xsd:documentation>
-										<xsd:appinfo>
-											<tool:annotation kind="ref" />
-										</xsd:appinfo>
 									</xsd:annotation>
-								</xsd:attribute>
-								<xsd:attributeGroup ref="stepAttributes" />
-							</xsd:extension>
-						</xsd:complexContent>
-					</xsd:complexType>
-				</xsd:element>
-				<xsd:element name="split">
-					<xsd:annotation>
-						<xsd:documentation>
-							Declares job should split here into two or more subflows.
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:complexContent>
-							<xsd:extension base="nextType">
-								<xsd:sequence>
-									<xsd:element name="flow" type="flowType" minOccurs="2" maxOccurs="unbounded">
-										<xsd:annotation>
-											<xsd:documentation>
-												A subflow within a job, having the same format as a job, but without a separate identity.
-											</xsd:documentation>
-										</xsd:annotation>
-									</xsd:element>
-									<xsd:group ref="transitions"/>
-								</xsd:sequence>
-								<xsd:attribute name="id" type="xsd:ID" use="required" />
-								<xsd:attribute name="task-executor" type="xsd:string" use="optional">
-									<xsd:annotation>
-										<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
-										The task executor responsible for executing the task.
-										]]></xsd:documentation>
-										<xsd:appinfo>
-											<tool:annotation kind="ref">
-												<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
-											</tool:annotation>
-										</xsd:appinfo>
-									</xsd:annotation>
-								</xsd:attribute>
-							</xsd:extension>
-						</xsd:complexContent>
-					</xsd:complexType>
-				</xsd:element>
-				<xsd:element name="decision">
-					<xsd:annotation>
-						<xsd:documentation>
-							Declares job should query a decider to determine where execution should go next.
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:group ref="transitions"/>
-						<xsd:attribute name="id" type="xsd:ID" use="required" />
-						<xsd:attribute name="decider" type="xsd:string" use="required">
-							<xsd:annotation>
-								<xsd:documentation>
-									The decider is a reference to a JobExecutionDecider that can produce a status to base
-									the next transition on.
-								</xsd:documentation>
-								<xsd:appinfo>
-									<tool:annotation kind="ref">
-										<tool:expected-type type="org.springframework.batch.core.job.flow.JobExecutionDecider" />
-									</tool:annotation>
-								</xsd:appinfo>
-							</xsd:annotation>
-						</xsd:attribute>
-					</xsd:complexType>
-				</xsd:element>
-			</xsd:choice>
-		</xsd:sequence>
+								</xsd:element>
+								<xsd:group ref="transitions"/>
+							</xsd:choice>
+							<xsd:attribute name="id" type="xsd:ID" use="required" />
+							<xsd:attribute name="task-executor" type="xsd:string" use="optional">
+								<xsd:annotation>
+									<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
+									The task executor responsible for executing the task.
+									]]></xsd:documentation>
+									<xsd:appinfo>
+										<tool:annotation kind="ref">
+											<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
+										</tool:annotation>
+									</xsd:appinfo>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:complexContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="decision">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should query a decider to determine where execution should go next.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attribute name="decider" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>
+								The decider is a reference to a JobExecutionDecider that can produce a status to base
+								the next transition on.
+							</xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.batch.core.job.flow.JobExecutionDecider" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
 	</xsd:complexType>
 
 	<xsd:group name="jobListeners">
@@ -287,14 +285,12 @@
 	<xsd:complexType name="flowStepType">
 		<xsd:complexContent>
 			<xsd:extension base="nextType">
-				<xsd:sequence>
-					<xsd:choice minOccurs="0" maxOccurs="3">
-						<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
-						<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
-						<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
-					</xsd:choice>
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:element name="tasklet" type="taskletType"/>
+					<xsd:element name="transaction-attributes" type="transaction-attributesType"/>
+					<xsd:element name="listeners" type="stepListenersType"/>
 					<xsd:group ref="transitions"/>
-				</xsd:sequence>
+				</xsd:choice>
 				<xsd:attributeGroup ref="transactionManagerAttribute" />
 			</xsd:extension>
 		</xsd:complexContent>
@@ -592,104 +588,101 @@
 	</xsd:complexType>
 
 	<xsd:group name="transitions">
-		<xsd:sequence>
-			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:element name="next">
-					<xsd:annotation>
-						<xsd:documentation>
-							Defines a transition from this step to the
-							next one depending on the value of the exit
-							status.
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:attribute name="on" type="xsd:string" use="required">
-							<xsd:annotation>
-								<xsd:documentation>A pattern to match against the exit status
-									code. Use * and ? as wildcard characters. When a
-									step finishes the most
-									specific match will be chosen to select the next step. Hint:
-									always include a default
-									transition with on=&quot;*&quot;.</xsd:documentation>
-							</xsd:annotation></xsd:attribute>
-						<xsd:attribute name="to" type="xsd:string" use="required" >
-							<xsd:annotation>
-								<xsd:documentation>
-									The name of the step to go to next.  Must resolve to one of the other steps in this job.
-								</xsd:documentation>
-							</xsd:annotation>
-						</xsd:attribute>
-					</xsd:complexType>
-				</xsd:element>		
-				<xsd:element name="stop">
-					<xsd:annotation>
-						<xsd:documentation>
-							Declares job should be stop at this point and provides pointer where execution should continue when
-							the job is restarted.
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:attribute name="on" type="xsd:string" use="required" >
-							<xsd:annotation>
-								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
-								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
-							</xsd:annotation></xsd:attribute>
-						<xsd:attribute name="restart" type="xsd:string" use="required" >
-							<xsd:annotation>
-								<xsd:documentation>The name of the step to start on when the stopped job is restarted.  
-								Must resolve to one of the other steps in this job.</xsd:documentation>
-							</xsd:annotation>
-						</xsd:attribute>
-					</xsd:complexType>		
-				</xsd:element>		
-				<xsd:element name="end">
-					<xsd:annotation>
-						<xsd:documentation>
-							Declares job should end at this point, without the possibility of restart.  
-							BatchStatus will be COMPLETED.  ExitStatus is configurable.
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:attribute name="on" type="xsd:string" use="required" >
-							<xsd:annotation>
-								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
-								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
-							</xsd:annotation>
-						</xsd:attribute>
-						<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="COMPLETED">
-							<xsd:annotation>
-								<xsd:documentation>The exit code value to end on, defaults to COMPLETED.</xsd:documentation>
-							</xsd:annotation>
-						</xsd:attribute>
-					</xsd:complexType>		
-				</xsd:element>			
-				<xsd:element name="fail">
-					<xsd:annotation>
-						<xsd:documentation>
-							Declares job should fail at this point.  BatchStatus will be FAILED.  ExitStatus is configurable.
-						</xsd:documentation>
-					</xsd:annotation>
-					<xsd:complexType>
-						<xsd:attribute name="on" type="xsd:string" use="required" >
-							<xsd:annotation>
-								<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
-								When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
-							</xsd:annotation>
-						</xsd:attribute>
-						<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="FAILED">
-							<xsd:annotation>
-								<xsd:documentation>The exit code value to end on, defaults to FAILED.</xsd:documentation>
-							</xsd:annotation>
-						</xsd:attribute>
-					</xsd:complexType>		
-				</xsd:element>			
-			</xsd:choice>
-		</xsd:sequence>
+		<xsd:choice>
+			<xsd:element name="next">
+				<xsd:annotation>
+					<xsd:documentation>
+						Defines a transition from this step to the
+						next one depending on the value of the exit
+						status.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required">
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status
+								code. Use * and ? as wildcard characters. When a
+								step finishes the most
+								specific match will be chosen to select the next step. Hint:
+								always include a default
+								transition with on=&quot;*&quot;.</xsd:documentation>
+						</xsd:annotation></xsd:attribute>
+					<xsd:attribute name="to" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>
+								The name of the step to go to next.  Must resolve to one of the other steps in this job.
+							</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>
+			</xsd:element>		
+			<xsd:element name="stop">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should be stop at this point and provides pointer where execution should continue when
+						the job is restarted.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
+							When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
+						</xsd:annotation></xsd:attribute>
+					<xsd:attribute name="restart" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>The name of the step to start on when the stopped job is restarted.  
+							Must resolve to one of the other steps in this job.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>		
+			</xsd:element>		
+			<xsd:element name="end">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should end at this point, without the possibility of restart.  
+						BatchStatus will be COMPLETED.  ExitStatus is configurable.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
+							When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="COMPLETED">
+						<xsd:annotation>
+							<xsd:documentation>The exit code value to end on, defaults to COMPLETED.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>		
+			</xsd:element>			
+			<xsd:element name="fail">
+				<xsd:annotation>
+					<xsd:documentation>
+						Declares job should fail at this point.  BatchStatus will be FAILED.  ExitStatus is configurable.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:attribute name="on" type="xsd:string" use="required" >
+						<xsd:annotation>
+							<xsd:documentation>A pattern to match against the exit status code.  Use * and ? as wildcard characters. 
+							When a step finishes the most specific match will be chosen to select the next step.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attribute name="exit-code" use="optional" type="xsd:string" default="FAILED">
+						<xsd:annotation>
+							<xsd:documentation>The exit code value to end on, defaults to FAILED.</xsd:documentation>
+						</xsd:annotation>
+					</xsd:attribute>
+				</xsd:complexType>		
+			</xsd:element>			
+		</xsd:choice>
 	</xsd:group>
 		
 	<xsd:attributeGroup name="jobRepositoryAttribute">
-		<xsd:attribute name="job-repository" type="xsd:string"
-			default="jobRepository">
+		<xsd:attribute name="job-repository" type="xsd:string" default="jobRepository">
 			<xsd:annotation>
 				<xsd:documentation
 					source="java:org.springframework.batch.core.repository.JobRepository"><![CDATA[
@@ -708,8 +701,7 @@
 	</xsd:attributeGroup>
 
 	<xsd:attributeGroup name="transactionManagerAttribute">
-		<xsd:attribute name="transaction-manager" type="xsd:string"
-			default="transactionManager">
+		<xsd:attribute name="transaction-manager" type="xsd:string" default="transactionManager">
 			<xsd:annotation>
 				<xsd:documentation
 					source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[

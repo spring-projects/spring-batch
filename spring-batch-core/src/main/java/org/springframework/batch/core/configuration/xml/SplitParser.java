@@ -66,9 +66,6 @@ public class SplitParser {
 
 		String idAttribute = element.getAttribute("id");
 
-		@SuppressWarnings("unchecked")
-		List<Element> flowElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "flow");
-
 		BeanDefinitionBuilder stateBuilder = 
 			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.SplitState");
 
@@ -78,6 +75,13 @@ public class SplitParser {
             stateBuilder.addPropertyValue("taskExecutor", taskExecutorRef);
         }
 
+		@SuppressWarnings("unchecked")
+		List<Element> flowElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "flow");
+
+		if (flowElements.size() < 2) {
+			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);
+		}
+		
 		Collection<BeanDefinition> flows = new ArrayList<BeanDefinition>();
 		int i = 0;
 		for (Element nextElement : flowElements) {
