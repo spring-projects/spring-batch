@@ -57,6 +57,8 @@ import org.springframework.util.ClassUtils;
 public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 
 	private EntityManagerFactory entityManagerFactory;
+	
+	private EntityManager entityManager;
 
 	private final Map<String,Object> jpaPropertyMap = new HashMap<String,Object>();
 
@@ -95,17 +97,24 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	protected void doReadPage() {
-
-		EntityManager entityManager =
-				entityManagerFactory.createEntityManager(jpaPropertyMap);
+	protected void doOpen() throws Exception {
+		super.doOpen();
+		entityManager =
+			entityManagerFactory.createEntityManager(jpaPropertyMap);
 		if (entityManager == null) {
 			throw new DataAccessResourceFailureException("Unable to obtain an EntityManager");
 		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	protected void doReadPage() {
 
 		EntityTransaction tx = entityManager.getTransaction();
 		tx.begin();
+
+		entityManager.flush();
+		entityManager.clear();
 
 		Query query = entityManager.createQuery(queryString)
 				.setFirstResult(page * pageSize)
@@ -118,10 +127,7 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 		}
 
 		results = query.getResultList();
-
-		entityManager.flush();
-		entityManager.clear();
-
+		
 		tx.commit();
 	}
 
@@ -129,4 +135,10 @@ public class JpaPagingItemReader<T> extends AbstractPagingItemReader<T> {
 	protected void doJumpToPage(int itemIndex) {
 	}
 
+	@Override
+	protected void doClose() throws Exception {
+		entityManager.close();
+		super.doClose();
+	}
+	
 }
