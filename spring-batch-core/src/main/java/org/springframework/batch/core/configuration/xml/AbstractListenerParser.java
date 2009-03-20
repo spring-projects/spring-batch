@@ -59,7 +59,7 @@ public abstract class AbstractListenerParser {
 
 	private void checkListenerElementAttributes(ParserContext parserContext, Element element, String id,
 			String listenerRef, String className) {
-		if ((StringUtils.hasText(id) || StringUtils.hasText(className)) && StringUtils.hasText(listenerRef)) {
+		if (StringUtils.hasText(className) && StringUtils.hasText(listenerRef)) {
 			NamedNodeMap attributeNodes = element.getAttributes();
 			StringBuilder attributes = new StringBuilder();
 			for (int i = 0; i < attributeNodes.getLength(); i++) {
@@ -69,9 +69,8 @@ public abstract class AbstractListenerParser {
 				attributes.append(attributeNodes.item(i));
 			}
 			parserContext.getReaderContext().error(
-					"Both 'ref' and " + (StringUtils.hasText(id) ? "'id'" : "'class'")
-							+ " specified; use 'class' with an optional 'id' or just 'ref' for <"
-							+ element.getTagName() + "> element specified with attributes: " + attributes, element);
+					"Either 'ref' or 'class' may be specified, but not both; <" + element.getTagName()
+							+ "> element specified with attributes: " + attributes, element);
 		}
 	}
 
