@@ -254,11 +254,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				public Object recover(RetryContext context) throws Exception {
 
 					Exception le = (Exception) context.getLastThrowable();
-					if (outputs.size() > 1 && !rollbackClassifier.classify(le)) {
-						throw new RetryException("Invalid retry state during write caused by "
-								+ "exception that does not classify for rollback: ", le);
-					}
-
+					
 					boolean singleton = outputs.size() == 1;
 
 					if (singleton && !inputs.isBusy()) {
@@ -280,7 +276,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 					rollbackClassifier));
 
 		}
-		
+
 		callSkipListeners(inputs, outputs);
 
 	}
@@ -310,8 +306,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				throw new SkipListenerFailedException("Fatal exception in SkipListener.", ex, e);
 			}
 		}
-		
-		// Clear skips if we are possibly going to process this chunk again	
+
+		// Clear skips if we are possibly going to process this chunk again
 		outputs.clearSkips();
 		inputs.clearSkips();
 
@@ -348,8 +344,8 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		}
 	}
 
-	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs, ChunkMonitor chunkMonitor)
-			throws Exception {
+	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
+			ChunkMonitor chunkMonitor) throws Exception {
 
 		if (outputs.isEmpty()) {
 			inputs.setBusy(false);
@@ -362,22 +358,17 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 		List<O> items = Collections.singletonList(outputIterator.next());
 		try {
 			writeItems(items);
+			// If successful we are going to return and allow
+			// the driver to commit...
+			doAfterWrite(items);
+			contribution.incrementWriteCount(1);
 		}
 		catch (Exception e) {
 			checkSkipPolicy(inputIterator, outputIterator, e, contribution);
 			if (rollbackClassifier.classify(e)) {
 				throw e;
 			}
-			else {
-				throw new RetryException(
-						"Invalid retry state during recovery caused by exception that does not classify for rollback: ",
-						e);
-			}
 		}
-		// If successful we are going to return and allow
-		// the driver to commit...
-		doAfterWrite(items);
-		contribution.incrementWriteCount(1);
 		inputIterator.remove();
 		outputIterator.remove();
 		chunkMonitor.incrementOffset();

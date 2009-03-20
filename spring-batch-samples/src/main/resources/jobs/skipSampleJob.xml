@@ -37,7 +37,6 @@
 	</job>
 
 	<step id="secondPass" parent="t2">
-		<transaction-attributes/>
 		<tasklet writer="itemTrackingWriter">
 			<skippable-exception-classes merge="true">
 				java.lang.RuntimeException

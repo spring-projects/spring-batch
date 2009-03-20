@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -129,20 +128,22 @@ public abstract class AbstractStepParser {
 		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, "transaction-attributes");
 		if (txAttrElements.size() == 1) {
 			Element txAttrElement = txAttrElements.get(0);
-			String attributes = DomUtils.getTextValue(txAttrElement);
-			if (StringUtils.hasLength(attributes)) {
-				String[] attributesArray = StringUtils.tokenizeToStringArray(attributes, ",\n");
-				if (attributesArray.length > 0) {
-					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(Boolean.valueOf(txAttrElement.getAttribute("merge")));
-					managedList.addAll(Arrays.asList(attributesArray));
-					bd.getPropertyValues().addPropertyValue("transactionAttributeList", managedList);
-				}
+			String propagation = txAttrElement.getAttribute("propagation");
+			if (StringUtils.hasText(propagation)) {
+				bd.getPropertyValues().addPropertyValue("propagation", propagation);
+			}
+			String isolation = txAttrElement.getAttribute("isolation");
+			if (StringUtils.hasText(isolation)) {
+				bd.getPropertyValues().addPropertyValue("isolation", isolation);
+			}
+			String timeout = txAttrElement.getAttribute("timeout");
+			if (StringUtils.hasText(timeout)) {
+				bd.getPropertyValues().addPropertyValue("transactionTimeout", timeout);
 			}
 		}
 		else if (txAttrElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The 'transaction-attribute' element may not appear more than once in a single <step/>.",
+					"The 'transaction-attributes' element may not appear more than once in a single <step/>.",
 					stepElement);
 		}
 

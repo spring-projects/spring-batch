@@ -37,45 +37,43 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.interceptor.RollbackRuleAttribute;
-import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
-
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 
 /**
  * @author Thomas Risberg
- *
+ * 
  */
 @ContextConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 public class StepWithFaultTolerantProcessTaskJobParserTests {
-	
+
 	@Autowired
 	private Job job;
 
 	@Autowired
 	private JobRepository jobRepository;
-		
+
 	@Autowired
 	private TestReader reader;
-	
+
 	@Autowired
 	@Qualifier("listener")
 	private TestListener listener;
-	
+
 	@Autowired
 	private TestRetryListener retryListener;
-	
+
 	@Autowired
 	private TestProcessor processor;
-	
+
 	@Autowired
 	private TestWriter writer;
-	
+
 	@SuppressWarnings("unchecked")
 	@Autowired
 	private StepParserStepFactoryBean factory;
-	
+
 	@Before
 	public void setUp() {
 		MapJobRepositoryFactoryBean.clear();
@@ -92,27 +90,21 @@ public class StepWithFaultTolerantProcessTaskJobParserTests {
 		assertEquals("wrong retry-limit:", 3, rl);
 		Object cc = ReflectionTestUtils.getField(factory, "cacheCapacity");
 		assertEquals("wrong cache-capacity:", 100, cc);
-		Object txa = ReflectionTestUtils.getField(factory, "transactionAttribute");
-		assertEquals("wrong transaction-attribute:", TransactionDefinition.PROPAGATION_REQUIRED,
-				((RuleBasedTransactionAttribute)txa).getPropagationBehavior());
-		assertEquals("wrong transaction-attribute:", TransactionDefinition.ISOLATION_DEFAULT,
-				((RuleBasedTransactionAttribute)txa).getIsolationLevel());
-		assertEquals("wrong transaction-attribute:", 10,
-				((RuleBasedTransactionAttribute)txa).getTimeout());
-		RollbackRuleAttribute rra = 
-			(RollbackRuleAttribute) ((RuleBasedTransactionAttribute)txa).getRollbackRules().get(0);
-		assertEquals("wrong transaction-attribute:", 
-				"org.springframework.dao.DataIntegrityViolationException", rra.getExceptionName());
+		assertEquals("wrong transaction-attribute:", Propagation.REQUIRED, ReflectionTestUtils.getField(factory,
+				"propagation"));
+		assertEquals("wrong transaction-attribute:", Isolation.DEFAULT, ReflectionTestUtils.getField(factory,
+				"isolation"));
+		assertEquals("wrong transaction-attribute:", 10, ReflectionTestUtils.getField(factory, "transactionTimeout"));
 		Object txq = ReflectionTestUtils.getField(factory, "isReaderTransactionalQueue");
 		assertEquals("wrong is-reader-transactional-queue:", true, txq);
 		Object te = ReflectionTestUtils.getField(factory, "taskExecutor");
 		assertEquals("wrong task-executor:", ConcurrentTaskExecutor.class, te.getClass());
 		Object listeners = ReflectionTestUtils.getField(factory, "listeners");
-		assertEquals("wrong number of listeners:", 2, ((StepListener[])listeners).length);
+		assertEquals("wrong number of listeners:", 2, ((StepListener[]) listeners).length);
 		Object retryListeners = ReflectionTestUtils.getField(factory, "retryListeners");
-		assertEquals("wrong number of retry-listeners:", 2, ((RetryListener[])retryListeners).length);
+		assertEquals("wrong number of retry-listeners:", 2, ((RetryListener[]) retryListeners).length);
 		Object streams = ReflectionTestUtils.getField(factory, "streams");
-		assertEquals("wrong number of streams:", 1, ((ItemStream[])streams).length);
+		assertEquals("wrong number of streams:", 1, ((ItemStream[]) streams).length);
 		JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
 		job.execute(jobExecution);
 		assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());

@@ -43,6 +43,8 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.Assert;
@@ -76,7 +78,11 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 
 	private PlatformTransactionManager transactionManager;
 
-	private TransactionAttribute transactionAttribute;
+	private Propagation propagation = Propagation.REQUIRED;
+
+	private Isolation isolation = Isolation.DEFAULT;
+
+	private int transactionTimeout = DefaultTransactionAttribute.TIMEOUT_DEFAULT;
 
 	private JobRepository jobRepository;
 
@@ -153,6 +159,30 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	 */
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * The timeout for an individual transaction in the step.
+	 * 
+	 * @param transactionTimeout the transaction timeout to set, defaults to
+	 * infinite
+	 */
+	public void setTransactionTimeout(int transactionTimeout) {
+		this.transactionTimeout = transactionTimeout;
+	}
+
+	/**
+	 * @param propagation the propagation to set for business transactions
+	 */
+	public void setPropagation(Propagation propagation) {
+		this.propagation = propagation;
+	}
+
+	/**
+	 * @param isolation the isolation to set for business transactions
+	 */
+	public void setIsolation(Isolation isolation) {
+		this.isolation = isolation;
 	}
 
 	/**
@@ -268,27 +298,29 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Public setter for the {@link TransactionAttribute}.
-	 * @param transactionAttribute the {@link TransactionAttribute} to set
-	 */
-	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
-		this.transactionAttribute = transactionAttribute;
-	}
-
-	/**
-	 * Protected getter for the {@link TransactionAttribute} for subclasses
-	 * only.
+	 * Getter for the {@link TransactionAttribute} for subclasses only.
 	 * @return the transactionAttribute
 	 */
 	protected TransactionAttribute getTransactionAttribute() {
-		return transactionAttribute != null ? transactionAttribute : new DefaultTransactionAttribute() {
 
+		DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
+		attribute.setPropagationBehavior(propagation.value());
+		attribute.setIsolationLevel(isolation.value());
+		attribute.setTimeout(transactionTimeout);
+		return new DefaultTransactionAttribute(attribute) {
+
+			/**
+			 * Ignore the default behaviour and rollback on all exceptions that
+			 * bubble up to the tasklet level. The tasklet has to deal with the
+			 * rollback rules internally.
+			 */
 			@Override
 			public boolean rollbackOn(Throwable ex) {
 				return true;
 			}
 
 		};
+
 	}
 
 	/**
@@ -407,7 +439,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
-	
+
 	/**
 	 * Mkae the {@link TaskExecutor} available to subclasses
 	 * @return the taskExecutor to be used to execute chunks
@@ -438,9 +470,7 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		Assert.notNull(transactionManager, "TransactionManager must be provided");
 
 		step.setTransactionManager(transactionManager);
-		if (transactionAttribute != null) {
-			step.setTransactionAttribute(transactionAttribute);
-		}
+		step.setTransactionAttribute(getTransactionAttribute());
 		step.setJobRepository(jobRepository);
 		step.setStartLimit(startLimit);
 		step.setAllowStartIfComplete(allowStartIfComplete);
@@ -530,13 +560,14 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		}
 		return new SimpleCompletionPolicy(commitInterval);
 	}
-	
-	private void registerStreams(TaskletStep step, ItemReader<? extends T> itemReader, ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter) {
+
+	private void registerStreams(TaskletStep step, ItemReader<? extends T> itemReader,
+			ItemProcessor<? super T, ? extends S> itemProcessor, ItemWriter<? super S> itemWriter) {
 		for (Object itemHandler : new Object[] { itemReader, itemWriter, itemProcessor }) {
 			if (itemHandler instanceof ItemStream) {
-				registerStreams(step, new ItemStream[] {(ItemStream) itemHandler});
+				registerStreams(step, new ItemStream[] { (ItemStream) itemHandler });
 			}
-		}		
+		}
 	}
 
 	/**

@@ -21,8 +21,10 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import org.springframework.batch.classify.BinaryExceptionClassifier;
 import org.springframework.batch.classify.Classifier;
 import org.springframework.batch.core.JobInterruptedException;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
 import org.springframework.batch.core.step.skip.NonSkippableReadException;
 import org.springframework.batch.core.step.skip.SkipLimitExceededException;
@@ -68,6 +70,8 @@ import org.springframework.core.task.TaskExecutor;
 public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T, S> {
 
 	private Collection<Class<? extends Throwable>> skippableExceptionClasses = new HashSet<Class<? extends Throwable>>();
+
+	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
 	private Collection<Class<? extends Throwable>> fatalExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
@@ -187,11 +191,10 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Public setter for a limit that determines skip policy. If this value is
-	 * positive then an exception in chunk processing will cause the item to be
-	 * skipped and no exception propagated until the limit is reached. If it is
-	 * zero then all exceptions will be propagated from the chunk and cause the
-	 * step to abort.
+	 * A limit that determines skip policy. If this value is positive then an
+	 * exception in chunk processing will cause the item to be skipped and no
+	 * exception propagated until the limit is reached. If it is zero then all
+	 * exceptions will be propagated from the chunk and cause the step to abort.
 	 * 
 	 * @param skipLimit the value to set. Default is 0 (never skip).
 	 */
@@ -200,9 +203,12 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Public setter for exception classes that when raised won't crash the job
-	 * but will result in transaction rollback and the item which handling
-	 * caused the exception will be skipped.
+	 * Exception classes that when raised won't crash the job but will result in
+	 * the item which handling caused the exception being skipped. Any exception
+	 * which is marked for "no rollback" is also skippable, but not vice versa.
+	 * Remember to set the {@link #setSkipLimit(int) skip limit} as well.
+	 * <p/>
+	 * Defaults to all exceptions.
 	 * 
 	 * @param exceptionClasses defaults to <code>Exception</code>
 	 */
@@ -211,12 +217,38 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	}
 
 	/**
-	 * Public setter for exception classes that should cause immediate failure.
+	 * Exception classes that are candidates for no rollback. The {@link Step}
+	 * can not honour the no rollback hint in all circumstances, but any
+	 * exception on this list is counted as skippable, so even if there has to
+	 * be a rollback, then the step will not fail as long as the skip limit is
+	 * not breached.
+	 * <p/>
+	 * Defaults is empty.
+	 * 
+	 * @param noRollbackExceptionClasses the exception classes to set
+	 */
+	public void setNoRollbackExceptionClasses(Collection<Class<? extends Throwable>> noRollbackExceptionClasses) {
+		this.noRollbackExceptionClasses = noRollbackExceptionClasses;
+	}
+
+	/**
+	 * Exception classes that should cause immediate failure.
 	 * 
 	 * @param fatalExceptionClasses {@link Error} by default
 	 */
 	public void setFatalExceptionClasses(Collection<Class<? extends Throwable>> fatalExceptionClasses) {
 		this.fatalExceptionClasses = fatalExceptionClasses;
+	}
+
+	/**
+	 * Convenience method for subclasses to get an exception classifier based on
+	 * the provided transaction attributes.
+	 * 
+	 * @return an exception classifier: maps to true if an exception should
+	 * cause rollback
+	 */
+	protected Classifier<Throwable, Boolean> getRollbackClassifier() {
+		return new BinaryExceptionClassifier(noRollbackExceptionClasses, false);
 	}
 
 	@Override
@@ -254,7 +286,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			boolean concurrent = taskExecutor != null && !(taskExecutor instanceof SyncTaskExecutor);
 			if (!concurrent) {
 				chunkMonitor.setItemReader(getItemReader());
-			} else {
+			}
+			else {
 				logger.warn("Synchronous TaskExecutor detected (" + taskExecutor.getClass()
 						+ ") with ItemStream reader.  This is probably an error, "
 						+ "and may lead to incorrect restart data being stored.");
@@ -268,7 +301,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected SimpleChunkProvider<T> configureChunkProvider() {
 
-		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+		SkipPolicy readSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses(),
 				fatalExceptionClasses);
 		FaultTolerantChunkProvider<T> chunkProvider = new FaultTolerantChunkProvider<T>(getItemReader(),
 				getChunkOperations());
@@ -284,14 +317,8 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	@Override
 	protected SimpleChunkProcessor<T, S> configureChunkProcessor() {
 
-		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, skippableExceptionClasses,
+		SkipPolicy writeSkipPolicy = new LimitCheckingItemSkipPolicy(skipLimit, getSkippableExceptionClasses(),
 				fatalExceptionClasses);
-
-		Classifier<Throwable, Boolean> rollbackClassifier = new Classifier<Throwable, Boolean>() {
-			public Boolean classify(Throwable classifiable) {
-				return getTransactionAttribute().rollbackOn(classifiable);
-			}
-		};
 
 		BatchRetryTemplate batchRetryTemplate = configureRetry();
 
@@ -300,12 +327,21 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		chunkProcessor.setBuffering(!isReaderTransactionalQueue());
 		chunkProcessor.setWriteSkipPolicy(writeSkipPolicy);
 		chunkProcessor.setProcessSkipPolicy(writeSkipPolicy);
-		chunkProcessor.setRollbackClassifier(rollbackClassifier);
+		chunkProcessor.setRollbackClassifier(getRollbackClassifier());
 		chunkProcessor.setKeyGenerator(keyGenerator);
 		chunkProcessor.setChunkMonitor(chunkMonitor);
 
 		return chunkProcessor;
 
+	}
+
+	/**
+	 * @return
+	 */
+	private Collection<Class<? extends Throwable>> getSkippableExceptionClasses() {
+		HashSet<Class<? extends Throwable>> set = new HashSet<Class<? extends Throwable>>(skippableExceptionClasses);
+		set.addAll(noRollbackExceptionClasses);
+		return set;
 	}
 
 	/**

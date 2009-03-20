@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -42,7 +41,6 @@ import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
-import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.StringUtils;
 
 /**
@@ -55,8 +53,8 @@ public class FaultTolerantStepFactoryBeanTests {
 	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
 
 	@SuppressWarnings("unchecked")
-	private Collection<Class<? extends Throwable>> skippableExceptions = new HashSet<Class<? extends Throwable>>(Arrays
-			.<Class<? extends Throwable>> asList(SkippableException.class, SkippableRuntimeException.class));
+	private Collection<Class<? extends Throwable>> skippableExceptions = Arrays.<Class<? extends Throwable>> asList(
+			SkippableException.class, SkippableRuntimeException.class);
 
 	private SkipReaderStub reader = new SkipReaderStub();
 
@@ -250,33 +248,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expectedOutput, writer.written);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
-	}
-
-	/**
-	 * Check that rollback write exception does cause rollback when included on
-	 * transaction attributes as "no rollback for".
-	 */
-	@Test
-	public void testSkipWithoutRethrow() throws Exception {
-		factory.setTransactionAttribute(new DefaultTransactionAttribute() {
-			public boolean rollbackOn(Throwable ex) {
-				return !(ex instanceof SkippableRuntimeException);
-			};
-		});
-		Step step = (Step) factory.getObject();
-
-		step.execute(stepExecution);
-
-		assertEquals(1, stepExecution.getSkipCount());
-		assertEquals(1, stepExecution.getReadSkipCount());
-		assertEquals(0, stepExecution.getWriteSkipCount());
-
-		// one rollback for write exception
-		assertEquals(1, stepExecution.getRollbackCount());
-
-		assertEquals(4, stepExecution.getReadCount());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
@@ -547,51 +518,6 @@ public class FaultTolerantStepFactoryBeanTests {
 				.getName()));
 	}
 
-	/**
-	 * Scenario: Exception in processor that shouldn't cause rollback
-	 */
-	@Test
-	public void testProcessorNoRollback() throws Exception {
-		factory.setTransactionAttribute(new DefaultTransactionAttribute());
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,3")));
-		factory.setItemProcessor(processor);
-
-		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
-		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
-
-		Step step = (Step) factory.getObject();
-
-		processor.rollback = false;
-		step.execute(stepExecution);
-		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(0, stepExecution.getRollbackCount());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
-	}
-
-	/**
-	 * Scenario: Exception in processor that should cause rollback
-	 */
-	@Test
-	public void testProcessorRollback() throws Exception {
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,3")));
-		factory.setItemProcessor(processor);
-
-		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
-		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
-
-		Step step = (Step) factory.getObject();
-
-		processor.rollback = true;
-		step.execute(stepExecution);
-		assertEquals(2, stepExecution.getSkipCount());
-		assertEquals(2, stepExecution.getRollbackCount());
-		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
-				.getName()));
-	}
-
 	@Test
 	public void testReprocessingAfterWriterRollback() throws Exception {
 		factory.setItemProcessor(new ItemProcessor<String, String>() {
@@ -730,7 +656,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
 		private final Collection<String> failures;
 
-		private boolean rollback = false;
+		private boolean runtimeException = false;
 
 		public SkipProcessorStub(Collection<String> failures) {
 			this.failures = failures;
@@ -738,7 +664,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		public String process(String item) throws Exception {
 			if (failures.contains(item)) {
-				if (rollback) {
+				if (runtimeException) {
 					throw new SkippableRuntimeException("should cause rollback");
 				}
 				else {

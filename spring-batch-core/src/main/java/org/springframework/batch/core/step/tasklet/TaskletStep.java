@@ -260,7 +260,13 @@ public class TaskletStep extends AbstractStep {
 				try {
 
 					try {
-						result = tasklet.execute(contribution, chunkContext);
+						try {
+							result = tasklet.execute(contribution, chunkContext);
+						} catch (Exception e) {
+							if (transactionAttribute.rollbackOn(e)) {
+								throw e;
+							}
+						}
 						chunkListener.afterChunk();
 					}
 					finally {

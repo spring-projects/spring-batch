@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch" 
-	xmlns:beans="http://www.springframework.org/schema/beans" 
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
        		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -14,24 +11,18 @@
 
 	<job id="tradeJob">
 		<step id="step1" next="step2">
-			<tasklet reader="fileItemReader" 
-			         processor="validatingProcessor" 
-			         writer="tradeWriter" 
-			         commit-interval="1">
+			<tasklet reader="fileItemReader" processor="validatingProcessor" writer="tradeWriter" commit-interval="1">
 				<streams>
-					<stream ref="fileItemReader"/>
+					<stream ref="fileItemReader" />
 				</streams>
 			</tasklet>
-			<transaction-attributes>
-				PROPAGATION_REQUIRED
-				ISOLATION_READ_COMMITTED
-			</transaction-attributes>
+			<transaction-attributes isolation="READ_COMMITTED" />
 		</step>
 		<step id="step2" next="step3">
-			<tasklet reader="tradeSqlItemReader" writer="customerWriter" commit-interval="1"/>
+			<tasklet reader="tradeSqlItemReader" writer="customerWriter" commit-interval="1" />
 		</step>
 		<step id="step3">
-			<tasklet reader="customerSqlItemReader" writer="creditWriter" commit-interval="1"/>
+			<tasklet reader="customerSqlItemReader" writer="creditWriter" commit-interval="1" />
 		</step>
 	</job>
 
@@ -40,15 +31,15 @@
 	</beans:bean>
 
 	<beans:bean id="tradeWriter" class="org.springframework.batch.sample.domain.trade.internal.TradeWriter">
-		<beans:property name="dao" ref="tradeDao"/>
+		<beans:property name="dao" ref="tradeDao" />
 	</beans:bean>
-	
+
 	<beans:bean id="customerWriter" class="org.springframework.batch.sample.domain.trade.internal.CustomerUpdateWriter">
-		<beans:property name="dao" ref="customerDao"/>
+		<beans:property name="dao" ref="customerDao" />
 	</beans:bean>
-	
+
 	<beans:bean id="creditWriter" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditUpdateWriter">
-		<beans:property name="dao" ref="customerReportItemWriter"/>
+		<beans:property name="dao" ref="customerReportItemWriter" />
 	</beans:bean>
 
 	<beans:bean id="tradeSqlItemReader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
@@ -68,7 +59,7 @@
 	</beans:bean>
 
 	<beans:bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao"
-		  p:dataSource-ref="dataSource">
+		p:dataSource-ref="dataSource">
 		<beans:property name="incrementer">
 			<beans:bean parent="incrementerParent">
 				<beans:property name="incrementerName" value="TRADE_SEQ" />
@@ -77,12 +68,12 @@
 	</beans:bean>
 
 	<beans:bean id="customerDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcCustomerDebitDao"
-		  p:dataSource-ref="dataSource" />
+		p:dataSource-ref="dataSource" />
 
 	<beans:bean id="customerReportItemWriter" class="org.springframework.batch.sample.domain.trade.internal.FlatFileCustomerCreditDao">
 		<beans:property name="itemWriter">
 			<beans:bean class="org.springframework.batch.item.file.FlatFileItemWriter">
-				<beans:property name="resource" value="target/test-outputs/20070122.testStream.CustomerReportStep.TEMP.txt"/>
+				<beans:property name="resource" value="target/test-outputs/20070122.testStream.CustomerReportStep.TEMP.txt" />
 				<beans:property name="lineAggregator">
 					<beans:bean class="org.springframework.batch.item.file.transform.PassThroughLineAggregator" />
 				</beans:property>

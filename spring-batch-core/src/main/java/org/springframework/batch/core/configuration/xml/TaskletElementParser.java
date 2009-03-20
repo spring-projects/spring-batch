@@ -123,6 +123,8 @@ public class TaskletElementParser {
 
 		handleExceptionElement(element, parserContext, bd, "fatal-exception-classes", "fatalExceptionClasses");
 
+		handleExceptionElement(element, parserContext, bd, "no-rollback-exception-classes", "noRollbackExceptionClasses");
+
 		handleRetryListenersElement(element, bd, parserContext);
 
 		handleStreamsElement(element, bd, parserContext);

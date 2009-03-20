@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://www.springframework.org/schema/batch" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:tool="http://www.springframework.org/schema/tool"
-	targetNamespace="http://www.springframework.org/schema/batch" elementFormDefault="qualified" attributeFormDefault="unqualified"
-	version="2.0">
+	xmlns:tx="http://www.springframework.org/schema/tx" targetNamespace="http://www.springframework.org/schema/batch"
+	elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
+	<xsd:import namespace="http://www.springframework.org/schema/tx" />
 
 	<xsd:annotation>
 		<xsd:documentation><![CDATA[
@@ -24,7 +25,7 @@
 		</xsd:annotation>
 		<xsd:complexType>
 			<xsd:choice minOccurs="0" maxOccurs="unbounded">
-				<xsd:group ref="flowGroup"/>
+				<xsd:group ref="flowGroup" />
 				<xsd:element name="listeners">
 					<xsd:annotation>
 						<xsd:documentation><![CDATA[
@@ -148,12 +149,12 @@
 						</xsd:annotation>
 					</xsd:attribute>
 					<xsd:attributeGroup ref="transactionManagerAttribute" />
-					<xsd:attribute name="isolation-level-for-create" type="xsd:string">
+					<xsd:attribute name="isolation-level-for-create" default="SERIALIZABLE" type="isolationType">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
 							The isolation level to use for creation of job execution entities.
-							The default is ISOLATION_SERIALIZABLE, which prevents accidental 
-							concurrent execution of the same job (ISOLATION_REPEATABLE_READ 
+							The default is SERIALIZABLE, which prevents accidental 
+							concurrent execution of the same job (REPEATABLE_READ 
 							would work as well).
 							]]></xsd:documentation>
 						</xsd:annotation>
@@ -177,10 +178,12 @@
 				<xsd:annotation>
 					<xsd:documentation>
 						Defines a stage in job processing backed by a
-						Step. The id attribute must be specified.  The
-						step requires either a tasklet definition, a 
+						Step. The id attribute must be specified. The
+						step
+						requires either a tasklet definition, a
 						tasklet reference, a reference to a step defined
-						elsewhere, or a reference to a (possibly 
+						elsewhere, or a reference
+						to a (possibly
 						abstract) parent step.
 					</xsd:documentation>
 				</xsd:annotation>
@@ -218,10 +221,10 @@
 								</xsd:documentation>
 							</xsd:annotation>
 							<xsd:complexType>
-								<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded"/>
+								<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded" />
 							</xsd:complexType>
 						</xsd:element>
-						<xsd:group ref="transitions"/>
+						<xsd:group ref="transitions" />
 					</xsd:choice>
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attribute name="task-executor" type="xsd:string" use="optional">
@@ -236,7 +239,7 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attributeGroup ref="nextAttribute"/>
+					<xsd:attributeGroup ref="nextAttribute" />
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="decision">
@@ -246,13 +249,14 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:group ref="transitions" minOccurs="0" maxOccurs="unbounded" />
 					<xsd:attribute name="id" type="xsd:ID" use="required" />
 					<xsd:attribute name="decider" type="xsd:string" use="required">
 						<xsd:annotation>
 							<xsd:documentation>
 								The decider is a reference to a JobExecutionDecider that can produce a status to base
-								the next transition on.
+								the next
+								transition on.
 							</xsd:documentation>
 							<xsd:appinfo>
 								<tool:annotation kind="ref">
@@ -268,28 +272,73 @@
 
 	<xsd:complexType name="stepType">
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:group ref="stepElements"/>
+			<xsd:group ref="stepElements" />
 		</xsd:choice>
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
 	</xsd:complexType>
 
 	<xsd:complexType name="flowStepType">
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:group ref="stepElements"/>
-			<xsd:group ref="transitions"/>
+			<xsd:group ref="stepElements" />
+			<xsd:group ref="transitions" />
 		</xsd:choice>
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
-		<xsd:attributeGroup ref="nextAttribute"/>
+		<xsd:attributeGroup ref="nextAttribute" />
 	</xsd:complexType>
 
 	<xsd:group name="stepElements">
 		<xsd:choice>
-			<xsd:element name="tasklet" type="taskletType"/>
+			<xsd:element name="tasklet" type="taskletType" />
 			<xsd:element name="transaction-attributes" type="transaction-attributesType"/>
-			<xsd:element name="listeners" type="stepListenersType"/>
+			<xsd:element name="listeners" type="stepListenersType" />
 		</xsd:choice>
 	</xsd:group>
-	
+
+	<xsd:complexType name="transaction-attributesType">
+		<xsd:attribute name="propagation" default="REQUIRED">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.transaction.annotation.Propagation"><![CDATA[
+	The transaction propagation behavior.
+							]]></xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="REQUIRED" />
+					<xsd:enumeration value="SUPPORTS" />
+					<xsd:enumeration value="MANDATORY" />
+					<xsd:enumeration value="REQUIRES_NEW" />
+					<xsd:enumeration value="NOT_SUPPORTED" />
+					<xsd:enumeration value="NEVER" />
+					<xsd:enumeration value="NESTED" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="isolation" default="DEFAULT" type="isolationType">
+			<xsd:annotation>
+				<xsd:documentation source="java:org.springframework.transaction.annotation.Isolation"><![CDATA[
+	The transaction isolation level.
+							]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="timeout" type="xsd:integer" default="-1">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+	The transaction timeout value (in seconds).
+							]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:simpleType name="isolationType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DEFAULT" />
+			<xsd:enumeration value="READ_UNCOMMITTED" />
+			<xsd:enumeration value="READ_COMMITTED" />
+			<xsd:enumeration value="REPEATABLE_READ" />
+			<xsd:enumeration value="SERIALIZABLE" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
 	<xsd:complexType name="taskletType">
 		<xsd:all>
 			<xsd:element name="retry-listeners" minOccurs="0" maxOccurs="1">
@@ -339,6 +388,23 @@
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					List of exception classes that are skippable.  
+					Separate each attribute with a comma or a newline.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of exception classes that should not cause rollback if possible.  This list
+					is only a hint and has to be interpreted by the step to make sense in context.  
 					Separate each attribute with a comma or a newline.
 					]]>
 					</xsd:documentation>
@@ -482,21 +548,6 @@
 		</xsd:attribute>
 	</xsd:complexType>
 
-	<xsd:complexType name="transaction-attributesType">
-		<xsd:annotation>
-			<xsd:documentation><![CDATA[
-				The transaction attributes to be used for the transaction used 
-				during the execution of the task within the step.  Separate 
-				each attribute with a comma or a newline.
-			]]></xsd:documentation>
-		</xsd:annotation>
-		<xsd:simpleContent>
-			<xsd:extension base="xsd:string">
-				<xsd:attributeGroup ref="mergeAttribute" />
-			</xsd:extension>
-		</xsd:simpleContent>
-	</xsd:complexType>
-
 	<xsd:attributeGroup name="nextAttribute">
 		<xsd:attribute name="next" type="xsd:string" use="optional">
 			<xsd:annotation>
@@ -513,9 +564,10 @@
 		<xsd:attribute name="ref" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation>
-					A reference to a listener, a POJO with a 
+					A reference to a listener, a POJO with a
 					listener-annotated method, or a POJO with
-					a method referenced by a *-method attribute.
+					a method
+					referenced by a *-method attribute.
 				</xsd:documentation>
 				<xsd:appinfo>
 					<tool:annotation kind="ref" />

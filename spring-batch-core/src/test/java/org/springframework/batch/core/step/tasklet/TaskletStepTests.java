@@ -35,6 +35,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.job.JobSupport;
@@ -45,6 +46,7 @@ import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.JobRepositorySupport;
 import org.springframework.batch.core.step.StepInterruptionPolicy;
 import org.springframework.batch.item.ExecutionContext;
@@ -54,12 +56,14 @@ import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.policy.DefaultResultCompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 
 public class TaskletStepTests {
@@ -780,6 +784,30 @@ public class TaskletStepTests {
 		step.setStepExecutionListeners(new StepExecutionListener[] { listener });
 		StepExecution stepExecution = new StepExecution(step.getName(), new JobExecution(jobInstance));
 
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+	}
+
+	@Test
+	public void testNoRollbackFor() throws Exception {
+
+		step.setTasklet(new Tasklet() {
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				throw new RuntimeException("Bar");
+			}
+		});
+
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
+
+		DefaultTransactionAttribute transactionAttribute = new DefaultTransactionAttribute() {
+		@Override
+			public boolean rollbackOn(Throwable ex) {
+				return false;
+			}
+		};
+		step.setTransactionAttribute(transactionAttribute);
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 

@@ -19,8 +19,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.util.StringUtils;
-
 import org.w3c.dom.Element;
 
 /**
@@ -56,7 +56,7 @@ public class JobRepositoryParser extends AbstractSingleBeanDefinitionParser {
         RuntimeBeanReference tx = new RuntimeBeanReference(transactionManager);
         builder.addPropertyValue("transactionManager", tx);
         if (StringUtils.hasText(isolationLevelForCreate)) {
-            builder.addPropertyValue("isolationLevelForCreate", isolationLevelForCreate);
+            builder.addPropertyValue("isolationLevelForCreate", DefaultTransactionDefinition.PREFIX_ISOLATION+isolationLevelForCreate);
         }
         if (StringUtils.hasText(tablePrefix)) {
             builder.addPropertyValue("tablePrefix", tablePrefix);

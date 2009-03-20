@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.configuration.xml;
 
-import java.beans.PropertyEditor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -41,10 +40,10 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.interceptor.TransactionAttribute;
-import org.springframework.transaction.interceptor.TransactionAttributeEditor;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create
@@ -65,39 +64,64 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	// Step Attributes
 	//
 	private String name;
+
 	private Boolean allowStartIfComplete;
+
 	private JobRepository jobRepository;
+
 	private Integer startLimit;
+
 	private Tasklet tasklet;
+
 	private PlatformTransactionManager transactionManager;
 
 	//
 	// Step Elements
 	//
 	private StepListener[] listeners;
-	private TransactionAttribute transactionAttribute;
+
+	private int transactionTimeout = DefaultTransactionAttribute.TIMEOUT_DEFAULT;
+
+	private Propagation propagation;
+
+	private Isolation isolation;
 
 	//
 	// Tasklet Attributes
 	//
 	private Integer cacheCapacity;
+
 	private CompletionPolicy chunkCompletionPolicy;
+
 	private Integer commitInterval;
+
 	private Boolean isReaderTransactionalQueue;
+
 	private Integer retryLimit;
+
 	private Integer skipLimit;
+
 	private TaskExecutor taskExecutor;
+
 	private ItemReader<? extends I> itemReader;
+
 	private ItemProcessor<? super I, ? extends O> itemProcessor;
+
 	private ItemWriter<? super O> itemWriter;
 
 	//
 	// Tasklet Elements
 	//
 	private RetryListener[] retryListeners;
+
 	private Collection<Class<? extends Throwable>> skippableExceptionClasses;
+
 	private Collection<Class<? extends Throwable>> retryableExceptionClasses;
+
 	private Collection<Class<? extends Throwable>> fatalExceptionClasses;
+
+	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses;
+
 	private ItemStream[] streams;
 
 	//
@@ -157,8 +181,14 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (listeners != null) {
 			fb.setListeners(listeners);
 		}
-		if (transactionAttribute != null) {
-			fb.setTransactionAttribute(transactionAttribute);
+		if (transactionTimeout >= 0) {
+			fb.setTransactionTimeout(transactionTimeout);
+		}
+		if (propagation != null) {
+			fb.setPropagation(propagation);
+		}
+		if (isolation != null) {
+			fb.setIsolation(isolation);
 		}
 
 		if (chunkCompletionPolicy != null) {
@@ -211,6 +241,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		if (fatalExceptionClasses != null) {
 			fb.setFatalExceptionClasses(fatalExceptionClasses);
 		}
+		if (noRollbackExceptionClasses != null) {
+			fb.setNoRollbackExceptionClasses(noRollbackExceptionClasses);
+		}
 	}
 
 	private void configureTaskletStep(TaskletStep ts) {
@@ -240,8 +273,24 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			}
 			ts.setStepExecutionListeners((StepExecutionListener[]) newListeners);
 		}
-		if (transactionAttribute != null) {
-			ts.setTransactionAttribute(transactionAttribute);
+		if (transactionTimeout >= 0 || propagation != null || isolation != null) {
+			DefaultTransactionAttribute attribute = new DefaultTransactionAttribute();
+			attribute.setPropagationBehavior(propagation.value());
+			attribute.setIsolationLevel(isolation.value());
+			attribute.setTimeout(transactionTimeout);
+			ts.setTransactionAttribute(new DefaultTransactionAttribute(attribute) {
+
+				/**
+				 * Ignore the default behaviour and rollback on all exceptions that
+				 * bubble up to the tasklet level. The tasklet has to deal with the
+				 * rollback rules internally.
+				 */
+				@Override
+				public boolean rollbackOn(Throwable ex) {
+					return true;
+				}
+
+			});
 		}
 	}
 
@@ -250,6 +299,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 				new PropertyNamePair(retryListeners, "retry-listeners"),
 				new PropertyNamePair(skippableExceptionClasses, "skippable-exception-classes"),
 				new PropertyNamePair(retryableExceptionClasses, "retryable-exception-classes"),
+				new PropertyNamePair(noRollbackExceptionClasses, "no-rollback-exception-classes"),
 				new PropertyNamePair(fatalExceptionClasses, "fatal-exception-classes") };
 
 		List<String> wrong = new ArrayList<String>();
@@ -268,6 +318,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private static class PropertyNamePair {
 		private Object property;
+
 		private String name;
 
 		public PropertyNamePair(Object property, String name) {
@@ -383,24 +434,24 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Set the transaction attribute with a list of all the individual
-	 * attributes.
-	 * 
-	 * @param transactionAttributeList
+	 * @param transactionTimeout the transactionTimeout to set
 	 */
-	public void setTransactionAttributeList(List<String> transactionAttributeList) {
-		String[] stringArray = transactionAttributeList.toArray(new String[0]);
-		String attributeString = StringUtils.arrayToCommaDelimitedString(stringArray);
-		PropertyEditor editor = new TransactionAttributeEditor();
-		editor.setAsText(attributeString);
-		this.setTransactionAttribute((TransactionAttribute) editor.getValue());
+	public void setTransactionTimeout(int transactionTimeout) {
+		this.transactionTimeout = transactionTimeout;
 	}
 
 	/**
-	 * @param transactionAttribute the {@link TransactionAttribute} to set
+	 * @param isolation the isolation to set
 	 */
-	public void setTransactionAttribute(TransactionAttribute transactionAttribute) {
-		this.transactionAttribute = transactionAttribute;
+	public void setIsolation(Isolation isolation) {
+		this.isolation = isolation;
+	}
+
+	/**
+	 * @param propagation the propagation to set
+	 */
+	public void setPropagation(Propagation propagation) {
+		this.propagation = propagation;
 	}
 
 	// =========================================================
@@ -419,7 +470,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * {@link MapRetryContextCache}.<br/>
 	 * 
 	 * @param cacheCapacity the cache capacity to set (greater than 0 else
-	 *            ignored)
+	 * ignored)
 	 */
 	public void setCacheCapacity(int cacheCapacity) {
 		this.cacheCapacity = cacheCapacity;
@@ -544,6 +595,14 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setRetryableExceptionClasses(Collection<Class<? extends Throwable>> retryableExceptionClasses) {
 		this.retryableExceptionClasses = retryableExceptionClasses;
+	}
+	
+	/**
+	 * Exception classes that may not cause a rollback if encountered in the right place.
+	 * @param noRollbackExceptionClasses the noRollbackExceptionClasses to set
+	 */
+	public void setNoRollbackExceptionClasses(Collection<Class<? extends Throwable>> noRollbackExceptionClasses) {
+		this.noRollbackExceptionClasses = noRollbackExceptionClasses;
 	}
 
 	/**

@@ -22,11 +22,11 @@
 				<skippable-exception-classes>
 					org.springframework.dao.DataIntegrityViolationException,
 				</skippable-exception-classes>
+				<no-rollback-exception-classes>
+					org.springframework.dao.DataIntegrityViolationException
+				</no-rollback-exception-classes>
 			</tasklet>
-			<transaction-attributes>
-				PROPAGATION_REQUIRED, ISOLATION_DEFAULT, timeout_10,
-				-org.springframework.dao.DataIntegrityViolationException			
-			</transaction-attributes>
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10"/>
 			<listeners>
 				<listener ref="listener"/>
 			</listeners>

@@ -38,8 +38,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.interceptor.RollbackRuleAttribute;
-import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
+import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 /**
  * @author Thomas Risberg
@@ -53,7 +52,8 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserTaskletAttributesTests-context.xml");
 		Map<String, Object> beans = ctx.getBeansOfType(StepParserStepFactoryBean.class);
 		String factoryName = (String) beans.keySet().toArray()[0];
-		StepParserStepFactoryBean<Object, Object> factory = (StepParserStepFactoryBean<Object, Object>) beans.get(factoryName);
+		StepParserStepFactoryBean<Object, Object> factory = (StepParserStepFactoryBean<Object, Object>) beans
+				.get(factoryName);
 		TaskletStep bean = (TaskletStep) factory.getObject();
 		assertEquals("wrong start-limit:", 25, bean.getStartLimit());
 	}
@@ -127,7 +127,8 @@ public class StepParserTests {
 		try {
 			new XmlBeanFactory(new ClassPathResource(contextLocation));
 			fail("Context should not load!");
-		} catch (BeanDefinitionParsingException e) {
+		}
+		catch (BeanDefinitionParsingException e) {
 			assertTrue(e.getMessage().contains("'ref' and 'class'"));
 		}
 	}
@@ -162,43 +163,35 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
 
 		// On Inline - No Merge
-		validateTransactionAttributesInherited("s1", false, ctx);
+		validateTransactionAttributesInherited("s1", ctx);
 
 		// On Standalone - No Merge
-		validateTransactionAttributesInherited("s2", false, ctx);
+		validateTransactionAttributesInherited("s2", ctx);
 
 		// On Inline With Tasklet Ref - No Merge
-		validateTransactionAttributesInherited("s3", false, ctx);
+		validateTransactionAttributesInherited("s3", ctx);
 
 		// On Standalone With Tasklet Ref - No Merge
-		validateTransactionAttributesInherited("s4", false, ctx);
+		validateTransactionAttributesInherited("s4", ctx);
 
 		// On Inline
-		validateTransactionAttributesInherited("s5", true, ctx);
+		validateTransactionAttributesInherited("s5", ctx);
 
 		// On Standalone
-		validateTransactionAttributesInherited("s6", true, ctx);
+		validateTransactionAttributesInherited("s6", ctx);
 
 		// On Inline With Tasklet Ref
-		validateTransactionAttributesInherited("s7", true, ctx);
+		validateTransactionAttributesInherited("s7", ctx);
 
 		// On Standalone With Tasklet Ref
-		validateTransactionAttributesInherited("s8", true, ctx);
+		validateTransactionAttributesInherited("s8", ctx);
 	}
 
-	private void validateTransactionAttributesInherited(String stepName, boolean inherited, ApplicationContext ctx) {
-		RuleBasedTransactionAttribute txa = getTransactionAttribute(ctx, stepName);
+	private void validateTransactionAttributesInherited(String stepName, ApplicationContext ctx) {
+		DefaultTransactionAttribute txa = getTransactionAttribute(ctx, stepName);
 		assertEquals(TransactionDefinition.PROPAGATION_REQUIRED, txa.getPropagationBehavior());
 		assertEquals(TransactionDefinition.ISOLATION_DEFAULT, txa.getIsolationLevel());
-		if (inherited) {
-			assertEquals(10, txa.getTimeout());
-			RollbackRuleAttribute rra = (RollbackRuleAttribute) txa.getRollbackRules().get(0);
-			assertEquals("org.springframework.dao.DataIntegrityViolationException", rra.getExceptionName());
-		}
-		else {
-			assertTrue(10 != txa.getTimeout());
-			assertTrue(txa.getRollbackRules().isEmpty());
-		}
+		assertEquals(-1, txa.getTimeout());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -224,7 +217,7 @@ public class StepParserTests {
 	}
 
 	@SuppressWarnings("unchecked")
-	private RuleBasedTransactionAttribute getTransactionAttribute(ApplicationContext ctx, String stepName) {
+	private DefaultTransactionAttribute getTransactionAttribute(ApplicationContext ctx, String stepName) {
 		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Step step = (Step) ctx.getBean(stepName);
@@ -233,7 +226,7 @@ public class StepParserTests {
 		}
 		assertTrue(step instanceof TaskletStep);
 		Object transactionAttribute = ReflectionTestUtils.getField(step, "transactionAttribute");
-		RuleBasedTransactionAttribute txa = (RuleBasedTransactionAttribute) transactionAttribute;
+		DefaultTransactionAttribute txa = (DefaultTransactionAttribute) transactionAttribute;
 		return txa;
 	}
 

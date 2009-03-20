@@ -34,6 +34,8 @@ import org.springframework.batch.retry.listener.RetryListenerSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 
 /**
  * @author Dan Garrette
@@ -65,7 +67,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test
-	public void testTaskletStep_All() throws Exception {
+	public void testTaskletStepAll() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -74,7 +76,9 @@ public class StepParserStepFactoryBeanTests {
 		fb.setTasklet(new DummyTasklet());
 		fb.setTransactionManager(new ResourcelessTransactionManager());
 		fb.setListeners(new StepExecutionListenerSupport[] { new StepExecutionListenerSupport() });
-		fb.setTransactionAttributeList(new ArrayList<String>());
+		fb.setIsolation(Isolation.DEFAULT);
+		fb.setTransactionTimeout(-1);
+		fb.setPropagation(Propagation.REQUIRED);
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
@@ -82,7 +86,7 @@ public class StepParserStepFactoryBeanTests {
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testSimpleStep_All() throws Exception {
+	public void testSimpleStepAll() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
@@ -90,7 +94,9 @@ public class StepParserStepFactoryBeanTests {
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
 		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
-		fb.setTransactionAttributeList(new ArrayList<String>());
+		fb.setIsolation(Isolation.DEFAULT);
+		fb.setTransactionTimeout(-1);
+		fb.setPropagation(Propagation.REQUIRED);
 		fb.setChunkCompletionPolicy(new DummyCompletionPolicy());
 		fb.setCommitInterval(5);
 		fb.setTaskExecutor(new SyncTaskExecutor());
@@ -113,7 +119,9 @@ public class StepParserStepFactoryBeanTests {
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
 		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
-		fb.setTransactionAttributeList(new ArrayList<String>());
+		fb.setIsolation(Isolation.DEFAULT);
+		fb.setTransactionTimeout(-1);
+		fb.setPropagation(Propagation.REQUIRED);
 		fb.setChunkCompletionPolicy(new DummyCompletionPolicy());
 		fb.setCommitInterval(5);
 		fb.setTaskExecutor(new SyncTaskExecutor());
@@ -145,7 +153,9 @@ public class StepParserStepFactoryBeanTests {
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
 		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
-		fb.setTransactionAttributeList(new ArrayList<String>());
+		fb.setIsolation(Isolation.DEFAULT);
+		fb.setTransactionTimeout(-1);
+		fb.setPropagation(Propagation.REQUIRED);
 		fb.setChunkCompletionPolicy(new DummyCompletionPolicy());
 		fb.setTaskExecutor(new SyncTaskExecutor());
 		fb.setItemReader(new DummyItemReader());
@@ -169,7 +179,6 @@ public class StepParserStepFactoryBeanTests {
 		fb.setStartLimit(5);
 		fb.setTransactionManager(new ResourcelessTransactionManager());
 		fb.setListeners(new StepListener[] { new StepExecutionListenerSupport() });
-		fb.setTransactionAttributeList(new ArrayList<String>());
 		fb.setChunkCompletionPolicy(new DummyCompletionPolicy());
 		fb.setTaskExecutor(new SyncTaskExecutor());
 		fb.setItemReader(new DummyItemReader());

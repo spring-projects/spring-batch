@@ -40,18 +40,19 @@ import org.springframework.batch.item.file.FlatFileParseException;
  * Furthermore, it is also likely that you only want to skip certain exceptions.
  * {@link FlatFileParseException} is a good example of an exception you will
  * likely want to skip, but a {@link FileNotFoundException} should cause
- * immediate termination of the {@link Step}. Because it would be impossible
- * for a general purpose policy to determine all the types of exceptions that
- * should be skipped from those that shouldn't, two lists must be passed in,
- * with all of the exceptions that are 'fatal' and 'skippable'. The two lists
- * are not enforced to be exclusive, they are prioritized instead - exceptions
- * that are fatal will never be skipped, regardless whether the exception can
- * also be classified as skippable.
+ * immediate termination of the {@link Step}. Because it would be impossible for
+ * a general purpose policy to determine all the types of exceptions that should
+ * be skipped from those that shouldn't, two lists are passed in, with all
+ * of the exceptions that are 'fatal' and 'skippable'. The two lists are not
+ * enforced to be exclusive, they are prioritized instead - exceptions that are
+ * fatal will never be skipped, regardless whether the exception can also be
+ * classified as skippable.
  * </p>
  * 
  * @author Ben Hale
  * @author Lucas Ward
  * @author Robert Kasanicky
+ * @author Dave Syer
  */
 public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 
@@ -81,9 +82,24 @@ public class LimitCheckingItemSkipPolicy implements SkipPolicy {
 	 */
 	public LimitCheckingItemSkipPolicy(int skipLimit, Collection<Class<? extends Throwable>> skippableExceptions,
 			Collection<Class<? extends Throwable>> fatalExceptions) {
+		this(skipLimit, new BinaryExceptionClassifier(skippableExceptions), new BinaryExceptionClassifier(
+				fatalExceptions));
+	}
+
+	/**
+	 * 
+	 * @param skipLimit the number of skippable exceptions that are allowed to
+	 * be skipped
+	 * @param skippableExceptionClassifier exception classifier for those that
+	 * can be skipped (non-critical)
+	 * @param fatalExceptionClassifier exception classifier for classes that
+	 * should never be skipped
+	 */
+	public LimitCheckingItemSkipPolicy(int skipLimit, Classifier<Throwable, Boolean> skippableExceptionClassifier,
+			Classifier<Throwable, Boolean> fatalExceptionClassifier) {
 		this.skipLimit = skipLimit;
-		skippableExceptionClassifier = new BinaryExceptionClassifier(skippableExceptions);
-		fatalExceptionClassifier = new BinaryExceptionClassifier(fatalExceptions);
+		this.skippableExceptionClassifier = skippableExceptionClassifier;
+		this.fatalExceptionClassifier = fatalExceptionClassifier;
 	}
 
 	/**
