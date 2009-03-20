@@ -52,7 +52,7 @@ Spring Batch Downloads
 </dependency>
 +---------------
 
-  With full releases there are also traditional "spring-*" artifacts deployed on the Maven central repo, and also in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}:
+  With full releases there are also traditional "spring-*" artifacts deployed on the Maven central repo.  Full releases in this format also go in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}:
 
 +---------------
 <repository>
@@ -106,7 +106,7 @@ Spring Batch Downloads
 </dependency>
 +---------------
 
-  Milestones are also published in the older s3 repository and in Maven central repo.  You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}S3 repository}} with a web browser.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
+  Milestones are also published in the older s3 repository with Maven Central format dependencies.  You can browse the {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}S3 repository}} with a web browser.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
 +---------------
 <repository>
