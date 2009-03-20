@@ -6,13 +6,14 @@
   <version>2.0.0.CI-SNAPSHOT</version>
   <name>    Spring Batch Parent
   </name>
+  <url>http://static.springframework.org/spring-batch</url>
   <description>    Spring Batch parent project.  Defines dependencies and common configuration for the 		build process.
   </description>
   <packaging>pom</packaging>
   <properties>
     <maven.test.failure.ignore>true</maven.test.failure.ignore>
     <spring.framework.version>2.5.6</spring.framework.version>
-    <bundlor.version>1.0.0.BUILD-SNAPSHOT</bundlor.version>
+    <bundlor.version>1.0.0.M1A</bundlor.version>
   </properties>
   <profiles>
     <profile>
@@ -27,6 +28,53 @@
         <maven.test.skip>true</maven.test.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
       </properties>
+    </profile>
+    <profile>
+      <id>staging</id>
+      <distributionManagement>
+        <site>
+          <id>staging</id>
+          <url>file:///${user.dir}/target/staging</url>
+        </site>
+        <repository>
+          <id>staging</id>
+          <url>file:///${user.dir}/target/staging</url>
+        </repository>
+        <snapshotRepository>
+          <id>staging</id>
+          <url>file:///${user.dir}/target/staging</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>javadoc</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>snapshots</id>
@@ -49,7 +97,7 @@
           <plugins>
             <plugin>
               <artifactId>maven-site-plugin</artifactId>
-              <version>2.0-beta-7-SNAPSHOT</version>
+              <version>2.0-beta-8-SNAPSHOT</version>
             </plugin>
           </plugins>
         </pluginManagement>
@@ -64,10 +112,6 @@
           <artifactId>com.springsource.bundlor.maven</artifactId>
           <version>${bundlor.version}</version>
           <inherited>true</inherited>
-          <configuration>
-            <manifestTemplatePath>${project.basedir}/template.mf</manifestTemplatePath>
-            <outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
-          </configuration>
           <executions>
             <execution>
               <id>bundlor-transform</id>
@@ -130,6 +174,39 @@
       </plugin>
     </plugins>
   </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.1</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <quiet>true</quiet>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -173,9 +250,9 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>javax.xml.stream</groupId>
-        <artifactId>javax.xml.stream</artifactId>
-        <version>1.0.1</version>
+        <groupId>stax</groupId>
+        <artifactId>stax</artifactId>
+        <version>1.2.0</version>
         <optional>true</optional>
       </dependency>
       <dependency>
@@ -406,7 +483,36 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  <repositories/>
+  <distributionManagement>
+    <downloadUrl>http://www.springframework.org/download</downloadUrl>
+    <site>
+      <id>static.springframework.org</id>
+      <url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
+    </site>
+    <repository>
+      <id>spring-milestone</id>
+      <name>        Spring Milestone Repository
+      </name>
+      <url>s3://repository.springsource.com/maven/bundles/milestone</url>
+    </repository>
+    <snapshotRepository>
+      <id>spring-snapshot</id>
+      <name>        Spring Snapshot Repository
+      </name>
+      <url>s3://repository.springsource.com/maven/bundles/snapshot</url>
+    </snapshotRepository>
+  </distributionManagement>
+  <repositories>
+    <repository>
+      <id>objectstyle</id>
+      <name>        ObjectStyle.org Repository
+      </name>
+      <url>http://objectstyle.org/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
   <pluginRepositories>
     <pluginRepository>
       <id>com.springsource.repository.bundles.milestone</id>

@@ -12,9 +12,6 @@
     <version>2.0.0.CI-SNAPSHOT</version>
     <relativePath>../spring-batch-parent</relativePath>
   </parent>
-  <properties>
-    <bundle.symbolic.name>${pom.groupId}.infrastructure</bundle.symbolic.name>
-  </properties>
   <profiles>
     <profile>
       <id>tiger</id>
@@ -179,6 +176,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>emma-maven-plugin</artifactId>
+        <version>1.0-alpha-1</version>
       </plugin>
     </plugins>
   </reporting>

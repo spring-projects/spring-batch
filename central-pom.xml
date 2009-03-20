@@ -15,7 +15,7 @@
     <module>spring-batch-core</module>
     <module>spring-batch-test</module>
   </modules>
-  <url>http://www.springframework.org/spring-batch</url>
+  <url>http://static.springframework.org/spring-batch</url>
   <organization>
     <name>SpringSource</name>
     <url>http://www.springsource.com</url>
@@ -67,13 +67,6 @@
       </modules>
       <build>
         <plugins>
-          <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-          </plugin>
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <inherited>false</inherited>
@@ -298,7 +291,7 @@
           <plugins>
             <plugin>
               <artifactId>maven-site-plugin</artifactId>
-              <version>2.0-beta-7-SNAPSHOT</version>
+              <version>2.0-beta-8-SNAPSHOT</version>
             </plugin>
           </plugins>
         </pluginManagement>
@@ -399,62 +392,6 @@
           </executions>
         </plugin>
         <plugin>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>javadoc</id>
-              <phase>package</phase>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-            <execution>
-              <id>repost</id>
-              <phase>site</phase>
-              <goals>
-                <goal>javadoc</goal>
-              </goals>
-            </execution>
-          </executions>
-          <configuration>
-            <links>
-              <link>http://java.sun.com/j2ee/1.4/docs/api</link>
-              <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-              <link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
-              <link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
-              <link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
-              <link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
-              <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
-              <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
-              <link>http://junit.sourceforge.net/javadoc/</link>
-              <link>http://logging.apache.org/log4j/docs/api/</link>
-              <link>http://jakarta.apache.org/regexp/apidocs/</link>
-              <link>http://jakarta.apache.org/velocity/api/</link>
-              <link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
-              <link>http://static.springframework.org/spring-batch/apidocs/</link>
-              <link>http://static.springframework.org/spring-ws/site/apidocs/</link>
-            </links>
-            <header>              &lt;!-- Begin Google Analytics code --&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var gaJsHost = ((&quot;https:&quot; == document.location.protocol) ? &quot;https://ssl.&quot; : &quot;http://www.&quot;);		document.write(unescape(&quot;%3Cscript src='&quot; + gaJsHost + &quot;google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E&quot;));	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var pageTracker = _gat._getTracker(&quot;UA-2728886-3&quot;);		pageTracker._setDomainName(&quot;none&quot;);		pageTracker._setAllowLinker(true);		pageTracker._trackPageview();	&lt;/script&gt;	&lt;!-- End Google Analytics code --&gt;
-            </header>
-            <bottom>              &lt;!-- Begin LoopFuse code --&gt;	&lt;script src=&quot;http://loopfuse.net/webrecorder/js/listen.js&quot; type=&quot;text/javascript&quot;&gt;	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt; 		_lf_cid = &quot;LF_48be82fa&quot;;		_lf_remora();	&lt;/script&gt;	&lt;!-- End LoopFuse code --&gt;
-            </bottom>
-            <aggregate>true</aggregate>
-            <excludePackageNames>*.batch.sample,*.batch.container,example,test</excludePackageNames>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
@@ -486,6 +423,31 @@
             </reports>
           </reportSet>
         </reportSets>
+        <configuration>
+          <aggregate>true</aggregate>
+          <breakiterator>true</breakiterator>
+          <links>
+            <link>http://java.sun.com/j2ee/1.4/docs/api</link>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+            <link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+            <link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
+            <link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+            <link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+            <link>http://jakarta.apache.org/commons/pool/apidocs/</link>
+            <link>http://jakarta.apache.org/commons/logging/apidocs/</link>
+            <link>http://junit.sourceforge.net/javadoc/</link>
+            <link>http://logging.apache.org/log4j/docs/api/</link>
+            <link>http://jakarta.apache.org/regexp/apidocs/</link>
+            <link>http://jakarta.apache.org/velocity/api/</link>
+            <link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
+            <link>http://static.springframework.org/spring-batch/apidocs/</link>
+            <link>http://static.springframework.org/spring-ws/site/apidocs/</link>
+          </links>
+          <header>            &lt;!-- Begin Google Analytics code --&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var gaJsHost = ((&quot;https:&quot; == document.location.protocol) ? &quot;https://ssl.&quot; : &quot;http://www.&quot;);		document.write(unescape(&quot;%3Cscript src='&quot; + gaJsHost + &quot;google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E&quot;));	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var pageTracker = _gat._getTracker(&quot;UA-2728886-3&quot;);		pageTracker._setDomainName(&quot;none&quot;);		pageTracker._setAllowLinker(true);		pageTracker._trackPageview();	&lt;/script&gt;	&lt;!-- End Google Analytics code --&gt;
+          </header>
+          <bottom>            &lt;!-- Begin LoopFuse code --&gt;	&lt;script src=&quot;http://loopfuse.net/webrecorder/js/listen.js&quot; type=&quot;text/javascript&quot;&gt;	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt; 		_lf_cid = &quot;LF_48be82fa&quot;;		_lf_remora();	&lt;/script&gt;	&lt;!-- End LoopFuse code --&gt;
+          </bottom>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -550,34 +512,8 @@
       <url>http://repository.springsource.com/maven/bundles/snapshot</url>
     </pluginRepository>
     <pluginRepository>
-      <id>spring-external</id>
-      <name>        Spring External Repository
-      </name>
-      <url>http://s3.amazonaws.com/maven.springframework.org/external</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>        Codehaus Snapshots
-      </id>
-      <url>http://snapshots.repository.codehaus.org/</url>
-      <snapshots>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
       <id>agilejava</id>
       <url>http://agilejava.com/maven</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>spring-external-svn</id>
-      <name>        Spring External SVN Repository
-      </name>
-      <url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo-ext</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
