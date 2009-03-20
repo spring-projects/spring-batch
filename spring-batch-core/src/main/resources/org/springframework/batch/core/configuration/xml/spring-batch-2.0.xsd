@@ -289,7 +289,7 @@
 		<xsd:choice>
 			<xsd:element name="tasklet" type="taskletType" />
 			<xsd:element name="transaction-attributes" type="transaction-attributesType" />
-			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
+			<xsd:element name="no-rollback-exception-classes">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					List of exception classes that should not cause rollback if possible.  This list
@@ -314,8 +314,8 @@
 		<xsd:attribute name="propagation" default="REQUIRED">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.transaction.annotation.Propagation"><![CDATA[
-	The transaction propagation behavior.
-							]]></xsd:documentation>
+				The transaction propagation behavior.
+				]]></xsd:documentation>
 			</xsd:annotation>
 			<xsd:simpleType>
 				<xsd:restriction base="xsd:string">
@@ -332,8 +332,8 @@
 		<xsd:attribute name="isolation" default="DEFAULT" type="isolationType">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.transaction.annotation.Isolation"><![CDATA[
-	The transaction isolation level.
-							]]></xsd:documentation>
+				The transaction isolation level.
+				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 		<xsd:attribute name="timeout" type="xsd:integer" default="-1">

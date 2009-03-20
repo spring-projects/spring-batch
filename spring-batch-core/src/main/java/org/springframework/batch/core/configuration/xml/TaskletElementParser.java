@@ -15,7 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import java.util.Arrays;
+import static org.springframework.batch.core.configuration.xml.AbstractStepParser.handleExceptionElement;
+
 import java.util.List;
 
 import org.springframework.beans.MutablePropertyValues;
@@ -141,24 +142,6 @@ public class TaskletElementParser {
 
 		return bd;
 
-	}
-
-	@SuppressWarnings("unchecked")
-	private void handleExceptionElement(Element element, ParserContext parserContext, BeanDefinition bd,
-			String subElementName, String propertyName) {
-		Element child = DomUtils.getChildElementByTagName(element, subElementName);
-		if (child != null) {
-			String exceptions = DomUtils.getTextValue(child);
-			if (StringUtils.hasLength(exceptions)) {
-				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
-				if (exceptionArray.length > 0) {
-					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
-					managedList.addAll(Arrays.asList(exceptionArray));
-					bd.getPropertyValues().addPropertyValue(propertyName, managedList);
-				}
-			}
-		}
 	}
 
 	private void handleRetryListenersElement(Element element, BeanDefinition bd, ParserContext parserContext) {

@@ -109,7 +109,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		}
 		else if (listenersElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The 'listeners' element may not appear more than once in a single <job/>.", element);
+					"The '<listeners/>' element may not appear more than once in a single <job/>.", element);
 		}
 
 	}

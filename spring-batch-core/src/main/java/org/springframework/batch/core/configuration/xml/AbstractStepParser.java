@@ -127,7 +127,6 @@ public abstract class AbstractStepParser {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	protected void setUpBeanDefinition(Element stepElement, AbstractBeanDefinition bd, ParserContext parserContext,
 			String jobRepositoryRef) {
 		checkStepAttributes(stepElement, bd);
@@ -141,6 +140,22 @@ public abstract class AbstractStepParser {
 		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
 		bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
 
+		handleTransactionAttributesElement(stepElement, bd, parserContext);
+
+		handleListenersElement(stepElement, bd, parserContext);
+
+		handleExceptionElement(stepElement, parserContext, bd, "no-rollback-exception-classes",
+				"noRollbackExceptionClasses");
+
+		bd.setRole(BeanDefinition.ROLE_SUPPORT);
+
+		bd.setSource(parserContext.extractSource(stepElement));
+
+	}
+
+	private void handleTransactionAttributesElement(Element stepElement, AbstractBeanDefinition bd,
+			ParserContext parserContext) {
+		@SuppressWarnings("unchecked")
 		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, TX_ATTRIBUTES_ELE);
 		if (txAttrElements.size() == 1) {
 			Element txAttrElement = txAttrElements.get(0);
@@ -159,26 +174,17 @@ public abstract class AbstractStepParser {
 		}
 		else if (txAttrElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The '" + TX_ATTRIBUTES_ELE + "' element may not appear more than once in a single <"
+					"The <" + TX_ATTRIBUTES_ELE + "/> element may not appear more than once in a single <"
 							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
-
-		handleListenersElement(stepElement, bd, parserContext);
-
-		handleExceptionElement(stepElement, parserContext, bd, "no-rollback-exception-classes",
-				"noRollbackExceptionClasses");
-
-		bd.setRole(BeanDefinition.ROLE_SUPPORT);
-
-		bd.setSource(parserContext.extractSource(stepElement));
-
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleExceptionElement(Element element, ParserContext parserContext, BeanDefinition bd,
+	public static void handleExceptionElement(Element element, ParserContext parserContext, BeanDefinition bd,
 			String subElementName, String propertyName) {
-		Element child = DomUtils.getChildElementByTagName(element, subElementName);
-		if (child != null) {
+		List<Element> children = DomUtils.getChildElementsByTagName(element, subElementName);
+		if (children.size() == 1) {
+			Element child = children.get(0);
 			String exceptions = DomUtils.getTextValue(child);
 			if (StringUtils.hasLength(exceptions)) {
 				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
@@ -190,6 +196,12 @@ public abstract class AbstractStepParser {
 				}
 			}
 		}
+		else if (children.size() > 1) {
+			parserContext.getReaderContext().error(
+					"The <" + subElementName + "/> element may not appear more than once in a single <"
+							+ element.getNodeName() + "/>.", element);
+		}
+
 	}
 
 	private void checkStepAttributes(Element stepElement, AbstractBeanDefinition bd) {
@@ -228,7 +240,7 @@ public abstract class AbstractStepParser {
 		}
 		else if (listenersElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The '" + LISTENERS_ELE + "' element may not appear more than once in a single <"
+					"The <" + LISTENERS_ELE + "/> element may not appear more than once in a single <"
 							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
 	}
