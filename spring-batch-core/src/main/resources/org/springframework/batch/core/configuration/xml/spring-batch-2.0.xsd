@@ -289,6 +289,23 @@
 		<xsd:choice>
 			<xsd:element name="tasklet" type="taskletType" />
 			<xsd:element name="transaction-attributes" type="transaction-attributesType" />
+			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					List of exception classes that should not cause rollback if possible.  This list
+					is only a hint and has to be interpreted by the step to make sense in context.  
+					Separate each attribute with a comma or a newline.
+					]]>
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="xsd:string">
+							<xsd:attributeGroup ref="mergeAttribute" />
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
 			<xsd:element name="listeners" type="stepListenersType" />
 		</xsd:choice>
 	</xsd:group>
@@ -386,24 +403,8 @@
 			<xsd:element name="skippable-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
-					List of exception classes that are skippable.  
-					Separate each attribute with a comma or a newline.
-					]]>
-					</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:simpleContent>
-						<xsd:extension base="xsd:string">
-							<xsd:attributeGroup ref="mergeAttribute" />
-						</xsd:extension>
-					</xsd:simpleContent>
-				</xsd:complexType>
-			</xsd:element>
-			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-					List of exception classes that should not cause rollback if possible.  This list
-					is only a hint and has to be interpreted by the step to make sense in context.  
+					List of exception classes that are skippable.  Exceptions that are already marked as no-rollback
+					are automatically skippable (but it doesn't hurt to add them again here).
 					Separate each attribute with a comma or a newline.
 					]]>
 					</xsd:documentation>

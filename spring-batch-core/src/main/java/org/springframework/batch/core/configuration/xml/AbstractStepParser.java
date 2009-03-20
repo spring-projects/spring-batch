@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -148,11 +149,31 @@ public abstract class AbstractStepParser {
 		}
 
 		handleListenersElement(stepElement, bd, parserContext);
+		
+		handleExceptionElement(stepElement, parserContext, bd, "no-rollback-exception-classes", "noRollbackExceptionClasses");
 
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
 
 		bd.setSource(parserContext.extractSource(stepElement));
 
+	}
+
+	@SuppressWarnings("unchecked")
+	private void handleExceptionElement(Element element, ParserContext parserContext, BeanDefinition bd,
+			String subElementName, String propertyName) {
+		Element child = DomUtils.getChildElementByTagName(element, subElementName);
+		if (child != null) {
+			String exceptions = DomUtils.getTextValue(child);
+			if (StringUtils.hasLength(exceptions)) {
+				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
+				if (exceptionArray.length > 0) {
+					ManagedList managedList = new ManagedList();
+					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
+					managedList.addAll(Arrays.asList(exceptionArray));
+					bd.getPropertyValues().addPropertyValue(propertyName, managedList);
+				}
+			}
+		}
 	}
 
 	private void checkStepAttributes(Element stepElement, AbstractBeanDefinition bd) {
