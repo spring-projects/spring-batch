@@ -17,7 +17,6 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.List;
 import java.util.Map;
@@ -113,24 +112,16 @@ public class StepParserTests {
 				"org/springframework/batch/core/configuration/xml/StepParserNoCommitIntervalOrCompletionPolicyTests-context.xml");
 	}
 
-	@Test
+	@Test(expected = BeanDefinitionParsingException.class)
 	public void testTaskletStepWithBadStepListener() throws Exception {
-		loadContextWithBadListener("org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml");
+		String contextLocation = "org/springframework/batch/core/configuration/xml/StepParserBadStepListenerTests-context.xml";
+		new XmlBeanFactory(new ClassPathResource(contextLocation));
 	}
 
-	@Test
+	@Test(expected = BeanDefinitionParsingException.class)
 	public void testTaskletStepWithBadRetryListener() throws Exception {
-		loadContextWithBadListener("org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml");
-	}
-
-	private void loadContextWithBadListener(String contextLocation) {
-		try {
-			new XmlBeanFactory(new ClassPathResource(contextLocation));
-			fail("Context should not load!");
-		}
-		catch (BeanDefinitionParsingException e) {
-			assertTrue(e.getMessage().contains("'ref' and 'class'"));
-		}
+		String contextLocation = "org/springframework/batch/core/configuration/xml/StepParserBadRetryListenerTests-context.xml";
+		new XmlBeanFactory(new ClassPathResource(contextLocation));
 	}
 
 	@Test(expected = BeanDefinitionParsingException.class)
