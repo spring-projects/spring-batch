@@ -60,7 +60,7 @@ public abstract class AbstractStepParser {
 		@SuppressWarnings("unchecked")
 		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, "tasklet");
 		boolean taskletElementExists = taskletElements.size() > 0;
-		boolean stepUnderspecified = stepUnderspecified(stepElement);
+		boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
 		AbstractBeanDefinition bd = null;
 		if (StringUtils.hasText(taskletRef)) {
 			if (taskletElementExists) {
@@ -87,18 +87,6 @@ public abstract class AbstractStepParser {
 
 		return bd;
 
-	}
-
-	/**
-	 * Should this step should be treated as incomplete? If it has a parent or
-	 * is abstract, then it may not have all properties.
-	 * 
-	 * @param stepElement
-	 * @return TRUE if
-	 */
-	private boolean stepUnderspecified(Element stepElement) {
-		return Boolean.valueOf(stepElement.getAttribute("abstract"))
-				|| StringUtils.hasText(stepElement.getAttribute("parent"));
 	}
 
 	/**

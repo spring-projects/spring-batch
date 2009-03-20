@@ -93,6 +93,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 				parserContext.extractSource(element));
 		parserContext.pushContainingComponent(compositeDef);
 
+		boolean stepExists = false;
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
@@ -100,6 +101,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 				String nodeName = node.getLocalName();
 				if (nodeName.equals("step")) {
 					stateTransitions.addAll(stepParser.parse((Element) node, parserContext, jobRepositoryRef));
+					stepExists = true;
 				}
 				else if (nodeName.equals("decision")) {
 					stateTransitions.addAll(decisionParser.parse((Element) node, parserContext));
@@ -107,10 +109,15 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 				else if (nodeName.equals("split")) {
 					stateTransitions.addAll(splitParser.parse((Element) node, new ParserContext(parserContext
 							.getReaderContext(), parserContext.getDelegate(), builder.getBeanDefinition())));
+					stepExists = true;
 				}
 			}
 		}
 
+		if (!stepExists && !CoreNamespaceUtils.isUnderspecified(element)) {
+			parserContext.getReaderContext().error("A flow must contain at least one step", element);
+		}
+		
 		builder.addConstructorArgValue(flowName);
 		ManagedList managedList = new ManagedList();
 		@SuppressWarnings( { "unchecked", "unused" })

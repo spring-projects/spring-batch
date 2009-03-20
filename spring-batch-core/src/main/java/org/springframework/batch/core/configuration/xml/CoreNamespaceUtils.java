@@ -19,6 +19,8 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.util.StringUtils;
+import org.w3c.dom.Element;
 
 /**
  * utility methods used in parsing of the batch core namespace
@@ -55,4 +57,15 @@ public class CoreNamespaceUtils {
 		}
 	}
 
+	/**
+	 * Should this element be treated as incomplete? If it has a parent or is
+	 * abstract, then it may not have all properties.
+	 * 
+	 * @param element
+	 * @return TRUE if the element is abstract or has a parent
+	 */
+	public static boolean isUnderspecified(Element element) {
+		return Boolean.valueOf(element.getAttribute("abstract")) || StringUtils.hasText(element.getAttribute("parent"));
+	}
+	
 }
