@@ -63,8 +63,8 @@
       <glossterm>Tasklet</glossterm>
 
       <glossdef>
-        <para>An application program created by application developer to
-        process the business logic for an entire Step.</para>
+        <para>A component created by application developer to process the
+        business logic for a Step.</para>
       </glossdef>
     </glossentry>
 
