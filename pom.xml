@@ -22,19 +22,25 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>https://fisheye.springframework.org/browse/spring-batch</url>
-		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</connection>
-		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk</developerConnection>
+		<url>https://fisheye.springframework.org/browse/spring-batch
+		</url>
+		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk
+		</connection>
+		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH</url>
+		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH
+		</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
 			<name>Spring Batch Forum</name>
-			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
-			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
+			<post>http://forum.springframework.org/forumdisplay.php?f=41
+			</post>
+			<archive>http://forum.springframework.org/forumdisplay.php?f=41
+			</archive>
 		</mailingList>
 	</mailingLists>
 	<ciManagement>
@@ -97,7 +103,8 @@
 									<goal>generate-html</goal>
 								</goals>
 								<configuration>
-									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
+									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl
+									</htmlCustomization>
 									<postProcess>
 										<move todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/target/docbkx/html">
@@ -132,8 +139,7 @@
 									<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
 									<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
 									<postProcess>
-										<copy file="${basedir}/target/docbkx/pdf/index.pdf"
-											tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
+										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
 											failonerror="false" />
 									</postProcess>
 								</configuration>
@@ -146,7 +152,8 @@
 								</goals>
 								<configuration>
 									<chunkedOutput>true</chunkedOutput>
-									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
+									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl
+									</htmlCustomization>
 									<postProcess>
 										<move todir="${basedir}/target/site/reference">
 											<fileset dir="${basedir}/target/docbkx">
@@ -182,8 +189,7 @@
 							</dependency>
 							<dependency>
 								<!--
-									This is a downgrade for the 2.0.8 plugin (was 0.94) but
-									prevents ArrayOutOfBounds exception on xi:includes
+									This is a downgrade for the 2.0.8 plugin (was 0.94) but prevents ArrayOutOfBounds exception on xi:includes
 								-->
 								<groupId>org.apache.xmlgraphics</groupId>
 								<artifactId>fop</artifactId>
@@ -196,7 +202,8 @@
 							<draftWatermarkImage />
 							<htmlStylesheet>css/html.css</htmlStylesheet>
 							<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
-							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
+							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl
+							</foCustomization>
 							<xincludeSupported>true</xincludeSupported>
 							<entities>
 								<entity>
@@ -250,45 +257,37 @@
 											<fileset dir="target">
 												<include name="*with-dep*.zip" />
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
-												handledirsep="true" />
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
 										</unzip>
 										<unzip dest="target/it/no-dep">
 											<fileset dir="target">
 												<include name="*no-dep*.zip" />
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
-												handledirsep="true" />
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
 										</unzip>
-										<fail
-											message="Failed integration test of zip distro: Spring Batch jar files are missing.">
+										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="3">
-														<fileset id="fs" dir="target/it/with-dep/dist"
-															includes="*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
 										</fail>
-										<fail
-											message="Failed integration test of zip distro: dependency jar files are missing.">
+										<fail message="Failed integration test of zip distro: dependency jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib"
-															includes="org.springframework.beans-*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
 										</fail>
-										<fail
-											message="Failed integration test of zip distro: test dependency jar files are missing.">
+										<fail message="Failed integration test of zip distro: test dependency jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib"
-															includes="com.springsource.org.junit-*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
@@ -331,6 +330,53 @@
 			</distributionManagement>
 		</profile>
 		<profile>
+			<id>brits</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<distributionManagement>
+				<downloadUrl>http://www.springframework.org/download</downloadUrl>
+				<site>
+					<id>static.springframework.org</id>
+					<url>
+						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk
+			</url>
+				</site>
+				<repository>
+					<id>spring-milestone</id>
+					<name>Spring Milestone Repository</name>
+					<url>s3://repository.springsource.com/maven/bundles/milestone
+					</url>
+				</repository>
+				<snapshotRepository>
+					<id>spring-snapshot</id>
+					<name>Spring Snapshot Repository</name>
+					<url>s3://repository.springsource.com/maven/bundles/snapshot
+					</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+		<profile>
+			<id>central</id>
+			<distributionManagement>
+				<site>
+					<id>staging</id>
+					<url>file:///${user.dir}/target/staging</url>
+				</site>
+				<repository>
+					<id>spring-milestone</id>
+					<name>Spring Milestone Repository</name>
+					<url>s3://maven.springframework.org/milestone</url>
+					<!-- <url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url> -->
+				</repository>
+				<snapshotRepository>
+					<id>spring-snapshot</id>
+					<name>Spring Snapshot Repository</name>
+					<url>s3://maven.springframework.org/snapshot</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+		<profile>
 			<id>snapshots</id>
 			<pluginRepositories>
 				<pluginRepository>
@@ -349,8 +395,7 @@
 				<pluginManagement>
 					<plugins>
 						<!--
-							This seems to work better than the default (2008/03/19) because
-							links on sub-module sites are not broken
+							This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken
 						-->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
@@ -384,25 +429,6 @@
 			</build>
 		</profile>
 	</profiles>
-	<distributionManagement>
-		<downloadUrl>http://www.springframework.org/download</downloadUrl>
-		<site>
-			<id>static.springframework.org</id>
-			<url>
-				scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk
-			</url>
-		</site>
-		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone Repository</name>
-			<url>s3://repository.springsource.com/maven/bundles/milestone</url>
-		</repository>
-		<snapshotRepository>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://repository.springsource.com/maven/bundles/snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
 	<build>
 		<extensions>
 			<extension>
@@ -485,19 +511,25 @@
 					<links>
 						<link>http://java.sun.com/j2ee/1.4/docs/api</link>
 						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
+						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
+						</link>
 						<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/fileupload/apidocs/
+						</link>
+						<link>http://jakarta.apache.org/commons/httpclient/apidocs/
+						</link>
 						<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
 						<link>http://jakarta.apache.org/commons/logging/apidocs/</link>
 						<link>http://junit.sourceforge.net/javadoc/</link>
 						<link>http://logging.apache.org/log4j/docs/api/</link>
 						<link>http://jakarta.apache.org/regexp/apidocs/</link>
 						<link>http://jakarta.apache.org/velocity/api/</link>
-						<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
-						<link>http://static.springframework.org/spring-batch/apidocs/</link>
-						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
+						<link>http://static.springframework.org/spring/docs/2.5.x/api/
+						</link>
+						<link>http://static.springframework.org/spring-batch/apidocs/
+						</link>
+						<link>http://static.springframework.org/spring-ws/site/apidocs/
+						</link>
 					</links>
 					<header><![CDATA[
 	<!-- Begin Google Analytics code -->
@@ -571,7 +603,8 @@
 			<id>com.springsource.repository.bundles.milestone</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone</url>
+			<url>http://repository.springsource.com/maven/bundles/milestone
+			</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -580,7 +613,8 @@
 			<id>com.springsource.repository.bundles.snapshot</id>
 			<name>SpringSource Enterprise Bundle Repository -
 				SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
+			<url>http://repository.springsource.com/maven/bundles/snapshot
+			</url>
 		</pluginRepository>
 		<pluginRepository>
 			<id>agilejava</id>

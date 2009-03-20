@@ -271,6 +271,55 @@
       </distributionManagement>
     </profile>
     <profile>
+      <id>brits</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <distributionManagement>
+        <downloadUrl>http://www.springframework.org/download</downloadUrl>
+        <site>
+          <id>static.springframework.org</id>
+          <url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
+        </site>
+        <repository>
+          <id>spring-milestone</id>
+          <name>            Spring Milestone Repository
+          </name>
+          <url>s3://repository.springsource.com/maven/bundles/milestone</url>
+        </repository>
+        <snapshotRepository>
+          <id>spring-snapshot</id>
+          <name>            Spring Snapshot Repository
+          </name>
+          <url>s3://repository.springsource.com/maven/bundles/snapshot</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+    <profile>
+      <id>central</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <distributionManagement>
+        <site>
+          <id>staging</id>
+          <url>file:///${user.dir}/target/staging</url>
+        </site>
+        <repository>
+          <id>spring-milestone</id>
+          <name>            Spring Milestone Repository
+          </name>
+          <url>s3://maven.springframework.org/milestone</url>
+        </repository>
+        <snapshotRepository>
+          <id>spring-snapshot</id>
+          <name>            Spring Snapshot Repository
+          </name>
+          <url>s3://maven.springframework.org/snapshot</url>
+        </snapshotRepository>
+      </distributionManagement>
+    </profile>
+    <profile>
       <id>snapshots</id>
       <pluginRepositories>
         <pluginRepository>
@@ -321,25 +370,6 @@
       </build>
     </profile>
   </profiles>
-  <distributionManagement>
-    <downloadUrl>http://www.springframework.org/download</downloadUrl>
-    <site>
-      <id>static.springframework.org</id>
-      <url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
-    </site>
-    <repository>
-      <id>spring-milestone</id>
-      <name>        Spring Milestone Repository
-      </name>
-      <url>s3://repository.springsource.com/maven/bundles/milestone</url>
-    </repository>
-    <snapshotRepository>
-      <id>spring-snapshot</id>
-      <name>        Spring Snapshot Repository
-      </name>
-      <url>s3://repository.springsource.com/maven/bundles/snapshot</url>
-    </snapshotRepository>
-  </distributionManagement>
   <build>
     <extensions>
       <extension>
