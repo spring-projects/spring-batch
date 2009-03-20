@@ -138,7 +138,7 @@
 				<plugin>
 					<groupId>com.springsource.bundlor</groupId>
 					<artifactId>com.springsource.bundlor.maven</artifactId>
-					<version>1.0.0.BUILD-SNAPSHOT</version>
+					<version>1.0.0.M1B</version>
 					<configuration>
 						<outputFile>${project.basedir}/src/main/resources/META-INF/MANIFEST.MF</outputFile>
 					</configuration>
