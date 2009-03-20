@@ -23,37 +23,49 @@
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="flowType">
-					<xsd:group ref="jobListeners" />
-					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attributeGroup ref="jobRepositoryAttribute" />
-					<xsd:attribute name="incrementer" type="xsd:string" use="optional">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[ 
-								A reference to a JobParametersIncrementer bean definition.  This will be 
-								used to provide new parameters to a Job instance that is starting in a 
-								sequence.
-								]]>
-							</xsd:documentation>
-							<xsd:appinfo>
-								<tool:annotation kind="ref" />
-								<tool:expected-type type="org.springframework.batch.core.JobParametersIncrementer" />
-							</xsd:appinfo>
-						</xsd:annotation>
-					</xsd:attribute>
-					<xsd:attribute name="restartable" type="xsd:string" default="true" use="optional">
-						<xsd:annotation>
-							<xsd:documentation><![CDATA[
-							Whether the job should be retartable or not in case of failure.  Set this to false
-							if the Job should not be restarted.
-							]]></xsd:documentation>
-						</xsd:annotation>
-					</xsd:attribute>
-					<xsd:attributeGroup ref="parentAttribute" />
-					<xsd:attributeGroup ref="abstractAttribute" />
-				</xsd:extension>
-			</xsd:complexContent>
+			<xsd:choice minOccurs="0" maxOccurs="unbounded">
+				<xsd:group ref="flowGroup"/>
+				<xsd:element name="listeners">
+					<xsd:annotation>
+						<xsd:documentation><![CDATA[
+						List of all listeners for the job
+						]]>
+						</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="1" maxOccurs="unbounded" />
+						</xsd:sequence>
+						<xsd:attributeGroup ref="mergeAttribute" />
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:attribute name="id" type="xsd:ID" use="required" />
+			<xsd:attributeGroup ref="jobRepositoryAttribute" />
+			<xsd:attribute name="incrementer" type="xsd:string" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[ 
+						A reference to a JobParametersIncrementer bean definition.  This will be 
+						used to provide new parameters to a Job instance that is starting in a 
+						sequence.
+						]]>
+					</xsd:documentation>
+					<xsd:appinfo>
+						<tool:annotation kind="ref" />
+						<tool:expected-type type="org.springframework.batch.core.JobParametersIncrementer" />
+					</xsd:appinfo>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="restartable" type="xsd:string" default="true" use="optional">
+				<xsd:annotation>
+					<xsd:documentation><![CDATA[
+					Whether the job should be retartable or not in case of failure.  Set this to false
+					if the Job should not be restarted.
+					]]></xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attributeGroup ref="parentAttribute" />
+			<xsd:attributeGroup ref="abstractAttribute" />
 		</xsd:complexType>
 	</xsd:element>
 
@@ -159,8 +171,8 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:complexType name="flowType">
-		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+	<xsd:group name="flowGroup">
+		<xsd:choice>
 			<xsd:element name="step">
 				<xsd:annotation>
 					<xsd:documentation>
@@ -201,12 +213,15 @@
 					<xsd:complexContent>
 						<xsd:extension base="nextType">
 							<xsd:choice minOccurs="0" maxOccurs="unbounded">
-								<xsd:element name="flow" type="flowType">
+								<xsd:element name="flow">
 									<xsd:annotation>
 										<xsd:documentation>
 											A subflow within a job, having the same format as a job, but without a separate identity.
 										</xsd:documentation>
 									</xsd:annotation>
+									<xsd:complexType>
+										<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded"/>
+									</xsd:complexType>
 								</xsd:element>
 								<xsd:group ref="transitions"/>
 							</xsd:choice>
@@ -252,25 +267,6 @@
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:choice>
-	</xsd:complexType>
-
-	<xsd:group name="jobListeners">
-		<xsd:sequence>
-			<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-					List of all listeners for the job
-					]]>
-					</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="listener" type="jobExecutionListenerType" minOccurs="1" maxOccurs="unbounded" />
-					</xsd:sequence>
-					<xsd:attributeGroup ref="mergeAttribute" />
-				</xsd:complexType>
-			</xsd:element>
-		</xsd:sequence>
 	</xsd:group>
 
 	<xsd:complexType name="stepType">

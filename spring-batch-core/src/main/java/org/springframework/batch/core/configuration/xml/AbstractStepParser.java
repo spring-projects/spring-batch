@@ -75,7 +75,8 @@ public abstract class AbstractStepParser {
 			bd = taskletElementParser.parse(taskElement, parserContext, stepUnderspecified);
 		}
 		else if (taskletElements.size() > 1) {
-			parserContext.getReaderContext().error("The 'tasklet' element may not appear more than once.", stepElement);
+			parserContext.getReaderContext().error(
+					"The 'tasklet' element may not appear more than once in a single <step/>.", stepElement);
 		}
 
 		if (bd != null) {
@@ -141,7 +142,8 @@ public abstract class AbstractStepParser {
 		}
 		else if (txAttrElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The 'transaction-attribute' element may not appear more than once.", stepElement);
+					"The 'transaction-attribute' element may not appear more than once in a single <step/>.",
+					stepElement);
 		}
 
 		handleListenersElement(stepElement, bd, parserContext);
@@ -187,7 +189,7 @@ public abstract class AbstractStepParser {
 			parserContext.popAndRegisterContainingComponent();
 		}
 		else if (listenersElements.size() > 1) {
-			parserContext.getReaderContext().error("The 'listeners' element may not appear more than once.",
+			parserContext.getReaderContext().error("The 'listeners' element may not appear more than once in a single <step/>.",
 					stepElement);
 		}
 	}

@@ -90,8 +90,9 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		builder.addPropertyValue("flow", flowDef);
 
 		JobExecutionListenerParser listenerParser = new JobExecutionListenerParser();
-		Element listenersElement = (Element) DomUtils.getChildElementByTagName(element, "listeners");
-		if (listenersElement != null) {
+		List<Element> listenersElements = DomUtils.getChildElementsByTagName(element, "listeners");
+		if (listenersElements.size() == 1) {
+			Element listenersElement = listenersElements.get(0);
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
@@ -105,7 +106,11 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyValue("jobExecutionListeners", listeners);
 			parserContext.popAndRegisterContainingComponent();
 		}
-
+		else if (listenersElements.size() > 1) {
+			parserContext.getReaderContext().error(
+					"The 'listeners' element may not appear more than once in a single <job/>.", element);
+		}
+		
 	}
 
 }
