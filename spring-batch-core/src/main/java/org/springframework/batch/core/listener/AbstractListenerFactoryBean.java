@@ -15,19 +15,15 @@
  */
 package org.springframework.batch.core.listener;
 
+import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerByAnnotation;
 import static org.springframework.batch.support.MethodInvokerUtils.getMethodInvokerForInterface;
-import static org.springframework.batch.support.MethodInvokerUtils.getParamTypesString;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -36,9 +32,7 @@ import org.springframework.batch.support.MethodInvokerUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
-import org.springframework.util.ReflectionUtils;
 
 /**
  * {@link FactoryBean} implementation that builds a listener based on the
@@ -68,8 +62,6 @@ import org.springframework.util.ReflectionUtils;
  * @see ListenerMetaData
  */
 public abstract class AbstractListenerFactoryBean implements FactoryBean, InitializingBean {
-
-	private static Log logger = LogFactory.getLog(AbstractListenerFactoryBean.class);
 
 	private Object delegate;
 
@@ -101,7 +93,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 			invokers.add(getMethodInvokerByName(entry.getValue(), delegate, metaData.getParamTypes()));
 			invokers.add(getMethodInvokerForInterface(metaData.getListenerInterface(), metaData.getMethodName(),
 					delegate, metaData.getParamTypes()));
-			invokers.add(getMethodInvokerByAnnotation(metaData));
+			invokers.add(getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate, metaData.getParamTypes()));
 			if (!invokers.isEmpty()) {
 				invokerMap.put(metaData.getMethodName(), invokers);
 				listenerInterfaces.add(metaData.getListenerInterface());
@@ -121,7 +113,12 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 		// create a proxy listener for only the interfaces that have methods to
 		// be called
 		ProxyFactory proxyFactory = new ProxyFactory();
-		proxyFactory.setTarget(delegate);
+		if (delegate instanceof Advised) {
+			proxyFactory.setTargetSource(((Advised) delegate).getTargetSource());
+		}
+		else {
+			proxyFactory.setTarget(delegate);
+		}
 		proxyFactory.setInterfaces(listenerInterfaces.toArray(new Class[0]));
 		proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MethodInvokerMethodInterceptor(invokerMap, ordered)));
 		return proxyFactory.getProxy();
@@ -129,50 +126,14 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	}
 
 	protected abstract ListenerMetaData getMetaDataFromPropertyName(String propertyName);
-	
+
 	protected abstract ListenerMetaData[] getMetaDataValues();
-	
+
 	protected abstract Class<?> getDefaultListenerClass();
-
-	/**
-	 * Create a MethodInvoker from the delegate based on the annotationType.
-	 * Ensure that the annotated method has a valid set of parameters.
-	 * 
-	 * @param metaData
-	 * @return a MethodInvoker
-	 */
-	protected MethodInvoker getMethodInvokerByAnnotation(final ListenerMetaData metaData) {
-		final Class<? extends Annotation> annotationType = metaData.getAnnotation();
-		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, delegate);
-		if (mi != null) {
-			ReflectionUtils.doWithMethods(delegate.getClass(), new ReflectionUtils.MethodCallback() {
-				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
-					Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
-					if (annotation != null) {
-						Class<?>[] paramTypes = method.getParameterTypes();
-						if (paramTypes.length > 0) {
-							Class<?>[] expectedParamTypes = metaData.getParamTypes();
-
-							String errorMsg = "The method [" + method.getName() + "] on target class ["
-									+ delegate.getClass().getSimpleName() + "] is incompatable with the signature ["
-									+ getParamTypesString(expectedParamTypes) + "] expected for the annotation ["
-									+ metaData.getAnnotation().getSimpleName() + "].";
-
-							Assert.isTrue(paramTypes.length == expectedParamTypes.length, errorMsg);
-							for (int i = 0; i < paramTypes.length; i++) {
-								Assert.isTrue(paramTypes[i].equals(expectedParamTypes[i]), errorMsg);
-							}
-						}
-					}
-				}
-			});
-		}
-		return mi;
-	}
 
 	protected MethodInvoker getMethodInvokerByName(String methodName, Object candidate, Class<?>... params) {
 		if (methodName != null) {
-			return MethodInvokerUtils.createMethodInvokerByName(candidate, methodName, false, params);
+			return MethodInvokerUtils.getMethodInvokerByName(candidate, methodName, false, params);
 		}
 		else {
 			return null;
@@ -184,16 +145,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	}
 
 	public void setDelegate(Object delegate) {
-		if (delegate instanceof Advised) {
-			try {
-				setDelegate(((Advised) delegate).getTargetSource().getTarget());
-			} catch (Exception e) {
-				throw new IllegalStateException("Cannot generate listener for proxy with no target", e);
-			}
-		}
-		else {
-			this.delegate = delegate;
-		}
+		this.delegate = delegate;
 	}
 
 	public void setMetaDataMap(Map<String, String> metaDataMap) {
@@ -225,24 +177,21 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	 * Convenience method to check whether the given object is or can be made
 	 * into a listener.
 	 * 
-	 * @param delegate the object to check
+	 * @param target the object to check
 	 * @return true if the delegate is an instance of any of the listener
-	 *         interface, or contains the marker annotations
+	 * interface, or contains the marker annotations
 	 */
-	public static boolean isListener(Object delegate, Class<?> listenerType, ListenerMetaData[] metaDataValues) {
-		if (listenerType.isInstance(delegate)) {
+	public static boolean isListener(Object target, Class<?> listenerType, ListenerMetaData[] metaDataValues) {
+		if (listenerType.isInstance(target)) {
 			return true;
 		}
-		if (delegate instanceof Advised) {
-			try {
-				return isListener(((Advised) delegate).getTargetSource().getTarget(), listenerType, metaDataValues);
-			} catch (Exception e) {
-				logger.debug("Error obtaining target for Proxy.  Assume not a listener.", e);
-				return false;
+		if (target instanceof Advised) {
+			if (listenerType.isAssignableFrom(((Advised) target).getTargetSource().getTargetClass())) {
+				return true;
 			}
 		}
 		for (ListenerMetaData metaData : metaDataValues) {
-			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), delegate) != null) {
+			if (MethodInvokerUtils.getMethodInvokerByAnnotation(metaData.getAnnotation(), target) != null) {
 				return true;
 			}
 		}

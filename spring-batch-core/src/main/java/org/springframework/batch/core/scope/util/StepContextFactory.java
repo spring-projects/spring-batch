@@ -21,7 +21,7 @@ import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 
 /**
  * Implementation of {@link ContextFactory} that provides the current
- * {@link StepContext} as a contxt object.
+ * {@link StepContext} as a context object.
  * 
  * @author Dave Syer
  * 
@@ -33,7 +33,8 @@ public class StepContextFactory implements ContextFactory {
 	}
 
 	public String getContextId() {
-		return (String) StepSynchronizationManager.getContext().getId();
+		StepContext context = StepSynchronizationManager.getContext();
+		return context!=null ? (String) context.getId() : "sysinit";
 	}
 
 }

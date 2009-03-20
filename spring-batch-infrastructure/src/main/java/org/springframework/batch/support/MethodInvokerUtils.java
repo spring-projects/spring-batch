@@ -21,6 +21,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.springframework.aop.framework.Advised;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -41,12 +42,11 @@ public class MethodInvokerUtils {
 	 * @param object to be invoked
 	 * @param methodName of the method to be invoked
 	 * @param paramsRequired boolean indicating whether the parameters are
-	 *            required, if false, a no args version of the method will be
-	 *            searched for.
+	 * required, if false, a no args version of the method will be searched for.
 	 * @param paramTypes - parameter types of the method to search for.
 	 * @return MethodInvoker if the method is found, null if it is not.
 	 */
-	public static MethodInvoker createMethodInvokerByName(Object object, String methodName, boolean paramsRequired,
+	public static MethodInvoker getMethodInvokerByName(Object object, String methodName, boolean paramsRequired,
 			Class<?>... paramTypes) {
 		Assert.notNull(object, "Object to invoke must not be null");
 		Method method = ClassUtils.getMethodIfAvailable(object.getClass(), methodName, paramTypes);
@@ -94,7 +94,7 @@ public class MethodInvokerUtils {
 			Class<?>... paramTypes) {
 
 		if (cls.isAssignableFrom(object.getClass())) {
-			return MethodInvokerUtils.createMethodInvokerByName(object, methodName, true, paramTypes);
+			return MethodInvokerUtils.getMethodInvokerByName(object, methodName, true, paramTypes);
 		}
 		else {
 			return null;
@@ -102,28 +102,68 @@ public class MethodInvokerUtils {
 	}
 
 	/**
+	 * Create a MethodInvoker from the delegate based on the annotationType.
+	 * Ensure that the annotated method has a valid set of parameters.
+	 * 
+	 * @param annotationType the annotation to scan for
+	 * @param target the target object
+	 * @param expectedParamTypes the expected parameter types for the method
+	 * @return a MethodInvoker
+	 */
+	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
+			final Object target, final Class<?>... expectedParamTypes) {
+		MethodInvoker mi = MethodInvokerUtils.getMethodInvokerByAnnotation(annotationType, target);
+		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource()
+				.getTargetClass() : target.getClass();
+		if (mi != null) {
+			ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
+				public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
+					Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
+					if (annotation != null) {
+						Class<?>[] paramTypes = method.getParameterTypes();
+						if (paramTypes.length > 0) {
+							String errorMsg = "The method [" + method.getName() + "] on target class ["
+									+ targetClass.getSimpleName() + "] is incompatable with the signature ["
+									+ getParamTypesString(expectedParamTypes) + "] expected for the annotation ["
+									+ annotationType.getSimpleName() + "].";
+
+							Assert.isTrue(paramTypes.length == expectedParamTypes.length, errorMsg);
+							for (int i = 0; i < paramTypes.length; i++) {
+								Assert.isTrue(paramTypes[i].equals(expectedParamTypes[i]), errorMsg);
+							}
+						}
+					}
+				}
+			});
+		}
+		return mi;
+	}
+
+	/**
 	 * Create {@link MethodInvoker} for the method with the provided annotation
-	 * on the provided object. It should be noted that annotations that cannot
-	 * be applied to methods (i.e. that aren't annotated with an element type of
-	 * METHOD) will cause an exception to be thrown.
+	 * on the provided object. Annotations that cannot be applied to methods
+	 * (i.e. that aren't annotated with an element type of METHOD) will cause an
+	 * exception to be thrown.
 	 * 
 	 * @param annotationType to be searched for
-	 * @param candidate to be invoked
+	 * @param target to be invoked
 	 * @return MethodInvoker for the provided annotation, null if none is found.
 	 */
 	public static MethodInvoker getMethodInvokerByAnnotation(final Class<? extends Annotation> annotationType,
-			final Object candidate) {
-		Assert.notNull(candidate, "class must not be null");
-		Assert.notNull(annotationType, "annotationType must not be null");
+			final Object target) {
+		Assert.notNull(target, "Target must not be null");
+		Assert.notNull(annotationType, "AnnotationType must not be null");
 		Assert.isTrue(ObjectUtils.containsElement(annotationType.getAnnotation(Target.class).value(),
 				ElementType.METHOD), "Annotation [" + annotationType + "] is not a Method-level annotation.");
+		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource()
+				.getTargetClass() : target.getClass();
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<Method>();
-		ReflectionUtils.doWithMethods(candidate.getClass(), new ReflectionUtils.MethodCallback() {
+		ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 				Annotation annotation = AnnotationUtils.findAnnotation(method, annotationType);
 				if (annotation != null) {
 					Assert.isNull(annotatedMethod.get(), "found more than one method on target class ["
-							+ candidate.getClass().getSimpleName() + "] with the annotation type ["
+							+ targetClass.getSimpleName() + "] with the annotation type ["
 							+ annotationType.getSimpleName() + "].");
 					annotatedMethod.set(method);
 				}
@@ -134,20 +174,20 @@ public class MethodInvokerUtils {
 			return null;
 		}
 		else {
-			return new SimpleMethodInvoker(candidate, annotatedMethod.get());
+			return new SimpleMethodInvoker(target, annotatedMethod.get());
 		}
 	}
 
 	/**
 	 * Create a {@link MethodInvoker} for the delegate from a single public
-	 * method with the signature provided.
+	 * method.
 	 * 
-	 * @param candidate an object to search for an appropriate method
+	 * @param target an object to search for an appropriate method
 	 * @return a MethodInvoker that calls a method on the delegate
 	 */
-	public static <C, T> MethodInvoker getMethodInvokerForSingleArgument(Object candidate) {
+	public static <C, T> MethodInvoker getMethodInvokerForSingleArgument(Object target) {
 		final AtomicReference<Method> methodHolder = new AtomicReference<Method>();
-		ReflectionUtils.doWithMethods(candidate.getClass(), new ReflectionUtils.MethodCallback() {
+		ReflectionUtils.doWithMethods(target.getClass(), new ReflectionUtils.MethodCallback() {
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {
 				if (method.getParameterTypes() == null || method.getParameterTypes().length != 1) {
 					return;
@@ -161,6 +201,6 @@ public class MethodInvokerUtils {
 			}
 		});
 		Method method = methodHolder.get();
-		return new SimpleMethodInvoker(candidate, method);
+		return new SimpleMethodInvoker(target, method);
 	}
 }

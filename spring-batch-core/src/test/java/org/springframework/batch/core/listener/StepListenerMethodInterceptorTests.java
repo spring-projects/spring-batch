@@ -45,8 +45,8 @@ public class StepListenerMethodInterceptorTests {
 	public void testMultipleInvokersPerName() throws Throwable{
 		
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
-		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.createMethodInvokerByName(testClass, "method1", false));
-		invokers.add(MethodInvokerUtils.createMethodInvokerByName(testClass, "method2", false));
+		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.getMethodInvokerByName(testClass, "method1", false));
+		invokers.add(MethodInvokerUtils.getMethodInvokerByName(testClass, "method2", false));
 		invokerMap.put("method1", invokers);
 		interceptor = new MethodInvokerMethodInterceptor(invokerMap);
 		interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method1")));
@@ -58,8 +58,8 @@ public class StepListenerMethodInterceptorTests {
 	@Test
 	public void testExitStatusReturn() throws Throwable{
 		Map<String, Set<MethodInvoker>> invokerMap = new HashMap<String, Set<MethodInvoker>>();
-		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.createMethodInvokerByName(testClass, "method3", false));
-		invokers.add(MethodInvokerUtils.createMethodInvokerByName(testClass, "method3", false));
+		Set<MethodInvoker> invokers = asSet(MethodInvokerUtils.getMethodInvokerByName(testClass, "method3", false));
+		invokers.add(MethodInvokerUtils.getMethodInvokerByName(testClass, "method3", false));
 		invokerMap.put("method3", invokers);
 		interceptor = new MethodInvokerMethodInterceptor(invokerMap);
 		assertEquals(ExitStatus.COMPLETED, interceptor.invoke(new StubMethodInvocation(TestClass.class.getMethod("method3"))));

@@ -64,7 +64,7 @@
 	
 	<beans:bean id="dummyWriter" class="org.springframework.batch.sample.support.DummyItemWriter"/>
 
-	<beans:bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener">
+	<beans:bean id="promotionListener" class="org.springframework.batch.core.listener.ExecutionContextPromotionListener" scope="step">
 		<beans:property name="keys" value="stepName"/>
 	</beans:bean>
 	
