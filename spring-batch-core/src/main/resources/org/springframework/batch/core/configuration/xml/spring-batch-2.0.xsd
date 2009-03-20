@@ -166,11 +166,11 @@
 					<xsd:annotation>
 						<xsd:documentation>
 							Defines a stage in job processing backed by a
-							Step. The id attribute must be specified and
-							can match the id of a bean definition
-							for a Step. If it does not, then you must provide
-							a tasklet definition or a
-							reference to a Step defined elsewhere.
+							Step. The id attribute must be specified.  The
+							step requires either a tasklet definition, a 
+							tasklet reference, a reference to a step defined
+							elsewhere, or a reference to a (possibly 
+							abstract) parent step.
 						</xsd:documentation>
 					</xsd:annotation>
 					<xsd:complexType>
@@ -180,9 +180,7 @@
 								<xsd:attribute name="ref" type="xsd:string" use="optional">
 									<xsd:annotation>
 										<xsd:documentation>
-											The step name attribute defines the name for the step. It can be used as
-											a reference to
-											another bean definition where business logic is specified.
+											A reference to a step defined elsewhere.
 										</xsd:documentation>
 										<xsd:appinfo>
 											<tool:annotation kind="ref" />
@@ -203,21 +201,21 @@
 					<xsd:complexType>
 						<xsd:complexContent>
 							<xsd:extension base="nextType">
-								<xsd:sequence minOccurs="2" maxOccurs="unbounded">
-									<xsd:element name="flow" type="flowType">
+								<xsd:sequence>
+									<xsd:element name="flow" type="flowType" minOccurs="2" maxOccurs="unbounded">
 										<xsd:annotation>
 											<xsd:documentation>
 												A subflow within a job, having the same format as a job, but without a separate identity.
 											</xsd:documentation>
 										</xsd:annotation>
 									</xsd:element>
-									<xsd:group ref="transitions" />
+									<xsd:group ref="transitions"/>
 								</xsd:sequence>
 								<xsd:attribute name="id" type="xsd:ID" use="required" />
 								<xsd:attribute name="task-executor" type="xsd:string" use="optional">
 									<xsd:annotation>
 										<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
-										The task executor responsible for executing the task..
+										The task executor responsible for executing the task.
 										]]></xsd:documentation>
 										<xsd:appinfo>
 											<tool:annotation kind="ref">
@@ -237,24 +235,21 @@
 						</xsd:documentation>
 					</xsd:annotation>
 					<xsd:complexType>
-						<xsd:complexContent>
-							<xsd:extension base="transitionType">
-								<xsd:attribute name="id" type="xsd:ID" use="required" />
-								<xsd:attribute name="decider" type="xsd:string" use="required">
-									<xsd:annotation>
-										<xsd:documentation>
-											The decider is a reference to a JobExecutionDecider that can produce a status to base
-											the next transition on.
-										</xsd:documentation>
-										<xsd:appinfo>
-											<tool:annotation kind="ref">
-												<tool:expected-type type="org.springframework.batch.core.job.flow.JobExecutionDecider" />
-											</tool:annotation>
-										</xsd:appinfo>
-									</xsd:annotation>
-								</xsd:attribute>
-							</xsd:extension>
-						</xsd:complexContent>
+						<xsd:group ref="transitions"/>
+						<xsd:attribute name="id" type="xsd:ID" use="required" />
+						<xsd:attribute name="decider" type="xsd:string" use="required">
+							<xsd:annotation>
+								<xsd:documentation>
+									The decider is a reference to a JobExecutionDecider that can produce a status to base
+									the next transition on.
+								</xsd:documentation>
+								<xsd:appinfo>
+									<tool:annotation kind="ref">
+										<tool:expected-type type="org.springframework.batch.core.job.flow.JobExecutionDecider" />
+									</tool:annotation>
+								</xsd:appinfo>
+							</xsd:annotation>
+						</xsd:attribute>
 					</xsd:complexType>
 				</xsd:element>
 			</xsd:choice>
@@ -284,7 +279,7 @@
 		<xsd:sequence>
 			<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
 			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
-			<xsd:group ref="stepListeners" />
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1" />
 		</xsd:sequence>
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
 	</xsd:complexType>
@@ -295,8 +290,8 @@
 				<xsd:sequence>
 					<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
 					<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
-					<xsd:group ref="stepListeners" />
-					<xsd:group ref="transitions" />
+					<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+					<xsd:group ref="transitions"/>
 				</xsd:sequence>
 				<xsd:attributeGroup ref="transactionManagerAttribute" />
 			</xsd:extension>
@@ -522,10 +517,6 @@
 		</xsd:attribute>
 	</xsd:complexType>
 
-	<xsd:complexType name="transitionType">
-		<xsd:group ref="transitions" />
-	</xsd:complexType>
-
 	<xsd:complexType name="listenerType">
 		<xsd:attribute name="ref" type="xsd:string">
 			<xsd:annotation>
@@ -585,24 +576,18 @@
 		</xsd:complexContent>
 	</xsd:complexType>
 
-	<xsd:group name="stepListeners">
+	<xsd:complexType name="stepListenersType">
+		<xsd:annotation>
+			<xsd:documentation><![CDATA[
+			The listeners for a step definition of any type relevant for a step (extensions of StepListener),
+			]]>
+			</xsd:documentation>
+		</xsd:annotation>
 		<xsd:sequence>
-			<xsd:element name="listeners" minOccurs="0" maxOccurs="1">
-				<xsd:annotation>
-					<xsd:documentation><![CDATA[
-					The listeners for a step definition of any type relevant for a step (extensions of StepListener),
-					]]>
-					</xsd:documentation>
-				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:sequence>
-						<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded" />
-					</xsd:sequence>
-					<xsd:attributeGroup ref="mergeAttribute" />
-				</xsd:complexType>
-			</xsd:element>
+			<xsd:element name="listener" type="stepListenerType" minOccurs="1" maxOccurs="unbounded" />
 		</xsd:sequence>
-	</xsd:group>
+		<xsd:attributeGroup ref="mergeAttribute" />
+	</xsd:complexType>
 
 	<xsd:group name="transitions">
 		<xsd:sequence>
@@ -699,7 +684,7 @@
 			</xsd:choice>
 		</xsd:sequence>
 	</xsd:group>
-	
+		
 	<xsd:attributeGroup name="jobRepositoryAttribute">
 		<xsd:attribute name="job-repository" type="xsd:string"
 			default="jobRepository">
