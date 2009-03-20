@@ -73,8 +73,8 @@
       <classname>JobInstance</classname>. Ideally, all jobs should be able to
       start up where they left off, but there are scenarios where this is not
       possible. <emphasis role="bold">It is entirely up to the developer to
-      ensure that a new <classname>JobInstance</classname> is created in this scenario</emphasis>.
-      However, Spring Batch does provide some help. If a
+      ensure that a new <classname>JobInstance</classname> is created in this
+      scenario</emphasis>. However, Spring Batch does provide some help. If a
       <classname>Job</classname> should never be restarted, but should always
       be run as part of a new <classname>JobInstance</classname>, then the
       restartable property may be set to 'false':</para>
@@ -170,6 +170,46 @@
   }
 
 </programlisting>
+    </section>
+
+    <section>
+      <title>Inheriting from a Parent Job</title>
+
+      <para>If a group of <classname>Job</classname>s share similar, but not
+      identical, configurations, then it may be helpful to define a "parent"
+      <classname>Job</classname> from which the concrete
+      <classname>Job</classname>s may inherit properties. Similar to class
+      inheritance in Java, the "child" <classname>Job</classname> will combine
+      its elements and attributes with the parent's. </para>
+
+      <para>In the following example, "baseJob" is an abstract
+      <classname>Job</classname> definition that defines only a list of
+      listeners. The <classname>Job</classname> "job1" is a concrete
+      definition that inherits the list of listeners from "baseJob" and merges
+      it with its own list of listeners to produce a
+      <classname>Job</classname> with two listeners and one
+      <classname>Step</classname>, "step1".</para>
+
+      <programlisting>
+  &lt;job id="baseJob" abstract="true"&gt;
+    &lt;listeners&gt;
+      &lt;listener class="com.ListenerOne"/&gt;
+    &lt;listeners&gt;
+  &lt;/job&gt;
+
+  &lt;job id="job1" parent="baseJob3"&gt;
+    &lt;step id="step1" ref="standaloneStep"/&gt;
+
+    &lt;listeners merge="true"&gt;
+      &lt;listener class="com.ListenerTwo"/&gt;
+    &lt;listeners&gt;
+  &lt;/job&gt;
+
+</programlisting>
+
+      <para>Please see the section on <link
+      linkend="InheritingFromParentStep">Inheriting from a Parent Step</link>
+      for more detailed information. </para>
     </section>
 
     <section>
@@ -321,47 +361,42 @@
       <programlisting>  &lt;bean id="jobRepository" 
         class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
 
-      <para>Note that the in-memory repository is volatile and so does
-      not allow restart between JVM instances.  It also cannot
-      guarantee that two job instances with the same parameters are
-      launched simultaneously.  So use the database version of the
-      repository wherever you need quality of service.</para>
-
+      <para>Note that the in-memory repository is volatile and so does not
+      allow restart between JVM instances. It also cannot guarantee that two
+      job instances with the same parameters are launched simultaneously. So
+      use the database version of the repository wherever you need quality of
+      service.</para>
     </section>
 
     <section>
       <title>Non-standard Database Types in a Repository</title>
 
-      <para>If you are using a database platform that is not in the
-      list of supported platforms, you may be able to use one of the
-      supported types, if the SQL variant is close enough.  To do this
-      you can use the
-      raw <classname>JobRepositoryFactoryBean</classname> instead of
-      the namespace shortcut and use it to set the database type to
-      the closest match:</para>
+      <para>If you are using a database platform that is not in the list of
+      supported platforms, you may be able to use one of the supported types,
+      if the SQL variant is close enough. To do this you can use the raw
+      <classname>JobRepositoryFactoryBean</classname> instead of the namespace
+      shortcut and use it to set the database type to the closest
+      match:</para>
 
-      <programlisting><![CDATA[
-<bean id="jobRepository" class="org...JobRepositoryFactoryBean">
-  <property name="databaseType" value="db2"/>
-  <property name="dataSource" ref="dataSource"/>
-</bean>
-]]></programlisting>
+      <programlisting>
+&lt;bean id="jobRepository" class="org...JobRepositoryFactoryBean"&gt;
+  &lt;property name="databaseType" value="db2"/&gt;
+  &lt;property name="dataSource" ref="dataSource"/&gt;
+&lt;/bean&gt;
+</programlisting>
 
-      <para>(The <classname>JobRepositoryFactoryBean</classname> tries
-      to auto-detect the database type from
-      the <classname>DataSource</classname> if it is not specified.)
-      The major differences between platforms are mainly accounted for
-      by the strategy for incrementing primary keys, so often it might
-      be necessary to override
-      the <literal>incrementerFactory</literal> as well (using one of
-      the standard implementations from the Spring Framework).</para>
+      <para>(The <classname>JobRepositoryFactoryBean</classname> tries to
+      auto-detect the database type from the <classname>DataSource</classname>
+      if it is not specified.) The major differences between platforms are
+      mainly accounted for by the strategy for incrementing primary keys, so
+      often it might be necessary to override the
+      <literal>incrementerFactory</literal> as well (using one of the standard
+      implementations from the Spring Framework).</para>
 
-      <para>If even that doesn't work, or you are not using an RDBMS,
-      then the only option may be to implement the
-      various <classname>Dao</classname> interfaces that
-      the <classname>SimpleJobRepository</classname> depends on and
-      wire one up manually in the normal Spring way.</para>
-
+      <para>If even that doesn't work, or you are not using an RDBMS, then the
+      only option may be to implement the various <classname>Dao</classname>
+      interfaces that the <classname>SimpleJobRepository</classname> depends
+      on and wire one up manually in the normal Spring way.</para>
     </section>
   </section>
 
