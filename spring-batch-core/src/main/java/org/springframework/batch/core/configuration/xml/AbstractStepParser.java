@@ -59,11 +59,10 @@ public abstract class AbstractStepParser {
 		String taskletRef = stepElement.getAttribute("tasklet");
 		@SuppressWarnings("unchecked")
 		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, "tasklet");
-		boolean taskletElementExists = taskletElements.size() > 0;
 		boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
 		AbstractBeanDefinition bd = null;
 		if (StringUtils.hasText(taskletRef)) {
-			if (taskletElementExists) {
+			if (taskletElements.size() > 0) {
 				parserContext.getReaderContext().error(
 						"The <" + taskletElements.get(0).getNodeName()
 								+ "> element can't be combined with the 'tasklet=\"" + taskletRef
@@ -71,9 +70,12 @@ public abstract class AbstractStepParser {
 			}
 			bd = parseTaskletRef(stepElement, taskletRef, parserContext, jobRepositoryRef);
 		}
-		else if (taskletElementExists) {
+		else if (taskletElements.size() == 1) {
 			Element taskElement = taskletElements.get(0);
 			bd = taskletElementParser.parse(taskElement, parserContext, stepUnderspecified);
+		}
+		else if (taskletElements.size() > 1) {
+			parserContext.getReaderContext().error("The 'tasklet' element may not appear more than once.", stepElement);
 		}
 
 		if (bd != null) {
@@ -123,18 +125,23 @@ public abstract class AbstractStepParser {
 		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
 		bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
 
-		Element child = DomUtils.getChildElementByTagName(stepElement, "transaction-attributes");
-		if (child != null) {
-			String attributes = DomUtils.getTextValue(child);
+		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, "transaction-attributes");
+		if (txAttrElements.size() == 1) {
+			Element txAttrElement = txAttrElements.get(0);
+			String attributes = DomUtils.getTextValue(txAttrElement);
 			if (StringUtils.hasLength(attributes)) {
 				String[] attributesArray = StringUtils.tokenizeToStringArray(attributes, ",\n");
 				if (attributesArray.length > 0) {
 					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
+					managedList.setMergeEnabled(Boolean.valueOf(txAttrElement.getAttribute("merge")));
 					managedList.addAll(Arrays.asList(attributesArray));
 					bd.getPropertyValues().addPropertyValue("transactionAttributeList", managedList);
 				}
 			}
+		}
+		else if (txAttrElements.size() > 1) {
+			parserContext.getReaderContext().error(
+					"The 'transaction-attribute' element may not appear more than once.", stepElement);
 		}
 
 		handleListenersElement(stepElement, bd, parserContext);
@@ -161,11 +168,12 @@ public abstract class AbstractStepParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleListenersElement(Element element, BeanDefinition bd, ParserContext parserContext) {
-		Element listenersElement = DomUtils.getChildElementByTagName(element, "listeners");
-		if (listenersElement != null) {
+	private void handleListenersElement(Element stepElement, BeanDefinition bd, ParserContext parserContext) {
+		List<Element> listenersElements = DomUtils.getChildElementsByTagName(stepElement, "listeners");
+		if (listenersElements.size() == 1) {
+			Element listenersElement = listenersElements.get(0);
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
-					parserContext.extractSource(element));
+					parserContext.extractSource(stepElement));
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList listenerBeans = new ManagedList();
 			listenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute("merge")));
@@ -177,6 +185,10 @@ public abstract class AbstractStepParser {
 			}
 			bd.getPropertyValues().addPropertyValue("listeners", listenerBeans);
 			parserContext.popAndRegisterContainingComponent();
+		}
+		else if (listenersElements.size() > 1) {
+			parserContext.getReaderContext().error("The 'listeners' element may not appear more than once.",
+					stepElement);
 		}
 	}
 

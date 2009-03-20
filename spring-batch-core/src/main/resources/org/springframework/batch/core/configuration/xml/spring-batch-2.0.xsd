@@ -276,11 +276,11 @@
 	</xsd:group>
 
 	<xsd:complexType name="stepType">
-		<xsd:sequence>
+		<xsd:choice minOccurs="0" maxOccurs="3">
 			<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
 			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1" />
-		</xsd:sequence>
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+		</xsd:choice>
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
 	</xsd:complexType>
 
@@ -288,16 +288,18 @@
 		<xsd:complexContent>
 			<xsd:extension base="nextType">
 				<xsd:sequence>
-					<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
-					<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
-					<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+					<xsd:choice minOccurs="0" maxOccurs="3">
+						<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
+						<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
+						<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+					</xsd:choice>
 					<xsd:group ref="transitions"/>
 				</xsd:sequence>
 				<xsd:attributeGroup ref="transactionManagerAttribute" />
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
-
+	
 	<xsd:complexType name="taskletType">
 		<xsd:all>
 			<xsd:element name="retry-listeners" minOccurs="0" maxOccurs="1">
