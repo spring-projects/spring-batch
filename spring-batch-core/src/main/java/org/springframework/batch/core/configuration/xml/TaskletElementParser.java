@@ -42,6 +42,18 @@ import org.w3c.dom.NamedNodeMap;
  */
 public class TaskletElementParser {
 
+	private static final String ID_ATTR = "id";
+
+	private static final String REF_ATTR = "ref";
+
+	private static final String CLASS_ATTR = "class";
+
+	private static final String MERGE_ATTR = "merge";
+
+	private static final String COMMIT_INTERVAL_ATTR = "commit-interval";
+
+	private static final String CHUNK_COMPLETION_POLICY_ATTR = "chunk-completion-policy";
+
 	/**
 	 * @param element
 	 * @param parserContext
@@ -54,7 +66,7 @@ public class TaskletElementParser {
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 
 		propertyValues.addPropertyValue("hasTaskletElement", Boolean.TRUE);
-		
+
 		String readerBeanId = element.getAttribute("reader");
 		if (StringUtils.hasText(readerBeanId)) {
 			RuntimeBeanReference readerRef = new RuntimeBeanReference(readerBeanId);
@@ -79,12 +91,12 @@ public class TaskletElementParser {
 			propertyValues.addPropertyValue("taskExecutor", taskExecutorRef);
 		}
 
-		String commitInterval = element.getAttribute("commit-interval");
+		String commitInterval = element.getAttribute(COMMIT_INTERVAL_ATTR);
 		if (StringUtils.hasText(commitInterval)) {
 			propertyValues.addPropertyValue("commitInterval", commitInterval);
 		}
 
-		String completionPolicyRef = element.getAttribute("chunk-completion-policy");
+		String completionPolicyRef = element.getAttribute(CHUNK_COMPLETION_POLICY_ATTR);
 		if (StringUtils.hasText(completionPolicyRef)) {
 			RuntimeBeanReference completionPolicy = new RuntimeBeanReference(completionPolicyRef);
 			propertyValues.addPropertyValue("chunkCompletionPolicy", completionPolicy);
@@ -93,8 +105,8 @@ public class TaskletElementParser {
 		if (!underspecified
 				&& propertyValues.contains("commitInterval") == propertyValues.contains("chunkCompletionPolicy")) {
 			parserContext.getReaderContext().error(
-					"The 'tasklet' element must contain either 'commit-interval' "
-							+ "or 'chunk-completion-policy', but not both.", element);
+					"The '" + element.getNodeName() + "' element must contain either '" + COMMIT_INTERVAL_ATTR + "' "
+							+ "or '" + CHUNK_COMPLETION_POLICY_ATTR + "', but not both.", element);
 		}
 
 		String skipLimit = element.getAttribute("skip-limit");
@@ -141,7 +153,7 @@ public class TaskletElementParser {
 				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
 				if (exceptionArray.length > 0) {
 					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
+					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
 					managedList.addAll(Arrays.asList(exceptionArray));
 					bd.getPropertyValues().addPropertyValue(propertyName, managedList);
 				}
@@ -156,7 +168,7 @@ public class TaskletElementParser {
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList retryListenerBeans = new ManagedList();
-			retryListenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute("merge")));
+			retryListenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans);
 			bd.getPropertyValues().addPropertyValue("retryListeners", retryListenerBeans);
 			parserContext.popAndRegisterContainingComponent();
@@ -168,9 +180,9 @@ public class TaskletElementParser {
 		List<Element> listenerElements = DomUtils.getChildElementsByTagName(element, "listener");
 		if (listenerElements != null) {
 			for (Element listenerElement : listenerElements) {
-				String id = listenerElement.getAttribute("id");
-				String listenerRef = listenerElement.getAttribute("ref");
-				String className = listenerElement.getAttribute("class");
+				String id = listenerElement.getAttribute(ID_ATTR);
+				String listenerRef = listenerElement.getAttribute(REF_ATTR);
+				String className = listenerElement.getAttribute(CLASS_ATTR);
 				checkListenerElementAttributes(parserContext, element, listenerElement, id, listenerRef, className);
 				if (StringUtils.hasText(listenerRef)) {
 					BeanReference bean = new RuntimeBeanReference(listenerRef);
@@ -185,8 +197,8 @@ public class TaskletElementParser {
 				}
 				else {
 					parserContext.getReaderContext().error(
-							"Neither 'ref' or 'class' specified for <" + listenerElement.getTagName() + "> element",
-							element);
+							"Neither '" + REF_ATTR + "' or '" + CLASS_ATTR + "' specified for <"
+									+ listenerElement.getTagName() + "> element", element);
 				}
 			}
 		}
@@ -194,7 +206,7 @@ public class TaskletElementParser {
 
 	private void checkListenerElementAttributes(ParserContext parserContext, Element element, Element listenerElement,
 			String id, String listenerRef, String className) {
-		if ((StringUtils.hasText(id) || StringUtils.hasText(className)) && StringUtils.hasText(listenerRef)) {
+		if (StringUtils.hasText(className) && StringUtils.hasText(listenerRef)) {
 			NamedNodeMap attributeNodes = listenerElement.getAttributes();
 			StringBuilder attributes = new StringBuilder();
 			for (int i = 0; i < attributeNodes.getLength(); i++) {
@@ -204,8 +216,8 @@ public class TaskletElementParser {
 				attributes.append(attributeNodes.item(i));
 			}
 			parserContext.getReaderContext().error(
-					"Both 'ref' and " + (StringUtils.hasText(id) ? "'id'" : "'class'")
-							+ " specified; use 'class' with an optional 'id' or just 'ref' for <"
+					"Both '" + REF_ATTR + "' and '" + CLASS_ATTR + "' specified; use '" + CLASS_ATTR
+							+ "' with an optional '" + ID_ATTR + "' or just '" + REF_ATTR + "' for <"
 							+ listenerElement.getTagName() + "> element specified with attributes: " + attributes,
 					element);
 		}
@@ -216,18 +228,18 @@ public class TaskletElementParser {
 		Element streamsElement = DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
 			ManagedList streamBeans = new ManagedList();
-			streamBeans.setMergeEnabled(Boolean.valueOf(streamsElement.getAttribute("merge")));
+			streamBeans.setMergeEnabled(Boolean.valueOf(streamsElement.getAttribute(MERGE_ATTR)));
 			List<Element> streamElements = DomUtils.getChildElementsByTagName(streamsElement, "stream");
 			if (streamElements != null) {
 				for (Element streamElement : streamElements) {
-					String streamRef = streamElement.getAttribute("ref");
+					String streamRef = streamElement.getAttribute(REF_ATTR);
 					if (StringUtils.hasText(streamRef)) {
 						BeanReference bean = new RuntimeBeanReference(streamRef);
 						streamBeans.add(bean);
 					}
 					else {
 						parserContext.getReaderContext().error(
-								"ref not specified for <" + streamElement.getTagName() + "> element", element);
+								REF_ATTR + " not specified for <" + streamElement.getTagName() + "> element", element);
 					}
 				}
 			}

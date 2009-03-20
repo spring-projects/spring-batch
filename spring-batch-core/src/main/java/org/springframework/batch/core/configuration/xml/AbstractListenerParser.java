@@ -22,6 +22,12 @@ import org.w3c.dom.NamedNodeMap;
  */
 public abstract class AbstractListenerParser {
 
+	private static final String ID_ATTR = "id";
+	
+	private static final String REF_ATTR = "ref";
+	
+	private static final String CLASS_ATTR = "class";
+
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(getBeanClass());
 		doParse(element, parserContext, builder);
@@ -30,9 +36,9 @@ public abstract class AbstractListenerParser {
 
 	@SuppressWarnings("unchecked")
 	public void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
-		String id = element.getAttribute("id");
-		String listenerRef = element.getAttribute("ref");
-		String className = element.getAttribute("class");
+		String id = element.getAttribute(ID_ATTR);
+		String listenerRef = element.getAttribute(REF_ATTR);
+		String className = element.getAttribute(CLASS_ATTR);
 		checkListenerElementAttributes(parserContext, element, id, listenerRef, className);
 
 		if (StringUtils.hasText(listenerRef)) {
@@ -44,7 +50,8 @@ public abstract class AbstractListenerParser {
 		}
 		else {
 			parserContext.getReaderContext().error(
-					"Neither 'ref' or 'class' specified for <" + element.getTagName() + "> element", element);
+					"Neither '" + REF_ATTR + "' or '" + CLASS_ATTR + "' specified for <" + element.getTagName()
+							+ "> element", element);
 		}
 
 		ManagedMap metaDataMap = new ManagedMap();
@@ -69,8 +76,8 @@ public abstract class AbstractListenerParser {
 				attributes.append(attributeNodes.item(i));
 			}
 			parserContext.getReaderContext().error(
-					"Either 'ref' or 'class' may be specified, but not both; <" + element.getTagName()
-							+ "> element specified with attributes: " + attributes, element);
+					"Either '" + REF_ATTR + "' or '" + CLASS_ATTR + "' may be specified, but not both; <"
+							+ element.getTagName() + "> element specified with attributes: " + attributes, element);
 		}
 	}
 

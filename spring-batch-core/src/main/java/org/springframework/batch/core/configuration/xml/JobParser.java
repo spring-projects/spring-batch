@@ -37,6 +37,8 @@ import org.w3c.dom.Element;
  */
 public class JobParser extends AbstractSingleBeanDefinitionParser {
 
+	private JobExecutionListenerParser jobListenerParser = new JobExecutionListenerParser();
+
 	@Override
 	protected Class<FlowJob> getBeanClass(Element element) {
 		return FlowJob.class;
@@ -89,7 +91,6 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		BeanDefinition flowDef = flowParser.parse(element, parserContext);
 		builder.addPropertyValue("flow", flowDef);
 
-		JobExecutionListenerParser listenerParser = new JobExecutionListenerParser();
 		List<Element> listenersElements = DomUtils.getChildElementsByTagName(element, "listeners");
 		if (listenersElements.size() == 1) {
 			Element listenersElement = listenersElements.get(0);
@@ -101,7 +102,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(listenersElement,
 					"listener");
 			for (Element listenerElement : listenerElements) {
-				listeners.add(listenerParser.parse(listenerElement, parserContext));
+				listeners.add(jobListenerParser.parse(listenerElement, parserContext));
 			}
 			builder.addPropertyValue("jobExecutionListeners", listeners);
 			parserContext.popAndRegisterContainingComponent();
@@ -110,7 +111,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			parserContext.getReaderContext().error(
 					"The 'listeners' element may not appear more than once in a single <job/>.", element);
 		}
-		
+
 	}
 
 }

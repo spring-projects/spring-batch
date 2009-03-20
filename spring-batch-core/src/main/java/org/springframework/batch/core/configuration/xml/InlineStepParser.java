@@ -42,6 +42,8 @@ import org.w3c.dom.Element;
  */
 public class InlineStepParser extends AbstractStepParser {
 
+	private static final String REF_ATTR = "ref";
+
 	/**
 	 * Parse the step and turn it into a list of transitions.
 	 * 
@@ -57,37 +59,28 @@ public class InlineStepParser extends AbstractStepParser {
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
 				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
-		String stepId = element.getAttribute("id");
-		String stepRef = element.getAttribute("ref");
-		String taskletRef = element.getAttribute("tasklet");
+		String stepId = element.getAttribute(ID_ATTR);
+		String stepRef = element.getAttribute(REF_ATTR);
+		String taskletRef = element.getAttribute(TASKLET_ATTR);
 
 		@SuppressWarnings("unchecked")
-		List<Element> listOfTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "tasklet");
+		List<Element> listOfTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, TASKLET_ELE);
 		@SuppressWarnings("unchecked")
-		List<Element> listOfListenersElements = (List<Element>) DomUtils
-				.getChildElementsByTagName(element, "listeners");
+		List<Element> listOfListenersElements = (List<Element>) DomUtils.getChildElementsByTagName(element,
+				LISTENERS_ELE);
 
 		if (StringUtils.hasText(stepRef)) {
 			if (StringUtils.hasText(taskletRef)) {
-				parserContext.getReaderContext().error(
-						"The 'tasklet' attribute can't be combined with the 'ref=\"" + stepRef
-								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
+				cantBeCombinedWithRef(TASKLET_ATTR, "attribute", element, parserContext);
 			}
 			if (listOfTaskElements.size() > 0) {
-				parserContext.getReaderContext().error(
-						"The <" + listOfTaskElements.get(0).getNodeName()
-								+ "> element can't be combined with the 'ref=\"" + stepRef
-								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
+				cantBeCombinedWithRef(TASKLET_ELE, "element", element, parserContext);
 			}
 			if (listOfListenersElements.size() > 0) {
-				parserContext.getReaderContext().error(
-						"The 'listeners' element can't be combined with the 'ref=\"" + stepRef
-								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
+				cantBeCombinedWithRef(LISTENERS_ELE, "element", element, parserContext);
 			}
-			if (StringUtils.hasText(element.getAttribute("parent"))) {
-				parserContext.getReaderContext().error(
-						"The 'parent' element can't be combined with the 'ref=\"" + stepRef
-								+ "\"' attribute specification for <" + element.getNodeName() + ">", element);
+			if (StringUtils.hasText(element.getAttribute(PARENT_ATTR))) {
+				cantBeCombinedWithRef(PARENT_ATTR, "attribute", element, parserContext);
 			}
 			BeanDefinitionBuilder stepBuilder = BeanDefinitionBuilder
 					.genericBeanDefinition("org.springframework.batch.core.configuration.xml.DelegatingStep");
@@ -107,6 +100,13 @@ public class InlineStepParser extends AbstractStepParser {
 		}
 		return FlowParser.getNextElements(parserContext, stepId, stateBuilder.getBeanDefinition(), element);
 
+	}
+
+	private void cantBeCombinedWithRef(String itemName, String itemType, Element element, ParserContext parserContext) {
+		parserContext.getReaderContext().error(
+				"The '" + itemName + "' " + itemType + " can't be combined with the '" + REF_ATTR + "=\""
+						+ element.getAttribute(REF_ATTR) + "\"' attribute specification for <" + element.getNodeName()
+						+ ">", element);
 	}
 
 }

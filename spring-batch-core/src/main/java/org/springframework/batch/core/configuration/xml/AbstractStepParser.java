@@ -44,6 +44,20 @@ import org.w3c.dom.Element;
  */
 public abstract class AbstractStepParser {
 
+	protected static final String ID_ATTR = "id";
+
+	protected static final String PARENT_ATTR = "parent";
+
+	protected static final String TASKLET_ATTR = "tasklet";
+
+	protected static final String TASKLET_ELE = "tasklet";
+
+	protected static final String LISTENERS_ELE = "listeners";
+
+	protected static final String MERGE_ATTR = "merge";
+
+	private static final String TX_ATTRIBUTES_ELE = "transaction-attributes";
+
 	private TaskletElementParser taskletElementParser = new TaskletElementParser();
 
 	private StepListenerParser stepListenerParser = new StepListenerParser();
@@ -56,17 +70,17 @@ public abstract class AbstractStepParser {
 	protected AbstractBeanDefinition parseTasklet(Element stepElement, ParserContext parserContext,
 			String jobRepositoryRef) {
 
-		String taskletRef = stepElement.getAttribute("tasklet");
+		String taskletRef = stepElement.getAttribute(TASKLET_ATTR);
 		@SuppressWarnings("unchecked")
-		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, "tasklet");
+		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, TASKLET_ELE);
 		boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
 		AbstractBeanDefinition bd = null;
 		if (StringUtils.hasText(taskletRef)) {
 			if (taskletElements.size() > 0) {
 				parserContext.getReaderContext().error(
-						"The <" + taskletElements.get(0).getNodeName()
-								+ "> element can't be combined with the 'tasklet=\"" + taskletRef
-								+ "\"' attribute specification for <" + stepElement.getNodeName() + ">", stepElement);
+						"The <" + TASKLET_ELE + "/> element can't be combined with the '" + TASKLET_ATTR + "=\""
+								+ taskletRef + "\"' attribute specification for <" + stepElement.getNodeName() + "/>",
+						stepElement);
 			}
 			bd = parseTaskletRef(stepElement, taskletRef, parserContext, jobRepositoryRef);
 		}
@@ -76,7 +90,8 @@ public abstract class AbstractStepParser {
 		}
 		else if (taskletElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The 'tasklet' element may not appear more than once in a single <step/>.", stepElement);
+					"The '<" + TASKLET_ELE + "/>' element may not appear more than once in a single <"
+							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
 
 		if (bd != null) {
@@ -84,8 +99,8 @@ public abstract class AbstractStepParser {
 		}
 		else if (!stepUnderspecified) {
 			parserContext.getReaderContext().error(
-					"Step [" + stepElement.getAttribute("id")
-							+ "] has neither a <tasklet/> element nor a 'tasklet' attribute.", stepElement);
+					"Step [" + stepElement.getAttribute(ID_ATTR) + "] has neither a <" + TASKLET_ELE
+							+ "/> element nor a '" + TASKLET_ATTR + "' attribute.", stepElement);
 		}
 
 		return bd;
@@ -126,7 +141,7 @@ public abstract class AbstractStepParser {
 		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
 		bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
 
-		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, "transaction-attributes");
+		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, TX_ATTRIBUTES_ELE);
 		if (txAttrElements.size() == 1) {
 			Element txAttrElement = txAttrElements.get(0);
 			String propagation = txAttrElement.getAttribute("propagation");
@@ -144,13 +159,14 @@ public abstract class AbstractStepParser {
 		}
 		else if (txAttrElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The 'transaction-attributes' element may not appear more than once in a single <step/>.",
-					stepElement);
+					"The '" + TX_ATTRIBUTES_ELE + "' element may not appear more than once in a single <"
+							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
 
 		handleListenersElement(stepElement, bd, parserContext);
-		
-		handleExceptionElement(stepElement, parserContext, bd, "no-rollback-exception-classes", "noRollbackExceptionClasses");
+
+		handleExceptionElement(stepElement, parserContext, bd, "no-rollback-exception-classes",
+				"noRollbackExceptionClasses");
 
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
 
@@ -168,7 +184,7 @@ public abstract class AbstractStepParser {
 				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
 				if (exceptionArray.length > 0) {
 					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute("merge")));
+					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
 					managedList.addAll(Arrays.asList(exceptionArray));
 					bd.getPropertyValues().addPropertyValue(propertyName, managedList);
 				}
@@ -185,7 +201,7 @@ public abstract class AbstractStepParser {
 		if (StringUtils.hasText(allowStartIfComplete)) {
 			bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
 		}
-		String parentRef = stepElement.getAttribute("parent");
+		String parentRef = stepElement.getAttribute(PARENT_ATTR);
 		if (StringUtils.hasText(parentRef)) {
 			bd.setParentName(parentRef);
 		}
@@ -193,14 +209,14 @@ public abstract class AbstractStepParser {
 
 	@SuppressWarnings("unchecked")
 	private void handleListenersElement(Element stepElement, BeanDefinition bd, ParserContext parserContext) {
-		List<Element> listenersElements = DomUtils.getChildElementsByTagName(stepElement, "listeners");
+		List<Element> listenersElements = DomUtils.getChildElementsByTagName(stepElement, LISTENERS_ELE);
 		if (listenersElements.size() == 1) {
 			Element listenersElement = listenersElements.get(0);
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
 					parserContext.extractSource(stepElement));
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList listenerBeans = new ManagedList();
-			listenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute("merge")));
+			listenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {
@@ -211,8 +227,9 @@ public abstract class AbstractStepParser {
 			parserContext.popAndRegisterContainingComponent();
 		}
 		else if (listenersElements.size() > 1) {
-			parserContext.getReaderContext().error("The 'listeners' element may not appear more than once in a single <step/>.",
-					stepElement);
+			parserContext.getReaderContext().error(
+					"The '" + LISTENERS_ELE + "' element may not appear more than once in a single <"
+							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
 	}
 
