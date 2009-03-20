@@ -3,6 +3,7 @@
 	<artifactId>org.springframework.batch.samples</artifactId>
 	<packaging>jar</packaging>
 	<name>Samples</name>
+	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Example batch jobs using Spring Batch Core and Execution.]]>

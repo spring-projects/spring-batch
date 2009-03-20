@@ -3,6 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>org.springframework.batch.test</artifactId>
 	<name>Test</name>
+	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
 	<packaging>jar</packaging>
 	<description>Domain for batch job testing</description>
 

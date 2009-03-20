@@ -3,6 +3,7 @@
 	<artifactId>org.springframework.batch.infrastructure</artifactId>
 	<packaging>jar</packaging>
 	<name>Infrastructure</name>
+	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[The Spring Batch Infrastructure is a set of low-level components, interfaces and tools for batch processing applications and optimisations.]]>

@@ -4,6 +4,7 @@
 	<artifactId>org.springframework.batch.core</artifactId>
 	<packaging>jar</packaging>
 	<name>Core</name>
+	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
 	<description>
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Core domain for batch processing, expressing a domain of Jobs, Steps, Chunks, etc.]]>
