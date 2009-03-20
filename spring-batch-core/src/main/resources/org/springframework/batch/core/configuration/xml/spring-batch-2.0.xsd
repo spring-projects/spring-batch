@@ -210,36 +210,33 @@
 					</xsd:documentation>
 				</xsd:annotation>
 				<xsd:complexType>
-					<xsd:complexContent>
-						<xsd:extension base="nextType">
-							<xsd:choice minOccurs="0" maxOccurs="unbounded">
-								<xsd:element name="flow">
-									<xsd:annotation>
-										<xsd:documentation>
-											A subflow within a job, having the same format as a job, but without a separate identity.
-										</xsd:documentation>
-									</xsd:annotation>
-									<xsd:complexType>
-										<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded"/>
-									</xsd:complexType>
-								</xsd:element>
-								<xsd:group ref="transitions"/>
-							</xsd:choice>
-							<xsd:attribute name="id" type="xsd:ID" use="required" />
-							<xsd:attribute name="task-executor" type="xsd:string" use="optional">
-								<xsd:annotation>
-									<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
-									The task executor responsible for executing the task.
-									]]></xsd:documentation>
-									<xsd:appinfo>
-										<tool:annotation kind="ref">
-											<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
-										</tool:annotation>
-									</xsd:appinfo>
-								</xsd:annotation>
-							</xsd:attribute>
-						</xsd:extension>
-					</xsd:complexContent>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="flow">
+							<xsd:annotation>
+								<xsd:documentation>
+									A subflow within a job, having the same format as a job, but without a separate identity.
+								</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:group ref="flowGroup" minOccurs="0" maxOccurs="unbounded"/>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:group ref="transitions"/>
+					</xsd:choice>
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attribute name="task-executor" type="xsd:string" use="optional">
+						<xsd:annotation>
+							<xsd:documentation source="java:org.springframework.core.task.TaskExecutor"><![CDATA[
+							The task executor responsible for executing the task.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type type="org.springframework.core.task.TaskExecutor" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
+					<xsd:attributeGroup ref="nextAttribute"/>
 				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="decision">
@@ -270,27 +267,28 @@
 	</xsd:group>
 
 	<xsd:complexType name="stepType">
-		<xsd:choice minOccurs="0" maxOccurs="3">
-			<xsd:element name="tasklet" type="taskletType" minOccurs="0" maxOccurs="1" />
-			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
-			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="stepElements"/>
 		</xsd:choice>
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
 	</xsd:complexType>
 
 	<xsd:complexType name="flowStepType">
-		<xsd:complexContent>
-			<xsd:extension base="nextType">
-				<xsd:choice minOccurs="0" maxOccurs="unbounded">
-					<xsd:element name="tasklet" type="taskletType"/>
-					<xsd:element name="transaction-attributes" type="transaction-attributesType"/>
-					<xsd:element name="listeners" type="stepListenersType"/>
-					<xsd:group ref="transitions"/>
-				</xsd:choice>
-				<xsd:attributeGroup ref="transactionManagerAttribute" />
-			</xsd:extension>
-		</xsd:complexContent>
+		<xsd:choice minOccurs="0" maxOccurs="unbounded">
+			<xsd:group ref="stepElements"/>
+			<xsd:group ref="transitions"/>
+		</xsd:choice>
+		<xsd:attributeGroup ref="transactionManagerAttribute" />
+		<xsd:attributeGroup ref="nextAttribute"/>
 	</xsd:complexType>
+
+	<xsd:group name="stepElements">
+		<xsd:choice>
+			<xsd:element name="tasklet" type="taskletType"/>
+			<xsd:element name="transaction-attributes" type="transaction-attributesType"/>
+			<xsd:element name="listeners" type="stepListenersType"/>
+		</xsd:choice>
+	</xsd:group>
 	
 	<xsd:complexType name="taskletType">
 		<xsd:all>
@@ -499,7 +497,7 @@
 		</xsd:simpleContent>
 	</xsd:complexType>
 
-	<xsd:complexType name="nextType">
+	<xsd:attributeGroup name="nextAttribute">
 		<xsd:attribute name="next" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
@@ -509,7 +507,7 @@
 				</xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-	</xsd:complexType>
+	</xsd:attributeGroup>
 
 	<xsd:complexType name="listenerType">
 		<xsd:attribute name="ref" type="xsd:string">
