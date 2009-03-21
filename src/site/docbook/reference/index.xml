@@ -2,76 +2,77 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <book xmlns:xi="http://www.w3.org/2001/XInclude">
-  <bookinfo>
-    <title>Spring Batch - Reference Documentation</title>
+	<bookinfo>
+		<title>Spring Batch - Reference Documentation</title>
 
-    <releaseinfo>Spring Batch 2.0.0.RC2</releaseinfo>
+		<releaseinfo>Spring Batch 2.0.0.RC2</releaseinfo>
 
-    <authorgroup>
-      <author>
-        <firstname>Lucas</firstname>
-	<surname>Ward</surname>
-      </author>
-      <author>
-        <firstname>Dave</firstname>
+		<authorgroup>
+			<author>
+				<firstname>Lucas</firstname>
+				<surname>Ward</surname>
+			</author>
+			<author>
+				<firstname>Dave</firstname>
+				<surname>Syer</surname>
+			</author>
 
-        <surname>Syer</surname>
-      </author>
+			<author>
+				<firstname>Thomas</firstname>
+				<surname>Risberg</surname>
+			</author>
 
-      <author>
-        <firstname>Thomas</firstname>
+			<author>
+				<firstname>Robert</firstname>
+				<surname>Kasanicky</surname>
+			</author>
 
-        <surname>Risberg</surname>
-      </author>
+			<author>
+				<firstname>Dan</firstname>
+				<surname>Garrette</surname>
+			</author>
 
-      <author>
-        <firstname>Robert</firstname>
+			<author>
+				<firstname>Wayne</firstname>
+				<surname>Lund</surname>
+			</author>
 
-        <surname>Kasanicky</surname>
-      </author>
+		</authorgroup>
 
-      <author>
-        <firstname>Wayne</firstname>
+		<legalnotice>
+			<para>Copies of this document may be made for your own use and for
+				distribution to others, provided that you do not charge any fee for such
+				copies and further provided that each copy contains this Copyright
+				Notice, whether distributed in print or electronically.</para>
+		</legalnotice>
+	</bookinfo>
 
-        <surname>Lund</surname>
-      </author>
+	<xi:include href="spring-batch-intro.xml" />
 
-    </authorgroup>
+	<xi:include href="whatsnew.xml" />
 
-    <legalnotice>
-      <para>Copies of this document may be made for your own use and for
-      distribution to others, provided that you do not charge any fee for such
-      copies and further provided that each copy contains this Copyright
-      Notice, whether distributed in print or electronically.</para>
-    </legalnotice>
-  </bookinfo>
+	<xi:include href="domain.xml" />
 
-  <xi:include href="spring-batch-intro.xml" />
-   
-  <xi:include href="whatsnew.xml" />
+	<xi:include href="job.xml" />
 
-  <xi:include href="domain.xml" />
-  
-  <xi:include href="job.xml" />
-  
-  <xi:include href="step.xml" />
+	<xi:include href="step.xml" />
 
-  <xi:include href="readersAndWriters.xml" />
+	<xi:include href="readersAndWriters.xml" />
 
-  <xi:include href="scalability.xml" />
+	<xi:include href="scalability.xml" />
 
-  <xi:include href="repeat.xml" />
+	<xi:include href="repeat.xml" />
 
-  <xi:include href="retry.xml" />
-  
-  <xi:include href="testing.xml" />
-  
-  <xi:include href="common-patterns.xml" />
+	<xi:include href="retry.xml" />
 
-  <xi:include href="appendix.xml" />
-  
-  <xi:include href="schema-appendix.xml" />
+	<xi:include href="testing.xml" />
 
-  <xi:include href="glossary.xml" />
+	<xi:include href="common-patterns.xml" />
+
+	<xi:include href="appendix.xml" />
+
+	<xi:include href="schema-appendix.xml" />
+
+	<xi:include href="glossary.xml" />
 
 </book>
