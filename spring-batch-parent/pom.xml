@@ -48,7 +48,7 @@
 			</distributionManagement>
 		</profile>
 		<profile>
-			<id>release</id>
+			<id>sources</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -109,6 +109,13 @@
 		</profile>
 	</profiles>
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.springframework.build.aws</groupId>
+				<artifactId>org.springframework.build.aws.maven</artifactId>
+				<version>2.0.0.RELEASE</version>
+			</extension>
+		</extensions>
 		<pluginManagement>
 			<plugins>
 				<plugin>

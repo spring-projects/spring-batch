@@ -263,10 +263,10 @@
 											</fileset>
 											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
 										</unzip>
-										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
+										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing or wrong.">
 											<condition>
 												<not>
-													<resourcecount count="3">
+													<resourcecount count="9">
 														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
 													</resourcecount>
 												</not>
@@ -295,10 +295,32 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-invoker-plugin</artifactId>
-					</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-invoker-plugin</artifactId>
+					<inherited>false</inherited>
+					<configuration>
+						<projectsDirectory>target/it/no-dep</projectsDirectory>
+						<localRepositoryPath>target/local-repo</localRepositoryPath>
+						<debug>true</debug>
+						<settingsFile>${basedir}/src/it/settings.xml</settingsFile>
+						<goals>
+							<goal>test</goal>
+						</goals>
+						<pomIncludes>
+							<pomInclude>samples/*/pom.xml</pomInclude>
+						</pomIncludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -452,31 +474,6 @@
 							<version>1.7.0</version>
 						</dependency>
 					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-invoker-plugin</artifactId>
-					<configuration>
-						<projectsDirectory>target/it/no-dep</projectsDirectory>
-						<localRepositoryPath>target/local-repo</localRepositoryPath>
-						<debug>true</debug>
-						<settingsFile>${basedir}/src/it/settings.xml</settingsFile>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<pomIncludes>
-							<pomInclude>samples/*/pom.xml</pomInclude>
-						</pomIncludes>
-					</configuration>
-					<executions>
-						<execution>
-							<id>integration-test</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>run</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
