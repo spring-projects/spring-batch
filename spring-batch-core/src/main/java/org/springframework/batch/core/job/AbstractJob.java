@@ -254,7 +254,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 				// The job was already stopped before we even got this far. Deal
 				// with it in the same way as any other interruption.
-				execution.setStatus(BatchStatus.FAILED);
+				execution.setStatus(BatchStatus.STOPPED);
 				execution.setExitStatus(ExitStatus.COMPLETED);
 
 			}
@@ -346,7 +346,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 			jobRepository.updateExecutionContext(execution);
 
-			if (currentStepExecution.getStatus() == BatchStatus.STOPPING) {
+			if (currentStepExecution.getStatus() == BatchStatus.STOPPING || currentStepExecution.getStatus() == BatchStatus.STOPPED) {
 				throw new JobInterruptedException("Job interrupted by step execution");
 			}
 

@@ -1,0 +1,152 @@
+Spring Batch 2.0.0.RC2 Release Notes
+
+* Issues
+
+  * {{{http://jira.springframework.org/browse/BATCH-1165}BATCH-1165}} -	Allow 'id' and 'ref' to exist together on <*-listener/>
+
+  * {{{http://jira.springframework.org/browse/BATCH-1164}BATCH-1164}} -	Putting scope="step" on a listener causes failure
+
+  * {{{http://jira.springframework.org/browse/BATCH-1163}BATCH-1163}} -	In Batch xsd, elements in <job/> should be unordered
+
+  * {{{http://jira.springframework.org/browse/BATCH-1162}BATCH-1162}} -	In Batch xsd, elements in <split/> should be unordered
+
+  * {{{http://jira.springframework.org/browse/BATCH-1161}BATCH-1161}} -	Throw error if a flow has no steps
+
+  * {{{http://jira.springframework.org/browse/BATCH-1160}BATCH-1160}} -	In Batch xsd, stepType and flowStepType should be unordered
+
+  * {{{http://jira.springframework.org/browse/BATCH-1159}BATCH-1159}} -	PROCESS_SKIP_COUNT seems not to ever get written to database
+
+  * {{{http://jira.springframework.org/browse/BATCH-1157}BATCH-1157}} -	Add max count parameter to counting item readers
+
+  * {{{http://jira.springframework.org/browse/BATCH-1154}BATCH-1154}} -	TaskletElementParser can't predict which StepFactoryBean to use
+
+  * {{{http://jira.springframework.org/browse/BATCH-1153}BATCH-1153}} -	listener element should only have an "id" when defined at the top level
+
+  * {{{http://jira.springframework.org/browse/BATCH-1152}BATCH-1152}} -	Allow comma and newline as delimiters in exception lists in namespace
+
+  * {{{http://jira.springframework.org/browse/BATCH-1151}BATCH-1151}} -	Add IDE support to <retry-listeners/> in xsd
+
+  * {{{http://jira.springframework.org/browse/BATCH-1147}BATCH-1147}} -	StepExecution getFilterCount always return 0
+
+  * {{{http://jira.springframework.org/browse/BATCH-1145}BATCH-1145}} -	Conflicts if both <step/> and <tasklet/> have a "parent" attribute
+
+  * {{{http://jira.springframework.org/browse/BATCH-1144}BATCH-1144}} -	Create top-level element <job-listener/>
+
+  * {{{http://jira.springframework.org/browse/BATCH-1143}BATCH-1143}} -	Standalone <step/> should not be allowed to have "tasklet" attribute and <tasklet/> together
+
+  * {{{http://jira.springframework.org/browse/BATCH-1142}BATCH-1142}} -	In the xsd, <listeners/> should be moved from "flowType" to "job"
+
+  * {{{http://jira.springframework.org/browse/BATCH-1141}BATCH-1141}} -	Rename CompositeExecutionJobListener to CompositeJobExecutionListener
+
+  * {{{http://jira.springframework.org/browse/BATCH-1139}BATCH-1139}} -	Add "parent" attribute to <tasklet/>
+
+  * {{{http://jira.springframework.org/browse/BATCH-1138}BATCH-1138}} -	Add "parent" attribute to <job/>
+
+  * {{{http://jira.springframework.org/browse/BATCH-1136}BATCH-1136}} -	Add setListeners(StepExecutionListener[]) to TaskletStep
+
+  * {{{http://jira.springframework.org/browse/BATCH-1135}BATCH-1135}} -	Create top-level element <step-listener/>
+
+  * {{{http://jira.springframework.org/browse/BATCH-1134}BATCH-1134}} -	Create a superclass for StepListenerParser and JobExecutionListenerParser
+
+  * {{{http://jira.springframework.org/browse/BATCH-1132}BATCH-1132}} -	Add "parent" attribute to <step/>
+
+  * {{{http://jira.springframework.org/browse/BATCH-1131}BATCH-1131}} -	It is not possible to set transaction-attributes for a tasklet step
+
+  * {{{http://jira.springframework.org/browse/BATCH-1130}BATCH-1130}} -	Ensure Ordered is respected by generated listeners
+
+  * {{{http://jira.springframework.org/browse/BATCH-1129}BATCH-1129}} -	Problems with exception classifications
+
+  * {{{http://jira.springframework.org/browse/BATCH-1128}BATCH-1128}} -	Make sure WRITE_COUNT and ROLLBACK_COUNT are being updated correctly
+
+  * {{{http://jira.springframework.org/browse/BATCH-1127}BATCH-1127}} -	Add contextual line number information for exceptions thrown by FlatFileItemReader
+
+  * {{{http://jira.springframework.org/browse/BATCH-1126}BATCH-1126}} -	StepScope does not apply to twice nested inner beans
+
+  * {{{http://jira.springframework.org/browse/BATCH-1125}BATCH-1125}} -	NoWorkFoundStepExecutionListener doesn't fail the step
+
+  * {{{http://jira.springframework.org/browse/BATCH-1124}BATCH-1124}} -	Fix error message that occurs when the same annotation is used twice on one method
+
+  * {{{http://jira.springframework.org/browse/BATCH-1123}BATCH-1123}} -	ExecutionContextPromotionListener may perform promotion multiple times
+
+  * {{{http://jira.springframework.org/browse/BATCH-1122}BATCH-1122}} -	StaxEventWriter.startDocument() needs to be protected
+
+  * {{{http://jira.springframework.org/browse/BATCH-1121}BATCH-1121}} -	Documentation should cover the 'no work found' scenario
+
+  * {{{http://jira.springframework.org/browse/BATCH-1120}BATCH-1120}} -	Allow completion policy to be set on step
+
+  * {{{http://jira.springframework.org/browse/BATCH-1119}BATCH-1119}} -	afterWrite() will only be called if an exception is raised during throttling
+
+  * {{{http://jira.springframework.org/browse/BATCH-1118}BATCH-1118}} -	Listener annotation with wrong signature fails too late and too quietly
+
+  * {{{http://jira.springframework.org/browse/BATCH-1117}BATCH-1117}} -	onWriteError should be called with only the bad item
+
+  * {{{http://jira.springframework.org/browse/BATCH-1116}BATCH-1116}} -	Create section on MetaDataInstanceFactory in testing chapter
+
+  * {{{http://jira.springframework.org/browse/BATCH-1113}BATCH-1113}} -	query for JdbcJobExecutionDao.findRunningJobExecutions is broken
+
+  * {{{http://jira.springframework.org/browse/BATCH-1112}BATCH-1112}} -	Remove cycle in infrastructure database/support
+
+  * {{{http://jira.springframework.org/browse/BATCH-1111}BATCH-1111}} -	ChunkListener called before WriteListener
+
+  * {{{http://jira.springframework.org/browse/BATCH-1110}BATCH-1110}} -	Defer EntityManager flushing and clearing in JpaPagingItemReader
+
+  * {{{http://jira.springframework.org/browse/BATCH-1109}BATCH-1109}} -	Generalise PrefixMatching* to PatternMatching*
+
+  * {{{http://jira.springframework.org/browse/BATCH-1108}BATCH-1108}} -	Add composite ItemWriter/Processor based on Classifier
+
+  * {{{http://jira.springframework.org/browse/BATCH-1107}BATCH-1107}} -	Fix Date conversion in PlaceholderTargetSource
+
+  * {{{http://jira.springframework.org/browse/BATCH-1106}BATCH-1106}} -	SqlPagingQueryProviderFactoryBean ascending should default to true
+
+  * {{{http://jira.springframework.org/browse/BATCH-1105}BATCH-1105}} -	Namespace error in documentation
+
+  * {{{http://jira.springframework.org/browse/BATCH-1104}BATCH-1104}} -	Wrong stax version in spring-batch-parent-2.0.0.RC1.pom, is 1.2 should be 1.2.0
+
+  * {{{http://jira.springframework.org/browse/BATCH-1103}BATCH-1103}} -	Add partioning sample
+
+  * {{{http://jira.springframework.org/browse/BATCH-1102}BATCH-1102}} -	Classes with "listener" annotations should be auto-registered
+
+  * {{{http://jira.springframework.org/browse/BATCH-1101}BATCH-1101}} -	Remove StepScope bean definition from samples that don't need it
+
+  * {{{http://jira.springframework.org/browse/BATCH-1099}BATCH-1099}} -	Make writer in skip sample stateful
+
+  * {{{http://jira.springframework.org/browse/BATCH-1098}BATCH-1098}} -	Check @AfterWrite is only called once per item
+
+  * {{{http://jira.springframework.org/browse/BATCH-1097}BATCH-1097}} -	Add late binding to some io samples
+
+  * {{{http://jira.springframework.org/browse/BATCH-1096}BATCH-1096}} -	Add late binding to some io samples
+
+  * {{{http://jira.springframework.org/browse/BATCH-1093}BATCH-1093}} -	Make AbstractJobTests.makeUniqueJobParameters() public
+
+  * {{{http://jira.springframework.org/browse/BATCH-1092}BATCH-1092}} -	Fix naming conventions for exit status in <end/>
+
+  * {{{http://jira.springframework.org/browse/BATCH-1091}BATCH-1091}} -	Add strict flag to file readers (flat and XML).
+
+  * {{{http://jira.springframework.org/browse/BATCH-1072}BATCH-1072}} -	Update docs to reflect attribute change in step element
+
+  * {{{http://jira.springframework.org/browse/BATCH-1065}BATCH-1065}} -	"BATCH-1011
+
+  * {{{http://jira.springframework.org/browse/Update documentation to explain end/fail/pause transitions"
+  * {{{http://jira.springframework.org/browse/BATCH-976}BATCH-976}} -	Provide automatic batch database schema installation utility
+
+  * {{{http://jira.springframework.org/browse/BATCH-937}BATCH-937}} -	Make sure JobRepository can be proxied
+
+  * {{{http://jira.springframework.org/browse/BATCH-935}BATCH-935}} -	Use NumberFormat when parsing real numbers
+
+  * {{{http://jira.springframework.org/browse/BATCH-918}BATCH-918}} -	Duplicate jar files in *-with-dependencies.zip
+
+  * {{{http://jira.springframework.org/browse/BATCH-902}BATCH-902}} -	Revise FAQ on web site
+
+  * {{{http://jira.springframework.org/browse/BATCH-794}BATCH-794}} -	Align with SpringSource Enterprise Repository
+
+  * {{{http://jira.springframework.org/browse/BATCH-632}BATCH-632}} -	Move Tasklet interface from core to infrastructure
+
+  * {{{http://jira.springframework.org/browse/BATCH-573}BATCH-573}} -	Delegating streams and listeners (e.g. HibernateAwareItemWriter) should delegate those interfaces to their delegates.
+
+  * {{{http://jira.springframework.org/browse/BATCH-501}BATCH-501}} -	Core and Infrastructure still have circular dependency
+
+  * {{{http://jira.springframework.org/browse/BATCH-470}BATCH-470}} -	RFC: Can all ExceptionHandlers be replaced by a combination of making Repeat/RetryListeners more robust and rewriting as Listeners?
+
+  * {{{http://jira.springframework.org/browse/BATCH-394}BATCH-394}} -	If FieldSet is an interface it needs a factory, otherwise existing clients are tied to specific implementations
+
+  * {{{http://jira.springframework.org/browse/BATCH-22}BATCH-22}} -	Find alternative to ThreadLocal for RepeatSynchronizationManager

@@ -16,6 +16,7 @@
 package org.springframework.batch.sample.launch;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -83,7 +84,7 @@ public class RemoteLauncherTests {
 		assertTrue(launcher.getJobNames().contains("loopJob"));
 	}
 
-	//@Test
+	@Test
 	public void testPauseJob() throws Exception {
 		final int SLEEP_INTERVAL = 600;
 		assertTrue(isConnected());
@@ -100,18 +101,19 @@ public class RemoteLauncherTests {
 //		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
 		logger.debug(launcher.getSummary(executionId));
 		long resumedId = launcher.restart(executionId);
-		assertEquals("Picked up the same execution after pause and resume", executionId, resumedId);
+		assertNotSame("Picked up the same execution after pause and resume", executionId, resumedId);
 
 		Thread.sleep(SLEEP_INTERVAL);
-		launcher.stop(executionId);
+		launcher.stop(resumedId);
 		Thread.sleep(SLEEP_INTERVAL);
 
 //		assertEquals(0, launcher.getRunningExecutions("loopJob").size());
-		logger.debug(launcher.getSummary(executionId));
-		long resumeId2 = launcher.restart(executionId);
-		assertEquals("Picked up the same execution after pause and resume", executionId, resumeId2);
+		logger.debug(launcher.getSummary(resumedId));
+		long resumeId2 = launcher.restart(resumedId);
+		assertNotSame("Picked up the same execution after pause and resume", executionId, resumeId2);
 
-		launcher.stop(executionId);
+		Thread.sleep(SLEEP_INTERVAL);
+		launcher.stop(resumeId2);
 
 	}
 

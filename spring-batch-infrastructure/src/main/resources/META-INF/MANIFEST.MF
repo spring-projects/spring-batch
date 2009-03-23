@@ -115,4 +115,3 @@ Export-Package: org.springframework.batch.item;version="0",org.springf
  support",org.springframework.batch.support.transaction;version="0";us
  es:="org.aopalliance.intercept,org.springframework.transaction,org.sp
  ringframework.transaction.support"
-

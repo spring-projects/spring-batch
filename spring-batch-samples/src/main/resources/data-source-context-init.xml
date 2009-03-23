@@ -7,6 +7,7 @@
 		<property name="dataSource" ref="dataSource"/>
 		<property name="initScripts">
 			<list>
+				<value>${batch.drop.script}</value>
 				<value>${batch.schema.script}</value>
 				<value>${batch.business.schema.script}</value>
 			</list>

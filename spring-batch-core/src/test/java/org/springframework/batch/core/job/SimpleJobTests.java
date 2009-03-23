@@ -341,26 +341,13 @@ public class SimpleJobTests {
 				"no steps configured") >= 0);
 	}
 
-	// public void testNoStepsExecuted() throws Exception {
-	// StepExecution completedExecution = new
-	// StepExecution("completedExecution", jobExecution);
-	// completedExecution.setStatus(BatchStatus.COMPLETED);
-	//
-	// job.execute(jobExecution);
-	// ExitStatus exitStatus = jobExecution.getExitStatus();
-	// assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
-	// assertTrue("Wrong message in execution: " + exitStatus,
-	// exitStatus.getExitDescription().contains(
-	// "steps already completed"));
-	// }
-
 	@Test
 	public void testNotExecutedIfAlreadyStopped() throws Exception {
 		jobExecution.stop();
 		job.execute(jobExecution);
 
 		assertEquals(0, list.size());
-		checkRepository(BatchStatus.FAILED, ExitStatus.NOOP);
+		checkRepository(BatchStatus.STOPPED, ExitStatus.NOOP);
 		ExitStatus exitStatus = jobExecution.getExitStatus();
 		assertEquals(ExitStatus.NOOP.getExitCode(), exitStatus.getExitCode());
 	}
@@ -454,7 +441,7 @@ public class SimpleJobTests {
 
 		assertNull("Second step was not supposed to be executed", step2.passedInStepContext);
 	}
-	
+
 	@Test
 	public void testGetStepExists() {
 		step1 = new StubStep("step1", jobRepository);
@@ -546,7 +533,7 @@ public class SimpleJobTests {
 				stepExecution.setExitStatus(ExitStatus.FAILED);
 				stepExecution.setStatus(BatchStatus.FAILED);
 				stepExecution.addFailureException(exception);
-				throw (JobInterruptedException)exception;
+				throw (JobInterruptedException) exception;
 			}
 			if (exception instanceof RuntimeException) {
 				stepExecution.setExitStatus(ExitStatus.FAILED);

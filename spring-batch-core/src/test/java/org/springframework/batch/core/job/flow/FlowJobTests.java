@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
@@ -38,7 +39,13 @@ import org.springframework.batch.core.job.flow.support.state.DecisionState;
 import org.springframework.batch.core.job.flow.support.state.EndState;
 import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.dao.JobExecutionDao;
+import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
+import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
+import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
+import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.batch.core.step.StepSupport;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 
@@ -53,8 +60,10 @@ public class FlowJobTests {
 	private JobExecution jobExecution;
 
 	private JobRepository jobRepository;
-
+	
 	private boolean fail = false;
+
+	private JobExecutionDao jobExecutionDao;
 
 	@Before
 	public void setUp() throws Exception {
@@ -62,6 +71,8 @@ public class FlowJobTests {
 		MapJobRepositoryFactoryBean factory = new MapJobRepositoryFactoryBean();
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.afterPropertiesSet();
+		jobExecutionDao = new MapJobExecutionDao();
+		jobRepository = new SimpleJobRepository(new MapJobInstanceDao(), jobExecutionDao, new MapStepExecutionDao(), new MapExecutionContextDao());
 		jobRepository = (JobRepository) factory.getObject();
 		job.setJobRepository(jobRepository);
 		jobExecution = jobRepository.createJobExecution("job", new JobParameters());
@@ -179,6 +190,29 @@ public class FlowJobTests {
 		job.doExecute(jobExecution);
 		assertEquals(2, jobExecution.getStepExecutions().size());
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+	}
+
+	@Test
+	public void testInterrupted() throws Exception {
+		SimpleFlow flow = new SimpleFlow("job");
+		List<StateTransition> transitions = new ArrayList<StateTransition>();
+		transitions.add(StateTransition.createStateTransition(new StepState(new StubStep("step1") {
+			@Override
+			public void execute(StepExecution stepExecution) throws JobInterruptedException {
+				stepExecution.setStatus(BatchStatus.STOPPING);
+				jobRepository.update(stepExecution);
+			}	
+		}), "end0"));
+		transitions.add(StateTransition.createEndStateTransition(new EndState(FlowExecutionStatus.COMPLETED, "end0")));
+		flow.setStateTransitions(transitions);
+		flow.afterPropertiesSet();
+		job.setFlow(flow);
+		job.afterPropertiesSet();
+		job.execute(jobExecution);
+		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
+		checkRepository(BatchStatus.STOPPED, ExitStatus.STOPPED);
+		assertEquals(1, jobExecution.getAllFailureExceptions().size());
+		assertEquals(JobInterruptedException.class, jobExecution.getFailureExceptions().get(0).getClass());
 	}
 
 	@Test
@@ -416,6 +450,17 @@ public class FlowJobTests {
 		}
 		fail("No stepExecution found with name: [" + stepName + "]");
 		return null;
+	}
+
+	private void checkRepository(BatchStatus status, ExitStatus exitStatus) {
+		// because map dao stores in memory, it can be checked directly
+		JobInstance jobInstance = jobExecution.getJobInstance();
+		JobExecution other = (JobExecution) jobExecutionDao.findJobExecutions(jobInstance).get(0);
+		assertEquals(jobInstance.getId(), other.getJobId());
+		assertEquals(status, other.getStatus());
+		if (exitStatus != null) {
+			assertEquals(exitStatus.getExitCode(), other.getExitStatus().getExitCode());
+		}
 	}
 
 }
