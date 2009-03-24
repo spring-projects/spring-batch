@@ -171,7 +171,7 @@
       <classname>Step</classname>s may inherit properties. Similar to class
       inheritance in Java, the "child" <classname>Step</classname> will
       combine its elements and attributes with the parent's. The child will
-      also override any of the parent's <classname>Step</classname>s. </para>
+      also override any of the parent's <classname>Step</classname>s.</para>
 
       <para>In the following example, the <classname>Step</classname>
       "concreteStep1" will inherit from "parentStep". It will be instantiated
@@ -231,7 +231,7 @@
         child to add additional listeners to the list defined by the parent,
         every list element has a "merge" attribute. If the element specifies
         that merge="true", then the child's list will be combined with the
-        parent's instead of overriding it. </para>
+        parent's instead of overriding it.</para>
 
         <para>In the following example, the <classname>Step</classname>
         "concreteStep3" will be created will two listeners:
@@ -1048,7 +1048,8 @@
 
     private Resource directory;
 
-    public ExitStatus execute() throws Exception {
+    public RepeatStatus execute(StepContribution contribution, 
+                                ChunkContext chunkContext) throws Exception {
       File dir = directory.getFile();
       Assert.state(dir.isDirectory());
     
@@ -1056,7 +1057,8 @@
       for (int i = 0; i &lt; files.length; i++) {
         boolean deleted = files[i].delete();
         if (!deleted) {
-          throw new UnexpectedJobExecutionException("Could not delete file " + files[i].getPath());
+          throw new UnexpectedJobExecutionException("Could not delete file " + 
+                                                     files[i].getPath());
         }
       }
       return ExitStatus.FINISHED;
