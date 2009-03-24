@@ -30,14 +30,14 @@ import org.springframework.validation.Errors;
  * @author Tomas Slanina
  * @author Robert Kasanicky
  */
-public class SpringValidator implements Validator, InitializingBean {
+public class SpringValidator<T> implements Validator<T>, InitializingBean {
 
 	private org.springframework.validation.Validator validator;
 
 	/**
 	 * @see Validator#validate(Object)
 	 */
-	public void validate(Object item) throws ValidationException {
+	public void validate(T item) throws ValidationException {
 
 		if (!validator.supports(item.getClass())) {
 			throw new ValidationException("Validation failed for " + item + ": " + item.getClass().getName()

@@ -28,9 +28,9 @@ import org.springframework.util.Assert;
  */
 public class ValidatingItemProcessor<T> implements ItemProcessor<T, T> {
 
-	private Validator validator;
+	private Validator<? super T> validator;
 	
-	public ValidatingItemProcessor(Validator validator){
+	public ValidatingItemProcessor(Validator<? super T> validator){
 		Assert.notNull(validator, "Validator must not be null.");
 		this.validator = validator;
 	}
@@ -40,7 +40,7 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T> {
 	 * 
 	 * @param validator
 	 */
-	public void setValidator(Validator validator) {
+	public void setValidator(Validator<? super T> validator) {
 		this.validator = validator;
 	}
 

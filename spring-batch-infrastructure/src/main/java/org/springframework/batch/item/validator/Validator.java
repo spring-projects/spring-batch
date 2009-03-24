@@ -23,12 +23,12 @@ package org.springframework.batch.item.validator;
  * @author tomas.slanina
  * 
  */
-public interface Validator {
+public interface Validator<T> {
 	/**
 	 * Method used to validate if the value is valid.
 	 * 
 	 * @param value object to be validated
 	 * @throws ValidationException if value is not valid.
 	 */
-	void validate(Object value) throws ValidationException;
+	void validate(T value) throws ValidationException;
 }

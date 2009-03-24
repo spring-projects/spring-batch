@@ -1,15 +1,20 @@
 package org.springframework.batch.item.validator;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertSame;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.easymock.EasyMock.*;
 
 /**
  * Tests for {@link ValidatingItemProcessor}.
  */
 public class ValidatingItemProcessorTests {
 
-	private Validator validator = createMock(Validator.class);
+	@SuppressWarnings("unchecked")
+	private Validator<String> validator = createMock(Validator.class);
 	
 	private ValidatingItemProcessor<String> tested = new ValidatingItemProcessor<String>(validator);
 	
