@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
@@ -39,12 +38,6 @@ public class StandaloneStepParser extends AbstractStepParser {
 	 */
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
 		String jobRepositoryRef = element.getAttribute("job-repository");
-		AbstractBeanDefinition bd = parseTasklet(element, parserContext, jobRepositoryRef);
-		if (bd == null) {
-			bd = new GenericBeanDefinition();
-			setUpBeanDefinition(element, bd, parserContext, element.getAttribute("job-repository"));
-		}
-
-		return bd;
+		return parseTasklet(element, parserContext, jobRepositoryRef);
 	}
 }

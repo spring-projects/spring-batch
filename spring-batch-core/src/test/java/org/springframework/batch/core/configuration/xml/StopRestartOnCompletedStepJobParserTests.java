@@ -43,7 +43,7 @@ public class StopRestartOnCompletedStepJobParserTests extends AbstractJobParserT
 		//
 		// First Launch
 		//
-		launchAndAssert("[s0, s1]");
+		launchAndAssert("[s1]");
 
 		//
 		// Second Launch

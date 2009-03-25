@@ -8,14 +8,13 @@
 	
 	<job id="job">
 		<step id="s0" ref="step2" next="fail"/>
-		<step id="fail" ref="taskletStep">
+		
+		<!-- On restart this step will be re-executed: effect is infinitely re-runnable job -->
+		<step id="fail" parent="failingStep" allow-start-if-complete="true">
 			<!-- On failure: stop the job, but restart with the same step. -->
 			<stop on="FAILED" restart="fail"/>
 			<end on="*"/>
 		</step>
 	</job>
-
-	<!-- On restart this step will be re-executed: effect is infinitely re-runnable job -->
-	<step id="taskletStep" parent="failingStep" allow-start-if-complete="true"/>
  
 </beans:beans>

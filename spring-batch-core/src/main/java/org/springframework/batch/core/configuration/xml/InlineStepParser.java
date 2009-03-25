@@ -85,10 +85,8 @@ public class InlineStepParser extends AbstractStepParser {
 		}
 		else {
 			AbstractBeanDefinition bd = parseTasklet(element, parserContext, jobRepositoryRef);
-			if (bd != null) {
-				parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
-				stateBuilder.addConstructorArgReference(stepId);
-			}
+			parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
+			stateBuilder.addConstructorArgReference(stepId);
 		}
 		return FlowParser.getNextElements(parserContext, stepId, stateBuilder.getBeanDefinition(), element);
 

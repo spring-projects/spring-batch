@@ -14,7 +14,7 @@ import org.w3c.dom.Element;
  */
 public class TopLevelStepListenerParser extends AbstractSingleBeanDefinitionParser {
 
-	private StepListenerParser stepListenerParser = new StepListenerParser();
+	private static final StepListenerParser stepListenerParser = new StepListenerParser();
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {

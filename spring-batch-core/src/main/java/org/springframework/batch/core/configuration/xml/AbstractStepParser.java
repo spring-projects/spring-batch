@@ -94,15 +94,18 @@ public abstract class AbstractStepParser {
 							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
 
-		if (bd != null) {
-			setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
-		}
-		else if (!stepUnderspecified) {
-			parserContext.getReaderContext().error(
-					"Step [" + stepElement.getAttribute(ID_ATTR) + "] has neither a <" + TASKLET_ELE
-							+ "/> element nor a '" + TASKLET_ATTR + "' attribute.", stepElement);
+		if (bd == null) {
+			if (stepUnderspecified) {
+				bd = new GenericBeanDefinition();
+			}
+			else {
+				parserContext.getReaderContext().error(
+						"Step [" + stepElement.getAttribute(ID_ATTR) + "] has neither a <" + TASKLET_ELE
+								+ "/> element nor a '" + TASKLET_ATTR + "' attribute.", stepElement);
+			}
 		}
 
+		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
 		return bd;
 
 	}

@@ -29,11 +29,12 @@ import org.w3c.dom.Element;
  */
 public class TopLevelStepParser extends AbstractBeanDefinitionParser {
 	
+	private static final StandaloneStepParser stepParser = new StandaloneStepParser();
+
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
 		CoreNamespaceUtils.checkForStepScope(parserContext, parserContext.extractSource(element));
-		StandaloneStepParser stepParser = new StandaloneStepParser();
 		return stepParser.parse(element, parserContext);
 		
 	}

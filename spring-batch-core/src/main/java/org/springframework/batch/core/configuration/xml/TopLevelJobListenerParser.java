@@ -14,7 +14,7 @@ import org.w3c.dom.Element;
  */
 public class TopLevelJobListenerParser extends AbstractSingleBeanDefinitionParser {
 
-	private JobExecutionListenerParser jobListenerParser = new JobExecutionListenerParser();
+	private static final JobExecutionListenerParser jobListenerParser = new JobExecutionListenerParser();
 
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
