@@ -15,17 +15,27 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import static org.springframework.batch.core.configuration.xml.FlowParser.END_ELE;
+import static org.springframework.batch.core.configuration.xml.FlowParser.FAIL_ELE;
+import static org.springframework.batch.core.configuration.xml.FlowParser.NEXT_ATTR;
+import static org.springframework.batch.core.configuration.xml.FlowParser.NEXT_ELE;
+import static org.springframework.batch.core.configuration.xml.FlowParser.STOP_ELE;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.batch.core.job.flow.support.state.StepState;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
-import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Internal parser for the &lt;step/&gt; elements inside a job. A step element
@@ -44,6 +54,8 @@ public class InlineStepParser extends AbstractStepParser {
 
 	private static final String REF_ATTR = "ref";
 
+	private static final String TX_MANAGER_ATTR = "transaction-manager";
+
 	/**
 	 * Parse the step and turn it into a list of transitions.
 	 * 
@@ -57,33 +69,13 @@ public class InlineStepParser extends AbstractStepParser {
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobRepositoryRef) {
 
-		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
-				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.StepState");
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
 		String stepId = element.getAttribute(ID_ATTR);
 		String stepRef = element.getAttribute(REF_ATTR);
-		String taskletRef = element.getAttribute(TASKLET_ATTR);
-
-		@SuppressWarnings("unchecked")
-		List<Element> listOfTaskElements = (List<Element>) DomUtils.getChildElementsByTagName(element, TASKLET_ELE);
-		@SuppressWarnings("unchecked")
-		List<Element> listOfListenersElements = (List<Element>) DomUtils.getChildElementsByTagName(element,
-				LISTENERS_ELE);
 
 		if (StringUtils.hasText(stepRef)) {
-			if (StringUtils.hasText(taskletRef)) {
-				cantBeCombinedWithRef(TASKLET_ATTR, "attribute", element, parserContext);
-			}
-			if (listOfTaskElements.size() > 0) {
-				cantBeCombinedWithRef(TASKLET_ELE, "element", element, parserContext);
-			}
-			if (listOfListenersElements.size() > 0) {
-				cantBeCombinedWithRef(LISTENERS_ELE, "element", element, parserContext);
-			}
-			if (StringUtils.hasText(element.getAttribute(PARENT_ATTR))) {
-				cantBeCombinedWithRef(PARENT_ATTR, "attribute", element, parserContext);
-			}
-			BeanDefinitionBuilder stepBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition("org.springframework.batch.core.configuration.xml.DelegatingStep");
+			this.checkStepRef(element, parserContext);
+			BeanDefinitionBuilder stepBuilder = BeanDefinitionBuilder.genericBeanDefinition(DelegatingStep.class);
 			stepBuilder.addConstructorArgValue(stepId);
 			stepBuilder.addConstructorArgReference(stepRef);
 			AbstractBeanDefinition bd = stepBuilder.getBeanDefinition();
@@ -100,6 +92,29 @@ public class InlineStepParser extends AbstractStepParser {
 		}
 		return FlowParser.getNextElements(parserContext, stepId, stateBuilder.getBeanDefinition(), element);
 
+	}
+
+	private void checkStepRef(Element element, ParserContext parserContext) {
+		List<String> legalAttributes = Arrays.asList(ID_ATTR, REF_ATTR, NEXT_ATTR, TX_MANAGER_ATTR);
+		NamedNodeMap allAttributes = element.getAttributes();
+		for (int i = 0; i < allAttributes.getLength(); i++) {
+			String attribute = allAttributes.item(i).getNodeName();
+			if (!legalAttributes.contains(attribute)) {
+				cantBeCombinedWithRef(attribute, "attribute", element, parserContext);
+			}
+		}
+
+		List<String> legalElements = Arrays.asList(NEXT_ELE, END_ELE, FAIL_ELE, STOP_ELE);
+		NodeList allElements = element.getChildNodes();
+		for (int i = 0; i < allElements.getLength(); i++) {
+			Node child = allElements.item(i);
+			if (child instanceof Element) {
+				String childName = child.getNodeName();
+				if (!legalElements.contains(childName)) {
+					cantBeCombinedWithRef(childName, "element", element, parserContext);
+				}
+			}
+		}
 	}
 
 	private void cantBeCombinedWithRef(String itemName, String itemType, Element element, ParserContext parserContext) {
