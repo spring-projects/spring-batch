@@ -16,7 +16,6 @@
 package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,22 +43,21 @@ public class StopRestartOnFailedStepJobParserTests extends AbstractJobParserTest
 		//
 		// First Launch
 		//
-		launchAndAssert();
+		launchAndAssert("[s0, fail]");
 
 		//
 		// Second Launch
 		//
 		stepNamesList.clear();
-		launchAndAssert();
+		launchAndAssert("[fail]");
 
 	}
 
-	private void launchAndAssert() throws JobInstanceAlreadyCompleteException, JobRestartException,
+	private void launchAndAssert(String stepNames) throws JobInstanceAlreadyCompleteException, JobRestartException,
 			JobExecutionAlreadyRunningException {
 		JobExecution jobExecution = createJobExecution();
 		job.execute(jobExecution);
-		assertEquals(1, stepNamesList.size());
-		assertTrue(stepNamesList.contains("fail"));
+		assertEquals(stepNames, stepNamesList.toString());
 
 		assertEquals(BatchStatus.STOPPED, jobExecution.getStatus());
 		assertEquals(ExitStatus.STOPPED.getExitCode(), jobExecution.getExitStatus().getExitCode());
