@@ -124,12 +124,6 @@ public class StepParserTests {
 		new XmlBeanFactory(new ClassPathResource(contextLocation));
 	}
 
-	@Test(expected = BeanDefinitionParsingException.class)
-	public void testStepParserParentAndRef() throws Exception {
-		new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAndRefTests-context.xml");
-	}
-
 	@Test
 	public void testParentStep() throws Exception {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(

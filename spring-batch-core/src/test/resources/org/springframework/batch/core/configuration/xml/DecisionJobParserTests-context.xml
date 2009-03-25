@@ -13,8 +13,8 @@
 			<next on="FOO" to="s1"/>
 			<next on="*" to="s2"/>
 		</decision>
-		<step id="s1" ref="step1" />
-		<step id="s2" ref="step2" />
+		<step id="s1" parent="step1" />
+		<step id="s2" parent="step2" />
 	</job>
 
 </beans:beans>

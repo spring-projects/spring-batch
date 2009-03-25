@@ -9,9 +9,10 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
-	<batch:job id="partitionJob">
-		<batch:step id="step" ref="step1:master" />
-	</batch:job>
+	<bean id="partitionJob" class="org.springframework.batch.core.job.SimpleJob">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="steps" ref="step1:master"/>
+	</bean>
 
 	<bean name="step1:master" class="org.springframework.batch.core.partition.support.PartitionStep">
 		<property name="jobRepository" ref="jobRepository" />

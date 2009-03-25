@@ -9,14 +9,14 @@
 	<beans:bean id="decider" class="org.springframework.batch.core.configuration.xml.StopJobParserTests$TestDecider"/>
 
 	<job id="job">
-		<step id="s1" ref="step1">
+		<step id="s1" parent="step1">
 			<stop on="COMPLETED" restart="decision"/>
 		</step>
 		<decision id="decision" decider="decider">
 			<next on="FOO" to="s2"/>
 			<end on="*" exit-code="FAILED"/>
 		</decision>
-		<step id="s2" ref="step2"/>
+		<step id="s2" parent="step2"/>
 	</job>
 
 </beans:beans>

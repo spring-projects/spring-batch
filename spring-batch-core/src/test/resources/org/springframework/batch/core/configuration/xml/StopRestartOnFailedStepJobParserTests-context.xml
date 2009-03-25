@@ -7,7 +7,7 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step id="s0" ref="step2" next="fail"/>
+		<step id="s0" parent="step2" next="fail"/>
 		
 		<!-- On restart this step will be re-executed: effect is infinitely re-runnable job -->
 		<step id="fail" parent="failingStep" allow-start-if-complete="true">

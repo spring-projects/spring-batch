@@ -69,7 +69,7 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="step">
+	<xsd:element name="step" type="stepType">
 		<xsd:annotation>
 			<xsd:documentation>
 				Defines a stage in job processing backed by a
@@ -78,16 +78,6 @@
 				to form a Job flow.
 			</xsd:documentation>
 		</xsd:annotation>
-		<xsd:complexType>
-			<xsd:complexContent>
-				<xsd:extension base="stepType">
-					<xsd:attribute name="id" type="xsd:ID" use="required" />
-					<xsd:attributeGroup ref="jobRepositoryAttribute" />
-					<xsd:attributeGroup ref="stepAttributes" />
-					<xsd:attributeGroup ref="abstractAttribute" />
-				</xsd:extension>
-			</xsd:complexContent>
-		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:element name="job-listener">
@@ -173,37 +163,17 @@
 
 	<xsd:group name="flowGroup">
 		<xsd:choice>
-			<xsd:element name="step">
+			<xsd:element name="step" type="flowStepType">
 				<xsd:annotation>
 					<xsd:documentation>
 						Defines a stage in job processing backed by a
 						Step. The id attribute must be specified. The
-						step
-						requires either a tasklet definition, a
+						step requires either a tasklet definition, a
 						tasklet reference, a reference to a step defined
-						elsewhere, or a reference
-						to a (possibly
+						elsewhere, or a reference to a (possibly
 						abstract) parent step.
 					</xsd:documentation>
 				</xsd:annotation>
-				<xsd:complexType>
-					<xsd:complexContent>
-						<xsd:extension base="flowStepType">
-							<xsd:attribute name="id" type="xsd:ID" use="required" />
-							<xsd:attribute name="ref" type="xsd:string" use="optional">
-								<xsd:annotation>
-									<xsd:documentation>
-										A reference to a step defined elsewhere.
-									</xsd:documentation>
-									<xsd:appinfo>
-										<tool:annotation kind="ref" />
-									</xsd:appinfo>
-								</xsd:annotation>
-							</xsd:attribute>
-							<xsd:attributeGroup ref="stepAttributes" />
-						</xsd:extension>
-					</xsd:complexContent>
-				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="split">
 				<xsd:annotation>
@@ -273,6 +243,10 @@
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
 			<xsd:group ref="stepElements" />
 		</xsd:choice>
+		<xsd:attribute name="id" type="xsd:ID" use="required" />
+		<xsd:attributeGroup ref="jobRepositoryAttribute" />
+		<xsd:attributeGroup ref="stepAttributes" />
+		<xsd:attributeGroup ref="abstractAttribute" />
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
 	</xsd:complexType>
 
@@ -281,6 +255,8 @@
 			<xsd:group ref="stepElements" />
 			<xsd:group ref="transitions" />
 		</xsd:choice>
+		<xsd:attribute name="id" type="xsd:ID" use="required" />
+		<xsd:attributeGroup ref="stepAttributes" />
 		<xsd:attributeGroup ref="transactionManagerAttribute" />
 		<xsd:attributeGroup ref="nextAttribute" />
 	</xsd:complexType>

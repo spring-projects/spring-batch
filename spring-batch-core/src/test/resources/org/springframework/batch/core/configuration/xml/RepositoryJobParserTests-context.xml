@@ -21,7 +21,7 @@
 	</beans:bean>
 
 	<job id="job" job-repository="thisRepository">
-		<step id="s1" ref="step1" />
+		<step id="s1" parent="step1" />
 	</job>
 
 </beans:beans>

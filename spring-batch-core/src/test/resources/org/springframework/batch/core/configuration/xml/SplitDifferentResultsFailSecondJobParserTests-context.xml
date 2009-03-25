@@ -14,18 +14,18 @@
 			<next on="FAILED" to="s3"/>
 
 			<flow>
-				<step id="s1" ref="step1"/>
+				<step id="s1" parent="step1"/>
 			</flow>
 			<fail on="COMPLETED" />
 
 			<flow>
-				<step id="fail" ref="failingStep"/>
+				<step id="fail" parent="failingStep"/>
 			</flow>
 
 
 		</split>
 
-		<step id="s3" ref="step3"/>
+		<step id="s3" parent="step3"/>
 
 	</job>
 

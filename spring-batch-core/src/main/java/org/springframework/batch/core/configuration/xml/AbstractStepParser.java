@@ -46,15 +46,15 @@ public abstract class AbstractStepParser {
 
 	protected static final String ID_ATTR = "id";
 
-	protected static final String PARENT_ATTR = "parent";
+	private static final String PARENT_ATTR = "parent";
 
-	protected static final String TASKLET_ATTR = "tasklet";
+	private static final String TASKLET_ATTR = "tasklet";
 
-	protected static final String TASKLET_ELE = "tasklet";
+	private static final String TASKLET_ELE = "tasklet";
 
-	protected static final String LISTENERS_ELE = "listeners";
+	private static final String LISTENERS_ELE = "listeners";
 
-	protected static final String MERGE_ATTR = "merge";
+	private static final String MERGE_ATTR = "merge";
 
 	private static final String TX_ATTRIBUTES_ELE = "transaction-attributes";
 

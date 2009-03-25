@@ -11,20 +11,20 @@
 			<tasklet reader="reader" writer="writer" commit-interval="5" />
 			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 		</step>
-		<step id="s2" ref="standalone2" next="s3" />
+		<step id="s2" parent="standalone2" next="s3" />
 		<step id="s3" tasklet="dummyTasklet" parent="baseStep" next="s4">
 			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 		</step>
-		<step id="s4" ref="standalone4" next="s5" />
+		<step id="s4" parent="standalone4" next="s5" />
 		<step id="s5" parent="baseStep" next="s6">
 			<tasklet reader="reader" writer="writer" commit-interval="5" />
 			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 		</step>
-		<step id="s6" ref="standalone6" next="s7" />
+		<step id="s6" parent="standalone6" next="s7" />
 		<step id="s7" tasklet="dummyTasklet" parent="baseStep" next="s8">
 			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 		</step>
-		<step id="s8" ref="standalone8" next="s5" />
+		<step id="s8" parent="standalone8" next="s5" />
 	</job>
 
 	<step id="standalone2" parent="baseStep">

@@ -45,15 +45,15 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 	private static final String SPLIT_ELE = "split";
 
-	public static final String NEXT_ATTR = "next";
+	private static final String NEXT_ATTR = "next";
 
-	public static final String NEXT_ELE = "next";
+	private static final String NEXT_ELE = "next";
 
-	public static final String END_ELE = "end";
+	private static final String END_ELE = "end";
 
-	public static final String FAIL_ELE = "fail";
+	private static final String FAIL_ELE = "fail";
 
-	public static final String STOP_ELE = "stop";
+	private static final String STOP_ELE = "stop";
 
 	private static final String ON_ATTR = "on";
 

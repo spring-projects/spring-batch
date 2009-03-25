@@ -20,7 +20,7 @@
 			<tasklet reader="gameFileItemReader" writer="gameWriter" 
 			               commit-interval="${job.commit.interval}" />
 		</step>
-		<step id="playerSummarization" ref="summarizationStep" />
+		<step id="playerSummarization" parent="summarizationStep" />
 	</job>
 
 	<step id="summarizationStep">

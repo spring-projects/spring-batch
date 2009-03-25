@@ -9,7 +9,7 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step id="fail" ref="failingStep">
+		<step id="fail" parent="failingStep">
 			<end on="*" />
 		</step>
 	</job>

@@ -25,7 +25,7 @@
 
 		<step id="errorPrint1" tasklet="errorLogTasklet" next="step2"/>
 
-		<step id="step2" ref="secondPass" next="skipCheckingDecision"/>
+		<step id="step2" parent="secondPass" next="skipCheckingDecision"/>
 
 		<decision id="skipCheckingDecision" decider="skipCheckingDecider">
 			<end on="*"/>

@@ -11,13 +11,13 @@
 	<job id="job">
 		<split id="split1" task-executor="taskExecutor">
 			<flow>
-				<step id="fail" ref="failingStep">
+				<step id="fail" parent="failingStep">
 					<fail on="FAILED"/>
 					<end on="*"/>
 				</step>
 			</flow>
 			<flow>
-				<step id="s1" ref="step1"/>
+				<step id="s1" parent="step1"/>
 			</flow>
 		</split>
 	</job>
