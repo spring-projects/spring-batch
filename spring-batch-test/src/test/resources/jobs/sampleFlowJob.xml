@@ -13,8 +13,8 @@
  			http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
 
 	<job id="sampleFlowJob">
-		<step id="step1" ref="s1" next="step2"/>
-		<step id="step2" ref="s2"/>
+		<step id="step1" parent="s1" next="step2"/>
+		<step id="step2" parent="s2"/>
 	</job>
 
 	<beans:bean id="s1" parent="taskletStep">
