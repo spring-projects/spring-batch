@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans:beans xmlns="http://www.springframework.org/schema/batch" 
-	xmlns:beans="http://www.springframework.org/schema/beans" 
-	xmlns:aop="http://www.springframework.org/schema/aop"
-	xmlns:tx="http://www.springframework.org/schema/tx"
-	xmlns:p="http://www.springframework.org/schema/p"
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
@@ -15,7 +12,7 @@
 		<step id="step1">
 			<tasklet reader="itemReader" processor="processor" writer="tradeWriter" commit-interval="2">
 				<streams>
-					<stream ref="fileItemReader"/>
+					<stream ref="fileItemReader" />
 				</streams>
 			</tasklet>
 		</step>
@@ -31,15 +28,12 @@
 		<beans:property name="dao" ref="tradeDao" />
 	</beans:bean>
 
-	<beans:bean id="itemReader"
-		class="org.springframework.batch.sample.support.ExceptionThrowingItemReaderProxy">
+	<beans:bean id="itemReader" class="org.springframework.batch.sample.support.ExceptionThrowingItemReaderProxy">
 		<beans:property name="delegate" ref="fileItemReader" />
 	</beans:bean>
 
-	<beans:bean id="fileItemReader"
-		class="org.springframework.batch.item.file.FlatFileItemReader">
-		<beans:property name="resource"
-			value="classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt" />
+	<beans:bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
+		<beans:property name="resource" value="#{jobParameters['input.file']}" />
 		<beans:property name="lineMapper">
 			<beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
 				<beans:property name="lineTokenizer" ref="fixedFileTokenizer" />
@@ -49,17 +43,14 @@
 		<beans:property name="saveState" value="true" />
 	</beans:bean>
 
-	<beans:bean id="fixedFileTokenizer"
-		class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
+	<beans:bean id="fixedFileTokenizer" class="org.springframework.batch.item.file.transform.FixedLengthTokenizer">
 		<beans:property name="names" value="ISIN, Quantity, Price, Customer" />
 		<beans:property name="columns" value="1-12, 13-15, 16-20, 21-29" />
 	</beans:bean>
 
-	<beans:bean id="fixedValidator"
-		class="org.springframework.batch.item.validator.SpringValidator">
+	<beans:bean id="fixedValidator" class="org.springframework.batch.item.validator.SpringValidator">
 		<beans:property name="validator">
-			<beans:bean id="tradeValidator"
-				class="org.springmodules.validation.valang.ValangValidator">
+			<beans:bean id="tradeValidator" class="org.springmodules.validation.valang.ValangValidator">
 				<beans:property name="valang">
 					<beans:value>
 						<![CDATA[
@@ -71,8 +62,7 @@
 		</beans:property>
 	</beans:bean>
 
-	<beans:bean id="tradeDao"
-		class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
+	<beans:bean id="tradeDao" class="org.springframework.batch.sample.domain.trade.internal.JdbcTradeDao">
 		<beans:property name="dataSource" ref="dataSource" />
 		<beans:property name="incrementer">
 			<beans:bean parent="incrementerParent">
@@ -82,7 +72,6 @@
 		</beans:property>
 	</beans:bean>
 
-	<beans:bean id="fieldSetMapper"
-		class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
+	<beans:bean id="fieldSetMapper" class="org.springframework.batch.sample.domain.trade.internal.TradeFieldSetMapper" />
 
 </beans:beans>

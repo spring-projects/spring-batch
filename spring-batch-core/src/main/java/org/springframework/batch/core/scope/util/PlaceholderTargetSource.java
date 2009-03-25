@@ -106,37 +106,24 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 					String key = (String) value;
 					if (key.startsWith(PLACEHOLDER_PREFIX) && key.endsWith(PLACEHOLDER_SUFFIX)) {
 						key = extractKey(key);
-						result = convertFromContext(key, requiredType);
+						result = convertFromContext(key, requiredType, typeConverter);
+						if (result==null) {
+							Object property = getPropertyFromContext(key);
+							// Give the normal type converter a chance by reversing to a String
+							if (property!=null) {
+								property = convertToString(property, typeConverter);
+								if (property!=null) {
+									value = property;
+								}
+							}
+						}
 					}
 				}
 				else if (requiredType.isAssignableFrom(value.getClass())) {
 					result = value;
 				}
 				else if (requiredType.isAssignableFrom(String.class)) {
-					if (typeConverter instanceof PropertyEditorRegistrySupport) {
-						/*
-						 * PropertyEditorRegistrySupport is de rigeur with
-						 * TypeConverter instances used internally by Spring. If
-						 * we have one of those then we can convert to String
-						 * but the TypeConverter doesn't know how to.
-						 */
-						PropertyEditorRegistrySupport registry = (PropertyEditorRegistrySupport) typeConverter;
-						PropertyEditor editor = registry.findCustomEditor(value.getClass(), null);
-						if (editor != null) {
-							if (registry.isSharedEditor(editor)) {
-								// Synchronized access to shared editor
-								// instance.
-								synchronized (editor) {
-									editor.setValue(value);
-									result = editor.getAsText();
-								}
-							}
-							else {
-								editor.setValue(value);
-								result = editor.getAsText();
-							}
-						}
-					}
+					result = convertToString(value, typeConverter);
 					if (result == null) {
 						logger.debug("Falling back on toString for conversion of : [" + value.getClass() + "]");
 						result = value.toString();
@@ -216,19 +203,65 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	/**
 	 * @param value
-	 * @param requiredType
-	 * @return
+	 * @param typeConverter
+	 * @return a String representation of the input if possible
 	 */
-	private Object convertFromContext(String key, Class<?> requiredType) {
-		Object result = null;
-		BeanWrapper wrapper = new BeanWrapperImpl(contextFactory.getContext());
-		if (wrapper.isReadableProperty(key)) {
-			Object property = wrapper.getPropertyValue(key);
-			if (property == null || requiredType.isAssignableFrom(property.getClass())) {
-				result = property;
+	protected String convertToString(Object value, TypeConverter typeConverter) {
+		String result = null;
+		try {
+			// Give it one chance to convert - this forces the default editors to be registered
+			result = (String) typeConverter.convertIfNecessary(value, String.class);
+		} catch (TypeMismatchException e) {
+			// ignore
+		}
+		if (result== null && typeConverter instanceof PropertyEditorRegistrySupport) {
+			/*
+			 * PropertyEditorRegistrySupport is de rigeur with TypeConverter
+			 * instances used internally by Spring. If we have one of those then
+			 * we can convert to String but the TypeConverter doesn't know how
+			 * to.
+			 */
+			PropertyEditorRegistrySupport registry = (PropertyEditorRegistrySupport) typeConverter;
+			PropertyEditor editor = registry.findCustomEditor(value.getClass(), null);
+			if (editor != null) {
+				if (registry.isSharedEditor(editor)) {
+					// Synchronized access to shared editor
+					// instance.
+					synchronized (editor) {
+						editor.setValue(value);
+						result = editor.getAsText();
+					}
+				}
+				else {
+					editor.setValue(value);
+					result = editor.getAsText();
+				}
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * @param value
+	 * @param requiredType
+	 * @param typeConverter
+	 * @return
+	 */
+	private Object convertFromContext(String key, Class<?> requiredType, TypeConverter typeConverter) {
+		Object result = null;
+		Object property = getPropertyFromContext(key);
+		if (property == null || requiredType.isAssignableFrom(property.getClass())) {
+			result = property;
+		}
+		return result;
+	}
+
+	private Object getPropertyFromContext(String key) {
+		BeanWrapper wrapper = new BeanWrapperImpl(contextFactory.getContext());
+		if (wrapper.isReadableProperty(key)) {
+			return wrapper.getPropertyValue(key);
+		}
+		return null;
 	}
 
 	private String extractKey(String value) {
@@ -276,7 +309,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	private void replaceIfTypeMatches(StringBuilder result, int first, int next, String key, Class<?> requiredType,
 			TypeConverter typeConverter) {
-		Object property = convertFromContext(key, requiredType);
+		Object property = convertFromContext(key, requiredType, typeConverter);
 		if (property != null) {
 			result.replace(first, next + 1, (String) typeConverter.convertIfNecessary(property, String.class));
 		}

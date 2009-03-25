@@ -17,7 +17,6 @@
 package org.springframework.batch.sample;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import javax.sql.DataSource;
 
@@ -62,10 +61,10 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	 * finish successfully, because it continues execution where the previous
 	 * run stopped (module throws exception after fixed number of processed
 	 * records).
-	 * @throws Exception the exception thrown
+	 * @throws Throwable 
 	 */
 	@Test
-	public void testRestart() throws Exception {
+	public void testRestart() throws Throwable {
 
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
@@ -73,8 +72,10 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
 		
 		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
-		assertTrue("Not planned exception: " + expected.getMessage(), expected.getMessage().toLowerCase().indexOf(
-					"planned") >= 0);
+		if(expected.getMessage().toLowerCase().indexOf(
+					"planned") < 0) {
+			throw expected;
+		}
 
 		int medium = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 		// assert based on commit interval = 2
@@ -91,7 +92,7 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	// load the application context and launch the job
 	private JobExecution runJobForRestartTest() throws Exception {
 		return getLauncher().run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
-				.stringToProperties("parameter=true")));
+				.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 	}
 
 }
