@@ -6,7 +6,9 @@
 
 	<beans:import resource="common-context.xml" />
 	
-	<step id="step" tasklet="tasklet"/>
+	<step id="step">
+		<tasklet ref="tasklet"/>
+	</step>
 
 	<beans:bean id="tasklet" class="org.springframework.batch.core.configuration.xml.TestTasklet"/>
 

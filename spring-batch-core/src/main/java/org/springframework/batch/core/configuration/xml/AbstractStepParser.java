@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
@@ -48,9 +49,11 @@ public abstract class AbstractStepParser {
 
 	private static final String PARENT_ATTR = "parent";
 
-	private static final String TASKLET_ATTR = "tasklet";
+	private static final String TASKLET_REF_ATTR = "ref";
 
 	private static final String TASKLET_ELE = "tasklet";
+
+	private static final String CHUNK_TASKLET_ELE = "chunk-tasklet";
 
 	private static final String LISTENERS_ELE = "listeners";
 
@@ -58,35 +61,28 @@ public abstract class AbstractStepParser {
 
 	private static final String TX_ATTRIBUTES_ELE = "transaction-attributes";
 
-	private TaskletElementParser taskletElementParser = new TaskletElementParser();
+	private static final String JOB_REPO_ATTR = "job-repository";
 
-	private StepListenerParser stepListenerParser = new StepListenerParser();
+	private static final ChunkTaskletParser chunkTaskletParser = new ChunkTaskletParser();
+
+	private static final StepListenerParser stepListenerParser = new StepListenerParser();
 
 	/**
-	 * @param stepElement
+	 * @param stepElement The &lt;step/&gt; element
 	 * @param parserContext
-	 * @return a BeanDefinition if possible
+	 * @param jobRepositoryRef The name of the bean defining the JobRepository.
+	 *            Use 'null' if the job-repository is specified on the
+	 *            &lt;tasklet/&gt; element; this method will look it up.
 	 */
-	protected AbstractBeanDefinition parseTasklet(Element stepElement, ParserContext parserContext,
-			String jobRepositoryRef) {
+	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobRepositoryRef) {
 
-		String taskletRef = stepElement.getAttribute(TASKLET_ATTR);
+		AbstractBeanDefinition bd = new GenericBeanDefinition();
+
 		@SuppressWarnings("unchecked")
 		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, TASKLET_ELE);
-		boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-		AbstractBeanDefinition bd = null;
-		if (StringUtils.hasText(taskletRef)) {
-			if (taskletElements.size() > 0) {
-				parserContext.getReaderContext().error(
-						"The <" + TASKLET_ELE + "/> element can't be combined with the '" + TASKLET_ATTR + "=\""
-								+ taskletRef + "\"' attribute specification for <" + stepElement.getNodeName() + "/>",
-						stepElement);
-			}
-			bd = parseTaskletRef(stepElement, taskletRef, parserContext, jobRepositoryRef);
-		}
-		else if (taskletElements.size() == 1) {
-			Element taskElement = taskletElements.get(0);
-			bd = taskletElementParser.parse(taskElement, parserContext, stepUnderspecified);
+		if (taskletElements.size() == 1) {
+			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
+			parseTasklet(taskletElements.get(0), bd, parserContext, jobRepositoryRef, stepUnderspecified);
 		}
 		else if (taskletElements.size() > 1) {
 			parserContext.getReaderContext().error(
@@ -94,69 +90,102 @@ public abstract class AbstractStepParser {
 							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
 
-		if (bd == null) {
-			if (stepUnderspecified) {
-				bd = new GenericBeanDefinition();
-			}
-			else {
-				parserContext.getReaderContext().error(
-						"Step [" + stepElement.getAttribute(ID_ATTR) + "] has neither a <" + TASKLET_ELE
-								+ "/> element nor a '" + TASKLET_ATTR + "' attribute.", stepElement);
-			}
+		String parentRef = stepElement.getAttribute(PARENT_ATTR);
+		if (StringUtils.hasText(parentRef)) {
+			bd.setParentName(parentRef);
 		}
-
-		setUpBeanDefinition(stepElement, bd, parserContext, jobRepositoryRef);
-		return bd;
-
-	}
-
-	/**
-	 * @param stepElement
-	 * @param taskletRef
-	 * @param parserContext
-	 */
-	private AbstractBeanDefinition parseTaskletRef(Element stepElement, String taskletRef, ParserContext parserContext,
-			String jobRepositoryRef) {
-
-		GenericBeanDefinition bd = new GenericBeanDefinition();
-		bd.setBeanClass(StepParserStepFactoryBean.class);
-
-		if (StringUtils.hasText(taskletRef)) {
-			RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
-			bd.getPropertyValues().addPropertyValue("tasklet", taskletBeanRef);
-		}
-
-		return bd;
-
-	}
-
-	protected void setUpBeanDefinition(Element stepElement, AbstractBeanDefinition bd, ParserContext parserContext,
-			String jobRepositoryRef) {
-		checkStepAttributes(stepElement, bd);
 
 		bd.setAbstract(Boolean.valueOf(stepElement.getAttribute("abstract")));
 
-		RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
-		bd.getPropertyValues().addPropertyValue("jobRepository", jobRepositoryBeanRef);
+		return bd;
 
-		String transactionManagerRef = stepElement.getAttribute("transaction-manager");
+	}
+
+	private void parseTasklet(Element taskletElement, AbstractBeanDefinition bd, ParserContext parserContext,
+			String jobRepositoryRef, boolean stepUnderspecified) {
+
+		bd.setBeanClass(StepParserStepFactoryBean.class);
+
+		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
+		@SuppressWarnings("unchecked")
+		List<Element> chunkTaskletElements = (List<Element>) DomUtils.getChildElementsByTagName(taskletElement,
+				CHUNK_TASKLET_ELE);
+		if (StringUtils.hasText(taskletRef)) {
+			if (chunkTaskletElements.size() > 0) {
+				parserContext.getReaderContext().error(
+						"The <" + CHUNK_TASKLET_ELE + "/> element can't be combined with the '" + TASKLET_REF_ATTR
+								+ "=\"" + taskletRef + "\"' attribute specification for <"
+								+ taskletElement.getNodeName() + "/>", taskletElement);
+			}
+			parseTaskletRef(taskletRef, bd.getPropertyValues());
+		}
+		else if (chunkTaskletElements.size() == 1) {
+			chunkTaskletParser.parse(chunkTaskletElements.get(0), bd, parserContext, stepUnderspecified);
+		}
+		else if (chunkTaskletElements.size() > 1) {
+			parserContext.getReaderContext().error(
+					"The '<" + CHUNK_TASKLET_ELE + "/>' element may not appear more than once in a single <"
+							+ taskletElement.getNodeName() + "/>.", taskletElement);
+		}
+		else if (!stepUnderspecified) {
+			parserContext.getReaderContext().error(
+					"Step [" + taskletElement.getAttribute(ID_ATTR) + "] has neither a <" + CHUNK_TASKLET_ELE
+							+ "/> element nor a '" + TASKLET_REF_ATTR + "' attribute.", taskletElement);
+		}
+
+		setUpBeanDefinitionForTaskletStep(taskletElement, bd, parserContext, jobRepositoryRef);
+
+	}
+
+	private void parseTaskletRef(String taskletRef, MutablePropertyValues propertyValues) {
+		if (StringUtils.hasText(taskletRef)) {
+			RuntimeBeanReference taskletBeanRef = new RuntimeBeanReference(taskletRef);
+			propertyValues.addPropertyValue("tasklet", taskletBeanRef);
+		}
+	}
+
+	private void setUpBeanDefinitionForTaskletStep(Element taskletElement, AbstractBeanDefinition bd,
+			ParserContext parserContext, String jobRepositoryRef) {
+
+		MutablePropertyValues propertyValues = bd.getPropertyValues();
+
+		checkStepAttributes(taskletElement, propertyValues);
+
+		propertyValues.addPropertyValue("jobRepository", resolveJobRepositoryRef(taskletElement, parserContext,
+				jobRepositoryRef));
+
+		String transactionManagerRef = taskletElement.getAttribute("transaction-manager");
 		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
-		bd.getPropertyValues().addPropertyValue("transactionManager", transactionManagerBeanRef);
+		propertyValues.addPropertyValue("transactionManager", transactionManagerBeanRef);
 
-		handleTransactionAttributesElement(stepElement, bd, parserContext);
+		handleTransactionAttributesElement(taskletElement, propertyValues, parserContext);
 
-		handleListenersElement(stepElement, bd, parserContext);
+		handleListenersElement(taskletElement, propertyValues, parserContext);
 
-		handleExceptionElement(stepElement, parserContext, bd, "no-rollback-exception-classes",
+		handleExceptionElement(taskletElement, parserContext, propertyValues, "no-rollback-exception-classes",
 				"noRollbackExceptionClasses");
 
 		bd.setRole(BeanDefinition.ROLE_SUPPORT);
 
-		bd.setSource(parserContext.extractSource(stepElement));
+		bd.setSource(parserContext.extractSource(taskletElement));
 
 	}
 
-	private void handleTransactionAttributesElement(Element stepElement, AbstractBeanDefinition bd,
+	private RuntimeBeanReference resolveJobRepositoryRef(Element taskletElement, ParserContext parserContext,
+			String jobRepositoryRef) {
+		if (!StringUtils.hasText(jobRepositoryRef)) {
+			jobRepositoryRef = taskletElement.getAttribute(JOB_REPO_ATTR);
+			if (!StringUtils.hasText(jobRepositoryRef)) {
+				parserContext.getReaderContext().error(
+						"The '" + JOB_REPO_ATTR + "' attribute may exist on an <" + taskletElement.getNodeName()
+								+ "/> element.", taskletElement);
+			}
+		}
+		RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
+		return jobRepositoryBeanRef;
+	}
+
+	private void handleTransactionAttributesElement(Element stepElement, MutablePropertyValues propertyValues,
 			ParserContext parserContext) {
 		@SuppressWarnings("unchecked")
 		List<Element> txAttrElements = DomUtils.getChildElementsByTagName(stepElement, TX_ATTRIBUTES_ELE);
@@ -164,15 +193,15 @@ public abstract class AbstractStepParser {
 			Element txAttrElement = txAttrElements.get(0);
 			String propagation = txAttrElement.getAttribute("propagation");
 			if (StringUtils.hasText(propagation)) {
-				bd.getPropertyValues().addPropertyValue("propagation", propagation);
+				propertyValues.addPropertyValue("propagation", propagation);
 			}
 			String isolation = txAttrElement.getAttribute("isolation");
 			if (StringUtils.hasText(isolation)) {
-				bd.getPropertyValues().addPropertyValue("isolation", isolation);
+				propertyValues.addPropertyValue("isolation", isolation);
 			}
 			String timeout = txAttrElement.getAttribute("timeout");
 			if (StringUtils.hasText(timeout)) {
-				bd.getPropertyValues().addPropertyValue("transactionTimeout", timeout);
+				propertyValues.addPropertyValue("transactionTimeout", timeout);
 			}
 		}
 		else if (txAttrElements.size() > 1) {
@@ -183,8 +212,8 @@ public abstract class AbstractStepParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void handleExceptionElement(Element element, ParserContext parserContext, BeanDefinition bd,
-			String subElementName, String propertyName) {
+	public static void handleExceptionElement(Element element, ParserContext parserContext,
+			MutablePropertyValues propertyValues, String subElementName, String propertyName) {
 		List<Element> children = DomUtils.getChildElementsByTagName(element, subElementName);
 		if (children.size() == 1) {
 			Element child = children.get(0);
@@ -195,7 +224,7 @@ public abstract class AbstractStepParser {
 					ManagedList managedList = new ManagedList();
 					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
 					managedList.addAll(Arrays.asList(exceptionArray));
-					bd.getPropertyValues().addPropertyValue(propertyName, managedList);
+					propertyValues.addPropertyValue(propertyName, managedList);
 				}
 			}
 		}
@@ -207,23 +236,20 @@ public abstract class AbstractStepParser {
 
 	}
 
-	private void checkStepAttributes(Element stepElement, AbstractBeanDefinition bd) {
+	private void checkStepAttributes(Element stepElement, MutablePropertyValues propertyValues) {
 		String startLimit = stepElement.getAttribute("start-limit");
 		if (StringUtils.hasText(startLimit)) {
-			bd.getPropertyValues().addPropertyValue("startLimit", startLimit);
+			propertyValues.addPropertyValue("startLimit", startLimit);
 		}
 		String allowStartIfComplete = stepElement.getAttribute("allow-start-if-complete");
 		if (StringUtils.hasText(allowStartIfComplete)) {
-			bd.getPropertyValues().addPropertyValue("allowStartIfComplete", allowStartIfComplete);
-		}
-		String parentRef = stepElement.getAttribute(PARENT_ATTR);
-		if (StringUtils.hasText(parentRef)) {
-			bd.setParentName(parentRef);
+			propertyValues.addPropertyValue("allowStartIfComplete", allowStartIfComplete);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleListenersElement(Element stepElement, BeanDefinition bd, ParserContext parserContext) {
+	private void handleListenersElement(Element stepElement, MutablePropertyValues propertyValues,
+			ParserContext parserContext) {
 		List<Element> listenersElements = DomUtils.getChildElementsByTagName(stepElement, LISTENERS_ELE);
 		if (listenersElements.size() == 1) {
 			Element listenersElement = listenersElements.get(0);
@@ -238,7 +264,7 @@ public abstract class AbstractStepParser {
 					listenerBeans.add(stepListenerParser.parse(listenerElement, parserContext));
 				}
 			}
-			bd.getPropertyValues().addPropertyValue("listeners", listenerBeans);
+			propertyValues.addPropertyValue("listeners", listenerBeans);
 			parserContext.popAndRegisterContainingComponent();
 		}
 		else if (listenersElements.size() > 1) {

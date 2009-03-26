@@ -8,27 +8,29 @@
 
 	<job id="job">
 		<step id="step">
-			<tasklet reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
-				retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" task-executor="taskExecutor">
-				<retry-listeners>
-					<listener ref="retryListener" />
-					<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
-				</retry-listeners>
-				<streams>
-					<stream ref="reader" />
-				</streams>
-				<skippable-exception-classes>
+			<tasklet>
+				<chunk-tasklet reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
+				               retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" task-executor="taskExecutor">
+					<retry-listeners>
+						<listener ref="retryListener" />
+						<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
+					</retry-listeners>
+					<streams>
+						<stream ref="reader" />
+					</streams>
+					<skippable-exception-classes>
+						org.springframework.dao.DataIntegrityViolationException
+					</skippable-exception-classes>
+				</chunk-tasklet>
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
+				<no-rollback-exception-classes>
 					org.springframework.dao.DataIntegrityViolationException
-				</skippable-exception-classes>
+				</no-rollback-exception-classes>
+				<listeners>
+					<listener class="org.springframework.batch.core.configuration.xml.TestListener" />
+					<listener ref="listener" />
+				</listeners>
 			</tasklet>
-			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
-			<no-rollback-exception-classes>
-				org.springframework.dao.DataIntegrityViolationException
-			</no-rollback-exception-classes>
-			<listeners>
-				<listener class="org.springframework.batch.core.configuration.xml.TestListener" />
-				<listener ref="listener" />
-			</listeners>
 		</step>
 	</job>
 

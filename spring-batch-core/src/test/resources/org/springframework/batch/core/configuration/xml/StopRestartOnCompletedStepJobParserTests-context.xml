@@ -7,8 +7,9 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<!-- On restart this step will be re-executed: effect is infinitely re-runnable job -->
-		<step id="s1" parent="step1" allow-start-if-complete="true">
+		<step id="s1" parent="step1">
+			<!-- On restart this step will be re-executed: effect is infinitely re-runnable job -->
+			<tasklet allow-start-if-complete="true"/>
 			<!-- On normal step status: stop the job, but restart with the same step. -->
 			<stop on="COMPLETED" restart="s1"/>
 			<end on="*"/>

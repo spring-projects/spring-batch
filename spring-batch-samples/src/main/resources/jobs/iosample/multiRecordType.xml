@@ -15,7 +15,9 @@
 		
 	<batch:job id="ioSampleJob">
 		<batch:step id="step1">
-			<batch:tasklet reader="itemReader" writer="itemWriter" commit-interval="2"/>
+			<batch:tasklet>
+				<batch:chunk-tasklet reader="itemReader" writer="itemWriter" commit-interval="2"/>
+			</batch:tasklet>
 		</batch:step>
 	</batch:job>
 

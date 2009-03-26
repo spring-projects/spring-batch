@@ -9,13 +9,15 @@
 
 	<job id="customerFilterJob">
 		<step id="uploadCustomer">
-			<tasklet reader="customerFileUploadReader" 
-			         processor="customerUpdateProcessor" 
-			         writer="customerUpdateWriter" 
-			         commit-interval="1"/>
-			<listeners>
-				<listener ref="customerTokenizer"/>
-			</listeners>
+			<tasklet>
+				<chunk-tasklet 	reader="customerFileUploadReader" 
+								processor="customerUpdateProcessor" 
+								writer="customerUpdateWriter" 
+								commit-interval="1"/>
+				<listeners>
+					<listener ref="customerTokenizer"/>
+				</listeners>
+		    </tasklet>
 		</step>
 	</job>
 		

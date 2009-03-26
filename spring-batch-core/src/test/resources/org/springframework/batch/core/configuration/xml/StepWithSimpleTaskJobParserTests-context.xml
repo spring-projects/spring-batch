@@ -7,13 +7,16 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step id="step1" tasklet="tasklet">
+		<step id="step1">
+			<tasklet ref="tasklet"/>
 			<next on="*" to="step2" />
 		</step>
-		<step id="step2" tasklet="tasklet">
-			<listeners>
-				<listener ref="listener"/>
-			</listeners>
+		<step id="step2">
+			<tasklet ref="tasklet">
+				<listeners>
+					<listener ref="listener"/>
+				</listeners>
+			</tasklet>
 		</step>
 	</job>
 

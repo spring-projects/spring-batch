@@ -13,17 +13,21 @@
 
 	<job id="parallelJob">
 		<step id="staging" next="loading">
-			<tasklet reader="fileItemReader" 
-			         processor="validatingProcessor" 
-			         writer="stagingItemWriter" 
-			         commit-interval="2"/>
+			<tasklet>
+				<chunk-tasklet reader="fileItemReader" 
+						       processor="validatingProcessor" 
+						       writer="stagingItemWriter" 
+						       commit-interval="2"/>
+			</tasklet>
 		</step>
 		<step id="loading">
-			<tasklet reader="stagingReader" 
-			         processor="stagingProcessor" 
-			         writer="tradeWriter" 
-			         commit-interval="1" 
-			         task-executor="taskExecutor"/>
+			<tasklet>
+				<chunk-tasklet reader="stagingReader" 
+					           processor="stagingProcessor" 
+					           writer="tradeWriter" 
+					           commit-interval="1" 
+					           task-executor="taskExecutor"/>
+			</tasklet>
 		</step>
 	</job>
 

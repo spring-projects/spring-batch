@@ -14,8 +14,10 @@
 
 	<job id="skipJob" incrementer="incrementer">
 		<step id="step1" parent="baseStep">
-			<tasklet reader="fileItemReader" processor="tradeProcessor" writer="tradeWriter" 
-			         commit-interval="3" skip-limit="10">
+			<tasklet>
+				<chunk-tasklet reader="fileItemReader" processor="tradeProcessor" writer="tradeWriter" 
+				               commit-interval="3" skip-limit="10">
+				</chunk-tasklet>
 			</tasklet>
 
 			<next on="*" to="step2" />
@@ -23,7 +25,9 @@
 			<fail on="FAILED" exit-code="FAILED"/>
 		</step>
 
-		<step id="errorPrint1" tasklet="errorLogTasklet" next="step2"/>
+		<step id="errorPrint1" next="step2">
+			<tasklet ref="errorLogTasklet"/>
+		</step>
 
 		<step id="step2" parent="secondPass" next="skipCheckingDecision"/>
 
@@ -33,33 +37,41 @@
 			<fail on="FAILED" exit-code="FAILED"/>
 		</decision>
 		
-		<step id="errorPrint2" tasklet="errorLogTasklet"/>
+		<step id="errorPrint2">
+			<tasklet ref="errorLogTasklet"/>
+		</step>
 	</job>
 
 	<step id="secondPass" parent="t2">
-		<tasklet writer="itemTrackingWriter">
-			<skippable-exception-classes merge="true">
-				java.lang.RuntimeException
-			</skippable-exception-classes>
+		<tasklet>
+			<chunk-tasklet writer="itemTrackingWriter">
+				<skippable-exception-classes merge="true">
+					java.lang.RuntimeException
+				</skippable-exception-classes>
+			</chunk-tasklet>
 		</tasklet>
 	</step>
 
 	<step id="t2" parent="t3" abstract="true"/>
 
 	<step id="t3" parent="baseStep" abstract="true">
-		<tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="dummyWriter" 
-		         commit-interval="2" skip-limit="10">
-			<skippable-exception-classes>
-				org.springframework.batch.item.validator.ValidationException
-			</skippable-exception-classes>
+		<tasklet>
+			<chunk-tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="dummyWriter" 
+			               commit-interval="2" skip-limit="10">
+				<skippable-exception-classes>
+					org.springframework.batch.item.validator.ValidationException
+				</skippable-exception-classes>
+			</chunk-tasklet>
 		</tasklet>
 	</step>
 
 	<step id="baseStep" abstract="true">
-		<listeners>
-			<listener class="org.springframework.batch.sample.common.SkipCheckingListener"/>
-			<listener ref="promotionListener"/>
-		</listeners>
+		<tasklet>
+			<listeners>
+				<listener class="org.springframework.batch.sample.common.SkipCheckingListener"/>
+				<listener ref="promotionListener"/>
+			</listeners>
+		</tasklet>
 	</step>
 	
 	<beans:bean id="dummyWriter" class="org.springframework.batch.sample.support.DummyItemWriter"/>

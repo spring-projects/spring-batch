@@ -14,11 +14,13 @@
 
 	<job id="multilineOrderJob">
 		<step id="step1">
-			<tasklet reader="reader" processor="processor" writer="fileItemWriter" commit-interval="5">
-				<streams>
-					<stream ref="fileItemWriter"/>
-					<stream ref="fileItemReader"/>
-				</streams>
+			<tasklet>
+				<chunk-tasklet reader="reader" processor="processor" writer="fileItemWriter" commit-interval="5">
+					<streams>
+						<stream ref="fileItemWriter"/>
+						<stream ref="fileItemReader"/>
+					</streams>
+				</chunk-tasklet>
 			</tasklet>
 		</step>
 	</job>

@@ -14,16 +14,17 @@
 
 	<job id="headerFooterSample">
 		<step id="step1">
-			<tasklet reader="reader" writer="writer" commit-interval="3">
-				<streams>
-					<stream ref="reader"/>
-					<stream ref="writer"/>
-				</streams>
+			<tasklet>
+				<chunk-tasklet reader="reader" writer="writer" commit-interval="3">
+					<streams>
+						<stream ref="reader"/>
+						<stream ref="writer"/>
+					</streams>
+				</chunk-tasklet>
+				<listeners>
+					<listener ref="footerCallback"/>
+				</listeners>
 			</tasklet>
-			
-			<listeners>
-				<listener ref="footerCallback"/>
-			</listeners>
 		</step>
 	</job>
 

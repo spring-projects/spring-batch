@@ -12,18 +12,21 @@
 
 	<job id="hibernateJob" restartable="false">
 		<step id="step1">
-			<tasklet reader="hibernateItemReader" 
-			         processor="creditIncreaseProcessor" 
-			         writer="hibernateCreditWriter" 
-			         skip-limit="5" 
-			         commit-interval="3"/>
+			<tasklet>
+				<chunk-tasklet reader="hibernateItemReader" 
+						       processor="creditIncreaseProcessor" 
+						       writer="hibernateCreditWriter" 
+						       skip-limit="5" 
+						       commit-interval="3"/>
+			</tasklet>
 		</step>
 	</job>
 
-	<beans:bean id="creditIncreaseProcessor" class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
+	<beans:bean id="creditIncreaseProcessor" 
+	            class="org.springframework.batch.sample.domain.trade.internal.CustomerCreditIncreaseProcessor" />
 
 	<beans:bean id="hibernateCreditWriter"
-		class="org.springframework.batch.sample.domain.trade.internal.HibernateAwareCustomerCreditItemWriter">
+		        class="org.springframework.batch.sample.domain.trade.internal.HibernateAwareCustomerCreditItemWriter">
 		<beans:property name="sessionFactory" ref="sessionFactory" />
 		<beans:property name="dao" ref="customerCreditDao" />
 	</beans:bean>

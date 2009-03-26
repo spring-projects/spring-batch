@@ -15,7 +15,9 @@
 
 	<job id="ioSampleJob">
 		<step id="step1">
-			<tasklet reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/>
+			<tasklet>
+				<chunk-tasklet reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/>
+			</tasklet>
 		</step>
 	</job>
 

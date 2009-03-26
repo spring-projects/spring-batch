@@ -20,12 +20,10 @@ import static org.springframework.batch.core.configuration.xml.AbstractStepParse
 import java.util.List;
 
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanReference;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.CompositeComponentDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -35,13 +33,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * Internal parser for the &lt;tasklet/&gt; element either inside a job or as a
- * standalone tasklet definition.
+ * Internal parser for the &lt;chunk-tasklet/&gt; element either inside a step.
  * 
  * @author Thomas Risberg
  * @since 2.0
  */
-public class TaskletElementParser {
+public class ChunkTaskletParser {
 
 	private static final String ID_ATTR = "id";
 
@@ -59,14 +56,11 @@ public class TaskletElementParser {
 	 * @param element
 	 * @param parserContext
 	 */
-	protected AbstractBeanDefinition parse(Element element, ParserContext parserContext, boolean underspecified) {
-
-		GenericBeanDefinition bd = new GenericBeanDefinition();
-		bd.setBeanClass(StepParserStepFactoryBean.class);
+	protected void parse(Element element, AbstractBeanDefinition bd, ParserContext parserContext, boolean underspecified) {
 
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 
-		propertyValues.addPropertyValue("hasTaskletElement", Boolean.TRUE);
+		propertyValues.addPropertyValue("hasChunkTaskletElement", Boolean.TRUE);
 
 		String readerBeanId = element.getAttribute("reader");
 		if (StringUtils.hasText(readerBeanId)) {
@@ -106,7 +100,7 @@ public class TaskletElementParser {
 		if (!underspecified
 				&& propertyValues.contains("commitInterval") == propertyValues.contains("chunkCompletionPolicy")) {
 			parserContext.getReaderContext().error(
-					"The '" + element.getNodeName() + "' element must contain either '" + COMMIT_INTERVAL_ATTR + "' "
+					"The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR + "' "
 							+ "or '" + CHUNK_COMPLETION_POLICY_ATTR + "', but not both.", element);
 		}
 
@@ -130,21 +124,23 @@ public class TaskletElementParser {
 			propertyValues.addPropertyValue("isReaderTransactionalQueue", isReaderTransactionalQueue);
 		}
 
-		handleExceptionElement(element, parserContext, bd, "skippable-exception-classes", "skippableExceptionClasses");
+		handleExceptionElement(element, parserContext, propertyValues, "skippable-exception-classes",
+				"skippableExceptionClasses");
 
-		handleExceptionElement(element, parserContext, bd, "retryable-exception-classes", "retryableExceptionClasses");
+		handleExceptionElement(element, parserContext, propertyValues, "retryable-exception-classes",
+				"retryableExceptionClasses");
 
-		handleExceptionElement(element, parserContext, bd, "fatal-exception-classes", "fatalExceptionClasses");
+		handleExceptionElement(element, parserContext, propertyValues, "fatal-exception-classes",
+				"fatalExceptionClasses");
 
-		handleRetryListenersElement(element, bd, parserContext);
+		handleRetryListenersElement(element, propertyValues, parserContext);
 
-		handleStreamsElement(element, bd, parserContext);
-
-		return bd;
+		handleStreamsElement(element, propertyValues, parserContext);
 
 	}
 
-	private void handleRetryListenersElement(Element element, BeanDefinition bd, ParserContext parserContext) {
+	private void handleRetryListenersElement(Element element, MutablePropertyValues propertyValues,
+			ParserContext parserContext) {
 		Element listenersElement = DomUtils.getChildElementByTagName(element, "retry-listeners");
 		if (listenersElement != null) {
 			CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(listenersElement.getTagName(),
@@ -153,7 +149,7 @@ public class TaskletElementParser {
 			ManagedList retryListenerBeans = new ManagedList();
 			retryListenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans);
-			bd.getPropertyValues().addPropertyValue("retryListeners", retryListenerBeans);
+			propertyValues.addPropertyValue("retryListeners", retryListenerBeans);
 			parserContext.popAndRegisterContainingComponent();
 		}
 	}
@@ -207,7 +203,7 @@ public class TaskletElementParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void handleStreamsElement(Element element, BeanDefinition bd, ParserContext parserContext) {
+	private void handleStreamsElement(Element element, MutablePropertyValues propertyValues, ParserContext parserContext) {
 		Element streamsElement = DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
 			ManagedList streamBeans = new ManagedList();
@@ -226,7 +222,7 @@ public class TaskletElementParser {
 					}
 				}
 			}
-			bd.getPropertyValues().addPropertyValue("streams", streamBeans);
+			propertyValues.addPropertyValue("streams", streamBeans);
 		}
 	}
 

@@ -5,29 +5,32 @@
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<job id="job">
-		<step id="step" start-limit="25" allow-start-if-complete="true">
-			<tasklet reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
-				retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" task-executor="taskExecutor">
-				<retry-listeners>
-					<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
-				</retry-listeners>
-				<streams>
-					<stream ref="reader" />
-				</streams>
-				<fatal-exception-classes>
-					org.springframework.jdbc.BadSqlGrammarException
-				</fatal-exception-classes>
-				<skippable-exception-classes>
-					org.springframework.dao.DataIntegrityViolationException
-				</skippable-exception-classes>
+		<step id="step">
+			<tasklet start-limit="25" allow-start-if-complete="true">
+				<chunk-tasklet reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
+								retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" 
+								task-executor="taskExecutor">
+					<retry-listeners>
+						<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener" />
+					</retry-listeners>
+					<streams>
+						<stream ref="reader" />
+					</streams>
+					<fatal-exception-classes>
+						org.springframework.jdbc.BadSqlGrammarException
+					</fatal-exception-classes>
+					<skippable-exception-classes>
+						org.springframework.dao.DataIntegrityViolationException
+					</skippable-exception-classes>
+				</chunk-tasklet>
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
+				<no-rollback-exception-classes>
+						org.springframework.dao.DataIntegrityViolationException
+				</no-rollback-exception-classes>
+				<listeners>
+					<listener ref="listener" />
+				</listeners>
 			</tasklet>
-			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
-			<no-rollback-exception-classes>
-					org.springframework.dao.DataIntegrityViolationException
-			</no-rollback-exception-classes>
-			<listeners>
-				<listener ref="listener" />
-			</listeners>
 		</step>
 	</job>
 

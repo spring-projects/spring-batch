@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<beans:import resource="common-context.xml" />
+
+	<job id="job">
+		<step id="s1" parent="baseStep">
+			<tasklet>
+				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" skip-limit="5">
+					<skippable-exception-classes merge="true">
+						java.lang.NullPointerException
+					</skippable-exception-classes>
+		        	<fatal-exception-classes merge="true">
+		        		org.springframework.dao.CannotAcquireLockException
+		        	</fatal-exception-classes>
+		        	<streams merge="true">
+		        		<stream ref="stream1"/>
+		        	</streams>
+					<retry-listeners merge="true">
+						<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					</retry-listeners>
+				</chunk-tasklet>
+			</tasklet>
+		</step>
+
+		<step id="s2" parent="baseStep">
+			<tasklet>
+				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" skip-limit="5">
+					<skippable-exception-classes>
+						java.lang.NullPointerException
+					</skippable-exception-classes>
+		        	<fatal-exception-classes>
+		        		org.springframework.dao.CannotAcquireLockException
+		        	</fatal-exception-classes>
+		        	<streams>
+		        		<stream ref="stream1"/>
+		        	</streams>
+					<retry-listeners>
+						<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
+					</retry-listeners>
+				</chunk-tasklet>
+			</tasklet>
+		</step>
+	</job>
+
+	<step id="baseStep" abstract="true">
+		<tasklet>
+				<chunk-tasklet>
+					<skippable-exception-classes>
+						java.lang.ArithmeticException
+					</skippable-exception-classes>
+					<fatal-exception-classes>
+						org.springframework.dao.DeadlockLoserDataAccessException
+					</fatal-exception-classes>
+					<streams>
+						<stream ref="stream2"/>
+					</streams>
+					<retry-listeners>
+						<listener class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
+					</retry-listeners>
+				</chunk-tasklet>
+		</tasklet>
+	</step>
+	
+	<beans:bean id="stream1" class="org.springframework.batch.item.support.CompositeItemStream"/>
+	<beans:bean id="stream2" class="org.springframework.batch.core.configuration.xml.TestReader"/>
+
+</beans:beans>

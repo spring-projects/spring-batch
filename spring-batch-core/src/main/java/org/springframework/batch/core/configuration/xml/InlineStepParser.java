@@ -56,7 +56,7 @@ public class InlineStepParser extends AbstractStepParser {
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
 		String stepId = element.getAttribute(ID_ATTR);
 
-		AbstractBeanDefinition bd = parseTasklet(element, parserContext, jobRepositoryRef);
+		AbstractBeanDefinition bd = parseStep(element, parserContext, jobRepositoryRef);
 		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
 		stateBuilder.addConstructorArgReference(stepId);
 

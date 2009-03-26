@@ -8,47 +8,65 @@
 
 	<job id="job">
 		<step id="s1" parent="baseStep" next="s2">
-			<tasklet reader="reader" writer="writer" commit-interval="5" />
-			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			<tasklet>
+				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
 		</step>
 		<step id="s2" parent="standalone2" next="s3" />
-		<step id="s3" tasklet="dummyTasklet" parent="baseStep" next="s4">
-			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		<step id="s3" parent="baseStep" next="s4">
+			<tasklet ref="dummyTasklet">
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
 		</step>
 		<step id="s4" parent="standalone4" next="s5" />
 		<step id="s5" parent="baseStep" next="s6">
-			<tasklet reader="reader" writer="writer" commit-interval="5" />
-			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			<tasklet>
+				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
 		</step>
 		<step id="s6" parent="standalone6" next="s7" />
-		<step id="s7" tasklet="dummyTasklet" parent="baseStep" next="s8">
-			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		<step id="s7" parent="baseStep" next="s8">
+			<tasklet ref="dummyTasklet">
+				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+			</tasklet>
 		</step>
 		<step id="s8" parent="standalone8" next="s5" />
 	</job>
 
 	<step id="standalone2" parent="baseStep">
-		<tasklet reader="reader" writer="writer" commit-interval="5" />
-		<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		<tasklet>
+			<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
 	</step>
 
-	<step id="standalone4" tasklet="dummyTasklet" parent="baseStep">
-		<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+	<step id="standalone4"  parent="baseStep">
+		<tasklet ref="dummyTasklet">
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
 	</step>
 
 	<step id="standalone6" parent="baseStep">
-		<tasklet reader="reader" writer="writer" commit-interval="5" />
-		<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		<tasklet>
+			<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
 	</step>
 
-	<step id="standalone8" tasklet="dummyTasklet" parent="baseStep">
-		<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+	<step id="standalone8" parent="baseStep">
+		<tasklet ref="dummyTasklet">
+			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
+		</tasklet>
 	</step>
 
 	<step id="baseStep" abstract="true">
-		<transaction-attributes timeout="10"/>
-		<listeners>
-			<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
-		</listeners>
+		<tasklet>
+			<transaction-attributes timeout="10"/>
+			<listeners>
+				<listener class="org.springframework.batch.core.listener.StepExecutionListenerSupport" />
+			</listeners>
+		</tasklet>
 	</step>
 </beans:beans>

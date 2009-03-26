@@ -146,7 +146,7 @@ public class StepParserStepFactoryBeanTests {
 	@Test
 	public void testSimpleStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
-		fb.setHasTaskletElement(true);
+		fb.setHasChunkTaskletElement(true);
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
 		fb.setJobRepository(new JobRepositorySupport());
@@ -162,7 +162,7 @@ public class StepParserStepFactoryBeanTests {
 		fb.setItemProcessor(new PassThroughItemProcessor<Object>());
 		fb.setItemWriter(new DummyItemWriter());
 		fb.setStreams(new ItemStream[] { new FlatFileItemReader<Object>() });
-		
+
 		Object step = fb.getObject();
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
@@ -172,7 +172,7 @@ public class StepParserStepFactoryBeanTests {
 	@Test
 	public void testFaultTolerantStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
-		fb.setHasTaskletElement(true);
+		fb.setHasChunkTaskletElement(true);
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
 		fb.setJobRepository(new JobRepositorySupport());

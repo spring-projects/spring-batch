@@ -13,19 +13,25 @@
 
 	<job id="footballJob">
 		<step id="playerload" next="gameLoad">
-			<tasklet reader="playerFileItemReader" writer="playerWriter" 
-			               commit-interval="${job.commit.interval}" />
+			<tasklet>
+				<chunk-tasklet reader="playerFileItemReader" writer="playerWriter" 
+			                   commit-interval="${job.commit.interval}" />
+			</tasklet>
 		</step>
 		<step id="gameLoad" next="playerSummarization">
-			<tasklet reader="gameFileItemReader" writer="gameWriter" 
-			               commit-interval="${job.commit.interval}" />
+			<tasklet>
+				<chunk-tasklet reader="gameFileItemReader" writer="gameWriter" 
+			                   commit-interval="${job.commit.interval}" />
+			</tasklet>
 		</step>
 		<step id="playerSummarization" parent="summarizationStep" />
 	</job>
 
 	<step id="summarizationStep">
-		<tasklet reader="playerSummarizationSource" writer="summaryWriter" 
-			               commit-interval="${job.commit.interval}" />
+		<tasklet>
+			<chunk-tasklet reader="playerSummarizationSource" writer="summaryWriter" 
+		                   commit-interval="${job.commit.interval}" />
+		</tasklet>
 	</step>
 
 	<beans:bean id="playerWriter" class="org.springframework.batch.sample.domain.football.internal.PlayerItemWriter">

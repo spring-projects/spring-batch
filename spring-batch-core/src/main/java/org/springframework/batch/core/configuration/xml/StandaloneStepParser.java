@@ -37,7 +37,6 @@ public class StandaloneStepParser extends AbstractStepParser {
 	 * @param parserContext the parser context for the bean factory
 	 */
 	public AbstractBeanDefinition parse(Element element, ParserContext parserContext) {
-		String jobRepositoryRef = element.getAttribute("job-repository");
-		return parseTasklet(element, parserContext, jobRepositoryRef);
+		return parseStep(element, parserContext, null);
 	}
 }

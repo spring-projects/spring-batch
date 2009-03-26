@@ -69,7 +69,7 @@
 		</xsd:complexType>
 	</xsd:element>
 
-	<xsd:element name="step" type="stepType">
+	<xsd:element name="step">
 		<xsd:annotation>
 			<xsd:documentation>
 				Defines a stage in job processing backed by a
@@ -78,6 +78,22 @@
 				to form a Job flow.
 			</xsd:documentation>
 		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:choice minOccurs="0" maxOccurs="1">
+				<xsd:element name="tasklet">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:extension base="taskletType">
+								<xsd:attributeGroup ref="jobRepositoryAttribute"/>
+							</xsd:extension>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+			<xsd:attribute name="id" type="xsd:ID" use="required" />
+			<xsd:attributeGroup ref="parentAttribute"/>
+			<xsd:attributeGroup ref="abstractAttribute" />
+		</xsd:complexType>
 	</xsd:element>
 
 	<xsd:element name="job-listener">
@@ -163,17 +179,25 @@
 
 	<xsd:group name="flowGroup">
 		<xsd:choice>
-			<xsd:element name="step" type="flowStepType">
+			<xsd:element name="step">
 				<xsd:annotation>
 					<xsd:documentation>
 						Defines a stage in job processing backed by a
 						Step. The id attribute must be specified. The
-						step requires either a tasklet definition, a
-						tasklet reference, a reference to a step defined
-						elsewhere, or a reference to a (possibly
-						abstract) parent step.
+						step requires either a chunk-tasklet definition,
+						a tasklet reference, or a reference to a 
+						(possibly abstract) parent step.
 					</xsd:documentation>
 				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:choice minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="tasklet" type="taskletType"/>
+						<xsd:group ref="transitions" />
+					</xsd:choice>
+					<xsd:attribute name="id" type="xsd:ID" use="required" />
+					<xsd:attributeGroup ref="parentAttribute"/>
+					<xsd:attributeGroup ref="nextAttribute" />
+				</xsd:complexType>
 			</xsd:element>
 			<xsd:element name="split">
 				<xsd:annotation>
@@ -239,31 +263,9 @@
 		</xsd:choice>
 	</xsd:group>
 
-	<xsd:complexType name="stepType">
+	<xsd:complexType name="taskletType">
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:group ref="stepElements" />
-		</xsd:choice>
-		<xsd:attribute name="id" type="xsd:ID" use="required" />
-		<xsd:attributeGroup ref="jobRepositoryAttribute" />
-		<xsd:attributeGroup ref="stepAttributes" />
-		<xsd:attributeGroup ref="abstractAttribute" />
-		<xsd:attributeGroup ref="transactionManagerAttribute" />
-	</xsd:complexType>
-
-	<xsd:complexType name="flowStepType">
-		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:group ref="stepElements" />
-			<xsd:group ref="transitions" />
-		</xsd:choice>
-		<xsd:attribute name="id" type="xsd:ID" use="required" />
-		<xsd:attributeGroup ref="stepAttributes" />
-		<xsd:attributeGroup ref="transactionManagerAttribute" />
-		<xsd:attributeGroup ref="nextAttribute" />
-	</xsd:complexType>
-
-	<xsd:group name="stepElements">
-		<xsd:choice>
-			<xsd:element name="tasklet" type="taskletType" />
+			<xsd:element name="chunk-tasklet" type="chunkTaskletType" />
 			<xsd:element name="transaction-attributes" type="transaction-attributesType" />
 			<xsd:element name="no-rollback-exception-classes">
 				<xsd:annotation>
@@ -284,7 +286,34 @@
 			</xsd:element>
 			<xsd:element name="listeners" type="stepListenersType" />
 		</xsd:choice>
-	</xsd:group>
+		<xsd:attribute name="ref" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
+				The tasklet is a reference to another bean definition that implements the Tasklet interface.
+				</xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="start-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				The maximum number of times a Step may be started.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="allow-start-if-complete" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				Set to true to allow a step to be started even if it is already complete.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attributeGroup ref="transactionManagerAttribute"/>
+	</xsd:complexType>
 
 	<xsd:complexType name="transaction-attributesType">
 		<xsd:attribute name="propagation" default="REQUIRED">
@@ -331,7 +360,7 @@
 		</xsd:restriction>
 	</xsd:simpleType>
 
-	<xsd:complexType name="taskletType">
+	<xsd:complexType name="chunkTaskletType">
 		<xsd:all>
 			<xsd:element name="retry-listeners" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
@@ -739,36 +768,6 @@
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
-	</xsd:attributeGroup>
-
-	<xsd:attributeGroup name="stepAttributes">
-		<xsd:attribute name="tasklet" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation>
-				The tasklet is a reference to another bean definition that implements the Tasklet interface.
-				</xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref">
-						<tool:expected-type type="org.springframework.batch.core.step.tasklet.Tasklet"/>
-					</tool:annotation>
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="start-limit" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				The maximum number of times a Step may be started.
-				]]></xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attribute name="allow-start-if-complete" type="xsd:string" use="optional">
-			<xsd:annotation>
-				<xsd:documentation><![CDATA[
-				Set to true to allow a step to be started even if it is already complete.
-				]]></xsd:documentation>
-			</xsd:annotation>
-		</xsd:attribute>
-		<xsd:attributeGroup ref="parentAttribute"/>
 	</xsd:attributeGroup>
 
 	<xsd:attributeGroup name="parentAttribute">

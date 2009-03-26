@@ -7,10 +7,12 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step id="ft-step" tasklet="tasklet">
-			<listeners>
-				<listener ref="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
-			</listeners>
+		<step id="ft-step">
+			<tasklet ref="tasklet">
+				<listeners>
+					<listener ref="listener" class="org.springframework.batch.core.configuration.xml.TestListener"/>
+				</listeners>
+			</tasklet>
 		</step>
 	</job>
 

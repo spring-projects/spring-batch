@@ -11,18 +11,25 @@
 
 	<job id="tradeJob">
 		<step id="step1" next="step2">
-			<tasklet reader="fileItemReader" processor="validatingProcessor" writer="tradeWriter" commit-interval="1">
-				<streams>
-					<stream ref="fileItemReader" />
-				</streams>
+			<tasklet>
+				<chunk-tasklet reader="fileItemReader" processor="validatingProcessor" writer="tradeWriter" 
+				               commit-interval="1">
+					<streams>
+						<stream ref="fileItemReader" />
+					</streams>
+				</chunk-tasklet>
+				<transaction-attributes isolation="READ_COMMITTED" />
 			</tasklet>
-			<transaction-attributes isolation="READ_COMMITTED" />
 		</step>
 		<step id="step2" next="step3">
-			<tasklet reader="tradeSqlItemReader" writer="customerWriter" commit-interval="1" />
+			<tasklet>
+				<chunk-tasklet reader="tradeSqlItemReader" writer="customerWriter" commit-interval="1" />
+			</tasklet>
 		</step>
 		<step id="step3">
-			<tasklet reader="customerSqlItemReader" writer="creditWriter" commit-interval="1" />
+			<tasklet>
+				<chunk-tasklet reader="customerSqlItemReader" writer="creditWriter" commit-interval="1" />
+			</tasklet>
 		</step>
 	</job>
 

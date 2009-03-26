@@ -12,10 +12,12 @@
 
 	<batch:job id="multilineJob">
 		<batch:step id="step1">
-			<batch:tasklet reader="reader" writer="writer" commit-interval="1">
-				<batch:streams>
-					<batch:stream ref="fileItemReader"/>
-				</batch:streams>
+			<batch:tasklet>
+				<batch:chunk-tasklet reader="reader" writer="writer" commit-interval="1">
+					<batch:streams>
+						<batch:stream ref="fileItemReader"/>
+					</batch:streams>
+				</batch:chunk-tasklet>
 			</batch:tasklet>
 		</batch:step>
 	</batch:job>

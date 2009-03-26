@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  */
 public class JobParser extends AbstractSingleBeanDefinitionParser {
 
-	private JobExecutionListenerParser jobListenerParser = new JobExecutionListenerParser();
+	private static final JobExecutionListenerParser jobListenerParser = new JobExecutionListenerParser();
 
 	@Override
 	protected Class<FlowJob> getBeanClass(Element element) {

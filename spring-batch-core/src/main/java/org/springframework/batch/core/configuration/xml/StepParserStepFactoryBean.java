@@ -127,7 +127,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	//
 	// Additional
 	//
-	private boolean hasTaskletElement = false;
+	private boolean hasChunkTaskletElement = false;
 
 	/**
 	 * Create a {@link Step} from the configuration provided.
@@ -135,8 +135,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * @see FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
-		if (hasTaskletElement) {
-			Assert.isNull(tasklet, "Step [" + name + "] has both a <tasklet/> element and a 'tasklet' attribute.");
+		if (hasChunkTaskletElement) {
+			Assert.isNull(tasklet, "Step [" + name
+					+ "] has both a <chunk-tasklet/> element and a 'ref' attribute  referencing a Tasklet.");
 
 			if (isFaultTolerant()) {
 				FaultTolerantStepFactoryBean<I, O> fb = new FaultTolerantStepFactoryBean<I, O>();
@@ -158,7 +159,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 		else {
 			throw new IllegalStateException("Step [" + name
-					+ "] has neither a <tasklet/> element nor a 'tasklet' attribute.");
+					+ "] has neither a <chunk-tasklet/> element nor a 'ref' attribute referencing a Tasklet.");
 		}
 	}
 
@@ -281,9 +282,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 			ts.setTransactionAttribute(new DefaultTransactionAttribute(attribute) {
 
 				/**
-				 * Ignore the default behaviour and rollback on all exceptions that
-				 * bubble up to the tasklet level. The tasklet has to deal with the
-				 * rollback rules internally.
+				 * Ignore the default behaviour and rollback on all exceptions
+				 * that bubble up to the tasklet level. The tasklet has to deal
+				 * with the rollback rules internally.
 				 */
 				@Override
 				public boolean rollbackOn(Throwable ex) {
@@ -470,7 +471,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * {@link MapRetryContextCache}.<br/>
 	 * 
 	 * @param cacheCapacity the cache capacity to set (greater than 0 else
-	 * ignored)
+	 *            ignored)
 	 */
 	public void setCacheCapacity(int cacheCapacity) {
 		this.cacheCapacity = cacheCapacity;
@@ -596,9 +597,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	public void setRetryableExceptionClasses(Collection<Class<? extends Throwable>> retryableExceptionClasses) {
 		this.retryableExceptionClasses = retryableExceptionClasses;
 	}
-	
+
 	/**
-	 * Exception classes that may not cause a rollback if encountered in the right place.
+	 * Exception classes that may not cause a rollback if encountered in the
+	 * right place.
+	 * 
 	 * @param noRollbackExceptionClasses the noRollbackExceptionClasses to set
 	 */
 	public void setNoRollbackExceptionClasses(Collection<Class<? extends Throwable>> noRollbackExceptionClasses) {
@@ -626,9 +629,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * @param hasTaskletElement
+	 * @param hasChunkTaskletElement
 	 */
-	public void setHasTaskletElement(boolean hasTaskletElement) {
-		this.hasTaskletElement = hasTaskletElement;
+	public void setHasChunkTaskletElement(boolean hasChunkTaskletElement) {
+		this.hasChunkTaskletElement = hasChunkTaskletElement;
 	}
 }

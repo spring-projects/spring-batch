@@ -10,10 +10,12 @@
 
 	<job id="restartSampleJob" restartable="true">
 		<step id="step1">
-			<tasklet reader="itemReader" processor="processor" writer="tradeWriter" commit-interval="2">
-				<streams>
-					<stream ref="fileItemReader" />
-				</streams>
+			<tasklet>
+				<chunk-tasklet reader="itemReader" processor="processor" writer="tradeWriter" commit-interval="2">
+					<streams>
+						<stream ref="fileItemReader" />
+					</streams>
+				</chunk-tasklet>
 			</tasklet>
 		</step>
 	</job>

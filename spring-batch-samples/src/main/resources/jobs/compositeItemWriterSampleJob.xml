@@ -17,12 +17,15 @@
 
 	<job id="compositeItemWriterJob">
 		<step id="step1">
-			<tasklet reader="fileItemReader" processor="processor" writer="compositeWriter" commit-interval="1">
-				<streams>
-					<stream ref="fileItemReader"/>
-					<stream ref="fileItemWriter1"/>
-					<stream ref="fileItemWriter2"/>
-				</streams>
+			<tasklet>
+				<chunk-tasklet reader="fileItemReader" processor="processor" writer="compositeWriter" 
+				               commit-interval="1">
+					<streams>
+						<stream ref="fileItemReader"/>
+						<stream ref="fileItemWriter1"/>
+						<stream ref="fileItemWriter2"/>
+					</streams>
+				</chunk-tasklet>
 			</tasklet>
 		</step>
 	</job>
