@@ -63,7 +63,7 @@ public abstract class AbstractStepParser {
 
 	private static final String JOB_REPO_ATTR = "job-repository";
 
-	private static final ChunkElementParser chunkTaskletParser = new ChunkElementParser();
+	private static final ChunkElementParser chunkElementParser = new ChunkElementParser();
 
 	private static final StepListenerParser stepListenerParser = new StepListenerParser();
 
@@ -120,7 +120,7 @@ public abstract class AbstractStepParser {
 			parseTaskletRef(taskletRef, bd.getPropertyValues());
 		}
 		else if (chunkTaskletElements.size() == 1) {
-			chunkTaskletParser.parse(chunkTaskletElements.get(0), bd, parserContext, stepUnderspecified);
+			chunkElementParser.parse(chunkTaskletElements.get(0), bd, parserContext, stepUnderspecified);
 		}
 		else if (chunkTaskletElements.size() > 1) {
 			parserContext.getReaderContext().error(
