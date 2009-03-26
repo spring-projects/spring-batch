@@ -14,14 +14,14 @@
 	<job id="footballJob">
 		<step id="playerload" next="gameLoad">
 			<tasklet>
-				<chunk-tasklet reader="playerFileItemReader" writer="playerWriter" 
-			                   commit-interval="${job.commit.interval}" />
+				<chunk reader="playerFileItemReader" writer="playerWriter" 
+	                   commit-interval="${job.commit.interval}" />
 			</tasklet>
 		</step>
 		<step id="gameLoad" next="playerSummarization">
 			<tasklet>
-				<chunk-tasklet reader="gameFileItemReader" writer="gameWriter" 
-			                   commit-interval="${job.commit.interval}" />
+				<chunk reader="gameFileItemReader" writer="gameWriter" 
+	                   commit-interval="${job.commit.interval}" />
 			</tasklet>
 		</step>
 		<step id="playerSummarization" parent="summarizationStep" />
@@ -29,8 +29,8 @@
 
 	<step id="summarizationStep">
 		<tasklet>
-			<chunk-tasklet reader="playerSummarizationSource" writer="summaryWriter" 
-		                   commit-interval="${job.commit.interval}" />
+			<chunk reader="playerSummarizationSource" writer="summaryWriter" 
+                   commit-interval="${job.commit.interval}" />
 		</tasklet>
 	</step>
 

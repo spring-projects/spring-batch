@@ -9,9 +9,9 @@
 	<job id="job">
 		<step id="step">
 			<tasklet>
-				<chunk-tasklet reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
-								retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" 
-								task-executor="taskExecutor">
+				<chunk reader="reader" processor="processor" writer="writer" commit-interval="10" skip-limit="20"
+						retry-limit="3" cache-capacity="100" is-reader-transactional-queue="true" 
+						task-executor="taskExecutor">
 					<retry-listeners>
 						<listener class="org.springframework.batch.core.configuration.xml.TestRetryListener" ref="retryListener" />
 					</retry-listeners>
@@ -21,7 +21,7 @@
 					<skippable-exception-classes>
 						org.springframework.dao.DataIntegrityViolationException,
 					</skippable-exception-classes>
-				</chunk-tasklet>
+				</chunk>
 				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" timeout="10" />
 				<no-rollback-exception-classes>
 						org.springframework.dao.DataIntegrityViolationException

@@ -41,15 +41,15 @@ import org.springframework.test.util.ReflectionTestUtils;
  * @author Dan Garrette
  * @since 2.0
  */
-public class ChunkTaskletParserTests {
+public class ChunkElementParserTests {
 
-	private ConfigurableApplicationContext chunkTaskletParentAttributeParserTestsContext = new ClassPathXmlApplicationContext(
-			"org/springframework/batch/core/configuration/xml/ChunkTaskletParentAttributeParserTests-context.xml");
+	private ConfigurableApplicationContext chunkElementParentAttributeParserTestsContext = new ClassPathXmlApplicationContext(
+			"org/springframework/batch/core/configuration/xml/ChunkElementParentAttributeParserTests-context.xml");
 
 	@Test
 	public void testInheritSkippable() throws Exception {
 		Collection<Class<?>> skippable = getExceptionClasses("s1", "skippable",
-				chunkTaskletParentAttributeParserTestsContext);
+				chunkElementParentAttributeParserTestsContext);
 		assertEquals(2, skippable.size());
 		boolean e = false;
 		boolean f = false;
@@ -67,7 +67,7 @@ public class ChunkTaskletParserTests {
 
 	@Test
 	public void testInheritFatal() throws Exception {
-		Collection<Class<?>> fatal = getExceptionClasses("s1", "fatal", chunkTaskletParentAttributeParserTestsContext);
+		Collection<Class<?>> fatal = getExceptionClasses("s1", "fatal", chunkElementParentAttributeParserTestsContext);
 		boolean a = false;
 		boolean b = false;
 		for (Class<?> cls : fatal) {
@@ -84,7 +84,7 @@ public class ChunkTaskletParserTests {
 
 	@Test
 	public void testInheritStreams() throws Exception {
-		Collection<ItemStream> streams = getStreams("s1", chunkTaskletParentAttributeParserTestsContext);
+		Collection<ItemStream> streams = getStreams("s1", chunkElementParentAttributeParserTestsContext);
 		assertEquals(2, streams.size());
 		boolean c = false;
 		for (ItemStream o : streams) {
@@ -98,7 +98,7 @@ public class ChunkTaskletParserTests {
 	@Test
 	public void testInheritRetryListeners() throws Exception {
 		Collection<RetryListener> retryListeners = getRetryListeners("s1",
-				chunkTaskletParentAttributeParserTestsContext);
+				chunkElementParentAttributeParserTestsContext);
 		assertEquals(2, retryListeners.size());
 		boolean g = false;
 		boolean h = false;
@@ -117,7 +117,7 @@ public class ChunkTaskletParserTests {
 	@Test
 	public void testInheritSkippable_NoMerge() throws Exception {
 		Collection<Class<?>> skippable = getExceptionClasses("s2", "skippable",
-				chunkTaskletParentAttributeParserTestsContext);
+				chunkElementParentAttributeParserTestsContext);
 		assertEquals(1, skippable.size());
 		boolean e = false;
 		for (Class<?> cls : skippable) {
@@ -130,7 +130,7 @@ public class ChunkTaskletParserTests {
 
 	@Test
 	public void testInheritFatal_NoMerge() throws Exception {
-		Collection<Class<?>> fatal = getExceptionClasses("s2", "fatal", chunkTaskletParentAttributeParserTestsContext);
+		Collection<Class<?>> fatal = getExceptionClasses("s2", "fatal", chunkElementParentAttributeParserTestsContext);
 		boolean a = false;
 		boolean b = false;
 		for (Class<?> cls : fatal) {
@@ -147,7 +147,7 @@ public class ChunkTaskletParserTests {
 
 	@Test
 	public void testInheritStreams_NoMerge() throws Exception {
-		Collection<ItemStream> streams = getStreams("s2", chunkTaskletParentAttributeParserTestsContext);
+		Collection<ItemStream> streams = getStreams("s2", chunkElementParentAttributeParserTestsContext);
 		assertEquals(1, streams.size());
 		boolean c = false;
 		for (ItemStream o : streams) {
@@ -161,7 +161,7 @@ public class ChunkTaskletParserTests {
 	@Test
 	public void testInheritRetryListeners_NoMerge() throws Exception {
 		Collection<RetryListener> retryListeners = getRetryListeners("s2",
-				chunkTaskletParentAttributeParserTestsContext);
+				chunkElementParentAttributeParserTestsContext);
 		assertEquals(1, retryListeners.size());
 		boolean h = false;
 		for (RetryListener o : retryListeners) {

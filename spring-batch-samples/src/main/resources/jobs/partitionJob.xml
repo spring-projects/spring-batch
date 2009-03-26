@@ -38,7 +38,7 @@
 
 	<batch:step id="step1">
 		<batch:tasklet job-repository="jobRepository" transaction-manager="transactionManager">
-			<batch:chunk-tasklet writer="itemWriter" reader="itemReader" processor="itemProcessor" commit-interval="5" />
+			<batch:chunk writer="itemWriter" reader="itemReader" processor="itemProcessor" commit-interval="5" />
 			<batch:listeners>
 				<batch:listener ref="fileNameListener" />
 			</batch:listeners>

@@ -184,7 +184,7 @@
 					<xsd:documentation>
 						Defines a stage in job processing backed by a
 						Step. The id attribute must be specified. The
-						step requires either a chunk-tasklet definition,
+						step requires either a chunk definition,
 						a tasklet reference, or a reference to a 
 						(possibly abstract) parent step.
 					</xsd:documentation>
@@ -265,7 +265,7 @@
 
 	<xsd:complexType name="taskletType">
 		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element name="chunk-tasklet" type="chunkTaskletType" />
+			<xsd:element name="chunk" type="chunkTaskletType" />
 			<xsd:element name="transaction-attributes" type="transaction-attributesType" />
 			<xsd:element name="no-rollback-exception-classes">
 				<xsd:annotation>

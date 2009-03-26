@@ -18,14 +18,14 @@
 	<job id="compositeItemWriterJob">
 		<step id="step1">
 			<tasklet>
-				<chunk-tasklet reader="fileItemReader" processor="processor" writer="compositeWriter" 
-				               commit-interval="1">
+				<chunk reader="fileItemReader" processor="processor" writer="compositeWriter" 
+		               commit-interval="1">
 					<streams>
 						<stream ref="fileItemReader"/>
 						<stream ref="fileItemWriter1"/>
 						<stream ref="fileItemWriter2"/>
 					</streams>
-				</chunk-tasklet>
+				</chunk>
 			</tasklet>
 		</step>
 	</job>

@@ -9,7 +9,7 @@
 	<job id="job">
 		<step id="s1" parent="baseStep" next="s2">
 			<tasklet>
-				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+				<chunk reader="reader" writer="writer" commit-interval="5" />
 				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 			</tasklet>
 		</step>
@@ -22,7 +22,7 @@
 		<step id="s4" parent="standalone4" next="s5" />
 		<step id="s5" parent="baseStep" next="s6">
 			<tasklet>
-				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+				<chunk reader="reader" writer="writer" commit-interval="5" />
 				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 			</tasklet>
 		</step>
@@ -37,7 +37,7 @@
 
 	<step id="standalone2" parent="baseStep">
 		<tasklet>
-			<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+			<chunk reader="reader" writer="writer" commit-interval="5" />
 			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 		</tasklet>
 	</step>
@@ -50,7 +50,7 @@
 
 	<step id="standalone6" parent="baseStep">
 		<tasklet>
-			<chunk-tasklet reader="reader" writer="writer" commit-interval="5" />
+			<chunk reader="reader" writer="writer" commit-interval="5" />
 			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 		</tasklet>
 	</step>

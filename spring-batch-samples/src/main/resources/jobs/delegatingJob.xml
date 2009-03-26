@@ -20,7 +20,7 @@
 	<job id="delegateJob">
 		<step id="step1">
 			<tasklet>
-				<chunk-tasklet reader="reader" writer="writer" commit-interval="1"/>
+				<chunk reader="reader" writer="writer" commit-interval="1"/>
 			</tasklet>
 		</step>
 	</job>

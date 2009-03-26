@@ -15,9 +15,9 @@
 	<job id="skipJob" incrementer="incrementer">
 		<step id="step1" parent="baseStep">
 			<tasklet>
-				<chunk-tasklet reader="fileItemReader" processor="tradeProcessor" writer="tradeWriter" 
-				               commit-interval="3" skip-limit="10">
-				</chunk-tasklet>
+				<chunk reader="fileItemReader" processor="tradeProcessor" writer="tradeWriter" 
+		               commit-interval="3" skip-limit="10">
+				</chunk>
 			</tasklet>
 
 			<next on="*" to="step2" />
@@ -44,11 +44,11 @@
 
 	<step id="secondPass" parent="t2">
 		<tasklet>
-			<chunk-tasklet writer="itemTrackingWriter">
+			<chunk writer="itemTrackingWriter">
 				<skippable-exception-classes merge="true">
 					java.lang.RuntimeException
 				</skippable-exception-classes>
-			</chunk-tasklet>
+			</chunk>
 		</tasklet>
 	</step>
 
@@ -56,12 +56,12 @@
 
 	<step id="t3" parent="baseStep" abstract="true">
 		<tasklet>
-			<chunk-tasklet reader="tradeSqlItemReader" processor="tradeProcessor" writer="dummyWriter" 
-			               commit-interval="2" skip-limit="10">
+			<chunk reader="tradeSqlItemReader" processor="tradeProcessor" writer="dummyWriter" 
+	               commit-interval="2" skip-limit="10">
 				<skippable-exception-classes>
 					org.springframework.batch.item.validator.ValidationException
 				</skippable-exception-classes>
-			</chunk-tasklet>
+			</chunk>
 		</tasklet>
 	</step>
 

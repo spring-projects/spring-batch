@@ -53,7 +53,7 @@ public abstract class AbstractStepParser {
 
 	private static final String TASKLET_ELE = "tasklet";
 
-	private static final String CHUNK_TASKLET_ELE = "chunk-tasklet";
+	private static final String CHUNK_ELE = "chunk";
 
 	private static final String LISTENERS_ELE = "listeners";
 
@@ -63,7 +63,7 @@ public abstract class AbstractStepParser {
 
 	private static final String JOB_REPO_ATTR = "job-repository";
 
-	private static final ChunkTaskletParser chunkTaskletParser = new ChunkTaskletParser();
+	private static final ChunkElementParser chunkTaskletParser = new ChunkElementParser();
 
 	private static final StepListenerParser stepListenerParser = new StepListenerParser();
 
@@ -109,11 +109,11 @@ public abstract class AbstractStepParser {
 		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
 		@SuppressWarnings("unchecked")
 		List<Element> chunkTaskletElements = (List<Element>) DomUtils.getChildElementsByTagName(taskletElement,
-				CHUNK_TASKLET_ELE);
+				CHUNK_ELE);
 		if (StringUtils.hasText(taskletRef)) {
 			if (chunkTaskletElements.size() > 0) {
 				parserContext.getReaderContext().error(
-						"The <" + CHUNK_TASKLET_ELE + "/> element can't be combined with the '" + TASKLET_REF_ATTR
+						"The <" + CHUNK_ELE + "/> element can't be combined with the '" + TASKLET_REF_ATTR
 								+ "=\"" + taskletRef + "\"' attribute specification for <"
 								+ taskletElement.getNodeName() + "/>", taskletElement);
 			}
@@ -124,12 +124,12 @@ public abstract class AbstractStepParser {
 		}
 		else if (chunkTaskletElements.size() > 1) {
 			parserContext.getReaderContext().error(
-					"The '<" + CHUNK_TASKLET_ELE + "/>' element may not appear more than once in a single <"
+					"The '<" + CHUNK_ELE + "/>' element may not appear more than once in a single <"
 							+ taskletElement.getNodeName() + "/>.", taskletElement);
 		}
 		else if (!stepUnderspecified) {
 			parserContext.getReaderContext().error(
-					"Step [" + taskletElement.getAttribute(ID_ATTR) + "] has neither a <" + CHUNK_TASKLET_ELE
+					"Step [" + taskletElement.getAttribute(ID_ATTR) + "] has neither a <" + CHUNK_ELE
 							+ "/> element nor a '" + TASKLET_REF_ATTR + "' attribute.", taskletElement);
 		}
 

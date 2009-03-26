@@ -13,11 +13,11 @@
 	<job id="hibernateJob" restartable="false">
 		<step id="step1">
 			<tasklet>
-				<chunk-tasklet reader="hibernateItemReader" 
-						       processor="creditIncreaseProcessor" 
-						       writer="hibernateCreditWriter" 
-						       skip-limit="5" 
-						       commit-interval="3"/>
+				<chunk reader="hibernateItemReader" 
+				       processor="creditIncreaseProcessor" 
+				       writer="hibernateCreditWriter" 
+				       skip-limit="5" 
+				       commit-interval="3"/>
 			</tasklet>
 		</step>
 	</job>

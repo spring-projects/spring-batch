@@ -9,12 +9,12 @@
 	<job id="job">
 		<step id="ft-step">
 			<tasklet>
-				<chunk-tasklet reader="reader" processor="processor" writer="writer"
-								commit-interval="10">
+				<chunk reader="reader" processor="processor" writer="writer"
+						commit-interval="10">
 					<streams>
 						<stream ref="reader"/>
 					</streams>
-				</chunk-tasklet>
+				</chunk>
 				<listeners>
 					 <listener class="org.springframework.batch.core.configuration.xml.TestListener"
 						       after-step-method="destroy"/> 

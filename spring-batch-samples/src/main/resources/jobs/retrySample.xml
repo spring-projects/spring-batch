@@ -14,14 +14,14 @@
 	<job id="retrySample">
 		<step id="step1">
 			<tasklet>
-				<chunk-tasklet reader="itemGenerator" 
-					           writer="itemWriter" 
-					           commit-interval="1"
-					           retry-limit="3">
+				<chunk reader="itemGenerator" 
+			           writer="itemWriter" 
+			           commit-interval="1"
+			           retry-limit="3">
 				    <retryable-exception-classes>
 				    	java.lang.Exception
 				    </retryable-exception-classes>
-				</chunk-tasklet>
+				</chunk>
 			</tasklet>
 		</step>
 	</job>

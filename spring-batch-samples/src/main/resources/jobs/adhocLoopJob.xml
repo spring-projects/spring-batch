@@ -16,7 +16,7 @@
 	<job id="loopJob" incrementer="jobParametersIncrementer">
 		<step id="step1">
 			<tasklet>
-				<chunk-tasklet reader="reader" writer="writer" commit-interval="3"/>
+				<chunk reader="reader" writer="writer" commit-interval="3"/>
 			</tasklet>
 		</step>
 	</job>

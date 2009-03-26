@@ -33,12 +33,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
 /**
- * Internal parser for the &lt;chunk-tasklet/&gt; element either inside a step.
+ * Internal parser for the &lt;chunk/&gt; element inside a step.
  * 
  * @author Thomas Risberg
  * @since 2.0
  */
-public class ChunkTaskletParser {
+public class ChunkElementParser {
 
 	private static final String ID_ATTR = "id";
 

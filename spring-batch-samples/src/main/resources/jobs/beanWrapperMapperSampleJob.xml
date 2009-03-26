@@ -11,13 +11,14 @@
 	<job id="beanWrapperMapperJob">
 		<step id="step1" next="step2">
 			<tasklet>
-				<chunk-tasklet reader="tradeFileItemReader" processor="processor" writer="tradeWriter" 
-				               commit-interval="1"/>
+				<chunk reader="tradeFileItemReader" processor="processor" writer="tradeWriter" 
+		               commit-interval="1"/>
 			</tasklet>
 		</step>
 		<step id="step2">
 			<tasklet>
-				<chunk-tasklet reader="personFileItemReader" writer="personWriter" commit-interval="1"/>
+				<chunk reader="personFileItemReader" writer="personWriter" 
+				       commit-interval="1"/>
 			</tasklet>
 		</step>
 	</job>

@@ -9,8 +9,8 @@
 	<job id="job">
 		<step id="s1">
 			<tasklet>
-				<chunk-tasklet reader="reader" writer="writer" 
-							   commit-interval="25" chunk-completion-policy="completionPolicy"/>
+				<chunk reader="reader" writer="writer" 
+					   commit-interval="25" chunk-completion-policy="completionPolicy"/>
 			</tasklet>
 		</step>
 	</job>

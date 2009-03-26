@@ -9,7 +9,7 @@
 	<job id="job">
 		<step id="s1" parent="baseStep">
 			<tasklet>
-				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" skip-limit="5">
+				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5">
 					<skippable-exception-classes merge="true">
 						java.lang.NullPointerException
 					</skippable-exception-classes>
@@ -22,13 +22,13 @@
 					<retry-listeners merge="true">
 						<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
 					</retry-listeners>
-				</chunk-tasklet>
+				</chunk>
 			</tasklet>
 		</step>
 
 		<step id="s2" parent="baseStep">
 			<tasklet>
-				<chunk-tasklet reader="reader" writer="writer" commit-interval="5" skip-limit="5">
+				<chunk reader="reader" writer="writer" commit-interval="5" skip-limit="5">
 					<skippable-exception-classes>
 						java.lang.NullPointerException
 					</skippable-exception-classes>
@@ -41,14 +41,14 @@
 					<retry-listeners>
 						<listener class="org.springframework.batch.core.configuration.xml.DummyRetryListener"/>
 					</retry-listeners>
-				</chunk-tasklet>
+				</chunk>
 			</tasklet>
 		</step>
 	</job>
 
 	<step id="baseStep" abstract="true">
 		<tasklet>
-				<chunk-tasklet>
+				<chunk>
 					<skippable-exception-classes>
 						java.lang.ArithmeticException
 					</skippable-exception-classes>
@@ -61,7 +61,7 @@
 					<retry-listeners>
 						<listener class="org.springframework.batch.retry.listener.RetryListenerSupport"/>
 					</retry-listeners>
-				</chunk-tasklet>
+				</chunk>
 		</tasklet>
 	</step>
 	

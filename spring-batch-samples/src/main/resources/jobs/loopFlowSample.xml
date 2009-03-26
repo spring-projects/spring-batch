@@ -14,7 +14,7 @@
 	<job id="loopFlowSample">
 		<step id="step1" next="step2">
 			<tasklet>
-				<chunk-tasklet reader="itemGenerator" writer="itemWriter" commit-interval="1"/>
+				<chunk reader="itemGenerator" writer="itemWriter" commit-interval="1"/>
 				<listeners>
 					<listener ref="resettingListener"/>
 				</listeners>
@@ -22,7 +22,7 @@
 		</step>
 		<step id="step2" next="limitDecision">
 			<tasklet allow-start-if-complete="true">
-				<chunk-tasklet reader="itemGenerator" writer="itemWriter" commit-interval="1"/>
+				<chunk reader="itemGenerator" writer="itemWriter" commit-interval="1"/>
 				<listeners>
 					<listener ref="resettingListener"/>
 				</listeners>
