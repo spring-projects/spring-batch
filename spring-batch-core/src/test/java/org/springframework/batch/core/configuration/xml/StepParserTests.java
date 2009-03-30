@@ -184,9 +184,6 @@ public class StepParserTests {
 		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Step step = (Step) ctx.getBean(stepName);
-		if (step instanceof DelegatingStep) {
-			step = (Step) ReflectionTestUtils.getField(step, "delegate");
-		}
 		assertTrue(step instanceof TaskletStep);
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
 		Object composite = ReflectionTestUtils.getField(compositeListener, "list");
@@ -206,9 +203,6 @@ public class StepParserTests {
 		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
 		assertTrue(beans.containsKey(stepName));
 		Step step = (Step) ctx.getBean(stepName);
-		if (step instanceof DelegatingStep) {
-			step = (Step) ReflectionTestUtils.getField(step, "delegate");
-		}
 		assertTrue(step instanceof TaskletStep);
 		Object transactionAttribute = ReflectionTestUtils.getField(step, "transactionAttribute");
 		DefaultTransactionAttribute txa = (DefaultTransactionAttribute) transactionAttribute;
