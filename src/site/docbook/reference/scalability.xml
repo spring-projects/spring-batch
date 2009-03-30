@@ -91,14 +91,14 @@
     <para><programlisting>&lt;job id="job1"&gt;
   &lt;split id="split1" task-executor="taskExecutor" next="step4"&gt;
     &lt;flow&gt;
-      &lt;step id="step1" ref="s1" next="step2"/&gt;
-      &lt;step id="step2" ref="s2"/&gt;
+      &lt;step id="step1" parent="s1" next="step2"/&gt;
+      &lt;step id="step2" parent="s2"/&gt;
     &lt;/flow&gt;
     &lt;flow&gt;
-      &lt;step id="step3" ref="s3"/&gt;
+      &lt;step id="step3" parent="s3"/&gt;
     &lt;/flow&gt;
   &lt;/split&gt;
-  &lt;step id="step4" ref="s4"/&gt;
+  &lt;step id="step4" parent="s4"/&gt;
 &lt;/job&gt;
 
 &lt;beans:bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/&gt;</programlisting></para>

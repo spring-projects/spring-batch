@@ -107,14 +107,14 @@
     namespace abstracts away the need to instantiate it directly. Instead, the
     <code>&lt;job&gt;</code> tag can be used:</para>
 
-    <programlisting><![CDATA[  
-  <job id="footballJob">
-    <step id="playerload" next="gameLoad"/>
-    <step id="gameLoad" next="playerSummarization"/>
-    <step id="playerSummarization"/>
-  </job>
+    <programlisting>  
+  &lt;job id="footballJob"&gt;
+    &lt;step id="playerload" next="gameLoad"/&gt;
+    &lt;step id="gameLoad" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization"/&gt;
+  &lt;/job&gt;
 
-]]></programlisting>
+</programlisting>
 
     <section id="jobInstance">
       <title id="s.2.1.2">JobInstance</title>
@@ -134,8 +134,8 @@
       executions (<classname>JobExecution</classname> is discussed in more
       detail below) and only one <classname>JobInstance</classname>
       corresponding to a particular <classname>Job</classname> and
-      <classname>JobParameters</classname> can be running at a given time.
-      </para>
+      <classname>JobParameters</classname> can be running at a given
+      time.</para>
 
       <para>The definition of a <classname>JobInstance</classname> has
       absolutely no bearing on the data the will be loaded. It is entirely up
@@ -716,7 +716,7 @@
     is to put the current number of lines read into the context, and the
     framework will do the rest:</para>
 
-    <programlisting><![CDATA[executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());]]></programlisting>
+    <programlisting>executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());</programlisting>
 
     <para>Using the EndOfDay example from the Job Stereotypes section as an
     example, assume there's one step: 'loadData', that loads a file into the
@@ -863,7 +863,7 @@
     <classname>ItemReader</classname> is opened, it can check to see if it has
     any stored state in the context, and initialize itself from there:</para>
 
-    <programlisting><![CDATA[  if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
+    <programlisting>  if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     log.debug("Initializing for restart. Restart data is: " + executionContext);
 
     long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
@@ -871,10 +871,10 @@
     LineReader reader = getReader();
 
     Object record = "";
-    while (reader.getPosition() < lineCount && record != null) {
+    while (reader.getPosition() &lt; lineCount &amp;&amp; record != null) {
        record = readLine();
     }
-  }]]></programlisting>
+  }</programlisting>
 
     <para>In this case, after the above code is executed, the current line
     will be 40,322, allowing the <classname>Step</classname> to start again
@@ -914,12 +914,12 @@
     <classname>StepExecution</classname>. For example, consider the following
     code snippet:</para>
 
-    <programlisting><![CDATA[
+    <programlisting>
   ExecutionContext ecStep = stepExecution.getExecutionContext();
   ExecutionContext ecJob = jobExecution.getExecutionContext();
   //ecStep does not equal ecJob
 
-]]></programlisting>
+</programlisting>
 
     <para>As noted in the comment, ecStep will not equal ecJob; they are two
     different <classname>ExecutionContext</classname>s. The one scoped to the
@@ -942,10 +942,10 @@
     <classname>JobExecution</classname> implementations are persisted by
     passing them to the repository:</para>
 
-    <programlisting><![CDATA[  
-  <job-repository id="jobRepository"/>
+    <programlisting>  
+  &lt;job-repository id="jobRepository"/&gt;
 
-]]></programlisting>
+</programlisting>
   </section>
 
   <section>
@@ -955,12 +955,12 @@
     launching a <classname>Job</classname> with a given set of
     <classname>JobParameters</classname>:</para>
 
-    <programlisting><![CDATA[  public interface JobLauncher {
+    <programlisting>  public interface JobLauncher {
 
     public JobExecution run(Job job, JobParameters jobParameters) 
                 throws JobExecutionAlreadyRunningException, JobRestartException;
 }
-]]></programlisting>
+</programlisting>
 
     <para>It is expected that implementations will obtain a valid
     <classname>JobExecution</classname> from the
@@ -1024,7 +1024,9 @@
 
     &lt;job id="ioSampleJob"&gt;
       &lt;step id="step1"&gt;
-        &lt;tasklet reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/&gt;
+        &lt;/tasklet&gt;
       &lt;/step&gt;
     &lt;/job&gt;
 
