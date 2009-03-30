@@ -341,7 +341,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 			jobRepository.add(currentStepExecution);
 
-			logger.info("Executing step: "+step);
+			logger.info("Executing step: [" + step + "]");
 			step.execute(currentStepExecution);
 
 			jobRepository.updateExecutionContext(execution);
