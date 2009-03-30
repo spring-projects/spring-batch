@@ -71,8 +71,8 @@ public abstract class AbstractStepParser {
 	 * @param stepElement The &lt;step/&gt; element
 	 * @param parserContext
 	 * @param jobRepositoryRef The name of the bean defining the JobRepository.
-	 *            Use 'null' if the job-repository is specified on the
-	 *            &lt;tasklet/&gt; element; this method will look it up.
+	 *        Use 'null' if the job-repository is specified on the
+	 *        &lt;tasklet/&gt; element; this method will look it up.
 	 */
 	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobRepositoryRef) {
 
@@ -108,24 +108,18 @@ public abstract class AbstractStepParser {
 
 		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
 		@SuppressWarnings("unchecked")
-		List<Element> chunkTaskletElements = (List<Element>) DomUtils.getChildElementsByTagName(taskletElement,
-				CHUNK_ELE);
+		List<Element> chunkElements = (List<Element>) DomUtils.getChildElementsByTagName(taskletElement, CHUNK_ELE);
 		if (StringUtils.hasText(taskletRef)) {
-			if (chunkTaskletElements.size() > 0) {
+			if (chunkElements.size() > 0) {
 				parserContext.getReaderContext().error(
-						"The <" + CHUNK_ELE + "/> element can't be combined with the '" + TASKLET_REF_ATTR
-								+ "=\"" + taskletRef + "\"' attribute specification for <"
-								+ taskletElement.getNodeName() + "/>", taskletElement);
+						"The <" + CHUNK_ELE + "/> element can't be combined with the '" + TASKLET_REF_ATTR + "=\""
+								+ taskletRef + "\"' attribute specification for <" + taskletElement.getNodeName()
+								+ "/>", taskletElement);
 			}
 			parseTaskletRef(taskletRef, bd.getPropertyValues());
 		}
-		else if (chunkTaskletElements.size() == 1) {
-			chunkElementParser.parse(chunkTaskletElements.get(0), bd, parserContext, stepUnderspecified);
-		}
-		else if (chunkTaskletElements.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The '<" + CHUNK_ELE + "/>' element may not appear more than once in a single <"
-							+ taskletElement.getNodeName() + "/>.", taskletElement);
+		else if (chunkElements.size() == 1) {
+			chunkElementParser.parse(chunkElements.get(0), bd, parserContext, stepUnderspecified);
 		}
 		else if (!stepUnderspecified) {
 			parserContext.getReaderContext().error(
@@ -204,11 +198,6 @@ public abstract class AbstractStepParser {
 				propertyValues.addPropertyValue("transactionTimeout", timeout);
 			}
 		}
-		else if (txAttrElements.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The <" + TX_ATTRIBUTES_ELE + "/> element may not appear more than once in a single <"
-							+ stepElement.getNodeName() + "/>.", stepElement);
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -266,11 +255,6 @@ public abstract class AbstractStepParser {
 			}
 			propertyValues.addPropertyValue("listeners", listenerBeans);
 			parserContext.popAndRegisterContainingComponent();
-		}
-		else if (listenersElements.size() > 1) {
-			parserContext.getReaderContext().error(
-					"The <" + LISTENERS_ELE + "/> element may not appear more than once in a single <"
-							+ stepElement.getNodeName() + "/>.", stepElement);
 		}
 	}
 

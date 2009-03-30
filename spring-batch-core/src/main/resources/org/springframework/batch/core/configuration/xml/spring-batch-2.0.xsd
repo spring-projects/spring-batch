@@ -264,10 +264,10 @@
 	</xsd:group>
 
 	<xsd:complexType name="taskletType">
-		<xsd:choice minOccurs="0" maxOccurs="unbounded">
-			<xsd:element name="chunk" type="chunkTaskletType" />
-			<xsd:element name="transaction-attributes" type="transaction-attributesType" />
-			<xsd:element name="no-rollback-exception-classes">
+		<xsd:all>
+			<xsd:element name="chunk" type="chunkTaskletType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="transaction-attributes" type="transaction-attributesType" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="no-rollback-exception-classes" minOccurs="0" maxOccurs="1">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					List of exception classes that should not cause rollback if possible.  This list
@@ -284,8 +284,8 @@
 					</xsd:simpleContent>
 				</xsd:complexType>
 			</xsd:element>
-			<xsd:element name="listeners" type="stepListenersType" />
-		</xsd:choice>
+			<xsd:element name="listeners" type="stepListenersType" minOccurs="0" maxOccurs="1"/>
+		</xsd:all>
 		<xsd:attribute name="ref" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
