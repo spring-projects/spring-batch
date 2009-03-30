@@ -38,6 +38,7 @@ import org.springframework.batch.repeat.RepeatException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 /**
  * A {@link Step} implementation that provides common behavior to subclasses,
@@ -316,6 +317,10 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 	protected JobRepository getJobRepository() {
 		return jobRepository;
+	}
+
+	public String toString() {
+		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
 	}
 
 	/**

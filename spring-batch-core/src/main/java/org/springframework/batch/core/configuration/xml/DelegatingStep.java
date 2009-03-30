@@ -19,6 +19,7 @@ package org.springframework.batch.core.configuration.xml;
 import org.springframework.batch.core.JobInterruptedException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
+import org.springframework.util.ClassUtils;
 
 /**
  * Class used for delegating from a <step> definition to an individual bean
@@ -61,4 +62,7 @@ public class DelegatingStep implements Step {
 		return delegate.isAllowStartIfComplete();
 	}
 
+	public String toString() {
+		return ClassUtils.getShortName(getClass()) + ": [name=" + name + "]";
+	}
 }
