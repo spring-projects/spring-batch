@@ -77,12 +77,6 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 
 	private Collection<Class<? extends Throwable>> retryableExceptionClasses = new HashSet<Class<? extends Throwable>>();
 
-	{
-		fatalExceptionClasses.add(Error.class);
-		skippableExceptionClasses.add(Exception.class);
-		retryableExceptionClasses.add(Exception.class);
-	}
-
 	private int cacheCapacity = 0;
 
 	private int retryLimit = 0;

@@ -50,11 +50,7 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
-
-	@SuppressWarnings("unchecked")
-	private Collection<Class<? extends Throwable>> skippableExceptions = Arrays.<Class<? extends Throwable>> asList(
-			SkippableException.class, SkippableRuntimeException.class);
+	private FaultTolerantStepFactoryBean<String, String> factory;
 
 	private SkipReaderStub reader = new SkipReaderStub();
 
@@ -78,13 +74,19 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	@Before
 	public void setUp() throws Exception {
+		factory = new FaultTolerantStepFactoryBean<String, String>();
+		
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
-		factory.setSkippableExceptionClasses(skippableExceptions);
 		factory.setSkipLimit(2);
+
+		@SuppressWarnings("unchecked")
+		Collection<Class<? extends Throwable>> skippableExceptions = Arrays.<Class<? extends Throwable>> asList(
+				SkippableException.class, SkippableRuntimeException.class);
+		factory.setSkippableExceptionClasses(skippableExceptions);
 
 		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();

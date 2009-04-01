@@ -27,6 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamSupport;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.sample.domain.trade.Trade;
 import org.springframework.batch.sample.domain.trade.TradeDao;
 import org.springframework.util.Assert;
@@ -58,7 +59,7 @@ public class TradeWriter extends ItemStreamSupport implements ItemWriter<Trade> 
 			Assert.notNull(trade.getPrice()); // There must be a price to total
 
 			if (this.failingCustomers.contains(trade.getCustomer())) {
-				throw new RuntimeException("Something unexpected happened!");
+				throw new WriteFailedException("Something unexpected happened!");
 			}
 		}
 

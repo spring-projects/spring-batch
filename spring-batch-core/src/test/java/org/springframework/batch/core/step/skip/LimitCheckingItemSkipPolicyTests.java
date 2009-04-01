@@ -25,19 +25,20 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.batch.core.step.skip.LimitCheckingItemSkipPolicy;
-import org.springframework.batch.core.step.skip.SkipLimitExceededException;
+import org.springframework.batch.item.ItemWriterException;
+import org.springframework.batch.item.WriteFailedException;
+import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.file.FlatFileParseException;
 
 /**
  * @author Lucas Ward
  * @author Dave Syer
- *
+ * 
  */
 public class LimitCheckingItemSkipPolicyTests {
 
 	private LimitCheckingItemSkipPolicy failurePolicy;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
@@ -45,26 +46,100 @@ public class LimitCheckingItemSkipPolicyTests {
 		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
 		failurePolicy = new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
 	}
-	
+
 	@Test
-	public void testLimitExceed(){		
-		try{
+	public void testLimitExceed() {
+		try {
 			failurePolicy.shouldSkip(new FlatFileParseException("", ""), 2);
 			fail();
+		} catch (SkipLimitExceededException ex) {
+			// expected
 		}
-		catch(SkipLimitExceededException ex){
-			//expected
-		}
-	}
-	
-	@Test
-	public void testNonSkippableException(){
-		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), 2));
-	}
-	
-	@Test
-	public void testSkip(){
-		assertTrue(failurePolicy.shouldSkip(new FlatFileParseException("",""), 0));
 	}
 
+	@Test
+	public void testNonSkippableException() {
+		assertFalse(failurePolicy.shouldSkip(new FileNotFoundException(), 2));
+	}
+
+	@Test
+	public void testSkip() {
+		assertTrue(failurePolicy.shouldSkip(new FlatFileParseException("", ""), 0));
+	}
+
+	private LimitCheckingItemSkipPolicy getSkippableSubsetFailurePolicy() {
+		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
+		skippableExceptions.add(WriteFailedException.class);
+		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
+		fatalExceptions.add(ItemWriterException.class);
+		return new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
+	}
+
+	/**
+	 * condition: skippable < fatal; exception is unclassified
+	 * 
+	 * expected: false; default classification
+	 */
+	@Test
+	public void testSkippableSubset_unclassified() {
+		assertFalse(getSkippableSubsetFailurePolicy().shouldSkip(new RuntimeException(), 0));
+	}
+
+	/**
+	 * condition: skippable < fatal; exception is skippable
+	 * 
+	 * expected: false; fatal overrides skippable
+	 */
+	@Test
+	public void testSkippableSubset_skippable() {
+		assertFalse(getSkippableSubsetFailurePolicy().shouldSkip(new WriteFailedException(""), 0));
+	}
+
+	/**
+	 * condition: skippable < fatal; exception is fatal
+	 * 
+	 * expected: false
+	 */
+	@Test
+	public void testSkippableSubset_fatal() {
+		assertFalse(getSkippableSubsetFailurePolicy().shouldSkip(new WriterNotOpenException(""), 0));
+	}
+
+	private LimitCheckingItemSkipPolicy getFatalSubsetFailurePolicy() {
+		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
+		skippableExceptions.add(ItemWriterException.class);
+		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
+		fatalExceptions.add(WriteFailedException.class);
+		return new LimitCheckingItemSkipPolicy(1, skippableExceptions, fatalExceptions);
+	}
+
+	/**
+	 * condition: fatal < skippable; exception is unclassified
+	 * 
+	 * expected: false; default classification
+	 */
+	@Test
+	public void testFatalSubset_unclassified() {
+		assertFalse(getFatalSubsetFailurePolicy().shouldSkip(new RuntimeException(), 0));
+	}
+
+	/**
+	 * condition: fatal < skippable; exception is skippable
+	 * 
+	 * expected: true
+	 */
+	@Test
+	public void testFatalSubset_skippable() {
+		assertTrue(getFatalSubsetFailurePolicy().shouldSkip(new WriterNotOpenException(""), 0));
+	}
+
+	/**
+	 * condition: fatal < skippable; exception is fatal
+	 * 
+	 * expected: false
+	 */
+	@Test
+	public void testFatalSubset_fatal() {
+		assertFalse(getFatalSubsetFailurePolicy().shouldSkip(new WriteFailedException(""), 0));
+	}
 }

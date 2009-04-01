@@ -42,7 +42,7 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
+	private FaultTolerantStepFactoryBean<String, String> factory;
 
 	private static Collection<String> NO_FAILURES = Collections.emptyList();
 
@@ -60,12 +60,19 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	@Before
 	public void setUp() throws Exception {
+		factory = new FaultTolerantStepFactoryBean<String, String>();
+		
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
 		factory.setSkipLimit(2);
+		
+		@SuppressWarnings("unchecked")
+		Collection<Class<? extends Throwable>> skippableExceptions = Arrays
+				.<Class<? extends Throwable>> asList(Exception.class);
+		factory.setSkippableExceptionClasses(skippableExceptions);
 
 		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();

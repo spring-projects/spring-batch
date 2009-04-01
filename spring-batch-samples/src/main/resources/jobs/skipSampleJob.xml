@@ -17,6 +17,10 @@
 			<tasklet>
 				<chunk reader="fileItemReader" processor="tradeProcessor" writer="tradeWriter" 
 		               commit-interval="3" skip-limit="10">
+					<skippable-exception-classes>
+						org.springframework.batch.item.file.FlatFileParseException
+						org.springframework.batch.item.WriteFailedException
+					</skippable-exception-classes>
 				</chunk>
 			</tasklet>
 
@@ -46,7 +50,7 @@
 		<tasklet>
 			<chunk writer="itemTrackingWriter">
 				<skippable-exception-classes merge="true">
-					java.lang.RuntimeException
+					org.springframework.batch.item.validator.ValidationException
 				</skippable-exception-classes>
 			</chunk>
 		</tasklet>
@@ -59,7 +63,7 @@
 			<chunk reader="tradeSqlItemReader" processor="tradeProcessor" writer="dummyWriter" 
 	               commit-interval="2" skip-limit="10">
 				<skippable-exception-classes>
-					org.springframework.batch.item.validator.ValidationException
+					java.lang.RuntimeException
 				</skippable-exception-classes>
 			</chunk>
 		</tasklet>

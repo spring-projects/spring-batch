@@ -17,7 +17,11 @@
 				       processor="creditIncreaseProcessor" 
 				       writer="hibernateCreditWriter" 
 				       skip-limit="5" 
-				       commit-interval="3"/>
+				       commit-interval="3">
+					<skippable-exception-classes>
+						java.lang.RuntimeException
+					</skippable-exception-classes>
+				</chunk>
 			</tasklet>
 		</step>
 	</job>

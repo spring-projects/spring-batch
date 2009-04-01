@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -63,7 +64,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	private FaultTolerantStepFactoryBean<String, String> factory = new FaultTolerantStepFactoryBean<String, String>();
+	private FaultTolerantStepFactoryBean<String, String> factory;
 
 	private List<Object> recovered = new ArrayList<Object>();
 
@@ -88,11 +89,6 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		}
 	};
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see junit.framework.TestCase#setUp()
-	 */
 	@Before
 	public void setUp() throws Exception {
 
@@ -100,6 +96,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		MapJobExecutionDao.clear();
 		MapStepExecutionDao.clear();
 
+		factory = new FaultTolerantStepFactoryBean<String, String>();
 		factory.setBeanName("step");
 
 		factory.setItemReader(new ListItemReader<String>(new ArrayList<String>()));
@@ -112,6 +109,11 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 			}
 		});
 		factory.setCommitInterval(1); // trivial by default
+
+		@SuppressWarnings("unchecked")
+		Collection<Class<? extends Throwable>> skippableExceptions = Arrays
+				.<Class<? extends Throwable>> asList(Exception.class);
+		factory.setSkippableExceptionClasses(skippableExceptions);
 
 		JobParameters jobParameters = new JobParametersBuilder().addString("statefulTest", "make_this_unique")
 				.toJobParameters();
