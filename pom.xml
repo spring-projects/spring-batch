@@ -266,7 +266,7 @@
 										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
 											<condition>
 												<not>
-													<resourcecount count="3">
+													<resourcecount count="9">
 														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
 													</resourcecount>
 												</not>
