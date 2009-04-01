@@ -76,9 +76,9 @@
       the Spring Batch namespace can be used:</para>
 
       <programlisting>
-  &lt;job id="sampleJob"&gt;
+  &lt;job id="sampleJob" job-repository="jobRepository"&gt;
     &lt;step id="step1"&gt;
-      &lt;tasklet job-repository="jobRepository" transaction-manager="transactionManager"&gt;
+      &lt;tasklet transaction-manager="transactionManager"&gt;
           &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
       &lt;tasklet&gt;
     &lt;/step&gt;
@@ -110,7 +110,10 @@
             that will be used to periodically store the
             <classname>StepExecution</classname> and
             <classname>ExecutionContext</classname> during processing (just
-            before committing).</para>
+            before committing). For an in-line &lt;step/&gt; (one defined
+            within a &lt;job/&gt;) it is an attribute on the &lt;job/&gt;
+            element; for a standalone step, it is defined as an attribute of
+            the on the &lt;tasklet/&gt;.</para>
           </listitem>
 
           <listitem>
@@ -600,7 +603,7 @@
       the <classname>Step</classname> can be configured with a list of
       exceptions that should not cause rollback. The
       no-rollback-exception-classes element is a list of transaction
-      attributes, separated by commas or newlines. </para>
+      attributes, separated by commas or newlines.</para>
 
       <programlisting>
   &lt;step id="step1"&gt;
