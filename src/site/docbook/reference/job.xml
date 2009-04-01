@@ -170,6 +170,18 @@
   }
 
 </programlisting>
+
+      <para>The annotations corresponding to this interface are:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><classname>@BeforeJob</classname></para>
+        </listitem>
+
+        <listitem>
+          <para><classname>@AfterJob</classname></para>
+        </listitem>
+      </itemizedlist>
     </section>
 
     <section>
