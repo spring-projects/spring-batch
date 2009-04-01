@@ -139,12 +139,14 @@
       attribute:</para>
 
       <programlisting>
-  &lt;job id="sampleJob"&gt;
+  &lt;job id="sampleJob" job-repository="jobRepository"&gt;
     &lt;step id="step1" <emphasis role="bold">parent="standaloneStep"</emphasis> /&gt;
   &lt;/job&gt;
 
   &lt;step id="standaloneStep"&gt;
-      &lt;tasklet reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+      &lt;tasklet job-repository="jobRepository" transaction-manager="transactionManager"&gt;
+          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+      &lt;/tasklet&gt;
   &lt;/step&gt;
 
 </programlisting>
@@ -154,7 +156,7 @@
 
       <orderedlist>
         <listitem>
-          <para>The Id will be used as the step name when persisting the
+          <para>The id will be used as the step name when persisting the
           StepExecution. If the same standalone step is referenced in more
           than one step in the job, an error will occur.</para>
         </listitem>
