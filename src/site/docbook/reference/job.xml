@@ -38,9 +38,9 @@
 
     <programlisting>  
   &lt;job id="footballJob"&gt;
-    &lt;step id="playerload" next="gameLoad"/&gt;
-    &lt;step id="gameLoad" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization"/&gt;
+    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
+    &lt;step id="gameLoad"            parent="s2" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization" parent="s3"/&gt;
   &lt;/job&gt;
 
 </programlisting>
@@ -51,9 +51,9 @@
 
     <programlisting> 
   &lt;job id="footballJob" <emphasis role="bold">job-repository="specialRepository"</emphasis>&gt;
-    &lt;step id="playerload" next="gameLoad"/&gt;
-    &lt;step id="gameLoad" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization"/&gt;
+    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
+    &lt;step id="gameLoad"            parent="s3" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization" parent="s3"/&gt;
   &lt;/job&gt;
 
 </programlisting>
@@ -81,9 +81,9 @@
 
       <programlisting>  
   &lt;job id="footballJob" <emphasis role="bold">restartable="false"</emphasis>&gt;
-    &lt;step id="playerload" next="gameLoad"/&gt;
-    &lt;step id="gameLoad" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization"/&gt;
+    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
+    &lt;step id="gameLoad"            parent="s2" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization" parent="s3"/&gt;
   &lt;/job&gt;
 
 </programlisting>
@@ -144,9 +144,9 @@
 
       <programlisting>  
   &lt;job id="footballJob"&gt;
-    &lt;step id="playerload" next="gameLoad"/&gt;
-    &lt;step id="gameLoad" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization"/&gt;
+    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
+    &lt;step id="gameLoad"            parent="s2" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization" parent="s3"/&gt;
     &lt;listeners&gt;
       &lt;listener class="org.springframework.batch.sample.SampleListener"/&gt;
     &lt;/listeners&gt;
@@ -180,7 +180,7 @@
       <classname>Job</classname> from which the concrete
       <classname>Job</classname>s may inherit properties. Similar to class
       inheritance in Java, the "child" <classname>Job</classname> will combine
-      its elements and attributes with the parent's. </para>
+      its elements and attributes with the parent's.</para>
 
       <para>In the following example, "baseJob" is an abstract
       <classname>Job</classname> definition that defines only a list of
@@ -198,7 +198,7 @@
   &lt;/job&gt;
 
   &lt;job id="job1" parent="baseJob3"&gt;
-    &lt;step id="step1" ref="standaloneStep"/&gt;
+    &lt;step id="step1" parent="standaloneStep"/&gt;
 
     &lt;listeners merge="true"&gt;
       &lt;listener class="com.ListenerTwo"/&gt;
@@ -209,7 +209,7 @@
 
       <para>Please see the section on <link
       linkend="InheritingFromParentStep">Inheriting from a Parent Step</link>
-      for more detailed information. </para>
+      for more detailed information.</para>
     </section>
 
     <section>
@@ -940,9 +940,9 @@
 
       <programlisting>  
   &lt;job id="footballJob" <emphasis role="bold">incrementer="sampleIncrementer"</emphasis>&gt;
-    &lt;step id="playerload" next="gameLoad"/&gt;
-    &lt;step id="gameLoad" next="playerSummarization"/&gt;
-    &lt;step id="playerSummarization"/&gt;
+    &lt;step id="playerload"          parent="s1" next="gameLoad"/&gt;
+    &lt;step id="gameLoad"            parent="s2" next="playerSummarization"/&gt;
+    &lt;step id="playerSummarization" parent="s3"/&gt;
   &lt;/job&gt;
 
 </programlisting>
