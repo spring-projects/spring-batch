@@ -1,0 +1,16 @@
+Spring Batch 2.0.0.RC3 Release Notes
+
+* Issues
+
+* {{{http://jira.springframework.org/browse/BATCH-1168}BATCH-1168}} -         Bad ERROR_LOG definition in business-schema-mysql.sql
+* {{{http://jira.springframework.org/browse/BATCH-1169}BATCH-1169}} -         Incorrect system property name in data-source-context.xml
+* {{{http://jira.springframework.org/browse/BATCH-1171}BATCH-1171}} -         Interrupted step does not fail job.
+* {{{http://jira.springframework.org/browse/BATCH-1174}BATCH-1174}} -         Late binding of jobParameters does not work if late binding expression is not preceded or trailed by string
+* {{{http://jira.springframework.org/browse/BATCH-1176}BATCH-1176}} -         Update documentation section 5.2.2. Example Tasklet implementation
+* {{{http://jira.springframework.org/browse/BATCH-1178}BATCH-1178}} -         <step/> with "ref=" silently ignores other attributes
+* {{{http://jira.springframework.org/browse/BATCH-1180}BATCH-1180}} -         Error occurs if parent= attribute appears on inline <step/> without tasket
+* {{{http://jira.springframework.org/browse/BATCH-1181}BATCH-1181}} -         <step/> element always assumes the step is a TaskletStep
+* {{{http://jira.springframework.org/browse/BATCH-1175}BATCH-1175}} -         Update Validator interface for Java 5
+* {{{http://jira.springframework.org/browse/BATCH-1183}BATCH-1183}} -         Implement toString() on Step Implementations
+* {{{http://jira.springframework.org/browse/BATCH-1179}BATCH-1179}} -         Remove ref= attribute from <step/> in favor of parent=
+* {{{http://jira.springframework.org/browse/BATCH-1184}BATCH-1184}} -         DelegatingStep is not used.  It should be removed.
