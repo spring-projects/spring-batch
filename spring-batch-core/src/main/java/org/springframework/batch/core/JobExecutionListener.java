@@ -27,14 +27,17 @@ package org.springframework.batch.core;
 public interface JobExecutionListener {
 
 	/**
-	 * Initialise the state of the listener with the {@link JobExecution} from
-	 * the current scope.
+	 * Callback before a job executes.
+	 * 
 	 * @param jobExecution the current {@link JobExecution}
 	 */
 	void beforeJob(JobExecution jobExecution);
 
 	/**
-	 * Callback after completion of a job, both successful and failed.
+	 * Callback after completion of a job. Called after both both successful and
+	 * failed executions. To perform logic on a particular status, use
+	 * "if (jobExecution.getStatus() == BatchStatus.X)".
+	 * 
 	 * @param jobExecution the current {@link JobExecution}
 	 */
 	void afterJob(JobExecution jobExecution);
