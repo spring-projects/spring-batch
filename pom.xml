@@ -7,7 +7,7 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-	<version>2.0.0.CI-SNAPSHOT</version>
+	<version>2.0.0.RC3</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-parent</module>
@@ -266,7 +266,7 @@
 										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
 											<condition>
 												<not>
-													<resourcecount count="3">
+													<resourcecount count="9">
 														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
 													</resourcecount>
 												</not>
