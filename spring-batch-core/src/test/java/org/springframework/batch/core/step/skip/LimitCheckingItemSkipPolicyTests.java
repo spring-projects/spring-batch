@@ -67,7 +67,7 @@ public class LimitCheckingItemSkipPolicyTests {
 		assertTrue(failurePolicy.shouldSkip(new FlatFileParseException("", ""), 0));
 	}
 
-	private LimitCheckingItemSkipPolicy getSkippableSubsetFailurePolicy() {
+	private LimitCheckingItemSkipPolicy getSkippableSubsetSkipPolicy() {
 		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
 		skippableExceptions.add(WriteFailedException.class);
 		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
@@ -82,7 +82,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	 */
 	@Test
 	public void testSkippableSubset_unclassified() {
-		assertFalse(getSkippableSubsetFailurePolicy().shouldSkip(new RuntimeException(), 0));
+		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new RuntimeException(), 0));
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	 */
 	@Test
 	public void testSkippableSubset_skippable() {
-		assertFalse(getSkippableSubsetFailurePolicy().shouldSkip(new WriteFailedException(""), 0));
+		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
 	}
 
 	/**
@@ -102,10 +102,10 @@ public class LimitCheckingItemSkipPolicyTests {
 	 */
 	@Test
 	public void testSkippableSubset_fatal() {
-		assertFalse(getSkippableSubsetFailurePolicy().shouldSkip(new WriterNotOpenException(""), 0));
+		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new WriterNotOpenException(""), 0));
 	}
 
-	private LimitCheckingItemSkipPolicy getFatalSubsetFailurePolicy() {
+	private LimitCheckingItemSkipPolicy getFatalSubsetSkipPolicy() {
 		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
 		skippableExceptions.add(ItemWriterException.class);
 		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
@@ -120,7 +120,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	 */
 	@Test
 	public void testFatalSubset_unclassified() {
-		assertFalse(getFatalSubsetFailurePolicy().shouldSkip(new RuntimeException(), 0));
+		assertFalse(getFatalSubsetSkipPolicy().shouldSkip(new RuntimeException(), 0));
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class LimitCheckingItemSkipPolicyTests {
 	 */
 	@Test
 	public void testFatalSubset_skippable() {
-		assertTrue(getFatalSubsetFailurePolicy().shouldSkip(new WriterNotOpenException(""), 0));
+		assertTrue(getFatalSubsetSkipPolicy().shouldSkip(new WriterNotOpenException(""), 0));
 	}
 
 	/**
@@ -140,6 +140,6 @@ public class LimitCheckingItemSkipPolicyTests {
 	 */
 	@Test
 	public void testFatalSubset_fatal() {
-		assertFalse(getFatalSubsetFailurePolicy().shouldSkip(new WriteFailedException(""), 0));
+		assertFalse(getFatalSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
 	}
 }
