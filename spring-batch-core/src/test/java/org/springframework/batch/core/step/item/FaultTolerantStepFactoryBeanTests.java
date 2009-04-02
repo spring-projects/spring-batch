@@ -29,18 +29,24 @@ import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.listener.SkipListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.ItemWriterException;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.item.WriteFailedException;
+import org.springframework.batch.item.WriterNotOpenException;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
+import org.springframework.beans.factory.FactoryBean;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -791,4 +797,93 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expected.getExitStatus(), actual.getExitStatus());
 		assertEquals(expected.getJobExecutionId(), actual.getJobExecutionId());
 	}
+	
+	/**
+	 * condition: skippable < fatal; exception is unclassified
+	 * 
+	 * expected: false; default classification
+	 */
+	@Test
+	public void testSkippableSubset_unclassified() throws Exception {
+		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new RuntimeException(), 0));
+	}
+
+	/**
+	 * condition: skippable < fatal; exception is skippable
+	 * 
+	 * expected: false; fatal overrides skippable
+	 */
+	@Test
+	public void testSkippableSubset_skippable() throws Exception {
+		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
+	}
+
+	/**
+	 * condition: skippable < fatal; exception is fatal
+	 * 
+	 * expected: false
+	 */
+	@Test
+	public void testSkippableSubset_fatal() throws Exception {
+		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new WriterNotOpenException(""), 0));
+	}
+
+
+	/**
+	 * condition: fatal < skippable; exception is unclassified
+	 * 
+	 * expected: false; default classification
+	 */
+	@Test
+	public void testFatalSubset_unclassified() throws Exception {
+		assertFalse(getFatalSubsetSkipPolicy().shouldSkip(new RuntimeException(), 0));
+	}
+
+	/**
+	 * condition: fatal < skippable; exception is skippable
+	 * 
+	 * expected: true
+	 */
+	@Test
+	public void testFatalSubset_skippable() throws Exception {
+		assertTrue(getFatalSubsetSkipPolicy().shouldSkip(new WriterNotOpenException(""), 0));
+	}
+
+	/**
+	 * condition: fatal < skippable; exception is fatal
+	 * 
+	 * expected: false
+	 */
+	@Test
+	public void testFatalSubset_fatal() throws Exception {
+		assertFalse(getFatalSubsetSkipPolicy().shouldSkip(new WriteFailedException(""), 0));
+	}
+
+	private SkipPolicy getSkippableSubsetSkipPolicy() throws Exception {
+		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
+		skippableExceptions.add(WriteFailedException.class);
+		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
+		fatalExceptions.add(ItemWriterException.class);
+		factory.setSkippableExceptionClasses(skippableExceptions);
+		factory.setFatalExceptionClasses(fatalExceptions);
+		return getSkipPolicy(factory);
+	}
+
+	private SkipPolicy getFatalSubsetSkipPolicy() throws Exception {
+		List<Class<? extends Throwable>> skippableExceptions = new ArrayList<Class<? extends Throwable>>();
+		skippableExceptions.add(ItemWriterException.class);
+		List<Class<? extends Throwable>> fatalExceptions = new ArrayList<Class<? extends Throwable>>();
+		fatalExceptions.add(WriteFailedException.class);
+		factory.setSkippableExceptionClasses(skippableExceptions);
+		factory.setFatalExceptionClasses(fatalExceptions);
+		return getSkipPolicy(factory);
+	}
+
+	private SkipPolicy getSkipPolicy(FactoryBean stepFactoryBean) throws Exception {
+		Object step = factory.getObject();
+		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
+		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
+		return (SkipPolicy)ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
+	}
+
 }
