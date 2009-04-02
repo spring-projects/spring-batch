@@ -1019,13 +1019,15 @@
      xmlns:beans="http://www.springframework.org/schema/beans" 
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="
-           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
-           <emphasis role="bold">http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.0.xsd</emphasis>"&gt;
+           http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+           <emphasis role="bold">http://www.springframework.org/schema/batch 
+           http://www.springframework.org/schema/batch/spring-batch-2.0.xsd</emphasis>"&gt;
 
     &lt;job id="ioSampleJob"&gt;
       &lt;step id="step1"&gt;
         &lt;tasklet&gt;
-            &lt;chunk reader="itemReader" processor="itemProcessor" writer="itemWriter" commit-interval="2"/&gt;
+            &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
         &lt;/tasklet&gt;
       &lt;/step&gt;
     &lt;/job&gt;
