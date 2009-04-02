@@ -528,7 +528,7 @@
     </section>
 
     <section>
-      <title>Configuring Fatal Exceptions 800-446-7834 AA2486</title>
+      <title>Configuring Fatal Exceptions</title>
 
       <para>One problem with the example above is that any other exception
       besides a <classname>FlatFileParseException</classname> will cause the
@@ -1113,7 +1113,7 @@
                                                      files[i].getPath());
         }
       }
-      return ExitStatus.FINISHED;
+      return RepeatStatus.FINISHED;
     }
 
     public void setDirectoryResource(Resource directory) {
