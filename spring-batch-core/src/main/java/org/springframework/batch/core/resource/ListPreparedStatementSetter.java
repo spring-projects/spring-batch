@@ -18,13 +18,9 @@ package org.springframework.batch.core.resource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
-import org.springframework.batch.core.listener.StepExecutionListenerSupport;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlTypeValue;
@@ -39,27 +35,15 @@ import org.springframework.util.Assert;
  * @author Lucas Ward
  * 
  */
-public class StepExecutionPreparedStatementSetter extends StepExecutionListenerSupport implements
+public class ListPreparedStatementSetter implements
 		PreparedStatementSetter, InitializingBean {
 
-	private List<String> parameterKeys;
-
-	private JobParameters jobParameters;
+	private List<?> parameterKeys;
 
 	public void setValues(PreparedStatement ps) throws SQLException {
-		Map<String, JobParameter> parameters = jobParameters.getParameters();
 		for (int i = 0; i < parameterKeys.size(); i++) {
-			JobParameter arg = parameters.get(parameterKeys.get(i));
-			if (arg == null) {
-				throw new IllegalStateException("No job parameter found for with key of: [" + parameterKeys.get(i)
-						+ "]");
-			}
-			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, arg.getValue());
+			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, parameterKeys.get(i));
 		}
-	}
-
-	public void beforeStep(StepExecution stepExecution) {
-		this.jobParameters = stepExecution.getJobParameters();
 	}
 
 	/**
@@ -67,7 +51,7 @@ public class StepExecutionPreparedStatementSetter extends StepExecutionListenerS
 	 * It is assumed that their order in the List is the order of the parameters
 	 * in the PreparedStatement.
 	 */
-	public void setParameterKeys(List<String> parameterKeys) {
+	public void setParameters(List<?> parameterKeys) {
 		this.parameterKeys = parameterKeys;
 	}
 

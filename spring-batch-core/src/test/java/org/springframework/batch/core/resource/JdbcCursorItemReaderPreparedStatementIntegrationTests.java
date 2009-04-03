@@ -1,26 +1,22 @@
 package org.springframework.batch.core.resource;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Transactional;
+import javax.sql.DataSource;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.sql.DataSource;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/data-source-context.xml")
@@ -49,17 +45,11 @@ public class JdbcCursorItemReaderPreparedStatementIntegrationTests {
 		itemReader.setMaxRows(100);
 		itemReader.setQueryTimeout(1000);
 		itemReader.setSaveState(true);
-		StepExecutionPreparedStatementSetter pss = new StepExecutionPreparedStatementSetter();
-		JobParameters jobParameters = new JobParametersBuilder().addLong("begin.id", 1L).addLong("end.id", 4L).toJobParameters();
-		JobInstance jobInstance = new JobInstance(1L, jobParameters, "simpleJob");
-		JobExecution jobExecution = new JobExecution(jobInstance, (long) 2);
-		StepExecution stepExecution = new StepExecution("taskletStep", jobExecution, 3L);
-		pss.beforeStep(stepExecution);
-		
-		List<String> parameterNames = new ArrayList<String>();
-		parameterNames.add("begin.id");
-		parameterNames.add("end.id");
-		pss.setParameterKeys(parameterNames);
+		ListPreparedStatementSetter pss = new ListPreparedStatementSetter();
+		List<Long> parameters = new ArrayList<Long>();
+		parameters.add(1L);
+		parameters.add(4L);
+		pss.setParameters(parameters);
 		
 		itemReader.setPreparedStatementSetter(pss);
 	}

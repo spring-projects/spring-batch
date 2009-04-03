@@ -15,29 +15,26 @@
  */
 package org.springframework.batch.core.resource;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import javax.sql.DataSource;
 
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobInstance;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.StepExecution;
-import org.springframework.jdbc.core.RowCallbackHandler;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import javax.sql.DataSource;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowCallbackHandler;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Lucas Ward
@@ -45,9 +42,9 @@ import javax.sql.DataSource;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/org/springframework/batch/core/repository/dao/data-source-context.xml")
-public class StepExecutionPreparedStatementSetterTests {
+public class ListPreparedStatementSetterTests {
 
-	StepExecutionPreparedStatementSetter pss;
+	ListPreparedStatementSetter pss;
 
 	StepExecution stepExecution;
 	
@@ -61,21 +58,16 @@ public class StepExecutionPreparedStatementSetterTests {
 	@Before
 	public void onSetUpInTransaction() throws Exception {
 		
-		pss = new StepExecutionPreparedStatementSetter();
-		JobParameters jobParameters = new JobParametersBuilder().addLong("begin.id", 1L).addLong("end.id", 4L).toJobParameters();
-		JobInstance jobInstance = new JobInstance(1L, jobParameters, "simpleJob");
-		JobExecution jobExecution = new JobExecution(jobInstance, 2L);
-		stepExecution = new StepExecution("taskletStep", jobExecution, 3L);
-		pss.beforeStep(stepExecution);
+		pss = new ListPreparedStatementSetter();
+		List<Long> parameters = new ArrayList<Long>();
+		parameters.add(1L);
+		parameters.add(4L);
+		pss.setParameters(parameters);
 	}
 	
 	@Transactional @Test
 	public void testSetValues(){
 		
-		List<String> parameterNames = new ArrayList<String>();
-		parameterNames.add("begin.id");
-		parameterNames.add("end.id");
-		pss.setParameterKeys(parameterNames);
 		final List<String> results = new ArrayList<String>();
 		simpleJdbcTemplate.getJdbcOperations().query(
 				"SELECT NAME from T_FOOS where ID > ? and ID < ?",
@@ -93,35 +85,12 @@ public class StepExecutionPreparedStatementSetterTests {
 	@Transactional @Test
 	public void testAfterPropertiesSet() throws Exception{
 		try{
+			pss.setParameters(null);
 			pss.afterPropertiesSet();
 			fail();
 		}
 		catch(IllegalArgumentException ex){
 			//expected
 		}
-	}
-	
-	@Transactional @Test
-	public void testNonExistentProperties(){
-		
-		List<String> parameterNames = new ArrayList<String>();
-		parameterNames.add("badParameter");
-		parameterNames.add("end.id");
-		pss.setParameterKeys(parameterNames);
-		
-		try{
-			simpleJdbcTemplate.getJdbcOperations().query(
-					"SELECT NAME from T_FOOS where ID > ? and ID < ?",
-					pss,
-					new RowCallbackHandler(){
-						public void processRow(ResultSet rs) throws SQLException {
-							fail();
-						}});
-			
-			fail();
-		}catch(IllegalStateException ex){
-			//expected
-		}
-
 	}
 }
