@@ -30,6 +30,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T> {
 
 	private Validator<? super T> validator;
 	
+	private boolean filter = false;
+	
 	public ValidatingItemProcessor(Validator<? super T> validator){
 		Assert.notNull(validator, "Validator must not be null.");
 		this.validator = validator;
@@ -45,13 +47,31 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T> {
 	}
 
 	/**
+	 * Should the processor filter invalid records instead of skipping them?
+	 * 
+	 * @param filter
+	 */
+	public void setFilter(boolean filter) {
+		this.filter = filter;
+	}
+
+	/**
 	 * Validate the item and return it unmodified
 	 * 
 	 * @return the input item
 	 * @throws ValidationException if validation fails
 	 */
 	public T process(T item) throws ValidationException {
-		validator.validate(item);
+		try {
+			validator.validate(item);
+		} catch (ValidationException e) {
+			if (filter) {
+				return null; // filter the item
+			}
+			else {
+				throw e; // skip the item
+			}
+		}
 		return item;
 	}
 
