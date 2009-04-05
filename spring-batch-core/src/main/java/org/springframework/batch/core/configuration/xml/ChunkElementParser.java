@@ -60,7 +60,7 @@ public class ChunkElementParser {
 
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 
-		propertyValues.addPropertyValue("hasChunkTaskletElement", Boolean.TRUE);
+		propertyValues.addPropertyValue("hasChunkElement", Boolean.TRUE);
 
 		String readerBeanId = element.getAttribute("reader");
 		if (StringUtils.hasText(readerBeanId)) {

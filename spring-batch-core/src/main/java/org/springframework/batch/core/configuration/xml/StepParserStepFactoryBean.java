@@ -65,6 +65,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	//
 	private String name;
 
+	//
+	// Tasklet Attributes
+	//
 	private Boolean allowStartIfComplete;
 
 	private JobRepository jobRepository;
@@ -76,9 +79,11 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private PlatformTransactionManager transactionManager;
 
 	//
-	// Step Elements
+	// Tasklet Elements
 	//
 	private StepListener[] listeners;
+
+	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses;
 
 	private int transactionTimeout = DefaultTransactionAttribute.TIMEOUT_DEFAULT;
 
@@ -87,7 +92,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private Isolation isolation;
 
 	//
-	// Tasklet Attributes
+	// Chunk Attributes
 	//
 	private Integer cacheCapacity;
 
@@ -110,7 +115,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private ItemWriter<? super O> itemWriter;
 
 	//
-	// Tasklet Elements
+	// Chunk Elements
 	//
 	private RetryListener[] retryListeners;
 
@@ -120,14 +125,12 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 
 	private Collection<Class<? extends Throwable>> fatalExceptionClasses;
 
-	private Collection<Class<? extends Throwable>> noRollbackExceptionClasses;
-
 	private ItemStream[] streams;
 
 	//
 	// Additional
 	//
-	private boolean hasChunkTaskletElement = false;
+	private boolean hasChunkElement = false;
 
 	/**
 	 * Create a {@link Step} from the configuration provided.
@@ -135,7 +138,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * @see FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
-		if (hasChunkTaskletElement) {
+		if (hasChunkElement) {
 			Assert.isNull(tasklet, "Step [" + name
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
 
@@ -300,7 +303,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 				new PropertyNamePair(retryListeners, "retry-listeners"),
 				new PropertyNamePair(skippableExceptionClasses, "skippable-exception-classes"),
 				new PropertyNamePair(retryableExceptionClasses, "retryable-exception-classes"),
-				new PropertyNamePair(noRollbackExceptionClasses, "no-rollback-exception-classes"),
 				new PropertyNamePair(fatalExceptionClasses, "fatal-exception-classes") };
 
 		List<String> wrong = new ArrayList<String>();
@@ -374,6 +376,10 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 	}
 
+	// =========================================================
+	// Tasklet Attributes
+	// =========================================================
+
 	/**
 	 * Public setter for the flag to indicate that the step should be replayed
 	 * on a restart, even if successful the first time.
@@ -420,7 +426,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	// =========================================================
-	// Step Elements
+	// Tasklet Elements
 	// =========================================================
 
 	/**
@@ -432,6 +438,16 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setListeners(StepListener[] listeners) {
 		this.listeners = listeners;
+	}
+
+	/**
+	 * Exception classes that may not cause a rollback if encountered in the
+	 * right place.
+	 * 
+	 * @param noRollbackExceptionClasses the noRollbackExceptionClasses to set
+	 */
+	public void setNoRollbackExceptionClasses(Collection<Class<? extends Throwable>> noRollbackExceptionClasses) {
+		this.noRollbackExceptionClasses = noRollbackExceptionClasses;
 	}
 
 	/**
@@ -456,7 +472,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	// =========================================================
-	// Tasklet Attributes
+	// Chunk Attributes
 	// =========================================================
 
 	/**
@@ -566,7 +582,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	// =========================================================
-	// Tasklet Elements
+	// Chunk Elements
 	// =========================================================
 
 	/**
@@ -599,16 +615,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
-	 * Exception classes that may not cause a rollback if encountered in the
-	 * right place.
-	 * 
-	 * @param noRollbackExceptionClasses the noRollbackExceptionClasses to set
-	 */
-	public void setNoRollbackExceptionClasses(Collection<Class<? extends Throwable>> noRollbackExceptionClasses) {
-		this.noRollbackExceptionClasses = noRollbackExceptionClasses;
-	}
-
-	/**
 	 * Public setter for exception classes that should cause immediate failure.
 	 * 
 	 * @param fatalExceptionClasses
@@ -628,10 +634,14 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		this.streams = streams;
 	}
 
+	// =========================================================
+	// Additional
+	// =========================================================
+
 	/**
-	 * @param hasChunkTaskletElement
+	 * @param hasChunkElement
 	 */
-	public void setHasChunkTaskletElement(boolean hasChunkTaskletElement) {
-		this.hasChunkTaskletElement = hasChunkTaskletElement;
+	public void setHasChunkElement(boolean hasChunkElement) {
+		this.hasChunkElement = hasChunkElement;
 	}
 }

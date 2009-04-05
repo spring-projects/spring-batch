@@ -26,6 +26,7 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
@@ -209,4 +210,23 @@ public class StepParserTests {
 		return txa;
 	}
 
+	@Test
+	public void testInheritFromBean() throws Exception {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		
+		assertTrue(getTasklet("s9", ctx) instanceof DummyTasklet);
+		assertTrue(getTasklet("s10", ctx) instanceof DummyTasklet);
+	}
+
+	@SuppressWarnings("unchecked")
+	private Tasklet getTasklet(String stepName, ApplicationContext ctx) {
+		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
+		assertTrue(beans.containsKey(stepName));
+		Step step = (Step) ctx.getBean(stepName);
+		assertTrue(step instanceof TaskletStep);
+		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
+		assertTrue(tasklet instanceof Tasklet);
+		return (Tasklet)tasklet;
+	}
 }

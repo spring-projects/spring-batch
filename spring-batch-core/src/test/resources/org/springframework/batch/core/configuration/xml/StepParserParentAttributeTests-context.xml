@@ -32,7 +32,9 @@
 				<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 			</tasklet>
 		</step>
-		<step id="s8" parent="standalone8" next="s5" />
+		<step id="s8" parent="standalone8" next="s9" />
+		<step id="s9" parent="standalone9" next="s10" />
+		<step id="s10" parent="standalone10" />
 	</job>
 
 	<step id="standalone2" parent="baseStep">
@@ -60,6 +62,18 @@
 			<transaction-attributes propagation="REQUIRED" isolation="DEFAULT" />
 		</tasklet>
 	</step>
+
+	<beans:bean id="standalone9" class="org.springframework.batch.core.step.tasklet.TaskletStep">
+		<beans:property name="tasklet" ref="dummyTasklet"/>
+		<beans:property name="jobRepository" ref="jobRepository"/>
+		<beans:property name="transactionManager" ref="transactionManager"/>
+	</beans:bean>
+
+	<beans:bean id="standalone10" class="org.springframework.batch.core.step.tasklet.TaskletStep" abstract="true">
+		<beans:property name="tasklet" ref="dummyTasklet"/>
+		<beans:property name="jobRepository" ref="jobRepository"/>
+		<beans:property name="transactionManager" ref="transactionManager"/>
+	</beans:bean>
 
 	<step id="baseStep" abstract="true">
 		<tasklet>

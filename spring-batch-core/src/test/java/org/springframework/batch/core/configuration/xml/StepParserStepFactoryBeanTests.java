@@ -146,7 +146,7 @@ public class StepParserStepFactoryBeanTests {
 	@Test
 	public void testSimpleStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
-		fb.setHasChunkTaskletElement(true);
+		fb.setHasChunkElement(true);
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
 		fb.setJobRepository(new JobRepositorySupport());
@@ -172,7 +172,7 @@ public class StepParserStepFactoryBeanTests {
 	@Test
 	public void testFaultTolerantStep() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
-		fb.setHasChunkTaskletElement(true);
+		fb.setHasChunkElement(true);
 		fb.setBeanName("step1");
 		fb.setAllowStartIfComplete(true);
 		fb.setJobRepository(new JobRepositorySupport());
