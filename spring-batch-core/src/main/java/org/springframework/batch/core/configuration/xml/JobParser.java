@@ -64,7 +64,10 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
 
-		builder.setAbstract(Boolean.valueOf(element.getAttribute("abstract")));
+		String isAbstract = element.getAttribute("abstract");
+		if (StringUtils.hasText(isAbstract)) {
+			builder.setAbstract(Boolean.valueOf(isAbstract));
+		}
 
 		String parentRef = element.getAttribute("parent");
 		if (StringUtils.hasText(parentRef)) {

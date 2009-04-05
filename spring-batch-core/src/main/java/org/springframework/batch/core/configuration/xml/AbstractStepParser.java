@@ -95,7 +95,10 @@ public abstract class AbstractStepParser {
 			bd.setParentName(parentRef);
 		}
 
-		bd.setAbstract(Boolean.valueOf(stepElement.getAttribute("abstract")));
+		String isAbstract = stepElement.getAttribute("abstract");
+		if (StringUtils.hasText(isAbstract)) {
+			bd.setAbstract(Boolean.valueOf(isAbstract));
+		}
 
 		return bd;
 

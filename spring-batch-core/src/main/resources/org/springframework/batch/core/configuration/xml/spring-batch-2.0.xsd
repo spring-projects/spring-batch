@@ -784,7 +784,7 @@
 	</xsd:attributeGroup>
 
 	<xsd:attributeGroup name="abstractAttribute">
-		<xsd:attribute name="abstract" type="xsd:boolean" default="false" use="optional">
+		<xsd:attribute name="abstract" type="xsd:boolean" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
 					Is this bean "abstract", that is, not meant to be instantiated itself
