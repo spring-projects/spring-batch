@@ -104,6 +104,8 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 		// proxy itself is not subject to auto-proxying! Only its target bean
 		// is.
 		pf.addInterface(AopInfrastructureBean.class);
+		
+		this.scopedTargetSource.afterPropertiesSet();
 
 		this.proxy = pf.getProxy(cbf.getBeanClassLoader());
 	}

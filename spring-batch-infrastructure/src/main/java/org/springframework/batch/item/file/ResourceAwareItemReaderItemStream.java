@@ -18,6 +18,7 @@ package org.springframework.batch.item.file;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
+import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.core.io.Resource;
 
 /**
@@ -26,7 +27,7 @@ import org.springframework.core.io.Resource;
  * 
  * @author Robert Kasanicky
  */
-public interface ResourceAwareItemReaderItemStream<T> extends ItemReader<T>, ItemStream {
+public interface ResourceAwareItemReaderItemStream<T> extends ItemStreamReader<T> {
 
 	void setResource(Resource resource);
 }

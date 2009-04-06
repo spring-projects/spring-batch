@@ -31,6 +31,7 @@ import org.springframework.beans.factory.config.BeanDefinitionVisitor;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.core.AttributeAccessor;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringValueResolver;
@@ -51,7 +52,8 @@ import org.springframework.util.StringValueResolver;
  * @author Dave Syer
  * 
  */
-public class PlaceholderTargetSource extends SimpleBeanTargetSource implements InitializingBean {
+public class PlaceholderTargetSource extends SimpleBeanTargetSource implements
+		InitializingBean {
 
 	/**
 	 * Key for placeholders to be replaced from the properties provided.
@@ -62,11 +64,14 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	private ContextFactory contextFactory;
 
+	private String beanName;
+
 	/**
 	 * Public setter for the context factory. Used to construct the context root
 	 * whenever placeholders are replaced in a bean definition.
 	 * 
-	 * @param contextFactory the {@link ContextFactory}
+	 * @param contextFactory
+	 *            the {@link ContextFactory}
 	 */
 	public void setContextFactory(ContextFactory contextFactory) {
 		this.contextFactory = contextFactory;
@@ -78,8 +83,9 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	 * @see
 	 * org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
 	 */
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		Assert.notNull(contextFactory, "The ContextFactory must be set.");
+		beanName = getTargetBeanName() + "#" + contextFactory.getContextId();
 	}
 
 	/*
@@ -90,56 +96,68 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	@Override
 	public synchronized Object getTarget() throws BeansException {
 
+		// Object target;
+		Object target = getTargetFromContext();
+		if (target != null) {
+			return target;
+		}
+
 		DefaultListableBeanFactory listableBeanFactory = (DefaultListableBeanFactory) getBeanFactory();
 
-		final TypeConverter typeConverter = listableBeanFactory.getTypeConverter();
+		final TypeConverter typeConverter = listableBeanFactory
+				.getTypeConverter();
 
-		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(listableBeanFactory);
+		DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory(
+				listableBeanFactory);
 		beanFactory.copyConfigurationFrom(listableBeanFactory);
 
 		final TypeConverter contextTypeConverter = new TypeConverter() {
 			@SuppressWarnings("unchecked")
-			public Object convertIfNecessary(Object value, Class requiredType, MethodParameter methodParam)
-					throws TypeMismatchException {
+			public Object convertIfNecessary(Object value, Class requiredType,
+					MethodParameter methodParam) throws TypeMismatchException {
 				Object result = null;
 				if (value instanceof String) {
 					String key = (String) value;
-					if (key.startsWith(PLACEHOLDER_PREFIX) && key.endsWith(PLACEHOLDER_SUFFIX)) {
+					if (key.startsWith(PLACEHOLDER_PREFIX)
+							&& key.endsWith(PLACEHOLDER_SUFFIX)) {
 						key = extractKey(key);
-						result = convertFromContext(key, requiredType, typeConverter);
-						if (result==null) {
+						result = convertFromContext(key, requiredType,
+								typeConverter);
+						if (result == null) {
 							Object property = getPropertyFromContext(key);
-							// Give the normal type converter a chance by reversing to a String
-							if (property!=null) {
-								property = convertToString(property, typeConverter);
-								if (property!=null) {
+							// Give the normal type converter a chance by
+							// reversing to a String
+							if (property != null) {
+								property = convertToString(property,
+										typeConverter);
+								if (property != null) {
 									value = property;
 								}
 							}
 						}
 					}
-				}
-				else if (requiredType.isAssignableFrom(value.getClass())) {
+				} else if (requiredType.isAssignableFrom(value.getClass())) {
 					result = value;
-				}
-				else if (requiredType.isAssignableFrom(String.class)) {
+				} else if (requiredType.isAssignableFrom(String.class)) {
 					result = convertToString(value, typeConverter);
 					if (result == null) {
-						logger.debug("Falling back on toString for conversion of : [" + value.getClass() + "]");
+						logger
+								.debug("Falling back on toString for conversion of : ["
+										+ value.getClass() + "]");
 						result = value.toString();
 					}
 				}
-				return result != null ? result : typeConverter.convertIfNecessary(value, requiredType, methodParam);
+				return result != null ? result : typeConverter
+						.convertIfNecessary(value, requiredType, methodParam);
 			}
 
 			@SuppressWarnings("unchecked")
-			public Object convertIfNecessary(Object value, Class requiredType) throws TypeMismatchException {
+			public Object convertIfNecessary(Object value, Class requiredType)
+					throws TypeMismatchException {
 				return convertIfNecessary(value, requiredType, null);
 			}
 		};
 		beanFactory.setTypeConverter(contextTypeConverter);
-
-		String beanName = getTargetBeanName() + "#" + contextFactory.getContextId();
 
 		try {
 
@@ -149,27 +167,34 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			 * come back when getBean() is called later on
 			 */
 			String targetBeanName = getTargetBeanName();
-			GenericBeanDefinition beanDefinition = new GenericBeanDefinition(listableBeanFactory
-					.getMergedBeanDefinition(targetBeanName));
+			GenericBeanDefinition beanDefinition = new GenericBeanDefinition(
+					listableBeanFactory.getMergedBeanDefinition(targetBeanName));
 			logger.debug("Rehydrating scoped target: [" + targetBeanName + "]");
 
-			BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(new StringValueResolver() {
-				public String resolveStringValue(String strVal) {
-					if (!strVal.contains(PLACEHOLDER_PREFIX)) {
-						return strVal;
-					}
-					if (strVal.startsWith(PLACEHOLDER_PREFIX) && strVal.endsWith(PLACEHOLDER_SUFFIX)) {
-						// If the whole value is a placeholder it might be
-						// possible to replace it all in one go as a String
-						// (e.g. if it's a ref=#{})
-						StringBuilder result = new StringBuilder(strVal);
-						String key = extractKey(strVal);
-						replaceIfTypeMatches(result, 0, strVal.length() - 1, key, String.class, typeConverter);
-						return result.toString();
-					}
-					return replacePlaceholders(strVal, contextTypeConverter);
-				}
-			}) {
+			BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(
+					new StringValueResolver() {
+						public String resolveStringValue(String strVal) {
+							if (!strVal.contains(PLACEHOLDER_PREFIX)) {
+								return strVal;
+							}
+							if (strVal.startsWith(PLACEHOLDER_PREFIX)
+									&& strVal.endsWith(PLACEHOLDER_SUFFIX)) {
+								// If the whole value is a placeholder it might
+								// be
+								// possible to replace it all in one go as a
+								// String
+								// (e.g. if it's a ref=#{})
+								StringBuilder result = new StringBuilder(strVal);
+								String key = extractKey(strVal);
+								replaceIfTypeMatches(result, 0,
+										strVal.length() - 1, key, String.class,
+										typeConverter);
+								return result.toString();
+							}
+							return replacePlaceholders(strVal,
+									contextTypeConverter);
+						}
+					}) {
 				protected Object resolveValue(Object value) {
 					if (value instanceof TypedStringValue) {
 						TypedStringValue typedStringValue = (TypedStringValue) value;
@@ -178,8 +203,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 							String visitedString = resolveStringValue(stringValue);
 							value = new TypedStringValue(visitedString);
 						}
-					}
-					else {
+					} else {
 						value = super.resolveValue(value);
 					}
 					return value;
@@ -190,15 +214,31 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			beanFactory.registerBeanDefinition(beanName, beanDefinition);
 			// Make the replacements before the target is hydrated
 			visitor.visitBeanDefinition(beanDefinition);
-			return beanFactory.getBean(beanName);
+			target = beanFactory.getBean(beanName);
+			putTargetInContext(target);
+			return target;
 
-		}
-		finally {
+		} finally {
 			beanFactory.removeBeanDefinition(beanName);
 			beanFactory = null;
 			// Anything else we can do to clean it up?
 		}
 
+	}
+
+	private void putTargetInContext(Object target) {
+		Object context = contextFactory.getContext();
+		if (context instanceof AttributeAccessor) {
+			((AttributeAccessor) context).setAttribute(beanName, target);
+		}
+	}
+
+	private Object getTargetFromContext() {
+		Object context = contextFactory.getContext();
+		if (context instanceof AttributeAccessor) {
+			return ((AttributeAccessor) context).getAttribute(beanName);
+		}
+		return null;
 	}
 
 	/**
@@ -209,12 +249,15 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	protected String convertToString(Object value, TypeConverter typeConverter) {
 		String result = null;
 		try {
-			// Give it one chance to convert - this forces the default editors to be registered
-			result = (String) typeConverter.convertIfNecessary(value, String.class);
+			// Give it one chance to convert - this forces the default editors
+			// to be registered
+			result = (String) typeConverter.convertIfNecessary(value,
+					String.class);
 		} catch (TypeMismatchException e) {
 			// ignore
 		}
-		if (result== null && typeConverter instanceof PropertyEditorRegistrySupport) {
+		if (result == null
+				&& typeConverter instanceof PropertyEditorRegistrySupport) {
 			/*
 			 * PropertyEditorRegistrySupport is de rigeur with TypeConverter
 			 * instances used internally by Spring. If we have one of those then
@@ -222,7 +265,8 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			 * to.
 			 */
 			PropertyEditorRegistrySupport registry = (PropertyEditorRegistrySupport) typeConverter;
-			PropertyEditor editor = registry.findCustomEditor(value.getClass(), null);
+			PropertyEditor editor = registry.findCustomEditor(value.getClass(),
+					null);
 			if (editor != null) {
 				if (registry.isSharedEditor(editor)) {
 					// Synchronized access to shared editor
@@ -231,8 +275,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 						editor.setValue(value);
 						result = editor.getAsText();
 					}
-				}
-				else {
+				} else {
 					editor.setValue(value);
 					result = editor.getAsText();
 				}
@@ -247,10 +290,12 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	 * @param typeConverter
 	 * @return
 	 */
-	private Object convertFromContext(String key, Class<?> requiredType, TypeConverter typeConverter) {
+	private Object convertFromContext(String key, Class<?> requiredType,
+			TypeConverter typeConverter) {
 		Object result = null;
 		Object property = getPropertyFromContext(key);
-		if (property == null || requiredType.isAssignableFrom(property.getClass())) {
+		if (property == null
+				|| requiredType.isAssignableFrom(property.getClass())) {
 			result = property;
 		}
 		return result;
@@ -267,7 +312,8 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	private String extractKey(String value) {
 		if (value.startsWith(PLACEHOLDER_PREFIX)) {
 			value = value.substring(PLACEHOLDER_PREFIX.length());
-			value = value.substring(0, value.length() - PLACEHOLDER_SUFFIX.length());
+			value = value.substring(0, value.length()
+					- PLACEHOLDER_SUFFIX.length());
 		}
 		return value;
 	}
@@ -286,17 +332,28 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 		while (first >= 0) {
 
-			Assert.state(next > 0, String.format("Placeholder key incorrectly specified: use %skey%s (in %s)",
-					PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, value));
+			Assert
+					.state(
+							next > 0,
+							String
+									.format(
+											"Placeholder key incorrectly specified: use %skey%s (in %s)",
+											PLACEHOLDER_PREFIX,
+											PLACEHOLDER_SUFFIX, value));
 
-			String key = result.substring(first + PLACEHOLDER_PREFIX.length(), next);
+			String key = result.substring(first + PLACEHOLDER_PREFIX.length(),
+					next);
 
-			replaceIfTypeMatches(result, first, next, key, String.class, typeConverter);
-			replaceIfTypeMatches(result, first, next, key, Long.class, typeConverter);
-			replaceIfTypeMatches(result, first, next, key, Integer.class, typeConverter);
+			replaceIfTypeMatches(result, first, next, key, String.class,
+					typeConverter);
+			replaceIfTypeMatches(result, first, next, key, Long.class,
+					typeConverter);
+			replaceIfTypeMatches(result, first, next, key, Integer.class,
+					typeConverter);
 			// Spring cannot convert from String to Date, so there is an error
 			// here.
-			replaceIfTypeMatches(result, first, next, key, Date.class, typeConverter);
+			replaceIfTypeMatches(result, first, next, key, Date.class,
+					typeConverter);
 			first = result.indexOf(PLACEHOLDER_PREFIX, first + 1);
 			next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);
 
@@ -307,11 +364,13 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 
 	}
 
-	private void replaceIfTypeMatches(StringBuilder result, int first, int next, String key, Class<?> requiredType,
+	private void replaceIfTypeMatches(StringBuilder result, int first,
+			int next, String key, Class<?> requiredType,
 			TypeConverter typeConverter) {
 		Object property = convertFromContext(key, requiredType, typeConverter);
 		if (property != null) {
-			result.replace(first, next + 1, (String) typeConverter.convertIfNecessary(property, String.class));
+			result.replace(first, next + 1, (String) typeConverter
+					.convertIfNecessary(property, String.class));
 		}
 	}
 
