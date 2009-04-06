@@ -11,7 +11,6 @@ Import-Template:
  org.codehaus.jettison.*;version="[1.0,1.1)";resolution:=optional,
  org.aopalliance.*;version="[1.0.0, 2.0.0)",
  org.aspectj.*;version="[1.5.2,1.7.0)";resolution:=optional,
- org.osgi.framework;resolution:=optional,
  org.apache.commons.logging.*;version="[1.0.4, 2.0.0)",
  org.springframework.batch.*;version="[2.0.0, 3.0.0)";resolution:=optional,
  org.springframework.aop.*;version="[2.5.5, 3.0.0)",
@@ -23,9 +22,8 @@ Import-Template:
  org.springframework.jdbc.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.transaction.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.util.*;version="[2.5.5, 3.0.0)";resolution:=optional,
- org.springframework.osgi.*;version="[1.1.0, 2.0.0)";resolution:=optional
-Unversioned-Imports: 
- javax.sql.*,
- org.osgi.framework,
- org.w3c.dom.*
+ org.springframework.osgi.*;version="[1.1.0, 2.0.0)";resolution:=optional,
+ org.osgi.framework;version="0";resolution:=optional,
+ org.w3c.dom;version="0";resolution:=optional,
+ javax.sql.*;version="0";resolution:=optional
  

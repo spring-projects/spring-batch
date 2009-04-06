@@ -13,5 +13,4 @@ Import-Template:
  org.springframework.transaction.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.context.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.core.*;version="[2.5.5, 3.0.0)";resolution:=optional,
-Unversioned-Imports: 
- javax.sql.*
+ javax.sql.*;version="0";resolution:=optional
