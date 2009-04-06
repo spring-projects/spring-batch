@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>org.springframework.batch</artifactId>
@@ -138,7 +139,9 @@
 									<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
 									<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
 									<postProcess>
-										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf" failonerror="false" />
+										<copy file="${basedir}/target/docbkx/pdf/index.pdf"
+											tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
+											failonerror="false" />
 									</postProcess>
 								</configuration>
 								<phase>pre-site</phase>
@@ -187,7 +190,8 @@
 							</dependency>
 							<dependency>
 								<!--
-									This is a downgrade for the 2.0.8 plugin (was 0.94) but prevents ArrayOutOfBounds exception on xi:includes
+									This is a downgrade for the 2.0.8 plugin (was 0.94) but
+									prevents ArrayOutOfBounds exception on xi:includes
 								-->
 								<groupId>org.apache.xmlgraphics</groupId>
 								<artifactId>fop</artifactId>
@@ -255,37 +259,45 @@
 											<fileset dir="target">
 												<include name="*with-dep*.zip" />
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
+												handledirsep="true" />
 										</unzip>
 										<unzip dest="target/it/no-dep">
 											<fileset dir="target">
 												<include name="*no-dep*.zip" />
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
+												handledirsep="true" />
 										</unzip>
-										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
+										<fail
+											message="Failed integration test of zip distro: Spring Batch jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="9">
-														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/dist"
+															includes="*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
 										</fail>
-										<fail message="Failed integration test of zip distro: dependency jar files are missing.">
+										<fail
+											message="Failed integration test of zip distro: dependency jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/sources/lib"
+															includes="org.springframework.beans-*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
 										</fail>
-										<fail message="Failed integration test of zip distro: test dependency jar files are missing.">
+										<fail
+											message="Failed integration test of zip distro: test dependency jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/sources/lib"
+															includes="com.springsource.org.junit-*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
@@ -328,33 +340,6 @@
 			</distributionManagement>
 		</profile>
 		<profile>
-			<id>brits</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<distributionManagement>
-				<downloadUrl>http://www.springframework.org/download</downloadUrl>
-				<site>
-					<id>static.springframework.org</id>
-					<url>
-						scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk
-			</url>
-				</site>
-				<repository>
-					<id>spring-milestone</id>
-					<name>Spring Milestone Repository</name>
-					<url>s3://repository.springsource.com/maven/bundles/milestone
-					</url>
-				</repository>
-				<snapshotRepository>
-					<id>spring-snapshot</id>
-					<name>Spring Snapshot Repository</name>
-					<url>s3://repository.springsource.com/maven/bundles/snapshot
-					</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-		<profile>
 			<id>central</id>
 			<distributionManagement>
 				<site>
@@ -365,7 +350,9 @@
 					<id>spring-milestone</id>
 					<name>Spring Milestone Repository</name>
 					<url>s3://maven.springframework.org/milestone</url>
-					<!-- <url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url> -->
+					<!--
+						<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url>
+					-->
 				</repository>
 				<snapshotRepository>
 					<id>spring-snapshot</id>
@@ -393,7 +380,8 @@
 				<pluginManagement>
 					<plugins>
 						<!--
-							This seems to work better than the default (2008/03/19) because links on sub-module sites are not broken
+							This seems to work better than the default (2008/03/19) because
+							links on sub-module sites are not broken
 						-->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
@@ -427,6 +415,23 @@
 			</build>
 		</profile>
 	</profiles>
+	<distributionManagement>
+		<downloadUrl>http://www.springframework.org/download</downloadUrl>
+		<site>
+			<id>static.springframework.org</id>
+			<url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
+		</site>
+		<repository>
+			<id>spring-milestone</id>
+			<name>Spring Milestone Repository</name>
+			<url>s3://repository.springsource.com/maven/bundles/milestone</url>
+		</repository>
+		<snapshotRepository>
+			<id>spring-snapshot</id>
+			<name>Spring Snapshot Repository</name>
+			<url>s3://repository.springsource.com/maven/bundles/snapshot</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<extensions>
 			<extension>
