@@ -510,4 +510,76 @@
     which will not affect the status of the
     <classname>Step</classname>.</para>
   </section>
+
+  <section>
+    <title>Passing data to future steps</title>
+
+    <para>It is often useful to pass information from one step to another.
+    This can be done using the <classname>ExecutionContext</classname>. The
+    catch is that there are two <classname>ExecutionContext</classname>s: one
+    at the <classname>Step</classname> level and one at the
+    <classname>Job</classname> level. The <classname>Step</classname>
+    <classname>ExecutionContext</classname> lives only as long as the step
+    while the <classname>Job</classname>
+    <classname>ExecutionContext</classname> lives through the whole
+    <classname>Job</classname>. On the other hand, the
+    <classname>Step</classname> <classname>ExecutionContext</classname> is
+    updated every time the <classname>Step</classname> commits a chunk while
+    the <classname>Job</classname> <classname>ExecutionContext</classname> is
+    updated only at the end of each <classname>Step</classname>. </para>
+
+    <para>The consequence of this separation is that all data must be placed
+    in the <classname>Step</classname> <classname>ExecutionContext</classname>
+    while the <classname>Step</classname> is executing. This will ensure that
+    the data will be stored properly while the <classname>Step</classname> is
+    on-going. If data is stored to the <classname>Job</classname>
+    <classname>ExecutionContext</classname>, then it will not be persisted
+    during <classname>Step</classname> execution and if the
+    <classname>Step</classname> fails, that data will be lost. </para>
+
+    <programlisting>public void MyItemWriter implements ItemWriter&lt;Object&gt; {
+    private StepExecution stepExecution;
+
+    public void write(List&lt;? extends Object&gt; items) throws Exception {
+        // ...
+
+        this.stepExecution.getExecutionContext().put("someKey", someObject);
+    }
+
+    @BeforeStep
+    public void saveStepName(StepExecution stepExecution) {
+        this.stepExecution = stepExecution;
+    }
+}</programlisting>
+
+    <para>To make the data available to future <classname>Step</classname>s,
+    it will have to be "promoted" to the <classname>Job</classname>
+    <classname>ExecutionContext</classname> after the step has finished.
+    Spring Batch provides the
+    <classname>ExecutionContextPromotionListener</classname> for this purpose.
+    The listener must be configured with the keys related to the data in the
+    <classname>ExecutionContext</classname> that must be promoted. It can
+    also, optionally, be configured with a list of exit code patterns for
+    which the promotion should occur ("COMPLETED" is the default). As with all
+    listeners, it must be registered on the
+    <classname>Step</classname>.</para>
+
+    <programlisting>&lt;step id="step1"&gt;
+    &lt;tasket&gt;
+        &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
+        &lt;listeners&gt;
+            &lt;listener ref="promotionListener"/&gt;
+        &lt;/listeners&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
+
+&lt;step id="step2"&gt;
+   ...
+&lt;/step&gt;
+
+&lt;beans:bean id="promotionListener" 
+            class="org.spr....ExecutionContextPromotionListener"&gt;
+    &lt;beans:property name="keys" value="someKey"/&gt;
+&lt;/beans:bean&gt;</programlisting>
+  </section>
 </chapter>
