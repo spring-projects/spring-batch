@@ -129,18 +129,6 @@
 		<property name="date" value="#{date}" />
 	</bean>
 
-	<bean id="withNull"
-		class="org.springframework.batch.core.scope.util.PlaceholderTargetSource">
-		<property name="contextFactory" ref="context" />
-		<property name="targetBeanName" value="withNullTarget" />
-	</bean>
-
-	<bean id="withNullTarget"
-		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
-		lazy-init="true">
-		<property name="name" value="bar-#{garbage}" />
-	</bean>
-
 	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
 		<property name="customEditors">
 			<map>

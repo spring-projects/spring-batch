@@ -48,10 +48,6 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	private PlaceholderTargetSource withDate;
 
 	@Autowired
-	@Qualifier("withNull")
-	private PlaceholderTargetSource withNull;
-
-	@Autowired
 	@Qualifier("compound")
 	private PlaceholderTargetSource compound;
 
@@ -170,13 +166,6 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	public void testGetDate() {
 		Node target = (Node) withDate.getTarget();
 		assertEquals(1L, target.getDate().getTime());
-	}
-
-	@Test
-	public void testGetNull() {
-		Node target = (Node) withNull.getTarget();
-		// Remains unconverted because null is explicitly excluded
-		assertEquals("bar-#{garbage}", target.getName());
 	}
 
 	public static interface Node {

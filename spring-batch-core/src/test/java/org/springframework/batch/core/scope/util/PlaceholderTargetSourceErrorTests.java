@@ -73,9 +73,35 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 	}
 
 	@Test
+	public void testPartialReplaceMissingProperty() throws Exception {
+		try {
+			Node target = (Node) createValue("name", "#{garbage}-bar").getTarget();
+			assertEquals("bar", target.getName());
+			fail("Expected IllegalStateException");
+		}
+		catch (Exception e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.toLowerCase().contains("cannot bind"));
+		}
+	}
+
+	@Test
 	public void testFullReplaceSunnyDay() throws Exception {
 		Node target = (Node) createValue("name", "#{foo}").getTarget();
 		assertEquals("bar", target.getName());
+	}
+
+	@Test
+	public void testFullReplaceMissingProperty() throws Exception {
+		try {
+			Node target = (Node) createValue("name", "#{garbage}").getTarget();
+			assertEquals("bar", target.getName());
+			fail("Expected IllegalStateException");
+		}
+		catch (Exception e) {
+			String message = e.getMessage();
+			assertTrue("Wrong message: " + message, message.toLowerCase().contains("cannot bind"));
+		}
 	}
 
 	@Test
