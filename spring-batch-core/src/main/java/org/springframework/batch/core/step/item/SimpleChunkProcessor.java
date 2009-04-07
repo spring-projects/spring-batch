@@ -175,7 +175,7 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 		Chunk<O> outputs = transform(contribution, inputs);
 
-		contribution.incrementFilterCount(inputsSize  - outputs.size());
+		contribution.incrementFilterCount(inputsSize  - outputs.size() - inputs.getSkips().size());
 
 		outputs = new Chunk<O>(outputs.getItems(), skips.getSkips());
 

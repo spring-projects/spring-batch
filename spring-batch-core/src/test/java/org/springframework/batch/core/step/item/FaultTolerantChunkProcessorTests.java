@@ -66,6 +66,31 @@ public class FaultTolerantChunkProcessorTests {
 		Chunk<String> inputs = new Chunk<String>(Arrays.asList("1", "2"));
 		processor.process(contribution, inputs);
 		assertEquals(1, list.size());
+		assertEquals(1, contribution.getFilterCount());
+	}
+
+	@Test
+	public void testFilterCountOnSkip() throws Exception {
+		processor.setProcessSkipPolicy(new AlwaysSkipItemSkipPolicy());
+		processor.setItemProcessor(new ItemProcessor<String, String>() {
+			public String process(String item) throws Exception {
+				if (item.equals("1")) {
+					throw new RuntimeException("Skippable");
+				}
+				return item;
+			}
+		});
+		Chunk<String> inputs = new Chunk<String>(Arrays.asList("1", "2"));
+		try {
+			processor.process(contribution, inputs);
+			fail("Expected Exception");
+		} catch (Exception e) {
+			assertEquals("Skippable", e.getMessage());
+		}
+		processor.process(contribution, inputs);
+		assertEquals(1, list.size());
+		assertEquals(1, contribution.getSkipCount());
+		assertEquals(0, contribution.getFilterCount());
 	}
 
 	@Test
