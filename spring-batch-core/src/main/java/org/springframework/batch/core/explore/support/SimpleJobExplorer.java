@@ -23,6 +23,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.explore.JobExplorer;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
@@ -50,6 +51,8 @@ public class SimpleJobExplorer implements JobExplorer {
 	
 	private StepExecutionDao stepExecutionDao;
 
+	private ExecutionContextDao ecDao;
+
 	/**
 	 * Provide default constructor with low visibility in case user wants to use
 	 * use aop:proxy-target-class="true" for AOP interceptor.
@@ -57,11 +60,12 @@ public class SimpleJobExplorer implements JobExplorer {
 	SimpleJobExplorer() {
 	}
 
-	public SimpleJobExplorer(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao, StepExecutionDao stepExecutionDao) {
+	public SimpleJobExplorer(JobInstanceDao jobInstanceDao, JobExecutionDao jobExecutionDao, StepExecutionDao stepExecutionDao, ExecutionContextDao ecDao) {
 		super();
 		this.jobInstanceDao = jobInstanceDao;
 		this.jobExecutionDao = jobExecutionDao;
 		this.stepExecutionDao = stepExecutionDao;
+		this.ecDao = ecDao;
 	}
 
 	/* (non-Javadoc)
@@ -102,7 +106,9 @@ public class SimpleJobExplorer implements JobExplorer {
 	 * @see org.springframework.batch.core.explore.JobExplorer#getStepExecution(java.lang.Long)
 	 */
 	public StepExecution getStepExecution(Long jobExecutionId, Long executionId) {
-		return stepExecutionDao.getStepExecution(getJobExecution(jobExecutionId), executionId);
+		StepExecution stepExecution = stepExecutionDao.getStepExecution(getJobExecution(jobExecutionId), executionId);
+		getStepExecutionDependencies(stepExecution);
+		return stepExecution;
 	}
 
 	/* (non-Javadoc)
@@ -128,6 +134,12 @@ public class SimpleJobExplorer implements JobExplorer {
 		JobInstance jobInstance = jobInstanceDao.getJobInstance(jobExecution);
 		stepExecutionDao.addStepExecutions(jobExecution);
 		jobExecution.setJobInstance(jobInstance);
+		jobExecution.setExecutionContext(ecDao.getExecutionContext(jobExecution));
+
+	}
+
+	private void getStepExecutionDependencies(StepExecution stepExecution) {
+		stepExecution.setExecutionContext(ecDao.getExecutionContext(stepExecution));		
 	}
 
 }

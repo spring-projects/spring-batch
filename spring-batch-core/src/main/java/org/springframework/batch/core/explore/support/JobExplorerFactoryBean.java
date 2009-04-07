@@ -19,18 +19,22 @@ package org.springframework.batch.core.explore.support;
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.repository.dao.AbstractJdbcBatchMetadataDao;
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
+import org.springframework.batch.core.repository.dao.JdbcExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JdbcJobExecutionDao;
 import org.springframework.batch.core.repository.dao.JdbcJobInstanceDao;
 import org.springframework.batch.core.repository.dao.JdbcStepExecutionDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.incrementer.AbstractDataFieldMaxValueIncrementer;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
+import org.springframework.jdbc.support.lob.LobHandler;
 import org.springframework.util.Assert;
 
 /**
@@ -40,7 +44,8 @@ import org.springframework.util.Assert;
  * 
  * @author Dave Syer
  */
-public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean implements InitializingBean {
+public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
+		implements InitializingBean {
 
 	private DataSource dataSource;
 
@@ -55,9 +60,13 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 		}
 	};
 
+	private LobHandler lobHandler;
+
 	/**
 	 * Public setter for the {@link DataSource}.
-	 * @param dataSource a {@link DataSource}
+	 * 
+	 * @param dataSource
+	 *            a {@link DataSource}
 	 */
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
@@ -65,10 +74,21 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 
 	/**
 	 * Sets the table prefix for all the batch meta-data tables.
+	 * 
 	 * @param tablePrefix
 	 */
 	public void setTablePrefix(String tablePrefix) {
 		this.tablePrefix = tablePrefix;
+	}
+
+	/**
+	 * The lob handler to use when saving {@link ExecutionContext} instances.
+	 * Defaults to null which works for most databases.
+	 * 
+	 * @param lobHandler
+	 */
+	public void setLobHandler(LobHandler lobHandler) {
+		this.lobHandler = lobHandler;
 	}
 
 	public void afterPropertiesSet() throws Exception {
@@ -80,7 +100,19 @@ public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean imple
 	}
 
 	private Object getTarget() throws Exception {
-		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao());
+		return new SimpleJobExplorer(createJobInstanceDao(),
+				createJobExecutionDao(), createStepExecutionDao(),
+				createExecutionContextDao());
+	}
+
+	@Override
+	protected ExecutionContextDao createExecutionContextDao() throws Exception {
+		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
+		dao.setJdbcTemplate(jdbcTemplate);
+		dao.setLobHandler(lobHandler);
+		dao.setTablePrefix(tablePrefix);
+		dao.afterPropertiesSet();
+		return dao;
 	}
 
 	@Override

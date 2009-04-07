@@ -16,8 +16,10 @@
 
 package org.springframework.batch.core.explore.support;
 
+import org.springframework.batch.core.repository.dao.ExecutionContextDao;
 import org.springframework.batch.core.repository.dao.JobExecutionDao;
 import org.springframework.batch.core.repository.dao.JobInstanceDao;
+import org.springframework.batch.core.repository.dao.MapExecutionContextDao;
 import org.springframework.batch.core.repository.dao.MapJobExecutionDao;
 import org.springframework.batch.core.repository.dao.MapJobInstanceDao;
 import org.springframework.batch.core.repository.dao.MapStepExecutionDao;
@@ -47,8 +49,13 @@ public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean {
 		return new MapStepExecutionDao();
 	}
 
+	@Override
+	protected ExecutionContextDao createExecutionContextDao() throws Exception {
+		return new MapExecutionContextDao();
+	}
+	
 	public Object getObject() throws Exception {
-		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao());
+		return new SimpleJobExplorer(createJobInstanceDao(), createJobExecutionDao(), createStepExecutionDao(), createExecutionContextDao());
 	}
 
 }
