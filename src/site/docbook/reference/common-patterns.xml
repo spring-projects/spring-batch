@@ -547,7 +547,7 @@
     }
 
     @BeforeStep
-    public void saveStepName(StepExecution stepExecution) {
+    public void saveStepExecution(StepExecution stepExecution) {
         this.stepExecution = stepExecution;
     }
 }</programlisting>
