@@ -129,7 +129,7 @@ public class MethodInvokerUtils {
 
 							Assert.isTrue(paramTypes.length == expectedParamTypes.length, errorMsg);
 							for (int i = 0; i < paramTypes.length; i++) {
-								Assert.isTrue(paramTypes[i].equals(expectedParamTypes[i]), errorMsg);
+								Assert.isTrue(expectedParamTypes[i].isAssignableFrom(paramTypes[i]), errorMsg);
 							}
 						}
 					}

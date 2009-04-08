@@ -22,7 +22,6 @@ import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_STEP;
 import static org.springframework.batch.core.listener.StepListenerMetaData.AFTER_WRITE;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -66,8 +65,6 @@ public class StepListenerFactoryBeanTests {
 
 	private StepListenerFactoryBean factoryBean;
 
-	private TestListener testListener;
-
 	private JobExecution jobExecution = new JobExecution(11L);
 
 	private StepExecution stepExecution = new StepExecution("testStep", jobExecution);
@@ -75,39 +72,39 @@ public class StepListenerFactoryBeanTests {
 	@Before
 	public void setUp() {
 		factoryBean = new StepListenerFactoryBean();
-		testListener = new TestListener();
 	}
 
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testStepAndChunk() throws Exception {
 
+		TestListener testListener = new TestListener();
 		factoryBean.setDelegate(testListener);
 		Map<String, String> metaDataMap = new HashMap<String, String>();
 		;
 		metaDataMap.put(AFTER_STEP.getPropertyName(), "destroy");
 		metaDataMap.put(AFTER_CHUNK.getPropertyName(), "afterChunk");
 		factoryBean.setMetaDataMap(metaDataMap);
-		Object item = new Object();
-		List<Object> items = new ArrayList<Object>();
-		items.add(item);
+		String readItem = "item";
+		Integer writeItem = 2;
+		List<Integer> writeItems = Arrays.asList(writeItem);
 		StepListener listener = (StepListener) factoryBean.getObject();
 		((StepExecutionListener) listener).beforeStep(stepExecution);
 		((StepExecutionListener) listener).afterStep(stepExecution);
 		((ChunkListener) listener).beforeChunk();
 		((ChunkListener) listener).afterChunk();
-		((ItemReadListener<Object>) listener).beforeRead();
-		((ItemReadListener<Object>) listener).afterRead(item);
+		((ItemReadListener<String>) listener).beforeRead();
+		((ItemReadListener<String>) listener).afterRead(readItem);
 		((ItemReadListener) listener).onReadError(new Exception());
-		((ItemProcessListener<Object, Object>) listener).beforeProcess(item);
-		((ItemProcessListener<Object, Object>) listener).afterProcess(item, item);
-		((ItemProcessListener<Object, Object>) listener).onProcessError(item, new Exception());
-		((ItemWriteListener<Object>) listener).beforeWrite(items);
-		((ItemWriteListener<Object>) listener).afterWrite(items);
-		((ItemWriteListener<Object>) listener).onWriteError(new Exception(), items);
-		((SkipListener<Object, Object>) listener).onSkipInRead(new Throwable());
-		((SkipListener<Object, Object>) listener).onSkipInProcess(item, new Throwable());
-		((SkipListener<Object, Object>) listener).onSkipInWrite(item, new Throwable());
+		((ItemProcessListener<String, Integer>) listener).beforeProcess(readItem);
+		((ItemProcessListener<String, Integer>) listener).afterProcess(readItem, writeItem);
+		((ItemProcessListener<String, Integer>) listener).onProcessError(readItem, new Exception());
+		((ItemWriteListener<Integer>) listener).beforeWrite(writeItems);
+		((ItemWriteListener<Integer>) listener).afterWrite(writeItems);
+		((ItemWriteListener<Integer>) listener).onWriteError(new Exception(), writeItems);
+		((SkipListener<String, Integer>) listener).onSkipInRead(new Throwable());
+		((SkipListener<String, Integer>) listener).onSkipInProcess(readItem, new Throwable());
+		((SkipListener<String, Integer>) listener).onSkipInWrite(writeItem, new Throwable());
 		assertTrue(testListener.beforeStepCalled);
 		assertTrue(testListener.beforeChunkCalled);
 		assertTrue(testListener.afterChunkCalled);
@@ -402,7 +399,7 @@ public class StepListenerFactoryBeanTests {
 
 	}
 
-	private class TestListener implements SkipListener<Object, Object> {
+	private class TestListener implements SkipListener<String, Integer> {
 
 		boolean beforeStepCalled = false;
 
@@ -476,7 +473,7 @@ public class StepListenerFactoryBeanTests {
 		}
 
 		@AfterProcess
-		public void afterProcess() {
+		public void afterProcess(String item, Integer result) {
 			afterProcessCalled = true;
 		}
 
@@ -500,7 +497,7 @@ public class StepListenerFactoryBeanTests {
 			onWriteErrorCalled = true;
 		}
 
-		public void onSkipInProcess(Object item, Throwable t) {
+		public void onSkipInProcess(String item, Throwable t) {
 			onSkipInProcessCalled = true;
 		}
 
@@ -508,7 +505,7 @@ public class StepListenerFactoryBeanTests {
 			onSkipInReadCalled = true;
 		}
 
-		public void onSkipInWrite(Object item, Throwable t) {
+		public void onSkipInWrite(Integer item, Throwable t) {
 			onSkipInWriteCalled = true;
 		}
 
