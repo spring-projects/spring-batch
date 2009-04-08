@@ -31,6 +31,7 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
@@ -189,6 +190,8 @@ public class CommandLineJobRunner {
 			context = new ClassPathXmlApplicationContext(jobPath);
 			context.getAutowireCapableBeanFactory().autowireBeanProperties(this,
 					AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+			
+			Assert.notNull(launcher,"A JobLauncher must be provided.  Please add one to the configuration.");
 
 			Job job;
 			if (jobLocator != null) {
