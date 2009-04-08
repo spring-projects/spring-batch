@@ -23,6 +23,7 @@ import org.springframework.jdbc.core.RowMapper;
 /**
  * A convenient strategy for SQL updates, acting effectively as the inverse of
  * {@link RowMapper}.
+ * 
  * @author Dave Syer
  * 
  */

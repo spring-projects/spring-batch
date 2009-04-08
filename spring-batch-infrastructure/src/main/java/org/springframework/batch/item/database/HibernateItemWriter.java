@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  * and clear the session at chunk boundaries.<br/><br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
- * behaviour), so it can be used to write in multiple concurrent transactions.
+ * behavior), so it can be used to write in multiple concurrent transactions.
  * 
  * @author Dave Syer
  * @author Thomas Risberg

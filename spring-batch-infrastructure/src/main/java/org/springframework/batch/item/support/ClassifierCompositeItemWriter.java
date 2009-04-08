@@ -32,6 +32,7 @@ import org.springframework.batch.item.ItemWriter;
  * The implementation is thread-safe if all delegates are thread-safe.
  * 
  * @author Dave Syer
+ * @since 2.0
  */
 public class ClassifierCompositeItemWriter<T> implements ItemWriter<T> {
 

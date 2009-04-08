@@ -22,7 +22,7 @@ import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Calls a collection of ItemWriters in fixed-order sequence.
+ * Calls a collection of {@link ItemWriter}s in fixed-order sequence.<br/><br/>
  * 
  * The implementation is thread-safe if all delegates are thread-safe.
  * 

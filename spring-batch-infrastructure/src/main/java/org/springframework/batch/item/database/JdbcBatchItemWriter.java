@@ -37,9 +37,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.util.Assert;
 
 /**
- * {@link ItemWriter} that uses the batching features from 
+ * <p>{@link ItemWriter} that uses the batching features from 
  * {@link SimpleJdbcTemplate} to execute a batch of statements for all items 
- * provided.<br/>
+ * provided.</p>
  * 
  * The user must provide an SQL query and a special callback in the for of either 
  * {@link ItemPreparedStatementSetter}, or a {@link ItemSqlParameterSourceProvider}.
@@ -52,7 +52,7 @@ import org.springframework.util.Assert;
  * It is expected that {@link #write(List)} is called inside a transaction.<br/>
  * 
  * The writer is thread safe after its properties are set (normal singleton
- * behaviour), so it can be used to write in multiple concurrent transactions.
+ * behavior), so it can be used to write in multiple concurrent transactions.
  * 
  * @author Dave Syer
  * @author Thomas Risberg

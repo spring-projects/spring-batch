@@ -30,7 +30,7 @@ import org.springframework.jms.core.JmsTemplate;
  * {@link #write(List)}.<br/><br/>
  * 
  * The implementation is thread safe after its properties are set (normal
- * singleton behaviour).
+ * singleton behavior).
  * 
  * @author Dave Syer
  * 
@@ -42,7 +42,7 @@ public class JmsItemWriter<T> implements ItemWriter<T> {
 	private JmsOperations jmsTemplate;
 
 	/**
-	 * Setter for jms template.
+	 * Setter for JMS template.
 	 * 
 	 * @param jmsTemplate a {@link JmsOperations} instance
 	 */

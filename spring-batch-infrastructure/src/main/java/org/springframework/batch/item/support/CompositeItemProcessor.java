@@ -25,7 +25,7 @@ import org.springframework.util.Assert;
 /**
  * Composite {@link ItemProcessor} that passes the item through a sequence of
  * injected <code>ItemTransformer</code>s (return value of previous
- * transformation is the entry value of the next).
+ * transformation is the entry value of the next).<br/><br/>
  * 
  * Note the user is responsible for injecting a chain of {@link ItemProcessor}
  * s that conforms to declared input and output types.

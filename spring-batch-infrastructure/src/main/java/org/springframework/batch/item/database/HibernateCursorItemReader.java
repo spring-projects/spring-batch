@@ -33,22 +33,19 @@ import org.springframework.util.StringUtils;
 
 /**
  * {@link ItemReader} for reading database records built on top of Hibernate.
- * 
  * It executes the HQL query when initialized iterates over the result set as
  * {@link #read()} method is called, returning an object corresponding to
  * current row. The query can be set directly using
  * {@link #setQueryString(String)} or a named query can be used by
  * {@link #setQueryName(String)}.
  * 
- * The reader can be configured to use either {@link StatelessSession}
+ * <p>The reader can be configured to use either {@link StatelessSession}
  * sufficient for simple mappings without the need to cascade to associated
  * objects or standard hibernate {@link Session} for more advanced mappings or
- * when caching is desired.
+ * when caching is desired.  When stateful session is used it will be cleared after successful commit
+ * without being flushed (no inserts or updates are expected).</p>
  * 
- * When stateful session is used it will be cleared after successful commit
- * without being flushed (no inserts or updates are expected).
- * 
- * The implementation is *not* thread-safe.
+ * The implementation is <b>not</b> thread-safe.
  * 
  * @author Robert Kasanicky
  * @author Dave Syer

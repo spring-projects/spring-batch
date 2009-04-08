@@ -78,6 +78,7 @@ import org.springframework.util.Assert;
  * @see java.sql.Connection#close()
  * @see DataSourceUtils#releaseConnection
  * @see org.springframework.jdbc.support.nativejdbc.NativeJdbcExtractor
+ * @since 2.0
  */
 public class ExtendedConnectionDataSourceProxy implements SmartDataSource, InitializingBean {
 

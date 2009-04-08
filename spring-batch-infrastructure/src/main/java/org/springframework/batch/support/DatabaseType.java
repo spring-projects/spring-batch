@@ -27,7 +27,7 @@ import org.springframework.jdbc.support.MetaDataAccessException;
 
 /**
  * Enum representing a database type, such as DB2 or oracle.  The type also
- * contains a product name, which is expected to the same as the product name
+ * contains a product name, which is expected to be the same as the product name
  * provided by the database driver's metadata.
  * 
  * @author Lucas Ward
@@ -53,7 +53,7 @@ public enum DatabaseType {
 			nameMap.put(type.getProductName(), type);
 		}
 	}
-	//A description is necessary due to the length of database descriptions
+	//A description is necessary due to the nature of database descriptions
 	//in metadata.
 	private final String productName;
 	

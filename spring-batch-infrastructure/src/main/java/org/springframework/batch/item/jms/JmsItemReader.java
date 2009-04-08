@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  * {@link #read()}.<br/><br/>
  * 
  * The implementation is thread safe after its properties are set (normal
- * singleton behaviour).
+ * singleton behavior).
  * 
  * @author Dave Syer
  * 
