@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationEvent;
  * @author Dave Syer
  * 
  */
+@SuppressWarnings("serial")
 public class SimpleMessageApplicationEvent extends ApplicationEvent {
 
 	private String message;

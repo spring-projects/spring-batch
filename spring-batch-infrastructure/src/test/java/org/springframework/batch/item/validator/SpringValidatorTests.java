@@ -16,21 +16,25 @@
 
 package org.springframework.batch.item.validator;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 /**
  * Tests for {@link SpringValidator}.
  */
-public class SpringValidatorTests extends TestCase {
+public class SpringValidatorTests {
 
-	SpringValidator validator = new SpringValidator();
+	private SpringValidator<Object> validator = new SpringValidator<Object>();
 
-	Validator mockValidator;
+	private Validator mockValidator;
 
-	protected void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		mockValidator = new MockSpringValidator();
 		validator.setValidator(mockValidator);
 	}
@@ -38,64 +42,47 @@ public class SpringValidatorTests extends TestCase {
 	/**
 	 * Validator property is not set
 	 */
+	@Test(expected = IllegalArgumentException.class)
 	public void testNullValidator() throws Exception {
-
 		validator.setValidator(null);
-
-		try {
-			validator.afterPropertiesSet();
-			fail("null validator must cause exception");
-		}
-		catch (IllegalArgumentException e) {
-			// expected
-		}
+		validator.afterPropertiesSet();
 	}
 
 	/**
 	 * Validator does not know how to validate object of the given class
 	 */
+	@Test(expected = ValidationException.class)
 	public void testValidateUnsupportedType() {
-		try {
-			validator.validate(Integer.valueOf(1)); // only strings are supported
-			fail("must not validate unsupported classes");
-		}
-		catch (ValidationException expected) {
-			assertTrue(true);
-		}
+		validator.validate(Integer.valueOf(1)); // only strings are supported
 	}
 
 	/**
 	 * Typical successful validation - no exception is thrown.
 	 */
+	@Test
 	public void testValidateSuccessfully() {
 		validator.validate(MockSpringValidator.ACCEPT_VALUE);
-		assertTrue(true);
 	}
 
 	/**
 	 * Typical failed validation - {@link ValidationException} is thrown
 	 */
+	@Test(expected = ValidationException.class)
 	public void testValidateFailure() {
-		try {
-			validator.validate(MockSpringValidator.REJECT_VALUE);
-			fail("exception should have been thrown on invalid value");
-		}
-		catch (ValidationException e) {
-			// expected
-		}
+		validator.validate(MockSpringValidator.REJECT_VALUE);
 	}
 
 	/**
 	 * Typical failed validation - message contains the item and names of
 	 * invalid fields.
 	 */
+	@Test
 	public void testValidateFailureWithFields() {
 		try {
 			validator.validate(MockSpringValidator.REJECT_MULTI_VALUE);
 			fail("exception should have been thrown on invalid value");
 		}
 		catch (ValidationException expected) {
-//			System.out.println(expected.getMessage());
 			assertTrue("message should contain the item#toString() value", expected.getMessage().contains(
 					"TestBeanToString"));
 			assertTrue("message should contain names of the invalid fields", expected.getMessage().contains("foo"));
@@ -103,7 +90,7 @@ public class SpringValidatorTests extends TestCase {
 		}
 	}
 
-	static class MockSpringValidator implements Validator {
+	private static class MockSpringValidator implements Validator {
 		public static final TestBean ACCEPT_VALUE = new TestBean();
 
 		public static final TestBean REJECT_VALUE = new TestBean();
@@ -132,7 +119,7 @@ public class SpringValidatorTests extends TestCase {
 		}
 	}
 
-	static class TestBean {
+	private static class TestBean {
 		private String foo;
 
 		private String bar;
@@ -158,6 +145,5 @@ public class SpringValidatorTests extends TestCase {
 		public String toString() {
 			return "TestBeanToString";
 		}
-
 	}
 }
