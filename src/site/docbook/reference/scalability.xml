@@ -114,7 +114,7 @@
     detail.</para>
   </section>
 
-  <section>
+  <section id="remoteChunking">
     <title>Remote Chunking</title>
 
     <para>In Remote Chunking the Step processing is split across multiple
@@ -162,7 +162,7 @@
     users.</para>
   </section>
 
-  <section>
+  <section id="partitioning">
     <title>Partitioning</title>
 
     <para>Spring Batch also provides an SPI for partitioning a Step execution

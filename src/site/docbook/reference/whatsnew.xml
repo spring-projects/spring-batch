@@ -236,8 +236,7 @@
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center"
-                     fileref="images/1-1-step.png" scale="80"
+          <imagedata align="center" fileref="images/1-1-step.png" scale="80"
                      width="50%" />
         </imageobject>
       </mediaobject>
@@ -253,8 +252,7 @@
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center"
-                     fileref="images/composite-transformer.png"
+          <imagedata align="center" fileref="images/composite-transformer.png"
                      scale="65" width="" />
         </imageobject>
       </mediaobject>
@@ -277,8 +275,7 @@
 
         <imageobject role="fo">
           <imagedata align="center" contentwidth="480"
-                     fileref="images/step.png"
-                     scale="60" width="" />
+                     fileref="images/step.png" scale="60" width="" />
         </imageobject>
       </mediaobject>
     </section>
@@ -340,8 +337,7 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/job-repository-advanced.png"
+        <imagedata align="center" fileref="images/job-repository-advanced.png"
                    scale="70" width="" />
       </imageobject>
     </mediaobject>
@@ -366,8 +362,7 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/sequential-flow.png"
+        <imagedata align="center" fileref="images/sequential-flow.png"
                    scale="80" width="" />
       </imageobject>
     </mediaobject>
@@ -381,8 +376,7 @@
       </imageobject>
 
       <imageobject role="fo">
-        <imagedata align="center"
-                   fileref="images/conditional-flow.png"
+        <imagedata align="center" fileref="images/conditional-flow.png"
                    scale="80" width="" />
       </imageobject>
     </mediaobject>
@@ -404,5 +398,66 @@
 
     <para>More details on how to configure non sequential steps can be found
     in <xref linkend="controllingStepFlow" />.</para>
+  </section>
+
+  <section>
+    <title>Scalability</title>
+
+    <para>Spring Batch 1.x was always intended as a single VM, possibly
+    multi-threaded model, but many features were built into it that support
+    parallel execution in multiple processes. Many projects have successfully
+    implemented a scalable solution relying on the quality of service features
+    of Spring Batch to ensure that processing only happens in the correct
+    sequence. In 2.0 those features have been exposed more explicitly. There
+    are two approaches to scalability: remote chunking, and
+    partitioning.</para>
+
+    <section>
+      <title>Remote Chunking</title>
+
+      <para>Remote chunking is a technique for dividing up the work of a step
+      without any explicit knowledge of the structure of the data. Any input
+      source can be split up dynamically by reading it in a single process (as
+      per normal in 1.x) and sending the items as a chunk to a remote worker
+      process. The remote process implements a listener pattern, responding to
+      the request, processing the data and sending an asynchronous reply. The
+      transport for the request and reply has to be durable with guaranteed
+      delivery and a single consumer, and those features are readily available
+      with any JMS implementation. But Spring Batch is building the remote
+      chunking feature on top of Spring Integration, therefore it is agnostic
+      to the actual implementation of the message middleware. More details can
+      be found in <xref linkend="remoteChunking" /></para>
+    </section>
+
+    <section>
+      <title>Partitioning</title>
+
+      <para>Partitioning is an alternative approach which in contrast depends
+      on having some knowledge of the structure of the input data, like a
+      range of primary keys, or the name of a file to process. The advantage
+      of this model is that the processors of each element in a partition can
+      act as if they are a single step in a normal Spring Batch job. They
+      don't have to implement any special or new patterns, which makes them
+      easy to configure and test. Partitioning in principle is more scalable
+      than remote chunking because there is no serialization bottleneck
+      arising from reading all the input data in one place.</para>
+
+      <para>In Spring Batch 2.0 partitioning is supported by two interfaces:
+      <classname>PartitionHandler</classname> and
+      <classname>StepExecutionSplitter</classname>. The
+      <classname>PartitionHandler</classname> is the one that knows about the
+      execution fabric - it has to transmit requests to remote steps and
+      collect the results using whatever grid or remoting technology is
+      available. <classname>PartitionHandler</classname> is an SPI, and Spring
+      Batch provides one implementation out of the box for local execution
+      through a <classname>TaskExecutor</classname>. This will be useful
+      immediately when parallel processing of heavily IO bound tasks is
+      required, since in those cases remote execution only complicates the
+      deployment and doesn't necessarily help much with the performance. Other
+      implementations will be specific to the execution fabric. (e.g. one of
+      the grid providers such as IBM, Oracle, Terracotta, Appistry etc.),
+      Spring Batch makes no preference for any of grid provider over another.
+      More details can be found in <xref linkend="partitioning" /></para>
+    </section>
   </section>
 </chapter>
