@@ -27,7 +27,7 @@ import org.springframework.batch.core.repository.JobRestartException;
  * its execution step by step.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface FlowExecutor {
 

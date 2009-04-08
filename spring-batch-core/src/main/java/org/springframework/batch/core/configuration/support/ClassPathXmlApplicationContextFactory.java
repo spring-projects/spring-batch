@@ -24,6 +24,13 @@ import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
+/**
+ * {@link ApplicationContextFactory} implementation that takes a parent context and a path 
+ * to the context to create.  Each time the createApplicationContext method is called, a new
+ * {@link ApplicationContext} will be returned.  It should be noted that if a path isn't
+ * set, the parent will always be returned.
+ * 
+ */
 public class ClassPathXmlApplicationContextFactory implements ApplicationContextFactory, ApplicationContextAware {
 
 	private ConfigurableApplicationContext parent;

@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.flow.State;
  * continuing if just starting.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class EndState extends AbstractState {
 

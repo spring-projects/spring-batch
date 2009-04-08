@@ -29,10 +29,7 @@ import org.springframework.batch.core.repository.dao.JobInstanceDao;
 import org.springframework.batch.core.repository.dao.StepExecutionDao;
 
 /**
- * 
- * <p>
  * Implementation of {@link JobExplorer} using the injected DAOs.
- * <p>
  * 
  * @author Dave Syer
  * @author Lucas Ward

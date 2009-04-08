@@ -43,6 +43,7 @@ import org.springframework.util.Assert;
  * to describe what kind of database they are using.
  * 
  * @author Dave Syer
+ * @since 2.0
  */
 public class JobExplorerFactoryBean extends AbstractJobExplorerFactoryBean
 		implements InitializingBean {

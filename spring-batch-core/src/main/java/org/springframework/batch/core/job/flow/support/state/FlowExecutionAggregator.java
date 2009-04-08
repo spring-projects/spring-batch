@@ -25,7 +25,7 @@ import org.springframework.batch.core.job.flow.FlowExecutionStatus;
  * single exit status.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface FlowExecutionAggregator {
 

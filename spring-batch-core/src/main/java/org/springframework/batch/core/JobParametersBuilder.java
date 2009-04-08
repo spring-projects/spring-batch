@@ -23,16 +23,17 @@ import java.util.Map;
 import org.springframework.util.Assert;
 
 /**
- * Helper class for creating {@link JobParameters}. Useful because of all
- * {@link JobParameters} are immutable, and require 3 separate maps of the three
- * supported types to ensure typesafety. Once created, it can be used in the
+ * Helper class for creating {@link JobParameters}. Useful because all
+ * {@link JobParameter} objects are immutable, and must be instantiated separately
+ * to ensure typesafety. Once created, it can be used in the
  * same was a java.lang.StringBuilder (except, order is irrelevant), by adding
- * various parameters types and creating a valid JobRuntimeParametres once
+ * various parameter types and creating a valid {@link JobParameters} once
  * finished.
  * 
  * @author Lucas Ward
  * @since 1.0
  * @see JobParameters
+ * @see JobParameter
  */
 public class JobParametersBuilder {
 
@@ -67,7 +68,7 @@ public class JobParametersBuilder {
 	}
 
 	/**
-	 * Add a new Date parameter for the given key.
+	 * Add a new {@link Date} parameter for the given key.
 	 * 
 	 * @param key - parameter accessor.
 	 * @param parameter - runtime parameter

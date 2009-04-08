@@ -28,8 +28,9 @@ package org.springframework.batch.core.launch.support;
 public class JvmSystemExiter implements SystemExiter {
 
 	/**
-	 * Delegate call to System.exit() with the argument provided. Do not use
-	 * this at home children!
+	 * Delegate call to System.exit() with the argument provided. This should only
+	 * be used in a scenario where a particular status needs to be returned to
+	 * a Batch scheduler.
 	 * 
 	 * @see org.springframework.batch.core.launch.support.SystemExiter#exit(int)
 	 */

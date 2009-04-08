@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
  * ignored.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class MultiResourcePartitioner implements Partitioner {
 

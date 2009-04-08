@@ -20,7 +20,9 @@ import java.util.List;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Listener interface around the writing of an item.
+ * Listener interface for the writing of items.  Implementations
+ * of this interface will be notified before, after, and in case
+ * of any exception thrown while writing a list of items.
  * 
  * @author Lucas Ward
  * 
@@ -35,9 +37,10 @@ public interface ItemWriteListener<S> extends StepListener {
 	void beforeWrite(List<? extends S> items);
 
 	/**
-	 * Called after {@link ItemWriter#write(java.util.List)} If the item is last
-	 * in a chunk, this will be called before any transaction is committed, and
-	 * before {@link ChunkListener#afterChunk()}
+	 * Called after {@link ItemWriter#write(java.util.List)} This will be 
+	 * called before any transaction is committed, and before 
+	 * {@link ChunkListener#afterChunk()}
+	 * 
 	 * @param items written items
 	 */
 	void afterWrite(List<? extends S> items);

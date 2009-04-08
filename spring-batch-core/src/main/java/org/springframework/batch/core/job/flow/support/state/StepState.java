@@ -27,7 +27,7 @@ import org.springframework.batch.core.step.StepHolder;
  * execute the specified {@link Step}.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class StepState extends AbstractState implements StepHolder {
 

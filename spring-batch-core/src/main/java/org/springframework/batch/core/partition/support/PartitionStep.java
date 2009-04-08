@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  * load using a {@link PartitionHandler}.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class PartitionStep extends AbstractStep {
 

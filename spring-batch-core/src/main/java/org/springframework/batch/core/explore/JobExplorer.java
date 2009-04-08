@@ -25,6 +25,7 @@ import org.springframework.batch.core.StepExecution;
 /**
  * @author Dave Syer
  * 
+ * @since 2.0
  */
 public interface JobExplorer {
 

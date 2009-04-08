@@ -70,7 +70,7 @@ import org.springframework.util.StringValueResolver;
  * accessors provided as a convenience for step and job attributes.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	

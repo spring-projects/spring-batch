@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
  * execution of the originating State.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class StateTransition implements Comparable<StateTransition> {
 

@@ -45,10 +45,10 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * Batch domain object representing a job. Job is an explicit abstraction
- * representing the configuration of a job specified by a developer. It should
- * be noted that restart policy is applied to the job as a whole and not to a
- * step.
+ * Abstract implementation of the {@link Job} interface.  Common dependencies such as a
+ * {@link JobRepository}, {@link JobExecutionListener}s, and various configuration 
+ * parameters are set here.  Therefore, common error handling and listener calling
+ * activities are abstracted away from implementations.
  * 
  * @author Lucas Ward
  * @author Dave Syer

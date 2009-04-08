@@ -21,8 +21,10 @@ import org.springframework.batch.core.job.flow.FlowExecutor;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 
 /**
- * @author Dave Syer
+ * State that requires a decider to make the status decision.
  * 
+ * @author Dave Syer
+ * @since 2.0
  */
 public class DecisionState extends AbstractState {
 

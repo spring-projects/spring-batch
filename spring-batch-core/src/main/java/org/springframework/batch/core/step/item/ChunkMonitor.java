@@ -29,7 +29,7 @@ import org.springframework.batch.item.ItemStreamException;
  * and the wrapped {@link ItemStream}.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 class ChunkMonitor implements ItemStream {
 	

@@ -27,7 +27,7 @@ import org.springframework.batch.core.StepExecution;
  * execution independent from the fabric they are going to run on.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface StepExecutionSplitter {
 

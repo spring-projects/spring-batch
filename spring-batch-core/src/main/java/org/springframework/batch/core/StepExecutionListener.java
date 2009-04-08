@@ -26,8 +26,9 @@ package org.springframework.batch.core;
 public interface StepExecutionListener extends StepListener {
 
 	/**
-	 * Initialise the state of the listener with the {@link StepExecution} from
+	 * Initialize the state of the listener with the {@link StepExecution} from
 	 * the current scope.
+	 * 
 	 * @param stepExecution
 	 */
 	void beforeStep(StepExecution stepExecution);

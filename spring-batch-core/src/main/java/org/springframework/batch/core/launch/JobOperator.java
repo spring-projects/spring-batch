@@ -31,13 +31,13 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 
 /**
- * A really low level interface for inspecting and controlling jobs with access
+ * Low level interface for inspecting and controlling jobs with access
  * only to primitive and collection types. Suitable for a command-line client
  * (e.g. that launches a new process for each operation), or a remote launcher
  * like a JMX console.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface JobOperator {
 

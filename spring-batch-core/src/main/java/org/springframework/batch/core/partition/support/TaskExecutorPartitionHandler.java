@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
  * filesystem scanning and copying.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class TaskExecutorPartitionHandler implements PartitionHandler, InitializingBean {
 

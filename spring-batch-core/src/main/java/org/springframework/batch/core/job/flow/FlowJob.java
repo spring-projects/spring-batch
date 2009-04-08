@@ -20,6 +20,7 @@ import java.util.HashSet;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.JobInterruptedException;
@@ -31,8 +32,13 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.core.step.StepHolder;
 
 /**
- * @author Dave Syer
+ * Implementation of the {@link Job} interface that allows for complex flows
+ * of steps, rather than requiring sequential execution.  In general, this
+ * job implementation was designed to be used behind a parser, allowing for
+ * a namespace to abstract away details.
  * 
+ * @author Dave Syer
+ * @since 2.0
  */
 public class FlowJob extends AbstractJob {
 

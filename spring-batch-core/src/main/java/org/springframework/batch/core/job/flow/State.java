@@ -17,7 +17,7 @@ package org.springframework.batch.core.job.flow;
 
 /**
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface State {
 

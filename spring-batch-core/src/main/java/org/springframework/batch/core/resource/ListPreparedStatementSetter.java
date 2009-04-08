@@ -19,8 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.SqlTypeValue;
@@ -28,9 +27,13 @@ import org.springframework.jdbc.core.StatementCreatorUtils;
 import org.springframework.util.Assert;
 
 /**
- * Implementation of the {@link PreparedStatementSetter} interface that also
- * implements {@link StepExecutionListener} and uses {@link JobParameters} to
- * set the parameters on a PreparedStatement.
+ * Implementation of the {@link PreparedStatementSetter} interface that accepts
+ * a list of values to be set on a PreparedStatement.  This is usually used in
+ * conjunction with the {@link JdbcCursorItemReader} to allow for the replacement 
+ * of bind variables when generating the cursor.  The order of the list will be
+ * used to determine the ordering of setting variables.  For example, the first
+ * item in the list will be the first bind variable set.  (i.e. it will
+ * correspond to the first '?' in the SQL statement)
  * 
  * @author Lucas Ward
  * 
@@ -38,24 +41,24 @@ import org.springframework.util.Assert;
 public class ListPreparedStatementSetter implements
 		PreparedStatementSetter, InitializingBean {
 
-	private List<?> parameterKeys;
+	private List<?> parameters;
 
 	public void setValues(PreparedStatement ps) throws SQLException {
-		for (int i = 0; i < parameterKeys.size(); i++) {
-			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, parameterKeys.get(i));
+		for (int i = 0; i < parameters.size(); i++) {
+			StatementCreatorUtils.setParameterValue(ps, i + 1, SqlTypeValue.TYPE_UNKNOWN, parameters.get(i));
 		}
 	}
 
 	/**
-	 * The parameter names that will be pulled from the {@link JobParameters}.
+	 * The parameter values that will be set on the PreparedStatement.
 	 * It is assumed that their order in the List is the order of the parameters
 	 * in the PreparedStatement.
 	 */
-	public void setParameters(List<?> parameterKeys) {
-		this.parameterKeys = parameterKeys;
+	public void setParameters(List<?> parameters) {
+		this.parameters = parameters;
 	}
 
 	public void afterPropertiesSet() throws Exception {
-		Assert.notNull(parameterKeys, "Parameters names must be provided");
+		Assert.notNull(parameters, "Parameters must be provided");
 	}
 }

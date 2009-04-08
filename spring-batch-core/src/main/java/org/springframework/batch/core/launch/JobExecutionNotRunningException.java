@@ -18,8 +18,11 @@ package org.springframework.batch.core.launch;
 import org.springframework.batch.core.JobExecutionException;
 
 /**
+ * Execution indicating that a JobExecution that is not currently running has
+ * been requested to stop.
+ * 
  * @author Dave Syer
- *
+ * @since 2.0
  */
 public class JobExecutionNotRunningException extends JobExecutionException {
 

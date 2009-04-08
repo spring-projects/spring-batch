@@ -230,6 +230,40 @@ public class FaultTolerantStepFactoryBeanTests {
 				.getName()));
 	}
 
+	@Test
+	public void testProcessFilter() throws Exception {
+
+		reader = new SkipReaderStub(new String[] { "1", "2", "3", "4", "5" }, NO_FAILURES);
+		factory.setItemReader(reader);
+		writer = new SkipWriterStub(NO_FAILURES);
+		factory.setItemWriter(writer);
+		FilterProcessorStub processor = new FilterProcessorStub(Arrays.asList(new String[] { "4" }));
+		factory.setItemProcessor(processor);
+		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<String, String>();
+		factory.setListeners(new StepListener[]{listenerStub});
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+
+		assertEquals(0, stepExecution.getSkipCount());
+		assertEquals(0, stepExecution.getReadSkipCount());
+		assertEquals(5, stepExecution.getReadCount());
+		assertEquals(1, stepExecution.getFilterCount());
+		assertEquals(0, stepExecution.getRollbackCount());
+		assertTrue(listenerStub.isFilterEncountered());
+
+		// writer skips "4"
+		assertTrue(reader.processed.contains("4"));
+		assertFalse(writer.written.contains("4"));
+
+		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
+		assertEquals(expectedOutput, writer.written);
+
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
+				.getName()));
+	}
+	
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
@@ -683,6 +717,22 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 
 	}
+	
+	private static class FilterProcessorStub implements ItemProcessor<String, String> {
+		private final Collection<String> failures;
+
+		public FilterProcessorStub(Collection<String> failures) {
+			this.failures = failures;
+		}
+
+		public String process(String item) throws Exception {
+			if (failures.contains(item)) {
+				return null;
+			}
+			return item;
+		}
+
+	}
 
 	/**
 	 * Simple item reader that supports skip functionality.
@@ -724,6 +774,34 @@ public class FaultTolerantStepFactoryBeanTests {
 			return item;
 		}
 
+	}
+	
+	private static class ItemProcessListenerStub<T,S> implements ItemProcessListener<T, S>{
+
+		private boolean errorEncountered = false;
+		private boolean filterEncountered = false;
+		
+		public void afterProcess(T item, S result) {
+			if(result == null){
+				filterEncountered = true;
+			}
+		}
+
+		public void beforeProcess(T item) {
+			
+		}
+
+		public void onProcessError(T item, Exception e) {
+			errorEncountered = true;
+		}
+		
+		public boolean isErrorEncountered() {
+			return errorEncountered;
+		}
+		
+		public boolean isFilterEncountered() {
+			return filterEncountered;
+		}
 	}
 
 	/**

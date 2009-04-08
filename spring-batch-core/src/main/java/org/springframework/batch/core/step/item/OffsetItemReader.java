@@ -9,7 +9,7 @@ import org.springframework.batch.item.UnexpectedInputException;
 
 /**
  * Convenience wrapper for an ItemReader that keeps track of how many items
- * successfully processed.
+ * were successfully processed.
  */
 class OffsetItemReader<T> implements ItemReader<T>, ItemStream {
 

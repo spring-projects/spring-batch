@@ -22,7 +22,7 @@ import org.springframework.batch.core.job.flow.State;
 
 /**
  * @author Dave Syer
- *
+ * @since 2.0
  */
 public abstract class AbstractState implements State {
 	

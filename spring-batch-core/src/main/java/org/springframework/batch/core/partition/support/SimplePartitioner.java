@@ -28,7 +28,7 @@ import org.springframework.batch.item.ExecutionContext;
  * size.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class SimplePartitioner implements Partitioner {
 

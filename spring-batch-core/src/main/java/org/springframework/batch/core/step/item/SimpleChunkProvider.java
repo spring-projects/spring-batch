@@ -30,10 +30,11 @@ import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.RepeatStatus;
 
 /**
+ * Simple implementation of the ChunkProvider interface that does basic 
+ * chunk providing from an {@link ItemReader}.
  * 
  * @author Dave Syer
- * 
- * @param <I> input item type
+ * @see ChunkOrientedTasklet
  */
 public class SimpleChunkProvider<I> implements ChunkProvider<I> {
 

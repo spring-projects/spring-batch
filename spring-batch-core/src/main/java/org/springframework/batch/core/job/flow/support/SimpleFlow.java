@@ -43,7 +43,7 @@ import org.springframework.beans.factory.InitializingBean;
  * if unambiguous.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class SimpleFlow implements Flow, InitializingBean {
 

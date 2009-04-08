@@ -42,7 +42,7 @@ import org.springframework.batch.item.ExecutionContext;
  * <code>{step1:partition0, step1:partition1, ...}</code>.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class SimpleStepExecutionSplitter implements StepExecutionSplitter {
 

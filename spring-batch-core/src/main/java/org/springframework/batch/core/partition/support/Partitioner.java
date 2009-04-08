@@ -27,7 +27,7 @@ import org.springframework.batch.item.ExecutionContext;
  * key ranges, or a set of unique filenames.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface Partitioner {
 

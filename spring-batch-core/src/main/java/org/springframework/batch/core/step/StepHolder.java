@@ -7,7 +7,7 @@ import org.springframework.batch.core.Step;
  * access to the underlying instance.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface StepHolder {
 

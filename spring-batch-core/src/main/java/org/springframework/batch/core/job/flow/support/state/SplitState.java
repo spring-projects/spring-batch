@@ -36,7 +36,7 @@ import org.springframework.core.task.TaskRejectedException;
  * parallel subflows.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class SplitState extends AbstractState {
 

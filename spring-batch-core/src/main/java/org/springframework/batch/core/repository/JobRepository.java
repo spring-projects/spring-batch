@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Isolation;
 
 /**
  * <p>
- * Repository responsible for persistence of batch metadata entities.
+ * Repository responsible for persistence of batch meta-data entities.
  * </p>
  * 
  * @see JobInstance

@@ -37,6 +37,11 @@ import org.springframework.batch.retry.RetryContext;
 import org.springframework.batch.retry.RetryException;
 import org.springframework.batch.retry.support.DefaultRetryState;
 
+/**
+ * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
+ * allows for skipping or retry of items that cause exceptions during writing. 
+ * 
+ */
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
 
 	private SkipPolicy itemProcessSkipPolicy = new LimitCheckingItemSkipPolicy(0);

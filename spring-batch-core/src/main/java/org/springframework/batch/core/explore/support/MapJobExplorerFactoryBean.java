@@ -31,6 +31,7 @@ import org.springframework.beans.factory.FactoryBean;
  * {@link SimpleJobExplorer} using in-memory DAO implementations.
  * 
  * @author Dave Syer
+ * @since 2.0
  */
 public class MapJobExplorerFactoryBean extends AbstractJobExplorerFactoryBean {
 

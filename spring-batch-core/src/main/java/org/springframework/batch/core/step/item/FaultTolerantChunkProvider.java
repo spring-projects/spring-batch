@@ -24,6 +24,12 @@ import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.repeat.RepeatOperations;
 
+/**
+ * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
+ * allows for skipping or retry of items that cause exceptions during reading
+ * or processing. 
+ * 
+ */
 public class FaultTolerantChunkProvider<I> extends SimpleChunkProvider<I> {
 
 	private SkipPolicy skipPolicy = new LimitCheckingItemSkipPolicy(0);

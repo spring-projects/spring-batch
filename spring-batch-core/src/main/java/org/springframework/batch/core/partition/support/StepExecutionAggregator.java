@@ -28,7 +28,7 @@ import org.springframework.util.Assert;
  * into a single result.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class StepExecutionAggregator {
 

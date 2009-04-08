@@ -19,7 +19,7 @@ import java.util.Collection;
 
 /**
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public interface Flow {
 

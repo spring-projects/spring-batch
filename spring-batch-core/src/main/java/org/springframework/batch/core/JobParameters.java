@@ -162,9 +162,7 @@ public class JobParameters implements Serializable {
 	}
 	
 	/**
-	 * Get a map of all parameters, including string, long, and date. It should
-	 * be noted that a Collections$UnmodifiableMap is returned, ensuring
-	 * immutability.
+	 * Get a map of all parameters, including string, long, and date. 
 	 * 
 	 * @return an unmodifiable map containing all parameters.
 	 */
@@ -173,7 +171,7 @@ public class JobParameters implements Serializable {
 	}
 	
 	/**
-	 * @return true if the prameters is empty, false otherwise.
+	 * @return true if the parameters is empty, false otherwise.
 	 */
 	public boolean isEmpty(){
 		return parameters.isEmpty();

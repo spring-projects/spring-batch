@@ -30,7 +30,7 @@ import java.util.List;
  * skipped items are then available through the chunk.
  * 
  * @author Dave Syer
- * 
+ * @since 2.0
  */
 public class Chunk<W> implements Iterable<W> {
 

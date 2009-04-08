@@ -19,8 +19,13 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 
 /**
- * @author Dave Syer
+ * Interface allowing for programmatic access to the decision on what the status
+ * of a flow should be.  For example, if some condition that's stored in the 
+ * database indicates that the job should stop for a manual check, a decider
+ * implementation could check that value to determine the status of the flow. 
  * 
+ * @author Dave Syer
+ * @since 2.0
  */
 public interface JobExecutionDecider {
 

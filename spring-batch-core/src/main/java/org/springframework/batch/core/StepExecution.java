@@ -27,10 +27,8 @@ import org.springframework.util.Assert;
 
 /**
  * Batch domain object representation the execution of a step. Unlike
- * JobExecution, there are four additional properties: itemCount, commitCount,
- * rollbackCount and execution context. These values represent how many items
- * the step has processed, how many times it has been committed and rolled back,
- * and any other information the developer wishes to store, respectively.
+ * {@link JobExecution}, there are additional properties related the 
+ * processing of items such as commit count, etc. 
  * 
  * @author Lucas Ward
  * @author Dave Syer

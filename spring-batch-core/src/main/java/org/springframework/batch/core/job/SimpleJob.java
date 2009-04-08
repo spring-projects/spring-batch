@@ -32,7 +32,8 @@ import org.springframework.batch.core.repository.JobRestartException;
 /**
  * Simple implementation of {@link Job} interface providing the ability to run a
  * {@link JobExecution}. Sequentially executes a job by iterating through its
- * list of steps.
+ * list of steps.  Any {@link Step} that fails will fail the job.  The job is
+ * considered complete when all steps have been executed.
  * 
  * @author Lucas Ward
  * @author Dave Syer

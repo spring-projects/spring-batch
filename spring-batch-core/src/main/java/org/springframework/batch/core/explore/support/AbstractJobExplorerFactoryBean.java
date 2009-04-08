@@ -32,6 +32,7 @@ import org.springframework.beans.factory.FactoryBean;
  * @see MapJobExplorerFactoryBean
  * 
  * @author Dave Syer
+ * @since 2.0
  */
 public abstract class AbstractJobExplorerFactoryBean implements FactoryBean {
 

@@ -33,6 +33,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.UnexpectedJobExecutionException;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.ListableJobRegistry;
 import org.springframework.batch.core.converter.DefaultJobParametersConverter;
 import org.springframework.batch.core.converter.JobParametersConverter;
@@ -55,9 +56,20 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
+ * Simple implementation of the JobOperator interface.  Due to the amount of 
+ * functionality the implementation is combining, the following dependencies
+ * are required:
+ * 
+ * <ul>
+ * 	<li> {@link JobLauncher}
+ *  <li> {@link JobExplorer}
+ *  <li> {@link JobRepository}
+ *  <li> {@link JobRegistry}
+ * </ul>
+ * 
  * @author Dave Syer
  * @author Lucas Ward
- * 
+ * @since 2.0
  */
 public class SimpleJobOperator implements JobOperator, InitializingBean {
 

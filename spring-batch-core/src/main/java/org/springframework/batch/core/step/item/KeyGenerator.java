@@ -16,6 +16,10 @@
 package org.springframework.batch.core.step.item;
 
 /**
+ * Interface for defining keys to uniquely identify items.
+ * this can be useful if the item itself cannot be modified to
+ * properly override equals.
+ * 
  * @author Dave Syer
  *
  */

@@ -26,6 +26,12 @@ import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
+/**
+ * Simple implementation of the {@link ChunkProcessor} interface that handles basic
+ * item writing and processing.  Any exceptions encountered will be rethrown.
+ * 
+ * @see ChunkOrientedTasklet
+ */
 public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, InitializingBean {
 
 	private ItemProcessor<? super I, ? extends O> itemProcessor;
