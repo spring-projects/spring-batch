@@ -370,14 +370,26 @@
       this reason, Spring batch provides an in-memory Map version of the job
       respository:</para>
 
-      <programlisting>  &lt;bean id="jobRepository" 
-        class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean" /&gt;</programlisting>
+      <programlisting><![CDATA[<bean id="jobRepository" 
+  class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+    <property name="transactionManager" ref="transactionManager"/>
+</bean>
+]]></programlisting>
 
       <para>Note that the in-memory repository is volatile and so does not
       allow restart between JVM instances. It also cannot guarantee that two
       job instances with the same parameters are launched simultaneously. So
       use the database version of the repository wherever you need quality of
       service.</para>
+
+	  <para>However it does require a transaction manager to be
+	  defined because there are rollback semantics within the
+	  repository, and because the business logic might still be
+	  transactional (e.g. RDBMS access).  For testing purposes many
+	  people find
+	  the <classname>ResourcelessTransactionManager</classname>
+	  useful.</para>
+
     </section>
 
     <section>
