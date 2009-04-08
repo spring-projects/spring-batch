@@ -21,13 +21,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.item.ItemProcessor;
 
 /**
- * Marks a method to be called if an exception is thrown by an {@link ItemProcessor}
+ * Marks a method to be called if an exception is thrown by an
+ * {@link ItemProcessor} <br>
+ * <br>
+ * Expected signature: void onProcessError(T item, {@link Exception} e)
  * 
  * @author Lucas Ward
  * @since 2.0
+ * @see ItemProcessListener
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

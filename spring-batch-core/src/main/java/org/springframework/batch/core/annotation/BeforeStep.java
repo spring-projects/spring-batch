@@ -28,7 +28,9 @@ import org.springframework.batch.core.StepExecutionListener;
 /**
  * Marks a method to be called before a {@link Step} is executed, which comes
  * after a {@link StepExecution} is created and persisted, but before the first
- * item is read.
+ * item is read. <br>
+ * <br>
+ * Expected signature: void beforeStep({@link StepExecution} stepExecution)
  * 
  * @author Lucas Ward
  * @since 2.0

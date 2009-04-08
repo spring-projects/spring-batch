@@ -21,14 +21,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.batch.core.SkipListener;
 import org.springframework.batch.item.ItemReader;
 
 /**
- * Marks a method to be called when an item is skipped due to an exception thrown in the
- * {@link ItemReader}
+ * Marks a method to be called when an item is skipped due to an exception
+ * thrown in the {@link ItemReader} <br>
+ * <br>
+ * Expected signature: void onSkipInRead({@link Throwable} t)
  * 
  * @author Lucas Ward
  * @since 2.0
+ * @see SkipListener
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

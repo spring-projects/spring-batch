@@ -21,13 +21,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 
 /**
- * Marks a method to be called after a {@link Step} has completed.  Annotated methods
- * will be called regardless of the status of the {@link StepExecution}.  
+ * Marks a method to be called after a {@link Step} has completed. Annotated
+ * methods will be called regardless of the status of the {@link StepExecution}. <br>
+ * <br>
+ * Expected signature: {@link ExitStatus} afterStep({@link StepExecution}
+ * stepExecution);
  * 
  * @author Lucas Ward
  * @since 2.0

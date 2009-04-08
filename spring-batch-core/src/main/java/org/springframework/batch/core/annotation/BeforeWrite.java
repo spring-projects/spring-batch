@@ -20,14 +20,19 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
 
+import org.springframework.batch.core.ItemWriteListener;
 import org.springframework.batch.item.ItemWriter;
 
 /**
- * Marks a method to be called before an item is passed to an {@link ItemWriter}
+ * Marks a method to be called before an item is passed to an {@link ItemWriter} <br>
+ * <br>
+ * Expected signature: void beforeWrite({@link List}&lt;? extends S&gt; items)
  * 
  * @author Lucas Ward
  * @since 2.0
+ * @see ItemWriteListener
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})

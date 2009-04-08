@@ -26,8 +26,10 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 
 /**
- * Marks a method to be called after a {@link Job} has completed.  Annotated methods
- * will be called regardless of the status of the {@link JobExecution}.  
+ * Marks a method to be called after a {@link Job} has completed. Annotated
+ * methods will be called regardless of the status of the {@link JobExecution}. <br>
+ * <br>
+ * Expected signature: void afterJob({@link JobExecution} jobExecution)
  * 
  * @author Lucas Ward
  * @since 2.0

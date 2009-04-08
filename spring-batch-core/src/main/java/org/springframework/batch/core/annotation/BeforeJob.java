@@ -30,7 +30,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 /**
  * Marks a method to be called before a {@link Job} is executed, which comes
  * after a {@link JobExecution} is created and persisted, but before the first
- * {@link Step} is executed.
+ * {@link Step} is executed. <br>
+ * <br>
+ * Expected signature: void beforeJob({@link JobExecution} jobExecution)
  * 
  * @author Lucas Ward
  * @since 2.0

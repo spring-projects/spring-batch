@@ -20,13 +20,18 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.batch.core.ItemProcessListener;
 import org.springframework.batch.item.ItemProcessor;
 
 /**
- * Marks a method to be called before an item is passed to an {@link ItemProcessor}
+ * Marks a method to be called before an item is passed to an
+ * {@link ItemProcessor} <br>
+ * <br>
+ * Expected signature: void beforeProcess(T item)
  * 
  * @author Lucas Ward
  * @since 2.0
+ * @see ItemProcessListener
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
