@@ -18,7 +18,14 @@ package org.springframework.batch.repeat;
 
 public enum RepeatStatus {
 
-	CONTINUABLE(true), FINISHED(false);
+	/**
+	 * Indicates that processing can continue.
+	 */
+	CONTINUABLE(true), 
+	/**
+	 * Indicates that processing is finished (either successful or unsuccessful)
+	 */
+	FINISHED(false);
 
 	private final boolean continuable;
 
