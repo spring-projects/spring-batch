@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean class="org.springframework.batch.core.configuration.support.ClassPathXmlJobRegistry">
-		<property name="jobPaths" value="classpath:org/springframework/batch/core/launch/support/job-*.xml"/>
+		<property name="jobPaths" value="classpath*:org/springframework/batch/core/launch/support/job-*.xml"/>
 	</bean>
 
 </beans>
