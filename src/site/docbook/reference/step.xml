@@ -1552,10 +1552,10 @@
   &lt;job id="job"&gt;
     &lt;step id="step1" parent="s1" next="decision" /&gt;
     
-    &lt;decision id="skipCheckingDecision" decider="decider"&gt;
+    &lt;decision id="decision" decider="decider"&gt;
       &lt;next on="FAILED" to="step2" /&gt;
       &lt;next on="COMPLETED" to="step3" /&gt;
-    &lt;/step&gt;
+    &lt;/decision&gt;
 
     &lt;step id="step2" parent="s2" next="step3"/&gt;
     &lt;step id="step3" parent="s3" /&gt;
