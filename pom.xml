@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
 	<artifactId>org.springframework.batch</artifactId>
@@ -15,7 +15,7 @@
 		<module>spring-batch-infrastructure</module>
 		<module>spring-batch-core</module>
 		<module>spring-batch-test</module>
-	</modules>
+  </modules>
 	<url>http://static.springframework.org/spring-batch</url>
 	<organization>
 		<name>SpringSource</name>
@@ -108,22 +108,22 @@
 									<postProcess>
 										<move todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/target/docbkx/html">
-												<include name="index.html" />
+												<include name="index.html"/>
 											</fileset>
 										</move>
 										<copy todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/src/docbkx/resources">
-												<include name="**/*.css" />
-												<include name="**/*.png" />
-												<include name="**/*.gif" />
-												<include name="**/*.jpg" />
+												<include name="**/*.css"/>
+												<include name="**/*.png"/>
+												<include name="**/*.gif"/>
+												<include name="**/*.jpg"/>
 											</fileset>
 										</copy>
 										<copy todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/src/site/docbook/reference">
-												<include name="**/*.png" />
-												<include name="**/*.gif" />
-												<include name="**/*.jpg" />
+												<include name="**/*.png"/>
+												<include name="**/*.gif"/>
+												<include name="**/*.jpg"/>
 											</fileset>
 										</copy>
 									</postProcess>
@@ -139,9 +139,7 @@
 									<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
 									<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
 									<postProcess>
-										<copy file="${basedir}/target/docbkx/pdf/index.pdf"
-											tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
-											failonerror="false" />
+										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf" failonerror="false"/>
 									</postProcess>
 								</configuration>
 								<phase>pre-site</phase>
@@ -158,22 +156,22 @@
 									<postProcess>
 										<move todir="${basedir}/target/site/reference">
 											<fileset dir="${basedir}/target/docbkx">
-												<include name="**/*.html" />
+												<include name="**/*.html"/>
 											</fileset>
 										</move>
 										<copy todir="${basedir}/target/site/reference/html">
 											<fileset dir="${basedir}/src/docbkx/resources">
-												<include name="**/*.css" />
-												<include name="**/*.png" />
-												<include name="**/*.gif" />
-												<include name="**/*.jpg" />
+												<include name="**/*.css"/>
+												<include name="**/*.png"/>
+												<include name="**/*.gif"/>
+												<include name="**/*.jpg"/>
 											</fileset>
 										</copy>
 										<copy todir="${basedir}/target/site/reference/html">
 											<fileset dir="${basedir}/src/site/docbook/reference">
-												<include name="**/*.png" />
-												<include name="**/*.gif" />
-												<include name="**/*.jpg" />
+												<include name="**/*.png"/>
+												<include name="**/*.gif"/>
+												<include name="**/*.jpg"/>
 											</fileset>
 										</copy>
 									</postProcess>
@@ -201,7 +199,7 @@
 						<configuration>
 							<includes>index.xml</includes>
 							<chunkedOutput>false</chunkedOutput>
-							<draftWatermarkImage />
+							<draftWatermarkImage/>
 							<htmlStylesheet>css/html.css</htmlStylesheet>
 							<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
 							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl
@@ -224,7 +222,7 @@
 								<phase>generate-sources</phase>
 								<configuration>
 									<tasks>
-										<copy file="pom.xml" todir="target" />
+										<copy file="pom.xml" todir="target"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -257,47 +255,39 @@
 									<tasks>
 										<unzip dest="target/it/with-dep">
 											<fileset dir="target">
-												<include name="*with-dep*.zip" />
+												<include name="*with-dep*.zip"/>
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
-												handledirsep="true" />
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true"/>
 										</unzip>
 										<unzip dest="target/it/no-dep">
 											<fileset dir="target">
-												<include name="*no-dep*.zip" />
+												<include name="*no-dep*.zip"/>
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
-												handledirsep="true" />
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true"/>
 										</unzip>
-										<fail
-											message="Failed integration test of zip distro: Spring Batch jar files are missing.">
+										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="9">
-														<fileset id="fs" dir="target/it/with-dep/dist"
-															includes="*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar"/>
 													</resourcecount>
 												</not>
 											</condition>
 										</fail>
-										<fail
-											message="Failed integration test of zip distro: dependency jar files are missing.">
+										<fail message="Failed integration test of zip distro: dependency jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib"
-															includes="org.springframework.beans-*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar"/>
 													</resourcecount>
 												</not>
 											</condition>
 										</fail>
-										<fail
-											message="Failed integration test of zip distro: test dependency jar files are missing.">
+										<fail message="Failed integration test of zip distro: test dependency jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib"
-															includes="com.springsource.org.junit-*.jar" />
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar"/>
 													</resourcecount>
 												</not>
 											</condition>
