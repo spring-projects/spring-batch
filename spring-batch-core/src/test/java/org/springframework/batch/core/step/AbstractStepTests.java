@@ -85,7 +85,7 @@ public class AbstractStepTests {
 
 		public ExitStatus afterStep(StepExecution stepExecution) {
 			assertSame(execution, stepExecution);
-			events.add(getEvent("afterStep"));
+			events.add(getEvent("afterStep("+stepExecution.getExitStatus().getExitCode()+")"));
 			stepExecution.getExecutionContext().putString("afterStep", "afterStep");
 			return stepExecution.getExitStatus();
 		}
@@ -175,8 +175,8 @@ public class AbstractStepTests {
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener2#afterStep", events.get(i++));
-		assertEquals("listener1#afterStep", events.get(i++));
+		assertEquals("listener2#afterStep(COMPLETED)", events.get(i++));
+		assertEquals("listener1#afterStep(COMPLETED)", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
@@ -213,8 +213,8 @@ public class AbstractStepTests {
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener2#afterStep", events.get(i++));
-		assertEquals("listener1#afterStep", events.get(i++));
+		assertEquals("listener2#afterStep(FAILED)", events.get(i++));
+		assertEquals("listener1#afterStep(FAILED)", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 
@@ -251,8 +251,8 @@ public class AbstractStepTests {
 		assertEquals("listener2#beforeStep", events.get(i++));
 		assertEquals("open", events.get(i++));
 		assertEquals("doExecute", events.get(i++));
-		assertEquals("listener2#afterStep", events.get(i++));
-		assertEquals("listener1#afterStep", events.get(i++));
+		assertEquals("listener2#afterStep(STOPPED)", events.get(i++));
+		assertEquals("listener1#afterStep(STOPPED)", events.get(i++));
 		assertEquals("close", events.get(i++));
 		assertEquals(7, events.size());
 

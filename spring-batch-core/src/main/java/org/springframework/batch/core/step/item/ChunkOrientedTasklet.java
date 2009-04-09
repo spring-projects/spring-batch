@@ -16,7 +16,6 @@
 
 package org.springframework.batch.core.step.item;
 
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -81,9 +80,6 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 
 		chunkContext.removeAttribute(INPUTS_KEY);
 		chunkContext.setComplete();
-		if (inputs.isEnd()) {
-			contribution.setExitStatus(ExitStatus.COMPLETED);
-		}
 
 		return RepeatStatus.continueIf(!inputs.isEnd());
 

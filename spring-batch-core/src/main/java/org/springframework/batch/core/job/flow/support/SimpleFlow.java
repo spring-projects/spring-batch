@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.JobExecutionException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.flow.Flow;
@@ -46,6 +48,8 @@ import org.springframework.beans.factory.InitializingBean;
  * @since 2.0
  */
 public class SimpleFlow implements Flow, InitializingBean {
+
+	private static final Log logger = LogFactory.getLog(SimpleFlow.class);
 
 	private State startState;
 
@@ -128,12 +132,15 @@ public class SimpleFlow implements Flow, InitializingBean {
 		FlowExecutionStatus status = FlowExecutionStatus.UNKNOWN;
 		State state = stateMap.get(stateName);
 
+		logger.debug("Resuming state="+stateName+" with status="+status);
+
 		// Terminate if there are no more states
 		while (state != null && status!=FlowExecutionStatus.STOPPED) {
 
 			stateName = state.getName();
 
 			try {
+				logger.debug("Handling state="+stateName);
 				status = state.handle(executor);
 			}
 			catch (Exception e) {
@@ -141,6 +148,8 @@ public class SimpleFlow implements Flow, InitializingBean {
 				throw new FlowExecutionException(String.format("Ended flow=%s at state=%s with exception", name,
 						stateName), e);
 			}
+			
+			logger.debug("Completed state="+stateName+" with status="+status);
 
 			state = nextState(stateName, status);
 

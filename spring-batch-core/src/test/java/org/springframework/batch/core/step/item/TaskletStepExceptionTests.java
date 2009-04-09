@@ -74,6 +74,7 @@ public class TaskletStepExceptionTests {
 
 		taskletStep.execute(stepExecution);
 		assertEquals(FAILED, stepExecution.getStatus());
+		assertEquals(FAILED.toString(), stepExecution.getExitStatus().getExitCode());
 	}
 
 	@Test
@@ -81,6 +82,7 @@ public class TaskletStepExceptionTests {
 		taskletStep.setStepExecutionListeners(new StepExecutionListener[] { new InterruptionListener() });
 		taskletStep.execute(stepExecution);
 		assertEquals(STOPPED, stepExecution.getStatus());
+		assertEquals(STOPPED.toString(), stepExecution.getExitStatus().getExitCode());
 	}
 
 	@Test
@@ -116,7 +118,7 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
-	public void testAfterStepFailure() throws Exception {
+	public void testAfterStepFailureWhenTaskletSucceeds() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStepExecutionListeners(new StepExecutionListenerSupport[] { new StepExecutionListenerSupport() {
@@ -142,7 +144,7 @@ public class TaskletStepExceptionTests {
 	/*
 	 * Exception in afterStep is ignored (only logged).
 	 */
-	public void testAfterStepFAilure() throws Exception {
+	public void testAfterStepFailureWhenTaskletFails() throws Exception {
 
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStepExecutionListeners(new StepExecutionListenerSupport[] { new StepExecutionListenerSupport() {

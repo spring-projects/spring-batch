@@ -17,7 +17,6 @@ package org.springframework.batch.core.configuration.xml;
 
 import java.util.List;
 
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
@@ -44,7 +43,6 @@ public class NameStoringTasklet extends StepExecutionListenerSupport implements 
 		if (stepNamesList != null) {
 			stepNamesList.add(stepName);
 		}
-		contribution.setExitStatus(ExitStatus.COMPLETED);
 		return RepeatStatus.FINISHED;
 	}
 

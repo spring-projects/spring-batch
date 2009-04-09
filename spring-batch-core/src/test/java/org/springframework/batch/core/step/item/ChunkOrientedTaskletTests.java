@@ -100,8 +100,10 @@ public class ChunkOrientedTaskletTests {
 		});
 		StepContribution contribution = new StepContribution(new StepExecution("foo", new JobExecution(new JobInstance(
 				123L, new JobParameters(), "job"))));
+		ExitStatus expected = contribution.getExitStatus();
 		handler.execute(contribution, context);
-		assertEquals(ExitStatus.COMPLETED.getExitCode(), contribution.getExitStatus().getExitCode());
+		// The tasklet does not change the exit code
+		assertEquals(expected, contribution.getExitStatus());
 	}
 
 }

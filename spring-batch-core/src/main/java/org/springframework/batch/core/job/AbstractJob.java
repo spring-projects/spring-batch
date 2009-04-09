@@ -235,6 +235,8 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 	 */
 	public final void execute(JobExecution execution) {
 
+		logger.debug("Job execution starting: "+execution);					
+
 		try {
 
 			if (execution.getStatus() != BatchStatus.STOPPING) {
@@ -246,6 +248,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 
 				try {
 					doExecute(execution);
+					logger.debug("Job execution complete: "+execution);					
 				} catch (RepeatException e) {
 					throw e.getCause();
 				}
@@ -256,6 +259,7 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 				// with it in the same way as any other interruption.
 				execution.setStatus(BatchStatus.STOPPED);
 				execution.setExitStatus(ExitStatus.COMPLETED);
+				logger.debug("Job execution was stopped: "+execution);					
 
 			}
 
@@ -290,7 +294,6 @@ public abstract class AbstractJob implements Job, StepLocator, BeanNameAware, In
 			
 			jobRepository.update(execution);
 			
-
 		}
 
 	}

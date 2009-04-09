@@ -11,8 +11,10 @@
 	<job id="job">
 		<step id="s1" parent="step1" next="fail"/>
 		<step id="fail" parent="failingStep">
-			<fail on="FAILED" exit-code="FAILED EARLY TERMINATION"/>
+			<next on="*" to="s2"/>
+			<fail on="FAILED" exit-code="EARLY TERMINATION"/>
 		</step>
+		<step id="s2" parent="step1"/>
 	</job>
 	
 </beans:beans>

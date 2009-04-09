@@ -48,7 +48,7 @@ public class FailTransitionJobParserTests extends AbstractJobParserTests {
 		assertTrue(stepNamesList.contains("fail"));
 
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		assertEquals("FAILED EARLY TERMINATION", jobExecution.getExitStatus()
+		assertEquals("EARLY TERMINATION", jobExecution.getExitStatus()
 				.getExitCode());
 
 		StepExecution stepExecution1 = getStepExecution(jobExecution, "s1");

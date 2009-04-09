@@ -199,7 +199,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 			catch (RepeatException e) {
 				throw e.getCause();
 			}
-			exitStatus = stepExecution.getExitStatus();
+			exitStatus = ExitStatus.COMPLETED.and(stepExecution.getExitStatus());
 
 			// Check if someone is trying to stop us
 			if (stepExecution.isTerminateOnly()) {
@@ -218,6 +218,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		finally {
 
 			try {
+				// Update the step execution to the latest known value so the listeners can act on it
+				stepExecution.setExitStatus(exitStatus);
 				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 			}
 			catch (Exception e) {
@@ -259,7 +261,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			StepSynchronizationManager.release();
 
-			logger.debug("Step execution complete: " + stepExecution);
+			logger.debug("Step execution complete: " + stepExecution.getSummary());
 		}
 	}
 

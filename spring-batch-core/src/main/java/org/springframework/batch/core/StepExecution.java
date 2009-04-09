@@ -500,11 +500,15 @@ public class StepExecution extends Entity {
 	}
 
 	public String toString() {
+		return String.format(getSummary() + ", exitDescription=%s", exitStatus.getExitDescription());
+	}
+
+	public String getSummary() {
 		return super.toString()
 				+ String.format(
 						", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
-								+ ", commitCount=%d, rollbackCount=%d", stepName, status, exitStatus, readCount,
-						filterCount, writeCount, readSkipCount, writeSkipCount, commitCount, rollbackCount);
+								+ ", commitCount=%d, rollbackCount=%d", stepName, status, exitStatus.getExitCode(),
+						readCount, filterCount, writeCount, readSkipCount, writeSkipCount, commitCount, rollbackCount);
 	}
 
 }
