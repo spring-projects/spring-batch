@@ -412,9 +412,9 @@
 			<url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
 		</site>
 		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone Repository</name>
-			<url>s3://repository.springsource.com/maven/bundles/milestone</url>
+			<id>spring-release</id>
+			<name>Spring Release Repository</name>
+			<url>s3://repository.springsource.com/maven/bundles/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
