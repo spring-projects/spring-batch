@@ -8,7 +8,7 @@
 		<!--  Use CDATA to keep it on a single line in the manifest -->
 		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
 	</description>
-	<version>2.0.0.CI-SNAPSHOT</version>
+	<version>2.0.0.RELEASE</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-parent</module>
@@ -22,12 +22,9 @@
 		<url>http://www.springsource.com</url>
 	</organization>
 	<scm>
-		<url>https://fisheye.springframework.org/browse/spring-batch
-		</url>
-		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk
-		</connection>
-		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/trunk
-		</developerConnection>
+		<url>https://fisheye.springframework.org/browse/spring-batch/tags/2.0.0.RELEASE</url>
+		<connection>scm:svn:https://src.springframework.org/svn/spring-batch/tags/2.0.0.RELEASE</connection>
+		<developerConnection>scm:svn:https://src.springframework.org/svn/spring-batch/tags/2.0.0.RELEASE</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
@@ -108,22 +105,22 @@
 									<postProcess>
 										<move todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/target/docbkx/html">
-												<include name="index.html"/>
+												<include name="index.html" />
 											</fileset>
 										</move>
 										<copy todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/src/docbkx/resources">
-												<include name="**/*.css"/>
-												<include name="**/*.png"/>
-												<include name="**/*.gif"/>
-												<include name="**/*.jpg"/>
+												<include name="**/*.css" />
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
 											</fileset>
 										</copy>
 										<copy todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/src/site/docbook/reference">
-												<include name="**/*.png"/>
-												<include name="**/*.gif"/>
-												<include name="**/*.jpg"/>
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
 											</fileset>
 										</copy>
 									</postProcess>
@@ -139,7 +136,7 @@
 									<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
 									<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
 									<postProcess>
-										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf" failonerror="false"/>
+										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf" failonerror="false" />
 									</postProcess>
 								</configuration>
 								<phase>pre-site</phase>
@@ -156,22 +153,22 @@
 									<postProcess>
 										<move todir="${basedir}/target/site/reference">
 											<fileset dir="${basedir}/target/docbkx">
-												<include name="**/*.html"/>
+												<include name="**/*.html" />
 											</fileset>
 										</move>
 										<copy todir="${basedir}/target/site/reference/html">
 											<fileset dir="${basedir}/src/docbkx/resources">
-												<include name="**/*.css"/>
-												<include name="**/*.png"/>
-												<include name="**/*.gif"/>
-												<include name="**/*.jpg"/>
+												<include name="**/*.css" />
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
 											</fileset>
 										</copy>
 										<copy todir="${basedir}/target/site/reference/html">
 											<fileset dir="${basedir}/src/site/docbook/reference">
-												<include name="**/*.png"/>
-												<include name="**/*.gif"/>
-												<include name="**/*.jpg"/>
+												<include name="**/*.png" />
+												<include name="**/*.gif" />
+												<include name="**/*.jpg" />
 											</fileset>
 										</copy>
 									</postProcess>
@@ -199,7 +196,7 @@
 						<configuration>
 							<includes>index.xml</includes>
 							<chunkedOutput>false</chunkedOutput>
-							<draftWatermarkImage/>
+							<draftWatermarkImage />
 							<htmlStylesheet>css/html.css</htmlStylesheet>
 							<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
 							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl
@@ -222,7 +219,7 @@
 								<phase>generate-sources</phase>
 								<configuration>
 									<tasks>
-										<copy file="pom.xml" todir="target"/>
+										<copy file="pom.xml" todir="target" />
 									</tasks>
 								</configuration>
 								<goals>
@@ -255,21 +252,21 @@
 									<tasks>
 										<unzip dest="target/it/with-dep">
 											<fileset dir="target">
-												<include name="*with-dep*.zip"/>
+												<include name="*with-dep*.zip" />
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true"/>
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
 										</unzip>
 										<unzip dest="target/it/no-dep">
 											<fileset dir="target">
-												<include name="*no-dep*.zip"/>
+												<include name="*no-dep*.zip" />
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true"/>
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
 										</unzip>
 										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
 											<condition>
 												<not>
 													<resourcecount count="9">
-														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar"/>
+														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
@@ -278,7 +275,7 @@
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar"/>
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="org.springframework.beans-*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
@@ -287,7 +284,7 @@
 											<condition>
 												<not>
 													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar"/>
+														<fileset id="fs" dir="target/it/with-dep/sources/lib" includes="com.springsource.org.junit-*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
