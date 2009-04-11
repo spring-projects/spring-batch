@@ -259,9 +259,9 @@
 			<url>file:///${user.dir}/target/staging/org.springframework.batch.archetype/${pom.artifactId}</url>
 		</site>
 		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone Repository</name>
-			<url>file:///${user.dir}/target/staging/milestone</url>
+			<id>spring-release</id>
+			<name>Spring Release Repository</name>
+			<url>file:///${user.dir}/target/staging/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
