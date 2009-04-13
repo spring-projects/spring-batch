@@ -18,7 +18,6 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Map;
 import java.util.Set;
 
-import org.springframework.batch.item.file.transform.RangeArrayPropertyEditor;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -44,6 +43,8 @@ public class CoreNamespaceUtils {
 
 	private static final String RANGE_ARRAY_CLASS_NAME = "org.springframework.batch.item.file.transform.Range[]";
 
+	private static final String RANGE_ARRAY_EDITOR_CLASS_NAME = "org.springframework.batch.item.file.transform.RangeArrayPropertyEditor";
+
 	protected static void checkForStepScope(ParserContext parserContext, Object source) {
 
 		boolean foundStepScope = false;
@@ -66,7 +67,7 @@ public class CoreNamespaceUtils {
 	}
 
 	/**
-	 * Register a RangeProperyEditor if one does not already exist.
+	 * Register a RangePropertyEditor if one does not already exist.
 	 * 
 	 * @param parserContext
 	 */
@@ -74,14 +75,17 @@ public class CoreNamespaceUtils {
 	protected static void addRangePropertyEditor(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!rangeArrayEditorAlreadyDefined(registry)) {
-			BeanDefinitionBuilder stepScopeBuilder = BeanDefinitionBuilder
-					.genericBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME);
-			AbstractBeanDefinition abd = stepScopeBuilder.getBeanDefinition();
-			abd.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+
+			AbstractBeanDefinition customEditorConfigurer = BeanDefinitionBuilder.genericBeanDefinition(
+					CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
+			customEditorConfigurer.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			ManagedMap editors = new ManagedMap();
-			editors.put(RANGE_ARRAY_CLASS_NAME, RangeArrayPropertyEditor.class);
-			abd.getPropertyValues().addPropertyValue("customEditors", editors);
-			registry.registerBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME, abd);
+			BeanDefinition value = BeanDefinitionBuilder.genericBeanDefinition(RANGE_ARRAY_EDITOR_CLASS_NAME)
+					.getBeanDefinition();
+			editors.put(RANGE_ARRAY_CLASS_NAME, value);
+			customEditorConfigurer.getPropertyValues().addPropertyValue("customEditors", editors);
+			registry.registerBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME, customEditorConfigurer);
+
 		}
 	}
 
