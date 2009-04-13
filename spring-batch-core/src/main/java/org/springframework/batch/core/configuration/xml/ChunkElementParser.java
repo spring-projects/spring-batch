@@ -99,9 +99,17 @@ public class ChunkElementParser {
 
 		if (!underspecified
 				&& propertyValues.contains("commitInterval") == propertyValues.contains("chunkCompletionPolicy")) {
-			parserContext.getReaderContext().error(
-					"The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR + "' "
-							+ "or '" + CHUNK_COMPLETION_POLICY_ATTR + "', but not both.", element);
+			if (propertyValues.contains("commitInterval")) {
+				parserContext.getReaderContext().error(
+						"The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR
+								+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "', but not both.", element);
+			}
+			else {
+				parserContext.getReaderContext().error(
+						"The <" + element.getNodeName() + "/> element must contain either '" + COMMIT_INTERVAL_ATTR
+								+ "' " + "or '" + CHUNK_COMPLETION_POLICY_ATTR + "'.", element);
+
+			}
 		}
 
 		String skipLimit = element.getAttribute("skip-limit");
