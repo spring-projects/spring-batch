@@ -97,10 +97,14 @@ public class TaskletStepTests {
 	}
 
 	private TaskletStep getStep(String[] strings) throws Exception {
+		return getStep(strings, 1);
+	}
+	
+	private TaskletStep getStep(String[] strings, int commitInterval) throws Exception {
 		TaskletStep step = new TaskletStep("stepName");
 		// Only process one item:
 		RepeatTemplate template = new RepeatTemplate();
-		template.setCompletionPolicy(new SimpleCompletionPolicy(1));
+		template.setCompletionPolicy(new SimpleCompletionPolicy(commitInterval));
 		step.setTasklet(new TestingChunkOrientedTasklet<String>(getReader(strings), itemWriter, template));
 		step.setJobRepository(new JobRepositorySupport());
 		step.setTransactionManager(transactionManager);
@@ -136,6 +140,32 @@ public class TaskletStepTests {
 		assertEquals(1, processed.size());
 		assertEquals(1, stepExecution.getReadCount());
 		assertEquals(1, stepExecution.getCommitCount());
+	}
+
+	@Test
+	public void testCommitCount_Even() throws Exception {
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		step = getStep(new String[] { "foo", "bar", "spam", "eggs" }, 2);
+		step.setTransactionManager(transactionManager);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
+		step.execute(stepExecution);
+		assertEquals(4, processed.size());
+		assertEquals(4, stepExecution.getReadCount());
+		assertEquals(4, stepExecution.getWriteCount());
+		assertEquals(3, stepExecution.getCommitCount()); //the empty chunk is the 3rd commit
+	}
+
+	@Test
+	public void testCommitCount_Uneven() throws Exception {
+		JobExecution jobExecutionContext = new JobExecution(jobInstance);
+		step = getStep(new String[] { "foo", "bar", "spam" }, 2);
+		step.setTransactionManager(transactionManager);
+		StepExecution stepExecution = new StepExecution(step.getName(), jobExecutionContext);
+		step.execute(stepExecution);
+		assertEquals(3, processed.size());
+		assertEquals(3, stepExecution.getReadCount());
+		assertEquals(3, stepExecution.getWriteCount());
+		assertEquals(2, stepExecution.getCommitCount());
 	}
 
 	@Test
