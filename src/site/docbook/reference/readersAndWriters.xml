@@ -648,7 +648,7 @@
         <title>FieldSetMapper</title>
 
         <para>The <classname>FieldSetMapper</classname> interface defines a
-        single method, <methodname>mapLine</methodname>, which takes a
+        single method, <methodname>mapFieldSet</methodname>, which takes a
         <classname>FieldSet</classname> object and maps its contents to an
         object. This object may be a custom DTO, a domain object, or a simple
         array, depending on the needs of the job. The
