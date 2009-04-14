@@ -487,7 +487,7 @@
 
       <para>The other properties in <classname>FlatFileItemReader</classname>
       allow you to further specify how your data will be interpreted: <table>
-          <title>Flat File Item Reader Properties</title>
+          <title>FlatFileItemReader Properties</title>
 
           <tgroup cols="3">
             <colspec align="center" />
@@ -504,6 +504,15 @@
 
             <tbody>
               <row>
+                <entry align="left">comments</entry>
+
+                <entry align="left">String[]</entry>
+
+                <entry align="left">Specifies line prefixes that indicate
+                comment rows</entry>
+              </row>
+
+              <row>
                 <entry align="left">encoding</entry>
 
                 <entry align="left">String</entry>
@@ -513,12 +522,13 @@
               </row>
 
               <row>
-                <entry align="left">comments</entry>
+                <entry align="left">lineMapper</entry>
 
-                <entry align="left">String[]</entry>
+                <entry align="left">LineMapper</entry>
 
-                <entry align="left">Specifies line prefixes that indicate
-                comment rows</entry>
+                <entry align="left">Converts a <classname>String</classname>
+                to an <classname>Object</classname> representing the
+                item.</entry>
               </row>
 
               <row>
@@ -531,7 +541,25 @@
               </row>
 
               <row>
-                <entry align="left">skippedLinesCallbackHandler</entry>
+                <entry align="left">recordSeparatorPolicy</entry>
+
+                <entry align="left">RecordSeparatorPolicy</entry>
+
+                <entry align="left">Used to determine where the line endings
+                are and do things like continue over a line ending if inside a
+                quoted string.</entry>
+              </row>
+
+              <row>
+                <entry align="left">resource</entry>
+
+                <entry align="left">Resource</entry>
+
+                <entry align="left">The resource from which to read.</entry>
+              </row>
+
+              <row>
+                <entry align="left">skippedLinesCallback</entry>
 
                 <entry align="left">LineCallbackHandler</entry>
 
@@ -541,25 +569,13 @@
               </row>
 
               <row>
-                <entry align="left">firstLineIsHeader</entry>
+                <entry align="left">strict</entry>
 
                 <entry align="left">boolean</entry>
 
-                <entry align="left">Indicates that the first line of the file
-                is a header containing field names. If the column names have
-                not been set yet and the tokenizer extends
-                AbstractLineTokenizer, field names will be set automatically
-                from this line</entry>
-              </row>
-
-              <row>
-                <entry align="left">recordSeparatorPolicy</entry>
-
-                <entry align="left">RecordSeparatorPolicy</entry>
-
-                <entry align="left">Used to determine where the line endings
-                are and do things like continue over a line ending if inside a
-                quoted string.</entry>
+                <entry align="left">In strict mode, the reader will throw an
+                exception on ExecutionContext if the input resource does not
+                exist.</entry>
               </row>
             </tbody>
           </tgroup>
