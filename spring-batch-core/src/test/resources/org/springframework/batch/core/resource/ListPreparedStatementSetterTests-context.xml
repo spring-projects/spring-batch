@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/batch" 
+	xmlns:beans="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       		http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       		http://www.springframework.org/schema/batch
+       		http://www.springframework.org/schema/batch/spring-batch-2.0.xsd">
+
+	<job id="pssJob">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="reader" writer="writer" commit-interval="1"/>
+			</tasklet>
+		</step>
+	</job>
+	
+	<job-repository id="jobRepository"/>
+
+	<beans:bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<beans:property name="jobRepository" ref="jobRepository" />
+	</beans:bean>
+
+	<beans:bean id="reader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
+		<beans:property name="dataSource" ref="dataSource"/>
+		<beans:property name="sql" value="select ID, NAME, VALUE from FOO where ID >= ?"/>
+		<beans:property name="preparedStatementSetter" ref="pss"/>
+		<beans:property name="rowMapper">
+			<beans:bean class="org.springframework.batch.core.resource.FooRowMapper"/>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="pss" class="org.springframework.batch.core.resource.ListPreparedStatementSetter" scope="step">
+		<beans:property name="parameters">
+			<beans:value>#{jobParameters[start.id]}</beans:value>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="writer" class="org.springframework.batch.core.resource.ListPreparedStatementSetterTests$FooStoringItemWriter"/>
+	
+</beans:beans>
