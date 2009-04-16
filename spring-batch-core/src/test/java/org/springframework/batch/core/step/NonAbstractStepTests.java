@@ -24,7 +24,7 @@ import org.springframework.util.Assert;
 /**
  * Tests for {@link AbstractStep}.
  */
-public class AbstractStepTests {
+public class NonAbstractStepTests {
 
 	AbstractStep tested = new EventTrackingStep();
 
@@ -188,9 +188,6 @@ public class AbstractStepTests {
 				.containsKey("afterStep"));
 	}
 
-	/**
-	 * Exception during business processing.
-	 */
 	@Test
 	public void testFailure() throws Exception {
 		tested = new EventTrackingStep() {
@@ -225,7 +222,6 @@ public class AbstractStepTests {
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("afterStep"));
 	}
-
 	/**
 	 * Exception during business processing.
 	 */
@@ -257,6 +253,30 @@ public class AbstractStepTests {
 		assertEquals(7, events.size());
 
 		assertEquals("STOPPED", execution.getExitStatus().getExitCode());
+
+		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
+				.containsKey("afterStep"));
+	}
+
+	@Test
+	public void testStoppedStepWithCustomStatus() throws Exception {
+		tested = new EventTrackingStep() {
+			@Override
+			protected void doExecute(StepExecution context) throws Exception {
+				super.doExecute(context);
+				context.setTerminateOnly();
+				context.setExitStatus(new ExitStatus("FUNNY"));
+			}
+		};
+		tested.setJobRepository(repository);
+		tested.setStepExecutionListeners(new StepExecutionListener[] { listener1, listener2 });
+
+		tested.execute(execution);
+		assertEquals(BatchStatus.STOPPED, execution.getStatus());
+		Throwable expected = execution.getFailureExceptions().get(0);
+		assertEquals("JobExecution interrupted.", expected.getMessage());
+
+		assertEquals("FUNNY", execution.getExitStatus().getExitCode());
 
 		assertTrue("Execution context modifications made by listener should be persisted", repository.saved
 				.containsKey("afterStep"));
