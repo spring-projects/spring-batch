@@ -184,7 +184,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 		stepExecution.setStatus(BatchStatus.STARTED);
 		getJobRepository().update(stepExecution);
 
-		ExitStatus exitStatus = ExitStatus.FAILED;
+		// Start with a default value that will be trumped by anything
+		ExitStatus exitStatus = ExitStatus.EXECUTING;
 		Exception commitException = null;
 
 		StepSynchronizationManager.register(stepExecution);
