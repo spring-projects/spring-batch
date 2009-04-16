@@ -220,6 +220,7 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 
 			try {
 				// Update the step execution to the latest known value so the listeners can act on it
+				exitStatus = exitStatus.and(stepExecution.getExitStatus());
 				stepExecution.setExitStatus(exitStatus);
 				exitStatus = exitStatus.and(getCompositeListener().afterStep(stepExecution));
 			}

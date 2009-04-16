@@ -86,6 +86,19 @@ public class TaskletStepExceptionTests {
 	}
 
 	@Test
+	public void testInterruptedWithCustomStatus() throws Exception {
+		taskletStep.setTasklet(new Tasklet() {
+			public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+				contribution.setExitStatus(new ExitStatus("FUNNY"));
+				throw new JobInterruptedException("Planned");
+			}
+		});
+		taskletStep.execute(stepExecution);
+		assertEquals(STOPPED, stepExecution.getStatus());
+		assertEquals("FUNNY", stepExecution.getExitStatus().getExitCode());
+	}
+
+	@Test
 	public void testOpenFailure() throws Exception {
 		final RuntimeException exception = new RuntimeException();
 		taskletStep.setStreams(new ItemStream[] { new ItemStreamSupport() {
