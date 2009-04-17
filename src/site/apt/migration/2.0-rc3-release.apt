@@ -3,29 +3,47 @@ Spring Batch 2.0.0.RELEASE Release Notes
 * Bug
 
     * {{{http://jira.springframework.org/browse/BATCH-1170}BATCH-1170}} - When using FixedLengthTokenizer and FixedLengthLineAggregator, can not read the record correctly with parameters like [p:columns="1-9,10-19,20-29,30-39,40-49"] in the configuration file.
+
     * {{{http://jira.springframework.org/browse/BATCH-1185}BATCH-1185}} - Job slows when step scope is used
+
     * {{{http://jira.springframework.org/browse/BATCH-1187}BATCH-1187}} - Step shouldn't exit with status=EXECUTING
+
     * {{{http://jira.springframework.org/browse/BATCH-1188}BATCH-1188}} - Build fails for bundlor SNAPSHOT used for Batch since it conflicts with more recent one
+
     * {{{http://jira.springframework.org/browse/BATCH-1192}BATCH-1192}} - Error in documentation section 4.2.3 - In-Memory Repository
+
     * {{{http://jira.springframework.org/browse/BATCH-1196}BATCH-1196}} - ExecutionContext not re-hydrated by JdbcJobExecutionDao
+
     * {{{http://jira.springframework.org/browse/BATCH-1197}BATCH-1197}} - Rerunning a job sometimes creates new job instance
+
     * {{{http://jira.springframework.org/browse/BATCH-1198}BATCH-1198}} - processSkipCount and filterCount mixed up
+
     * {{{http://jira.springframework.org/browse/BATCH-1201}BATCH-1201}} - Listener Annotations don't allow parameters to be subtypes of expected types
 
 * Improvement
 
     * {{{http://jira.springframework.org/browse/BATCH-1095}BATCH-1095}} - Throw exception if late binding fails
+
     * {{{http://jira.springframework.org/browse/BATCH-1150}BATCH-1150}} - Update StepExecutionPreparedStatementSetter to no longer be a listener
+
     * {{{http://jira.springframework.org/browse/BATCH-1172}BATCH-1172}} - Register RangeArrayPropertyEditor automatically
+
     * {{{http://jira.springframework.org/browse/BATCH-1177}BATCH-1177}} - Allow ValidatingItemProcessor to filter items on ValidationException
+
     * {{{http://jira.springframework.org/browse/BATCH-1189}BATCH-1189}} - By default, all exceptions should be fatal
+
     * {{{http://jira.springframework.org/browse/BATCH-1190}BATCH-1190}} - Navigation pane for Modules pages have bad links
+
     * {{{http://jira.springframework.org/browse/BATCH-1191}BATCH-1191}} - site:deploy - Missing distribution management information in the project
+
     * {{{http://jira.springframework.org/browse/BATCH-1200}BATCH-1200}} - Update JavaDocs for Listener Annotations
 
 * Task
 
     * {{{http://jira.springframework.org/browse/BATCH-834}BATCH-834}} - Review stop signal handling at JobExecution
+
     * {{{http://jira.springframework.org/browse/BATCH-1042}BATCH-1042}} - Add 'Whats New in 2.0" chapter to docs
+
     * {{{http://jira.springframework.org/browse/BATCH-1194}BATCH-1194}} - Swicth Eclipse meta data to m2eclipse
+
     * {{{http://jira.springframework.org/browse/BATCH-1195}BATCH-1195}} - Add "Common Pattern" for passing data from one step to another
