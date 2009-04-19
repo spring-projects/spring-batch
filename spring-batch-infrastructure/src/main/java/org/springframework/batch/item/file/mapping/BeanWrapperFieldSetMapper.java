@@ -16,6 +16,7 @@
 
 package org.springframework.batch.item.file.mapping;
 
+import java.beans.PropertyEditor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +25,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.support.DefaultPropertyEditorRegistrar;
 import org.springframework.beans.BeanWrapperImpl;
@@ -43,19 +43,25 @@ import org.springframework.validation.ObjectError;
 
 /**
  * {@link FieldSetMapper} implementation based on bean property paths. The
- * {@link DefaultFieldSet} to be mapped should have field name meta data
- * corresponding to bean property paths in a prototype instance of the desired
- * type. The prototype instance is initialized either by referring to to object
- * by bean name in the enclosing BeanFactory, or by providing a class to
- * instantiate reflectively.<br/>
+ * {@link FieldSet} to be mapped should have field name meta data corresponding
+ * to bean property paths in an instance of the desired type. The instance is
+ * created and initialized either by referring to to a prototype object by bean
+ * name in the enclosing BeanFactory, or by providing a class to instantiate
+ * reflectively.<br/><br/>
  * 
  * Nested property paths, including indexed properties in maps and collections,
- * can be referenced by the {@link DefaultFieldSet} names. They will be
- * converted to nested bean properties inside the prototype. The
- * {@link DefaultFieldSet} and the prototype are thus tightly coupled by the
- * fields that are available and those that can be initialized. If some of the
- * nested properties are optional (e.g. collection members) they need to be
- * removed by a post processor.<br/>
+ * can be referenced by the {@link FieldSet} names. They will be converted to
+ * nested bean properties inside the prototype. The {@link FieldSet} and the
+ * prototype are thus tightly coupled by the fields that are available and those
+ * that can be initialized. If some of the nested properties are optional (e.g.
+ * collection members) they need to be removed by a post processor.<br/><br/>
+ * 
+ * To customize the way that {@link FieldSet} values are converted to the
+ * desired type for injecting into the prototype there are several choices. You
+ * can inject {@link PropertyEditor} instances directly through the
+ * {@link #setCustomEditors(Map) customEditors} property, or you can override
+ * the {@link #createBinder(Object)} and {@link #initBinder(DataBinder)}
+ * methods, or you can provide a custom {@link FieldSet} implementation.<br/><br/>
  * 
  * Property name matching is "fuzzy" in the sense that it tolerates close
  * matches, as long as the match is unique. For instance:
@@ -90,7 +96,7 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	private static Map<Class<?>, Map<String, String>> propertiesMatched = new HashMap<Class<?>, Map<String, String>>();
 
 	private static int distanceLimit = 5;
-	
+
 	private boolean strict = true;
 
 	/*
@@ -147,12 +153,12 @@ public class BeanWrapperFieldSetMapper<T> extends DefaultPropertyEditorRegistrar
 	}
 
 	/**
-	 * Map the {@link DefaultFieldSet} to an object retrieved from the enclosing
-	 * Spring context, or to a new instance of the required type if no prototype
-	 * is available.
+	 * Map the {@link FieldSet} to an object retrieved from the enclosing Spring
+	 * context, or to a new instance of the required type if no prototype is
+	 * available.
 	 * 
-	 * @throws NotWritablePropertyException if the {@link DefaultFieldSet}
-	 * contains a field that cannot be mapped to a bean property.
+	 * @throws NotWritablePropertyException if the {@link FieldSet} contains a
+	 * field that cannot be mapped to a bean property.
 	 * @throws BindingException if there is a type conversion or other error (if
 	 * the {@link DataBinder} from {@link #createBinder(Object)} has errors
 	 * after binding).
