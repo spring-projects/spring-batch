@@ -481,7 +481,7 @@
       how to locate the files to be processed. Spring Batch begins the process
       of feeding the data into the pipe from this starting point. However,
       <ulink
-      url="http://static.springframework.org/spring/docs/2.5.x/reference/resources.html"><citetitle>Spring
+      url="http://www.springsource.org/spring-integration"><citetitle>Spring
       Integration</citetitle></ulink> provides many of these types of
       services.</para>
 
