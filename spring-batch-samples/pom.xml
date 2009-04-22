@@ -103,11 +103,12 @@
 			<groupId>com.mysql.jdbc</groupId>
 			<artifactId>com.springsource.com.mysql.jdbc</artifactId>
 			<version>5.1.6</version>
-			<scope>test</scope>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>com.springsource.org.hsqldb</artifactId>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -121,7 +122,6 @@
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>com.springsource.com.thoughtworks.xstream</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -173,19 +173,22 @@
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>com.springsource.net.sourceforge.jtds</artifactId>
 			<version>1.2.2</version>
-			<scope>test</scope>
+			<optional>true</optional>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle.jdbc</groupId>
 			<artifactId>com.springsource.oracle.jdbc</artifactId>
 			<version>10.2.0.2</version>
-			<scope>test</scope>
+			<optional>true</optional>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>com.springsource.org.postgresql.jdbc3</artifactId>
 			<version>8.3.603</version>
-			<scope>test</scope>
+			<optional>true</optional>
+			<scope>runtime</scope>
 		</dependency>
 		<!-- db2 driver needs to be installed locally in maven first -->
 		<!--
@@ -197,7 +200,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.aop</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.ws</groupId>
@@ -230,7 +232,8 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>org.springframework.web</artifactId>
-			<scope>test</scope>
+			<optional>true</optional>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 	<build>
