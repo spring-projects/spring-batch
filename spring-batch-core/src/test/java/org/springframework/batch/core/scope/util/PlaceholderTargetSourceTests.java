@@ -40,6 +40,10 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	private PlaceholderTargetSource withMultiple;
 
 	@Autowired
+	@Qualifier("withMultipleStartAndEnd")
+	private PlaceholderTargetSource withMultipleStartAndEnd;
+
+	@Autowired
 	@Qualifier("withEmbeddedDate")
 	private PlaceholderTargetSource withEmbeddedDate;
 
@@ -156,6 +160,12 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	}
 
 	@Test
+	public void testGetMultipleStartAndEnd() {
+		Node target = (Node) withMultipleStartAndEnd.getTarget();
+		assertEquals("4321-4321", target.getName());
+	}
+
+	@Test
 	public void testGetEmbeddedDate() {
 		Node target = (Node) withEmbeddedDate.getTarget();
 		String date = new SimpleDateFormat("yyyy/MM/dd").format(new Date(1L));
@@ -165,7 +175,9 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	@Test
 	public void testGetDate() {
 		Node target = (Node) withDate.getTarget();
-		assertEquals(1L, target.getDate().getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		String date = sdf.format(new Date(1L));
+		assertEquals(date, sdf.format(target.getDate()));
 	}
 
 	public static interface Node {

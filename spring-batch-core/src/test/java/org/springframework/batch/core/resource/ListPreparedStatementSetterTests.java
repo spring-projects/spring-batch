@@ -29,7 +29,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.AbstractJob;
@@ -113,9 +112,10 @@ public class ListPreparedStatementSetterTests {
 			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 0, "zero", 0);
 			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 1, "one", 1);
 			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 2, "two", 2);
+			this.simpleJdbcTemplate.update("insert into FOO values (?,?,?)", 3, "three", 3);
 
-			JobParameters params = new JobParametersBuilder().addLong("start.id", 1L).toJobParameters();
-			JobExecution jobExecution = this.jobLauncher.run(this.job, params);
+			JobParametersBuilder builder = new JobParametersBuilder().addLong("min.id", 1L).addLong("max.id", 2L);
+			JobExecution jobExecution = this.jobLauncher.run(this.job, builder.toJobParameters());
 			assertEquals(BatchStatus.COMPLETED, jobExecution.getStatus());
 
 			List<Foo> foos = fooStoringItemWriter.getFoos();

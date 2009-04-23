@@ -170,15 +170,6 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 					if (!strVal.contains(PLACEHOLDER_PREFIX)) {
 						return strVal;
 					}
-					if (strVal.startsWith(PLACEHOLDER_PREFIX) && strVal.endsWith(PLACEHOLDER_SUFFIX)) {
-						// If the whole value is a placeholder it might
-						// be possible to replace it all in one go as a
-						// String (e.g. if it's a ref=#{})
-						StringBuilder result = new StringBuilder(strVal);
-						String key = extractKey(strVal);
-						replaceIfTypeMatches(result, 0, strVal.length() - 1, key, String.class, typeConverter);
-						return result.toString();
-					}
 					return replacePlaceholders(strVal, contextTypeConverter);
 				}
 			}) {
@@ -327,7 +318,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 			replaced |= replaceIfTypeMatches(result, first, next, key, Integer.class, typeConverter);
 			replaced |= replaceIfTypeMatches(result, first, next, key, Date.class, typeConverter);
 			if (!replaced) {
-				throw new IllegalStateException("Cannot bind to placeholder: "+key);
+				logger.debug("Cannot bind to placeholder: " + key);
 			}
 			first = result.indexOf(PLACEHOLDER_PREFIX, first + 1);
 			next = result.indexOf(PLACEHOLDER_SUFFIX, first + 1);

@@ -22,9 +22,9 @@
 	</beans:bean>
 
 	<beans:bean id="reader" class="org.springframework.batch.item.database.JdbcCursorItemReader">
-		<beans:property name="dataSource" ref="dataSource"/>
-		<beans:property name="sql" value="select ID, NAME, VALUE from FOO where ID >= ?"/>
+		<beans:property name="sql" value="select ID, NAME, VALUE from FOO where ID &gt;= ? and ID &lt;= ?"/>
 		<beans:property name="preparedStatementSetter" ref="pss"/>
+		<beans:property name="dataSource" ref="dataSource"/>
 		<beans:property name="rowMapper">
 			<beans:bean class="org.springframework.batch.core.resource.FooRowMapper"/>
 		</beans:property>
@@ -32,7 +32,10 @@
 
 	<beans:bean id="pss" class="org.springframework.batch.core.resource.ListPreparedStatementSetter" scope="step">
 		<beans:property name="parameters">
-			<beans:value>#{jobParameters[start.id]}</beans:value>
+			<beans:list>
+				<beans:value>#{jobParameters[min.id]}</beans:value>
+				<beans:value>#{jobParameters[max.id]}</beans:value>
+			</beans:list>
 		</beans:property>
 	</beans:bean>
 
