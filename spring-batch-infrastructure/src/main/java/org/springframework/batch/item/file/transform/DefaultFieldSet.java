@@ -321,7 +321,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * @see org.springframework.batch.item.file.mapping.IFieldSet#readLong(int)
 	 */
 	public long readLong(int index) {
-		return (Long) parseNumber(readAndTrim(index));
+		return parseNumber(readAndTrim(index)).longValue();
 	}
 
 	/*
@@ -385,7 +385,7 @@ public class DefaultFieldSet implements FieldSet {
 	 * org.springframework.batch.item.file.mapping.IFieldSet#readDouble(int)
 	 */
 	public double readDouble(int index) {
-		return (Double) parseNumber(readAndTrim(index));
+		return (Double) parseNumber(readAndTrim(index)).doubleValue();
 	}
 
 	/*

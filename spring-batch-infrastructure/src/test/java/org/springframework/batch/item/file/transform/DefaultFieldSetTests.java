@@ -112,10 +112,26 @@ public class DefaultFieldSetTests {
 	}
 
 	@Test
+	public void testReadIntegerAsFloat() throws Exception {
+
+		assertEquals(354224, fieldSet.readFloat(5), .001);
+		assertEquals(354224, fieldSet.readFloat("Integer"), .001);
+
+	}
+
+	@Test
 	public void testReadFloat() throws Exception {
 
 		assertTrue(fieldSet.readFloat(7) == 124.3F);
 		assertTrue(fieldSet.readFloat("Float") == 124.3F);
+
+	}
+
+	@Test
+	public void testReadIntegerAsDouble() throws Exception {
+
+		assertEquals(354224, fieldSet.readDouble(5), .001);
+		assertEquals(354224, fieldSet.readDouble("Integer"), .001);
 
 	}
 
