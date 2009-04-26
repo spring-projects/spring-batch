@@ -24,8 +24,8 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.springframework.build.repository</groupId>
-						<artifactId>org.springframework.build.repository.maven</artifactId>
+						<groupId>org.springframework.build.converter</groupId>
+						<artifactId>org.springframework.build.converter.maven</artifactId>
 						<version>1.0.0.CI-SNAPSHOT</version>
 						<executions>
 							<execution>
