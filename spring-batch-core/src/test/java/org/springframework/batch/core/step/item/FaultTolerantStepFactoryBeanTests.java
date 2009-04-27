@@ -33,6 +33,7 @@ import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.ItemStreamReader;
 import org.springframework.batch.item.ItemWriter;
@@ -695,6 +696,56 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}
 
+	/**
+	 * Check ItemStream is opened
+	 */
+	@Test
+	public void testNestedItemStreamOpened() throws Exception {
+
+		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+			public void close() throws ItemStreamException {
+			}
+
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			public String read() throws Exception, UnexpectedInputException, ParseException {
+				return null;
+			}
+		};
+
+		ItemStreamReader<String> stream = new ItemStreamReader<String>() {
+			public void close() throws ItemStreamException {
+				closed = true;
+			}
+
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
+				opened = true;
+			}
+
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			public String read() throws Exception, UnexpectedInputException, ParseException {
+				return null;
+			}
+		};
+
+		factory.setItemReader(reader);
+		factory.setStreams(new ItemStream[] {stream, reader});
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+
+		assertTrue(opened);
+		assertTrue(closed);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+	}
+	
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
 		private final Collection<String> failures;
 

@@ -262,8 +262,9 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	protected void registerStreams(TaskletStep step, ItemStream[] streams) {
 		CompositeItemStream composite = new CompositeItemStream();
 		boolean streamIsReader = false;
-		for (final ItemStream stream : streams) {
-			if (stream instanceof ItemReader) {
+		ItemReader<? extends T> itemReader = getItemReader();
+		for (ItemStream stream : streams) {
+			if (stream == itemReader) {
 				streamIsReader = true;
 				composite.register(stream);
 			}
@@ -279,7 +280,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 			step.registerStream(chunkMonitor);
 			boolean concurrent = taskExecutor != null && !(taskExecutor instanceof SyncTaskExecutor);
 			if (!concurrent) {
-				chunkMonitor.setItemReader(getItemReader());
+				chunkMonitor.setItemReader(itemReader);
 			}
 			else {
 				logger.warn("Synchronous TaskExecutor detected (" + taskExecutor.getClass()
