@@ -80,9 +80,7 @@ public class CoreNamespaceUtils {
 					CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
 			customEditorConfigurer.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			ManagedMap editors = new ManagedMap();
-			BeanDefinition value = BeanDefinitionBuilder.genericBeanDefinition(RANGE_ARRAY_EDITOR_CLASS_NAME)
-					.getBeanDefinition();
-			editors.put(RANGE_ARRAY_CLASS_NAME, value);
+			editors.put(RANGE_ARRAY_CLASS_NAME, RANGE_ARRAY_EDITOR_CLASS_NAME);
 			customEditorConfigurer.getPropertyValues().addPropertyValue("customEditors", editors);
 			registry.registerBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME, customEditorConfigurer);
 
