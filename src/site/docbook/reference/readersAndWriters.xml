@@ -2200,13 +2200,13 @@
         database has its own strategy for providing paging support, we need to
         use a different <classname>PagingQueryProvider</classname> for each
         supported database type. There is also the
-        <classname>SimpleDelegatingPagingQueryProvider</classname> that will
+        <classname>SqlPagingQueryProviderFactoryBean</classname> that will
         auto-detect the database that is being used and determine the
         appropriate <classname>PagingQueryProvider</classname> implementation.
         This simplifies the configuration and is the recommended best
         practice.</para>
 
-        <para>The <classname>SimpleDelegatingPagingQueryProvider</classname>
+        <para>The <classname>SqlPagingQueryProviderFactoryBean</classname>
         requires that you specify a select clause and a from clause. You can
         also provide an optional where clause. These clauses will be used to
         build an SQL statement combined with the required sortKey.</para>
@@ -2223,7 +2223,7 @@
         class="org.springframework.batch.item.database.JdbcPagingItemReader"&gt;
         &lt;property name="dataSource" ref="dataSource"/&gt;
         &lt;property name="queryProvider"&gt;
-            &lt;bean class="org.springframework.batch.item.database.support.SimpleDelegatingPagingQueryProvider"&gt;
+            &lt;bean class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean"&gt;
                 &lt;property name="selectClause" value="select id, name, credit"/&gt;
                 &lt;property name="fromClause" value="from customer"/&gt;
                 &lt;property name="whereClause" value="where status=:status"/&gt;
