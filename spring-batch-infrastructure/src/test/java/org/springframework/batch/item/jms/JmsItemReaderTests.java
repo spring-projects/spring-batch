@@ -27,6 +27,7 @@ import javax.jms.Message;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.springframework.jms.core.JmsOperations;
+import org.springframework.jms.core.JmsTemplate;
 
 public class JmsItemReaderTests {
 
@@ -103,6 +104,20 @@ public class JmsItemReaderTests {
 		itemReader.setItemType(Message.class);
 		assertEquals(message, itemReader.read());
 		EasyMock.verify(jmsTemplate);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testTemplateWithNoDefaultDestination() throws Exception {
+		JmsTemplate jmsTemplate = new JmsTemplate();
+		jmsTemplate.setReceiveTimeout(100L);
+		itemReader.setJmsTemplate(jmsTemplate);		
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testTemplateWithNoTimeout() throws Exception {
+		JmsTemplate jmsTemplate = new JmsTemplate();
+		jmsTemplate.setDefaultDestinationName("foo");
+		itemReader.setJmsTemplate(jmsTemplate);		
 	}
 
 }

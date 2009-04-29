@@ -51,6 +51,17 @@ public class JmsItemReader<T> implements ItemReader<T> {
 	 */
 	public void setJmsTemplate(JmsOperations jmsTemplate) {
 		this.jmsTemplate = jmsTemplate;
+		if (jmsTemplate instanceof JmsTemplate) {
+			JmsTemplate template = (JmsTemplate) jmsTemplate;
+			Assert
+					.isTrue(
+							template.getReceiveTimeout() != JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT,
+							"JmsTemplate must have a receive timeout!");
+			Assert
+					.isTrue(template.getDefaultDestination() != null
+							|| template.getDefaultDestinationName() != null,
+							"JmsTemplate must have a defaultDestination or defaultDestinationName!");
+		}
 	}
 
 	/**
