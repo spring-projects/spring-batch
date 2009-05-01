@@ -19,7 +19,6 @@ package org.springframework.batch.test;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 
 import junit.framework.Assert;
 
@@ -47,9 +46,6 @@ public abstract class AssertFile {
 			Assert.assertEquals("More lines than expected.  There should not be a line number " + lineNum + ".", null,
 					actualLine);
 		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 		finally {
 			expectedReader.close();
 			actualReader.close();
@@ -58,5 +54,23 @@ public abstract class AssertFile {
 
 	public static void assertFileEquals(Resource expected, Resource actual) throws Exception {
 		AssertFile.assertFileEquals(expected.getFile(), actual.getFile());
+	}
+
+	public static void assertLineCount(int expectedLineCount, File file) throws Exception {
+		BufferedReader expectedReader = new BufferedReader(new FileReader(file));
+		try {
+			int lineCount = 0;
+			while (expectedReader.readLine() != null) {
+				lineCount++;
+			}
+			Assert.assertEquals(expectedLineCount, lineCount);
+		}
+		finally {
+			expectedReader.close();
+		}
+	}
+
+	public static void assertLineCount(int expectedLineCount, Resource resource) throws Exception {
+		AssertFile.assertLineCount(expectedLineCount, resource.getFile());
 	}
 }

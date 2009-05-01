@@ -85,4 +85,9 @@ public class AssertFileTests {
 		AssertFile.assertFileEquals(new FileSystemResource(DIRECTORY + expected), new FileSystemResource(DIRECTORY
 				+ actual));
 	}
+
+	@Test
+	public void testAssertLineCount() throws Exception {
+		AssertFile.assertLineCount(5, new FileSystemResource(DIRECTORY + "input1.txt"));
+	}
 }
