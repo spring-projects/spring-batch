@@ -96,6 +96,10 @@ public class HibernateItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	protected void doWrite(HibernateOperations hibernateTemplate, List<? extends T> items) {
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("Writing to Hibernate with " + items.size() + " items.");
+		}
+
 		if (!items.isEmpty()) {
 			long saveOrUpdateCount = 0;
 			for (T item : items) {

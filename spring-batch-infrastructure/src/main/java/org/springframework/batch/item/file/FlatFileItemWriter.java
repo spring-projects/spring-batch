@@ -25,11 +25,14 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
+import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.util.ExecutionContextUserSupport;
 import org.springframework.batch.item.util.FileUtils;
@@ -55,6 +58,8 @@ import org.springframework.util.ClassUtils;
  */
 public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implements ResourceAwareItemWriterItemStream<T>,
 		InitializingBean {
+
+	protected static final Log logger = LogFactory.getLog(JdbcBatchItemWriter.class);
 
 	private static final String DEFAULT_LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -180,6 +185,10 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 
 		if (!getOutputState().isInitialized()) {
 			throw new WriterNotOpenException("Writer must be open before it can be written to");
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("Writing to flat file with " + items.size() + " items.");
 		}
 
 		OutputState state = getOutputState();

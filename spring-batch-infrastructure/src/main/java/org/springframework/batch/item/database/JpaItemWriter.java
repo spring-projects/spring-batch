@@ -96,6 +96,10 @@ public class JpaItemWriter<T> implements ItemWriter<T>, InitializingBean {
 	 */
 	protected void doWrite(EntityManager entityManager, List<? extends T> items) {
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("Writing to JPA with " + items.size() + " items.");
+		}
+
 		if (!items.isEmpty()) {
 			long mergeCount = 0;
 			for (T item : items) {
