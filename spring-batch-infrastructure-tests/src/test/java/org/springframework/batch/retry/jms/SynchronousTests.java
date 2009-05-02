@@ -169,8 +169,8 @@ public class SynchronousTests {
 
 		JmsItemReader<Object> provider = new JmsItemReader<Object>();
 		// provider.setItemType(Message.class);
-		provider.setJmsTemplate(jmsTemplate);
 		jmsTemplate.setDefaultDestinationName("queue");
+		provider.setJmsTemplate(jmsTemplate);
 
 		final Object item = provider.read();
 
