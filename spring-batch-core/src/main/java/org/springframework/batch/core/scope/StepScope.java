@@ -73,7 +73,7 @@ import org.springframework.util.StringValueResolver;
  * @since 2.0
  */
 public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
-	
+
 	private Log logger = LogFactory.getLog(getClass());
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
@@ -99,7 +99,18 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	private String name = "step";
 
-	private boolean proxyTargetClass;
+	private boolean proxyTargetClass = false;
+
+	/**
+	 * Flag to indicate that proxies should use dynamic subclassing. This allows
+	 * classes with no interface to be proxied.  Defaults to false.
+	 * 
+	 * @param proxyTargetClass set to true to have proxies created using dynamic
+	 * subclasses
+	 */
+	public void setProxyTargetClass(boolean proxyTargetClass) {
+		this.proxyTargetClass = proxyTargetClass;
+	}
 
 	/**
 	 * @see Scope#get(String, ObjectFactory)
@@ -178,9 +189,9 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 	 * @throws BeansException if there is a problem.
 	 */
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		
+
 		beanFactory.registerScope(name, this);
-		
+
 		Assert.state(beanFactory instanceof BeanDefinitionRegistry,
 				"BeanFactory was not a BeanDefinitionRegistry, so StepScope cannot be used.");
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
@@ -273,7 +284,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				BeanDefinition definition = (BeanDefinition) value;
 				if (scope.equals(definition.getScope())) {
 					String beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
-					// Exit here so that nested inner bean definitions are not analysed
+					// Exit here so that nested inner bean definitions are not
+					// analysed
 					return createScopedProxy(beanName, definition, registry, proxyTargetClass);
 				}
 			}
@@ -281,7 +293,8 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				BeanDefinitionHolder holder = (BeanDefinitionHolder) value;
 				BeanDefinition definition = holder.getBeanDefinition();
 				if (scope.equals(definition.getScope())) {
-					// Exit here so that nested inner bean definitions are not analysed
+					// Exit here so that nested inner bean definitions are not
+					// analysed
 					return createScopedProxy(holder.getBeanName(), definition, registry, proxyTargetClass);
 				}
 			}
