@@ -162,8 +162,9 @@ public class PlaceholderProxyFactoryBean extends ProxyConfig implements FactoryB
 
 		if (proxyTargetClass) {
 			targetDefinition.setAttribute(AutoProxyUtils.PRESERVE_TARGET_CLASS_ATTRIBUTE, Boolean.TRUE);
-			// ProxyFactoryBean's "proxyTargetClass" default is TRUE, so we
-			// don't need to set it explicitly here.
+			// ProxyFactoryBean's "proxyTargetClass" default is FALSE, so we
+			// need to set it explicitly here.
+			proxyDefinition.getPropertyValues().addPropertyValue("proxyTargetClass", Boolean.TRUE);
 		}
 		else {
 			proxyDefinition.getPropertyValues().addPropertyValue("proxyTargetClass", Boolean.FALSE);
