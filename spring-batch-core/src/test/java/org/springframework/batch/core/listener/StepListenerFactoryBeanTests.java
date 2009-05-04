@@ -241,7 +241,9 @@ public class StepListenerFactoryBeanTests {
 			}
 		};
 		ProxyFactory factory = new ProxyFactory(delegate);
-		assertTrue(StepListenerFactoryBean.isListener(factory.getProxy()));
+		Object proxy = factory.getProxy();
+		assertTrue(StepListenerFactoryBean.isListener(proxy));
+		((StepExecutionListener) StepListenerFactoryBean.getListener(proxy)).beforeStep(null);
 	}
 
 	@Test

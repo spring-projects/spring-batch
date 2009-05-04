@@ -45,7 +45,7 @@
 		</batch:tasklet>
 	</batch:step>
 
-	<bean id="fileNameListener" class="org.springframework.batch.sample.common.OutputFileListener" />
+	<bean id="fileNameListener" class="org.springframework.batch.sample.common.OutputFileListener" scope="step"/>
 
 	<bean id="itemReader" scope="step" autowire-candidate="false" parent="itemReaderParent">
 		<property name="resource" value="#{stepExecutionContext[fileName]}" />

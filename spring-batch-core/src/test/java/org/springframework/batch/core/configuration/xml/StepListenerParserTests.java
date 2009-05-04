@@ -67,7 +67,7 @@ public class StepListenerParserTests {
 	}
 
 	@Test
-	public void testInheritListeners_NoMerge() throws Exception {
+	public void testInheritListenersNoMerge() throws Exception {
 		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepListenerParserTests-context.xml");
 		List<?> list = getListeners("s2", ctx);
