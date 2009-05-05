@@ -58,11 +58,6 @@
 
 </programlisting>
 
-    <para>Note that if the job repository's default id is overridden, it must
-    be explicitly specified on <emphasis role="bold">every</emphasis>
-    <classname>Step</classname> <emphasis role="bold">as well as</emphasis> on
-    the <classname>Job</classname>.</para>
-
     <section>
       <title>Restartability</title>
 
