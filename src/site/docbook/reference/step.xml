@@ -1035,13 +1035,15 @@
     <classname>ItemWriter</classname>. Spring Batch provides the
     <classname>TaskletStep</classname> for this scenario.</para>
 
-    <para>The <classname>Tasklet</classname> is a simple interface that has
-    one method, <methodname>execute</methodname>, which will be a called
-    repeatedly by the <classname>TaskletStep</classname> until it either
-    returns <literal>FINISHED</literal> or throws an exception to signal a
-    failure. Each call to the <classname>Tasklet</classname> is wrapped in a
-    transaction. <classname>Tasklet</classname> implementors might call a
-    stored procedure, a script, or a simple SQL update statement. To create a
+    <para>The <classname>Tasklet</classname> is a simple interface
+    that has one method, <methodname>execute</methodname>, which will
+    be a called repeatedly by the <classname>TaskletStep</classname>
+    until it either returns <literal>RepeatStatus.FINISHED</literal>
+    or throws an exception to signal a failure. Each call to
+    the <classname>Tasklet</classname> is wrapped in a
+    transaction. <classname>Tasklet</classname> implementors might
+    call a stored procedure, a script, or a simple SQL update
+    statement. To create a
     <classname>TaskletStep</classname>, the 'ref' attribute of the
     &lt;tasket/&gt; element should reference a bean defining a
     <classname>Tasklet</classname> object; no &lt;chunk/&gt; element should be
@@ -1113,7 +1115,7 @@
                                                      files[i].getPath());
         }
       }
-      return RepeatStatus.FINISHED;
+      return RepeatStatus.COMPLETED;
     }
 
     public void setDirectoryResource(Resource directory) {
