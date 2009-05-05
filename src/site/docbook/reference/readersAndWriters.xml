@@ -202,7 +202,9 @@
     <programlisting>  
   &lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
-      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="barWriter" commit-interval="2"/&gt;
+      &lt;tasklet&gt;
+        &lt;chunk reader="fooReader" processor="fooProcessor" writer="barWriter" commit-interval="2"/&gt;
+      &lt;/tasklet&gt;
     &lt;/step&gt;
   &lt;/job&gt;
 
@@ -269,7 +271,9 @@
       <programlisting> 
   &lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
-      &lt;tasklet reader="fooReader" processor="compositeProcessor" writer="foobarWriter" commit-interval="2"/&gt;
+      &lt;tasklet&gt;
+        &lt;chunk reader="fooReader" processor="compositeProcessor" writer="foobarWriter" commit-interval="2"/&gt;
+      &lt;/tasklet&gt;
     &lt;/step&gt;
   &lt;/job&gt;
 
@@ -383,16 +387,18 @@
     <programlisting>  
   &lt;job id="ioSampleJob"&gt;
     &lt;step name="step1"&gt;
-      &lt;tasklet reader="fooReader" processor="fooProcessor" writer="compositeItemWriter" 
-               commit-interval="2"/&gt;
-      &lt;streams&gt;
-        &lt;stream ref="barWriter" /&gt;
-      &lt;/streams&gt;
+      &lt;tasklet&gt;
+        &lt;chunk reader="fooReader" processor="fooProcessor" writer="compositeItemWriter" 
+               commit-interval="2"&gt;
+          &lt;streams&gt;
+            &lt;stream ref="barWriter" /&gt;
+          &lt;/streams&gt;
+        &lt;/chunk&gt;
+      &lt;/tasklet&gt;
     &lt;/step&gt;
   &lt;/job&gt;
 
-  &lt;bean id="compositeItemWriter" 
-        class="...CompositeItemWriter" &gt;
+  &lt;bean id="compositeItemWriter" class="...CompositeItemWriter"&gt;
     &lt;property name="delegate" ref="barWriter" /&gt;
   &lt;/bean&gt;
 
