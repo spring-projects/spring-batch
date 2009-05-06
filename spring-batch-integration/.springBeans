@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.0.v200809261800]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.3.RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -18,6 +18,8 @@
 		<config>src/test/resources/org/springframework/batch/integration/retry/RetryRepeatTransactionalPollingIntegrationTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/SmokeTests-context.xml</config>
 		<config>src/test/resources/org/springframework/batch/integration/retry/RetryTransactionalPollingIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/item/MessagingGatewayIntegrationTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/integration/partition/VanillaIntegrationTests-context.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
