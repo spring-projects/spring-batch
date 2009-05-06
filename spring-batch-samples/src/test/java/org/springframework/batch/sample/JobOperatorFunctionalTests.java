@@ -113,10 +113,17 @@ public class JobOperatorFunctionalTests {
 
 		assertTrue(exec1 != exec2);
 		assertTrue(operator.getParameters(exec1) != operator.getParameters(exec2));
-
+		
 		Set<Long> executions = operator.getRunningExecutions(jobName);
 		assertTrue(executions.contains(exec1));
 		assertTrue(executions.contains(exec2));
+		int count = 0;
+		boolean running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");
+		while (count++<10 && !running) {
+			Thread.sleep(100L);
+			running = operator.getSummary(exec1).contains("STARTED") && operator.getSummary(exec2).contains("STARTED");			
+		}
+		assertTrue(String.format("Jobs not started: [%s] and [%s]",operator.getSummary(exec1),operator.getSummary(exec1)), running);
 
 		operator.stop(exec1);
 		operator.stop(exec2);
