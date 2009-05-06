@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -34,6 +35,10 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	@Autowired
 	@Qualifier("withInteger")
 	private PlaceholderTargetSource withInteger;
+
+	@Autowired
+	@Qualifier("withList")
+	private PlaceholderTargetSource withList;
 
 	@Autowired
 	@Qualifier("withMultiple")
@@ -154,6 +159,13 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 	}
 
 	@Test
+	public void testGetList() {
+		Node target = (Node) withList.getTarget();
+		assertEquals(3, target.getList().size());
+		assertEquals("[bar, foo-4321, bar-4321]", target.getList().toString());
+	}
+
+	@Test
 	public void testGetMultiple() {
 		Node target = (Node) withMultiple.getTarget();
 		assertEquals("bar-4321-4321", target.getName());
@@ -186,6 +198,8 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 		Date getDate();
 
 		Node getParent();
+		
+		List<String> getList();
 	}
 
 	public static class Foo implements Node {
@@ -195,6 +209,8 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 		private Date date;
 
 		private Node parent;
+		
+		private List<String> list;
 
 		public Foo() {
 		}
@@ -225,6 +241,14 @@ public class PlaceholderTargetSourceTests extends ContextFactorySupport {
 
 		public void setParent(Node parent) {
 			this.parent = parent;
+		}
+
+		public void setList(List<String> list) {
+			this.list = list;
+		}
+
+		public List<String> getList() {
+			return list;
 		}
 
 	}
