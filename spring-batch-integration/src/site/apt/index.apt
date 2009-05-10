@@ -7,29 +7,31 @@
 
 Overview of the Spring Integration Batch Module
 
-  Many of the 2.0 Features we identified for Spring Batch look like they might be efficiently and concisely implemented in Spring Integration.  Here is a list of use cases.  These are features that can extend Spring Batch, or use Spring batch features in the context of Spring Integration.  Work in progress by Dave Syer and Jonas Partner.  Many issues to do with transactionality and synchronous execution have been raised and fixed in Spring Integration as a result of these use cases being prototyped.
+  Many use cases in Spring Batch look like they might be efficiently and concisely implemented in Spring Integration.  Here is a list.  These are features that can extend Spring Batch, or use Spring batch features in the context of Spring Integration.  Work in progress waiting for community feedback.  Many issues to do with transactionality and synchronous execution have been raised and fixed in Spring Integration as a result of these use cases being prototyped.
 
 *---+---+---+---+---+
 |<<ID>>|<<Description>>|<<Status>>|<<Sub-package>>|<<Comments>>|
 *----
-|1|{{{Triggers}Message triggers job}}|Prototype|launch|Relatively complete - maybe look at making handlers strongly typed.  Also lots of opportunities with monitoring progress.|
+|1|{{{Triggers}Message triggers job}}|Complete|launch|Complete.  Also lots of opportunities with monitoring progress.|
 *----
-|2|{{{Chunking}Chunking and multi-VM job execution}}|Prototype|chunk|Sunny day case works fine (but not packaged yet as a re-usable handler).  Failures might need some analysis.  Use of statefulStepExecutionListener might be improved on?|
+|2|{{{Chunking}Chunking and multi-VM job execution}}|Complete|chunk|Failures might need some analysis.  Use of stateful StepExecutionListener requires use of step scope.|
 *----
-|3|{{{Aggregator}Asynchronous Aggregator}}|Unstarted| |
+|3|{{{Aggregator}Asynchronous Aggregator}}|Unstarted| | |
 *----
-|4|{{{jobs}Stateful and non-linear jobs}} -> job = flow|Prototype|job|Failure cases need to be analysed - in particular, what happens on restart (after lights out) to messages from the middle of a job.|
+|4|{{{jobs}Stateful and non-linear jobs}} -> job = flow|Complete|job|Simple use cases work well with Spring Batch 2.0 and no Integration features.|
 *----
-|5|{{{Flexible}Flexible item processing model}} (as message flow) -> step = flow|Prototype|item|Complete (v. simple).|
+|5|{{{Flexible}Flexible item processing model}} (as message flow) -> step = flow|Complete|item|Complete (v. simple using MessagingGateway).  Unit tests only.|
 *----
-|6|{{{repeat}Automatic repeat / retry}}|Prototype|retry (unit test)|Works with patched PollingSourceAdapter.|
+|6|{{{repeat}Automatic repeat / retry}}|Complete|retry (unit test)|Unit tests only, since it just uses existing features.|
 *----
-|7|{{{files}Restartable file processing}}|Prototype|file|Seems to hang together.  Not tested thoroughly.|
+|7|{{{files}Restartable file processing}}|Complete|file|Seems to hang together.  Not tested thoroughly, but apparently someone is using it.|
+*----
+|8|{{{async}Asynchronous item processing}}|Complete|async|A general purpose ItemProcesor that returns a Future.|
 *----
 
   Numbers 2, 4, 5 have also been identified as high level Spring Batch 2.0 Features or themes.  If we implement 1, then we also don't need to do any more scheduling and triggering in Spring Batch.
 
-  Number 6 from the list (repeat/retry) is more of a Spring Integration pattern than a Spring Batch one.  We will try and implement it in Spring Batch first, and see about pushing it out into Spring Integration later (with probably a split of repeat/retry out of Batch at that time).
+  Number 6 from the list (repeat/retry) is more of a Spring Integration pattern than a Spring Batch one.  We implemented it in Spring Batch first, with an eye to seeing about pushing it out into Spring Integration later (with probably a split of repeat/retry out of Batch at that time).
 
 * Message {Triggers} Job
 
@@ -172,3 +174,14 @@ Overview of the Spring Integration Batch Module
     [[1]] System sends sucess message to reply channel
 
   Variation: send to asynchronous flow.  Same as main use case but item message is sent to asynchronous flow.  Not as robust because if the lights go out then meesages will be lost, but at least a large file can be split into smaller chunks.
+
+* Asynchronous item processing
+
+  This is actually a variation on {{{Flexible}flexible item processing model}}.
+
+  Description ({async}):
+
+    [[1]] ItemProcessor executes in background (non-transactionally)
+
+    [[1]] ItemWriter collects outputs from futures before phyically writing data
+

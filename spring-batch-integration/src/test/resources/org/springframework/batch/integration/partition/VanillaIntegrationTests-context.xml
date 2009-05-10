@@ -23,13 +23,13 @@
 	<integration:service-activator ref="stepExecutionRequestHandler"
 		input-channel="requests" output-channel="staging">
 		<integration:poller>
-			<integration:interval-trigger interval="10"/>
+			<integration:interval-trigger interval="10" />
 		</integration:poller>
 	</integration:service-activator>
 	<integration:aggregator ref="partitionHandler"
 		timeout="10000" input-channel="staging" output-channel="replies">
 		<integration:poller>
-			<integration:interval-trigger interval="10"/>
+			<integration:interval-trigger interval="10" />
 		</integration:poller>
 	</integration:aggregator>
 
