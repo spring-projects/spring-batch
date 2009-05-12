@@ -21,6 +21,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.support.CompositeItemStream;
 
 /**
  * Manage the offset data between the last successful commit and updates made to
@@ -48,7 +49,7 @@ class ChunkMonitor implements ItemStream {
 
 	private static final String OFFSET = ChunkMonitor.class.getName() + ".OFFSET";
 
-	private ItemStream stream;
+	private CompositeItemStream stream = new CompositeItemStream();
 
 	private ThreadLocal<ChunkMonitorData> holder = new ThreadLocal<ChunkMonitorData>();
 	{
@@ -62,8 +63,8 @@ class ChunkMonitor implements ItemStream {
 	/**
 	 * @param stream the stream to set
 	 */
-	public void setItemStream(ItemStream stream) {
-		this.stream = stream;
+	public void registerItemStream(ItemStream stream) {
+		this.stream.register(stream);
 	}
 
 	/**

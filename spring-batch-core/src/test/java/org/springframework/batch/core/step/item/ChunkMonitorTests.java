@@ -51,7 +51,7 @@ public class ChunkMonitorTests {
 				return "" + (count++);
 			}
 		});
-		monitor.setItemStream(new ItemStreamSupport() {
+		monitor.registerItemStream(new ItemStreamSupport() {
 			@Override
 			public void close() throws ItemStreamException {
 				closed = true;

@@ -33,7 +33,6 @@ import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
-import org.springframework.batch.item.support.CompositeItemStream;
 import org.springframework.batch.repeat.RepeatOperations;
 import org.springframework.batch.repeat.support.RepeatTemplate;
 import org.springframework.batch.retry.RetryException;
@@ -260,13 +259,12 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 	 */
 	@Override
 	protected void registerStreams(TaskletStep step, ItemStream[] streams) {
-		CompositeItemStream composite = new CompositeItemStream();
 		boolean streamIsReader = false;
 		ItemReader<? extends T> itemReader = getItemReader();
 		for (ItemStream stream : streams) {
-			if (stream == itemReader) {
+			if (stream instanceof ItemReader) {
 				streamIsReader = true;
-				composite.register(stream);
+				chunkMonitor.registerItemStream(stream);
 			}
 			else {
 				step.registerStream(stream);
@@ -276,7 +274,7 @@ public class FaultTolerantStepFactoryBean<T, S> extends SimpleStepFactoryBean<T,
 		// In cases where multiple nested item readers are registered,
 		// they all want to get the open() and close() callbacks.
 		if (streamIsReader) {
-			chunkMonitor.setItemStream(composite);
+			// double registration is fine
 			step.registerStream(chunkMonitor);
 			boolean concurrent = taskExecutor != null && !(taskExecutor instanceof SyncTaskExecutor);
 			if (!concurrent) {
