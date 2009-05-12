@@ -33,6 +33,11 @@ public class FooService {
 		processedFoos.add(foo);
 	}
 	
+	public String extractName(Foo foo) {
+		processedFoos.add(foo);
+		return foo.getName();
+	}
+	
 	public void processNameValuePair(String name, int value) {
 		processedFooNameValuePairs.add(new Foo(0, name, value));
 	}
