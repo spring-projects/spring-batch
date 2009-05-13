@@ -88,7 +88,7 @@
 		</beans:property>
 	</beans:bean>
 
-	<beans:bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+	<beans:bean id="fileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader" scope="step">
 		<beans:property name="resource" value="classpath:data/tradeJob/input/20070122.teststream.ImportTradeDataStep.txt" />
 		<beans:property name="lineMapper">
 			<beans:bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">

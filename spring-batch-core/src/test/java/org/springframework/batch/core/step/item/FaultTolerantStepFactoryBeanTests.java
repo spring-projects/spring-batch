@@ -10,10 +10,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.ExitStatus;
@@ -82,7 +85,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	@Before
 	public void setUp() throws Exception {
 		factory = new FaultTolerantStepFactoryBean<String, String>();
-		
+
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(2);
@@ -241,7 +244,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		FilterProcessorStub processor = new FilterProcessorStub(Arrays.asList(new String[] { "4" }));
 		factory.setItemProcessor(processor);
 		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<String, String>();
-		factory.setListeners(new StepListener[]{listenerStub});
+		factory.setListeners(new StepListener[] { listenerStub });
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
@@ -264,7 +267,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
-	
+
 	/**
 	 * Check items causing errors are skipped as expected.
 	 */
@@ -735,7 +738,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		};
 
 		factory.setItemReader(reader);
-		factory.setStreams(new ItemStream[] {stream, reader});
+		factory.setStreams(new ItemStream[] { stream, reader });
 
 		Step step = (Step) factory.getObject();
 
@@ -745,7 +748,53 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertTrue(closed);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 	}
-	
+
+	/**
+	 * Check ItemStream is opened
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testProxiedItemStreamOpened() throws Exception {
+
+		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
+			public void close() throws ItemStreamException {
+				closed = true;
+			}
+
+			public void open(ExecutionContext executionContext) throws ItemStreamException {
+				opened = true;
+			}
+
+			public void update(ExecutionContext executionContext) throws ItemStreamException {
+			}
+
+			public String read() throws Exception, UnexpectedInputException, ParseException {
+				return null;
+			}
+		};
+
+		ProxyFactory proxy = new ProxyFactory();
+		proxy.setTarget(reader);
+		proxy.setInterfaces(new Class<?>[] { ItemReader.class, ItemStream.class });
+		proxy.addAdvice(new MethodInterceptor() {
+			public Object invoke(MethodInvocation invocation) throws Throwable {
+				return invocation.proceed();
+			}
+		});
+		Object advised = proxy.getProxy();
+
+		factory.setItemReader((ItemReader<? extends String>) advised);
+		factory.setStreams(new ItemStream[] { (ItemStream) advised });
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+
+		assertTrue(opened);
+		assertTrue(closed);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+	}
+
 	private static class SkipProcessorStub implements ItemProcessor<String, String> {
 		private final Collection<String> failures;
 
@@ -768,7 +817,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 
 	}
-	
+
 	private static class FilterProcessorStub implements ItemProcessor<String, String> {
 		private final Collection<String> failures;
 
@@ -826,30 +875,31 @@ public class FaultTolerantStepFactoryBeanTests {
 		}
 
 	}
-	
-	private static class ItemProcessListenerStub<T,S> implements ItemProcessListener<T, S>{
+
+	private static class ItemProcessListenerStub<T, S> implements ItemProcessListener<T, S> {
 
 		private boolean errorEncountered = false;
+
 		private boolean filterEncountered = false;
-		
+
 		public void afterProcess(T item, S result) {
-			if(result == null){
+			if (result == null) {
 				filterEncountered = true;
 			}
 		}
 
 		public void beforeProcess(T item) {
-			
+
 		}
 
 		public void onProcessError(T item, Exception e) {
 			errorEncountered = true;
 		}
-		
+
 		public boolean isErrorEncountered() {
 			return errorEncountered;
 		}
-		
+
 		public boolean isFilterEncountered() {
 			return filterEncountered;
 		}
@@ -926,7 +976,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(expected.getExitStatus(), actual.getExitStatus());
 		assertEquals(expected.getJobExecutionId(), actual.getJobExecutionId());
 	}
-	
+
 	/**
 	 * condition: skippable < fatal; exception is unclassified
 	 * 
@@ -956,7 +1006,6 @@ public class FaultTolerantStepFactoryBeanTests {
 	public void testSkippableSubset_fatal() throws Exception {
 		assertFalse(getSkippableSubsetSkipPolicy().shouldSkip(new WriterNotOpenException(""), 0));
 	}
-
 
 	/**
 	 * condition: fatal < skippable; exception is unclassified
@@ -1012,7 +1061,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		Object step = factory.getObject();
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		Object chunkProvider = ReflectionTestUtils.getField(tasklet, "chunkProvider");
-		return (SkipPolicy)ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
+		return (SkipPolicy) ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
 	}
 
 }
