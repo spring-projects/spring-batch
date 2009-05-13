@@ -3,7 +3,7 @@ Spring Batch Samples
 * Overview
 
   There is considerable variability in the types of input and output
-  formats in batch jobs. There is also a number of options to consider
+  formats in batch jobs. There are also a number of options to consider
   in terms of how the types of strategies that will be used to handle
   skips, recovery, and statistics. However, when approaching a new
   batch job there are a few standard questions to answer to help
@@ -13,7 +13,7 @@ Spring Batch Samples
     * How do I configure this batch job? In the samples the pattern is
     to follow the convention of <<<[nameOf]Job.xml>>>. Each sample
     identifies the XML definition used to configure the job. Job
-    configurations that leverage a common execution environment have
+    configurations that use a common execution environment have
     many common items in their respective configurations.
 
     * What is the input source? Each sample batch job identifies
@@ -45,47 +45,76 @@ Spring Batch Samples
 
   Here is a list of samples with checks to indicate which features each one demonstrates:
 
-*----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+----+
-|<<Job / Feature>> | <<delimited input>> | <<fixed-length input>> | <<xml input>> | <<multiline input>> | <<db driving query input>> | <<db cursor input>> | <<delimited output>> | <<fixed-length output>> | <<xml output>> | <<multiline output>> | <<db output>> | <<skip>> | <<restart>> | <<automatic mapping>> | <<asynch launch>> | <<validation>> | <<delegation>> | <<write behind>> |
+*----+----+----+----+----+----+----+----+----+----+----+----+
+|<<Job / Feature>> | <<skip>> | <<retry>> | <<restart>> | <<automatic mapping>> | <<asynch launch>> | <<validation>> | <<delegation>> | <<write behind>> | <<non- sequential>> | <<asynch process>> | <<filtering>> | <<flat file>> | <<multi-step>> |
 *----
-{{adhocLoop}}                |  |  |  |  |  |  |  |  |  |  |  |  |  |  |x |  |  |  |
+{{adhocLoop}}                |  |  |  |  |x |  |  |  |  |  |  |  |  |
 *----
-{{batchUpdate}}              |  |  |  |  |  |x |  |  |  |  |  |  |  |  |  |  |  |x |
+{{beanWrapperMapperSample}}  |  |  |  |x |  |  |  |  |  |  |  |  |  |
 *----
-{{beanWrapperMapperSample}}  |  |x |  |  |  |  |  |  |  |  |x |  |  |x |  |x |  |  |
+{{compositeItemWriterSample}}|  |  |  |  |  |  |x |  |  |  |  |  |  |
 *----
-{{compositeItemWriterSample}}|  |  |  |  |  |  |  |x |  |  |x |  |  |  |  |x |  |  |
+{{customerFilter}}           |  |  |  |  |  |  |  |  |  |  |x |  |  |
 *----
-{{delegating}}               |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |x |  |
+{{delegating}}               |  |  |  |  |  |  |x |  |  |  |  |  |  |
 *----
-{{fixedLengthImport}}        |  |x |  |  |  |  |  |  |  |  |x |  |  |  |  |x |  |  |
+{{football}}                 |  |  |  |  |  |  |  |  |  |  |  |x |x |
 *----
-{{football}}                 |x |  |  |  |  |x |  |  |  |  |x |  |  |  |  |  |  |  |
+{{headerFooter}}             |  |  |  |  |  |  |  |  |  |  |  |x |  |
 *----
-{{hibernate}}                |  |  |  |  |  |x |  |  |  |  |x |  |  |  |  |  |  |x |
+{{hibernate}}                |  |x |  |  |  |  |  |x |  |  |  |  |  |
 *----
-{{ibatis}}                   |  |  |  |  |x |  |  |  |  |  |x |  |  |  |  |  |  |  |
+{{ioSample}}                 |  |  |  |  |  |x |  |x |  |  |  |x |  |
 *----
-{{multiline}}                |  |x |  |x |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+{{infiniteLoop}}             |  |  |  |  |  |x |  |  |  |  |  |  |  |
 *----
-{{multilineOrder}}           |x |  |  |x |  |  |  |x |  |x |  |  |  |  |  |  |  |  |
+{{loopflow}}                 |  |  |  |  |  |  |  |  |x |  |  |  |  |
 *----
-{{parallel}}                 |  |x |  |  |  |  |  |  |  |  |x |  |  |  |  |x |  |  |
+{{multiline}}                |  |  |  |  |  |  |x |  |  |  |  |  |  |
 *----
-{{quartzSample}}             |x |  |  |  |  |x |  |  |  |  |x |  |  |  |x |  |  |  |
+{{multilineOrder}}           |  |  |  |  |  |  |x |  |  |  |  |  |  |
 *----
-{{restartSample}}            |  |x |  |  |  |  |  |  |  |  |x |  |x |  |  |x |  |  |
+{{parallel}}                 |  |  |  |  |  |  |  |  |  |x |  |  |  |
 *----
-{{retrySample}}              |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |x |  |  |
+{{partition}}                |  |  |  |  |  |  |  |  |  |x |  |  |  |
 *----
-{{skipSample}}               |x |  |  |  |x |  |x |  |  |  |x |x |  |  |  |x |  |  |
+{{quartz}}                   |  |  |  |  |x |  |  |  |  |  |  |  |  |
 *----
-{{tasklet}}                  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |
+{{restart}}                  |  |  |x |  |  |  |  |  |  |  |  |  |  |
 *----
-{{trade}}                    |x |  |  |  |x |  |x |  |  |  |x |  |  |  |  |x |  |  |
+{{retry}}                    |  |x |  |  |  |  |  |  |  |  |  |  |  |
 *----
-{{xmlStax}}                  |  |  |x |  |  |  |  |  |x |  |  |  |  |  |  |  |  |  |
+{{skip}}                     |x |  |  |  |  |  |  |  |  |  |  |  |  |
 *----
+{{trade}}                    |  |  |  |  |  |x |  |  |  |  |  |x |  |
+*----
+
+  The <<<ioSampleJob>>> ({ioSample}) has a number of special instances that show different IO features using the same job configuration but with different readers and writers:
+
+*----+----+----+----+----+----+----+----+----+----+----+----+----+
+|<<Job / Feature>> | <<delimited input>> | <<fixed-length input>> | <<xml input>> | <<db paging input>> | <<db cursor input>> | <<delimited output>> | <<fixed-length output>> | <<xml output>> | <<db output>> | <<multiple files>> | <<multi-line>> | multi-record |
+*----
+delimited              |x |  |  |  |  |  |  |x |  |  |  |  |  |  |
+*----
+{{fixedLength}}        |  |x |  |  |  |  |  |  |x |  |  |  |  |  |
+*----
+{{ibatis}}             |  |  |  |  |x |  |  |  |  |  |x |  |  |  |
+*---
+iohibernate            |  |  |  |  |x |  |  |  |  |  |x |  |  |  |
+*---
+{{jdbcCursor}}         |  |  |  |  |x |  |  |  |  |  |x |  |  |  |
+*---
+jpa                    |  |  |  |x |  |  |  |  |  |  |x |  |  |  |
+*---
+multiLine              |x |  |  |  |  |  |  |x |  |  |  |  |x |  |
+*---
+multiRecordtype        |  |x |  |  |  |  |  |  |x |  |  |  |  |x |
+*---
+multiResource          |x |  |  |  |  |  |  |x |  |  |  |x |  |  |
+*---
+{{xml}}                |  |  |x |  |  |  |  |  |  |x |  |  |  |  |
+*---
+
 
 * Common Sample Source Structures
 
@@ -93,22 +122,19 @@ Spring Batch Samples
   a unit test in your IDE and run it directly.  Each sample has a
   separate test case in the <<<org.springframework.batch.samples>>>
   package.  The name of the test case is
-  <<<[JobName]FuntionalTests>>>.
+  <<<[JobName]FunctionalTests>>>.
 
     [Note:] The test cases do not ship in the samples jar file, but
-    they are in the source code, which you can download using
-    subversion (or browse in a web browser if you need to).  See
-    {{{source-repository.html}here}} for a link to the source code
-    repository.
+    they are in the .zip distribution and in the source code, which
+    you can download using subversion (or browse in a web browser if
+    you need to).  See {{{source-repository.html}here}} for a link to
+    the source code repository.
 
   You can also use the same Spring configuration as the unit test to
   launch the job via a main method in <<<CommmandLineJobRunner>>>.
   The samples source code has an Eclipse launch configuration to do
   this, taking the hassle out of setting up a classpath to run the
   job.
-
-  Each job consists of several steps, these steps are defined in steps
-  property.
 
 * Adhoc Loop and JMX Demo ({adhocLoop})
 
@@ -118,7 +144,7 @@ Spring Batch Samples
   JMX using the Eclipse launch configuration "jmxLauncher".
 
   The JMX launcher uses an additional XML configuration file
-  (adhoc-job-launcher-context.xml) to set up a <<<JobLauncher>>> for
+  (adhoc-job-launcher-context.xml) to set up a <<<JobOperator>>> for
   running jobs asynchronously (i.e. in a background thread).  This
   follows the same pattern as the {{{quartzSample}Quartz sample}}, so
   see that section for more details of the <<<JobLauncher>>>
@@ -126,17 +152,16 @@ Spring Batch Samples
 
   The rest of the configuration for this demo consists of exposing
   some components from the application context as JMX managed beans.
-  The <<<JobLauncher>>> is exposed as a stripped down interface
-  <<<ExportedJobLauncher>>>, so that it can be controlled from a
+  The <<<JobOperator>>> is exposed so that it can be controlled from a
   remote client (such as JConsole from the JDK) which does not have
   Spring Batch on the classpath.  See the Spring Core Reference Guide
   for more details on how to customise the JMX configuration.
 
-* Batch Update ({batchUpdate})
+* Jdbc Cursor and Batch Update ({jdbcCursor})
 
   The purpose of this sample is to show to usage of the
-  <<<JdbcBatchItemWriter>>> to make efficient updates to a
-  database table.
+  <<<JdbcCursorItemReader>>> and the <<<JdbcBatchItemWriter>>> to make
+  efficient updates to a database table.
 
   The <<<JdbcBatchItemWriter>>> accepts a special form of
   <<<PreparedStatementSetter>>> as a (mandatory) dependency.  This is
@@ -180,13 +205,19 @@ Spring Batch Samples
   to be restartable.  This is a common feature of all delegate
   patterns.
 
+* Customer Filter Sample ({customerFilter})
+
+  This shows the use of the <<<ItemProcessor>>> to filter out items by
+  returning null.  When an item is filtered it leads to an increment
+  in the <<<filterCount>>> in the step execution.
+
 * Delegating Sample ({delegating})
 
   This sample shows the delegate pattern again, and also the
   <<<ItemReaderAdapter>>> which is used to adapt a POJO to the
   <<<ItemReader>>> interface.
 
-* Fixed Length Import Job ({fixedLengthImport})
+* Fixed Length Import Job ({fixedLength})
 
   The goal is to demonstrate a typical scenario of importing data
   from a fixed-length file to database
@@ -200,12 +231,9 @@ Spring Batch Samples
 
   In this example we are using a simple fixed length record structure
   that can be found in the project at
-  <<<data/fixedLengthImportJob/input>>>.  A considerable amount of
+  <<<data/iosample/input>>>.  A considerable amount of
   thought can go into designing the folder structures for batch file
-  management. See
-  {{{http://static.springframework.org/spring-batch/apidocs/org/springframework/batch/core/resource/StepExecutionResourceProxy.html}here}}
-  for an example of an off-the-shelf strategy for linking input file
-  names with job parameters. The fixed length records look like this:
+  management.  The fixed length records look like this:
 
 +---
   UK21341EAH4597898.34customer1
@@ -531,7 +559,18 @@ games.player_id group by games.player_id, games.year_no
   AoP is used to wrap the <<<ItemWriter>>> and output each record as it
   is processed to the logger, which may impact performance.
 
-* Hibernate {hibernate}
+* Header Footer Sample ({headerFooter})
+
+  This sample shows the use of callbacks and listeners to deal with
+  headers and footers in flat files.  It uses two custom callbacks:
+
+    * <<<HeaderCopyCallback>>>: copies the header of a file from the
+    input to the output.
+
+    * <<<SummaryFooterCallback>>>: creates a summary footer at the end
+    of the output file.
+
+* Hibernate Sample {hibernate}
 
   The purpose of this sample is to show a typical usage of Hibernate
   as an ORM tool in the input and output of a job.
@@ -542,24 +581,28 @@ games.player_id group by games.player_id, games.year_no
   written as part of an online system.  
 
 
-  The output reliability and robustness are improved by the use of the
-  <<<HibernateAwareItemWriter>>> from the framework.  One of its roles
-  is to buffer items and flush them explicitly, rather than implicitly
-  on a transaction boundary (which would be the default).  This
+  The output reliability and robustness are improved by the use of
+  <<<Session.flush()>>> inside <<<ItemWriter.write()>>>.  This
   "write-behind" behaviour is provided by Hibernate implicitly, but we
   need to take control of it so that the skip and retry features
-  provided by Spring Batch can work effectively.  Thus the other role
-  of the <<<HibernateAwareItemWriter>>> is to watch out for failures
-  and flush aggressively when an item is seen from a previously failed
-  chunk.  In this way there will always be a failure at some point
-  immediately after the bad item was written, and the item is then
-  easily identifiable.
+  provided by Spring Batch can work effectively.
 
-* Ibatis ({ibatis})
+* Ibatis Sample ({ibatis})
 
   The goal of this sample is to show the use of Ibatis as a query
   mapping tool.  Its features are similar to the Hibernate sample, but
   it uses Ibatis to drive its input and output.
+
+* Infinite Loop Sample ({infiniteLoop})
+
+  This sample has a single step that is an infinite loop, reading and
+  writing fake data.  It is used to demonstrate stop signals and
+  restart capabilities.
+
+* Loop Flow Sample ({loopflow})
+
+  Shows how to implement a job that repeats one of its steps up to a
+  limit set by a <<<JobExecutionDecider>>>.
 
 * Multiline ({multiline})
 
@@ -669,6 +712,18 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
   It is then responsible for updating the processed flag (which
   happens inside the main step transaction).
 
+* Partitioning Sample ({partition})
+
+  The purpose of this sample is to show multi-threaded step execution
+  using the <<<PartitionHandler>>> SPI.  The example uses a
+  <<<TaskExecutorPartitionHandler>>> to spread the work of reading
+  some files acrosss multiple threads, with one <<<Step>>> execution
+  per thread.  The key components are the <<<PartitionStep>>> and the
+  <<<MultiResourcePartitioner>>> which is responsible for dividing up
+  the work.  Notice that the readers and writers in the <<<Step>>>
+  that is being partitioned are step-scoped, so that their state does
+  not get shared across threads of execution.
+
 * Quartz Sample ({quartz})
 
   The goal is to demonstrate how to schedule job execution using
@@ -737,7 +792,7 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
   the job execution is idempotent - you can never inadvertently
   process the same data twice.
 
-* Restart Sample ({restartSample})
+* Restart Sample ({restart})
 
   The goal of this sample is to show how a job can be restarted after
   a failure and continue processing where it left off.
@@ -749,7 +804,7 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
   exception in a specified place.  Since we re-use the same instance
   when we restart the job it will not fail the second time.
 
-* Retry Sample ({retrySample})
+* Retry Sample ({retry})
 
   The purpose of this sample is to show how to use the automatic retry
   capabilities of Spring Batch.
@@ -787,7 +842,7 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
   failing because the default implementation of <<<equals()>>> is
   based on object reference, not on field content.
 
-* Skip Sample ({skipSample})
+* Skip Sample ({skip})
 
   The purpose of this sample is to show how to use the skip features
   of Spring Batch.  Since skip is really just a special case of retry
@@ -889,7 +944,7 @@ SELECT ID FROM BATCH_STAGING WHERE JOB_ID=? AND PROCESSED=? ORDER BY ID
   credit on customer accounts is decreased appropriately. Last, a
   report about customers is exported to a file.
 
-* XML Input Output ({xmlStax})
+* XML Input Output ({xml})
 
   The goal here is to show the use of XML input and output through
   streaming and Spring OXM marshallers and unmarshallers. 
