@@ -466,7 +466,7 @@
     <classname>Tasklet</classname> implementation for calling system
     commands:</para>
 
-    <programlisting>  &lt;bean class="org.springframework.batch.sample.tasklet.SystemCommandTasklet"&gt;
+    <programlisting>  &lt;bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet"&gt;
     &lt;property name="command" value="echo hello" /&gt;
     &lt;!-- 5 second timeout for the command to complete --&gt;
     &lt;property name="timeout" value="5000" /&gt;
@@ -526,7 +526,7 @@
     <classname>Step</classname> <classname>ExecutionContext</classname> is
     updated every time the <classname>Step</classname> commits a chunk while
     the <classname>Job</classname> <classname>ExecutionContext</classname> is
-    updated only at the end of each <classname>Step</classname>. </para>
+    updated only at the end of each <classname>Step</classname>.</para>
 
     <para>The consequence of this separation is that all data must be placed
     in the <classname>Step</classname> <classname>ExecutionContext</classname>
@@ -535,7 +535,7 @@
     on-going. If data is stored to the <classname>Job</classname>
     <classname>ExecutionContext</classname>, then it will not be persisted
     during <classname>Step</classname> execution and if the
-    <classname>Step</classname> fails, that data will be lost. </para>
+    <classname>Step</classname> fails, that data will be lost.</para>
 
     <programlisting>public void MyItemWriter implements ItemWriter&lt;Object&gt; {
     private StepExecution stepExecution;
