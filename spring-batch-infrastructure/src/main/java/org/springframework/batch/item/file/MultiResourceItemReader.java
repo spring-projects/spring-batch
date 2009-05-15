@@ -46,7 +46,7 @@ import org.springframework.util.ClassUtils;
  * @author Robert Kasanicky
  */
 public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
-	
+
 	private static final Log logger = LogFactory.getLog(MultiResourceItemReader.class);
 
 	private final ExecutionContextUserSupport executionContextUserSupport = new ExecutionContextUserSupport();
@@ -58,7 +58,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	private MultiResourceIndex index = new MultiResourceIndex();
 
 	private boolean saveState = true;
-	
+
 	// signals there are no resources to read -> just return null on first read
 	private boolean noInput;
 
@@ -85,7 +85,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 		if (noInput) {
 			return null;
 		}
-		
+
 		T item;
 		item = readNextItem();
 		index.incrementItemCount();
@@ -96,6 +96,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	/**
 	 * Use the delegate to read the next item, jump to next resource if current
 	 * one is exhausted. Items are appended to the buffer.
+	 * 
 	 * @return next item from input
 	 */
 	private T readNextItem() throws Exception {
@@ -137,7 +138,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	public void open(ExecutionContext executionContext) throws ItemStreamException {
 
 		Assert.notNull(resources, "Resources must be set");
-		
+
 		noInput = false;
 		if (resources.length == 0) {
 			logger.warn("No resources to read");
@@ -192,7 +193,7 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 
 	/**
 	 * @param comparator used to order the injected resources, by default
-	 * compares {@link Resource#getFilename()} values.
+	 *        compares {@link Resource#getFilename()} values.
 	 */
 	public void setComparator(Comparator<Resource> comparator) {
 		this.comparator = comparator;
@@ -203,6 +204,13 @@ public class MultiResourceItemReader<T> implements ItemReader<T>, ItemStream {
 	 */
 	public void setResources(Resource[] resources) {
 		this.resources = resources;
+	}
+
+	public Resource getCurrentResource() {
+		if (index.currentResource >= resources.length) {
+			return null;
+		}
+		return resources[index.currentResource];
 	}
 
 	/**

@@ -35,7 +35,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	 * Setup the tested reader to read from the test resources.
 	 */
 	protected void setUp() throws Exception {
-		
+
 		itemReader.setLineMapper(new PassThroughLineMapper());
 
 		tested.setDelegate(itemReader);
@@ -63,6 +63,33 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 		assertEquals("7", tested.read());
 		assertEquals("8", tested.read());
 		assertEquals(null, tested.read());
+
+		tested.close();
+	}
+
+	public void testGetCurrentResource() throws Exception {
+
+		tested.open(ctx);
+
+		assertSame(r1, tested.getCurrentResource());
+		assertEquals("1", tested.read());
+		assertSame(r1, tested.getCurrentResource());
+		assertEquals("2", tested.read());
+		assertSame(r1, tested.getCurrentResource());
+		assertEquals("3", tested.read());
+		assertSame(r1, tested.getCurrentResource());
+		assertEquals("4", tested.read());
+		assertSame(r2, tested.getCurrentResource());
+		assertEquals("5", tested.read());
+		assertSame(r2, tested.getCurrentResource());
+		assertEquals("6", tested.read());
+		assertSame(r4, tested.getCurrentResource());
+		assertEquals("7", tested.read());
+		assertSame(r5, tested.getCurrentResource());
+		assertEquals("8", tested.read());
+		assertSame(r5, tested.getCurrentResource());
+		assertEquals(null, tested.read());
+		assertSame(null, tested.getCurrentResource());
 
 		tested.close();
 	}
@@ -205,7 +232,7 @@ public class MultiResourceItemReaderIntegrationTests extends TestCase {
 	public void testNoResourcesFound() throws Exception {
 		tested.setResources(new Resource[] {});
 		tested.open(ctx);
-		
+
 		assertNull(tested.read());
 	}
 
