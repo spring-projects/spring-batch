@@ -177,7 +177,7 @@ public class StepParserTests {
 		DefaultTransactionAttribute txa = getTransactionAttribute(ctx, stepName);
 		assertEquals(TransactionDefinition.PROPAGATION_REQUIRED, txa.getPropagationBehavior());
 		assertEquals(TransactionDefinition.ISOLATION_DEFAULT, txa.getIsolationLevel());
-		assertEquals(-1, txa.getTimeout());
+		assertEquals(10, txa.getTimeout());
 	}
 
 	@SuppressWarnings("unchecked")

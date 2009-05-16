@@ -56,7 +56,7 @@
 					</xsd:appinfo>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="restartable" type="xsd:string" default="true" use="optional">
+			<xsd:attribute name="restartable" type="xsd:string" use="optional">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[
 					Whether the job should be retartable or not in case of failure.  Set this to false
@@ -316,7 +316,7 @@
 	</xsd:complexType>
 
 	<xsd:complexType name="transaction-attributesType">
-		<xsd:attribute name="propagation" default="REQUIRED">
+		<xsd:attribute name="propagation">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.transaction.annotation.Propagation"><![CDATA[
 				The transaction propagation behavior.
@@ -334,18 +334,18 @@
 				</xsd:restriction>
 			</xsd:simpleType>
 		</xsd:attribute>
-		<xsd:attribute name="isolation" default="DEFAULT" type="isolationType">
+		<xsd:attribute name="isolation" type="isolationType">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.transaction.annotation.Isolation"><![CDATA[
 				The transaction isolation level.
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="timeout" type="xsd:integer" default="-1">
+		<xsd:attribute name="timeout" type="xsd:integer">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
-	The transaction timeout value (in seconds).
-							]]></xsd:documentation>
+				The transaction timeout value (in seconds).
+				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
 	</xsd:complexType>
@@ -517,7 +517,7 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attribute name="is-reader-transactional-queue" type="xsd:string" default="false" use="optional">
+		<xsd:attribute name="is-reader-transactional-queue" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation><![CDATA[
 				Whether the reader is a transactional queue. If it is then items read should not be cached 
