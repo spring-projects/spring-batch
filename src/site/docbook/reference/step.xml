@@ -507,8 +507,9 @@
       records are logged as well, which will be covered later when discussing
       listeners.<programlisting>
   &lt;step id="step1"&gt;
-      &lt;tasklet <emphasis role="bold">skip-limit="10"</emphasis>&gt;
-          &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10"&gt;
+      &lt;tasklet&gt;
+          &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
+            role="bold">skip-limit="10"</emphasis>&gt;
               <emphasis role="bold">&lt;skippable-exception-classes&gt;
                   org.springframework.batch.item.file.FlatFileParseException
               &lt;/skippable-exception-classes&gt;</emphasis>
@@ -537,8 +538,9 @@
       identify which exceptions should cause failure and skip everything
       else:<programlisting>
   &lt;step id="step1"&gt;
-      &lt;tasklet <emphasis role="bold">skip-limit="10"</emphasis>&gt;
-          &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10"&gt;
+      &lt;tasklet&gt;
+          &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
+            role="bold">skip-limit="10"</emphasis>&gt;
 <emphasis role="bold">              &lt;skippable-exception-classes&gt;
                   java.lang.Exception
               &lt;/skippable-exception-classes&gt;
@@ -1035,16 +1037,14 @@
     <classname>ItemWriter</classname>. Spring Batch provides the
     <classname>TaskletStep</classname> for this scenario.</para>
 
-    <para>The <classname>Tasklet</classname> is a simple interface
-    that has one method, <methodname>execute</methodname>, which will
-    be a called repeatedly by the <classname>TaskletStep</classname>
-    until it either returns <literal>RepeatStatus.FINISHED</literal>
-    or throws an exception to signal a failure. Each call to
-    the <classname>Tasklet</classname> is wrapped in a
-    transaction. <classname>Tasklet</classname> implementors might
-    call a stored procedure, a script, or a simple SQL update
-    statement. To create a
-    <classname>TaskletStep</classname>, the 'ref' attribute of the
+    <para>The <classname>Tasklet</classname> is a simple interface that has
+    one method, <methodname>execute</methodname>, which will be a called
+    repeatedly by the <classname>TaskletStep</classname> until it either
+    returns <literal>RepeatStatus.FINISHED</literal> or throws an exception to
+    signal a failure. Each call to the <classname>Tasklet</classname> is
+    wrapped in a transaction. <classname>Tasklet</classname> implementors
+    might call a stored procedure, a script, or a simple SQL update statement.
+    To create a <classname>TaskletStep</classname>, the 'ref' attribute of the
     &lt;tasket/&gt; element should reference a bean defining a
     <classname>Tasklet</classname> object; no &lt;chunk/&gt; element should be
     used within the &lt;tasket/&gt;:</para>
