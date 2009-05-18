@@ -20,7 +20,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.aop.framework.Advised;
@@ -28,6 +27,8 @@ import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.SimpleJobRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -39,11 +40,12 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 public class JobParserTests {
 
+	ConfigurableApplicationContext jobParserParentAttributeTestsCtx = new ClassPathXmlApplicationContext(
+			"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
+
 	@Test
 	public void testInheritListeners() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
-		List<?> job1Listeners = getListeners("job1", ctx);
+		List<?> job1Listeners = getListeners("job1", jobParserParentAttributeTestsCtx);
 		assertEquals(2, job1Listeners.size());
 		boolean a = false;
 		boolean b = false;
@@ -61,9 +63,7 @@ public class JobParserTests {
 
 	@Test
 	public void testInheritListeners_NoMerge() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
-		List<?> job2Listeners = getListeners("job2", ctx);
+		List<?> job2Listeners = getListeners("job2", jobParserParentAttributeTestsCtx);
 		assertEquals(1, job2Listeners.size());
 		boolean c = false;
 		for (Object l : job2Listeners) {
@@ -76,9 +76,7 @@ public class JobParserTests {
 
 	@Test
 	public void testStandaloneListener() throws Exception {
-		ConfigurableApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
-		List<?> jobListeners = getListeners("job3", ctx);
+		List<?> jobListeners = getListeners("job3", jobParserParentAttributeTestsCtx);
 		assertEquals(2, jobListeners.size());
 		boolean a = false;
 		boolean b = false;
@@ -96,8 +94,7 @@ public class JobParserTests {
 
 	@SuppressWarnings("unchecked")
 	private List<?> getListeners(String jobName, ApplicationContext ctx) throws Exception {
-		Map<String, Object> beans = ctx.getBeansOfType(Job.class);
-		assertTrue(beans.containsKey(jobName));
+		assertTrue(ctx.containsBean(jobName));
 		Job job = (Job) ctx.getBean(jobName);
 
 		assertTrue(job instanceof AbstractJob);
@@ -113,5 +110,30 @@ public class JobParserTests {
 			listeners.add(listener);
 		}
 		return listeners;
+	}
+
+	@Test
+	public void testJobRepositoryDefaults() throws Exception {
+		ApplicationContext ctx = jobParserParentAttributeTestsCtx;
+
+		assertTrue(getJobRepository("defaultRepoJob", ctx) instanceof SimpleJobRepository);
+
+		assertTrue(getJobRepository("specifiedRepoJob", ctx) instanceof DummyJobRepository);
+
+		assertTrue(getJobRepository("inheritSpecifiedRepoJob", ctx) instanceof DummyJobRepository);
+
+		assertTrue(getJobRepository("overrideInheritedRepoJob", ctx) instanceof SimpleJobRepository);
+	}
+
+	private JobRepository getJobRepository(String jobName, ApplicationContext ctx) throws Exception {
+		assertTrue(ctx.containsBean(jobName));
+		Job job = (Job) ctx.getBean(jobName);
+		assertTrue(job instanceof AbstractJob);
+		Object jobRepository = ReflectionTestUtils.getField(job, "jobRepository");
+		while (jobRepository instanceof Advised) {
+			jobRepository = ((Advised) jobRepository).getTargetSource().getTarget();
+		}
+		assertTrue(jobRepository instanceof JobRepository);
+		return (JobRepository) jobRepository;
 	}
 }

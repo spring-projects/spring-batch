@@ -61,20 +61,23 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 	 * finish successfully, because it continues execution where the previous
 	 * run stopped (module throws exception after fixed number of processed
 	 * records).
-	 * @throws Throwable 
+	 * 
+	 * @throws Exception
 	 */
 	@Test
-	public void testRestart() throws Throwable {
+	public void testLaunchJob() throws Exception {
 
 		int before = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
 
 		JobExecution jobExecution = runJobForRestartTest();
 		assertEquals(BatchStatus.FAILED, jobExecution.getStatus());
-		
-		Throwable expected = jobExecution.getAllFailureExceptions().get(0);
-		if(expected.getMessage().toLowerCase().indexOf(
-					"planned") < 0) {
-			throw expected;
+
+		Throwable ex = jobExecution.getAllFailureExceptions().get(0);
+		if (ex.getMessage().toLowerCase().indexOf("planned") < 0) {
+			if (ex instanceof Exception) {
+				throw (Exception) ex;
+			}
+			throw new RuntimeException(ex);
 		}
 
 		int medium = simpleJdbcTemplate.queryForInt("SELECT COUNT(*) FROM TRADE");
@@ -91,8 +94,12 @@ public class RestartFunctionalTests extends AbstractBatchLauncherTests {
 
 	// load the application context and launch the job
 	private JobExecution runJobForRestartTest() throws Exception {
-		return getLauncher().run(getJob(), new DefaultJobParametersConverter().getJobParameters(PropertiesConverter
-				.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
+		return getLauncher()
+				.run(
+						getJob(),
+						new DefaultJobParametersConverter()
+								.getJobParameters(PropertiesConverter
+										.stringToProperties("run.id(long)=1,parameter=true,run.date=20070122,input.file=classpath:data/fixedLengthImportJob/input/20070122.teststream.ImportTradeDataStep.txt")));
 	}
 
 }

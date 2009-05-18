@@ -24,6 +24,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.StepListener;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.item.FaultTolerantStepFactoryBean;
 import org.springframework.batch.core.step.item.SimpleStepFactoryBean;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -138,6 +139,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * @see FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
+		AbstractStep step;
 		if (hasChunkElement) {
 			Assert.isNull(tasklet, "Step [" + name
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
@@ -146,24 +148,26 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 				FaultTolerantStepFactoryBean<I, O> fb = new FaultTolerantStepFactoryBean<I, O>();
 				configureSimple(fb);
 				configureFaultTolerant(fb);
-				return fb.getObject();
+				step = (AbstractStep) fb.getObject();
 			}
 			else {
 				validateSimpleStep();
 				SimpleStepFactoryBean<I, O> fb = new SimpleStepFactoryBean<I, O>();
 				configureSimple(fb);
-				return fb.getObject();
+				step = (AbstractStep) fb.getObject();
 			}
 		}
 		else if (tasklet != null) {
 			TaskletStep ts = new TaskletStep();
 			configureTaskletStep(ts);
-			return ts;
+			step = (AbstractStep) ts;
 		}
 		else {
 			throw new IllegalStateException("Step [" + name
 					+ "] has neither a <chunk/> element nor a 'ref' attribute referencing a Tasklet.");
 		}
+
+		return step;
 	}
 
 	private void configureSimple(SimpleStepFactoryBean<I, O> fb) {
@@ -392,6 +396,13 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	/**
+	 * @return jobRepository
+	 */
+	public JobRepository getJobRepository() {
+		return jobRepository;
+	}
+
+	/**
 	 * Public setter for {@link JobRepository}.
 	 * 
 	 * @param jobRepository
@@ -416,6 +427,13 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setTasklet(Tasklet tasklet) {
 		this.tasklet = tasklet;
+	}
+
+	/**
+	 * @return transactionManager
+	 */
+	public PlatformTransactionManager getTransactionManager() {
+		return transactionManager;
 	}
 
 	/**
@@ -487,7 +505,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * {@link MapRetryContextCache}.<br/>
 	 * 
 	 * @param cacheCapacity the cache capacity to set (greater than 0 else
-	 *            ignored)
+	 *        ignored)
 	 */
 	public void setCacheCapacity(int cacheCapacity) {
 		this.cacheCapacity = cacheCapacity;
@@ -644,4 +662,5 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	public void setHasChunkElement(boolean hasChunkElement) {
 		this.hasChunkElement = hasChunkElement;
 	}
+
 }

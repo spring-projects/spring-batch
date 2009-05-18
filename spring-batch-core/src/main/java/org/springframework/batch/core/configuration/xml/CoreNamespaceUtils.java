@@ -29,7 +29,7 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 /**
- * utility methods used in parsing of the batch core namespace
+ * Utility methods used in parsing of the batch core namespace
  * 
  * @author Thomas Risberg
  */
@@ -45,8 +45,15 @@ public class CoreNamespaceUtils {
 
 	private static final String RANGE_ARRAY_EDITOR_CLASS_NAME = "org.springframework.batch.item.file.transform.RangeArrayPropertyEditor";
 
-	protected static void checkForStepScope(ParserContext parserContext, Object source) {
+	private static final String CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME = "org.springframework.batch.core.configuration.xml.CoreNamespacePostProcessor";
 
+	protected static void autoregisterBeansForNamespace(ParserContext parserContext, Object source) {
+		checkForStepScope(parserContext, source);
+		addRangePropertyEditor(parserContext);
+		addCoreNamespacePostProcessor(parserContext);
+	}
+
+	private static void checkForStepScope(ParserContext parserContext, Object source) {
 		boolean foundStepScope = false;
 		String[] beanNames = parserContext.getRegistry().getBeanDefinitionNames();
 		for (String beanName : beanNames) {
@@ -72,10 +79,9 @@ public class CoreNamespaceUtils {
 	 * @param parserContext
 	 */
 	@SuppressWarnings("unchecked")
-	protected static void addRangePropertyEditor(ParserContext parserContext) {
+	private static void addRangePropertyEditor(ParserContext parserContext) {
 		BeanDefinitionRegistry registry = parserContext.getRegistry();
 		if (!rangeArrayEditorAlreadyDefined(registry)) {
-
 			AbstractBeanDefinition customEditorConfigurer = BeanDefinitionBuilder.genericBeanDefinition(
 					CUSTOM_EDITOR_CONFIGURER_CLASS_NAME).getBeanDefinition();
 			customEditorConfigurer.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
@@ -83,7 +89,6 @@ public class CoreNamespaceUtils {
 			editors.put(RANGE_ARRAY_CLASS_NAME, RANGE_ARRAY_EDITOR_CLASS_NAME);
 			customEditorConfigurer.getPropertyValues().addPropertyValue("customEditors", editors);
 			registry.registerBeanDefinition(CUSTOM_EDITOR_CONFIGURER_CLASS_NAME, customEditorConfigurer);
-
 		}
 	}
 
@@ -105,6 +110,29 @@ public class CoreNamespaceUtils {
 						}
 					}
 				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param parserContext
+	 */
+	private static void addCoreNamespacePostProcessor(ParserContext parserContext) {
+		BeanDefinitionRegistry registry = parserContext.getRegistry();
+		if (!coreNamespaceBeanPostProcessorAlreadyDefined(registry)) {
+			AbstractBeanDefinition postProcessorBeanDef = BeanDefinitionBuilder.genericBeanDefinition(
+					CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME).getBeanDefinition();
+			postProcessorBeanDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
+			registry.registerBeanDefinition(CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME, postProcessorBeanDef);
+		}
+	}
+
+	private static boolean coreNamespaceBeanPostProcessorAlreadyDefined(BeanDefinitionRegistry registry) {
+		for (String beanName : registry.getBeanDefinitionNames()) {
+			BeanDefinition bd = registry.getBeanDefinition(beanName);
+			if (CORE_NAMESPACE_POST_PROCESSOR_CLASS_NAME.equals(bd.getBeanClassName())) {
+				return true;
 			}
 		}
 		return false;

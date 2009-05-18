@@ -153,7 +153,22 @@
 							</xsd:appinfo>
 						</xsd:annotation>
 					</xsd:attribute>
-					<xsd:attributeGroup ref="transactionManagerAttribute" />
+					<xsd:attribute name="transaction-manager" type="xsd:string" default="transactionManager">
+						<xsd:annotation>
+							<xsd:documentation
+								source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+							The bean name of the TransactionManager that is to be used. This attribute 
+							is not required, and only needs to be specified explicitly
+							if the bean name of the desired TransactionManager is not 'transactionManager'.
+							]]></xsd:documentation>
+							<xsd:appinfo>
+								<tool:annotation kind="ref">
+									<tool:expected-type
+										type="org.springframework.transaction.PlatformTransactionManager" />
+								</tool:annotation>
+							</xsd:appinfo>
+						</xsd:annotation>
+					</xsd:attribute>
 					<xsd:attribute name="isolation-level-for-create" default="SERIALIZABLE" type="isolationType">
 						<xsd:annotation>
 							<xsd:documentation><![CDATA[
@@ -312,7 +327,22 @@
 				]]></xsd:documentation>
 			</xsd:annotation>
 		</xsd:attribute>
-		<xsd:attributeGroup ref="transactionManagerAttribute"/>
+		<xsd:attribute name="transaction-manager" type="xsd:string">
+			<xsd:annotation>
+				<xsd:documentation
+					source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
+				The bean name of the TransactionManager that is to be used. This attribute 
+				is not required, and only needs to be specified explicitly
+				if the bean name of the desired TransactionManager is not 'transactionManager'.
+				]]></xsd:documentation>
+				<xsd:appinfo>
+					<tool:annotation kind="ref">
+						<tool:expected-type
+							type="org.springframework.transaction.PlatformTransactionManager" />
+					</tool:annotation>
+				</xsd:appinfo>
+			</xsd:annotation>
+		</xsd:attribute>
 	</xsd:complexType>
 
 	<xsd:complexType name="transaction-attributesType">
@@ -733,7 +763,7 @@
 	</xsd:group>
 		
 	<xsd:attributeGroup name="jobRepositoryAttribute">
-		<xsd:attribute name="job-repository" type="xsd:string" default="jobRepository">
+		<xsd:attribute name="job-repository" type="xsd:string">
 			<xsd:annotation>
 				<xsd:documentation
 					source="java:org.springframework.batch.core.repository.JobRepository"><![CDATA[
@@ -745,25 +775,6 @@
 					<tool:annotation kind="ref">
 						<tool:expected-type
 							type="org.springframework.batch.core.repository.JobRepository" />
-					</tool:annotation>
-				</xsd:appinfo>
-			</xsd:annotation>
-		</xsd:attribute>
-	</xsd:attributeGroup>
-
-	<xsd:attributeGroup name="transactionManagerAttribute">
-		<xsd:attribute name="transaction-manager" type="xsd:string" default="transactionManager">
-			<xsd:annotation>
-				<xsd:documentation
-					source="java:org.springframework.transaction.PlatformTransactionManager"><![CDATA[
-				The bean name of the TransactionManager that is to be used. This attribute 
-				is not required, and only needs to be specified explicitly
-				if the bean name of the desired TransactionManager is not 'transactionManager'.
-				]]></xsd:documentation>
-				<xsd:appinfo>
-					<tool:annotation kind="ref">
-						<tool:expected-type
-							type="org.springframework.transaction.PlatformTransactionManager" />
 					</tool:annotation>
 				</xsd:appinfo>
 			</xsd:annotation>

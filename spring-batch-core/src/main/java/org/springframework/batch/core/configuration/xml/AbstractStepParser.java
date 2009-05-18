@@ -70,11 +70,10 @@ public abstract class AbstractStepParser {
 	/**
 	 * @param stepElement The &lt;step/&gt; element
 	 * @param parserContext
-	 * @param jobRepositoryRef The name of the bean defining the JobRepository.
-	 *        Use 'null' if the job-repository is specified on the
-	 *        &lt;tasklet/&gt; element; this method will look it up.
+	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
+	 *        from the enclosing tag. Use 'null' if unknown.
 	 */
-	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobRepositoryRef) {
+	protected AbstractBeanDefinition parseStep(Element stepElement, ParserContext parserContext, String jobFactoryRef) {
 
 		AbstractBeanDefinition bd = new GenericBeanDefinition();
 
@@ -82,7 +81,7 @@ public abstract class AbstractStepParser {
 		List<Element> taskletElements = (List<Element>) DomUtils.getChildElementsByTagName(stepElement, TASKLET_ELE);
 		if (taskletElements.size() == 1) {
 			boolean stepUnderspecified = CoreNamespaceUtils.isUnderspecified(stepElement);
-			parseTasklet(taskletElements.get(0), bd, parserContext, jobRepositoryRef, stepUnderspecified);
+			parseTasklet(taskletElements.get(0), bd, parserContext, stepUnderspecified);
 		}
 		else if (taskletElements.size() > 1) {
 			parserContext.getReaderContext().error(
@@ -100,12 +99,16 @@ public abstract class AbstractStepParser {
 			bd.setAbstract(Boolean.valueOf(isAbstract));
 		}
 
+		if (StringUtils.hasText(jobFactoryRef)) {
+			bd.getPropertyValues().addPropertyValue("jobParserJobFactoryBeanRef", jobFactoryRef);
+		}
+
 		return bd;
 
 	}
 
 	private void parseTasklet(Element taskletElement, AbstractBeanDefinition bd, ParserContext parserContext,
-			String jobRepositoryRef, boolean stepUnderspecified) {
+			boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
 
@@ -130,8 +133,7 @@ public abstract class AbstractStepParser {
 							+ "/> element nor a '" + TASKLET_REF_ATTR + "' attribute.", taskletElement);
 		}
 
-		setUpBeanDefinitionForTaskletStep(taskletElement, bd, parserContext, jobRepositoryRef);
-
+		setUpBeanDefinitionForTaskletStep(taskletElement, bd, parserContext);
 	}
 
 	private void parseTaskletRef(String taskletRef, MutablePropertyValues propertyValues) {
@@ -142,18 +144,23 @@ public abstract class AbstractStepParser {
 	}
 
 	private void setUpBeanDefinitionForTaskletStep(Element taskletElement, AbstractBeanDefinition bd,
-			ParserContext parserContext, String jobRepositoryRef) {
+			ParserContext parserContext) {
 
 		MutablePropertyValues propertyValues = bd.getPropertyValues();
 
 		checkStepAttributes(taskletElement, propertyValues);
 
-		propertyValues.addPropertyValue("jobRepository", resolveJobRepositoryRef(taskletElement, parserContext,
-				jobRepositoryRef));
+		String jobRepositoryRef = taskletElement.getAttribute(JOB_REPO_ATTR);
+		if (StringUtils.hasText(jobRepositoryRef)) {
+			RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
+			propertyValues.addPropertyValue("jobRepository", jobRepositoryBeanRef);
+		}
 
 		String transactionManagerRef = taskletElement.getAttribute("transaction-manager");
-		RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
-		propertyValues.addPropertyValue("transactionManager", transactionManagerBeanRef);
+		if (StringUtils.hasText(transactionManagerRef)) {
+			RuntimeBeanReference transactionManagerBeanRef = new RuntimeBeanReference(transactionManagerRef);
+			propertyValues.addPropertyValue("transactionManager", transactionManagerBeanRef);
+		}
 
 		handleTransactionAttributesElement(taskletElement, propertyValues, parserContext);
 
@@ -166,20 +173,6 @@ public abstract class AbstractStepParser {
 
 		bd.setSource(parserContext.extractSource(taskletElement));
 
-	}
-
-	private RuntimeBeanReference resolveJobRepositoryRef(Element taskletElement, ParserContext parserContext,
-			String jobRepositoryRef) {
-		if (!StringUtils.hasText(jobRepositoryRef)) {
-			jobRepositoryRef = taskletElement.getAttribute(JOB_REPO_ATTR);
-			if (!StringUtils.hasText(jobRepositoryRef)) {
-				parserContext.getReaderContext().error(
-						"The '" + JOB_REPO_ATTR + "' attribute may exist on an <" + taskletElement.getNodeName()
-								+ "/> element.", taskletElement);
-			}
-		}
-		RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(jobRepositoryRef);
-		return jobRepositoryBeanRef;
 	}
 
 	private void handleTransactionAttributesElement(Element stepElement, MutablePropertyValues propertyValues,

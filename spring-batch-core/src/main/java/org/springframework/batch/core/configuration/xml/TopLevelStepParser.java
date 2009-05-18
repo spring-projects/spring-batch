@@ -21,23 +21,24 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
- * Parser for the lt;step/gt; top level element in the Batch namespace. Sets up and returns
- * a bean definition for a {@link org.springframework.batch.core.Step}.
+ * Parser for the lt;step/gt; top level element in the Batch namespace. Sets up
+ * and returns a bean definition for a
+ * {@link org.springframework.batch.core.Step}.
  * 
  * @author Thomas Risberg
  * 
  */
 public class TopLevelStepParser extends AbstractBeanDefinitionParser {
-	
+
 	private static final StandaloneStepParser stepParser = new StandaloneStepParser();
 
 	@Override
 	protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
 
-		CoreNamespaceUtils.checkForStepScope(parserContext, parserContext.extractSource(element));
-		CoreNamespaceUtils.addRangePropertyEditor(parserContext);
+		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, parserContext.extractSource(element));
+
 		return stepParser.parse(element, parserContext);
-		
+
 	}
 
 }

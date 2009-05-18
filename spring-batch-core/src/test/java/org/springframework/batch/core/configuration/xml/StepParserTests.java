@@ -25,11 +25,16 @@ import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.StepExecutionListenerSupport;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.core.step.tasklet.TaskletStep;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -37,11 +42,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
 
 /**
  * @author Thomas Risberg
+ * @author Dan Garrette
  */
 public class StepParserTests {
 
@@ -182,8 +189,7 @@ public class StepParserTests {
 
 	@SuppressWarnings("unchecked")
 	private StepExecutionListener getListener(String stepName, ApplicationContext ctx) throws Exception {
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey(stepName));
+		assertTrue(ctx.containsBean(stepName));
 		Step step = (Step) ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
 		Object compositeListener = ReflectionTestUtils.getField(step, "stepExecutionListener");
@@ -199,34 +205,107 @@ public class StepParserTests {
 		return listener;
 	}
 
-	@SuppressWarnings("unchecked")
 	private DefaultTransactionAttribute getTransactionAttribute(ApplicationContext ctx, String stepName) {
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey(stepName));
+		assertTrue(ctx.containsBean(stepName));
 		Step step = (Step) ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
 		Object transactionAttribute = ReflectionTestUtils.getField(step, "transactionAttribute");
-		DefaultTransactionAttribute txa = (DefaultTransactionAttribute) transactionAttribute;
-		return txa;
+		return (DefaultTransactionAttribute) transactionAttribute;
 	}
 
 	@Test
 	public void testInheritFromBean() throws Exception {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(
 				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
-		
+
 		assertTrue(getTasklet("s9", ctx) instanceof DummyTasklet);
 		assertTrue(getTasklet("s10", ctx) instanceof DummyTasklet);
 	}
 
-	@SuppressWarnings("unchecked")
 	private Tasklet getTasklet(String stepName, ApplicationContext ctx) {
-		Map<String, Object> beans = ctx.getBeansOfType(Step.class);
-		assertTrue(beans.containsKey(stepName));
+		assertTrue(ctx.containsBean(stepName));
 		Step step = (Step) ctx.getBean(stepName);
 		assertTrue(step instanceof TaskletStep);
 		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
 		assertTrue(tasklet instanceof Tasklet);
-		return (Tasklet)tasklet;
+		return (Tasklet) tasklet;
+	}
+
+	@Test
+	public void testJobRepositoryDefaults() throws Exception {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+
+		assertTrue(getJobRepository("defaultRepoStep", ctx) instanceof SimpleJobRepository);
+
+		assertTrue(getJobRepository("defaultRepoStepWithParent", ctx) instanceof SimpleJobRepository);
+
+		assertTrue(getJobRepository("overrideRepoStep", ctx) instanceof SimpleJobRepository);
+
+		assertDummyJobRepository("injectedRepoStep", "dummyJobRepository", ctx);
+
+		assertDummyJobRepository("injectedRepoStepWithParent", "dummyJobRepository", ctx);
+
+		assertDummyJobRepository("injectedOverrideRepoStep", "dummyJobRepository", ctx);
+
+		assertDummyJobRepository("injectedRepoFromParentStep", "dummyJobRepository2", ctx);
+
+		assertDummyJobRepository("injectedRepoFromParentStepWithParent", "dummyJobRepository2", ctx);
+
+		assertDummyJobRepository("injectedOverrideRepoFromParentStep", "dummyJobRepository2", ctx);
+
+		assertTrue(getJobRepository("defaultRepoStandaloneStep", ctx) instanceof SimpleJobRepository);
+
+		assertDummyJobRepository("specifiedRepoStandaloneStep", "dummyJobRepository2", ctx);
+	}
+
+	@Test
+	public void testTransactionManagerDefaults() throws Exception {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+
+		assertTrue(getTransactionManager("defaultTxMgrStep", ctx) instanceof ResourcelessTransactionManager);
+
+		assertDummyTransactionManager("specifiedTxMgrStep", "dummyTxMgr", ctx);
+
+		assertDummyTransactionManager("defaultTxMgrWithParentStep", "dummyTxMgr", ctx);
+
+		assertDummyTransactionManager("overrideTxMgrOnParentStep", "dummyTxMgr2", ctx);
+	}
+
+	private void assertDummyJobRepository(String beanName, String jobRepoName, ApplicationContext ctx) throws Exception {
+		JobRepository jobRepository = getJobRepository(beanName, ctx);
+		assertTrue(jobRepository instanceof DummyJobRepository);
+		assertEquals(jobRepoName, ((DummyJobRepository) jobRepository).getName());
+	}
+
+	private void assertDummyTransactionManager(String beanName, String txMgrName, ApplicationContext ctx)
+			throws Exception {
+		PlatformTransactionManager txMgr = getTransactionManager(beanName, ctx);
+		assertTrue(txMgr instanceof DummyPlatformTransactionManager);
+		assertEquals(txMgrName, ((DummyPlatformTransactionManager) txMgr).getName());
+	}
+
+	private JobRepository getJobRepository(String beanName, ApplicationContext ctx) throws Exception {
+		Object jobRepository = getFieldFromBean(beanName, "jobRepository", ctx);
+		assertTrue(jobRepository instanceof JobRepository);
+		return (JobRepository) jobRepository;
+	}
+
+	private PlatformTransactionManager getTransactionManager(String beanName, ApplicationContext ctx) throws Exception {
+		Object jobRepository = getFieldFromBean(beanName, "transactionManager", ctx);
+		assertTrue(jobRepository instanceof PlatformTransactionManager);
+		return (PlatformTransactionManager) jobRepository;
+	}
+
+	private Object getFieldFromBean(String beanName, String field, ApplicationContext ctx) throws Exception {
+		assertTrue(ctx.containsBean(beanName));
+		Object bean = ctx.getBean(beanName);
+		assertTrue(bean instanceof AbstractStep || bean instanceof AbstractJob);
+		Object property = ReflectionTestUtils.getField(bean, field);
+		while (property instanceof Advised) {
+			property = ((Advised) property).getTargetSource().getTarget();
+		}
+		return property;
 	}
 }

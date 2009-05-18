@@ -83,4 +83,46 @@
 			</listeners>
 		</tasklet>
 	</step>
+	
+	<job id="jobWithoutRepo">
+		<step id="defaultRepoStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="defaultRepoStepWithParent" parent="defaultRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="overrideRepoStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+	</job>
+
+	<job id="jobWithRepo" job-repository="dummyJobRepository">
+		<step id="injectedRepoStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoStepWithParent" parent="defaultRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedOverrideRepoStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+	</job>
+	
+	<job id="jobWithRepoOnParent" parent="baseJobWithRepo">
+		<step id="injectedRepoFromParentStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoFromParentStepWithParent" parent="defaultRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedOverrideRepoFromParentStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+	</job>
+
+	<step id="defaultRepoStandaloneStep">
+		<tasklet ref="dummyTasklet"/>
+	</step>
+	
+	<step id="specifiedRepoStandaloneStep">
+		<tasklet job-repository="dummyJobRepository2" transaction-manager="dummyTxMgr" ref="dummyTasklet"/>
+	</step>
+
+	<job id="baseJobWithRepo" job-repository="dummyJobRepository2" abstract="true"/>
+	
+	<beans:bean id="dummyJobRepository" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
+	<beans:bean id="dummyJobRepository2" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
+
+	<job id="defaultTxMgrTestJob">
+		<step id="defaultTxMgrStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="specifiedTxMgrStep"><tasklet ref="dummyTasklet" transaction-manager="dummyTxMgr"/></step>
+		<step id="defaultTxMgrWithParentStep" parent="specifiedRepoStandaloneStep"/>
+		<step id="overrideTxMgrOnParentStep" parent="specifiedRepoStandaloneStep"><tasklet transaction-manager="dummyTxMgr2"/></step>
+	</job>
+
+	<beans:bean id="dummyTxMgr" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
+	<beans:bean id="dummyTxMgr2" class="org.springframework.batch.core.configuration.xml.DummyPlatformTransactionManager"/>
+	
 </beans:beans>

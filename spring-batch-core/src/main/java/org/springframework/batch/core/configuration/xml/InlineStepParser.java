@@ -45,18 +45,18 @@ public class InlineStepParser extends AbstractStepParser {
 	 * 
 	 * @param element the &lt;step/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @param jobRepositoryRef the reference to the jobRepository from the
-	 *            enclosing tag
+	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
+	 *        from the enclosing tag
 	 * @return a collection of bean definitions for
 	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 *         instances objects
 	 */
-	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobRepositoryRef) {
+	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext, String jobFactoryRef) {
 
 		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder.genericBeanDefinition(StepState.class);
 		String stepId = element.getAttribute(ID_ATTR);
 
-		AbstractBeanDefinition bd = parseStep(element, parserContext, jobRepositoryRef);
+		AbstractBeanDefinition bd = parseStep(element, parserContext, jobFactoryRef);
 		parserContext.registerBeanComponent(new BeanComponentDefinition(bd, stepId));
 		stateBuilder.addConstructorArgReference(stepId);
 

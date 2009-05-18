@@ -30,9 +30,9 @@ import org.w3c.dom.Element;
 
 /**
  * Internal parser for the &lt;split/&gt; elements inside a job. A split element
- * references a bean definition for a 
- * {@link org.springframework.batch.core.job.flow.JobExecutionDecider} and goes on to
- * list a set of transitions to other states with &lt;next on="pattern"
+ * references a bean definition for a
+ * {@link org.springframework.batch.core.job.flow.JobExecutionDecider} and goes
+ * on to list a set of transitions to other states with &lt;next on="pattern"
  * to="stepName"/&gt;. Used by the {@link JobParser}.
  * 
  * @see JobParser
@@ -42,38 +42,39 @@ import org.w3c.dom.Element;
  */
 public class SplitParser {
 
-	private final String jobRepositoryRef;
+	private final String jobFactoryRef;
 
 	/**
 	 * Construct a {@link FlowParser} using the provided job repository ref.
-	 * @param jobRepositoryRef the reference to the jobRepository from the enclosing tag
+	 * 
+	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
+	 *        from the enclosing tag
 	 */
-	public SplitParser(String jobRepositoryRef) {
-		this.jobRepositoryRef = jobRepositoryRef;
+	public SplitParser(String jobFactoryRef) {
+		this.jobFactoryRef = jobFactoryRef;
 	}
-
 
 	/**
 	 * Parse the split and turn it into a list of transitions.
 	 * 
 	 * @param element the &lt;split/gt; element to parse
 	 * @param parserContext the parser context for the bean factory
-	 * @return a collection of bean definitions for 
-	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 * instances objects
+	 * @return a collection of bean definitions for
+	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 *         instances objects
 	 */
 	public Collection<BeanDefinition> parse(Element element, ParserContext parserContext) {
 
 		String idAttribute = element.getAttribute("id");
 
-		BeanDefinitionBuilder stateBuilder = 
-			BeanDefinitionBuilder.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.SplitState");
+		BeanDefinitionBuilder stateBuilder = BeanDefinitionBuilder
+				.genericBeanDefinition("org.springframework.batch.core.job.flow.support.state.SplitState");
 
-        String taskExecutorBeanId = element.getAttribute("task-executor");
-        if (StringUtils.hasText(taskExecutorBeanId)) {
-            RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
-            stateBuilder.addPropertyValue("taskExecutor", taskExecutorRef);
-        }
+		String taskExecutorBeanId = element.getAttribute("task-executor");
+		if (StringUtils.hasText(taskExecutorBeanId)) {
+			RuntimeBeanReference taskExecutorRef = new RuntimeBeanReference(taskExecutorBeanId);
+			stateBuilder.addPropertyValue("taskExecutor", taskExecutorRef);
+		}
 
 		@SuppressWarnings("unchecked")
 		List<Element> flowElements = (List<Element>) DomUtils.getChildElementsByTagName(element, "flow");
@@ -81,21 +82,21 @@ public class SplitParser {
 		if (flowElements.size() < 2) {
 			parserContext.getReaderContext().error("A <split/> must contain at least two 'flow' elements.", element);
 		}
-		
+
 		Collection<BeanDefinition> flows = new ArrayList<BeanDefinition>();
 		int i = 0;
 		for (Element nextElement : flowElements) {
-			FlowParser flowParser = new FlowParser(idAttribute+"#"+i, jobRepositoryRef);
+			FlowParser flowParser = new FlowParser(idAttribute + "#" + i, jobFactoryRef);
 			flows.add(flowParser.parse(nextElement, parserContext));
 			i++;
-		}	
+		}
 		ManagedList managedList = new ManagedList();
 		@SuppressWarnings( { "unchecked", "unused" })
 		boolean dummy = managedList.addAll(flows);
 
 		stateBuilder.addConstructorArgValue(managedList);
 		stateBuilder.addConstructorArgValue(idAttribute);
-		
+
 		return FlowParser.getNextElements(parserContext, stateBuilder.getBeanDefinition(), element);
 
 	}
