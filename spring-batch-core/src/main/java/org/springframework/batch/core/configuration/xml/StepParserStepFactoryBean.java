@@ -139,7 +139,6 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 * @see FactoryBean#getObject()
 	 */
 	public final Object getObject() throws Exception {
-		AbstractStep step;
 		if (hasChunkElement) {
 			Assert.isNull(tasklet, "Step [" + name
 					+ "] has both a <chunk/> element and a 'ref' attribute  referencing a Tasklet.");
@@ -148,26 +147,24 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 				FaultTolerantStepFactoryBean<I, O> fb = new FaultTolerantStepFactoryBean<I, O>();
 				configureSimple(fb);
 				configureFaultTolerant(fb);
-				step = (AbstractStep) fb.getObject();
+				return fb.getObject();
 			}
 			else {
 				validateSimpleStep();
 				SimpleStepFactoryBean<I, O> fb = new SimpleStepFactoryBean<I, O>();
 				configureSimple(fb);
-				step = (AbstractStep) fb.getObject();
+				return fb.getObject();
 			}
 		}
 		else if (tasklet != null) {
 			TaskletStep ts = new TaskletStep();
 			configureTaskletStep(ts);
-			step = (AbstractStep) ts;
+			return ts;
 		}
 		else {
 			throw new IllegalStateException("Step [" + name
 					+ "] has neither a <chunk/> element nor a 'ref' attribute referencing a Tasklet.");
 		}
-
-		return step;
 	}
 
 	private void configureSimple(SimpleStepFactoryBean<I, O> fb) {
