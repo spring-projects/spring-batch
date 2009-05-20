@@ -308,4 +308,14 @@ public class StepParserTests {
 		}
 		return property;
 	}
+
+	@Test
+	public void testNonAbstractStep() {
+		ApplicationContext ctx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+
+		assertTrue(ctx.containsBean("s11"));
+		Object bean = ctx.getBean("s11");
+		assertTrue(bean instanceof DummyStep);
+	}
 }
