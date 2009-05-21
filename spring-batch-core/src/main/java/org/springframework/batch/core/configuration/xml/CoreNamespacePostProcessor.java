@@ -16,11 +16,9 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -29,7 +27,6 @@ import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.StringUtils;
 
 /**
  * Post-process jobs and steps defined using the batch namespace to inject
@@ -61,7 +58,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 			BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
 			MutablePropertyValues pvs = (MutablePropertyValues) bd.getPropertyValues();
 			if (pvs.contains(JOB_FACTORY_PROPERTY_NAME)) {
-				if (isAbstractStep(bd, beanFactory)) {
+				if (CoreNamespaceBeanDefinitionUtils.isAbstractStep(bd, beanFactory)) {
 					String jobName = (String) pvs.getPropertyValue(JOB_FACTORY_PROPERTY_NAME).getValue();
 					PropertyValue jobRepository = getJobRepository(jobName, beanFactory);
 					if (jobRepository != null) {
@@ -81,47 +78,6 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	}
 
 	/**
-	 * @param bd
-	 * @param beanFactory
-	 * @return TRUE if the bean represents an AbstractStep (or
-	 *         StepParserStepFactoryBean).
-	 */
-	private boolean isAbstractStep(BeanDefinition bd, ConfigurableListableBeanFactory beanFactory) {
-		Class<?> stepClass = getClass(bd, beanFactory);
-		return StepParserStepFactoryBean.class.isAssignableFrom(stepClass)
-				|| AbstractStep.class.isAssignableFrom(stepClass);
-	}
-
-	/**
-	 * @param bd
-	 * @param beanFactory
-	 * @return The class of the bean. Search parent hierarchy if necessary.
-	 *         Return null if none is found.
-	 */
-	private Class<?> getClass(BeanDefinition bd, ConfigurableListableBeanFactory beanFactory) {
-		// Get the declared class of the bean
-		String className = bd.getBeanClassName();
-		if (StringUtils.hasText(className)) {
-			try {
-				return Class.forName(className);
-			}
-			catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		else {
-			// Search the parent until you find it
-			String parentName = bd.getParentName();
-			if (StringUtils.hasText(parentName)) {
-				return getClass(beanFactory.getBeanDefinition(parentName), beanFactory);
-			}
-			else {
-				return null;
-			}
-		}
-	}
-
-	/**
 	 * @param jobName
 	 * @param beanFactory
 	 * @return The {@link PropertyValue} for the {@link JobRepository} of the
@@ -130,21 +86,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	 */
 	private PropertyValue getJobRepository(String jobName, ConfigurableListableBeanFactory beanFactory) {
 		BeanDefinition jobDef = beanFactory.getBeanDefinition(jobName);
-		PropertyValues jobDefPvs = jobDef.getPropertyValues();
-		if (jobDefPvs.contains(JOB_REPOSITORY_PROPERTY_NAME)) {
-			// return the job repository property
-			return jobDefPvs.getPropertyValue(JOB_REPOSITORY_PROPERTY_NAME);
-		}
-		else {
-			// Search the parent until you find it
-			String parentName = jobDef.getParentName();
-			if (StringUtils.hasText(parentName)) {
-				return getJobRepository(parentName, beanFactory);
-			}
-			else {
-				return null;
-			}
-		}
+		return CoreNamespaceBeanDefinitionUtils.getPropertyValue(jobDef, JOB_REPOSITORY_PROPERTY_NAME, beanFactory);
 	}
 
 	/**
