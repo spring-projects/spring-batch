@@ -16,11 +16,8 @@
 
 package org.springframework.batch.sample.domain.order.internal;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.sample.domain.order.LineItem;
 import org.springframework.batch.sample.domain.order.Order;
@@ -29,38 +26,36 @@ import org.springframework.batch.sample.domain.order.Order;
  * Converts <code>Order</code> object to a list of strings.
  * 
  * @author Dave Syer
+ * @author Dan Garrette
  */
-public class OrderProcessor implements ItemProcessor<Order, List<String>> {
+public class OrderLineAggregator implements LineAggregator<Order> {
 
-	/**
-	 * Aggregators for all types of lines in the output file
-	 */
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
 	private Map<String, LineAggregator<Object>> aggregators;
 
-	/**
-	 * Converts information from an Order object to a collection of Strings for
-	 * output.
-	 * 
-	 * @throws Exception
-	 */
-	public List<String> process(Order order) throws Exception {
+	public String aggregate(Order order) {
+		StringBuilder result = new StringBuilder();
 
-		List<String> result = new ArrayList<String>();
-
-		result.add(aggregators.get("header").aggregate(order));
-		result.add(aggregators.get("customer").aggregate(order));
-		result.add(aggregators.get("address").aggregate(order));
-		result.add(aggregators.get("billing").aggregate(order));
+		result.append(aggregators.get("header").aggregate(order) + LINE_SEPARATOR);
+		result.append(aggregators.get("customer").aggregate(order) + LINE_SEPARATOR);
+		result.append(aggregators.get("address").aggregate(order) + LINE_SEPARATOR);
+		result.append(aggregators.get("billing").aggregate(order) + LINE_SEPARATOR);
 
 		for (LineItem lineItem : order.getLineItems()) {
-			result.add(aggregators.get("item").aggregate(lineItem));
+			result.append(aggregators.get("item").aggregate(lineItem) + LINE_SEPARATOR);
 		}
 
-		result.add(aggregators.get("footer").aggregate(order));
+		result.append(aggregators.get("footer").aggregate(order));
 
-		return result;
+		return result.toString();
 	}
 
+	/**
+	 * Set aggregators for all types of lines in the output file
+	 * 
+	 * @param aggregators
+	 */
 	public void setAggregators(Map<String, LineAggregator<Object>> aggregators) {
 		this.aggregators = aggregators;
 	}

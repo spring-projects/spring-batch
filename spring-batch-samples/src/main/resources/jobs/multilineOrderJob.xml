@@ -54,23 +54,16 @@
 	<bean id="orderItemFieldSetMapper" class="org.springframework.batch.sample.domain.order.internal.mapper.OrderItemFieldSetMapper" />
 	<bean id="shippingFieldSetMapper"  class="org.springframework.batch.sample.domain.order.internal.mapper.ShippingFieldSetMapper" />
 
-	<bean id="processor" class="org.springframework.batch.item.support.CompositeItemProcessor">
-		<property name="itemProcessors">
-			<list>
-				<bean class="org.springframework.batch.item.validator.ValidatingItemProcessor">
-					<constructor-arg ref="validator" />
-				</bean>
-				<bean class="org.springframework.batch.sample.domain.order.internal.OrderProcessor">
-					<property name="aggregators" ref="outputAggregators"/>
-				</bean>
-			</list>
-		</property>
+	<bean id="processor" class="org.springframework.batch.item.validator.ValidatingItemProcessor">
+		<constructor-arg ref="validator" />
 	</bean>
 
 	<bean id="fileItemWriter" class="org.springframework.batch.item.file.FlatFileItemWriter">
 		<property name="resource" value="file:target/test-outputs/multilineOrderOutput.txt" />
 		<property name="lineAggregator">
-			<bean class="org.springframework.batch.item.file.transform.RecursiveCollectionLineAggregator" />
+			<bean class="org.springframework.batch.sample.domain.order.internal.OrderLineAggregator">
+				<property name="aggregators" ref="outputAggregators"/>
+			</bean>
 		</property>
 	</bean>
 
