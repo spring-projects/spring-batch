@@ -52,6 +52,9 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
  */
 public class StepParserTests {
 
+	private static final ApplicationContext stepParserParentAttributeTestsCtx = new ClassPathXmlApplicationContext(
+			"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testTaskletStepAttributes() throws Exception {
@@ -134,8 +137,7 @@ public class StepParserTests {
 
 	@Test
 	public void testParentStep() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		// Inline Step
 		assertTrue(getListener("s1", ctx) instanceof StepExecutionListenerSupport);
@@ -152,8 +154,7 @@ public class StepParserTests {
 
 	@Test
 	public void testInheritTransactionAttributes() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		// On Inline - No Merge
 		validateTransactionAttributesInherited("s1", ctx);
@@ -215,8 +216,7 @@ public class StepParserTests {
 
 	@Test
 	public void testInheritFromBean() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		assertTrue(getTasklet("s9", ctx) instanceof DummyTasklet);
 		assertTrue(getTasklet("s10", ctx) instanceof DummyTasklet);
@@ -233,8 +233,7 @@ public class StepParserTests {
 
 	@Test
 	public void testJobRepositoryDefaults() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		assertTrue(getJobRepository("defaultRepoStep", ctx) instanceof SimpleJobRepository);
 
@@ -261,8 +260,7 @@ public class StepParserTests {
 
 	@Test
 	public void testTransactionManagerDefaults() throws Exception {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		assertTrue(getTransactionManager("defaultTxMgrStep", ctx) instanceof ResourcelessTransactionManager);
 
@@ -311,11 +309,23 @@ public class StepParserTests {
 
 	@Test
 	public void testNonAbstractStep() {
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(
-				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
 
 		assertTrue(ctx.containsBean("s11"));
 		Object bean = ctx.getBean("s11");
 		assertTrue(bean instanceof DummyStep);
+	}
+
+	@Test
+	public void testTaskletElementOverridesParentBeanClass() {
+		ApplicationContext ctx = stepParserParentAttributeTestsCtx;
+
+		assertTrue(ctx.containsBean("&s12"));
+		Object factoryBean = ctx.getBean("&s12");
+		assertTrue(factoryBean instanceof StepParserStepFactoryBean);
+
+		assertTrue(ctx.containsBean("s12"));
+		Object bean = ctx.getBean("s12");
+		assertTrue(bean instanceof TaskletStep);
 	}
 }

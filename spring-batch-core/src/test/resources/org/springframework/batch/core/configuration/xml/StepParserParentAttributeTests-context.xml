@@ -35,7 +35,10 @@
 		<step id="s8" parent="standalone8" next="s9" />
 		<step id="s9" parent="standalone9" next="s10" />
 		<step id="s10" parent="standalone10" next="s11"/>
-		<step id="s11" parent="dummyStep" />
+		<step id="s11" parent="dummyStep"/>
+		<step id="s12" parent="dummyStep">
+			<tasklet ref="dummyTasklet"/>
+		</step>
 	</job>
 
 	<step id="standalone2" parent="baseStep">
