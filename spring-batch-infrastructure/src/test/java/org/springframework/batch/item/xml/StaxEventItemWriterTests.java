@@ -22,10 +22,16 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.oxm.Marshaller;
 import org.springframework.oxm.XmlMappingException;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -99,13 +105,60 @@ public class StaxEventItemWriterTests {
 		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
 	}
 
+	@Test
+	public void testTransactionalRestart() throws Exception {
+		writer.open(executionContext);
+
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write item
+					writer.write(items);
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		writer.close();
+
+		// create new writer from saved restart data and continue writing
+		writer = createItemWriter();
+		writer.open(executionContext);
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					writer.write(items);
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		writer.close();
+
+		// check the output is concatenation of 'before restart' and 'after
+		// restart' writes.
+		String outputFile = outputFileContent();
+		assertEquals(2, StringUtils.countOccurrencesOf(outputFile, TEST_STRING));
+		assertTrue(outputFile.contains("<root>" + TEST_STRING + TEST_STRING + "</root>"));
+	}
+
 	/**
 	 * Item is written to the output file only after flush.
 	 */
 	@Test
 	public void testWriteWithHeader() throws Exception {
-		
-		writer.setHeaderCallback(new StaxWriterCallback(){
+
+		writer.setHeaderCallback(new StaxWriterCallback() {
 
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
@@ -116,9 +169,9 @@ public class StaxEventItemWriterTests {
 				catch (XMLStreamException e) {
 					throw new RuntimeException(e);
 				}
-				
+
 			}
-			
+
 		});
 		writer.open(executionContext);
 		writer.write(items);
@@ -150,7 +203,7 @@ public class StaxEventItemWriterTests {
 	 */
 	@Test
 	public void testOpenAndClose() throws Exception {
-		writer.setHeaderCallback(new StaxWriterCallback(){
+		writer.setHeaderCallback(new StaxWriterCallback() {
 
 			public void write(XMLEventWriter writer) throws IOException {
 				XMLEventFactory factory = XMLEventFactory.newInstance();
@@ -161,9 +214,9 @@ public class StaxEventItemWriterTests {
 				catch (XMLStreamException e) {
 					throw new RuntimeException(e);
 				}
-				
+
 			}
-			
+
 		});
 		writer.setFooterCallback(new StaxWriterCallback() {
 
@@ -176,16 +229,16 @@ public class StaxEventItemWriterTests {
 				catch (XMLStreamException e) {
 					throw new RuntimeException(e);
 				}
-				
+
 			}
-			
+
 		});
 		writer.setRootTagName("testroot");
 		writer.setRootElementAttributes(Collections.<String, String> singletonMap("attribute", "value"));
 		writer.open(executionContext);
 		writer.close();
 		String content = outputFileContent();
-		
+
 		assertTrue(content.contains("<testroot attribute=\"value\">"));
 		assertTrue(content.contains("<header></header>"));
 		assertTrue(content.contains("<footer></footer>"));

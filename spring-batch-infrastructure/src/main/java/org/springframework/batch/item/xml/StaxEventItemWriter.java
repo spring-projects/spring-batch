@@ -126,6 +126,8 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 	private StaxWriterCallback footerCallback;
 
+	private TransactionAwareBufferedWriter transactionAwareBufferedWriter;
+
 	public StaxEventItemWriter() {
 		setName(ClassUtils.getShortName(StaxEventItemWriter.class));
 	}
@@ -315,8 +317,9 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
 		try {
-			delegateEventWriter = outputFactory.createXMLEventWriter(new TransactionAwareBufferedWriter(
-					new OutputStreamWriter(os, encoding), getName()));
+			transactionAwareBufferedWriter = new TransactionAwareBufferedWriter(
+					new OutputStreamWriter(os, encoding), getName());
+			delegateEventWriter = outputFactory.createXMLEventWriter(transactionAwareBufferedWriter);
 			eventWriter = new NoStartEndDocumentStreamWriter(delegateEventWriter);
 			if (!restarted) {
 				startDocument(delegateEventWriter);
@@ -487,7 +490,7 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		try {
 			eventWriter.flush();
-			position = channel.position();
+			position = channel.position() + transactionAwareBufferedWriter.getBufferSize();
 		}
 		catch (Exception e) {
 			throw new DataAccessResourceFailureException("Unable to write to file resource: [" + resource + "]", e);

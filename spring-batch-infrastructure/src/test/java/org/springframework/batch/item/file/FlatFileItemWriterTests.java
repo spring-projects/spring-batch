@@ -39,9 +39,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemStreamException;
+import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.batch.item.file.transform.PassThroughLineAggregator;
+import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -247,6 +253,72 @@ public class FlatFileItemWriterTests {
 	}
 
 	@Test
+	public void testTransactionalRestart() throws Exception {
+
+		writer.setFooterCallback(new FlatFileFooterCallback() {
+
+			public void writeFooter(Writer writer) throws IOException {
+				writer.write("footer");
+			}
+
+		});
+
+		writer.open(executionContext);
+
+		PlatformTransactionManager transactionManager = new ResourcelessTransactionManager();
+		
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write some lines
+					writer.write(Arrays.asList(new String[] { "testLine1", "testLine2", "testLine3" }));
+					// write more lines
+					writer.write(Arrays.asList(new String[] { "testLine4", "testLine5" }));
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		// close template
+		writer.close();
+
+		// init with correct data
+		writer.open(executionContext);
+
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					// write more lines
+					writer.write(Arrays.asList(new String[] { "testLine6", "testLine7", "testLine8" }));
+				}
+				catch (Exception e) {
+					throw new UnexpectedInputException("Could not write data", e);
+				}
+				// get restart data
+				writer.update(executionContext);
+				return null;
+			}
+		});
+		// close template
+		writer.close();
+
+		// verify what was written to the file
+		for (int i = 1; i <= 8; i++) {
+			assertEquals("testLine" + i, readLine());
+		}
+
+		assertEquals("footer", readLine());
+
+		// 3 lines were written to the file after restart
+		assertEquals(3, executionContext.getLong(ClassUtils.getShortName(FlatFileItemWriter.class) + ".written"));
+
+	}
+
+	@Test
 	public void testOpenWithNonWritableFile() throws Exception {
 		writer = new FlatFileItemWriter<String>();
 		writer.setLineAggregator(new PassThroughLineAggregator<String>());
@@ -254,9 +326,9 @@ public class FlatFileItemWriterTests {
 		writer.setResource(file);
 		new File(file.getFile().getParent()).mkdirs();
 		file.getFile().createNewFile();
-		assertTrue("Test file must exist: "+file, file.exists());
-		assertTrue("Test file set to read-only: "+file, file.getFile().setReadOnly());
-		assertFalse("Should be readonly file: "+file, file.getFile().canWrite());
+		assertTrue("Test file must exist: " + file, file.exists());
+		assertTrue("Test file set to read-only: " + file, file.getFile().setReadOnly());
+		assertFalse("Should be readonly file: " + file, file.getFile().canWrite());
 		writer.afterPropertiesSet();
 		try {
 			writer.open(executionContext);

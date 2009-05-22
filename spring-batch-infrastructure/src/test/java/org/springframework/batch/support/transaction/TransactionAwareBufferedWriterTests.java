@@ -15,15 +15,15 @@
  */
 package org.springframework.batch.support.transaction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
 import org.junit.Test;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.batch.support.transaction.TransactionAwareBufferedWriter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -54,6 +54,12 @@ public class TransactionAwareBufferedWriterTests {
 		writer.write("foo");
 		writer.flush();
 		assertEquals("foo", stringWriter.toString());
+	}
+
+	@Test
+	public void testBufferSizeOutsideTransaction() throws Exception {
+		writer.write("foo");
+		assertEquals(0, writer.getBufferSize());
 	}
 
 	@Test
@@ -112,6 +118,22 @@ public class TransactionAwareBufferedWriterTests {
 			}
 		});
 		assertEquals("foo", stringWriter.toString());
+	}
+
+	@Test
+	public void tesBufferSizeInTransaction() throws Exception {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallback() {
+			public Object doInTransaction(TransactionStatus status) {
+				try {
+					writer.write("foo");
+				}
+				catch (IOException e) {
+					throw new IllegalStateException("Unexpected IOException", e);
+				}
+				assertEquals(3, writer.getBufferSize());
+				return null;
+			}
+		});
 	}
 
 	@Test

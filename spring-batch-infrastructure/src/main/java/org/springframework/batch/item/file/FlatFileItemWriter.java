@@ -214,7 +214,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 	public void close() {
 		if (state != null) {
 			try {
-				if (footerCallback != null) {
+				if (footerCallback != null && state.outputBufferedWriter != null) {
 					footerCallback.writeFooter(state.outputBufferedWriter);
 					state.outputBufferedWriter.flush();
 				}
@@ -350,7 +350,7 @@ public class FlatFileItemWriter<T> extends ExecutionContextUserSupport implement
 			}
 
 			outputBufferedWriter.flush();
-			pos = fileChannel.position();
+			pos = fileChannel.position() + ((TransactionAwareBufferedWriter)outputBufferedWriter).getBufferSize();
 
 			return pos;
 

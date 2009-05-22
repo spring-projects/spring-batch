@@ -82,6 +82,19 @@ public class TransactionAwareBufferedWriter extends Writer {
 	}
 
 	/**
+	 * Convenience method for clients to determine if there is any unflushed
+	 * data.
+	 * 
+	 * @return the current size of unflushed buffered data
+	 */
+	public long getBufferSize() {
+		if (!transactionActive()) {
+			return 0L;
+		}
+		return getCurrentBuffer().length();
+	}
+
+	/**
 	 * @return
 	 */
 	private boolean transactionActive() {
