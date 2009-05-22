@@ -5,7 +5,7 @@ import java.util.Calendar;
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
-import org.springframework.batch.sample.domain.order.internal.HeaderFieldSetMapper;
+import org.springframework.batch.sample.domain.order.internal.mapper.HeaderFieldSetMapper;
 import org.springframework.batch.sample.support.AbstractFieldSetMapperTests;
 
 public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
@@ -24,14 +24,9 @@ public class HeaderFieldSetMapperTests extends AbstractFieldSetMapperTests {
 	}
 
 	protected FieldSet fieldSet() {
-		String[] tokens = new String[]{
-				String.valueOf(ORDER_ID), 
-				DATE
-		};
-		String[] columnNames = new String[]{
-				HeaderFieldSetMapper.ORDER_ID_COLUMN,
-				HeaderFieldSetMapper.ORDER_DATE_COLUMN
-		};
+		String[] tokens = new String[] { String.valueOf(ORDER_ID), DATE };
+		String[] columnNames = new String[] { HeaderFieldSetMapper.ORDER_ID_COLUMN,
+				HeaderFieldSetMapper.ORDER_DATE_COLUMN };
 		return new DefaultFieldSet(tokens, columnNames);
 	}
 

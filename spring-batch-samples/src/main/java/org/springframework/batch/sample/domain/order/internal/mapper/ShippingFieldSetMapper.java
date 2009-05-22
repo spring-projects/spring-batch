@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.order.internal;
+package org.springframework.batch.sample.domain.order.internal.mapper;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.ShippingInfo;
 
-
-
 public class ShippingFieldSetMapper implements FieldSetMapper<ShippingInfo> {
-	
-    public static final String ADDITIONAL_SHIPPING_INFO_COLUMN = "ADDITIONAL_SHIPPING_INFO";
+
+	public static final String ADDITIONAL_SHIPPING_INFO_COLUMN = "ADDITIONAL_SHIPPING_INFO";
 	public static final String SHIPPING_TYPE_ID_COLUMN = "SHIPPING_TYPE_ID";
 	public static final String SHIPPER_ID_COLUMN = "SHIPPER_ID";
 
 	public ShippingInfo mapFieldSet(FieldSet fieldSet) {
-        ShippingInfo info = new ShippingInfo();
+		ShippingInfo info = new ShippingInfo();
 
-        info.setShipperId(fieldSet.readString(SHIPPER_ID_COLUMN));
-        info.setShippingTypeId(fieldSet.readString(SHIPPING_TYPE_ID_COLUMN));
-        info.setShippingInfo(fieldSet.readString(ADDITIONAL_SHIPPING_INFO_COLUMN));
+		info.setShipperId(fieldSet.readString(SHIPPER_ID_COLUMN));
+		info.setShippingTypeId(fieldSet.readString(SHIPPING_TYPE_ID_COLUMN));
+		info.setShippingInfo(fieldSet.readString(ADDITIONAL_SHIPPING_INFO_COLUMN));
 
-        return info;
-    }
+		return info;
+	}
 }

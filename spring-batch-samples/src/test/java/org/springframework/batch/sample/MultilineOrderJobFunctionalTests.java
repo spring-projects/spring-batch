@@ -16,50 +16,27 @@
 
 package org.springframework.batch.sample;
 
-import static org.junit.Assert.assertEquals;
+import static org.springframework.batch.test.AssertFile.assertFileEquals;
 
-import java.io.IOException;
-
-import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.batch.test.AbstractJobTests;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.StringUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration()
-public class MultilineOrderJobFunctionalTests extends AbstractValidatingBatchLauncherTests {
+public class MultilineOrderJobFunctionalTests extends AbstractJobTests {
 
-	private static final String EXPECTED_OUTPUT = 
-	"BEGIN_ORDER:13100345  2007/02/15                    "+
-	"CUSTOMER:20014539  Peter               Smith     "+
-	"ADDRESS:Oak Street 31/A     Small Town00235     "+
-	"BILLING:VISA      VISA-12345678903    "+
-	"ITEM:104439104137.49     "+
-	"ITEM:2134776319221.99    "+
-	"END_ORDER:              267.34"+
-	"BEGIN_ORDER:13100346  2007/02/15                    "+
-	"CUSTOMER:72155919                                "+
-	"ADDRESS:St. Andrews Road 31 London    55342     "+
-	"BILLING:AMEX      AMEX-72345678903    "+
-	"ITEM:10443191011070.50   "+
-	"ITEM:213472721921.79     "+
-	"ITEM:104433930179.95     "+
-	"ITEM:213474731955.29     "+
-	"ITEM:1044359501339.99    "+
-	"END_ORDER:            14043.74";
+	private static final String ACTUAL = "target/test-outputs/multilineOrderOutput.txt";
+	private static final String EXPECTED = "data/multilineOrderJob/result/multilineOrderOutput.txt";
 
-	
-	private Resource fileOutputLocator = new FileSystemResource("target/test-outputs/20070122.teststream.multilineOrderStep.TEMP.txt");
-	
-	/**
-	 * Read the output file and compare it with expected string
-	 * @throws IOException 
-	 */
-	protected void validatePostConditions() throws Exception {
-		assertEquals(EXPECTED_OUTPUT, StringUtils.replace(IOUtils.toString(fileOutputLocator.getInputStream()), System.getProperty("line.separator"), ""));
+	@Test
+	public void testJob() throws Exception {
+		this.launchJob();
+		assertFileEquals(new ClassPathResource(EXPECTED), new FileSystemResource(ACTUAL));
 	}
 
 }

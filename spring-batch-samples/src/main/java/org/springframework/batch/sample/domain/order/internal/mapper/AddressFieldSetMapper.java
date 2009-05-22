@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.order.internal;
+package org.springframework.batch.sample.domain.order.internal.mapper;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.Address;
 
-
-
 public class AddressFieldSetMapper implements FieldSetMapper<Address> {
-	
+
 	public static final String ADDRESSEE_COLUMN = "ADDRESSEE";
 	public static final String ADDRESS_LINE1_COLUMN = "ADDR_LINE1";
 	public static final String ADDRESS_LINE2_COLUMN = "ADDR_LINE2";
@@ -31,19 +29,18 @@ public class AddressFieldSetMapper implements FieldSetMapper<Address> {
 	public static final String ZIP_CODE_COLUMN = "ZIP_CODE";
 	public static final String STATE_COLUMN = "STATE";
 	public static final String COUNTRY_COLUMN = "COUNTRY";
-	
-	
-    public Address mapFieldSet(FieldSet fieldSet) {
-        Address address = new Address();
 
-        address.setAddressee(fieldSet.readString(ADDRESSEE_COLUMN));
-        address.setAddrLine1(fieldSet.readString(ADDRESS_LINE1_COLUMN));
-        address.setAddrLine2(fieldSet.readString(ADDRESS_LINE2_COLUMN));
-        address.setCity(fieldSet.readString(CITY_COLUMN));
-        address.setZipCode(fieldSet.readString(ZIP_CODE_COLUMN));
-        address.setState(fieldSet.readString(STATE_COLUMN));
-        address.setCountry(fieldSet.readString(COUNTRY_COLUMN));
+	public Address mapFieldSet(FieldSet fieldSet) {
+		Address address = new Address();
 
-        return address;
-    }
+		address.setAddressee(fieldSet.readString(ADDRESSEE_COLUMN));
+		address.setAddrLine1(fieldSet.readString(ADDRESS_LINE1_COLUMN));
+		address.setAddrLine2(fieldSet.readString(ADDRESS_LINE2_COLUMN));
+		address.setCity(fieldSet.readString(CITY_COLUMN));
+		address.setZipCode(fieldSet.readString(ZIP_CODE_COLUMN));
+		address.setState(fieldSet.readString(STATE_COLUMN));
+		address.setCountry(fieldSet.readString(COUNTRY_COLUMN));
+
+		return address;
+	}
 }

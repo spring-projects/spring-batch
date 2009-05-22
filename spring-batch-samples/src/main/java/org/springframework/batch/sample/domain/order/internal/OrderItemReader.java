@@ -52,7 +52,7 @@ public class OrderItemReader implements ItemReader<Order> {
 	private FieldSetMapper<LineItem> itemMapper;
 
 	private FieldSetMapper<ShippingInfo> shippingMapper;
-	
+
 	private ItemReader<FieldSet> fieldSetReader;
 
 	/**
@@ -67,7 +67,7 @@ public class OrderItemReader implements ItemReader<Order> {
 		}
 
 		log.info("Mapped: " + order);
-		
+
 		Order result = order;
 		order = null;
 
@@ -80,7 +80,6 @@ public class OrderItemReader implements ItemReader<Order> {
 			log.debug("FINISHED");
 			recordFinished = true;
 			order = null;
-
 			return;
 		}
 
@@ -90,12 +89,8 @@ public class OrderItemReader implements ItemReader<Order> {
 		if (Order.LINE_ID_HEADER.equals(lineId)) {
 			log.debug("STARTING NEW RECORD");
 			order = headerMapper.mapFieldSet(fieldSet);
-
-			return;
 		}
-
-		// mark we are finished with current Order
-		if (Order.LINE_ID_FOOTER.equals(lineId)) {
+		else if (Order.LINE_ID_FOOTER.equals(lineId)) {
 			log.debug("END OF RECORD");
 
 			// Do mapping for footer here, because mapper does not allow to pass
@@ -105,74 +100,57 @@ public class OrderItemReader implements ItemReader<Order> {
 			order.setTotalLines(fieldSet.readInt("TOTAL_LINE_ITEMS"));
 			order.setTotalItems(fieldSet.readInt("TOTAL_ITEMS"));
 
+			// mark we are finished with current Order
 			recordFinished = true;
-
-			return;
 		}
-
-		if (Customer.LINE_ID_BUSINESS_CUST.equals(lineId)) {
+		else if (Customer.LINE_ID_BUSINESS_CUST.equals(lineId)) {
 			log.debug("MAPPING CUSTOMER");
-
 			if (order.getCustomer() == null) {
-				order.setCustomer(customerMapper.mapFieldSet(fieldSet));
-				order.getCustomer().setBusinessCustomer(true);
+				Customer customer = customerMapper.mapFieldSet(fieldSet);
+				customer.setBusinessCustomer(true);
+				order.setCustomer(customer);
 			}
-
-			return;
 		}
-
-		if (Customer.LINE_ID_NON_BUSINESS_CUST.equals(lineId)) {
+		else if (Customer.LINE_ID_NON_BUSINESS_CUST.equals(lineId)) {
 			log.debug("MAPPING CUSTOMER");
-
 			if (order.getCustomer() == null) {
-				order.setCustomer(customerMapper.mapFieldSet(fieldSet));
-				order.getCustomer().setBusinessCustomer(false);
+				Customer customer = customerMapper.mapFieldSet(fieldSet);
+				customer.setBusinessCustomer(false);
+				order.setCustomer(customer);
 			}
-
-			return;
 		}
-
-		if (Address.LINE_ID_BILLING_ADDR.equals(lineId)) {
+		else if (Address.LINE_ID_BILLING_ADDR.equals(lineId)) {
 			log.debug("MAPPING BILLING ADDRESS");
 			order.setBillingAddress(addressMapper.mapFieldSet(fieldSet));
-			return;
 		}
-
-		if (Address.LINE_ID_SHIPPING_ADDR.equals(lineId)) {
+		else if (Address.LINE_ID_SHIPPING_ADDR.equals(lineId)) {
 			log.debug("MAPPING SHIPPING ADDRESS");
 			order.setShippingAddress(addressMapper.mapFieldSet(fieldSet));
-			return;
 		}
-
-		if (BillingInfo.LINE_ID_BILLING_INFO.equals(lineId)) {
+		else if (BillingInfo.LINE_ID_BILLING_INFO.equals(lineId)) {
 			log.debug("MAPPING BILLING INFO");
 			order.setBilling(billingMapper.mapFieldSet(fieldSet));
-			return;
 		}
-
-		if (ShippingInfo.LINE_ID_SHIPPING_INFO.equals(lineId)) {
+		else if (ShippingInfo.LINE_ID_SHIPPING_INFO.equals(lineId)) {
 			log.debug("MAPPING SHIPPING INFO");
 			order.setShipping(shippingMapper.mapFieldSet(fieldSet));
-			return;
 		}
-
-		if (LineItem.LINE_ID_ITEM.equals(lineId)) {
+		else if (LineItem.LINE_ID_ITEM.equals(lineId)) {
 			log.debug("MAPPING LINE ITEM");
-
 			if (order.getLineItems() == null) {
 				order.setLineItems(new ArrayList<LineItem>());
 			}
 			order.getLineItems().add(itemMapper.mapFieldSet(fieldSet));
-
-			return;
+		}
+		else {
+			log.debug("Could not map LINE_ID=" + lineId);
 		}
 
-		log.debug("Could not map LINE_ID=" + lineId);
-
 	}
-	
+
 	/**
-	 * @param fieldSetReader reads lines from the file converting them to {@link FieldSet}.
+	 * @param fieldSetReader reads lines from the file converting them to
+	 *        {@link FieldSet}.
 	 */
 	public void setFieldSetReader(ItemReader<FieldSet> fieldSetReader) {
 		this.fieldSetReader = fieldSetReader;

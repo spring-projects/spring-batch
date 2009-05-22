@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.order.internal;
+package org.springframework.batch.sample.domain.order.internal.mapper;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.BillingInfo;
 
-
-
 public class BillingFieldSetMapper implements FieldSetMapper<BillingInfo> {
-	
+
 	public static final String PAYMENT_TYPE_ID_COLUMN = "PAYMENT_TYPE_ID";
 	public static final String PAYMENT_DESC_COLUMN = "PAYMENT_DESC";
-	
-    public BillingInfo mapFieldSet(FieldSet fieldSet) {
-        BillingInfo info = new BillingInfo();
 
-        info.setPaymentId(fieldSet.readString(PAYMENT_TYPE_ID_COLUMN));
-        info.setPaymentDesc(fieldSet.readString(PAYMENT_DESC_COLUMN));
+	public BillingInfo mapFieldSet(FieldSet fieldSet) {
+		BillingInfo info = new BillingInfo();
 
-        return info;
-    }
+		info.setPaymentId(fieldSet.readString(PAYMENT_TYPE_ID_COLUMN));
+		info.setPaymentDesc(fieldSet.readString(PAYMENT_DESC_COLUMN));
+
+		return info;
+	}
 }

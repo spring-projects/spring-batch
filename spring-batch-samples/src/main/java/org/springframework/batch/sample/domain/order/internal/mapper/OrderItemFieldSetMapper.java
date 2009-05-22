@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package org.springframework.batch.sample.domain.order.internal;
+package org.springframework.batch.sample.domain.order.internal.mapper;
 
 import org.springframework.batch.item.file.mapping.FieldSetMapper;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.batch.sample.domain.order.LineItem;
 
-
 public class OrderItemFieldSetMapper implements FieldSetMapper<LineItem> {
-	
+
 	public static final String TOTAL_PRICE_COLUMN = "TOTAL_PRICE";
 	public static final String QUANTITY_COLUMN = "QUANTITY";
 	public static final String HANDLING_PRICE_COLUMN = "HANDLING_PRICE";
@@ -31,20 +30,19 @@ public class OrderItemFieldSetMapper implements FieldSetMapper<LineItem> {
 	public static final String DISCOUNT_PERC_COLUMN = "DISCOUNT_PERC";
 	public static final String PRICE_COLUMN = "PRICE";
 	public static final String ITEM_ID_COLUMN = "ITEM_ID";
-	
-	
-    public LineItem mapFieldSet(FieldSet fieldSet) {
-        LineItem item = new LineItem();
 
-        item.setItemId(fieldSet.readLong(ITEM_ID_COLUMN));
-        item.setPrice(fieldSet.readBigDecimal(PRICE_COLUMN));
-        item.setDiscountPerc(fieldSet.readBigDecimal(DISCOUNT_PERC_COLUMN));
-        item.setDiscountAmount(fieldSet.readBigDecimal(DISCOUNT_AMOUNT_COLUMN));
-        item.setShippingPrice(fieldSet.readBigDecimal(SHIPPING_PRICE_COLUMN));
-        item.setHandlingPrice(fieldSet.readBigDecimal(HANDLING_PRICE_COLUMN));
-        item.setQuantity(fieldSet.readInt(QUANTITY_COLUMN));
-        item.setTotalPrice(fieldSet.readBigDecimal(TOTAL_PRICE_COLUMN));
+	public LineItem mapFieldSet(FieldSet fieldSet) {
+		LineItem item = new LineItem();
 
-        return item;
-    }
+		item.setItemId(fieldSet.readLong(ITEM_ID_COLUMN));
+		item.setPrice(fieldSet.readBigDecimal(PRICE_COLUMN));
+		item.setDiscountPerc(fieldSet.readBigDecimal(DISCOUNT_PERC_COLUMN));
+		item.setDiscountAmount(fieldSet.readBigDecimal(DISCOUNT_AMOUNT_COLUMN));
+		item.setShippingPrice(fieldSet.readBigDecimal(SHIPPING_PRICE_COLUMN));
+		item.setHandlingPrice(fieldSet.readBigDecimal(HANDLING_PRICE_COLUMN));
+		item.setQuantity(fieldSet.readInt(QUANTITY_COLUMN));
+		item.setTotalPrice(fieldSet.readBigDecimal(TOTAL_PRICE_COLUMN));
+
+		return item;
+	}
 }
