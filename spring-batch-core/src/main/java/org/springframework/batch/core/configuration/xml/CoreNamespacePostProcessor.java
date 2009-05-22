@@ -56,10 +56,10 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
-			MutablePropertyValues pvs = (MutablePropertyValues) bd.getPropertyValues();
-			if (pvs.contains(JOB_FACTORY_PROPERTY_NAME)) {
-				if (CoreNamespaceBeanDefinitionUtils.isAbstractStep(bd, beanFactory)) {
-					String jobName = (String) pvs.getPropertyValue(JOB_FACTORY_PROPERTY_NAME).getValue();
+			if (bd.hasAttribute(JOB_FACTORY_PROPERTY_NAME)) {
+				MutablePropertyValues pvs = (MutablePropertyValues) bd.getPropertyValues();
+				if (CoreNamespaceBeanDefinitionUtils.isAbstractStep(beanName, beanFactory)) {
+					String jobName = (String) bd.getAttribute(JOB_FACTORY_PROPERTY_NAME);
 					PropertyValue jobRepository = getJobRepository(jobName, beanFactory);
 					if (jobRepository != null) {
 						// Set the job's JobRepository onto the step
@@ -72,7 +72,6 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 						pvs.addPropertyValue(JOB_REPOSITORY_PROPERTY_NAME, jobRepositoryBeanRef);
 					}
 				}
-				pvs.removePropertyValue(JOB_FACTORY_PROPERTY_NAME);
 			}
 		}
 	}
@@ -85,8 +84,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	 *         is found.
 	 */
 	private PropertyValue getJobRepository(String jobName, ConfigurableListableBeanFactory beanFactory) {
-		BeanDefinition jobDef = beanFactory.getBeanDefinition(jobName);
-		return CoreNamespaceBeanDefinitionUtils.getPropertyValue(jobDef, JOB_REPOSITORY_PROPERTY_NAME, beanFactory);
+		return CoreNamespaceBeanDefinitionUtils.getPropertyValue(jobName, JOB_REPOSITORY_PROPERTY_NAME, beanFactory);
 	}
 
 	/**

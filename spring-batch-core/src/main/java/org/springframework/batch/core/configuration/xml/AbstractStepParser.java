@@ -100,7 +100,7 @@ public abstract class AbstractStepParser {
 		}
 
 		if (StringUtils.hasText(jobFactoryRef)) {
-			bd.getPropertyValues().addPropertyValue("jobParserJobFactoryBeanRef", jobFactoryRef);
+			bd.setAttribute("jobParserJobFactoryBeanRef", jobFactoryRef);
 		}
 
 		return bd;
