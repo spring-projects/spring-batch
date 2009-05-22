@@ -36,6 +36,8 @@ import org.w3c.dom.Element;
  */
 public class JobParser extends AbstractSingleBeanDefinitionParser {
 
+	private static final String MERGE_ATTR = "merge";
+
 	private static final JobExecutionListenerParser jobListenerParser = new JobExecutionListenerParser();
 
 	@Override
@@ -96,7 +98,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList listeners = new ManagedList();
-			listeners.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute("merge")));
+			listeners.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
+					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = (List<Element>) DomUtils.getChildElementsByTagName(listenersElement,
 					"listener");
 			for (Element listenerElement : listenerElements) {

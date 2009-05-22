@@ -811,7 +811,7 @@
 	</xsd:attributeGroup>
 
 	<xsd:attributeGroup name="mergeAttribute">
-		<xsd:attribute name="merge" type="xsd:boolean" default="false" use="optional">
+		<xsd:attribute name="merge" type="xsd:boolean" use="optional">
 			<xsd:annotation>
 				<xsd:documentation>
 					Should this list be merged with the corresponding list provided 

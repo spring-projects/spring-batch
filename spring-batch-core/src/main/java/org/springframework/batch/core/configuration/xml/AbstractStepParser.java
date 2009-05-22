@@ -207,7 +207,8 @@ public abstract class AbstractStepParser {
 				String[] exceptionArray = StringUtils.tokenizeToStringArray(exceptions, ",\n");
 				if (exceptionArray.length > 0) {
 					ManagedList managedList = new ManagedList();
-					managedList.setMergeEnabled(Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
+					managedList.setMergeEnabled(child.hasAttribute(MERGE_ATTR)
+							&& Boolean.valueOf(child.getAttribute(MERGE_ATTR)));
 					managedList.addAll(Arrays.asList(exceptionArray));
 					propertyValues.addPropertyValue(propertyName, managedList);
 				}
@@ -242,7 +243,8 @@ public abstract class AbstractStepParser {
 					parserContext.extractSource(stepElement));
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList listenerBeans = new ManagedList();
-			listenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
+			listenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
+					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			List<Element> listenerElements = DomUtils.getChildElementsByTagName(listenersElement, "listener");
 			if (listenerElements != null) {
 				for (Element listenerElement : listenerElements) {

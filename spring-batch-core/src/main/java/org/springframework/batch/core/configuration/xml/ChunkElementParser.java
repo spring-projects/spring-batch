@@ -155,7 +155,8 @@ public class ChunkElementParser {
 					parserContext.extractSource(element));
 			parserContext.pushContainingComponent(compositeDef);
 			ManagedList retryListenerBeans = new ManagedList();
-			retryListenerBeans.setMergeEnabled(Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
+			retryListenerBeans.setMergeEnabled(listenersElement.hasAttribute(MERGE_ATTR)
+					&& Boolean.valueOf(listenersElement.getAttribute(MERGE_ATTR)));
 			handleRetryListenerElements(parserContext, listenersElement, retryListenerBeans);
 			propertyValues.addPropertyValue("retryListeners", retryListenerBeans);
 			parserContext.popAndRegisterContainingComponent();
@@ -215,7 +216,8 @@ public class ChunkElementParser {
 		Element streamsElement = DomUtils.getChildElementByTagName(element, "streams");
 		if (streamsElement != null) {
 			ManagedList streamBeans = new ManagedList();
-			streamBeans.setMergeEnabled(Boolean.valueOf(streamsElement.getAttribute(MERGE_ATTR)));
+			streamBeans.setMergeEnabled(streamsElement.hasAttribute(MERGE_ATTR)
+					&& Boolean.valueOf(streamsElement.getAttribute(MERGE_ATTR)));
 			List<Element> streamElements = DomUtils.getChildElementsByTagName(streamsElement, "stream");
 			if (streamElements != null) {
 				for (Element streamElement : streamElements) {
