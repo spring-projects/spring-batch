@@ -15,10 +15,8 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.PropertyValue;
-import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
@@ -29,29 +27,38 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 public class CoreNamespaceBeanDefinitionUtils {
 
 	/**
-	 * @param name the name of a bean definition in the bean factory
+	 * @param beanName the name of a bean definition in the bean factory
 	 * @param beanFactory a {@link BeanFactory}
 	 * @return TRUE if the bean represents an {@link AbstractStep} (or
-	 * {@link StepParserStepFactoryBean}).
+	 *         {@link StepParserStepFactoryBean}).
 	 */
-	public static boolean isAbstractStep(String name, ConfigurableListableBeanFactory beanFactory) {
-		if (beanFactory.isFactoryBean(name)) {
-			return beanFactory.isTypeMatch(BeanFactory.FACTORY_BEAN_PREFIX + name, StepParserStepFactoryBean.class);
+	public static boolean isAbstractStep(String beanName, ConfigurableListableBeanFactory beanFactory) {
+		if (beanFactory.isFactoryBean(beanName)) {
+			return beanFactory.isTypeMatch(BeanFactory.FACTORY_BEAN_PREFIX + beanName, StepParserStepFactoryBean.class);
 		}
-		return beanFactory.isTypeMatch(name, AbstractStep.class);
+		return beanFactory.isTypeMatch(beanName, AbstractStep.class);
 	}
 
 	/**
-	 * @param name a bean definition name
+	 * @param beanName a bean definition name
 	 * @param propertyName the name of the property
 	 * @param beanFactory a {@link BeanFactory}
-	 * @return The {@link PropertyValue} for the {@link JobRepository} of the
-	 * bean. Search parent hierarchy if necessary. Return null if none is found.
+	 * @return The {@link PropertyValue} for the property of the bean. Search
+	 *         parent hierarchy if necessary. Return null if none is found.
 	 */
-	public static PropertyValue getPropertyValue(String name, String propertyName,
+	public static PropertyValue getPropertyValue(String beanName, String propertyName,
 			ConfigurableListableBeanFactory beanFactory) {
-		PropertyValues jobDefPvs = beanFactory.getMergedBeanDefinition(name).getPropertyValues();
-		return jobDefPvs.getPropertyValue(propertyName);
+		return beanFactory.getMergedBeanDefinition(beanName).getPropertyValues().getPropertyValue(propertyName);
 	}
 
+	/**
+	 * @param beanName a bean definition name
+	 * @param attributeName the name of the property
+	 * @param beanFactory a {@link BeanFactory}
+	 * @return The value for the attribute of the bean. Search parent hierarchy
+	 *         if necessary. Return null if none is found.
+	 */
+	public static Object getAttribute(String beanName, String attributeName, ConfigurableListableBeanFactory beanFactory) {
+		return beanFactory.getMergedBeanDefinition(beanName).getAttribute(attributeName);
+	}
 }

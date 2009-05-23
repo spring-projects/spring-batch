@@ -39,8 +39,10 @@
 		<step id="s12" parent="dummyStep">
 			<tasklet ref="dummyTasklet"/>
 		</step>
+		<step id="s13" parent="dummyStepWithTaskletOnParent"/>
+		<step id="s14" parent="standaloneStepWithTaskletAndDummyParent"/>
 	</job>
-
+	
 	<step id="standalone2" parent="baseStep">
 		<tasklet>
 			<chunk reader="reader" writer="writer" commit-interval="5" />
@@ -90,6 +92,17 @@
 	
 	<beans:bean id="dummyStep" class="org.springframework.batch.core.configuration.xml.DummyStep"/>
 	
+	<beans:bean id="dummyStepWithTaskletOnParent" parent="standaloneStepWithTasklet" 
+	            class="org.springframework.batch.core.configuration.xml.DummyTasklet"/>
+
+	<step id="standaloneStepWithTasklet">
+		<tasklet ref="dummyTasklet"/>
+	</step>
+
+	<step id="standaloneStepWithTaskletAndDummyParent" parent="dummyStep">
+		<tasklet ref="dummyTasklet"/>
+	</step>
+
 	<job id="jobWithoutRepo">
 		<step id="defaultRepoStep"><tasklet ref="dummyTasklet"/></step>
 		<step id="defaultRepoStepWithParent" parent="defaultRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>

@@ -111,6 +111,7 @@ public abstract class AbstractStepParser {
 			boolean stepUnderspecified) {
 
 		bd.setBeanClass(StepParserStepFactoryBean.class);
+		bd.setAttribute("isNamespaceStep", true);
 
 		String taskletRef = taskletElement.getAttribute(TASKLET_REF_ATTR);
 		@SuppressWarnings("unchecked")

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -47,44 +48,60 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 
 	private ApplicationContext applicationContext;
 
+	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		for (String beanName : beanFactory.getBeanDefinitionNames()) {
+			injectJobRepositoryIntoSteps(beanName, beanFactory);
+			overrideStepClass(beanName, beanFactory);
+		}
+	}
+
 	/**
 	 * Automatically inject job-repository from a job into its steps. Only
 	 * inject if the step is an AbstractStep or StepParserStepFactoryBean.
 	 * 
-	 * @see org.springframework.beans.factory.config.BeanFactoryPostProcessor#postProcessBeanFactory(org.springframework.beans.factory.config.ConfigurableListableBeanFactory)
+	 * @param beanName
+	 * @param beanFactory
 	 */
-	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		for (String beanName : beanFactory.getBeanDefinitionNames()) {
-			BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
-			if (bd.hasAttribute(JOB_FACTORY_PROPERTY_NAME)) {
-				MutablePropertyValues pvs = (MutablePropertyValues) bd.getPropertyValues();
-				if (CoreNamespaceBeanDefinitionUtils.isAbstractStep(beanName, beanFactory)) {
-					String jobName = (String) bd.getAttribute(JOB_FACTORY_PROPERTY_NAME);
-					PropertyValue jobRepository = getJobRepository(jobName, beanFactory);
-					if (jobRepository != null) {
-						// Set the job's JobRepository onto the step
-						pvs.addPropertyValue(jobRepository);
-					}
-					else {
-						// No JobRepository found, so inject the default
-						RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(
-								DEFAULT_JOB_REPOSITORY_NAME);
-						pvs.addPropertyValue(JOB_REPOSITORY_PROPERTY_NAME, jobRepositoryBeanRef);
-					}
+	private void injectJobRepositoryIntoSteps(String beanName, ConfigurableListableBeanFactory beanFactory) {
+		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+		if (bd.hasAttribute(JOB_FACTORY_PROPERTY_NAME)) {
+			MutablePropertyValues pvs = (MutablePropertyValues) bd.getPropertyValues();
+			if (CoreNamespaceBeanDefinitionUtils.isAbstractStep(beanName, beanFactory)) {
+				String jobName = (String) bd.getAttribute(JOB_FACTORY_PROPERTY_NAME);
+				PropertyValue jobRepository = CoreNamespaceBeanDefinitionUtils.getPropertyValue(jobName,
+						JOB_REPOSITORY_PROPERTY_NAME, beanFactory);
+				if (jobRepository != null) {
+					// Set the job's JobRepository onto the step
+					pvs.addPropertyValue(jobRepository);
+				}
+				else {
+					// No JobRepository found, so inject the default
+					RuntimeBeanReference jobRepositoryBeanRef = new RuntimeBeanReference(DEFAULT_JOB_REPOSITORY_NAME);
+					pvs.addPropertyValue(JOB_REPOSITORY_PROPERTY_NAME, jobRepositoryBeanRef);
 				}
 			}
 		}
 	}
 
 	/**
-	 * @param jobName
+	 * If any of the beans in the parent hierarchy is a &lt;step/&gt; with a
+	 * &lt;tasklet/&gt;, then the bean class must be
+	 * {@link StepParserStepFactoryBean}.
+	 * 
+	 * @param beanName
 	 * @param beanFactory
-	 * @return The {@link PropertyValue} for the {@link JobRepository} of the
-	 *         bean. Search parent hierarchy if necessary. Return null if none
-	 *         is found.
 	 */
-	private PropertyValue getJobRepository(String jobName, ConfigurableListableBeanFactory beanFactory) {
-		return CoreNamespaceBeanDefinitionUtils.getPropertyValue(jobName, JOB_REPOSITORY_PROPERTY_NAME, beanFactory);
+	private void overrideStepClass(String beanName, ConfigurableListableBeanFactory beanFactory) {
+		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
+		Object isNamespaceStep = CoreNamespaceBeanDefinitionUtils
+				.getAttribute(beanName, "isNamespaceStep", beanFactory);
+		if (isNamespaceStep != null && (Boolean) isNamespaceStep == true) {
+			((AbstractBeanDefinition) bd).setBeanClass(StepParserStepFactoryBean.class);
+		}
+	}
+
+	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+		return injectDefaults(bean);
 	}
 
 	/**
@@ -96,10 +113,10 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	 * {@link StepParserStepFactoryBean} without a transactionManager.
 	 * </ul>
 	 * 
-	 * @see org.springframework.beans.factory.config.BeanPostProcessor#postProcessBeforeInitialization(java.lang.Object,
-	 *      java.lang.String)
+	 * @param bean
+	 * @return
 	 */
-	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+	private Object injectDefaults(Object bean) {
 		if (bean instanceof JobParserJobFactoryBean) {
 			JobParserJobFactoryBean fb = (JobParserJobFactoryBean) bean;
 			JobRepository jobRepository = fb.getJobRepository();
