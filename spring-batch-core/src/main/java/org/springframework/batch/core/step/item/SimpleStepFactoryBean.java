@@ -335,8 +335,8 @@ public class SimpleStepFactoryBean<T, S> implements FactoryBean, BeanNameAware {
 		return step;
 	}
 
-	public Class<Step> getObjectType() {
-		return Step.class;
+	public Class<TaskletStep> getObjectType() {
+		return TaskletStep.class;
 	}
 
 	/**

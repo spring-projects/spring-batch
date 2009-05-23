@@ -352,8 +352,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		return n != null && n > 0;
 	}
 
-	public Class<Step> getObjectType() {
-		return Step.class;
+	public Class<TaskletStep> getObjectType() {
+		return TaskletStep.class;
 	}
 
 	public boolean isSingleton() {

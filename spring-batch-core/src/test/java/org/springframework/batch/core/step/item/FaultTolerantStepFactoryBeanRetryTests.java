@@ -124,7 +124,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 
 	@Test
 	public void testType() throws Exception {
-		assertEquals(Step.class, factory.getObjectType());
+		assertTrue(Step.class.isAssignableFrom(factory.getObjectType()));
 	}
 
 	@Test

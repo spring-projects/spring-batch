@@ -16,6 +16,7 @@
 package org.springframework.batch.core.configuration.xml;
 
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.AbstractStep;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
@@ -66,9 +67,9 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
 		if (bd.hasAttribute(JOB_FACTORY_PROPERTY_NAME)) {
 			MutablePropertyValues pvs = (MutablePropertyValues) bd.getPropertyValues();
-			if (CoreNamespaceBeanDefinitionUtils.isAbstractStep(beanName, beanFactory)) {
+			if (beanFactory.isTypeMatch(beanName, AbstractStep.class)) {
 				String jobName = (String) bd.getAttribute(JOB_FACTORY_PROPERTY_NAME);
-				PropertyValue jobRepository = CoreNamespaceBeanDefinitionUtils.getPropertyValue(jobName,
+				PropertyValue jobRepository = BeanDefinitionUtils.getPropertyValue(jobName,
 						JOB_REPOSITORY_PROPERTY_NAME, beanFactory);
 				if (jobRepository != null) {
 					// Set the job's JobRepository onto the step
@@ -93,7 +94,7 @@ public class CoreNamespacePostProcessor implements BeanPostProcessor, BeanFactor
 	 */
 	private void overrideStepClass(String beanName, ConfigurableListableBeanFactory beanFactory) {
 		BeanDefinition bd = beanFactory.getBeanDefinition(beanName);
-		Object isNamespaceStep = CoreNamespaceBeanDefinitionUtils
+		Object isNamespaceStep = BeanDefinitionUtils
 				.getAttribute(beanName, "isNamespaceStep", beanFactory);
 		if (isNamespaceStep != null && (Boolean) isNamespaceStep == true) {
 			((AbstractBeanDefinition) bd).setBeanClass(StepParserStepFactoryBean.class);
