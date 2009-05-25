@@ -316,6 +316,15 @@ public class StaxEventItemWriter<T> extends ExecutionContextUserSupport implemen
 
 		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
 
+		if (outputFactory.isPropertySupported("com.ctc.wstx.automaticEndElements")) {
+			// If the current XMLOutputFactory implementation is supplied by
+			// Woodstox >= 3.2.9 we want to disable its
+			// automatic end element feature (see:
+			// http://jira.codehaus.org/browse/WSTX-165) per
+			// http://jira.springframework.org/browse/BATCH-761.
+			outputFactory.setProperty("com.ctc.wstx.automaticEndElements", Boolean.FALSE);
+		}
+		
 		try {
 			transactionAwareBufferedWriter = new TransactionAwareBufferedWriter(
 					new OutputStreamWriter(os, encoding), getName());
