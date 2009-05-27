@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -62,10 +63,8 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
 
-		String isAbstract = element.getAttribute("abstract");
-		if (StringUtils.hasText(isAbstract)) {
-			builder.setAbstract(Boolean.valueOf(isAbstract));
-		}
+		boolean isAbstract = CoreNamespaceUtils.isAbstract(element);
+		builder.setAbstract(isAbstract);
 
 		String parentRef = element.getAttribute("parent");
 		if (StringUtils.hasText(parentRef)) {
@@ -87,9 +86,20 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 			builder.addPropertyReference("jobParametersIncrementer", incrementer);
 		}
 
-		FlowParser flowParser = new FlowParser(jobName, jobName);
-		BeanDefinition flowDef = flowParser.parse(element, parserContext);
-		builder.addPropertyValue("flow", flowDef);
+		if (isAbstract) {
+			for (String tagName : Arrays.asList("step", "decision", "split")) {
+				if (!DomUtils.getChildElementsByTagName(element, tagName).isEmpty()) {
+					parserContext.getReaderContext().error(
+							"The <" + tagName + "/> element may not appear on a <job/> with abstract=\"true\" ["
+									+ jobName + "]", element);
+				}
+			}
+		}
+		else {
+			FlowParser flowParser = new FlowParser(jobName, jobName);
+			BeanDefinition flowDef = flowParser.parse(element, parserContext);
+			builder.addPropertyValue("flow", flowDef);
+		}
 
 		List<Element> listenersElements = DomUtils.getChildElementsByTagName(element, "listeners");
 		if (listenersElements.size() == 1) {

@@ -146,7 +146,16 @@ public class CoreNamespaceUtils {
 	 * @return TRUE if the element is abstract or has a parent
 	 */
 	public static boolean isUnderspecified(Element element) {
-		return Boolean.valueOf(element.getAttribute("abstract")) || StringUtils.hasText(element.getAttribute("parent"));
+		return isAbstract(element) || StringUtils.hasText(element.getAttribute("parent"));
+	}
+
+	/**
+	 * @param element
+	 * @return TRUE if the element is abstract
+	 */
+	public static boolean isAbstract(Element element) {
+		String abstractAttr = element.getAttribute("abstract");
+		return StringUtils.hasText(abstractAttr) && Boolean.valueOf(abstractAttr);
 	}
 
 }

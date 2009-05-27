@@ -132,7 +132,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 			}
 		}
 
-		if (!stepExists && !CoreNamespaceUtils.isUnderspecified(element)) {
+		if (!stepExists && !StringUtils.hasText(element.getAttribute("parent"))) {
 			parserContext.getReaderContext().error("The flow [" + flowName + "] must contain at least one step",
 					element);
 		}
