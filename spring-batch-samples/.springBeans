@@ -7,6 +7,68 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
+		<config>src/main/resources/jobs/multilineJob.xml</config>
+		<config>src/main/resources/jobs/multilineOrderIo.xml</config>
+		<config>src/main/resources/jobs/multilineOrderJob.xml</config>
+		<config>src/main/resources/jobs/tradeJob.xml</config>
+		<config>src/main/resources/jobs/restartSample.xml</config>
+		<config>src/main/resources/data-source-context.xml</config>
+		<config>src/main/resources/jobs/beanWrapperMapperSampleJob.xml</config>
+		<config>src/main/resources/jobs/adhocLoopJob.xml</config>
+		<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
+		<config>src/main/resources/data-source-context-init.xml</config>
+		<config>src/main/resources/jobs/footballJob.xml</config>
+		<config>src/main/resources/jobs/delegatingJob.xml</config>
+		<config>src/main/resources/jobs/parallelJob.xml</config>
+		<config>src/main/resources/jobs/retrySample.xml</config>
+		<config>src/main/resources/simple-job-launcher-context.xml</config>
+		<config>src/main/resources/adhoc-job-launcher-context.xml</config>
+		<config>src/main/resources/alt-data-source-context.xml</config>
+		<config>src/main/resources/quartz-job-launcher-context.xml</config>
+		<config>src/main/resources/jobs/skipSampleJob.xml</config>
+		<config>src/main/resources/jobs/multilineOrderInputTokenizers.xml</config>
+		<config>src/main/resources/jobs/multilineOrderOutputAggregators.xml</config>
+		<config>src/main/resources/jobs/compositeItemWriterSampleJob.xml</config>
+		<config>src/main/resources/hibernate-context.xml</config>
+		<config>src/main/resources/staging-test-context.xml</config>
+		<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+		<config>src/main/resources/jobs/headerFooterSample.xml</config>
+		<config>src/main/resources/jobs/customerFilterJob.xml</config>
+		<config>src/main/resources/skipSample-job-launcher-context.xml</config>
+		<config>src/main/resources/jobs/ioSampleJob.xml</config>
+		<config>src/main/resources/jobs/iosample/delimited.xml</config>
+		<config>src/main/resources/jobs/iosample/fixedLength.xml</config>
+		<config>src/main/resources/jobs/iosample/jdbcCursor.xml</config>
+		<config>src/main/resources/jobs/iosample/multiLine.xml</config>
+		<config>src/main/resources/jobs/iosample/multiRecordType.xml</config>
+		<config>src/main/resources/jobs/iosample/multiResource.xml</config>
+		<config>src/main/resources/jobs/iosample/xml.xml</config>
+		<config>src/main/resources/jobs/iosample/hibernate.xml</config>
+		<config>src/main/resources/jobs/hibernateJob.xml</config>
+		<config>src/main/resources/jobs/iosample/jpa.xml</config>
+		<config>src/main/resources/jobs/iosample/ibatis.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/JobOperatorFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/BeanWrapperMapperSampleJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/CompositeItemWriterSampleFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/CustomerFilterJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/DatabaseShutdownFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/DelegatingJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/FootballJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/GracefulShutdownFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/HeaderFooterSampleFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/HibernateFailureJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/domain/trade/internal/JdbcCustomerDebitDaoTests-context.xml</config>
+		<config>src/main/resources/jobs/loopFlowSample.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/MultilineJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/MultilineOrderJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/ParallelJobFunctionalTests-context.xml</config>
+		<config>src/main/resources/jobs/partitionJob.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/RestartFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/RetrySampleFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemReaderTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/common/StagingItemWriterTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/TradeJobFunctionalTests-context.xml</config>
+		<config>src/test/resources/org/springframework/batch/sample/PartitionJobFunctionalTests-context.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
@@ -14,6 +76,7 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -21,6 +84,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/jobs/beanWrapperMapperSampleJob.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -28,6 +96,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/delegatingJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -35,6 +107,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/footballJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -42,6 +118,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/jobs/infiniteLoopJob.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -49,6 +130,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/multilineJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -56,6 +142,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/parallelJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -63,6 +153,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/restartSample.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -70,6 +165,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/jobs/retrySample.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -77,6 +177,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/tradeJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -84,6 +189,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -91,6 +200,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/quartz-job-launcher-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -98,6 +211,14 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/multilineOrderIo.xml</config>
+				<config>src/main/resources/jobs/multilineOrderJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/jobs/multilineOrderInputTokenizers.xml</config>
+				<config>src/main/resources/jobs/multilineOrderOutputAggregators.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -105,6 +226,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/jobs/compositeItemWriterSampleJob.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -112,6 +238,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/jobs/adhocLoopJob.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -119,6 +250,8 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/staging-test-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -126,6 +259,9 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -133,6 +269,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/adhoc-job-launcher-context.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -140,6 +280,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/headerFooterSample.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -147,6 +291,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/jobs/customerFilterJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -154,6 +303,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/hibernate-context.xml</config>
+				<config>src/main/resources/jobs/hibernateJob.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -161,6 +315,10 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -168,6 +326,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/skipSampleJob.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/skipSample-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -175,6 +338,13 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/ioSampleJob.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/hibernate-context.xml</config>
+				<config>src/main/resources/jobs/iosample/hibernate.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -182,6 +352,12 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/iosample/jdbcCursor.xml</config>
+				<config>src/main/resources/jobs/ioSampleJob.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -189,6 +365,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/iosample/multiLine.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -196,6 +377,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/iosample/multiRecordType.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -203,6 +389,12 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/iosample/jpa.xml</config>
+				<config>src/main/resources/jobs/ioSampleJob.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -217,6 +409,11 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
+				<config>src/main/resources/org/springframework/batch/sample/config/common-context.xml</config>
+				<config>src/main/resources/data-source-context-init.xml</config>
+				<config>src/main/resources/jobs/iosample/ibatis.xml</config>
 			</configs>
 		</configSet>
 		<configSet>
@@ -224,6 +421,9 @@
 			<allowBeanDefinitionOverriding>true</allowBeanDefinitionOverriding>
 			<incomplete>false</incomplete>
 			<configs>
+				<config>src/main/resources/data-source-context.xml</config>
+				<config>src/main/resources/jobs/partitionJob.xml</config>
+				<config>src/main/resources/simple-job-launcher-context.xml</config>
 			</configs>
 		</configSet>
 	</configSets>
