@@ -34,6 +34,7 @@ import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.repeat.CompletionPolicy;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
+import org.springframework.batch.repeat.support.TaskExecutorRepeatTemplate;
 import org.springframework.batch.retry.RetryListener;
 import org.springframework.batch.retry.policy.MapRetryContextCache;
 import org.springframework.beans.factory.BeanNameAware;
@@ -107,6 +108,8 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	private Integer skipLimit;
 
 	private TaskExecutor taskExecutor;
+
+	private Integer throttleLimit;
 
 	private ItemReader<? extends I> itemReader;
 
@@ -203,6 +206,9 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 		}
 		if (taskExecutor != null) {
 			fb.setTaskExecutor(taskExecutor);
+		}
+		if (throttleLimit != null) {
+			fb.setThrottleLimit(throttleLimit);
 		}
 		if (itemReader != null) {
 			fb.setItemReader(itemReader);
@@ -572,6 +578,18 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	 */
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
+	}
+
+	/**
+	 * Public setter for the throttle limit. This limits the number of tasks
+	 * queued for concurrent processing to prevent thread pools from being
+	 * overwhelmed. Defaults to
+	 * {@link TaskExecutorRepeatTemplate#DEFAULT_THROTTLE_LIMIT}.
+	 * 
+	 * @param throttleLimit the throttle limit to set.
+	 */
+	public void setThrottleLimit(Integer throttleLimit) {
+		this.throttleLimit = throttleLimit;
 	}
 
 	/**

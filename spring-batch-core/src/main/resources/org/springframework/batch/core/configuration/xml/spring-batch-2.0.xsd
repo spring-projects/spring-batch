@@ -567,6 +567,15 @@
 				</xsd:appinfo>
 			</xsd:annotation>
 		</xsd:attribute>
+		<xsd:attribute name="throttle-limit" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation><![CDATA[
+				This limits the number of tasks queued for concurrent 
+				processing to prevent thread pools from being overwhelmed. 
+				Default is 4.
+				]]></xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
 		<xsd:attribute name="chunk-completion-policy" type="xsd:string" use="optional">
 			<xsd:annotation>
 				<xsd:documentation source="java:org.springframework.batch.repeat.CompletionPolicy"><![CDATA[
