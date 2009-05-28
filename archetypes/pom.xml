@@ -1,30 +1,32 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>org.springframework.batch.archetype</artifactId>
-	<packaging>pom</packaging>
-	<name>Archetypes</name>
-	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
-	<description>
-		<![CDATA[
-	Spring Batch archetypes are simple project templates containing just enough code
-	to get you started running a job.  For more detailed examples of using particular 
-	features of the framework, look at the Spring Batch Samples	project.  Currently the 
-	archetypes are deployed as regular Maven projects (not archetypes), because of limitations
-	in the archetype plugin (or our understanding of how it works).  For most effective use, 
-	copy one into Eclipse and use Q4E to manage the dependencies. 
-]]>
-	</description>
-
-	<parent>
-		<groupId>org.springframework.batch</groupId>
-		<artifactId>org.springframework.batch</artifactId>
-		<version>2.0.1.CI-SNAPSHOT</version>
-		<relativePath>../spring-batch-parent</relativePath>
-	</parent>
-
-	<modules>
-		<module>simple-cli</module>
-	</modules>
-
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>spring-batch-archetype</artifactId>
+  <packaging>pom</packaging>
+  <name>Archetypes</name>
+  <url>http://static.springframework.org/spring-batch/${artifactId}</url>
+  <description>    Spring Batch archetypes are simple project templates containing just enough code	to get you started running a job.  For more detailed examples of using particular 	features of the framework, look at the Spring Batch Samples	project.  Currently the 	archetypes are deployed as regular Maven projects (not archetypes), because of limitations	in the archetype plugin (or our understanding of how it works).  For most effective use, 	copy one into Eclipse and use Q4E to manage the dependencies.
+  </description>
+  <parent>
+    <groupId>org.springframework.batch</groupId>
+    <artifactId>spring-batch-parent</artifactId>
+    <version>2.0.1.CI-SNAPSHOT</version>
+    <relativePath>../spring-batch-parent</relativePath>
+  </parent>
+  <modules>
+    <module>simple-cli</module>
+  </modules>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <junitArtifactName>junit:junit</junitArtifactName>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 </project>

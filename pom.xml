@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
-	<artifactId>org.springframework.batch</artifactId>
-	<name>Spring Batch</name>
-	<description>
-		<!--  Use CDATA to keep it on a single line in the manifest -->
-		<![CDATA[Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.]]>
-	</description>
-	<version>2.0.1.CI-SNAPSHOT</version>
+	<artifactId>spring-batch</artifactId>
+	<name>    Spring Batch
+  </name>
+	<description>    Spring Batch provides tools for enterprise batch or bulk processing. It can be used to wire up jobs, and track	their execution, or simply as an optimization for repetitive processing in a transactional environment. Spring Batch is part of the Spring Portfolio.
+  </description>
+	<version>2.0.0.CI-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modules>
 		<module>spring-batch-parent</module>
 		<module>spring-batch-infrastructure</module>
 		<module>spring-batch-core</module>
 		<module>spring-batch-test</module>
-  </modules>
+	</modules>
 	<url>http://static.springframework.org/spring-batch</url>
 	<organization>
 		<name>SpringSource</name>
@@ -28,16 +28,14 @@
 	</scm>
 	<issueManagement>
 		<system>JIRA</system>
-		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH
-		</url>
+		<url>http://opensource.atlassian.com/projects/spring/browse/BATCH</url>
 	</issueManagement>
 	<mailingLists>
 		<mailingList>
-			<name>Spring Batch Forum</name>
-			<post>http://forum.springframework.org/forumdisplay.php?f=41
-			</post>
-			<archive>http://forum.springframework.org/forumdisplay.php?f=41
-			</archive>
+			<name>        Spring Batch Forum
+      </name>
+			<post>http://forum.springframework.org/forumdisplay.php?f=41</post>
+			<archive>http://forum.springframework.org/forumdisplay.php?f=41</archive>
 		</mailingList>
 	</mailingLists>
 	<ciManagement>
@@ -46,7 +44,8 @@
 	</ciManagement>
 	<licenses>
 		<license>
-			<name>Apache 2.0</name>
+			<name>        Apache 2.0
+      </name>
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
@@ -58,7 +57,6 @@
 				<module>archetypes</module>
 				<module>spring-batch-infrastructure-tests</module>
 				<module>spring-batch-integration</module>
-				<module>build-central</module>
 			</modules>
 		</profile>
 		<profile>
@@ -100,8 +98,7 @@
 									<goal>generate-html</goal>
 								</goals>
 								<configuration>
-									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl
-									</htmlCustomization>
+									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html.xsl</htmlCustomization>
 									<postProcess>
 										<move todir="${basedir}/target/site/reference/html-single">
 											<fileset dir="${basedir}/target/docbkx/html">
@@ -136,7 +133,8 @@
 									<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
 									<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
 									<postProcess>
-										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf" failonerror="false" />
+										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
+											failonerror="false" />
 									</postProcess>
 								</configuration>
 								<phase>pre-site</phase>
@@ -148,8 +146,7 @@
 								</goals>
 								<configuration>
 									<chunkedOutput>true</chunkedOutput>
-									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl
-									</htmlCustomization>
+									<htmlCustomization>${basedir}/src/docbkx/resources/xsl/html_chunk.xsl</htmlCustomization>
 									<postProcess>
 										<move todir="${basedir}/target/site/reference">
 											<fileset dir="${basedir}/target/docbkx">
@@ -184,10 +181,6 @@
 								<scope>runtime</scope>
 							</dependency>
 							<dependency>
-								<!--
-									This is a downgrade for the 2.0.8 plugin (was 0.94) but
-									prevents ArrayOutOfBounds exception on xi:includes
-								-->
 								<groupId>org.apache.xmlgraphics</groupId>
 								<artifactId>fop</artifactId>
 								<version>0.93</version>
@@ -199,8 +192,7 @@
 							<draftWatermarkImage />
 							<htmlStylesheet>css/html.css</htmlStylesheet>
 							<sourceDirectory>${basedir}/src/site/docbook/reference</sourceDirectory>
-							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl
-							</foCustomization>
+							<foCustomization>${basedir}/src/docbkx/resources/xsl/fopdf.xsl</foCustomization>
 							<xincludeSupported>true</xincludeSupported>
 							<entities>
 								<entity>
@@ -265,7 +257,7 @@
 										<fail message="Failed integration test of zip distro: Spring Batch jar files are missing.">
 											<condition>
 												<not>
-													<resourcecount count="9">
+													<resourcecount count="3">
 														<fileset id="fs" dir="target/it/with-dep/dist" includes="*.jar" />
 													</resourcecount>
 												</not>
@@ -327,28 +319,6 @@
 			</distributionManagement>
 		</profile>
 		<profile>
-			<id>central</id>
-			<distributionManagement>
-				<site>
-					<id>staging</id>
-					<url>file:///${user.dir}/target/staging</url>
-				</site>
-				<repository>
-					<id>spring-milestone</id>
-					<name>Spring Milestone Repository</name>
-					<url>s3://maven.springframework.org/milestone</url>
-					<!--
-						<url>https://springframework.svn.sourceforge.net/svnroot/springframework/repos/repo</url>
-					-->
-				</repository>
-				<snapshotRepository>
-					<id>spring-snapshot</id>
-					<name>Spring Snapshot Repository</name>
-					<url>s3://maven.springframework.org/snapshot</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-		<profile>
 			<id>snapshots</id>
 			<pluginRepositories>
 				<pluginRepository>
@@ -359,17 +329,14 @@
 			<repositories>
 				<repository>
 					<id>apache-snapshot</id>
-					<name>Apache Foundation Snapshot Repository</name>
+					<name>            Apache Foundation Snapshot Repository
+          </name>
 					<url>http://people.apache.org/maven-snapshot-repository</url>
 				</repository>
 			</repositories>
 			<build>
 				<pluginManagement>
 					<plugins>
-						<!--
-							This seems to work better than the default (2008/03/19) because
-							links on sub-module sites are not broken
-						-->
 						<plugin>
 							<artifactId>maven-site-plugin</artifactId>
 							<version>2.0-beta-8-SNAPSHOT</version>
@@ -403,20 +370,21 @@
 		</profile>
 	</profiles>
 	<distributionManagement>
-		<downloadUrl>http://www.springframework.org/download</downloadUrl>
 		<site>
-			<id>static.springframework.org</id>
-			<url>scp://static.springframework.org:/var/www/domains/springframework.org/static/htdocs/spring-batch/trunk</url>
+			<id>staging</id>
+			<url>file:///${user.dir}/target/staging</url>
 		</site>
 		<repository>
-			<id>spring-release</id>
-			<name>Spring Release Repository</name>
-			<url>s3://repository.springsource.com/maven/bundles/release</url>
+			<id>spring-milestone</id>
+			<name>            Spring Milestone Repository
+          </name>
+			<url>s3://maven.springframework.org/milestone</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>s3://repository.springsource.com/maven/bundles/snapshot</url>
+			<name>            Spring Snapshot Repository
+          </name>
+			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<build>
@@ -470,6 +438,13 @@
 						</execution>
 					</executions>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<junitArtifactName>junit:junit</junitArtifactName>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -501,117 +476,94 @@
 					<links>
 						<link>http://java.sun.com/j2ee/1.4/docs/api</link>
 						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-						</link>
+						<link>http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/</link>
 						<link>http://jakarta.apache.org/commons/dbcp/apidocs/</link>
-						<link>http://jakarta.apache.org/commons/fileupload/apidocs/
-						</link>
-						<link>http://jakarta.apache.org/commons/httpclient/apidocs/
-						</link>
+						<link>http://jakarta.apache.org/commons/fileupload/apidocs/</link>
+						<link>http://jakarta.apache.org/commons/httpclient/apidocs/</link>
 						<link>http://jakarta.apache.org/commons/pool/apidocs/</link>
 						<link>http://jakarta.apache.org/commons/logging/apidocs/</link>
 						<link>http://junit.sourceforge.net/javadoc/</link>
 						<link>http://logging.apache.org/log4j/docs/api/</link>
 						<link>http://jakarta.apache.org/regexp/apidocs/</link>
 						<link>http://jakarta.apache.org/velocity/api/</link>
-						<link>http://static.springframework.org/spring/docs/2.5.x/api/
-						</link>
-						<link>http://static.springframework.org/spring-batch/apidocs/
-						</link>
-						<link>http://static.springframework.org/spring-ws/site/apidocs/
-						</link>
+						<link>http://static.springframework.org/spring/docs/2.5.x/api/</link>
+						<link>http://static.springframework.org/spring-batch/apidocs/</link>
+						<link>http://static.springframework.org/spring-ws/site/apidocs/</link>
 					</links>
-					<header><![CDATA[
-	<!-- Begin Google Analytics code -->
-	<script type="text/javascript">
-		var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-		document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-	</script>
-	<script type="text/javascript">
-		var pageTracker = _gat._getTracker("UA-2728886-3");
-		pageTracker._setDomainName("none");
-		pageTracker._setAllowLinker(true);
-		pageTracker._trackPageview();
-	</script>
-	<!-- End Google Analytics code -->
-]]>
-					</header>
-					<bottom><![CDATA[
-	<!-- Begin LoopFuse code -->
-	<script src="http://loopfuse.net/webrecorder/js/listen.js" type="text/javascript">
-	</script>
-	<script type="text/javascript"> 
-		_lf_cid = "LF_48be82fa";
-		_lf_remora();
-	</script>
-	<!-- End LoopFuse code -->
-]]>
-					</bottom>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</reporting>
-	<developers>
-		<developer>
-			<id>dsyer</id>
-			<name>Dave Syer</name>
-			<email>david.syer@springsource.com</email>
-		</developer>
-		<developer>
-			<id>nebhale</id>
-			<name>Ben Hale</name>
-			<email>ben.hale@springsource.com</email>
-			<timezone>0</timezone>
-		</developer>
-		<developer>
-			<id>lward</id>
-			<name>Lucas Ward</name>
-			<email>lucas.l.ward@accenture.com</email>
-		</developer>
-		<developer>
-			<id>robokaso</id>
-			<name>Robert Kasanicky</name>
-			<email>robokaso@gmail.com</email>
-		</developer>
-		<developer>
-			<id>trisberg</id>
-			<name>Thomas Risberg</name>
-			<email>thomas.risberg@springsource.com</email>
-		</developer>
-		<developer>
-			<id>dhgarrette</id>
-			<name>Dan Garrette</name>
-			<email>daniel.h.garrette@accenture.com</email>
-		</developer>
-	</developers>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.milestone</id>
-			<name>SpringSource Enterprise Bundle Repository -
-				SpringSource Bundle Milestones</name>
-			<url>http://repository.springsource.com/maven/bundles/milestone
-			</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>com.springsource.repository.bundles.snapshot</id>
-			<name>SpringSource Enterprise Bundle Repository -
-				SpringSource Bundle Snapshots</name>
-			<url>http://repository.springsource.com/maven/bundles/snapshot
-			</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>agilejava</id>
-			<url>http://agilejava.com/maven</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
+					<header>            &lt;!-- Begin Google Analytics code --&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var gaJsHost = ((&quot;https:&quot; == document.location.protocol) ? &quot;https://ssl.&quot; : &quot;http://www.&quot;);		document.write(unescape(&quot;%3Cscript src='&quot; + gaJsHost + &quot;google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E&quot;));	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt;		var pageTracker = _gat._getTracker(&quot;UA-2728886-3&quot;);		pageTracker._setDomainName(&quot;none&quot;);		pageTracker._setAllowLinker(true);		pageTracker._trackPageview();	&lt;/script&gt;	&lt;!-- End Google Analytics code --&gt;
+          </header>
+          <bottom>            &lt;!-- Begin LoopFuse code --&gt;	&lt;script src=&quot;http://loopfuse.net/webrecorder/js/listen.js&quot; type=&quot;text/javascript&quot;&gt;	&lt;/script&gt;	&lt;script type=&quot;text/javascript&quot;&gt; 		_lf_cid = &quot;LF_48be82fa&quot;;		_lf_remora();	&lt;/script&gt;	&lt;!-- End LoopFuse code --&gt;
+          </bottom>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </reporting>
+  <developers>
+    <developer>
+      <id>dsyer</id>
+      <name>        Dave Syer
+      </name>
+      <email>david.syer@springsource.com</email>
+    </developer>
+    <developer>
+      <id>nebhale</id>
+      <name>        Ben Hale
+      </name>
+      <email>ben.hale@springsource.com</email>
+      <timezone>
+0</timezone>
+    </developer>
+    <developer>
+      <id>lward</id>
+      <name>        Lucas Ward
+      </name>
+      <email>lucas.l.ward@accenture.com</email>
+    </developer>
+    <developer>
+      <id>robokaso</id>
+      <name>        Robert Kasanicky
+      </name>
+      <email>robokaso@gmail.com</email>
+    </developer>
+    <developer>
+      <id>trisberg</id>
+      <name>        Thomas Risberg
+      </name>
+      <email>thomas.risberg@springsource.com</email>
+    </developer>
+    <developer>
+      <id>dhgarrette</id>
+      <name>        Dan Garrette
+      </name>
+      <email>daniel.h.garrette@accenture.com</email>
+    </developer>
+  </developers>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>com.springsource.repository.bundles.milestone</id>
+      <name>        SpringSource Enterprise Bundle Repository -				SpringSource Bundle Milestones
+      </name>
+      <url>http://repository.springsource.com/maven/bundles/milestone</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>com.springsource.repository.bundles.snapshot</id>
+      <name>        SpringSource Enterprise Bundle Repository -				SpringSource Bundle Snapshots
+      </name>
+      <url>http://repository.springsource.com/maven/bundles/snapshot</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>agilejava</id>
+      <url>http://agilejava.com/maven</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

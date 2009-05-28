@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,8 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 	protected ApplicationContext applicationContext;
 
 	private JobLauncher launcher;
+	
+	private JobExecution jobExecution;
 
 	private Job job;
 
@@ -62,6 +65,10 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 	public void setJob(Job job) {
 		this.job = job;
 	}
+	
+	public JobExecution getJobExecution() {
+		return jobExecution;
+	}
 
 	public Job getJob() {
 		return job;
@@ -77,7 +84,7 @@ public abstract class AbstractBatchLauncherTests implements ApplicationContextAw
 
 	@Test
 	public void testLaunchJob() throws Exception {
-		getLauncher().run(job, jobParameters);
+		jobExecution  = getLauncher().run(job, jobParameters);
 	}
 
 	/**
