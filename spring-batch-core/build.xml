@@ -2,6 +2,6 @@
 <project name="org.springframework.batch.core">
 
 	<property file="${basedir}/../build.properties" />
-	<import file="${basedir}/../build-ivy/package-bundle.xml"/>
+	<import file="${basedir}/../build-spring-batch/package-bundle.xml"/>
 
 </project>

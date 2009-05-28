@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="com.springsource.test.build" default="test">
+<project name="org.springframework.batch.build" default="test">
 	
 	<path id="bundles">
 		<pathelement location="${basedir}/../spring-batch-infrastructure"/>
