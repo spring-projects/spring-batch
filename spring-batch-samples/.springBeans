@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.2.3.RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[2.2.4.RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
@@ -70,6 +70,7 @@
 		<config>src/test/resources/org/springframework/batch/sample/PartitionJobFunctionalTests-context.xml</config>
 		<config>src/main/resources/jobs/multilineOrderValidator.xml</config>
 		<config>src/main/resources/jobs/restartFileSampleJob.xml</config>
+		<config>src/main/resources/jobs/taskletJob.xml</config>
 	</configs>
 	<configSets>
 		<configSet>
