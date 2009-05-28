@@ -1,52 +1,68 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="${project.name}">
-  <bannerLeft>
-    <name>${project.name}</name>
-    <href>http://www.springframework.org/spring-batch</href>
-  </bannerLeft>
-  <bannerRight>
-    <src>images/shim.gif</src>
-  </bannerRight>
-  <poweredBy>
-	  <logo name="" href="" img="images/shim.gif"/>
-  </poweredBy>
-  <skin>
-    <groupId>org.springframework.maven.skins</groupId>
-    <artifactId>maven-spring-skin</artifactId>
-    <version>1.0.5</version>
-  </skin>
+
+	<bannerLeft>
+		<name>${project.name}</name>
+		<href>http://www.springframework.org/spring-batch
+		</href>
+	</bannerLeft>
+
+	<bannerRight>
+		<src>images/shim.gif</src>
+	</bannerRight>
+
+	<poweredBy>
+		<logo name="" href="" img="images/shim.gif" />
+	</poweredBy>
+
+	<skin>
+		<groupId>org.springframework.maven.skins
+		</groupId>
+		<artifactId>maven-spring-skin</artifactId>
+		<version>1.0.5</version>
+	</skin>
+
 	<body>
+
 		<links>
-			<item name="Home" href="http://www.springframework.org/spring-batch/index.html"/>
+			<item name="Home"
+				href="http://www.springframework.org/spring-batch/index.html" />
 		</links>
-		
+
 		<menu name="Documentation" inherit="none">
-			<item name="Home" href="index.html"/>
-			<item name="Changelog" href="migration/index.html"/>
-			<item name="User Guide" href="reference/index.html"/>
-			<item name="Features" href="features.html"/>
-			<item name="Use Cases" href="cases/index.html"/>
-			<item name="Transactions" href="transactions.html"/>
-			<item name="FAQ" href="faq.html"/>
-			<item name="Batch Processing Strategies" href="batch-processing-strategies.html"/>
-			<item name="General Batch Principles and Guidelines" href="batch-principles-guidelines.html"/>
+			<item name="Home" href="index.html" />
+			<item name="Getting Started" href="getting-started.html" />
+			<item name="User Guide" href="reference/index.html" />
+			<item name="API" href="apidocs/index.html" />
+			<item name="Features" href="features.html" />
+			<item name="Use Cases" href="cases/index.html" />
+			<item name="Transactions" href="transactions.html" />
+			<item name="FAQ" href="faq.html" />
+			<item name="Changelog" href="migration/index.html" />
+			<item name="Batch Processing Strategies" href="batch-processing-strategies.html" />
+			<item name="General Batch Principles and Guidelines" href="batch-principles-guidelines.html" />
 		</menu>
+
 		<menu name="Support" inherit="none">
-			<item name="Building" href="building.html"/>
-			<item name="Getting Started" href="getting-started.html"/>
-			<item name="API" href="apidocs/index.html"/>
-			<item name="Forums" href="http://forum.springframework.org/forumdisplay.php?f=41"/>
-			<item name="JIRA" href="http://jira.springframework.org/browse/BATCH"/>
-			<item name="Downloads" href="downloads.html"/>
-            <item name="1.0.x" href="http://www.springframework.org/spring-batch/1.0.x/index.html"/>
-            <item name="1.1.x" href="http://www.springframework.org/spring-batch/1.1.x/index.html"/>
+			<item name="Building" href="building.html" />
+			<item name="Forums"
+				href="http://forum.springframework.org/forumdisplay.php?f=41" />
+			<item name="JIRA" href="http://jira.springframework.org/browse/BATCH" />
+s			<item name="1.0.x"
+				href="http://www.springframework.org/spring-batch/1.0.x/index.html" />
+			<item name="1.1.x"
+				href="http://www.springframework.org/spring-batch/1.1.x/index.html" />
 		</menu>
+
 		<menu name="Modules" inherit="none">
-			<item name="Infrastructure" href="org.springframework.batch.infrastructure/index.html"/>
-			<item name="Core" href="org.springframework.batch.core/index.html"/>
-			<item name="Test" href="org.springframework.batch.test/index.html"/>
-			<item name="Samples" href="org.springframework.batch.samples/index.html"/>
+			<item name="Infrastructure" href="spring-batch-infrastructure/index.html" />
+			<item name="Core" href="spring-batch-core/index.html" />
+			<item name="Test" href="spring-batch-test/index.html" />
+			<item name="Samples" href="spring-batch-samples/index.html" />
 		</menu>
+
 		<menu ref="reports"/>
+
 	</body>
+
 </project>

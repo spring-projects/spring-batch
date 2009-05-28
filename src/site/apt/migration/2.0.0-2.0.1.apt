@@ -1,0 +1,88 @@
+Spring Batch 2.0.1.RELEASE Release Notes
+
+* Bug
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1203]}} - Correct ChunkOrientedTasklet.setBuffering javadoc
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1204]}} - Error in FieldSetMapper documentation
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1205]}} - When readCount % commitInterval == 0, commitCount is one more than it should be
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1208]}} - late-binding not being resolved in <list/>
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1210]}} - AbstractStep overwrites custom exit status for STOPPED steps
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1212]}} - Incorrect link in Documentation
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1213]}} - Defaults in xsd override parent attributes
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1214]}} - CoreNamespaceUtils.addRangePropertyEditor fails with Spring 3.0
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1215]}} - Docs refer to non-existent class SimpleDelegatingPagingQueryProvider
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1218]}} - item streams won't get registered if ItemStream reader is used with step
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1223]}} - Maven Build - ClassNotFoundException: com.springsource.util.osgi.manifest.ManifestFactory
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1225]}} - FlatFileItemWriter and StaxEventItemWriter do not restart in the right place
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1230]}} - scope "step" does not work together with Annotation "@BeforeStep"
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1234]}} - ExitStatus.FINISHED should be ExitStatus.COMPLETED
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1236]}} - Fix namespace errors in Readers and Writers chapter
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1240]}} - ItemStream is not registered when defined in step scope
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1241]}} - SystemCommandTasklet package name is not accurate
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1244]}} - Documentation error for skip-limit
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1245]}} - StaxEventItemWriter writes extra end document tag with Woodstox 3.2.9 plus
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1249]}} - Add files to .springBeans in samples project
+
+
+* Improvement
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1172]}} - Register RangeArrayPropertyEditor automatically
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1202]}} - Improve error message when neither commit-interval nor chunk-completion-policy are specified on a chuck (xml namespace)
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1216]}} - Adding the possiblity to set the throttle limit in the spring batch name space
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1217]}} - Suggest use .doubleValue() value in DefaultFieldSet.readDouble(..)
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1219]}} - JmsItemReader and -Writer should check for proper settings on JmsTemplate
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1220]}} - Apply consistent debug logging in framework-provided ItemWriter implementations
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1221]}} - Use batch namespace in simple cli template / archetype
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1228]}} - Possibility to modify proxyTargetClass property of StepScope
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1233]}} - Confusing docs in section 4.1 on non-default job repo id for nested step element
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1247]}} - Clean up multilineOrderJob sample
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1248]}} - Remove default from "merge" attribute in XSD
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1250]}} - <job/> should disallow <decision/>, <split/>, and <step/> if abstract=true
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1251]}} - Use standard JPQL in JPA sample
+
+
+* New Feature
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1226]}} - Add assertLineCount method to AssertFile
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1238]}} - Add ItemProcessorAdapter similar to Item*Adapter
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1243]}} - Expose the current resource of MultiResourceItemReader
+
+
+* Task
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-724]}} - create tests for non-default table prefix
+
+    * {{{http://jira.springsource.org/browse/BATCH-1203}[BATCH-1211]}} - Update samples docs on website
