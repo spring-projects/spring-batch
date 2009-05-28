@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       	http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+      	http://www.springframework.org/schema/batch
+      	http://www.springframework.org/schema/batch/spring-batch-2.0.xsd
+       	http://www.springframework.org/schema/aop
+ 		http://www.springframework.org/schema/aop/spring-aop-2.0.xsd">
+
+	<!-- The tasklet used in this job will run in an infinite loop.  This is useful for testing graceful shutdown from
+		multiple environments. -->
+
+	<batch:job id="loopJob">
+		<batch:step id="step1">
+			<batch:tasklet ref="adapter"/>
+		</batch:step>
+	</batch:job>
+
+	<bean id="adapter" class="org.springframework.batch.core.step.tasklet.MethodInvokingTaskletAdapter">
+		<property name="targetObject" ref="value"/>
+		<property name="targetMethod" value="toString"/>
+	</bean>
+	
+	<bean id="value" class="org.springframework.batch.sample.TaskletJobFunctionalTests$TestBean" scope="step">
+		<property name="value" value="#{jobParameters[value]}"/>
+	</bean>
+
+</beans>
