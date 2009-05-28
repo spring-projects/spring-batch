@@ -1,319 +1,388 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>spring-batch-samples</artifactId>
-  <packaging>jar</packaging>
-  <name>Samples</name>
-  <url>http://static.springframework.org/spring-batch/${artifactId}</url>
-  <description>    Example batch jobs using Spring Batch Core and Execution.
-  </description>
-  <parent>
-    <groupId>org.springframework.batch</groupId>
-    <artifactId>spring-batch-parent</artifactId>
-    <version>2.0.1.CI-SNAPSHOT</version>
-    <relativePath>../spring-batch-parent</relativePath>
-  </parent>
-  <profiles>
-    <profile>
-      <id>tiger</id>
-      <activation>
-        <jdk>1.5</jdk>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>stax</groupId>
-          <artifactId>stax</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
-  <dependencies>
-    <dependency>
-      <groupId>org.springframework.batch</groupId>
-      <artifactId>spring-batch-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.batch</groupId>
-      <artifactId>spring-batch-test</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjweaver</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springmodules</groupId>
-      <artifactId>spring-modules-validation</artifactId>
-      <version>0.8</version>
-      <exclusions>
-        <exclusion>
-          <groupId>rhino</groupId>
-          <artifactId>js</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-validator</groupId>
-          <artifactId>commons-validator</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-lang</groupId>
-          <artifactId>commons-lang</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-digester</groupId>
-          <artifactId>commons-digester</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>antlr</groupId>
-          <artifactId>antlr</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>opensymphony</groupId>
-      <artifactId>quartz-all</artifactId>
-      <version>1.6.0</version>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.6</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>xmlunit</groupId>
-      <artifactId>xmlunit</artifactId>
-      <version>1.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-entitymanager</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.hibernate</groupId>
-      <artifactId>hibernate-annotations</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jta_1.1_spec</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>cglib</groupId>
-      <artifactId>cglib-nodep</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.ibatis</groupId>
-      <artifactId>ibatis-sqlmap</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
-      <optional>true</optional>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.jtds</groupId>
-      <artifactId>jtds</artifactId>
-      <version>1.2.2</version>
-      <optional>true</optional>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>com.springsource.oracle.jdbc</artifactId>
-      <version>10.2.0.2</version>
-      <optional>true</optional>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>8.3-603.jdbc3</version>
-      <optional>true</optional>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-aop</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.ws</groupId>
-      <artifactId>spring-oxm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-orm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-tx</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <optional>true</optional>
-      <scope>runtime</scope>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-sql</id>
-            <phase>generate-sources</phase>
-            <configuration>
-              <tasks>                <typedef resource="foundrylogic/vpp/typedef.properties"/>                <taskdef resource="foundrylogic/vpp/taskdef.properties"/>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/hsqldb.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/hsqldb.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-hsqldb.sql"/>
-                </vppcopy>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/db2.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/db2.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-db2.sql"/>
-                </vppcopy>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/derby.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/derby.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-derby.sql"/>
-                </vppcopy>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/oracle10g.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/oracle10g.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-oracle10g.sql"/>
-                </vppcopy>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/postgresql.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/postgresql.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-postgresql.sql"/>
-                </vppcopy>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/mysql.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/mysql.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-mysql.sql"/>
-                </vppcopy>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/sqlserver.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/sqlserver.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-sqlserver.sql"/>
-                </vppcopy>                <vppcopy todir="${basedir}/target/generated-resources" overwrite="true">
-                  <config>
-                    <context>                      <property key="includes" value="src/main/sql"/>                      <property file="${basedir}/src/main/sql/sybase.properties"/>
-                    </context>
-                    <engine>                      <property key="velocimacro.library" value="src/main/sql/sybase.vpp"/>
-                    </engine>
-                  </config>                  <fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp"/>                  <mapper type="glob" from="*.sql.vpp" to="*-sybase.sql"/>
-                </vppcopy>
-              </tasks>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <configuration>
-            <junitArtifactName>junit:junit</junitArtifactName>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>spring-batch-samples</artifactId>
+	<packaging>jar</packaging>
+	<name>Samples</name>
+	<url>http://static.springframework.org/spring-batch/${artifactId}</url>
+	<description>Example batch jobs using Spring Batch Core and Execution.</description>
+	<parent>
+		<groupId>org.springframework.batch</groupId>
+		<artifactId>spring-batch-parent</artifactId>
+		<version>2.0.1.CI-SNAPSHOT</version>
+		<relativePath>../spring-batch-parent</relativePath>
+	</parent>
+	<profiles>
+		<profile>
+			<id>tiger</id>
+			<activation>
+				<jdk>1.5</jdk>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>stax</groupId>
+					<artifactId>stax</artifactId>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.batch</groupId>
+			<artifactId>spring-batch-test</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springmodules</groupId>
+			<artifactId>spring-modules-validation</artifactId>
+			<version>0.8</version>
+			<exclusions>
+				<exclusion>
+					<groupId>rhino</groupId>
+					<artifactId>js</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-validator</groupId>
+					<artifactId>commons-validator</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-lang</groupId>
+					<artifactId>commons-lang</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-beanutils</groupId>
+					<artifactId>commons-beanutils</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-digester</groupId>
+					<artifactId>commons-digester</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>antlr</groupId>
+					<artifactId>antlr</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>opensymphony</groupId>
+			<artifactId>quartz-all</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.6</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>xmlunit</groupId>
+			<artifactId>xmlunit</artifactId>
+			<version>1.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jta_1.1_spec</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ibatis</groupId>
+			<artifactId>ibatis-sqlmap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.derby</groupId>
+			<artifactId>derby</artifactId>
+			<optional>true</optional>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sourceforge.jtds</groupId>
+			<artifactId>jtds</artifactId>
+			<version>1.2.2</version>
+			<optional>true</optional>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.oracle.jdbc</groupId>
+			<artifactId>com.springsource.oracle.jdbc</artifactId>
+			<version>10.2.0.2</version>
+			<optional>true</optional>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.3-603.jdbc3</version>
+			<optional>true</optional>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ws</groupId>
+			<artifactId>spring-oxm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<optional>true</optional>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sql</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<typedef resource="foundrylogic/vpp/typedef.properties" />
+								<taskdef resource="foundrylogic/vpp/taskdef.properties" />
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/hsqldb.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/hsqldb.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-hsqldb.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/db2.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/db2.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-db2.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/derby.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/derby.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-derby.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/oracle10g.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/oracle10g.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-oracle10g.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/postgresql.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/postgresql.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-postgresql.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/mysql.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/mysql.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-mysql.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sqlserver.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sqlserver.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sqlserver.sql" />
+								</vppcopy>
+								<vppcopy todir="${basedir}/target/generated-resources"
+									overwrite="true">
+									<config>
+										<context>
+											<property key="includes" value="src/main/sql" />
+											<property file="${basedir}/src/main/sql/sybase.properties" />
+										</context>
+										<engine>
+											<property key="velocimacro.library" value="src/main/sql/sybase.vpp" />
+										</engine>
+									</config>
+									<fileset dir="${basedir}/src/main/sql" includes="business-schema.sql.vpp" />
+									<mapper type="glob" from="*.sql.vpp" to="*-sybase.sql" />
+								</vppcopy>
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<junitArtifactName>junit:junit</junitArtifactName>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<repositories>
+		<repository>
+			<id>com.springsource.repository.bundles.external</id>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle External</name>
+			<url>http://repository.springsource.com/maven/bundles/external</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>

@@ -262,6 +262,10 @@
 				<optional>true</optional>
 				<exclusions>
 					<exclusion>
+						<groupId>cglib</groupId>
+						<artifactId>cglib</artifactId>
+					</exclusion>
+					<exclusion>
 						<groupId>asm</groupId>
 						<artifactId>asm</artifactId>
 					</exclusion>
@@ -489,23 +493,20 @@
 			<url>file:///${user.dir}/target/staging</url>
 		</site>
 		<repository>
-			<id>spring-milestone</id>
-			<name>            Spring Milestone Repository
-          </name>
-			<url>s3://maven.springframework.org/milestone</url>
+			<id>spring-release</id>
+			<name>Spring Release Repository</name>
+			<url>s3://maven.springframework.org/release</url>
 		</repository>
 		<snapshotRepository>
 			<id>spring-snapshot</id>
-			<name>            Spring Snapshot Repository
-          </name>
+			<name>Spring Snapshot Repository</name>
 			<url>s3://maven.springframework.org/snapshot</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>objectstyle</id>
-			<name>        ObjectStyle.org Repository
-      </name>
+			<name>ObjectStyle.org Repository</name>
 			<url>http://objectstyle.org/maven2</url>
 			<snapshots>
 				<enabled>false</enabled>
@@ -515,8 +516,7 @@
 	<pluginRepositories>
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.milestone</id>
-			<name>        SpringSource Enterprise Bundle Repository -				SpringSource Bundle Milestones
-      </name>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Milestones</name>
 			<url>http://repository.springsource.com/maven/bundles/milestone</url>
 			<snapshots>
 				<enabled>false</enabled>
@@ -524,8 +524,7 @@
 		</pluginRepository>
 		<pluginRepository>
 			<id>com.springsource.repository.bundles.snapshot</id>
-			<name>        SpringSource Enterprise Bundle Repository -				SpringSource Bundle Snapshots
-      </name>
+			<name>SpringSource Enterprise Bundle Repository - SpringSource Bundle Snapshots</name>
 			<url>http://repository.springsource.com/maven/bundles/snapshot</url>
 		</pluginRepository>
 	</pluginRepositories>
