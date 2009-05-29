@@ -23,6 +23,10 @@ import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
 
 /**
+ * Entry point for browsing executions of running or historical jobs and steps.
+ * Since the data may be re-hydrated from persistent storage, it may not contain
+ * volatile fields that would have been present when the execution was active.
+ * 
  * @author Dave Syer
  * 
  * @since 2.0
@@ -41,12 +45,17 @@ public interface JobExplorer {
 	List<JobInstance> getJobInstances(String jobName, int start, int count);
 
 	/**
+	 * Retrieve a {@link JobExecution} by its id.
+	 * 
 	 * @param executionId the job execution id
 	 * @return the {@link JobExecution} with this id, or null if not found
 	 */
 	JobExecution getJobExecution(Long executionId);
 
 	/**
+	 * Retrieve a {@link StepExecution} by its id and parent
+	 * {@link JobExecution} id.
+	 * 
 	 * @param jobExecutionId the parent job execution id
 	 * @param stepExecutionId the step execution id
 	 * @return the {@link StepExecution} with this id, or null if not found
