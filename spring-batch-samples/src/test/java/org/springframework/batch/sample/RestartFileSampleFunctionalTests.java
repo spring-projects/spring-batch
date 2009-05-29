@@ -55,7 +55,7 @@ public class RestartFileSampleFunctionalTests extends AbstractJobTests {
 
 		JobExecution je2 = this.launchJob(jobParameters);
 		assertEquals(BatchStatus.COMPLETED, je2.getStatus());
-//		AssertFile.assertLineCount(20, outputResource);
+		AssertFile.assertLineCount(20, outputResource);
 	}
 
 	public static class CustomerCreditFlatFileItemWriter extends FlatFileItemWriter<CustomerCredit> {
