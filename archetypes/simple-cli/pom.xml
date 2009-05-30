@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.springframework.batch</groupId>
-  <artifactId>spring-batch-simple-cli</artifactId>
-  <version>2.0.1.CI-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>Commandline</name>
-  <url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
-  <description>    This project is a minimal command line batch sample from      Spring Batch.  Once installed you can use &quot;mvn exec:java&quot; to       see the job run; or if you ship the lib directory you can put      the project jar on the classpath and run the      CommandLineJobRunner directly or with &quot;java -jar&quot;.
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.springframework.batch</groupId>
+	<artifactId>spring-batch-simple-cli</artifactId>
+	<version>2.0.1.CI-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>Commandline</name>
+	<url>http://www.springframework.org/spring-batch/archetypes/simple-cli-archetype</url>
+	<description>    This project is a minimal command line batch sample from      Spring Batch.  Once installed you can use &quot;mvn exec:java&quot; to       see the job run; or if you ship the lib directory you can put      the project jar on the classpath and run the      CommandLineJobRunner directly or with &quot;java -jar&quot;.
   </description>
   <properties>
     <maven.test.failure.ignore>true</maven.test.failure.ignore>
@@ -68,6 +70,11 @@
     <dependency>
       <groupId>org.springframework.batch</groupId>
       <artifactId>spring-batch-core</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.batch</groupId>
+      <artifactId>spring-batch-infrastructure</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

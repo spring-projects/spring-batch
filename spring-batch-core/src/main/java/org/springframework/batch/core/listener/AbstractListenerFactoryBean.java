@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
@@ -186,7 +187,8 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 			return true;
 		}
 		if (target instanceof Advised) {
-			if (listenerType.isAssignableFrom(((Advised) target).getTargetSource().getTargetClass())) {
+			TargetSource targetSource = ((Advised) target).getTargetSource();
+			if (targetSource!=null && targetSource.getTargetClass()!=null && listenerType.isAssignableFrom(targetSource.getTargetClass())) {
 				return true;
 			}
 		}

@@ -157,6 +157,10 @@ public class MethodInvokerUtils {
 				ElementType.METHOD), "Annotation [" + annotationType + "] is not a Method-level annotation.");
 		final Class<?> targetClass = (target instanceof Advised) ? ((Advised) target).getTargetSource()
 				.getTargetClass() : target.getClass();
+		if (targetClass == null) {
+			// Proxy with no target cannot have annotations
+			return null;
+		}
 		final AtomicReference<Method> annotatedMethod = new AtomicReference<Method>();
 		ReflectionUtils.doWithMethods(targetClass, new ReflectionUtils.MethodCallback() {
 			public void doWith(Method method) throws IllegalArgumentException, IllegalAccessException {

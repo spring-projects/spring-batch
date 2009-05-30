@@ -27,6 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.aop.framework.ProxyFactory;
@@ -227,6 +231,19 @@ public class StepListenerFactoryBeanTests {
 			public void foo(StepExecution execution) {
 			}
 		}));
+	}
+
+	@Test
+	public void testProxyWithNoTarget() throws Exception {
+		ProxyFactory factory = new ProxyFactory();
+		factory.addInterface(DataSource.class);
+		factory.addAdvice(new MethodInterceptor() {
+			public Object invoke(MethodInvocation invocation) throws Throwable {
+				return null;
+			}
+		});
+		Object proxy = factory.getProxy();
+		assertFalse(StepListenerFactoryBean.isListener(proxy));
 	}
 
 	@Test
