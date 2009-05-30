@@ -16,7 +16,6 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.batch.item.ItemProcessor;
@@ -32,18 +31,7 @@ public class SkipProcessorStub<T> extends ExceptionThrowingItemHandlerStub<T> im
 
 	private List<T> committed = TransactionAwareProxyFactory.createTransactionalList();
 
-	public SkipProcessorStub() {
-		super();
-	}
-
-	public SkipProcessorStub(T... failures) {
-		super(Arrays.asList(failures));
-	}
-
-	public SkipProcessorStub(boolean runtimeException, T... failures) {
-		this(failures);
-		this.setRuntimeException(runtimeException);
-	}
+	private boolean filter = false;
 
 	public List<T> getProcessed() {
 		return processed;
@@ -53,16 +41,31 @@ public class SkipProcessorStub<T> extends ExceptionThrowingItemHandlerStub<T> im
 		return committed;
 	}
 
+	public void setFilter(boolean filter) {
+		this.filter = filter;
+	}
+
 	public void clear() {
-		processed = new ArrayList<T>();
-		committed = TransactionAwareProxyFactory.createTransactionalList();
-		this.setFailures(new ArrayList<T>());
+		super.clear();
+		processed.clear();
+		committed.clear();
+		filter = false;
 	}
 
 	public T process(T item) throws Exception {
 		processed.add(item);
 		committed.add(item);
-		checkFailure(item);
+		try {
+			checkFailure(item);
+		}
+		catch (Exception e) {
+			if(filter){
+				return null;
+			}
+			else{
+				throw e;
+			}
+		}
 		return item;
 	}
 }

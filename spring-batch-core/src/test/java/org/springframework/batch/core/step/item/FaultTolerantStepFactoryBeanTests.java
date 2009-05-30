@@ -34,7 +34,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.core.step.skip.SkipPolicy;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemStream;
 import org.springframework.batch.item.ItemStreamException;
@@ -45,7 +44,6 @@ import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.item.WriteFailedException;
 import org.springframework.batch.item.WriterNotOpenException;
-import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
@@ -61,20 +59,17 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	private FaultTolerantStepFactoryBean<String, String> factory;
 
-	private SkipReaderStub<String> reader = new SkipReaderStub<String>(new String[] { "1", "2", "3", "4", "5" },
-			Collections.singleton("2"));
+	private SkipReaderStub<String> reader = new SkipReaderStub<String>();
 
-	private SkipWriterStub<String> writer = new SkipWriterStub<String>("4");
+	private SkipProcessorStub<String> processor = new SkipProcessorStub<String>();;
+
+	private SkipWriterStub<String> writer = new SkipWriterStub<String>();
 
 	private JobExecution jobExecution;
 
 	private StepExecution stepExecution;
 
 	private JobRepository repository;
-
-	private List<String> processed = new ArrayList<String>();
-
-	private int count;
 
 	private boolean opened = false;
 
@@ -87,8 +82,15 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(2);
+
+		reader.clear();
+		reader.setItems("1", "2", "3", "4", "5");
 		factory.setItemReader(reader);
+		processor.clear();
+		factory.setItemProcessor(processor);
+		writer.clear();
 		factory.setItemWriter(writer);
+
 		factory.setSkipLimit(2);
 
 		@SuppressWarnings("unchecked")
@@ -114,17 +116,11 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testNonSkippableExceptionOnRead() throws Exception {
+		reader.setFailures("2");
 
 		// nothing is skippable
 		Collection<Class<? extends Throwable>> empty = Collections.emptySet();
 		factory.setSkippableExceptionClasses(empty);
-
-		// no exceptions on write
-		factory.setItemWriter(new ItemWriter<String>() {
-			public void write(List<? extends String> items) throws Exception {
-				logger.debug(items);
-			}
-		});
 
 		Step step = (Step) factory.getObject();
 
@@ -145,15 +141,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		factory.setCommitInterval(1);
 
 		// no failures on read
-		reader = new SkipReaderStub<String>(new String[] { "1", "2", "3", "4", "5" });
-		factory.setItemReader(reader);
-		factory.setItemWriter(new ItemWriter<String>() {
-
-			public void write(List<? extends String> items) throws Exception {
-				throw new RuntimeException("non-skippable exception");
-			}
-
-		});
+		reader.setItems("1", "2", "3", "4", "5");
+		writer.setFailures("1");
 
 		Step step = (Step) factory.getObject();
 
@@ -161,7 +150,7 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 		assertEquals(1, reader.getRead().size());
 		assertEquals(ExitStatus.FAILED.getExitCode(), stepExecution.getExitStatus().getExitCode());
-		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("non-skippable exception"));
+		assertTrue(stepExecution.getExitStatus().getExitDescription().contains("Intended Failure"));
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
@@ -171,14 +160,11 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testReadSkip() throws Exception {
+		reader.setFailures("2");
 
-		writer = new SkipWriterStub<String>();
-		factory.setItemWriter(writer);
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
-
-		System.err.println(writer.getWritten());
 
 		assertEquals(1, stepExecution.getSkipCount());
 		assertEquals(1, stepExecution.getReadSkipCount());
@@ -203,13 +189,9 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testProcessSkip() throws Exception {
+		processor.setFailures("4");
+		writer.setFailures("4");
 
-		reader = new SkipReaderStub<String>(new String[] { "1", "2", "3", "4", "5" });
-		factory.setItemReader(reader);
-		writer = new SkipWriterStub<String>();
-		factory.setItemWriter(writer);
-		SkipProcessorStub<String> processor = new SkipProcessorStub<String>("4");
-		factory.setItemProcessor(processor);
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
@@ -234,13 +216,8 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	@Test
 	public void testProcessFilter() throws Exception {
-
-		reader = new SkipReaderStub<String>(new String[] { "1", "2", "3", "4", "5" });
-		factory.setItemReader(reader);
-		writer = new SkipWriterStub<String>();
-		factory.setItemWriter(writer);
-		FilterProcessorStub processor = new FilterProcessorStub(Arrays.asList(new String[] { "4" }));
-		factory.setItemProcessor(processor);
+		processor.setFailures("4");
+		processor.setFilter(true);
 		ItemProcessListenerStub<String, String> listenerStub = new ItemProcessListenerStub<String, String>();
 		factory.setListeners(new StepListener[] { listenerStub });
 		Step step = (Step) factory.getObject();
@@ -271,9 +248,8 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testWriteSkip() throws Exception {
+		writer.setFailures("4");
 
-		reader = new SkipReaderStub<String>(new String[] { "1", "2", "3", "4", "5" });
-		factory.setItemReader(reader);
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
@@ -302,9 +278,10 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testFatalException() throws Exception {
-		factory.setFatalExceptionClasses(Collections
-				.<Class<? extends Throwable>> singleton(FatalRuntimeException.class));
-		factory.setItemWriter(new SkipWriterStub<String>() {
+		reader.setFailures("2");
+
+		factory.setFatalExceptionClasses(getExceptionList(FatalRuntimeException.class));
+		factory.setItemWriter(new ItemWriter<String>() {
 			public void write(List<? extends String> items) {
 				throw new FatalRuntimeException("Ouch!");
 			}
@@ -323,6 +300,8 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSkipOverLimit() throws Exception {
+		reader.setFailures("2");
+		writer.setFailures("4");
 
 		factory.setSkipLimit(1);
 
@@ -348,13 +327,13 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSkipOverLimitOnRead() throws Exception {
+		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
+		reader.setFailures(StringUtils.commaDelimitedListToStringArray("2,3,5"));
 
-		reader = new SkipReaderStub<String>(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
-				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
+		writer.setFailures("4");
 
 		factory.setSkipLimit(3);
-		factory.setItemReader(reader);
-		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -381,19 +360,19 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSkipListenerFailsOnRead() throws Exception {
+		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
+		reader.setFailures(StringUtils.commaDelimitedListToStringArray("2,3,5"));
 
-		reader = new SkipReaderStub<String>(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
-				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
+		writer.setFailures("4");
 
 		factory.setSkipLimit(3);
-		factory.setItemReader(reader);
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			@Override
 			public void onSkipInRead(Throwable t) {
 				throw new RuntimeException("oops");
 			}
 		} });
-		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -416,18 +395,18 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSkipListenerFailsOnWrite() throws Exception {
+		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
 
-		reader = new SkipReaderStub<String>(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
+		writer.setFailures("4");
 
 		factory.setSkipLimit(3);
-		factory.setItemReader(reader);
 		factory.setListeners(new StepListener[] { new SkipListenerSupport<String, String>() {
 			@Override
 			public void onSkipInWrite(String item, Throwable t) {
 				throw new RuntimeException("oops");
 			}
 		} });
-		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -446,12 +425,12 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSkipOnReadNotDoubleCounted() throws Exception {
+		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"));
+		reader.setFailures(StringUtils.commaDelimitedListToStringArray("2,3,5"));
 
-		reader = new SkipReaderStub<String>(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6"), Arrays
-				.asList(StringUtils.commaDelimitedListToStringArray("2,3,5")));
+		writer.setFailures("4");
 
 		factory.setSkipLimit(4);
-		factory.setItemReader(reader);
 
 		Step step = (Step) factory.getObject();
 
@@ -476,15 +455,12 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSkipOnWriteNotDoubleCounted() throws Exception {
+		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7"));
+		reader.setFailures(StringUtils.commaDelimitedListToStringArray("2,3"));
 
-		reader = new SkipReaderStub<String>(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7"), Arrays
-				.asList(StringUtils.commaDelimitedListToStringArray("2,3")));
-
-		writer = new SkipWriterStub<String>("4", "5");
+		writer.setFailures("4", "5");
 
 		factory.setSkipLimit(4);
-		factory.setItemReader(reader);
-		factory.setItemWriter(writer);
 		factory.setCommitInterval(3); // includes all expected skips
 
 		Step step = (Step) factory.getObject();
@@ -503,27 +479,18 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	@Test
 	public void testDefaultSkipPolicy() throws Exception {
-		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
+		reader.setItems("a", "b", "c");
+		reader.setFailures("b");
+
+		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
 		factory.setSkipLimit(1);
-		List<String> items = Arrays.asList(new String[] { "a", "b", "c" });
-		ItemReader<String> provider = new ListItemReader<String>(items) {
-			public String read() {
-				String item = super.read();
-				count++;
-				if ("b".equals(item)) {
-					throw new RuntimeException("Read error - planned failure.");
-				}
-				return item;
-			}
-		};
-		factory.setItemReader(provider);
+
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
 
 		assertEquals(1, stepExecution.getSkipCount());
-		// b is processed once and skipped, plus 1, plus c, plus the null at end
-		assertEquals(4, count);
+		assertEquals("[a, c]", reader.getRead().toString());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
 	}
@@ -533,15 +500,14 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testSkipOverLimitOnReadWithAllSkipsAtEnd() throws Exception {
+		reader.setItems(StringUtils.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"));
+		reader.setFailures(StringUtils.commaDelimitedListToStringArray("6,12,13,14,15"));
 
-		reader = new SkipReaderStub<String>(StringUtils
-				.commaDelimitedListToStringArray("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"), Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("6,12,13,14,15")));
+		writer.setFailures("4");
 
 		factory.setCommitInterval(5);
 		factory.setSkipLimit(3);
-		factory.setItemReader(reader);
-		factory.setSkippableExceptionClasses(Collections.<Class<? extends Throwable>> singleton(Exception.class));
+		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
 
 		Step step = (Step) factory.getObject();
 
@@ -564,13 +530,9 @@ public class FaultTolerantStepFactoryBeanTests {
 
 	@Test
 	public void testReprocessingAfterWriterRollback() throws Exception {
-		factory.setItemProcessor(new ItemProcessor<String, String>() {
-			public String process(String item) throws Exception {
-				processed.add(item);
-				return item;
-			}
-		});
-		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }));
+		reader.setItems("1", "2", "3", "4");
+
+		writer.setFailures("4");
 
 		Step step = (Step) factory.getObject();
 		step.execute(stepExecution);
@@ -580,15 +542,15 @@ public class FaultTolerantStepFactoryBeanTests {
 
 		// 1,2,3,4,3,4,4 - two re-processing attempts until the item is
 		// identified and finally skipped on the third attempt
-		assertEquals(7, processed.size());
-		assertEquals("[1, 2, 3, 4, 3, 4, 4]", processed.toString());
+		assertEquals(7, processor.getProcessed().size());
+		assertEquals("[1, 2, 3, 4, 3, 4, 4]", processor.getProcessed().toString());
 		assertStepExecutionsAreEqual(stepExecution, repository.getLastStepExecution(jobExecution.getJobInstance(), step
 				.getName()));
-
 	}
 
 	@Test
 	public void testAutoRegisterItemListeners() throws Exception {
+		reader.setFailures("2");
 
 		final List<Integer> listenerCalls = new ArrayList<Integer>();
 
@@ -667,6 +629,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testItemStreamOpenedEvenWithTaskExecutor() throws Exception {
+		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
 			public void close() throws ItemStreamException {
@@ -702,6 +665,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	 */
 	@Test
 	public void testNestedItemStreamOpened() throws Exception {
+		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
 			public void close() throws ItemStreamException {
@@ -753,6 +717,7 @@ public class FaultTolerantStepFactoryBeanTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testProxiedItemStreamOpened() throws Exception {
+		writer.setFailures("4");
 
 		ItemStreamReader<String> reader = new ItemStreamReader<String>() {
 			public void close() throws ItemStreamException {
@@ -791,22 +756,6 @@ public class FaultTolerantStepFactoryBeanTests {
 		assertTrue(opened);
 		assertTrue(closed);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
-	}
-
-	private static class FilterProcessorStub implements ItemProcessor<String, String> {
-		private final Collection<String> failures;
-
-		public FilterProcessorStub(Collection<String> failures) {
-			this.failures = failures;
-		}
-
-		public String process(String item) throws Exception {
-			if (failures.contains(item)) {
-				return null;
-			}
-			return item;
-		}
-
 	}
 
 	private static class ItemProcessListenerStub<T, S> implements ItemProcessListener<T, S> {
@@ -950,4 +899,8 @@ public class FaultTolerantStepFactoryBeanTests {
 		return (SkipPolicy) ReflectionTestUtils.getField(chunkProvider, "skipPolicy");
 	}
 
+	@SuppressWarnings("unchecked")
+	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> args) {
+		return Arrays.<Class<? extends Throwable>> asList(args);
+	}
 }

@@ -16,12 +16,12 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ParseException;
 import org.springframework.batch.item.UnexpectedInputException;
+import org.springframework.util.Assert;
 
 /**
  * @author Dan Garrette
@@ -29,25 +29,22 @@ import org.springframework.batch.item.UnexpectedInputException;
  */
 public class SkipReaderStub<T> extends ExceptionThrowingItemHandlerStub<T> implements ItemReader<T> {
 
-	private final T[] items;
+	private T[] items;
 
 	private List<T> read = new ArrayList<T>();
 
 	private int counter = -1;
 
+	public SkipReaderStub() {
+	}
+
 	public SkipReaderStub(T... items) {
-		super();
 		this.items = items;
 	}
 
-	public SkipReaderStub(T[] items, Collection<T> failures) {
-		super(failures);
+	public void setItems(T... items) {
+		Assert.isTrue(counter < 0, "Items cannot be set once reading has started");
 		this.items = items;
-	}
-
-	public SkipReaderStub(T[] items, Collection<T> failures, boolean runtimeException) {
-		this(items, failures);
-		this.setRuntimeException(runtimeException);
 	}
 
 	public List<T> getRead() {
@@ -55,8 +52,9 @@ public class SkipReaderStub<T> extends ExceptionThrowingItemHandlerStub<T> imple
 	}
 
 	public void clear() {
-		read = new ArrayList<T>();
-		this.setFailures(new ArrayList<T>());
+		super.clear();
+		counter = -1;
+		read.clear();
 	}
 
 	public T read() throws Exception, UnexpectedInputException, ParseException {

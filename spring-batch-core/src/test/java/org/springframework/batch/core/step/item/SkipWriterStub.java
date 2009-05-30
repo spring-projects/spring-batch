@@ -16,7 +16,6 @@
 package org.springframework.batch.core.step.item;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.batch.item.ItemWriter;
@@ -32,19 +31,6 @@ public class SkipWriterStub<T> extends ExceptionThrowingItemHandlerStub<T> imple
 
 	private List<T> committed = TransactionAwareProxyFactory.createTransactionalList();
 
-	public SkipWriterStub() {
-		super();
-	}
-
-	public SkipWriterStub(T... failures) {
-		super(Arrays.asList(failures));
-	}
-
-	public SkipWriterStub(boolean runtimeException, T... failures) {
-		this(failures);
-		this.setRuntimeException(runtimeException);
-	}
-
 	public List<T> getWritten() {
 		return written;
 	}
@@ -54,9 +40,9 @@ public class SkipWriterStub<T> extends ExceptionThrowingItemHandlerStub<T> imple
 	}
 
 	public void clear() {
-		written = new ArrayList<T>();
-		committed = TransactionAwareProxyFactory.createTransactionalList();
-		this.setFailures(new ArrayList<T>());
+		super.clear();
+		written.clear();
+		committed.clear();
 	}
 
 	public void write(List<? extends T> items) throws Exception {

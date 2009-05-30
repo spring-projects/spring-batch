@@ -15,6 +15,7 @@
  */
 package org.springframework.batch.core.step.item;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -28,33 +29,25 @@ public abstract class ExceptionThrowingItemHandlerStub<T> {
 
 	private boolean runtimeException = false;
 
-	public ExceptionThrowingItemHandlerStub() {
-	}
-
-	public ExceptionThrowingItemHandlerStub(Collection<T> failures) {
-		this.failures = failures;
-	}
-
-	public ExceptionThrowingItemHandlerStub(Collection<T> failures, boolean runtimeException) {
-		this(failures);
-		this.runtimeException = runtimeException;
-	}
-
-	public void setFailures(Collection<T> failures) {
-		this.failures = failures;
+	public void setFailures(T... failures) {
+		this.failures = Arrays.asList(failures);
 	}
 
 	public void setRuntimeException(boolean runtimeException) {
 		this.runtimeException = runtimeException;
 	}
 
+	public void clear() {
+		failures.clear();
+	}
+
 	protected void checkFailure(T item) throws Exception {
 		if (isFailure(item)) {
 			if (runtimeException) {
-				throw new SkippableRuntimeException("should cause rollback in reader");
+				throw new SkippableRuntimeException("Intended Failure");
 			}
 			else {
-				throw new SkippableException("shouldn't cause rollback in reader");
+				throw new SkippableException("Intended Failure");
 			}
 		}
 	}

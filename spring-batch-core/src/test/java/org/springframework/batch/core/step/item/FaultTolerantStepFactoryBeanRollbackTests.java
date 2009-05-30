@@ -36,7 +36,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	private FaultTolerantStepFactoryBean<String, String> factory;
 
-	private SkipReaderStub<String> reader = new SkipReaderStub<String>("1", "2", "3", "4", "5");
+	private SkipReaderStub<String> reader = new SkipReaderStub<String>();
+
+	private SkipProcessorStub<String> processor = new SkipProcessorStub<String>();
 
 	private SkipWriterStub<String> writer = new SkipWriterStub<String>();
 
@@ -53,14 +55,18 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(2);
+
+		reader.clear();
+		reader.setItems("1", "2", "3", "4", "5");
 		factory.setItemReader(reader);
+		processor.clear();
+		factory.setItemProcessor(processor);
+		writer.clear();
 		factory.setItemWriter(writer);
+
 		factory.setSkipLimit(2);
 
-		@SuppressWarnings("unchecked")
-		Collection<Class<? extends Throwable>> skippableExceptions = Arrays
-				.<Class<? extends Throwable>> asList(Exception.class);
-		factory.setSkippableExceptionClasses(skippableExceptions);
+		factory.setSkippableExceptionClasses(getExceptionList(Exception.class));
 
 		MapJobRepositoryFactoryBean.clear();
 		MapJobRepositoryFactoryBean repositoryFactory = new MapJobRepositoryFactoryBean();
@@ -109,8 +115,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testReaderDefaultNoRollbackOnCheckedException() throws Exception {
-		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }, Arrays.asList("2", "3"),
-				false));
+		reader.setItems("1", "2", "3", "4");
+		reader.setFailures("2", "3");
+		reader.setRuntimeException(false);
 
 		Step step = (Step) factory.getObject();
 
@@ -125,8 +132,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testReaderAttributesOverrideSkippableNoRollback() throws Exception {
-		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }, Arrays.asList("2", "3"),
-				false));
+		reader.setFailures("2", "3");
+		reader.setItems("1", "2", "3", "4");
+		reader.setRuntimeException(false);
 
 		// No skips by default
 		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>());
@@ -147,11 +155,10 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testProcessorDefaultRollbackOnCheckedException() throws Exception {
-		SkipProcessorStub<String> processor = new SkipProcessorStub<String>(false, "1", "3");
-		factory.setItemProcessor(processor);
+		reader.setItems("1", "2", "3", "4");
 
-		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }));
-		factory.setItemWriter(new SkipWriterStub<String>());
+		processor.setFailures("1", "3");
+		processor.setRuntimeException(false);
 
 		Step step = (Step) factory.getObject();
 
@@ -166,11 +173,10 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testProcessorDefaultRollbackOnRuntimeException() throws Exception {
-		SkipProcessorStub<String> processor = new SkipProcessorStub<String>(true, "1", "3");
-		factory.setItemProcessor(processor);
+		reader.setItems("1", "2", "3", "4");
 
-		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }));
-		factory.setItemWriter(new SkipWriterStub<String>());
+		processor.setFailures("1", "3");
+		processor.setRuntimeException(true);
 
 		Step step = (Step) factory.getObject();
 
@@ -182,12 +188,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	@Test
 	public void testProcessSkipWithNoRollbackForCheckedException() throws Exception {
+		processor.setFailures("4");
+		processor.setRuntimeException(false);
 
-		reader = new SkipReaderStub<String>(new String[] { "1", "2", "3", "4", "5" });
-		factory.setItemReader(reader);
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
-		SkipProcessorStub<String> processor = new SkipProcessorStub<String>(false, "4");
-		factory.setItemProcessor(processor);
+
 		Step step = (Step) factory.getObject();
 
 		step.execute(stepExecution);
@@ -213,7 +218,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterDefaultRollbackOnCheckedException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub<String>(false, "2", "3"));
+		writer.setFailures("2", "3");
+		writer.setRuntimeException(false);
 
 		Step step = (Step) factory.getObject();
 
@@ -228,7 +234,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterDefaultRollbackOnRuntimeException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub<String>(true, "2", "3"));
+		writer.setFailures("2", "3");
+		writer.setRuntimeException(true);
 
 		Step step = (Step) factory.getObject();
 
@@ -244,7 +251,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterNoRollbackOnRuntimeException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub<String>(true, "2", "3"));
+		writer.setFailures("2", "3");
+		writer.setRuntimeException(true);
+
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableRuntimeException.class));
 
 		Step step = (Step) factory.getObject();
@@ -263,7 +272,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterNoRollbackOnCheckedException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub<String>(false, "2", "3"));
+		writer.setFailures("2", "3");
+		writer.setRuntimeException(false);
+
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
 
 		Step step = (Step) factory.getObject();
