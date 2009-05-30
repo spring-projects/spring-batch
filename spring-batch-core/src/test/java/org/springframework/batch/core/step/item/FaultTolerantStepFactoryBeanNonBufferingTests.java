@@ -49,6 +49,8 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 	private JobExecution jobExecution;
 
+	private static final SkippableRuntimeException exception = new SkippableRuntimeException("exception in writer");
+
 	int count = 0;
 
 	@Before
@@ -74,9 +76,9 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 	public void testSkip() throws Exception {
 		@SuppressWarnings("unchecked")
 		SkipListener<Integer, String> skipListener = createStrictMock(SkipListener.class);
-		skipListener.onSkipInWrite("3", SkipWriterStub.exception);
+		skipListener.onSkipInWrite("3", exception);
 		expectLastCall().once();
-		skipListener.onSkipInWrite("4", SkipWriterStub.exception);
+		skipListener.onSkipInWrite("4", exception);
 		expectLastCall().once();
 		replay(skipListener);
 
@@ -114,8 +116,6 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 
 		protected final Log logger = LogFactory.getLog(getClass());
 
-		private static final SkippableRuntimeException exception = new SkippableRuntimeException("exception in writer");
-
 		// simulate transactional output
 		private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
 
@@ -143,18 +143,6 @@ public class FaultTolerantStepFactoryBeanNonBufferingTests {
 			}
 		}
 
-	}
-
-	private static class SkippableException extends Exception {
-		public SkippableException(String message) {
-			super(message);
-		}
-	}
-
-	private static class SkippableRuntimeException extends RuntimeException {
-		public SkippableRuntimeException(String message) {
-			super(message);
-		}
 	}
 
 }

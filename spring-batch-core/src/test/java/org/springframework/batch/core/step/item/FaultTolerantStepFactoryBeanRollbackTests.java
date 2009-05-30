@@ -4,10 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -22,13 +20,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.ParseException;
-import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.batch.support.transaction.TransactionAwareProxyFactory;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
@@ -44,11 +36,9 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	private FaultTolerantStepFactoryBean<String, String> factory;
 
-	private static Collection<String> NO_FAILURES = Collections.emptyList();
+	private SkipReaderStub<String> reader = new SkipReaderStub<String>("1", "2", "3", "4", "5");
 
-	private SkipReaderStub reader = new SkipReaderStub();
-
-	private SkipWriterStub writer = new SkipWriterStub();
+	private SkipWriterStub<String> writer = new SkipWriterStub<String>();
 
 	private JobExecution jobExecution;
 
@@ -56,19 +46,17 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 	private JobRepository repository;
 
-	private static boolean runtimeException = false;
-
 	@Before
 	public void setUp() throws Exception {
 		factory = new FaultTolerantStepFactoryBean<String, String>();
-		
+
 		factory.setBeanName("stepName");
 		factory.setTransactionManager(new ResourcelessTransactionManager());
 		factory.setCommitInterval(2);
 		factory.setItemReader(reader);
 		factory.setItemWriter(writer);
 		factory.setSkipLimit(2);
-		
+
 		@SuppressWarnings("unchecked")
 		Collection<Class<? extends Throwable>> skippableExceptions = Arrays
 				.<Class<? extends Throwable>> asList(Exception.class);
@@ -121,11 +109,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testReaderDefaultNoRollbackOnCheckedException() throws Exception {
-		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, Arrays.asList("2", "3")));
+		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }, Arrays.asList("2", "3"),
+				false));
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = false;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -137,7 +125,8 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testReaderAttributesOverrideSkippableNoRollback() throws Exception {
-		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, Arrays.asList("2", "3")));
+		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }, Arrays.asList("2", "3"),
+				false));
 
 		// No skips by default
 		factory.setSkippableExceptionClasses(new HashSet<Class<? extends Throwable>>());
@@ -146,7 +135,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = false;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -159,16 +147,14 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testProcessorDefaultRollbackOnCheckedException() throws Exception {
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,3")));
+		SkipProcessorStub<String> processor = new SkipProcessorStub<String>(false, "1", "3");
 		factory.setItemProcessor(processor);
 
-		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
-		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
+		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }));
+		factory.setItemWriter(new SkipWriterStub<String>());
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = false;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -180,16 +166,14 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testProcessorDefaultRollbackOnRuntimeException() throws Exception {
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(StringUtils
-				.commaDelimitedListToStringArray("1,3")));
+		SkipProcessorStub<String> processor = new SkipProcessorStub<String>(true, "1", "3");
 		factory.setItemProcessor(processor);
 
-		factory.setItemReader(new SkipReaderStub(new String[] { "1", "2", "3", "4" }, NO_FAILURES));
-		factory.setItemWriter(new SkipWriterStub(NO_FAILURES));
+		factory.setItemReader(new SkipReaderStub<String>(new String[] { "1", "2", "3", "4" }));
+		factory.setItemWriter(new SkipWriterStub<String>());
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = true;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -199,14 +183,13 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@Test
 	public void testProcessSkipWithNoRollbackForCheckedException() throws Exception {
 
-		reader = new SkipReaderStub(new String[] { "1", "2", "3", "4", "5" }, NO_FAILURES);
+		reader = new SkipReaderStub<String>(new String[] { "1", "2", "3", "4", "5" });
 		factory.setItemReader(reader);
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
-		SkipProcessorStub processor = new SkipProcessorStub(Arrays.asList(new String[] { "4" }));
+		SkipProcessorStub<String> processor = new SkipProcessorStub<String>(false, "4");
 		factory.setItemProcessor(processor);
 		Step step = (Step) factory.getObject();
 
-		runtimeException = false;
 		step.execute(stepExecution);
 
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
@@ -217,11 +200,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		assertEquals(0, stepExecution.getRollbackCount());
 
 		// skips "4"
-		assertTrue(reader.processed.contains("4"));
-		assertFalse(writer.written.contains("4"));
+		assertTrue(reader.getRead().contains("4"));
+		assertFalse(writer.getCommitted().contains("4"));
 
 		List<String> expectedOutput = Arrays.asList(StringUtils.commaDelimitedListToStringArray("1,2,3,5"));
-		assertEquals(expectedOutput, writer.written);
+		assertEquals(expectedOutput, writer.getCommitted());
 
 	}
 
@@ -230,11 +213,10 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterDefaultRollbackOnCheckedException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub(Arrays.asList("2", "3")));
+		factory.setItemWriter(new SkipWriterStub<String>(false, "2", "3"));
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = false;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -246,11 +228,10 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterDefaultRollbackOnRuntimeException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub(Arrays.asList("2", "3")));
+		factory.setItemWriter(new SkipWriterStub<String>(true, "2", "3"));
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = true;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -263,12 +244,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterNoRollbackOnRuntimeException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub(Arrays.asList("2", "3")));
+		factory.setItemWriter(new SkipWriterStub<String>(true, "2", "3"));
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableRuntimeException.class));
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = true;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -283,12 +263,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	 */
 	@Test
 	public void testWriterNoRollbackOnCheckedException() throws Exception {
-		factory.setItemWriter(new SkipWriterStub(Arrays.asList("2", "3")));
+		factory.setItemWriter(new SkipWriterStub<String>(false, "2", "3"));
 		factory.setNoRollbackExceptionClasses(getExceptionList(SkippableException.class));
 
 		Step step = (Step) factory.getObject();
 
-		runtimeException = false;
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 		assertEquals(2, stepExecution.getSkipCount());
@@ -301,129 +280,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	@SuppressWarnings("unchecked")
 	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> args) {
 		return Arrays.<Class<? extends Throwable>> asList(args);
-	}
-
-	private static class SkipProcessorStub implements ItemProcessor<String, String> {
-		private final Collection<String> failures;
-
-		public SkipProcessorStub() {
-			this(NO_FAILURES);
-		}
-
-		public SkipProcessorStub(Collection<String> failures) {
-			this.failures = failures;
-		}
-
-		public String process(String item) throws Exception {
-			if (failures.contains(item)) {
-				if (runtimeException) {
-					throw new SkippableRuntimeException("should cause rollback");
-				}
-				else {
-					throw new SkippableException("shouldn't cause rollback");
-				}
-			}
-			return item;
-		}
-	}
-
-	/**
-	 * Simple item reader that supports skip functionality.
-	 */
-	private static class SkipReaderStub implements ItemReader<String> {
-
-		protected final Log logger = LogFactory.getLog(getClass());
-
-		private final String[] items;
-
-		private Collection<String> processed = new ArrayList<String>();
-
-		private int counter = -1;
-
-		private final Collection<String> failures;
-
-		public SkipReaderStub() {
-			this(new String[] { "1", "2", "3", "4", "5" }, NO_FAILURES);
-		}
-
-		public SkipReaderStub(String[] items, Collection<String> failures) {
-			this.items = items;
-			this.failures = failures;
-		}
-
-		public String read() throws Exception, UnexpectedInputException, ParseException {
-			counter++;
-			if (counter >= items.length) {
-				logger.debug("Returning null at count=" + counter);
-				return null;
-			}
-			String item = items[counter];
-			if (failures.contains(item)) {
-				logger.debug("Throwing exception for [" + item + "] at count=" + counter);
-				if (runtimeException) {
-					throw new SkippableRuntimeException("should cause rollback in reader");
-				}
-				else {
-					throw new SkippableException("shouldn't cause rollback in reader");
-				}
-			}
-			processed.add(item);
-			logger.debug("Returning [" + item + "] at count=" + counter);
-			return item;
-		}
-
-	}
-
-	/**
-	 * Simple item writer that supports skip functionality.
-	 */
-	private static class SkipWriterStub implements ItemWriter<String> {
-
-		protected final Log logger = LogFactory.getLog(getClass());
-
-		// simulate transactional output
-		private List<Object> written = TransactionAwareProxyFactory.createTransactionalList();
-
-		private final Collection<String> failures;
-
-		public SkipWriterStub() {
-			this(NO_FAILURES);
-		}
-
-		/**
-		 * @param failures commaDelimitedListToSet
-		 */
-		public SkipWriterStub(Collection<String> failures) {
-			this.failures = failures;
-		}
-
-		public void write(List<? extends String> items) throws Exception {
-			for (String item : items) {
-				if (failures.contains(item)) {
-					logger.debug("Throwing write exception on [" + item + "]");
-					if (runtimeException) {
-						throw new SkippableRuntimeException("should cause rollback in writer");
-					}
-					else {
-						throw new SkippableException("shouldn't cause rollback in writer");
-					}
-				}
-				written.add(item);
-			}
-		}
-
-	}
-
-	private static class SkippableException extends Exception {
-		public SkippableException(String message) {
-			super(message);
-		}
-	}
-
-	private static class SkippableRuntimeException extends RuntimeException {
-		public SkippableRuntimeException(String message) {
-			super(message);
-		}
 	}
 
 }
