@@ -285,12 +285,97 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		// Two multi-item chunks rolled back. When the item was encountered on
 		// its own it can proceed
 		assertEquals(2, stepExecution.getRollbackCount());
+	}
 
+	@Test
+	public void testSkipInProcessor() throws Exception {
+		processor.setFailures("4");
+		factory.setCommitInterval(30);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[1, 2, 3, 4, 1, 2, 3, 5]", processor.getProcessed().toString());
+		assertEquals("[1, 2, 3, 5]", processor.getCommitted().toString());
+		assertEquals("[1, 2, 3, 5]", writer.getWritten().toString());
+		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testMultipleSkipsInProcessor() throws Exception {
+		processor.setFailures("2", "4");
+		factory.setCommitInterval(30);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		// TODO: Fix this with BATCH-1259?
+		assertEquals("[1, 2, 1, 3, 4, 1, 3, 5]", processor.getProcessed().toString());
+		assertEquals("[1, 3, 5]", processor.getCommitted().toString());
+		assertEquals("[1, 3, 5]", writer.getWritten().toString());
+		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testFilterInProcessor() throws Exception {
+		processor.setFailures("4");
+		processor.setFilter(true);
+		factory.setCommitInterval(30);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[1, 2, 3, 4, 5]", processor.getProcessed().toString());
+		assertEquals("[1, 2, 3, 5]", processor.getCommitted().toString());
+		assertEquals("[1, 2, 3, 5]", writer.getWritten().toString());
+		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testSkipInWriter() throws Exception {
+		writer.setFailures("4");
+		factory.setCommitInterval(30);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		// TODO: Fix this with BATCH-1256
+		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 2, 3, 4, 5, 3, 4, 5, 4, 5, 5]", processor.getProcessed()
+				.toString());
+		assertEquals("[1, 2, 3, 4, 5, 2, 3, 4, 5, 3, 4, 5, 5]", processor.getCommitted().toString());
+		assertEquals("[1, 2, 3, 4, 1, 2, 3, 4, 5]", writer.getWritten().toString());
+		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
+	}
+
+	@Test
+	public void testMultipleSkipsInWriter() throws Exception {
+		writer.setFailures("2", "4");
+		factory.setCommitInterval(30);
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		// TODO: Fix this with BATCH-1256
+		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 2, 3, 4, 5, 3, 4, 5, 4, 5, 5]", processor.getProcessed()
+				.toString());
+		assertEquals("[1, 2, 3, 4, 5, 3, 4, 5, 5]", processor.getCommitted().toString());
+		assertEquals("[1, 2, 1, 2, 3, 4, 5]", writer.getWritten().toString());
+		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> args) {
-		return Arrays.<Class<? extends Throwable>> asList(args);
+	private Collection<Class<? extends Throwable>> getExceptionList(Class<? extends Throwable> arg) {
+		return Arrays.<Class<? extends Throwable>> asList(arg);
 	}
 
 }

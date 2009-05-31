@@ -54,18 +54,18 @@ public class SkipProcessorStub<T> extends ExceptionThrowingItemHandlerStub<T> im
 
 	public T process(T item) throws Exception {
 		processed.add(item);
-		committed.add(item);
 		try {
 			checkFailure(item);
 		}
 		catch (Exception e) {
-			if(filter){
+			if (filter) {
 				return null;
 			}
-			else{
+			else {
 				throw e;
 			}
 		}
+		committed.add(item);
 		return item;
 	}
 }

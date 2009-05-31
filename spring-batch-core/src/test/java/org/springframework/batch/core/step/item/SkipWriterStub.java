@@ -48,8 +48,8 @@ public class SkipWriterStub<T> extends ExceptionThrowingItemHandlerStub<T> imple
 	public void write(List<? extends T> items) throws Exception {
 		for (T item : items) {
 			written.add(item);
-			committed.add(item);
 			checkFailure(item);
+			committed.add(item);
 		}
 	}
 }
