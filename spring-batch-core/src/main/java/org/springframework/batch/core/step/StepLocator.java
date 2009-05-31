@@ -14,6 +14,6 @@ public interface StepLocator {
 	
 	Collection<String> getStepNames();
 	
-	Step getStep(String stepName);
+	Step getStep(String stepName) throws NoSuchStepException;
 
 }
