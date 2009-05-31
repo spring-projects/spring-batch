@@ -7,7 +7,6 @@
 	<artifactId>spring-batch-parent</artifactId>
 	<version>2.0.1.CI-SNAPSHOT</version>
 	<name>Spring Batch Parent</name>
-	<url>http://static.springframework.org/spring-batch</url>
 	<description>Spring Batch parent project.  Defines dependencies and common configuration for the
 	build process.</description>
 	<packaging>pom</packaging>
@@ -92,21 +91,15 @@
 					<url>http://people.apache.org/maven-snapshot-repository</url>
 				</repository>
 			</repositories>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<artifactId>maven-site-plugin</artifactId>
-							<version>2.0-beta-8-SNAPSHOT</version>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
 		</profile>
 	</profiles>
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>2.0</version>
+				</plugin>
 				<plugin>
 					<groupId>com.springsource.bundlor</groupId>
 					<artifactId>com.springsource.bundlor.maven</artifactId>

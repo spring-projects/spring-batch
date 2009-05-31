@@ -11,16 +11,16 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:org.springframework.batch.parent
+					org.springframework.batch:spring-batch-parent
 				</include>
 				<include>
-					org.springframework.batch:org.springframework.batch.test
+					org.springframework.batch:spring-batch-test
 				</include>
 				<include>
-					org.springframework.batch:org.springframework.batch.core
+					org.springframework.batch:spring-batch-core
 				</include>
 				<include>
-					org.springframework.batch:org.springframework.batch.infrastructure
+					org.springframework.batch:spring-batch-infrastructure
 				</include>
 			</includes>
 			<sources>
@@ -39,10 +39,10 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:org.springframework.batch.samples
+					org.springframework.batch:spring-batch-samples
 				</include>
 				<include>
-					org.springframework.batch:org.springframework.batch.archetype.simple.cli
+					org.springframework.batch:spring-batch-simple-cli
 				</include>
 			</includes>
 			<sources>
@@ -62,7 +62,7 @@
 		<moduleSet>
 			<includes>
 				<include>
-					org.springframework.batch:org.springframework.batch.parent
+					org.springframework.batch:spring-batch-parent
 				</include>
 			</includes>
 			<sources>

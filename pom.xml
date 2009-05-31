@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.batch</groupId>
@@ -79,7 +78,6 @@
 								<configuration>
 									<descriptors>
 										<descriptor>src/assembly/no-dependencies.xml</descriptor>
-										<descriptor>src/assembly/with-dependencies.xml</descriptor>
 									</descriptors>
 								</configuration>
 							</execution>
@@ -131,8 +129,7 @@
 									<imgSrcPath>src/site/docbook/reference/</imgSrcPath>
 									<admonGraphicsPath>src/docbkx/resources/images/</admonGraphicsPath>
 									<postProcess>
-										<copy file="${basedir}/target/docbkx/pdf/index.pdf"
-											tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
+										<copy file="${basedir}/target/docbkx/pdf/index.pdf" tofile="${basedir}/target/site/reference/pdf/spring-batch-docs.pdf"
 											failonerror="false" />
 									</postProcess>
 								</configuration>
@@ -241,49 +238,17 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<unzip dest="target/it/with-dep">
-											<fileset dir="target">
-												<include name="*with-dep*.zip" />
-											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
-												handledirsep="true" />
-										</unzip>
 										<unzip dest="target/it/no-dep">
 											<fileset dir="target">
 												<include name="*no-dep*.zip" />
 											</fileset>
-											<regexpmapper from="^[^/]*/(.*)$$" to="\1"
-												handledirsep="true" />
+											<regexpmapper from="^[^/]*/(.*)$$" to="\1" handledirsep="true" />
 										</unzip>
-										<fail
-											message="Failed integration test of zip distro: Spring Batch jar files are missing.">
+										<fail message="Failed integration test of zip distro: dist/* jar file count wrong.">
 											<condition>
 												<not>
-													<resourcecount count="3">
-														<fileset id="fs" dir="target/it/with-dep/dist"
-															includes="*.jar" />
-													</resourcecount>
-												</not>
-											</condition>
-										</fail>
-										<fail
-											message="Failed integration test of zip distro: dependency jar files are missing.">
-											<condition>
-												<not>
-													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib"
-															includes="org.springframework.beans-*.jar" />
-													</resourcecount>
-												</not>
-											</condition>
-										</fail>
-										<fail
-											message="Failed integration test of zip distro: test dependency jar files are missing.">
-											<condition>
-												<not>
-													<resourcecount count="1">
-														<fileset id="fs" dir="target/it/with-dep/sources/lib"
-															includes="com.springsource.org.junit-*.jar" />
+													<resourcecount count="6">
+														<fileset id="fs" dir="target/it/no-dep/dist" includes="spring-batch-*.jar" />
 													</resourcecount>
 												</not>
 											</condition>
@@ -294,8 +259,30 @@
 						</executions>
 					</plugin>
 					<plugin>
+						<!-- After the file count, we build the samples and archetypes as well -->
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-invoker-plugin</artifactId>
+						<configuration>
+							<projectsDirectory>target/it/no-dep</projectsDirectory>
+							<localRepositoryPath>target/local-repo</localRepositoryPath>
+							<debug>true</debug>
+							<settingsFile>${basedir}/src/it/settings.xml</settingsFile>
+							<goals>
+								<goal>test</goal>
+							</goals>
+							<pomIncludes>
+								<pomInclude>samples/*/pom.xml</pomInclude>
+							</pomIncludes>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-test</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
@@ -340,16 +327,6 @@
 					<url>http://people.apache.org/maven-snapshot-repository</url>
 				</repository>
 			</repositories>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<artifactId>maven-site-plugin</artifactId>
-							<version>2.0-beta-8-SNAPSHOT</version>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
 		</profile>
 		<profile>
 			<id>manifest</id>
@@ -402,6 +379,10 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>2.0</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
 					<dependencies>
@@ -416,31 +397,6 @@
 							<version>1.7.0</version>
 						</dependency>
 					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-invoker-plugin</artifactId>
-					<configuration>
-						<projectsDirectory>target/it/no-dep</projectsDirectory>
-						<localRepositoryPath>target/local-repo</localRepositoryPath>
-						<debug>true</debug>
-						<settingsFile>${basedir}/src/it/settings.xml</settingsFile>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<pomIncludes>
-							<pomInclude>samples/*/pom.xml</pomInclude>
-						</pomIncludes>
-					</configuration>
-					<executions>
-						<execution>
-							<id>integration-test</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>run</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
