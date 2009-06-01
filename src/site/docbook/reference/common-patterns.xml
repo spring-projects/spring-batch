@@ -537,13 +537,14 @@
     during <classname>Step</classname> execution and if the
     <classname>Step</classname> fails, that data will be lost.</para>
 
-    <programlisting>public void MyItemWriter implements ItemWriter&lt;Object&gt; {
+    <programlisting>public void SavingItemWriter implements ItemWriter&lt;Object&gt; {
     private StepExecution stepExecution;
 
     public void write(List&lt;? extends Object&gt; items) throws Exception {
         // ...
 
-        this.stepExecution.getExecutionContext().put("someKey", someObject);
+        ExecutionContext stepContext = this.stepExecution.getExecutionContext();
+        stepContext.put("someKey", someObject);
     }
 
     @BeforeStep
@@ -564,22 +565,41 @@
     listeners, it must be registered on the
     <classname>Step</classname>.</para>
 
-    <programlisting>&lt;step id="step1"&gt;
-    &lt;tasket&gt;
-        &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
-        &lt;listeners&gt;
-            &lt;listener ref="promotionListener"/&gt;
-        &lt;/listeners&gt;
-    &lt;/tasklet&gt;
-&lt;/step&gt;
+    <programlisting>&lt;job id="job1"&gt;
+    &lt;step id="step1"&gt;
+        &lt;tasket&gt;
+            &lt;chunk reader="reader" writer="savingWriter" commit-interval="10"/&gt;
+            &lt;listeners&gt;
+                <emphasis role="bold">&lt;listener ref="promotionListener"/&gt;</emphasis>
+            &lt;/listeners&gt;
+        &lt;/tasklet&gt;
+    &lt;/step&gt;
 
-&lt;step id="step2"&gt;
-   ...
-&lt;/step&gt;
+    &lt;step id="step2"&gt;
+       ...
+    &lt;/step&gt;
+&lt;/job&gt;
 
-&lt;beans:bean id="promotionListener" 
+<emphasis role="bold">&lt;beans:bean id="promotionListener" 
             class="org.spr....ExecutionContextPromotionListener"&gt;
     &lt;beans:property name="keys" value="someKey"/&gt;
-&lt;/beans:bean&gt;</programlisting>
+&lt;/beans:bean&gt;</emphasis></programlisting>
+
+    <para>Finally, to the saved values must be retrieved from the
+    <classname>Job</classname> <classname>ExeuctionContext</classname>:</para>
+
+    <programlisting>public void RetrievingItemWriter implements ItemWriter&lt;Object&gt; {
+    private Object someObject;
+
+    public void write(List&lt;? extends Object&gt; items) throws Exception {
+        // ...
+    }
+
+    @BeforeStep
+    public void saveStepExecution(StepExecution stepExecution) {
+        ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
+        this.someObject = jobContext.get("someKey");
+    }
+}</programlisting>
   </section>
 </chapter>
