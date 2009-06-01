@@ -183,7 +183,9 @@ public class SimpleChunkProcessor<I, O> implements ChunkProcessor<I>, Initializi
 
 		contribution.incrementFilterCount(inputsSize  - outputs.size() - inputs.getSkips().size());
 
+		boolean busy = skips.isBusy();
 		outputs = new Chunk<O>(outputs.getItems(), skips.getSkips());
+		outputs.setBusy(busy);
 
 		// Remember for next time if there are skips accumulating
 		inputs.setUserData(outputs);

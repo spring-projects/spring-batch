@@ -317,6 +317,7 @@ public class FaultTolerantStepFactoryBeanRetryTests {
 		// [a, b, c, d, e, f, null]
 		assertEquals(7, provided.size());
 		// [a, b, b, b, b, b, c, d, d, d, d, d, e, f]
+		System.err.println(processed);
 		assertEquals(14, processed.size());
 		// [b, d]
 		assertEquals(2, recovered.size());

@@ -19,6 +19,7 @@ package org.springframework.batch.core.step.item;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +40,7 @@ import org.springframework.batch.retry.support.DefaultRetryState;
 
 /**
  * FaultTolerant implementation of the {@link ChunkProcessor} interface, that
- * allows for skipping or retry of items that cause exceptions during writing. 
+ * allows for skipping or retry of items that cause exceptions during writing.
  * 
  */
 public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O> {
@@ -124,6 +125,11 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	protected Chunk<O> transform(final StepContribution contribution, Chunk<I> inputs) throws Exception {
 
 		Chunk<O> outputs = new Chunk<O>();
+		Object userData = inputs.getUserData();
+		@SuppressWarnings("unchecked")
+		final Chunk<O> cache = (userData instanceof Chunk) ? (Chunk<O>) userData : null;
+		final Chunk<O>.ChunkIterator cacheIterator = (cache != null) ? cache.iterator() : null;
+		final AtomicInteger count = new AtomicInteger(0);
 
 		for (final Chunk<I>.ChunkIterator iterator = inputs.iterator(); iterator.hasNext();) {
 
@@ -134,7 +140,21 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				public O doWithRetry(RetryContext context) throws Exception {
 					O output = null;
 					try {
-						output = doProcess(item);
+						count.incrementAndGet();
+						O cached = (cache != null) ? cacheIterator.next() : null;
+						if (cached != null && count.get() > 1) {
+							/*
+							 * If there is a cached chunk then we must be
+							 * scanning for errors in the writer, in which case
+							 * only the first one will be written, and for the
+							 * rest we need to fill in the output from the
+							 * cache.
+							 */
+							output = cached;
+						}
+						else {
+							output = doProcess(item);
+						}
 					}
 					catch (Exception e) {
 						if (rollbackClassifier.classify(e)) {
@@ -259,10 +279,10 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 				public Object recover(RetryContext context) throws Exception {
 
 					Exception le = (Exception) context.getLastThrowable();
-					
-					boolean singleton = outputs.size() == 1;
 
-					if (singleton && !inputs.isBusy()) {
+					boolean singleton = outputs.size() == 1 && outputs.getSkips().isEmpty();
+
+					if (singleton) {
 						Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
 						Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
 						checkSkipPolicy(inputIterator, outputIterator, le, contribution);

@@ -313,11 +313,11 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-		// TODO: Fix this with BATCH-1259?
-		assertEquals("[1, 2, 1, 3, 4, 1, 3, 5]", processor.getProcessed().toString());
 		assertEquals("[1, 3, 5]", processor.getCommitted().toString());
 		assertEquals("[1, 3, 5]", writer.getWritten().toString());
 		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
+		// TODO: Fix this with BATCH-1259?
+		assertEquals("[1, 2, 1, 3, 4, 1, 3, 5]", processor.getProcessed().toString());
 	}
 
 	@Test
@@ -347,12 +347,12 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-		// TODO: Fix this with BATCH-1256
-		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 2, 3, 4, 5, 3, 4, 5, 4, 5, 5]", processor.getProcessed()
-				.toString());
-		assertEquals("[1, 2, 3, 4, 5, 2, 3, 4, 5, 3, 4, 5, 5]", processor.getCommitted().toString());
-		assertEquals("[1, 2, 3, 4, 1, 2, 3, 4, 5]", writer.getWritten().toString());
+		assertEquals("[1, 2, 3, 5]", processor.getCommitted().toString());
 		assertEquals("[1, 2, 3, 5]", writer.getCommitted().toString());
+		assertEquals("[1, 2, 3, 4, 1, 2, 3, 4, 5]", writer.getWritten().toString());
+		// TODO: Fix this with BATCH-1259?
+		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed()
+				.toString());
 	}
 
 	@Test
@@ -365,12 +365,12 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		step.execute(stepExecution);
 		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
 
-		// TODO: Fix this with BATCH-1256
-		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 2, 3, 4, 5, 3, 4, 5, 4, 5, 5]", processor.getProcessed()
-				.toString());
-		assertEquals("[1, 2, 3, 4, 5, 3, 4, 5, 5]", processor.getCommitted().toString());
-		assertEquals("[1, 2, 1, 2, 3, 4, 5]", writer.getWritten().toString());
 		assertEquals("[1, 3, 5]", writer.getCommitted().toString());
+		assertEquals("[1, 2, 1, 2, 3, 4, 5]", writer.getWritten().toString());
+		assertEquals("[1, 3, 5]", processor.getCommitted().toString());
+		// TODO: Fix this with BATCH-1259?
+		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed()
+				.toString());
 	}
 
 	@SuppressWarnings("unchecked")
