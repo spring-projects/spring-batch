@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="org.springframework.batch.parent" xmlns:maven="antlib:org.apache.maven.artifact.ant">
+
+	<property file="${basedir}/../build.properties" />
+	<import file="${basedir}/../build-spring-batch/package-bundle.xml"/>
+
+	<target name="publish-maven-central" depends="maven.init">
+		<property name="maven.central.repository" value="s3://maven.springframework.org/${adjusted.release.type}"/>
+		<maven:deploy>
+			<remoteRepository url="${maven.central.repository}">
+				<authentication username="${accessKey}" passphrase="${secretKey}"/>
+			</remoteRepository>
+			<pom file="pom.xml"/>
+		</maven:deploy>
+	</target>
+
+</project>

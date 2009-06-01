@@ -7,10 +7,20 @@
 		<pathelement location="${basedir}/../spring-batch-test"/>
 	</path>
 
+	<path id="parents">
+		<pathelement location="${basedir}/../spring-batch-parent"/>
+	</path>
+
 	<property file="${basedir}/../build.properties" />
 	<propertyset id="bundlor.properties">
 	  <propertyref builtin="all"/>
 	</propertyset>
+
 	<import file="${basedir}/../spring-build/multi-bundle/default.xml"/>
+
+	<target name="publish-maven-central">
+      <all-bundles target="publish-maven-central" buildpathRef="bundles"/>
+      <all-bundles target="publish-maven-central" buildpathRef="parents"/>
+	</target>
 
 </project>

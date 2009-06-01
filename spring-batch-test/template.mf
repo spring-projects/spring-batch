@@ -1,3 +1,4 @@
+Manifest-Version: 1.0
 Bundle-SymbolicName: org.springframework.batch.test
 Bundle-Name: Spring Batch Test
 Bundle-Vendor: Spring
@@ -31,9 +32,7 @@ Import-Template:
  org.springframework.util.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.validation.*;version="[2.5.5, 3.0.0)";resolution:=optional,
  org.springframework.oxm.*;version="[1.5.0, 2.0.0)";resolution:=optional,
- org.springframework.xml.*;version="[1.5.0, 2.0.0)";resolution:=optional
-Unversioned-Imports: 
- javax.sql.*,
- javax.xml.namespace.*,
- javax.xml.transform.*
- 
+ org.springframework.xml.*;version="[1.5.0, 2.0.0)";resolution:=optional,
+ javax.sql.*;version="0",
+ javax.xml.namespace.*;version="0",
+ javax.xml.transform.*;version="0"
