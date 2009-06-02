@@ -85,6 +85,20 @@ public class StepParserStepFactoryBeanTests {
 		assertTrue(tasklet instanceof DummyTasklet);
 	}
 
+	@Test
+	public void testTaskletStepMissingIsolation() throws Exception {
+		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();
+		fb.setBeanName("step1");
+		fb.setJobRepository(new JobRepositorySupport());
+		fb.setTasklet(new DummyTasklet());
+		fb.setTransactionManager(new ResourcelessTransactionManager());
+		fb.setPropagation(Propagation.REQUIRED);
+		Object step = fb.getObject();
+		assertTrue(step instanceof TaskletStep);
+		Object tasklet = ReflectionTestUtils.getField(step, "tasklet");
+		assertTrue(tasklet instanceof DummyTasklet);
+	}
+
 	@Test(expected = IllegalStateException.class)
 	public void testSimpleStepAll() throws Exception {
 		StepParserStepFactoryBean<Object, Object> fb = new StepParserStepFactoryBean<Object, Object>();

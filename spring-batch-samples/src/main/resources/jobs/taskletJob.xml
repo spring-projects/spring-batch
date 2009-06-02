@@ -17,7 +17,9 @@
 
 	<batch:job id="loopJob">
 		<batch:step id="step1">
-			<batch:tasklet ref="adapter" />
+			<batch:tasklet ref="adapter">
+				<batch:transaction-attributes propagation="REQUIRED"/>
+			</batch:tasklet>
 		</batch:step>
 	</batch:job>
 
