@@ -15,7 +15,7 @@ Spring Batch Getting Started
 
     * Download STS version 2.1.0.* from the {{{http://www.springsource.com/products/sts}SpringSource website}}.  STS is a free Eclipse bundle with many features useful for Spring developers.
 
-    * Go to {{New->Other...}} and select {{SpringSource Tool Suite->Template Project}} from the wizard chooser.
+    * Go to <<<New->Other...>>> and select <<<SpringSource Tool Suite->Template Project>>> from the wizard chooser.
 
     * The wizard has a drop down with a list of template projects.  One of them is a "Simple Spring Batch Project".  Select it and follow the wizard.
 
