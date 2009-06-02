@@ -42,7 +42,7 @@ public class DefaultFieldSetTests {
 	@Before
 	public void setUp() throws Exception {
 
-		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "324",
+		tokens = new String[] { "TestString", "true", "C", "10", "-472", "354224", "543", "124.3", "424.3", "1,3245",
 				null, "2007-10-12", "12-10-2007", "" };
 		names = new String[] { "String", "Boolean", "Char", "Byte", "Short", "Integer", "Long", "Float", "Double",
 				"BigDecimal", "Null", "Date", "DatePattern", "BlankInput" };
@@ -146,9 +146,36 @@ public class DefaultFieldSetTests {
 	@Test
 	public void testReadBigDecimal() throws Exception {
 
-		BigDecimal bd = new BigDecimal(324);
-		assertEquals(fieldSet.readBigDecimal(9), bd);
-		assertEquals(fieldSet.readBigDecimal("BigDecimal"), bd);
+		BigDecimal bd = new BigDecimal("424.3");
+		assertEquals(bd, fieldSet.readBigDecimal(8));
+		assertEquals(bd, fieldSet.readBigDecimal("Double"));
+
+	}
+
+	@Test
+	public void testReadBigBigDecimal() throws Exception {
+
+		fieldSet = new DefaultFieldSet(new String[] {"12345678901234567890"});
+		BigDecimal bd = new BigDecimal("12345678901234567890");
+		assertEquals(bd, fieldSet.readBigDecimal(0));
+
+	}
+
+	@Test
+	public void testReadBigDecimalWithFormat() throws Exception {
+
+		fieldSet.setNumberFormat(NumberFormat.getInstance(Locale.US));
+		BigDecimal bd = new BigDecimal("424.3");
+		assertEquals(bd, fieldSet.readBigDecimal(8));
+
+	}
+
+	@Test
+	public void testReadBigDecimalWithEuroFormat() throws Exception {
+
+		fieldSet.setNumberFormat(NumberFormat.getInstance(Locale.GERMANY));
+		BigDecimal bd = new BigDecimal("1.3245");
+		assertEquals(bd, fieldSet.readBigDecimal(9));
 
 	}
 

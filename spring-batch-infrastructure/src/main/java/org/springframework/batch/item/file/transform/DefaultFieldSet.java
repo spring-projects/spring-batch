@@ -18,6 +18,7 @@ package org.springframework.batch.item.file.transform;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,6 +49,8 @@ public class DefaultFieldSet implements FieldSet {
 	}
 
 	private NumberFormat numberFormat = NumberFormat.getInstance(Locale.US);
+	private String grouping = ",";
+	private String decimal = ".";
 
 	/**
 	 * The fields wrapped by this '<code>FieldSet</code>' instance.
@@ -63,6 +66,10 @@ public class DefaultFieldSet implements FieldSet {
 	 */
 	public void setNumberFormat(NumberFormat numberFormat) {
 		this.numberFormat = numberFormat;
+		if (numberFormat instanceof DecimalFormat) {
+			grouping = ""+((DecimalFormat)numberFormat).getDecimalFormatSymbols().getGroupingSeparator();
+			decimal = ""+((DecimalFormat)numberFormat).getDecimalFormatSymbols().getDecimalSeparator();
+		}
 	}
 
 	/**
@@ -76,6 +83,7 @@ public class DefaultFieldSet implements FieldSet {
 
 	public DefaultFieldSet(String[] tokens) {
 		this.tokens = tokens == null ? null : (String[]) tokens.clone();
+		setNumberFormat(NumberFormat.getInstance(Locale.US));
 	}
 
 	public DefaultFieldSet(String[] tokens, String[] names) {
@@ -87,6 +95,7 @@ public class DefaultFieldSet implements FieldSet {
 		}
 		this.tokens = (String[]) tokens.clone();
 		this.names = Arrays.asList(names);
+		setNumberFormat(NumberFormat.getInstance(Locale.US));
 	}
 
 	/*
@@ -429,13 +438,22 @@ public class DefaultFieldSet implements FieldSet {
 	 */
 	public BigDecimal readBigDecimal(int index, BigDecimal defaultValue) {
 		String candidate = readAndTrim(index);
+		
+		if (!StringUtils.hasText(candidate)) {
+			return defaultValue;
+		}
 
 		try {
-			return (StringUtils.hasText(candidate)) ? new BigDecimal(candidate) : defaultValue;
+			String result = removeSeparators(candidate);
+			return new BigDecimal(result);
 		}
 		catch (NumberFormatException e) {
 			throw new NumberFormatException("Unparseable number: " + candidate);
 		}
+	}
+
+	private String removeSeparators(String candidate) {
+		return candidate.replace(grouping, "").replace(decimal, ".");
 	}
 
 	/*
