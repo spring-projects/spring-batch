@@ -352,6 +352,12 @@
 				<groupId>org.codehaus.jettison</groupId>
 				<artifactId>jettison</artifactId>
 				<version>1.0</version>
+				<exclusions>
+					<exclusion>
+						<groupId>stax</groupId>
+						<artifactId>stax-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.ibatis</groupId>

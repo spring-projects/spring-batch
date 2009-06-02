@@ -9,25 +9,24 @@ Snapshot Builds
 
   These builds are provided for testing and development purposes only. They are built by a Bamboo process automatically using the latest snapshot from Subversion.
 	
-  Snapshots are deployed every night to the {{{http://s3browse.com/explore/repository.springsource.com/maven/bundles/snapshot}SpringSource Enterprise Repository}}, so use this in your POM (inside a \<repositories\> element):
+  Snapshots are deployed in Maven Central format every night to the {{{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}SpringSource Maven Repository}}, so use this in your POM (inside a \<repositories\> element):
 
 +---
 <repository>
-  <id>com.springsource.repository.bundles.snapshot</id>
-  <name>SpringSource Enterprise Bundle Repository -
-    Snapshot Bundle Releases</name>
-  <url>http://repository.springsource.com/maven/bundles/snapshot</url>
+    <id>spring-s3</id>
+    <name>Spring Maven Snapshot Repository</name>
+    <url>http://s3.amazonaws.com/maven.springframework.org/snapshot</url>
 </repository>
 +---
 
-  If you are downloading the jar files manually from there you can see the internal and external project dependencies in the <<<org.springframework.batch.*/*.pom>>> files.  You will probably need <<<spring-batch-org.springframework.batch.core>>> and <<<org.springframework.batch.infrastructure>>>.
+  If you are downloading the jar files manually from there you can see the internal and external project dependencies in the <<<spring-batch-*/*.pom>>> files.  You will probably need <<<spring-batch-core>>> and <<<spring-batch-infrastructure>>>.
 
   Individual dependencies can then by added like so (inside a \<dependencies\> element at the top level):
 
 +---------------
 <dependency>
     <groupId>org.springframework.batch</groupId>
-    <artifactId>org.springframework.batch.core</artifactId>
+    <artifactId>spring-batch-core</artifactId>
     <version>2.0.2.CI-SNAPSHOT</version>
 </dependency>
 +---------------

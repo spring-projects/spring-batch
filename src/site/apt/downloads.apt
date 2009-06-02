@@ -11,7 +11,7 @@ Spring Batch Downloads
 
 * Zip Downloads
 
-  There are ZIP based artifacts that contain the release JARs.  There are two ZIP files in the release.  The first zip file is called <<<org.springframework.batch.*-no-dependencies.zip>>>.  This file contains only the JAR files for the release.  The second zip file is called <<<org.springframework.batch.*-with-dependencies.zip>>>.  This file contains the JAR files for the release as well as all of the third-party dependencies for the release.  In addition, this release contains the Spring Batch source code including the samples and their third-party dependencies as well.
+  There are ZIP based artifacts that contain the release JARs:  <<<spring-batch-*-no-dependencies.zip>>>.  This file contains only the JAR files for the release.  In addition, this release contains the Spring Batch source code including the samples.
 
   * Full releases: {{{http://static.springframework.org/downloads/nightly/release-download.php?project=BATCH}here}}.  
 
@@ -52,7 +52,7 @@ Spring Batch Downloads
 </dependency>
 +---------------
 
-  With full releases there are also traditional "spring-*" artifacts deployed on the Maven central repo.  Full releases in this format also go in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}:
+  There are also traditional "spring-*" artifacts deployed on the Maven central repo.  Full releases in this format also go in our s3 repository, browseable {{{http://s3browse.com/explore/maven.springframework.org/release/org/springframework/batch}here}}:
 
 +---------------
 <repository>
@@ -106,7 +106,7 @@ Spring Batch Downloads
 </dependency>
 +---------------
 
-  Milestones are also published in the older s3 repository with Maven Central format dependencies {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}browseable here}}.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
+  Milestones are also published in the other s3 repository with Maven Central format dependencies {{{http://s3browse.com/explore/maven.springframework.org/milestone/org/springframework/batch}browseable here}}.  To use them, just add the following repository to your POM (inside a \<repositories\> element at the top level):
 
 +---------------
 <repository>
