@@ -43,6 +43,7 @@
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.easymock</groupId>
@@ -116,11 +117,6 @@
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>jsr250-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<optional>false</optional>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

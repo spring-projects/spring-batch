@@ -15,7 +15,6 @@
  */
 package org.springframework.batch.core.configuration.xml;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.job.flow.Flow;
@@ -23,6 +22,7 @@ import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * This {@link FactoryBean} is used by the batch namespace parser to create
@@ -51,7 +51,7 @@ class JobParserJobFactoryBean implements FactoryBean {
 	}
 
 	public final Object getObject() throws Exception {
-		Assert.isTrue(!StringUtils.isBlank(name), "The job must have an 'id'.");
+		Assert.isTrue(StringUtils.hasText(name), "The job must have an id.");
 		FlowJob flowJob = new FlowJob(name);
 
 		if (restartable != null) {

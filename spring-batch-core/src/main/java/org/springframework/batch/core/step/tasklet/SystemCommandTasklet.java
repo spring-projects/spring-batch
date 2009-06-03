@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
-import org.apache.commons.lang.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.ExitStatus;
@@ -34,6 +33,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
+import org.springframework.util.StopWatch;
 
 /**
  * {@link Tasklet} that executes a system command.
@@ -105,7 +105,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 					contribution.setExitStatus(systemProcessExitCodeMapper.getExitStatus(systemCommandTask.get()));
 					return RepeatStatus.FINISHED;
 				}
-				else if (stopWatch.getTime() > timeout) {
+				else if (stopWatch.getTotalTimeMillis() > timeout) {
 					systemCommandTask.cancel(interruptOnCancel);
 					throw new SystemCommandException("Execution of system command did not finish within the timeout");
 				}
@@ -169,6 +169,7 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 	}
 
 	/**
+	 * Timeout in milliseconds.
 	 * @param timeout upper limit for how long the execution of the external
 	 * program is allowed to last.
 	 */

@@ -21,8 +21,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 /**
  * Value object representing runtime parameters to a batch job. Because the
  * parameters have no individual meaning outside of the JobParameters they are
@@ -193,7 +191,7 @@ public class JobParameters implements Serializable {
 	
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(7, 21).append(parameters).toHashCode();
+		return 17 + 23 * parameters.hashCode();
 	}
 	
 	@Override
