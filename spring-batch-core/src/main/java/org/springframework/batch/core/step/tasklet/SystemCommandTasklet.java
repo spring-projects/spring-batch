@@ -33,7 +33,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.util.Assert;
-import org.springframework.util.StopWatch;
 
 /**
  * {@link Tasklet} that executes a system command.
@@ -93,31 +92,24 @@ public class SystemCommandTasklet extends StepExecutionListenerSupport implement
 
 		});
 
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
+		long t0 = System.currentTimeMillis();
 
 		taskExecutor.execute(systemCommandTask);
 
-		try {
-			while (true) {
-				Thread.sleep(checkInterval);
-				if (systemCommandTask.isDone()) {
-					contribution.setExitStatus(systemProcessExitCodeMapper.getExitStatus(systemCommandTask.get()));
-					return RepeatStatus.FINISHED;
-				}
-				else if (stopWatch.getTotalTimeMillis() > timeout) {
-					systemCommandTask.cancel(interruptOnCancel);
-					throw new SystemCommandException("Execution of system command did not finish within the timeout");
-				}
-				else if (execution.isTerminateOnly()) {
-					systemCommandTask.cancel(interruptOnCancel);
-					throw new JobInterruptedException("Job interrupted while executing system command '" + command
-							+ "'");
-				}
+		while (true) {
+			Thread.sleep(checkInterval);
+			if (systemCommandTask.isDone()) {
+				contribution.setExitStatus(systemProcessExitCodeMapper.getExitStatus(systemCommandTask.get()));
+				return RepeatStatus.FINISHED;
 			}
-		}
-		finally {
-			stopWatch.stop();
+			else if (System.currentTimeMillis() - t0 > timeout) {
+				systemCommandTask.cancel(interruptOnCancel);
+				throw new SystemCommandException("Execution of system command did not finish within the timeout");
+			}
+			else if (execution.isTerminateOnly()) {
+				systemCommandTask.cancel(interruptOnCancel);
+				throw new JobInterruptedException("Job interrupted while executing system command '" + command + "'");
+			}
 		}
 
 	}

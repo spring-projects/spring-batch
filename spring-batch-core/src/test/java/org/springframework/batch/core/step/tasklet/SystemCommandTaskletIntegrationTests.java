@@ -70,6 +70,7 @@ public class SystemCommandTaskletIntegrationTests {
 	public void testExecuteFailure() throws Exception {
 		String command = "java org.springframework.batch.sample.tasklet.UnknownClass";
 		tasklet.setCommand(command);
+		tasklet.setTimeout(200L);
 		tasklet.afterPropertiesSet();
 
 		log.info("Executing command: " + command);
