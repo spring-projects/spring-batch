@@ -15,7 +15,7 @@
  */
 package org.springframework.batch.item.file.transform;
 
-import static junit.framework.Assert.*;
+import static junit.framework.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,21 +29,28 @@ import org.junit.Test;
 public class PassThroughFieldExtractorTests {
 
 	@Test
-	public void testExtract_string() {
+	public void testExtractString() {
 		PassThroughFieldExtractor<String> extractor = new PassThroughFieldExtractor<String>();
 		Object[] result = extractor.extract("abc");
 		assertTrue(Arrays.equals(new Object[] { "abc" }, result));
 	}
 
 	@Test
-	public void testExtract_array() {
+	public void testExtractArray() {
 		PassThroughFieldExtractor<String[]> extractor = new PassThroughFieldExtractor<String[]>();
 		Object[] result = extractor.extract(new String[] { "a", "b", null, "d" });
 		assertTrue(Arrays.equals(new Object[] { "a", "b", "", "d" }, result));
 	}
 
 	@Test
-	public void testExtract_collection() {
+	public void testExtractFieldSet() {
+		PassThroughFieldExtractor<FieldSet> extractor = new PassThroughFieldExtractor<FieldSet>();
+		Object[] result = extractor.extract(new DefaultFieldSet(new String[] { "a", "b", "", "d" }));
+		assertTrue(Arrays.equals(new Object[] { "a", "b", "", "d" }, result));
+	}
+
+	@Test
+	public void testExtractCollection() {
 		PassThroughFieldExtractor<List<String>> extractor = new PassThroughFieldExtractor<List<String>>();
 		Object[] result = extractor.extract(Arrays.asList("a", "b", null, "d"));
 		assertTrue(Arrays.equals(new Object[] { "a", "b", "", "d" }, result));

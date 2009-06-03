@@ -58,6 +58,10 @@ public class PassThroughFieldExtractor<T> implements FieldExtractor<T> {
 			}
 			return args;
 		}
+		
+		if (item instanceof FieldSet) {
+			return ((FieldSet) item).getValues();
+		}
 
 		return new Object[] { item };
 
