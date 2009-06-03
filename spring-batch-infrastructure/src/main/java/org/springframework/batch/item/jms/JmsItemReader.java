@@ -21,6 +21,7 @@ import javax.jms.Message;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.util.Assert;
@@ -28,7 +29,8 @@ import org.springframework.util.Assert;
 /**
  * An {@link ItemReader} for JMS using a {@link JmsTemplate}. The template
  * should have a default destination, which will be used to provide items in
- * {@link #read()}.<br/><br/>
+ * {@link #read()}.<br/>
+ * <br/>
  * 
  * The implementation is thread safe after its properties are set (normal
  * singleton behavior).
@@ -36,7 +38,7 @@ import org.springframework.util.Assert;
  * @author Dave Syer
  * 
  */
-public class JmsItemReader<T> implements ItemReader<T> {
+public class JmsItemReader<T> implements ItemReader<T>, InitializingBean {
 
 	protected Log logger = LogFactory.getLog(getClass());
 
@@ -53,14 +55,10 @@ public class JmsItemReader<T> implements ItemReader<T> {
 		this.jmsTemplate = jmsTemplate;
 		if (jmsTemplate instanceof JmsTemplate) {
 			JmsTemplate template = (JmsTemplate) jmsTemplate;
-			Assert
-					.isTrue(
-							template.getReceiveTimeout() != JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT,
-							"JmsTemplate must have a receive timeout!");
-			Assert
-					.isTrue(template.getDefaultDestination() != null
-							|| template.getDefaultDestinationName() != null,
-							"JmsTemplate must have a defaultDestination or defaultDestinationName!");
+			Assert.isTrue(template.getReceiveTimeout() != JmsTemplate.RECEIVE_TIMEOUT_INDEFINITE_WAIT,
+					"JmsTemplate must have a receive timeout!");
+			Assert.isTrue(template.getDefaultDestination() != null || template.getDefaultDestinationName() != null,
+					"JmsTemplate must have a defaultDestination or defaultDestinationName!");
 		}
 	}
 
@@ -77,7 +75,7 @@ public class JmsItemReader<T> implements ItemReader<T> {
 	public void setItemType(Class<? extends T> itemType) {
 		this.itemType = itemType;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public T read() {
 		if (itemType != null && itemType.isAssignableFrom(Message.class)) {
@@ -91,4 +89,7 @@ public class JmsItemReader<T> implements ItemReader<T> {
 		return (T) result;
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(this.jmsTemplate, "The 'jmsTemplate' is required.");
+	}
 }
