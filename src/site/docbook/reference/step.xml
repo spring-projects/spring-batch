@@ -56,18 +56,15 @@
     <para>Below is a code representation of the same concepts shown
     above:</para>
 
-    <programlisting>  
-  List items = new Arraylist();
-  for(int i = 0; i &lt; commitInterval; i++){
+    <programlisting>List items = new Arraylist();
+for(int i = 0; i &lt; commitInterval; i++){
     Object item = itemReader.read()
     Object processedItem = itemProcessor.process(item);
     items.add(processedItem);
-  }
-  itemWriter.write(items);
+}
+itemWriter.write(items);</programlisting>
 
-</programlisting>
-
-    <section>
+    <section id="configuringAStep">
       <title>Configuring a Step</title>
 
       <para>Despite the relatively short list of required dependencies for a
@@ -75,16 +72,13 @@
       potentially contain many collaborators. In order to ease configuration,
       the Spring Batch namespace can be used:</para>
 
-      <programlisting>
-  &lt;job id="sampleJob" job-repository="jobRepository"&gt;
+      <programlisting>&lt;job id="sampleJob" job-repository="jobRepository"&gt;
     &lt;step id="step1"&gt;
-      &lt;tasklet transaction-manager="transactionManager"&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
-      &lt;tasklet&gt;
+        &lt;tasklet transaction-manager="transactionManager"&gt;
+            &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+        &lt;tasklet&gt;
     &lt;/step&gt;
-  &lt;/job&gt;
-
-</programlisting>
+&lt;/job&gt;</programlisting>
 
       <para>The configuration above represents the only required dependencies
       to create a item-oriented step:<itemizedlist>
@@ -129,7 +123,7 @@
       writer.</para>
     </section>
 
-    <section>
+    <section id="standaloneStep">
       <title>Referencing a Standalone Step</title>
 
       <para>While steps must exist within a Job to define the flow, it can
@@ -138,18 +132,15 @@
       reference it from multiple jobs. This can be achieved with the 'parent'
       attribute:</para>
 
-      <programlisting>
-  &lt;job id="sampleJob" job-repository="jobRepository"&gt;
+      <programlisting>&lt;job id="sampleJob" job-repository="jobRepository"&gt;
     &lt;step id="step1" <emphasis role="bold">parent="standaloneStep"</emphasis> /&gt;
-  &lt;/job&gt;
+&lt;/job&gt;
 
-  &lt;step id="standaloneStep"&gt;
-      &lt;tasklet job-repository="jobRepository" transaction-manager="transactionManager"&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+&lt;step id="standaloneStep"&gt;
+    &lt;tasklet job-repository="jobRepository" transaction-manager="transactionManager"&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
 
       <para>It should be noted that the id attribute is still required on the
       step within the job element. This is for two reasons:</para>
@@ -186,22 +177,19 @@
       allowStartIfComplete=true. Additionally, the commitInterval will be '5'
       since it is overridden by the "concreteStep1":</para>
 
-      <programlisting>
-  &lt;step id="parentStep"&gt;
-      &lt;tasklet allow-start-if-complete="true"&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
+      <programlisting>&lt;step id="parentStep"&gt;
+    &lt;tasklet allow-start-if-complete="true"&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
 
-  &lt;step id="concreteStep1" parent="parentStep"&gt;
-      &lt;tasklet start-limit="5"&gt;
-          &lt;chunk processor="itemProcessor" commit-interval="5"/&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
+&lt;step id="concreteStep1" parent="parentStep"&gt;
+    &lt;tasklet start-limit="5"&gt;
+        &lt;chunk processor="itemProcessor" commit-interval="5"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
 
-</programlisting>
-
-      <section>
+      <section id="abstractStep">
         <title>Abstract Step</title>
 
         <para>Sometimes it may be necessary to define a parent
@@ -219,23 +207,20 @@
         be abstract. The <classname>Step</classname> "concreteStep2" will have
         'itemReader', 'itemWriter', and commitInterval=10.</para>
 
-        <programlisting>
-  &lt;step id="abstractParentStep" abstract="true"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk commit-interval="10"/&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
+        <programlisting>&lt;step id="abstractParentStep" abstract="true"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk commit-interval="10"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
 
-  &lt;step id="concreteStep2" parent="abstractParentStep"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter"/&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+&lt;step id="concreteStep2" parent="abstractParentStep"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
       </section>
 
-      <section>
+      <section id="mergingListsOnStep">
         <title>Merging Lists</title>
 
         <para>Some of the configurable elements on
@@ -253,27 +238,24 @@
         <classname>com.ListenerOne</classname> and
         <classname>com.ListenerTwo</classname>:</para>
 
-        <programlisting>
-  &lt;step id="listenersParentStep" abstract="true"&gt;
-      &lt;listeners&gt;
-          &lt;listener class="com.ListenerOne"/&gt;
-      &lt;listeners&gt;
-  &lt;/step&gt;
+        <programlisting>&lt;step id="listenersParentStep" abstract="true"&gt;
+    &lt;listeners&gt;
+        &lt;listener class="com.ListenerOne"/&gt;
+    &lt;listeners&gt;
+&lt;/step&gt;
 
-  &lt;step id="concreteStep3" parent="listenersParentStep"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="5"/&gt;
-          &lt;listeners merge="true"&gt;
-              &lt;listener class="com.ListenerTwo"/&gt;
-          &lt;listeners&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+&lt;step id="concreteStep3" parent="listenersParentStep"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="5"/&gt;
+        &lt;listeners merge="true"&gt;
+            &lt;listener class="com.ListenerTwo"/&gt;
+        &lt;listeners&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
       </section>
     </section>
 
-    <section>
+    <section id="commitInterval">
       <title>The Commit Interval</title>
 
       <para>As mentioned above, a step reads in and writes out items,
@@ -288,17 +270,14 @@
       number of items that are processed within a commit can be
       configured.</para>
 
-      <programlisting>
-  &lt;job id="sampleJob"&gt;
+      <programlisting>&lt;job id="sampleJob"&gt;
     &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" <emphasis
+        &lt;tasklet&gt;
+            &lt;chunk reader="itemReader" writer="itemWriter" <emphasis
           role="bold">commit-interval="10"</emphasis>/&gt;
-      &lt;/tasklet&gt;
+        &lt;/tasklet&gt;
     &lt;/step&gt;
-  &lt;/job&gt;
-
-</programlisting>
+&lt;/job&gt;</programlisting>
 
       <para>In the example above, 10 items will be processed within each
       transaction. At the beginning of processing a transaction is begun, and
@@ -309,14 +288,14 @@
       committed.</para>
     </section>
 
-    <section>
+    <section id="stepRestart">
       <title>Configuring a Step for Restart</title>
 
       <para>In <xref linkend="configureJob" />, restarting a
       <classname>Job</classname> was discussed. Restart has numerous impacts
       on steps, and as such may require some specific configuration.</para>
 
-      <section>
+      <section id="startLimit">
         <title>Setting a StartLimit</title>
 
         <para>There are many scenarios where you may want to control the
@@ -330,14 +309,11 @@
         as a <classname>Step</classname> that can be run infinitely. Below is
         an example start limit configuration:</para>
 
-        <programlisting> 
-  &lt;step id="step1"&gt;
+        <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet <emphasis role="bold">start-limit="1"</emphasis>&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
     &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+&lt;/step&gt;</programlisting>
 
         <para>The simple step above can be run only once. Attempting to run it
         again will cause an exception to be thrown. It should be noted that
@@ -345,7 +321,7 @@
         <classname>Integer.MAX_VALUE</classname>.</para>
       </section>
 
-      <section>
+      <section id="allowStartIfComplete">
         <title>Restarting a completed step</title>
 
         <para>In the case of a restartable job, there may be one or more steps
@@ -357,42 +333,36 @@
         successfully, will be skipped. Setting allow-start-if-complete to
         "true" overrides this so that the step will always run:</para>
 
-        <programlisting>
-  &lt;step id="step1"&gt;
+        <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet <emphasis role="bold">allow-start-if-complete="true"</emphasis>&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="10"/&gt;
     &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+&lt;/step&gt;</programlisting>
       </section>
 
-      <section>
+      <section id="stepRestartExample">
         <title>Step restart configuration example</title>
 
-        <programlisting>
-  &lt;job id="footballJob" restartable="true"&gt;
+        <programlisting>&lt;job id="footballJob" restartable="true"&gt;
     &lt;step id="playerload" next="gameLoad"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="playerFileItemReader" writer="playerWriter" 
-                 commit-interval="10" /&gt;
-      &lt;/tasklet&gt;
+        &lt;tasklet&gt;
+            &lt;chunk reader="playerFileItemReader" writer="playerWriter" 
+                   commit-interval="10" /&gt;
+        &lt;/tasklet&gt;
     &lt;/step&gt;
     &lt;step id="gameLoad" next="playerSummarization"&gt;
-      &lt;tasklet allow-start-if-complete="true"&gt;
-          &lt;chunk reader="gameFileItemReader" writer="gameWriter" 
-                 commit-interval="10"/&gt;
-      &lt;/tasklet&gt;
+        &lt;tasklet allow-start-if-complete="true"&gt;
+            &lt;chunk reader="gameFileItemReader" writer="gameWriter" 
+                   commit-interval="10"/&gt;
+        &lt;/tasklet&gt;
     &lt;/step&gt;
     &lt;step id="playerSummarization"&gt;
-      &lt;tasklet start-limit="3"&gt;
-          &lt;chunk reader="playerSummarizationSource" writer="summaryWriter" 
-                 commit-interval="10"/&gt;
-      &lt;/tasklet&gt;
+        &lt;tasklet start-limit="3"&gt;
+            &lt;chunk reader="playerSummarizationSource" writer="summaryWriter" 
+                   commit-interval="10"/&gt;
+        &lt;/tasklet&gt;
     &lt;/step&gt;
-  &lt;/job&gt;
-
-</programlisting>
+&lt;/job&gt;</programlisting>
 
         <para>The above example configuration is for a job that loads in
         information about football games and summarizes them. It contains
@@ -492,7 +462,7 @@
       </section>
     </section>
 
-    <section>
+    <section id="configuringSkip">
       <title>Configuring Skip Logic</title>
 
       <para>There are many scenarios where errors encountered while processing
@@ -505,19 +475,16 @@
       loaded because it was formatted incorrectly or was missing necessary
       information, then there probably won't be issues. Usually these bad
       records are logged as well, which will be covered later when discussing
-      listeners.<programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
+      listeners.<programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
             role="bold">skip-limit="10"</emphasis>&gt;
-              <emphasis role="bold">&lt;skippable-exception-classes&gt;
-                  org.springframework.batch.item.file.FlatFileParseException
-              &lt;/skippable-exception-classes&gt;</emphasis>
-          &lt;/chunk&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting></para>
+            <emphasis role="bold">&lt;skippable-exception-classes&gt;
+                org.springframework.batch.item.file.FlatFileParseException
+            &lt;/skippable-exception-classes&gt;</emphasis>
+        &lt;/chunk&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting></para>
 
       <para>In this example, a <classname>FlatFileItemReader</classname> is
       used, and if at any point a
@@ -528,7 +495,7 @@
       writes (regardless of success or failure).</para>
     </section>
 
-    <section>
+    <section id="fatalExceptions">
       <title>Configuring Fatal Exceptions</title>
 
       <para>One problem with the example above is that any other exception
@@ -536,22 +503,19 @@
       <classname>Job</classname> to fail. In certain scenarios this may be the
       correct behavior. However, in other scenarios it may be easier to
       identify which exceptions should cause failure and skip everything
-      else:<programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
+      else:<programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
             role="bold">skip-limit="10"</emphasis>&gt;
-<emphasis role="bold">              &lt;skippable-exception-classes&gt;
-                  java.lang.Exception
-              &lt;/skippable-exception-classes&gt;
-              &lt;fatal-exception-classes&gt;
-                  java.io.FileNotFoundException
-              &lt;/fatal-exception-classes&gt;
-</emphasis>          &lt;/chunk&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting></para>
+<emphasis role="bold">            &lt;skippable-exception-classes&gt;
+                java.lang.Exception
+            &lt;/skippable-exception-classes&gt;
+            &lt;fatal-exception-classes&gt;
+                java.io.FileNotFoundException
+            &lt;/fatal-exception-classes&gt;
+</emphasis>        &lt;/chunk&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting></para>
 
       <para>By setting the skippable exceptions to
       <classname>java.lang.Exception</classname>, any exception that is thrown
@@ -559,7 +523,7 @@
       contains specific exceptions that should be fatal if encountered.</para>
     </section>
 
-    <section>
+    <section id="retryLogic">
       <title>Configuring Retry Logic</title>
 
       <para>In most cases you want an exception to cause either a skip or
@@ -573,19 +537,16 @@
       process holds a lock on, waiting and trying again might result in
       success. In this case, retry should be configured:</para>
 
-      <programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2" <emphasis
+      <programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2" <emphasis
           role="bold">retry-limit="3"</emphasis>&gt;
-              <emphasis role="bold">&lt;retryable-exception-classes&gt;
-                  org.springframework.dao.DeadlockLoserDataAccessException
-              &lt;/retryable-exception-classes&gt;</emphasis>
-          &lt;/chunk&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+            <emphasis role="bold">&lt;retryable-exception-classes&gt;
+                org.springframework.dao.DeadlockLoserDataAccessException
+            &lt;/retryable-exception-classes&gt;</emphasis>
+        &lt;/chunk&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
 
       <para>The <classname>Step</classname> allows a limit for the number of
       times an individual item can be retried, and a list of exceptions that
@@ -593,8 +554,8 @@
       linkend="retry" /></para>
     </section>
 
-    <section>
-      <title>Controlling rollback</title>
+    <section id="controllingRollback">
+      <title>Controlling Rollback</title>
 
       <para>By default, regardless of retry or skip, any exceptions thrown
       from the <classname>ItemWriter</classname> will cause the transaction
@@ -609,20 +570,17 @@
       no-rollback-exception-classes element is a list of transaction
       attributes, separated by commas or newlines.</para>
 
-      <programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
-          &lt;no-rollback-exception-classes&gt;
-              org.springframework.batch.item.validator.ValidationException
-          &lt;/no-rollback-exception-classes&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+      <programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
+        &lt;no-rollback-exception-classes&gt;
+            org.springframework.batch.item.validator.ValidationException
+        &lt;/no-rollback-exception-classes&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
 
       <section id="transactionalReaders">
-        <title>Transactional readers</title>
+        <title>Transactional Readers</title>
 
         <para>The basic contract of the <classname>ItemReader</classname> is
         that it is forward only. The step buffers reader input, so that in the
@@ -634,36 +592,32 @@
         this reason, the step can be configured to not buffer the
         items:</para>
 
-        <programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"
-             <emphasis role="bold">    is-reader-transactional-queue="true"</emphasis>/&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+        <programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"
+           <emphasis role="bold">    is-reader-transactional-queue="true"</emphasis>/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
       </section>
     </section>
 
-    <section>
+    <section id="transactionAttributes">
       <title>Transaction Attributes</title>
 
       <para>Transaction attributes can be used to control the isolation,
-      propgation, and timeout settings. More information on setting
+      propagation, and timeout settings. More information on setting
       transaction attributes can be found in the spring core
       documentation.</para>
 
-      <programlisting>  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
-          &lt;transaction-attributes isolation="DEFAULT" propagation="REQUIRED" timeout="30"/&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-</programlisting>
+      <programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
+        &lt;transaction-attributes isolation="DEFAULT" propagation="REQUIRED" timeout="30"/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
     </section>
 
-    <section>
+    <section id="registeringItemStreams">
       <title>Registering ItemStreams with the Step</title>
 
       <para>The step has to take care of <classname>ItemStream</classname>
@@ -684,29 +638,26 @@
       can be registered on the <classname>Step</classname> through the
       'streams' element, as illustrated below:</para>
 
-      <programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="itemReader" writer="compositeWriter" commit-interval="2"&gt;
-              <emphasis role="bold">&lt;streams&gt;
-                  &lt;stream ref="fileItemWriter1"/&gt;
-                  &lt;stream ref="fileItemWriter2"/&gt;
-              &lt;/streams&gt;</emphasis>
-          &lt;/chunk&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
+      <programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="itemReader" writer="compositeWriter" commit-interval="2"&gt;
+            <emphasis role="bold">&lt;streams&gt;
+                &lt;stream ref="fileItemWriter1"/&gt;
+                &lt;stream ref="fileItemWriter2"/&gt;
+            &lt;/streams&gt;</emphasis>
+        &lt;/chunk&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
 
-  &lt;beans:bean id="compositeWriter" 
-              class="org.springframework.batch.item.support.CompositeItemWriter"&gt;
-      &lt;beans:property name="delegates"&gt;
-          &lt;beans:list&gt;
-              &lt;beans:ref bean="fileItemWriter1" /&gt;
-              &lt;beans:ref bean="fileItemWriter2" /&gt;
-          &lt;/beans:list&gt;
-      &lt;/beans:property&gt;
-  &lt;/beans:bean&gt;
-
-</programlisting>
+&lt;beans:bean id="compositeWriter" 
+            class="org.springframework.batch.item.support.CompositeItemWriter"&gt;
+    &lt;beans:property name="delegates"&gt;
+        &lt;beans:list&gt;
+            &lt;beans:ref bean="fileItemWriter1" /&gt;
+            &lt;beans:ref bean="fileItemWriter2" /&gt;
+        &lt;/beans:list&gt;
+    &lt;/beans:property&gt;
+&lt;/beans:bean&gt;</programlisting>
 
       <para>In the example above, the
       <classname>CompositeItemWriter</classname> is not an
@@ -720,7 +671,7 @@
       of a failure.</para>
     </section>
 
-    <section>
+    <section id="interceptingStepExecution">
       <title>Intercepting Step Execution</title>
 
       <para>Just as with the <classname>Job</classname>, there are many events
@@ -736,22 +687,19 @@
       interface (or an extension thereof) can be applied to a step via the
       listeners element:</para>
 
-      <programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet&gt;
-          &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
-          &lt;listeners&gt;
-              &lt;listener ref="stepListener"/&gt;
-          &lt;/listeners&gt;
-      &lt;/tasklet&gt;
-  &lt;/step&gt;
-
-</programlisting>
+      <programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="reader" writer="writer" commit-interval="10"/&gt;
+        &lt;listeners&gt;
+            &lt;listener ref="stepListener"/&gt;
+        &lt;/listeners&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;</programlisting>
 
       <para>In addition to the <classname>StepListener</classname> interfaces,
       annotations are provided to address the same concerns.</para>
 
-      <section>
+      <section id="stepExecutionListener">
         <title>StepExecutionListener</title>
 
         <para><classname>StepExecutionListener</classname> represents the most
@@ -759,15 +707,13 @@
         for notification before a <classname>Step</classname> is started and
         after it has ends, whether it ended normally or failed:</para>
 
-        <programlisting>
-  public interface StepExecutionListener extends StepListener {
+        <programlisting>public interface StepExecutionListener extends StepListener {
 
     void beforeStep(StepExecution stepExecution);
 
     ExitStatus afterStep(StepExecution stepExecution);
-  }
 
-</programlisting>
+}</programlisting>
 
         <para><classname>ExitStatus</classname> is the return type of
         <methodname>afterStep</methodname> in order to allow listeners the
@@ -787,7 +733,7 @@
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="chunkListener">
         <title>ChunkListener</title>
 
         <para>A chunk is defined as the items processed within the scope of a
@@ -796,12 +742,13 @@
         useful to perform logic before a chunk begins processing or after a
         chunk has completed:</para>
 
-        <programlisting>  public interface ChunkListener extends StepListener {
+        <programlisting>public interface ChunkListener extends StepListener {
 
     void beforeChunk();
 
     void afterChunk();
-  }</programlisting>
+
+}</programlisting>
 
         <para>The <methodname>beforeChunk</methodname> method is called after
         the transaction is started, but before <methodname>read</methodname>
@@ -824,19 +771,20 @@
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="itemReadListener">
         <title>ItemReadListener</title>
 
         <para>When discussing skip logic above, it was mentioned that it may
         be beneficial to log out skipped records, so that they can be deal
         with later. In the case of read errors, this can be done with an
-        <classname>ItemReaderListener:</classname><programlisting>  public interface ItemReadListener&lt;T&gt; extends StepListener {
+        <classname>ItemReaderListener:</classname><programlisting>public interface ItemReadListener&lt;T&gt; extends StepListener {
   
     void beforeRead();
 
     void afterRead(T item);
     
     void onReadError(Exception ex);
+
 }</programlisting></para>
 
         <para>The <methodname>beforeRead</methodname> method will be called
@@ -866,19 +814,20 @@
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="itemProcessListener">
         <title>ItemProcessListener</title>
 
         <para>Just as with the <classname>ItemReadListener</classname>, the
         processing of an item can be 'listened' to:</para>
 
-        <programlisting>  public interface ItemProcessListener&lt;T, S&gt; extends StepListener {
+        <programlisting>public interface ItemProcessListener&lt;T, S&gt; extends StepListener {
 
     void beforeProcess(T item);
 
     void afterProcess(T item, S result);
 
     void onProcessError(T item, Exception e);
+
 }</programlisting>
 
         <para>The <methodname>beforeProcess</methodname> method will be called
@@ -908,7 +857,7 @@
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="itemWriteListener">
         <title>ItemWriteListener</title>
 
         <para>The writing of an item can be 'listened' to with the
@@ -921,6 +870,7 @@
     void afterWrite(List&lt;? extends S&gt; items);
 
     void onWriteError(Exception exception, List&lt;? extends S&gt; items);
+
 }</programlisting>
 
         <para>The <methodname>beforeWrite</methodname> method will be called
@@ -949,7 +899,7 @@
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="skipListener">
         <title>SkipListener</title>
 
         <para><classname>ItemReadListener</classname>,
@@ -969,9 +919,8 @@
     void onSkipInProcess(T item, Throwable t);
 
     void onSkipInWrite(S item, Throwable t);
-  }
 
-</programlisting>
+}</programlisting>
 
         <para><methodname>onSkipInRead</methodname> will be called whenever an
         item is skipped while reading. It should be noted that rollbacks may
@@ -997,7 +946,7 @@
           </listitem>
         </itemizedlist>
 
-        <section>
+        <section id="skipListenersAndTransactions">
           <title>SkipListeners and Transactions</title>
 
           <para>One of the most common use cases for a
@@ -1026,7 +975,7 @@
     </section>
   </section>
 
-  <section>
+  <section id="taskletStep">
     <title>TaskletStep</title>
 
     <para>Chunk-oriented processing is not the only way to process in a
@@ -1049,12 +998,9 @@
     <classname>Tasklet</classname> object; no &lt;chunk/&gt; element should be
     used within the &lt;tasket/&gt;:</para>
 
-    <programlisting>
-  &lt;step id="step1"&gt;
-      &lt;tasklet <classname>ref="myTasklet"</classname>/&gt;
-  &lt;/step&gt;
-
-</programlisting>
+    <programlisting>&lt;step id="step1"&gt;
+    &lt;tasklet <classname>ref="myTasklet"</classname>/&gt;
+&lt;/step&gt;</programlisting>
 
     <note>
       <para><classname>TaskletStep</classname> will automatically register the
@@ -1062,11 +1008,11 @@
       interface</para>
     </note>
 
-    <section>
+    <section id="taskletAdapter">
       <title>TaskletAdapter</title>
 
-      <para>As with other adapters for the <classname>ItemWriter</classname>
-      and <classname>ItemReader</classname> interfaces, the
+      <para>As with other adapters for the <classname>ItemReader</classname>
+      and <classname>ItemWriter</classname> interfaces, the
       <classname>Tasklet</classname> interface contains an implementation that
       allows for adapting itself to any pre-existing class:
       <classname>TaskletAdapter</classname>. An example where this may be
@@ -1075,19 +1021,16 @@
       this class without having to write an adapter for the
       <classname>Tasklet</classname> interface:</para>
 
-      <programlisting>
-  &lt;bean id="myTasklet" class="org.springframework.batch.core.step.tasklet.TaskletAdapter"&gt;
+      <programlisting>&lt;bean id="myTasklet" class="org.springframework.batch.core.step.tasklet.TaskletAdapter"&gt;
     &lt;property name="targetObject"&gt;
-      &lt;bean class="org.mycompany.FooDao"&gt;
+        &lt;bean class="org.mycompany.FooDao"&gt;
     &lt;/property&gt;
     &lt;property name="targetMethod" value="updateFoo" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
+&lt;/bean&gt;</programlisting>
     </section>
 
-    <section>
-      <title>Example Tasklet implementation</title>
+    <section id="exampleTaskletImplementation">
+      <title>Example Tasklet Implementation</title>
 
       <para>Many batch jobs contain steps that must be done before the main
       processing begins in order to set up various resources or after
@@ -1098,34 +1041,34 @@
       project, is a <classname>Tasklet</classname> implementation with just
       such a responsibility:</para>
 
-      <programlisting>  public class FileDeletingTasklet implements Tasklet, InitializingBean {
+      <programlisting>public class FileDeletingTasklet implements Tasklet, InitializingBean {
 
     private Resource directory;
 
     public RepeatStatus execute(StepContribution contribution, 
                                 ChunkContext chunkContext) throws Exception {
-      File dir = directory.getFile();
-      Assert.state(dir.isDirectory());
+        File dir = directory.getFile();
+        Assert.state(dir.isDirectory());
     
-      File[] files = dir.listFiles();
-      for (int i = 0; i &lt; files.length; i++) {
-        boolean deleted = files[i].delete();
-        if (!deleted) {
-          throw new UnexpectedJobExecutionException("Could not delete file " + 
-                                                     files[i].getPath());
+        File[] files = dir.listFiles();
+        for (int i = 0; i &lt; files.length; i++) {
+            boolean deleted = files[i].delete();
+            if (!deleted) {
+                throw new UnexpectedJobExecutionException("Could not delete file " + 
+                                                          files[i].getPath());
+            }
         }
-      }
-      return RepeatStatus.COMPLETED;
+        return RepeatStatus.COMPLETED;
     }
 
     public void setDirectoryResource(Resource directory) {
-      this.directory = directory;
+        this.directory = directory;
     }
 
     public void afterPropertiesSet() throws Exception {
-      Assert.notNull(directory, "directory must be set");
+        Assert.notNull(directory, "directory must be set");
     }
-  }</programlisting>
+}</programlisting>
 
       <para>The above <classname>Tasklet</classname> implementation will
       delete all files within a given directory. It should be noted that the
@@ -1133,24 +1076,21 @@
       that is left is to reference the <classname>Tasklet</classname> from the
       <classname>Step</classname>:</para>
 
-      <programlisting>
-  &lt;job id="taskletJob"&gt;
+      <programlisting>&lt;job id="taskletJob"&gt;
     &lt;step id="deleteFilesInDir"&gt;
        &lt;tasklet ref="fileDeletingTasklet"/&gt;
     &lt;/step&gt;
-  &lt;/job&gt;
+&lt;/job&gt;
 
-  &lt;bean id="fileDeletingTasklet" 
-        class="org.springframework.batch.sample.tasklet.FileDeletingTasklet"&gt;
-    &lt;property name="directoryResource"&gt;
-      &lt;bean id="directory" 
-            class="org.springframework.core.io.FileSystemResource"&gt;
-        &lt;constructor-arg value="target/test-outputs/test-dir" /&gt;
-      &lt;/bean&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt;
-
-</programlisting>
+&lt;beans:bean id="fileDeletingTasklet" 
+            class="org.springframework.batch.sample.tasklet.FileDeletingTasklet"&gt;
+    &lt;beans:property name="directoryResource"&gt;
+        &lt;beans:bean id="directory" 
+                    class="org.springframework.core.io.FileSystemResource"&gt;
+            &lt;beans:constructor-arg value="target/test-outputs/test-dir" /&gt;
+        &lt;/beans:bean&gt;
+    &lt;/beans:property&gt;
+&lt;/beans:bean&gt;</programlisting>
     </section>
   </section>
 
@@ -1166,7 +1106,7 @@
     group of Steps is configured, certain steps may not even be processed at
     all.</para>
 
-    <section>
+    <section id="SequentialFlow">
       <title>Sequential Flow</title>
 
       <para>The simplest flow scenario is a job where all of the steps execute
@@ -1187,18 +1127,15 @@
       <para>This can be achieved using the 'next' attribute of the step
       element:</para>
 
-      <para><programlisting>
-  &lt;job id="job"&gt;
+      <para><programlisting>&lt;job id="job"&gt;
     &lt;step id="stepA" parent="s1" next="stepB" /&gt;
     &lt;step id="stepB" parent="s2" next="stepC"/&gt;
     &lt;step id="stepC" parent="s3" /&gt;
-  &lt;/job&gt;
-
-</programlisting>In the scenario above, 'step A' will execute first because it
-      is the first <classname>Step</classname> listed. If 'step A' completes
-      normally, then 'step B' will execute, and so on. However, if 'step A'
-      fails, then the entire <classname>Job</classname> will fail and 'step B'
-      will not execute.</para>
+&lt;/job&gt;</programlisting>In the scenario above, 'step A' will execute
+      first because it is the first <classname>Step</classname> listed. If
+      'step A' completes normally, then 'step B' will execute, and so on.
+      However, if 'step A' fails, then the entire <classname>Job</classname>
+      will fail and 'step B' will not execute.</para>
 
       <note>
         <para>With the Spring Batch namespace, the first step listed in the
@@ -1209,7 +1146,7 @@
       </note>
     </section>
 
-    <section>
+    <section id="conditionalFlow">
       <title>Conditional Flow</title>
 
       <para>In the example above, there are only two possibilities:</para>
@@ -1248,29 +1185,26 @@
       <classname>Job</classname> which <classname>Step</classname> to execute
       next. However, unlike the attribute, any number of "next" elements are
       allowed on a given <classname>Step</classname>, and there is no default
-      behavior the the case of failure. This means that if transition elements
-      are used, then all of the behavior for the <classname>Step</classname>'s
+      behavior the case of failure. This means that if transition elements are
+      used, then all of the behavior for the <classname>Step</classname>'s
       transitions must be defined explicitly. Note also that a single step
-      cannot have both a "next" attribute and a transtion element.</para>
+      cannot have both a "next" attribute and a transition element.</para>
 
       <para>The next element specifies a pattern to match and the step to
       execute next:</para>
 
-      <para><programlisting>
-  &lt;job id="job"&gt;
+      <para><programlisting>&lt;job id="job"&gt;
     &lt;step id="stepA" parent="s1"&gt;
-      &lt;next on="FAILED" to="stepB" /&gt;
-      &lt;next on="*" to="stepC" /&gt;
+        &lt;next on="*" to="stepB" /&gt;
+        &lt;next on="FAILED" to="stepC" /&gt;
     &lt;/step&gt;
     &lt;step id="stepB" parent="s2" next="stepC" /&gt;
     &lt;step id="stepC" parent="s3" /&gt;
-  &lt;/job&gt;
-
-</programlisting></para>
+&lt;/job&gt;</programlisting></para>
 
       <para>The "on" attribute of a transition element uses a simple
       pattern-matching scheme to match the <classname>ExitStatus</classname>
-      that results from the exeution of the <classname>Step</classname>. Only
+      that results from the execution of the <classname>Step</classname>. Only
       two special characters are allowed in the pattern:</para>
 
       <itemizedlist>
@@ -1296,7 +1230,7 @@
       "stepA" in the example above, an <classname>ExitStatus</classname> of
       "FAILED" would still go to "stepB".</para>
 
-      <section id="batchStatusVsExitStatus" label="">
+      <section id="batchStatusVsExitStatus">
         <title>Batch Status vs. Exit Status</title>
 
         <para>When configuring a <classname>Job</classname> for conditional
@@ -1314,10 +1248,7 @@
         it fails, and so on. The example above contains the following 'next'
         element:</para>
 
-        <programlisting>  
-  &lt;next on="FAILED" to="stepB" /&gt;
-
-</programlisting>
+        <programlisting>&lt;next on="FAILED" to="stepB" /&gt;</programlisting>
 
         <para>At first glance, it would appear that the 'on' attribute
         references the <classname>BatchStatus</classname> of the
@@ -1334,14 +1265,11 @@
         code needs to be different? A good example comes from the skip sample
         job within the samples project:</para>
 
-        <programlisting>  
-  &lt;step id="step1" parent="s1"&gt;
+        <programlisting>&lt;step id="step1" parent="s1"&gt;
     &lt;end on="FAILED" /&gt;
     &lt;next on="COMPLETED WITH SKIPS" to="errorPrint1" /&gt;
     &lt;next on="*" to="step2" /&gt;
-  &lt;/step&gt;
-
-</programlisting>
+&lt;/step&gt;</programlisting>
 
         <para>The above step has three possibilities:</para>
 
@@ -1367,18 +1295,19 @@
         change the exit code based on the condition of the execution having
         skipped records:</para>
 
-        <programlisting>  public class SkipCheckingListener extends StepExecutionListenerSupport {
+        <programlisting>public class SkipCheckingListener extends StepExecutionListenerSupport {
 
     public ExitStatus afterStep(StepExecution stepExecution) {
-      if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
+        if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
             &amp;&amp; stepExecution.getSkipCount() &gt; 0) {
-        return new ExitStatus("COMPLETED WITH SKIPS");
-      } else {
-        return null;
-      }
+            return new ExitStatus("COMPLETED WITH SKIPS");
+        }
+        else {
+            return null;
+        }
     }
 
-  }</programlisting>
+}</programlisting>
 
         <para>The above code is a <classname>StepExecutionListener</classname>
         that first checks to make sure the <classname>Step</classname> was
@@ -1389,7 +1318,7 @@
       </section>
     </section>
 
-    <section>
+    <section id="configuringForStop">
       <title>Configuring for Stop</title>
 
       <para>After the discussion of <link
@@ -1406,7 +1335,7 @@
       after the following step executes, the <classname>Job</classname> will
       end:</para>
 
-      <para><programlisting>  &lt;step id="stepC" parent="s3"/&gt;</programlisting></para>
+      <para><programlisting>&lt;step id="stepC" parent="s3"/&gt;</programlisting></para>
 
       <para>If no transitions are defined for a <classname>Step</classname>,
       then the <classname>Job</classname>'s statuses will be defined as
@@ -1421,7 +1350,7 @@
         </listitem>
 
         <listitem>
-          <para>Otherwise, the the <classname>Job</classname>'s
+          <para>Otherwise, the <classname>Job</classname>'s
           <classname>BatchStatus</classname> and
           <classname>ExitStatus</classname> will both be COMPLETED.</para>
         </listitem>
@@ -1443,7 +1372,7 @@
       in a job to have a status of FAILED but the job to have a status of
       COMPLETED, or vise versa.</para>
 
-      <section>
+      <section id="endElement">
         <title>The 'End' Element</title>
 
         <para>The 'end' element instructs a <classname>Job</classname> to stop
@@ -1465,15 +1394,17 @@
         fails, the <classname>Job</classname> will not be restartable (because
         the status is COMPLETED).</para>
 
-        <programlisting>  &lt;step id="step1" parent="s1" next="step2"&gt;
-  &lt;step id="step2" parent="s2"&gt;
+        <programlisting>&lt;step id="step1" parent="s1" next="step2"&gt;
+
+&lt;step id="step2" parent="s2"&gt;
     &lt;end on="FAILED"/&gt;
     &lt;next on="*" to="step3"/&gt;
-  &lt;/step&gt;
-  &lt;step id="step3" parent="s3"&gt;</programlisting>
+&lt;/step&gt;
+
+&lt;step id="step3" parent="s3"&gt;</programlisting>
       </section>
 
-      <section>
+      <section id="failElement">
         <title>The 'Fail' Element</title>
 
         <para>The 'fail' element instructs a <classname>Job</classname> to
@@ -1494,15 +1425,17 @@
         Additionally, if step2 fails, and the <classname>Job</classname> is
         restarted, then execution will begin again on step2.</para>
 
-        <programlisting>  &lt;step id="step1" parent="s1" next="step2"&gt;
-  &lt;step id="step2" parent="s2"&gt;
+        <programlisting>&lt;step id="step1" parent="s1" next="step2"&gt;
+
+&lt;step id="step2" parent="s2"&gt;
     &lt;fail on="FAILED" exit-code="EARLY TERMINATION"/&gt;
     &lt;next on="*" to="step3"/&gt;
-  &lt;/step&gt;
-  &lt;step id="step3" parent="s3"&gt;</programlisting>
+&lt;/step&gt;
+
+&lt;step id="step3" parent="s3"&gt;</programlisting>
       </section>
 
-      <section>
+      <section id="stopElement">
         <title>The 'Stop' Element</title>
 
         <para>The 'stop' element instructs a <classname>Job</classname> to
@@ -1513,19 +1446,20 @@
         attribute that specifies the step where execution should pick up when
         the <classname>Job is restarted</classname>.</para>
 
-        <para>In the following scenario, if step1 finsihes with COMPLETE, then
+        <para>In the following scenario, if step1 finishes with COMPLETE, then
         the job will then stop. Once it is restarted, execution will begin on
         step2.</para>
 
-        <para><programlisting>  &lt;step id="step1" parent="s1"&gt;
+        <para><programlisting>&lt;step id="step1" parent="s1"&gt;
     &lt;stop on="COMPLETED" restart="step2"/&gt;
-  &lt;/step&gt;
-  &lt;step id="step2" parent="s2"/&gt;</programlisting></para>
+&lt;/step&gt;
+
+&lt;step id="step2" parent="s2"/&gt;</programlisting></para>
       </section>
     </section>
 
-    <section>
-      <title>Programmatic flow decisions</title>
+    <section id="programmaticFlowDecisions">
+      <title>Programmatic Flow Decisions</title>
 
       <para>In some situations, more information than the
       <classname>ExitStatus</classname> may be required to decide which step
@@ -1533,39 +1467,33 @@
       <classname>JobExecutionDecider</classname> can be used to assist in the
       decision.</para>
 
-      <para><programlisting>
-  public class MyDecider implements JobExecutionDecider {
-      public String decide(JobExecution jobExecution, StepExecution stepExecution) {
-          if (someCondition) {
-              return "FAILED";
-          }
-          else {
-              return "COMPLETED";
-          }
-      }
-  }
-
-</programlisting></para>
+      <para><programlisting>public class MyDecider implements JobExecutionDecider {
+    public String decide(JobExecution jobExecution, StepExecution stepExecution) {
+        if (someCondition) {
+            return "FAILED";
+        }
+        else {
+            return "COMPLETED";
+        }
+    }
+}</programlisting></para>
 
       <para>In the job configuration, a "decision" tag will specify the
       decider to use as well as all of the transitions.</para>
 
-      <para><programlisting>
-  &lt;job id="job"&gt;
+      <para><programlisting>&lt;job id="job"&gt;
     &lt;step id="step1" parent="s1" next="decision" /&gt;
     
     &lt;decision id="decision" decider="decider"&gt;
-      &lt;next on="FAILED" to="step2" /&gt;
-      &lt;next on="COMPLETED" to="step3" /&gt;
+        &lt;next on="FAILED" to="step2" /&gt;
+        &lt;next on="COMPLETED" to="step3" /&gt;
     &lt;/decision&gt;
 
     &lt;step id="step2" parent="s2" next="step3"/&gt;
     &lt;step id="step3" parent="s3" /&gt;
-  &lt;/job&gt;
+&lt;/job&gt;
 
-  &lt;beans:bean id="decider" class="com.MyDecider"/&gt;
-
-</programlisting></para>
+&lt;beans:bean id="decider" class="com.MyDecider"/&gt;</programlisting></para>
     </section>
 
     <section id="split-flows">
@@ -1582,37 +1510,34 @@
       elements such as the 'next' attribute or the 'next', 'end', 'fail', or
       'pause' elements.</para>
 
-      <programlisting>  &lt;split id="split1" next="step4"&gt;
+      <programlisting>&lt;split id="split1" next="step4"&gt;
     &lt;flow&gt;
-      &lt;step id="step1" parent="s1" next="step2"/&gt;
-      &lt;step id="step2" parent="s2"/&gt;
+        &lt;step id="step1" parent="s1" next="step2"/&gt;
+        &lt;step id="step2" parent="s2"/&gt;
     &lt;/flow&gt;
     &lt;flow&gt;
-      &lt;step id="step3" parent="s3"/&gt;
+        &lt;step id="step3" parent="s3"/&gt;
     &lt;/flow&gt;
-  &lt;/split&gt;
-  &lt;step id="step4" parent="s4"/&gt;</programlisting>
+&lt;/split&gt;
+&lt;step id="step4" parent="s4"/&gt;</programlisting>
     </section>
   </section>
 
   <section id="late-binding" xreflabel="Late Binding">
-    <title>Late binding of Job and Step Attributes</title>
+    <title>Late Binding of Job and Step Attributes</title>
 
     <para>Both the XML and Flat File examples above use the Spring
-    <classname>Resource</classname> abstraction to obtain a file . This works
+    <classname>Resource</classname> abstraction to obtain a file. This works
     because <classname>Resource</classname> has a <markup>getFile</markup>
     method, which returns a <classname>java.io.File</classname>. Both XML and
     Flat File resources can be configured using standard Spring
     constructs:</para>
 
-    <programlisting>  
-  &lt;bean id="flatFileItemReader"
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    <programlisting>&lt;bean id="flatFileItemReader"
+      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource"
-                     value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
+              value="file://outputs/20070122.testStream.CustomerReportStep.TEMP.txt" /&gt;
+&lt;/bean&gt;</programlisting>
 
     <para>The above <classname>Resource</classname> will load the file from
     the file system location specified. Note that absolute locations have to
@@ -1622,13 +1547,10 @@
     at runtime as a parameter to the job. This could be solved using '-D'
     parameters, i.e. a system property:</para>
 
-    <programlisting>
-  &lt;bean id="flatFileItemReader"
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    <programlisting>&lt;bean id="flatFileItemReader"
+      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="${input.file.name}" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
+&lt;/bean&gt;</programlisting>
 
     <para>All that would be required for this solution to work would be a
     system argument (-Dinput.file.name="file://file.txt"). (Note that although
@@ -1644,34 +1566,31 @@
     accomplish this, Spring Batch allows for the late binding of various Job
     and Step attributes:</para>
 
-    <programlisting>  
-  &lt;bean id="flatFileItemReader" scope="step"
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    <programlisting>&lt;bean id="flatFileItemReader" scope="step"
+      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{jobParameters[input.file.name]}</emphasis>" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
+&lt;/bean&gt;</programlisting>
 
     <para>Both the <classname>JobExecution</classname> and
     <classname>StepExecution</classname> level
     <classname>ExecutionContext</classname> can be accessed in the same
     way:</para>
 
-    <programlisting>  
-  &lt;bean id="flatFileItemReader" scope="step"
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    <programlisting>&lt;bean id="flatFileItemReader" scope="step"
+      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{jobExecutionContext[input.file.name]}</emphasis>" /&gt;
-  &lt;/bean&gt;
+&lt;/bean&gt;</programlisting>
 
-</programlisting>
-
-    <programlisting>  
-  &lt;bean id="flatFileItemReader" scope="step"
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+    <programlisting>&lt;bean id="flatFileItemReader" scope="step"
+      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext[input.file.name]}</emphasis>" /&gt;
-  &lt;/bean&gt;
+&lt;/bean&gt;</programlisting>
 
-</programlisting>
+    <note>
+      <para>Any bean that uses late-binding must be declared with
+      scope="step". See for <xref linkend="step-scope" /> more
+      information.</para>
+    </note>
 
     <section id="step-scope">
       <title>Step Scope</title>
@@ -1679,13 +1598,10 @@
       <para>All of the late binding examples from above have a scope of "step"
       declared on the bean definition:</para>
 
-      <programlisting>  
-  &lt;bean id="flatFileItemReader" <emphasis role="bold">scope="step"</emphasis>
-        class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+      <programlisting>&lt;bean id="flatFileItemReader" <emphasis role="bold">scope="step"</emphasis>
+      class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
     &lt;property name="resource" value="#{jobParameters[input.file.name]}" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
+&lt;/bean&gt;</programlisting>
 
       <para>Using a scope of <classname>Step</classname> is required in order
       to use late binding since the bean cannot actually be instantiated until
@@ -1694,22 +1610,17 @@
       must be added explicitly, either by using the <literal>batch</literal>
       namespace:</para>
 
-      <programlisting>
-&lt;beans xmlns="http://www.springframework.org/schema/beans" 
+      <programlisting>&lt;beans:beans xmlns="http://www.springframework.org/schema/beans" 
        xmlns:batch="http://www.springframework.org/schema/batch" 
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="..."&gt;
 ...
-&lt;/beans&gt;
-</programlisting>
+&lt;/beans:beans&gt;</programlisting>
 
       <para>or by including a bean definition explicitly for
       the<classname>Step</classname> (but not both):</para>
 
-      <programlisting>
-  &lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;
-
-</programlisting>
+      <programlisting>&lt;bean class="org.springframework.batch.core.scope.StepScope" /&gt;</programlisting>
     </section>
   </section>
 </chapter>
