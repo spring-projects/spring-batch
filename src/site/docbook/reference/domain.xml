@@ -44,10 +44,16 @@
   processing needs.</para>
 
   <mediaobject>
-    <imageobject>
+    <imageobject role="html">
       <imagedata align="center"
                  fileref="images/spring-batch-reference-model.png"
                  format="PNG" scale="80" />
+    </imageobject>
+
+    <imageobject role="fo">
+      <imagedata align="center"
+                 fileref="images/spring-batch-reference-model.png"
+                 format="PNG" scale="40" />
     </imageobject>
 
     <caption><para>Figure 2.1: Batch Stereotypes</para></caption>
@@ -77,7 +83,7 @@
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/job-heirarchy.png"
-                   scale="80" />
+                   scale="40" />
       </imageobject>
     </mediaobject>
 
@@ -107,14 +113,11 @@
     namespace abstracts away the need to instantiate it directly. Instead, the
     <code>&lt;job&gt;</code> tag can be used:</para>
 
-    <programlisting>  
-  &lt;job id="footballJob"&gt;
+    <programlisting>&lt;job id="footballJob"&gt;
     &lt;step id="playerload" next="gameLoad"/&gt;
     &lt;step id="gameLoad" next="playerSummarization"/&gt;
     &lt;step id="playerSummarization"/&gt;
-  &lt;/job&gt;
-
-</programlisting>
+&lt;/job&gt;</programlisting>
 
     <section id="jobInstance">
       <title id="s.2.1.2">JobInstance</title>
@@ -176,7 +179,7 @@
           <imageobject role="fo">
             <imagedata align="center"
                        fileref="images/job-stereotypes-parameters.png"
-                       scale="80" />
+                       scale="40" />
           </imageobject>
         </mediaobject></para>
 
@@ -561,11 +564,11 @@
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png"
-                   scale="90" />
+                   scale="40" />
       </imageobject>
     </mediaobject>
 
-    <section>
+    <section id="stepExecution">
       <title id="stepExecution">StepExecution</title>
 
       <para>A <classname>StepExecution</classname> represents a single attempt
@@ -863,7 +866,7 @@
     <classname>ItemReader</classname> is opened, it can check to see if it has
     any stored state in the context, and initialize itself from there:</para>
 
-    <programlisting>  if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
+    <programlisting>if (executionContext.containsKey(getKey(LINES_READ_COUNT))) {
     log.debug("Initializing for restart. Restart data is: " + executionContext);
 
     long lineCount = executionContext.getLong(getKey(LINES_READ_COUNT));
@@ -872,9 +875,9 @@
 
     Object record = "";
     while (reader.getPosition() &lt; lineCount &amp;&amp; record != null) {
-       record = readLine();
+        record = readLine();
     }
-  }</programlisting>
+}</programlisting>
 
     <para>In this case, after the above code is executed, the current line
     will be 40,322, allowing the <classname>Step</classname> to start again
@@ -914,12 +917,9 @@
     <classname>StepExecution</classname>. For example, consider the following
     code snippet:</para>
 
-    <programlisting>
-  ExecutionContext ecStep = stepExecution.getExecutionContext();
-  ExecutionContext ecJob = jobExecution.getExecutionContext();
-  //ecStep does not equal ecJob
-
-</programlisting>
+    <programlisting>ExecutionContext ecStep = stepExecution.getExecutionContext();
+ExecutionContext ecJob = jobExecution.getExecutionContext();
+//ecStep does not equal ecJob</programlisting>
 
     <para>As noted in the comment, ecStep will not equal ecJob; they are two
     different <classname>ExecutionContext</classname>s. The one scoped to the
@@ -942,25 +942,21 @@
     <classname>JobExecution</classname> implementations are persisted by
     passing them to the repository:</para>
 
-    <programlisting>  
-  &lt;job-repository id="jobRepository"/&gt;
-
-</programlisting>
+    <programlisting>&lt;job-repository id="jobRepository"/&gt;</programlisting>
   </section>
 
-  <section>
+  <section id="jobLauncher">
     <title>JobLauncher</title>
 
     <para><classname>JobLauncher </classname>represents a simple interface for
     launching a <classname>Job</classname> with a given set of
     <classname>JobParameters</classname>:</para>
 
-    <programlisting>  public interface JobLauncher {
+    <programlisting>public interface JobLauncher {
 
     public JobExecution run(Job job, JobParameters jobParameters) 
                 throws JobExecutionAlreadyRunningException, JobRestartException;
-}
-</programlisting>
+}</programlisting>
 
     <para>It is expected that implementations will obtain a valid
     <classname>JobExecution</classname> from the
@@ -968,7 +964,7 @@
     <classname>Job</classname>.</para>
   </section>
 
-  <section>
+  <section id="itemReader">
     <title id="s.5.1.1">Item Reader</title>
 
     <para><classname>ItemReader</classname> is an abstraction that represents
@@ -980,7 +976,7 @@
     linkend="readersAndWriters" />.</para>
   </section>
 
-  <section>
+  <section id="itemWriter">
     <title id="s.5.1.2">Item Writer</title>
 
     <para><classname>ItemWriter</classname> is an abstraction that represents
@@ -989,10 +985,10 @@
     next, only the item that was passed in its current invocation. More
     details about the <classname>ItemWriter</classname> interface and its
     various implementations can be found in <xref
-    linkend="readersAndWriters" /></para>
+    linkend="readersAndWriters" />.</para>
   </section>
 
-  <section>
+  <section id="itemProcessor">
     <title>Item Processor</title>
 
     <para><classname>ItemProcessor</classname> is an abstraction that
@@ -1006,7 +1002,7 @@
     found in <xref linkend="readersAndWriters" />.</para>
   </section>
 
-  <section>
+  <section id="batchNamespace">
     <title>Batch Namespace</title>
 
     <para>Many of the domain concepts listed above need to be configured in a
@@ -1015,7 +1011,7 @@
     bean definition, a namespace has been provided for ease of
     configuration:</para>
 
-    <programlisting>  &lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>" 
+    <programlisting>&lt;beans:beans xmlns="<emphasis role="bold">http://www.springframework.org/schema/batch</emphasis>" 
      xmlns:beans="http://www.springframework.org/schema/beans" 
      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
      xsi:schemaLocation="
@@ -1025,14 +1021,14 @@
            http://www.springframework.org/schema/batch/spring-batch-2.0.xsd</emphasis>"&gt;
 
     &lt;job id="ioSampleJob"&gt;
-      &lt;step id="step1"&gt;
-        &lt;tasklet&gt;
-            &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
-        &lt;/tasklet&gt;
-      &lt;/step&gt;
+        &lt;step id="step1"&gt;
+            &lt;tasklet&gt;
+                &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
+            &lt;/tasklet&gt;
+        &lt;/step&gt;
     &lt;/job&gt;
 
-  &lt;/beans:beans&gt;</programlisting>
+&lt;/beans:beans&gt;</programlisting>
 
     <para>As long as the batch namespace has been declared, any of its
     elements can be used. More information on configuring a

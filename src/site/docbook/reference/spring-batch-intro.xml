@@ -37,7 +37,7 @@
   high-volume batch jobs can leverage the framework in a highly scalable
   manner to process significant volumes of information.</para>
 
-  <section>
+  <section id="springBatchBackground">
     <title id="s.1.4">Background</title>
 
     <para>While open source software projects and associated communities have
@@ -77,7 +77,7 @@
     will benefit from Spring Batch.</para>
   </section>
 
-  <section>
+  <section id="springBatchUsageScenarios">
     <title id="s-b-i.1.2">Usage Scenarios</title>
 
     <para>A typical batch program generally reads a large number of records
@@ -165,7 +165,7 @@
       </itemizedlist></para>
   </section>
 
-  <section>
+  <section id="springBatchArchitecture">
     <title id="s.1.1">Spring Batch Architecture</title>
 
     <para>Spring Batch is designed with extensibility and a diverse group of
@@ -174,12 +174,12 @@
     developers. <mediaobject>
         <imageobject role="fo">
           <imagedata align="center" fileref="images/spring-batch-layers.png"
-                     format="PNG" scale="80" width="35%" />
+                     format="PNG" scale="40" width="35%" />
         </imageobject>
 
         <imageobject role="html">
           <imagedata align="center" fileref="images/spring-batch-layers.png"
-                     format="PNG" scale="80" scalefit="" width="35%" />
+                     format="PNG" scale="40" scalefit="" width="35%" />
         </imageobject>
 
         <caption><para>Figure 1.1: Spring Batch Layered

@@ -32,7 +32,7 @@
     </listitem>
   </itemizedlist>
 
-  <section>
+  <section id="whatsNewJava5">
     <title id="s.2.1.6">Java 5</title>
 
     <para>The 1.x releases of Spring Batch were all based on Java 1.4. This
@@ -43,38 +43,33 @@
     work with have been updated to support generic types. As an example, the
     <classname>ItemReader</classname> interface from 1.1 is below:</para>
 
-    <programlisting>
-  public interface ItemReader {
+    <programlisting>public interface ItemReader {
 
     Object read() throws Exception;
 
     void mark() throws MarkFailedException;
  
     void reset() throws ResetFailedException;
-  }
-
-</programlisting>
+}</programlisting>
 
     <para>As you can see, the <methodname>read</methodname> method returns an
     <classname>Object</classname>. The 2.0 version is below:</para>
 
-    <programlisting>
-  public interface ItemReader&lt;T&gt; {
+    <programlisting>public interface ItemReader&lt;T&gt; {
 
     T read() throws Exception, UnexpectedInputException, ParseException;
 
-  }
-
-</programlisting>
+}</programlisting>
 
     <para>As you can see, <classname>ItemReader</classname> now supports the
-    generic type, T, which is returned from read. You may also notice that
-    <methodname>mark</methodname> and <methodname>reset</methodname> have been
-    removed. This is due to step processing strategy changes, which are
-    discussed below. Many other interfaces have been similarly updated.</para>
+    generic type, <classname>T</classname>, which is returned from read. You
+    may also notice that <methodname>mark</methodname> and
+    <methodname>reset</methodname> have been removed. This is due to step
+    processing strategy changes, which are discussed below. Many other
+    interfaces have been similarly updated.</para>
   </section>
 
-  <section>
+  <section id="whatsNewChunkOrientedProcessing">
     <title>Chunk Oriented Processing</title>
 
     <para>Previously, the default processing strategy provided by Spring Batch
@@ -83,13 +78,13 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/item-oriented-processing.png" scale="90"
+                   fileref="images/item-oriented-processing.png" scale="80"
                    width="" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/item-oriented-processing.png" scale="90"
+                   fileref="images/item-oriented-processing.png" scale="60"
                    width="50%" />
       </imageobject>
     </mediaobject>
@@ -102,40 +97,32 @@
     <classname>ItemWriter</classname> will each be called 5 times. This is
     illustrated in a simplified code example below:</para>
 
-    <programlisting>  
-  for(int i = 0; i &lt; commitInterval; i++){
+    <programlisting>for(int i = 0; i &lt; commitInterval; i++){
     Object item = itemReader.read();
     itemWriter.write(item);
-  }
-
-</programlisting>
+}</programlisting>
 
     <para>Both the <classname>ItemReader</classname> and
     <classname>ItemWriter</classname> interfaces were completely geared toward
     this approach:</para>
 
-    <programlisting>
-  public interface ItemReader {
+    <programlisting>public interface ItemReader {
 
     Object read() throws Exception;
 
     void mark() throws MarkFailedException;
  
     void reset() throws ResetFailedException;
-  }
+}</programlisting>
 
-</programlisting>
-
-    <programlisting>  public interface ItemWriter {
+    <programlisting>public interface ItemWriter {
 
     void write(Object item) throws Exception;
 
     void flush() throws FlushFailedException;
 
     void clear() throws ClearFailedException;
-  }
-
-</programlisting>
+}</programlisting>
 
     <para>Because the 'scope' of the processing was one item, supporting
     rollback scenarios required additional methods, which is what
@@ -158,13 +145,13 @@
       <imageobject role="html">
         <imagedata align="center"
                    fileref="images/simplified-chunk-oriented-processing.png"
-                   scale="90" width="" />
+                   scale="80" width="" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
                    fileref="images/simplified-chunk-oriented-processing.png"
-                   scale="90" width="60%" />
+                   scale="60" width="60%" />
       </imageobject>
     </mediaobject>
 
@@ -173,37 +160,28 @@
     aggregated into a list, that will ultimately be written out, as the
     simplified example below illustrates:</para>
 
-    <programlisting>
-  List items = new Arraylist();
-  for(int i = 0; i &lt; commitInterval; i++){
+    <programlisting>List items = new Arraylist();
+for(int i = 0; i &lt; commitInterval; i++){
     items.add(itemReader.read());
-  }
-  itemWriter.write(items);
-
-</programlisting>
+}
+itemWriter.write(items);</programlisting>
 
     <para>This approach not only allows for much simpler processing and
     scalability approaches, it also makes the
     <classname>ItemReader</classname> and <classname>ItemWriter</classname>
     interfaces much cleaner:</para>
 
-    <programlisting>
-  public interface ItemReader&lt;T&gt; {
+    <programlisting>public interface ItemReader&lt;T&gt; {
 
     T read() throws Exception, UnexpectedInputException, ParseException;
 
-  }
+}</programlisting>
 
-</programlisting>
-
-    <programlisting>
-  public interface ItemWriter&lt;T&gt; {
+    <programlisting>public interface ItemWriter&lt;T&gt; {
 
     void write(List&lt;? extends T&gt; items) throws Exception;
 
-  }
-
-</programlisting>
+}</programlisting>
 
     <para>As you can see, the interfaces no longer contain the
     <methodname>mark</methodname>, <methodname>reset</methodname>,
@@ -222,7 +200,7 @@
     linkend="chunkOrientedProcessing" />. Reader and writer implementation
     information can be found in <xref linkend="readersAndWriters" />.</para>
 
-    <section>
+    <section id="whatsNewItemProcessor">
       <title>ItemProcessor</title>
 
       <para>Previously, <classname>Step</classname>s had only two
@@ -231,12 +209,12 @@
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="images/1-1-step.png" scale="80"
+          <imagedata align="center" fileref="images/1-1-step.png" scale="50"
                      width="50%" />
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/1-1-step.png" scale="80"
+          <imagedata align="center" fileref="images/1-1-step.png" scale="30"
                      width="50%" />
         </imageobject>
       </mediaobject>
@@ -248,12 +226,12 @@
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/composite-transformer.png"
-                     scale="" width="70%" />
+                     scale="80" width="70%" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center" fileref="images/composite-transformer.png"
-                     scale="65" width="" />
+                     scale="40" width="" />
         </imageobject>
       </mediaobject>
 
@@ -269,60 +247,52 @@
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="images/step.png" scale=""
-                     width="50%" />
+          <imagedata align="center" fileref="images/step.png" scale="50" />
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" contentwidth="480"
-                     fileref="images/step.png" scale="60" width="" />
+          <imagedata align="center" fileref="images/step.png" scale="30" />
         </imageobject>
       </mediaobject>
     </section>
   </section>
 
-  <section>
-    <title>Configuration enhancements</title>
+  <section id="whatsNewConfiguration">
+    <title>Configuration Enhancements</title>
 
     <para>Until 2.0, the only option for configuring batch jobs has been
     normal spring bean configuration. However, in 2.0 there is a new namespace
     for configuration. For example, in 1.1, configuring a job looked like the
     following:</para>
 
-    <programlisting>  
-  &lt;bean id="footballJob"
-        class="org.springframework.batch.core.job.SimpleJob"&gt;
+    <programlisting>&lt;bean id="footballJob"
+      class="org.springframework.batch.core.job.SimpleJob"&gt;
     &lt;property name="steps"&gt;
-      &lt;list&gt;
-        &lt;!-- Step Bean details ommitted for clarity --&gt;
-        &lt;bean id="playerload" parent="simpleStep" /&gt;
-        &lt;bean id="gameLoad" parent="simpleStep" /&gt;
-        &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
-      &lt;/list&gt;
+        &lt;list&gt;
+            &lt;!-- Step Bean details ommitted for clarity --&gt;
+            &lt;bean id="playerload" parent="simpleStep" /&gt;
+            &lt;bean id="gameLoad" parent="simpleStep" /&gt;
+            &lt;bean id="playerSummarization" parent="simpleStep" /&gt;
+        &lt;/list&gt;
     &lt;/property&gt;
     &lt;property name="jobRepository" ref="jobRepository" /&gt;
-  &lt;/bean&gt;
-
-</programlisting>
+&lt;/bean&gt;</programlisting>
 
     <para>In 2.0, the equivalent would be:</para>
 
-    <programlisting>  
-  &lt;job id="footballJob"&gt;
+    <programlisting>&lt;job id="footballJob"&gt;
     &lt;step id="playerload" next="gameLoad"/&gt;
     &lt;step id="gameLoad" next="playerSummarization"/&gt;
     &lt;step id="playerSummarization"/&gt;
-  &lt;/job&gt;
-
-</programlisting>
+&lt;/job&gt;</programlisting>
 
     <para>More information on how to configure Jobs and Steps with the new
     namespace can be found in <xref linkend="configureJob" />, and <xref
     linkend="configureStep" />.</para>
   </section>
 
-  <section>
-    <title>Meta Data access improvements</title>
+  <section id="whatsNewMetaDataAccess">
+    <title>Meta Data Access Improvements</title>
 
     <para>The <classname>JobRepository</classname> interface represents basic
     CRUD operations with <classname>Job</classname> meta-data. However, it may
@@ -338,7 +308,7 @@
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   scale="70" width="" />
+                   scale="60" width="" />
       </imageobject>
     </mediaobject>
 
@@ -349,7 +319,7 @@
     in.</para>
   </section>
 
-  <section>
+  <section id="whatsNewNonSequential">
     <title>Non Sequential Step Execution</title>
 
     <para>2.0 has also seen improvements in how steps can be configured.
@@ -358,12 +328,12 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/sequential-flow.png"
-                   scale="" width="" />
+                   scale="50" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/sequential-flow.png"
-                   scale="80" width="" />
+                   scale="50" width="" />
       </imageobject>
     </mediaobject>
 
@@ -372,35 +342,32 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="80" width="" />
+                   scale="50" width="" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="80" width="" />
+                   scale="50" width="" />
       </imageobject>
     </mediaobject>
 
     <para>This new 'conditional flow' support is made easy to configure via
     the new namespace:</para>
 
-    <programlisting>
-  &lt;job id="job"&gt;
+    <programlisting>&lt;job id="job"&gt;
     &lt;step id="stepA"&gt;
-      &lt;next on="FAILED" to="stepB" /&gt;
-      &lt;next on="*" to="stepC" /&gt;
+        &lt;next on="FAILED" to="stepB" /&gt;
+        &lt;next on="*" to="stepC" /&gt;
     &lt;/step&gt;
     &lt;step id="stepB" next="stepC" /&gt;
     &lt;step id="stepC" /&gt;
-  &lt;/job&gt;
-
-</programlisting>
+&lt;/job&gt;</programlisting>
 
     <para>More details on how to configure non sequential steps can be found
     in <xref linkend="controllingStepFlow" />.</para>
   </section>
 
-  <section>
+  <section id="whatsNewScalability">
     <title>Scalability</title>
 
     <para>Spring Batch 1.x was always intended as a single VM, possibly
@@ -412,7 +379,7 @@
     are two approaches to scalability: remote chunking, and
     partitioning.</para>
 
-    <section>
+    <section id="whatsNewRemoteChunking">
       <title>Remote Chunking</title>
 
       <para>Remote chunking is a technique for dividing up the work of a step
@@ -429,7 +396,7 @@
       be found in <xref linkend="remoteChunking" /></para>
     </section>
 
-    <section>
+    <section id="whatsNewPartitioning">
       <title>Partitioning</title>
 
       <para>Partitioning is an alternative approach which in contrast depends
