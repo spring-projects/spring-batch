@@ -17,7 +17,9 @@
 package org.springframework.batch.repeat.support;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -29,12 +31,12 @@ import org.junit.Test;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.repeat.callback.NestedRepeatCallback;
 import org.springframework.batch.repeat.exception.ExceptionHandler;
 import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class TaskExecutorRepeatTemplateAsynchronousTests extends
-		AbstractTradeBatchTests {
+public class TaskExecutorRepeatTemplateAsynchronousTests extends AbstractTradeBatchTests {
 
 	RepeatTemplate template = getRepeatTemplate();
 
@@ -44,6 +46,8 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends
 	public RepeatTemplate getRepeatTemplate() {
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
 		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		// Set default completion above number of items in input file
+		template.setCompletionPolicy(new SimpleCompletionPolicy(8));
 		return template;
 	}
 
@@ -57,19 +61,19 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends
 		template.setTaskExecutor(taskExecutor);
 		try {
 			template.iterate(new RepeatCallback() {
-				public RepeatStatus doInIteration(RepeatContext context)
-						throws Exception {
+				public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 					count++;
 					throw new IllegalStateException("foo!");
 				}
 			});
 			fail("Expected IllegalStateException");
-		} catch (IllegalStateException e) {
+		}
+		catch (IllegalStateException e) {
 			assertEquals("foo!", e.getMessage());
 		}
 
-		assertTrue("Too few attempts: "+count, count>=2);
-		assertTrue("Too many attempts: "+count, count<=10);
+		assertTrue("Too few attempts: " + count, count >= 1);
+		assertTrue("Too many attempts: " + count, count <= 10);
 
 	}
 
@@ -83,19 +87,46 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends
 		template.setTaskExecutor(taskExecutor);
 
 		template.setExceptionHandler(new ExceptionHandler() {
-			public void handleException(RepeatContext context,
-					Throwable throwable) throws Throwable {
+			public void handleException(RepeatContext context, Throwable throwable) throws Throwable {
 				count++;
 			}
 		});
 		template.iterate(new RepeatCallback() {
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				throw new IllegalStateException("foo!");
 			}
 		});
 
-		assertEquals(4, count);
+		assertTrue("Too few attempts: " + count, count >= 1);
+		assertTrue("Too many attempts: " + count, count <= 10);
+
+	}
+
+	@Test
+	public void testNestedSession() throws Exception {
+
+		RepeatTemplate outer = getRepeatTemplate();
+		RepeatTemplate inner = new RepeatTemplate();
+
+		outer.iterate(new NestedRepeatCallback(inner, new RepeatCallback() {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+				count++;
+				assertNotNull(context);
+				assertNotSame("Nested batch should have new session", context, context.getParent());
+				assertSame(context, RepeatSynchronizationManager.getContext());
+				return RepeatStatus.FINISHED;
+			}
+		}) {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+				count++;
+				assertNotNull(context);
+				assertSame(context, RepeatSynchronizationManager.getContext());
+				return super.doInIteration(context);
+			}
+		});
+	
+		assertTrue("Too few attempts: " + count, count >= 1);
+		assertTrue("Too many attempts: " + count, count <= 10);
 
 	}
 
@@ -113,8 +144,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
@@ -145,8 +175,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Trade item = provider.read();
@@ -181,10 +210,8 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends
 		final String threadName = Thread.currentThread().getName();
 		final Set<String> threadNames = new HashSet<String>();
 
-		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(
-				provider, processor) {
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
+		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
@@ -192,8 +219,7 @@ public class TaskExecutorRepeatTemplateAsynchronousTests extends
 			}
 		};
 		RepeatCallback jobCallback = new RepeatCallback() {
-			public RepeatStatus doInIteration(RepeatContext context)
-					throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
 				stepTemplate.iterate(stepCallback);
 				return RepeatStatus.FINISHED;
 			}

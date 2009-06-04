@@ -16,15 +16,15 @@
 
 package org.springframework.batch.repeat.callback;
 
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatOperations;
+import org.springframework.batch.repeat.RepeatStatus;
 
 /**
- * Callback that delegates to another callback, via a {@link RepeatOperations} instance.
- * Useful when nesting or composing batches in one another, e.g. for breaking a
- * batch down into chunks.
+ * Callback that delegates to another callback, via a {@link RepeatOperations}
+ * instance. Useful when nesting or composing batches in one another, e.g. for
+ * breaking a batch down into chunks.
  * 
  * @author Dave Syer
  * 
@@ -38,8 +38,8 @@ public class NestedRepeatCallback implements RepeatCallback {
 	/**
 	 * Constructor setting mandatory fields.
 	 * 
-	 * @param template the {@link RepeatOperations} to use when calling the delegate
-	 * callback
+	 * @param template the {@link RepeatOperations} to use when calling the
+	 * delegate callback
 	 * @param callback the {@link RepeatCallback} delegate
 	 */
 	public NestedRepeatCallback(RepeatOperations template, RepeatCallback callback) {

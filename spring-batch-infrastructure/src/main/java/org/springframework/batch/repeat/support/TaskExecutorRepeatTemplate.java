@@ -51,7 +51,8 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	/**
 	 * Default limit for maximum number of concurrent unfinished results allowed
 	 * by the template.
-	 * {@link #getNextResult(RepeatContext, RepeatCallback, RepeatInternalState)}.
+	 * {@link #getNextResult(RepeatContext, RepeatCallback, RepeatInternalState)}
+	 * .
 	 */
 	public static final int DEFAULT_THROTTLE_LIMIT = 4;
 
@@ -71,10 +72,10 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	}
 
 	/**
-	 * Use the {@link #setTaskExecutor(TaskExecutor)} to generate a result. The internal state in
-	 * this case is a queue of unfinished result holders of type
-	 * {@link ResultHolder}. The holder with the return value should not be on
-	 * the queue when this method exits. The queue is scoped in the calling
+	 * Use the {@link #setTaskExecutor(TaskExecutor)} to generate a result. The
+	 * internal state in this case is a queue of unfinished result holders of
+	 * type {@link ResultHolder}. The holder with the return value should not be
+	 * on the queue when this method exits. The queue is scoped in the calling
 	 * method so there is no need to synchronize access.
 	 * 
 	 */
@@ -185,7 +186,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 	 * 
 	 */
 	private static class ExecutingRunnable implements Runnable, ResultHolder {
-		
+
 		private final RepeatCallback callback;
 
 		private final RepeatContext context;
@@ -226,13 +227,21 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 		 * @see java.lang.Runnable#run()
 		 */
 		public void run() {
+			boolean clearContext = false;
 			try {
+				if (RepeatSynchronizationManager.getContext() == null) {
+					clearContext = true;
+					RepeatSynchronizationManager.register(context);
+				}
 				result = callback.doInIteration(context);
 			}
 			catch (Exception e) {
 				error = e;
 			}
 			finally {
+				if (clearContext) {
+					RepeatSynchronizationManager.clear();
+				}
 				queue.put(this);
 			}
 		}
@@ -264,12 +273,12 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 	/**
 	 * @author Dave Syer
-	 *
+	 * 
 	 */
 	private static class ResultQueueInternalState extends RepeatInternalStateSupport {
 
 		private final ResultQueue<ResultHolder> results;
-		
+
 		/**
 		 * @param throttleLimit the throttle limit for the result queue
 		 */
@@ -277,8 +286,12 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 			super();
 			this.results = new ThrottleLimitResultQueue<ResultHolder>(throttleLimit);
 		}
-		/* (non-Javadoc)
-		 * @see org.springframework.batch.repeat.support.RepeatInternalState#getResultQueue()
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @seeorg.springframework.batch.repeat.support.RepeatInternalState#
+		 * getResultQueue()
 		 */
 		public ResultQueue<ResultHolder> getResultQueue() {
 			return results;
