@@ -120,7 +120,7 @@ public class TaskExecutorRepeatTemplate extends RepeatTemplate {
 
 		/*
 		 * N.B. If the queue is empty then take() blocks until a result appears,
-		 * and there must be at least one because we just submitted one to teh
+		 * and there must be at least one because we just submitted one to the
 		 * task executor.
 		 */
 		ResultHolder result = queue.take();

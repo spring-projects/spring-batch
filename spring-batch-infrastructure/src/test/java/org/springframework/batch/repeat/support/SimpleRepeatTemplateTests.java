@@ -50,7 +50,10 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 	int count = 0;
 
 	public RepeatTemplate getRepeatTemplate() {
-		return new RepeatTemplate();
+		template = new RepeatTemplate();
+		// default stop after more items than exist in dataset
+		template.setCompletionPolicy(new SimpleCompletionPolicy(8));
+		return template;
 	}
 
 	@Test
@@ -97,6 +100,7 @@ public class SimpleRepeatTemplateTests extends AbstractTradeBatchTests {
 		}
 
 		assertEquals(1, count);
+		assertTrue("Too many attempts: "+count, count<=10);
 
 	}
 

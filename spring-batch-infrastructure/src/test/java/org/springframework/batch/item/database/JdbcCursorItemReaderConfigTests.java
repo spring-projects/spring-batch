@@ -1,6 +1,10 @@
 package org.springframework.batch.item.database;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -29,14 +33,13 @@ public class JdbcCursorItemReaderConfigTests {
 		DataSource ds = createMock(DataSource.class);
 		Connection con = createMock(Connection.class);
 		expect(con.getAutoCommit()).andReturn(false);
-		PreparedStatement ps = createMock(PreparedStatement.class);
+		PreparedStatement ps = createNiceMock(PreparedStatement.class);
 		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY,
 				ResultSet.HOLD_CURSORS_OVER_COMMIT)).andReturn(ps);
 		expect(ds.getConnection()).andReturn(con);
 		expect(ds.getConnection()).andReturn(con);
 		con.commit();
-		replay(con);
-		replay(ds);
+		replay(con, ds, ps);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();
@@ -64,13 +67,12 @@ public class JdbcCursorItemReaderConfigTests {
 		DataSource ds = createMock(DataSource.class);
 		Connection con = createMock(Connection.class);
 		expect(con.getAutoCommit()).andReturn(false);
-		PreparedStatement ps = createMock(PreparedStatement.class);
+		PreparedStatement ps = createNiceMock(PreparedStatement.class);
 		expect(con.prepareStatement("select foo from bar", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)).andReturn(ps);
 		expect(ds.getConnection()).andReturn(con);
 		expect(ds.getConnection()).andReturn(con);
 		con.commit();
-		replay(con);
-		replay(ds);
+		replay(con, ds, ps);
 		PlatformTransactionManager tm = new DataSourceTransactionManager(ds);
 		TransactionTemplate tt = new TransactionTemplate(tm);
 		final JdbcCursorItemReader<String> reader = new JdbcCursorItemReader<String>();

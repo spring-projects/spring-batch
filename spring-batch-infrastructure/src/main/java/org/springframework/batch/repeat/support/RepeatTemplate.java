@@ -183,7 +183,10 @@ public class RepeatTemplate implements RepeatOperations {
 		RepeatStatus result = RepeatStatus.CONTINUABLE;
 
 		RepeatInternalState state = createInternalState(context);
+		// This is the list of exceptions thrown by all active callbacks 
 		Collection<Throwable> throwables = state.getThrowables();
+		// Keep a separate list of exceptions we handled that need to be rethrown 
+		Collection<Throwable> deferred = new ArrayList<Throwable>();
 
 		try {
 
@@ -214,33 +217,11 @@ public class RepeatTemplate implements RepeatOperations {
 
 					}
 					catch (Throwable throwable) {
-
-						// An exception alone is not sufficient grounds for not
-						// continuing
-						Throwable unwrappedThrowable = unwrapIfRethrown(throwable);
-						try {
-
-							for (int i = listeners.length; i-- > 0;) {
-								RepeatListener interceptor = listeners[i];
-								// This is not an error - only log at debug
-								// level.
-								logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
-										unwrappedThrowable);
-								interceptor.onError(context, unwrappedThrowable);
-							}
-
-							logger.debug("Handling exception: " + throwable.getClass().getName() + ", caused by: "
-									+ unwrappedThrowable.getClass().getName() + ": " + unwrappedThrowable.getMessage());
-							exceptionHandler.handleException(context, unwrappedThrowable);
-
-						}
-						catch (Throwable handled) {
-							throwables.add(handled);
-						}
+						doHandle(throwable, context, deferred);
 					}
 
 					// N.B. the order may be important here:
-					if (isComplete(context, result) || isMarkedComplete(context) || !throwables.isEmpty()) {
+					if (isComplete(context, result) || isMarkedComplete(context) || !deferred.isEmpty()) {
 						running = false;
 					}
 				}
@@ -248,6 +229,9 @@ public class RepeatTemplate implements RepeatOperations {
 			}
 
 			result = result.and(waitForResults(state));
+			for (Throwable throwable : throwables) {
+				doHandle(throwable, context, deferred);
+			}
 
 			// Explicitly drop any references to internal state...
 			state = null;
@@ -262,9 +246,9 @@ public class RepeatTemplate implements RepeatOperations {
 
 			try {
 
-				if (!throwables.isEmpty()) {
-					Throwable throwable = (Throwable) throwables.iterator().next();
-					logger.debug("Handling fatal exception explicitly (rethrowing first of " + throwables.size()
+				if (!deferred.isEmpty()) {
+					Throwable throwable = (Throwable) deferred.iterator().next();
+					logger.debug("Handling fatal exception explicitly (rethrowing first of " + deferred.size()
 							+ "): " + throwable.getClass().getName() + ": " + throwable.getMessage());
 					rethrow(throwable);
 				}
@@ -289,6 +273,32 @@ public class RepeatTemplate implements RepeatOperations {
 
 		return result;
 
+	}
+
+	private void doHandle(Throwable throwable, RepeatContext context,
+			Collection<Throwable> deferred) {
+		// An exception alone is not sufficient grounds for not
+		// continuing
+		Throwable unwrappedThrowable = unwrapIfRethrown(throwable);
+		try {
+
+			for (int i = listeners.length; i-- > 0;) {
+				RepeatListener interceptor = listeners[i];
+				// This is not an error - only log at debug
+				// level.
+				logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
+						unwrappedThrowable);
+				interceptor.onError(context, unwrappedThrowable);
+			}
+
+			logger.debug("Handling exception: " + throwable.getClass().getName() + ", caused by: "
+					+ unwrappedThrowable.getClass().getName() + ": " + unwrappedThrowable.getMessage());
+			exceptionHandler.handleException(context, unwrappedThrowable);
+
+		}
+		catch (Throwable handled) {
+			deferred.add(handled);
+		}
 	}
 
 	/**

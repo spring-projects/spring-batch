@@ -19,6 +19,7 @@ package org.springframework.batch.repeat.support;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -28,9 +29,75 @@ import org.junit.Test;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.repeat.exception.ExceptionHandler;
+import org.springframework.batch.repeat.policy.SimpleCompletionPolicy;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 
-public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
+public class TaskExecutorRepeatTemplateAsynchronousTests extends
+		AbstractTradeBatchTests {
+
+	RepeatTemplate template = getRepeatTemplate();
+
+	int count = 0;
+
+	// @Override
+	public RepeatTemplate getRepeatTemplate() {
+		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
+		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
+		return template;
+	}
+
+	@Test
+	public void testEarlyCompletionWithException() throws Exception {
+
+		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
+		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		template.setCompletionPolicy(new SimpleCompletionPolicy(20));
+		taskExecutor.setConcurrencyLimit(2);
+		template.setTaskExecutor(taskExecutor);
+		try {
+			template.iterate(new RepeatCallback() {
+				public RepeatStatus doInIteration(RepeatContext context)
+						throws Exception {
+					count++;
+					throw new IllegalStateException("foo!");
+				}
+			});
+			fail("Expected IllegalStateException");
+		} catch (IllegalStateException e) {
+			assertEquals("foo!", e.getMessage());
+		}
+
+		assertTrue("Too few attempts: "+count, count>=2);
+		assertTrue("Too many attempts: "+count, count<=10);
+
+	}
+
+	@Test
+	public void testExceptionHandlerSwallowsException() throws Exception {
+
+		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
+		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
+		template.setCompletionPolicy(new SimpleCompletionPolicy(4));
+		taskExecutor.setConcurrencyLimit(2);
+		template.setTaskExecutor(taskExecutor);
+
+		template.setExceptionHandler(new ExceptionHandler() {
+			public void handleException(RepeatContext context,
+					Throwable throwable) throws Throwable {
+				count++;
+			}
+		});
+		template.iterate(new RepeatCallback() {
+			public RepeatStatus doInIteration(RepeatContext context)
+					throws Exception {
+				throw new IllegalStateException("foo!");
+			}
+		});
+
+		assertEquals(4, count);
+
+	}
 
 	/**
 	 * Run a batch with a single template that itself has an async task
@@ -42,22 +109,20 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 	@Test
 	public void testMultiThreadAsynchronousExecution() throws Exception {
 
-		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
-		template.setTaskExecutor(new SimpleAsyncTaskExecutor());
-
 		final String threadName = Thread.currentThread().getName();
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context)
+					throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
 				Trade item = provider.read();
-				if (item!=null) {
+				if (item != null) {
 					processor.write(Collections.singletonList(item));
 				}
-				return RepeatStatus.continueIf(item!=null);
+				return RepeatStatus.continueIf(item != null);
 			}
 		};
 
@@ -67,7 +132,7 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		assertEquals(NUMBER_OF_ITEMS, processor.count);
 		assertTrue(threadNames.size() > 1);
 	}
-	
+
 	@Test
 	public void testThrottleLimit() throws Exception {
 		TaskExecutorRepeatTemplate template = new TaskExecutorRepeatTemplate();
@@ -80,14 +145,15 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final Set<String> threadNames = new HashSet<String>();
 
 		final RepeatCallback callback = new RepeatCallback() {
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context)
+					throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Trade item = provider.read();
-				if (item!=null) {
+				if (item != null) {
 					processor.write(Collections.singletonList(item));
 				}
-				return RepeatStatus.continueIf(item!=null);
+				return RepeatStatus.continueIf(item != null);
 			}
 		};
 
@@ -115,8 +181,10 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 		final String threadName = Thread.currentThread().getName();
 		final Set<String> threadNames = new HashSet<String>();
 
-		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(provider, processor) {
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+		final RepeatCallback stepCallback = new ItemReaderRepeatCallback<Trade>(
+				provider, processor) {
+			public RepeatStatus doInIteration(RepeatContext context)
+					throws Exception {
 				assertNotSame(threadName, Thread.currentThread().getName());
 				threadNames.add(Thread.currentThread().getName());
 				Thread.sleep(100);
@@ -124,7 +192,8 @@ public class AsynchronousRepeatTests extends AbstractTradeBatchTests {
 			}
 		};
 		RepeatCallback jobCallback = new RepeatCallback() {
-			public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+			public RepeatStatus doInIteration(RepeatContext context)
+					throws Exception {
 				stepTemplate.iterate(stepCallback);
 				return RepeatStatus.FINISHED;
 			}
