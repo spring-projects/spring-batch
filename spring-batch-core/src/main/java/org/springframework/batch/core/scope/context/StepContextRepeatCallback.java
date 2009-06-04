@@ -17,7 +17,10 @@ package org.springframework.batch.core.scope.context;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.RepeatCallback;
@@ -34,8 +37,12 @@ import org.springframework.batch.repeat.RepeatStatus;
 public abstract class StepContextRepeatCallback implements RepeatCallback {
 
 	private final Queue<ChunkContext> attributeQueue = new LinkedBlockingQueue<ChunkContext>();
+	
+	private final AtomicInteger workerCount = new AtomicInteger(0);
 
 	private final StepExecution stepExecution;
+
+	private final Log logger = LogFactory.getLog(StepContextRepeatCallback.class);
 
 	/**
 	 * @param stepExecution
@@ -45,14 +52,18 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	}
 
 	/**
-	 * Manage the {@link StepContext} lifecycle to ensure that the current
-	 * thread has a reference to the context, even if the callback is executed
-	 * in a pooled thread. Handles the registration and de-registration of the
-	 * step context, so clients should not duplicate those calls.
+	 * Manage the {@link StepContext} lifecycle. Business processing should be
+	 * delegated to {@link #doInChunkContext(RepeatContext, ChunkContext)}. This
+	 * is to ensure that the current thread has a reference to the context, even
+	 * if the callback is executed in a pooled thread. Handles the registration
+	 * and de-registration of the step context, so clients should not duplicate
+	 * those calls.
 	 * 
 	 * @see RepeatCallback#doInIteration(RepeatContext)
 	 */
 	public RepeatStatus doInIteration(RepeatContext context) throws Exception {
+		
+		workerCount.incrementAndGet();
 
 		// The StepContext has to be the same for all chunks,
 		// otherwise step-scoped beans will be re-initialised for each chunk.
@@ -64,9 +75,12 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		}
 
 		try {
-			return doInChunkContext(context, chunkContext);
+			logger.debug("Chunk execution starting: worker count="+workerCount.get()+", queue size="+attributeQueue.size());
+			return RepeatStatus.continueIf(doInChunkContext(context, chunkContext).isContinuable()
+					|| (attributeQueue.isEmpty() && workerCount.get()>1));
 		}
 		finally {
+			workerCount.decrementAndGet();
 			// Still some stuff to do with the data in this chunk,
 			// pass it back.
 			if (!chunkContext.isComplete()) {
@@ -77,14 +91,14 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 	}
 
 	/**
-	 * Do the work required for this chunk of the step. The
-	 * {@link ChunkContext} provided is managed by the base class, so that if
-	 * there is still work to do for the task in hand state can be stored here.
-	 * In a multi-threaded client, the base class ensures that only one thread
-	 * at a time can be working on each instance of {@link ChunkContext}. Workers
-	 * should signal that they are finished with a context by removing all the
-	 * attributes they have added. If a worker does not remove them another
-	 * thread might see stale state.
+	 * Do the work required for this chunk of the step. The {@link ChunkContext}
+	 * provided is managed by the base class, so that if there is still work to
+	 * do for the task in hand state can be stored here. In a multi-threaded
+	 * client, the base class ensures that only one thread at a time can be
+	 * working on each instance of {@link ChunkContext}. Workers should signal
+	 * that they are finished with a context by removing all the attributes they
+	 * have added. If a worker does not remove them another thread might see
+	 * stale state.
 	 * 
 	 * @param context the current {@link RepeatContext}
 	 * @param chunkContext the chunk context in which to carry out the work

@@ -12,7 +12,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -358,7 +357,6 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 	}
 
 	@Test
-	@Ignore
 	public void testMultithreadedSkipInWriter() throws Exception {
 		writer.setFailures("1", "2", "3", "4", "5");
 		factory.setCommitInterval(3);

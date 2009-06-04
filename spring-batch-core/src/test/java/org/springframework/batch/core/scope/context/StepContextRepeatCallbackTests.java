@@ -15,9 +15,12 @@
  */
 package org.springframework.batch.core.scope.context;
 
+import static org.junit.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Test;
@@ -28,6 +31,7 @@ import org.springframework.batch.core.scope.context.StepContextRepeatCallback;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.batch.repeat.context.RepeatContextSupport;
 
 /**
  * @author Dave Syer
@@ -58,7 +62,7 @@ public class StepContextRepeatCallbackTests {
 	}
 
 	@Test
-	public void testUnfinishedWork() throws Exception {
+	public void testAddingAttributes() throws Exception {
 		StepSynchronizationManager.register(stepExecution);
 		StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
 			@Override
@@ -73,11 +77,37 @@ public class StepContextRepeatCallbackTests {
 				return RepeatStatus.FINISHED;
 			}
 		};
-		callback.doInIteration(null);
+		assertEquals(RepeatStatus.FINISHED, callback.doInIteration(null));		
 		assertTrue(addedAttribute);
 		callback.doInIteration(null);
 		assertTrue(removedAttribute);
 		callback.doInIteration(null);
 		assertFalse(removedAttribute);
 	}
+
+	@Test
+	public void testUnfinishedWork() throws Exception {
+		StepSynchronizationManager.register(stepExecution);
+		final CountDownLatch latch = new CountDownLatch(2);
+		final StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
+			@Override
+			public RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception {
+				if (context==null) latch.await();
+				return RepeatStatus.FINISHED;
+			}
+		};
+		new Thread(new Runnable() {
+			public void run() {
+				try {
+					callback.doInIteration(null);
+				}
+				catch (Exception e) {
+					fail(e.getMessage());
+				}
+			}
+		}).start();
+		assertEquals(RepeatStatus.CONTINUABLE, callback.doInIteration(new RepeatContextSupport(null)));
+		latch.countDown();
+	}
+
 }
