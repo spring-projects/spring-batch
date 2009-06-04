@@ -77,7 +77,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		try {
 			logger.debug("Chunk execution starting: worker count="+workerCount.get()+", queue size="+attributeQueue.size());
 			return RepeatStatus.continueIf(doInChunkContext(context, chunkContext).isContinuable()
-					|| (attributeQueue.isEmpty() && workerCount.get()>1));
+					|| !attributeQueue.isEmpty() || workerCount.get()>1);
 		}
 		finally {
 			workerCount.decrementAndGet();
