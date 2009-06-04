@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Test;
@@ -89,14 +90,17 @@ public class StepContextRepeatCallbackTests {
 	@Test
 	public void testUnfinishedWork() throws Exception {
 		StepSynchronizationManager.register(stepExecution);
-		final CountDownLatch latch = new CountDownLatch(1);
+		final CountDownLatch background = new CountDownLatch(1);
+		final CountDownLatch foreground = new CountDownLatch(1);
 		final StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
+			private Log logger = LogFactory.getLog(getClass());
 			@Override
 			public RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception {
+				foreground.countDown();
 				if (context==null) {
-					LogFactory.getLog(getClass()).debug("Waiting for latch");
-					latch.await();
-					LogFactory.getLog(getClass()).debug("Released");
+					logger.debug("Waiting for latch");
+					background.await();
+					logger.debug("Released");
 				}
 				return RepeatStatus.FINISHED;
 			}
@@ -111,8 +115,9 @@ public class StepContextRepeatCallbackTests {
 				}
 			}
 		}).start();
+		foreground.await();
 		assertEquals(RepeatStatus.CONTINUABLE, callback.doInIteration(new RepeatContextSupport(null)));
-		latch.countDown();
+		background.countDown();
 	}
 
 }
