@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.batch.core.ExitStatus;
@@ -88,11 +89,15 @@ public class StepContextRepeatCallbackTests {
 	@Test
 	public void testUnfinishedWork() throws Exception {
 		StepSynchronizationManager.register(stepExecution);
-		final CountDownLatch latch = new CountDownLatch(2);
+		final CountDownLatch latch = new CountDownLatch(1);
 		final StepContextRepeatCallback callback = new StepContextRepeatCallback(stepExecution) {
 			@Override
 			public RepeatStatus doInChunkContext(RepeatContext context, ChunkContext chunkContext) throws Exception {
-				if (context==null) latch.await();
+				if (context==null) {
+					LogFactory.getLog(getClass()).debug("Waiting for latch");
+					latch.await();
+					LogFactory.getLog(getClass()).debug("Released");
+				}
 				return RepeatStatus.FINISHED;
 			}
 		};
