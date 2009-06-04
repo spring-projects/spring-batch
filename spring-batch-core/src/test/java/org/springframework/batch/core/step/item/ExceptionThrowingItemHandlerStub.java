@@ -19,11 +19,16 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * @author Dan Garrette
  * @since 2.0.1
  */
 public abstract class ExceptionThrowingItemHandlerStub<T> {
+	
+	protected Log logger = LogFactory.getLog(getClass());
 
 	private Collection<T> failures = Collections.emptyList();
 
@@ -44,10 +49,10 @@ public abstract class ExceptionThrowingItemHandlerStub<T> {
 	protected void checkFailure(T item) throws Exception {
 		if (isFailure(item)) {
 			if (runtimeException) {
-				throw new SkippableRuntimeException("Intended Failure");
+				throw new SkippableRuntimeException("Intended Failure: "+item);
 			}
 			else {
-				throw new SkippableException("Intended Failure");
+				throw new SkippableException("Intended Failure: "+item);
 			}
 		}
 	}

@@ -277,26 +277,14 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 			RecoveryCallback<Object> recoveryCallback = new RecoveryCallback<Object>() {
 
 				public Object recover(RetryContext context) throws Exception {
-
-					Exception le = (Exception) context.getLastThrowable();
-
-					boolean singleton = outputs.size() == 1 && outputs.getSkips().isEmpty();
-
-					if (singleton) {
-						Chunk<I>.ChunkIterator inputIterator = inputs.iterator();
-						Chunk<O>.ChunkIterator outputIterator = outputs.iterator();
-						checkSkipPolicy(inputIterator, outputIterator, le, contribution);
-						return null;
-					}
-
 					inputs.setBusy(true);
 					scan(contribution, inputs, outputs, chunkMonitor);
 					return null;
-
 				}
 
 			};
 
+			logger.debug("Attempting to write: "+inputs);
 			batchRetryTemplate.execute(retryCallback, recoveryCallback, new DefaultRetryState(inputs,
 					rollbackClassifier));
 
@@ -358,6 +346,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 
 	private void checkSkipPolicy(Chunk<I>.ChunkIterator inputIterator, Chunk<O>.ChunkIterator outputIterator,
 			Exception e, StepContribution contribution) {
+		logger.debug("Checking skip policy after failed write");
 		if (itemWriteSkipPolicy.shouldSkip(e, contribution.getStepSkipCount())) {
 			contribution.incrementWriteSkipCount();
 			inputIterator.remove();
@@ -372,6 +361,7 @@ public class FaultTolerantChunkProcessor<I, O> extends SimpleChunkProcessor<I, O
 	private void scan(final StepContribution contribution, final Chunk<I> inputs, final Chunk<O> outputs,
 			ChunkMonitor chunkMonitor) throws Exception {
 
+		logger.debug("Scanning for failed item on write.");
 		if (outputs.isEmpty()) {
 			inputs.setBusy(false);
 			return;

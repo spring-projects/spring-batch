@@ -110,8 +110,8 @@ public class RepeatTemplate implements RepeatOperations {
 
 	/**
 	 * Setter for policy to decide when the batch is complete. The default is to
-	 * complete normally when the callback returns a {@link RepeatStatus} which is
-	 * not marked as continuable, and abnormally when the callback throws an
+	 * complete normally when the callback returns a {@link RepeatStatus} which
+	 * is not marked as continuable, and abnormally when the callback throws an
 	 * exception (but the decision to re-throw the exception is deferred to the
 	 * {@link ExceptionHandler}).
 	 * 
@@ -222,13 +222,15 @@ public class RepeatTemplate implements RepeatOperations {
 
 							for (int i = listeners.length; i-- > 0;) {
 								RepeatListener interceptor = listeners[i];
-								interceptor.onError(context, unwrappedThrowable);
 								// This is not an error - only log at debug
 								// level.
 								logger.debug("Exception intercepted (" + (i + 1) + " of " + listeners.length + ")",
 										unwrappedThrowable);
+								interceptor.onError(context, unwrappedThrowable);
 							}
 
+							logger.debug("Handling exception: " + throwable.getClass().getName() + ", caused by: "
+									+ unwrappedThrowable.getClass().getName() + ": " + unwrappedThrowable.getMessage());
 							exceptionHandler.handleException(context, unwrappedThrowable);
 
 						}
@@ -261,7 +263,10 @@ public class RepeatTemplate implements RepeatOperations {
 			try {
 
 				if (!throwables.isEmpty()) {
-					rethrow((Throwable) throwables.iterator().next());
+					Throwable throwable = (Throwable) throwables.iterator().next();
+					logger.debug("Handling fatal exception explicitly (rethrowing first of " + throwables.size()
+							+ "): " + throwable.getClass().getName() + ": " + throwable.getMessage());
+					rethrow(throwable);
 				}
 
 			}
@@ -358,8 +363,8 @@ public class RepeatTemplate implements RepeatOperations {
 	 * processes. By default does nothing and returns true.
 	 * 
 	 * @param state the internal state.
-	 * @return true if {@link #canContinue(RepeatStatus)} is true for all results
-	 * retrieved.
+	 * @return true if {@link #canContinue(RepeatStatus)} is true for all
+	 * results retrieved.
 	 */
 	protected boolean waitForResults(RepeatInternalState state) {
 		// no-op by default

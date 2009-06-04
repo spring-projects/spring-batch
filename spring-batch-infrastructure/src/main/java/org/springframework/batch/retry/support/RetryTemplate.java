@@ -195,6 +195,7 @@ public class RetryTemplate implements RetryOperations {
 
 		// Allow the retry policy to initialise itself...
 		RetryContext context = open(retryPolicy, state);
+		logger.debug("RetryContext retrieved: "+context);
 
 		// Make sure the context is available globally for clients who need
 		// it...
@@ -248,6 +249,7 @@ public class RetryTemplate implements RetryOperations {
 						throw ex;
 					}
 
+					logger.debug("Checking for rethrow: count=" + context.getRetryCount());
 					if (shouldRethrow(retryPolicy, context, state)) {
 						logger.debug("Rethrow in retry for policy: count=" + context.getRetryCount());
 						throw e;

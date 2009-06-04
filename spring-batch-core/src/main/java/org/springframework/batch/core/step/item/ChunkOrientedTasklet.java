@@ -73,8 +73,6 @@ public class ChunkOrientedTasklet<I> implements Tasklet {
 		// Allow a message coming back from the processor to say that we
 		// are not done yet
 		if (inputs.isBusy()) {
-			// TODO: update ExecutionContext with an offset if the
-			// ItemReader was stateful
 			return RepeatStatus.CONTINUABLE;
 		}
 

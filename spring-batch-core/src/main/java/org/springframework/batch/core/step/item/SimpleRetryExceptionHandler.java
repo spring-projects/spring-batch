@@ -79,10 +79,11 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 		// Only bother to check the delegate exception handler if we know that
 		// retry is exhausted
 		if (fatalExceptionClassifier.classify(throwable) || context.hasAttribute(EXHAUSTED)) {
+			logger.debug("Handled fatal exception");
 			exceptionHandler.handleException(context, throwable);
 		}
 		else {
-			logger.debug("handled non-fatal exception", throwable);
+			logger.debug("Handled non-fatal exception", throwable);
 		}
 	}
 
@@ -95,6 +96,7 @@ public class SimpleRetryExceptionHandler extends RetryListenerSupport implements
 	 */
 	public <T> void close(RetryContext context, RetryCallback<T> callback, Throwable throwable) {
 		if (!retryPolicy.canRetry(context)) {
+			logger.debug("Marking retry as exhausted: "+context);
 			getRepeatContext().setAttribute(EXHAUSTED, "true");
 		}
 	}

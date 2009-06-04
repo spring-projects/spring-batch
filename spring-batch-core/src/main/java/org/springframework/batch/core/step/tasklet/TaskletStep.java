@@ -306,6 +306,7 @@ public class TaskletStep extends AbstractStep {
 				}
 				catch (FatalException e) {
 					try {
+						logger.debug("Rollback for FatalException: "+e.getClass().getName()+": "+e.getMessage());
 						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {
@@ -317,6 +318,7 @@ public class TaskletStep extends AbstractStep {
 				}
 				catch (Error e) {
 					try {
+						logger.debug("Rollback for Error: "+e.getClass().getName()+": "+e.getMessage());
 						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {
@@ -328,6 +330,7 @@ public class TaskletStep extends AbstractStep {
 				}
 				catch (Exception e) {
 					try {
+						logger.debug("Rollback for Exception: "+e.getClass().getName()+": "+e.getMessage());
 						rollback(stepExecution, transaction);
 					}
 					catch (Exception rollbackException) {

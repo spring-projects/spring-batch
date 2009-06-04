@@ -12,6 +12,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
@@ -21,6 +22,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.transaction.interceptor.RollbackRuleAttribute;
 import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute;
 import org.springframework.transaction.interceptor.TransactionAttribute;
@@ -353,6 +355,24 @@ public class FaultTolerantStepFactoryBeanRollbackTests {
 		// TODO: Fix this with BATCH-1259?
 		assertEquals("[1, 2, 3, 4, 5, 1, 2, 3, 4, 5]", processor.getProcessed()
 				.toString());
+	}
+
+	@Test
+	@Ignore
+	public void testMultithreadedSkipInWriter() throws Exception {
+		writer.setFailures("1", "2", "3", "4", "5");
+		factory.setCommitInterval(3);
+		factory.setSkipLimit(10);
+		factory.setTaskExecutor(new SimpleAsyncTaskExecutor());
+
+		Step step = (Step) factory.getObject();
+
+		step.execute(stepExecution);
+		assertEquals(BatchStatus.COMPLETED, stepExecution.getStatus());
+
+		assertEquals("[]", writer.getCommitted().toString());
+		assertEquals("[]", processor.getCommitted().toString());
+		assertEquals(5, stepExecution.getSkipCount());
 	}
 
 	@Test
