@@ -369,7 +369,7 @@ class StepParserStepFactoryBean<I, O> implements FactoryBean, BeanNameAware {
 	}
 
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	// =========================================================

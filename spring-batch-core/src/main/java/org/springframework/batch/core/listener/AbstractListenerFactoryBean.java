@@ -142,7 +142,7 @@ public abstract class AbstractListenerFactoryBean implements FactoryBean, Initia
 	}
 
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 	public void setDelegate(Object delegate) {

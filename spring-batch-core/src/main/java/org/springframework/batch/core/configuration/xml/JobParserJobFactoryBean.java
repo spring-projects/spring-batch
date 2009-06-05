@@ -107,7 +107,7 @@ class JobParserJobFactoryBean implements FactoryBean {
 	}
 
 	public boolean isSingleton() {
-		return false;
+		return true;
 	}
 
 }
