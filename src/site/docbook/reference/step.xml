@@ -19,12 +19,11 @@
 
   <mediaobject>
     <imageobject role="html">
-      <imagedata align="center" fileref="images/step.png" scale="75" width="" />
+      <imagedata align="center" fileref="images/step.png" scale="50" />
     </imageobject>
 
     <imageobject role="fo">
-      <imagedata align="center" contentwidth="480" fileref="images/step.png"
-                 scale="50" width="75%" />
+      <imagedata align="center" fileref="images/step.png" scale="30" />
     </imageobject>
   </mediaobject>
 
@@ -43,13 +42,12 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/chunk-oriented-processing.png" scale="75"
-                   width="" />
+                   fileref="images/chunk-oriented-processing.png" scale="75" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/chunk-oriented-processing.png" width="75%" />
+                   fileref="images/chunk-oriented-processing.png" scale="75" />
       </imageobject>
     </mediaobject>
 
@@ -477,8 +475,8 @@ itemWriter.write(items);</programlisting>
       records are logged as well, which will be covered later when discussing
       listeners.<programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
-        &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
-            role="bold">skip-limit="10"</emphasis>&gt;
+        &lt;chunk reader="flatFileItemReader" writer="itemWriter" 
+               commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
             <emphasis role="bold">&lt;skippable-exception-classes&gt;
                 org.springframework.batch.item.file.FlatFileParseException
             &lt;/skippable-exception-classes&gt;</emphasis>
@@ -505,8 +503,8 @@ itemWriter.write(items);</programlisting>
       identify which exceptions should cause failure and skip everything
       else:<programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
-        &lt;chunk reader="flatFileItemReader" writer="itemWriter" commit-interval="10" <emphasis
-            role="bold">skip-limit="10"</emphasis>&gt;
+        &lt;chunk reader="flatFileItemReader" writer="itemWriter" 
+               commit-interval="10" <emphasis role="bold">skip-limit="10"</emphasis>&gt;
 <emphasis role="bold">            &lt;skippable-exception-classes&gt;
                 java.lang.Exception
             &lt;/skippable-exception-classes&gt;
@@ -539,8 +537,8 @@ itemWriter.write(items);</programlisting>
 
       <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
-        &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2" <emphasis
-          role="bold">retry-limit="3"</emphasis>&gt;
+        &lt;chunk reader="itemReader" writer="itemWriter" 
+               commit-interval="2" <emphasis role="bold">retry-limit="3"</emphasis>&gt;
             <emphasis role="bold">&lt;retryable-exception-classes&gt;
                 org.springframework.dao.DeadlockLoserDataAccessException
             &lt;/retryable-exception-classes&gt;</emphasis>
@@ -612,7 +610,9 @@ itemWriter.write(items);</programlisting>
       <programlisting>&lt;step id="step1"&gt;
     &lt;tasklet&gt;
         &lt;chunk reader="itemReader" writer="itemWriter" commit-interval="2"/&gt;
-        &lt;transaction-attributes isolation="DEFAULT" propagation="REQUIRED" timeout="30"/&gt;
+        &lt;transaction-attributes isolation="DEFAULT" 
+                                propagation="REQUIRED" 
+                                timeout="30"/&gt;
     &lt;/tasklet&gt;
 &lt;/step&gt;</programlisting>
     </section>
@@ -1115,12 +1115,12 @@ itemWriter.write(items);</programlisting>
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/sequential-flow.png"
-                     scale="80" width="40%" />
+                     scale="80" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center" fileref="images/sequential-flow.png"
-                     width="40%" />
+                     scale="40" />
         </imageobject>
       </mediaobject>
 
@@ -1298,8 +1298,9 @@ itemWriter.write(items);</programlisting>
         <programlisting>public class SkipCheckingListener extends StepExecutionListenerSupport {
 
     public ExitStatus afterStep(StepExecution stepExecution) {
-        if (!stepExecution.getExitStatus().getExitCode().equals(ExitStatus.FAILED.getExitCode())
-            &amp;&amp; stepExecution.getSkipCount() &gt; 0) {
+        String exitCode = stepExecution.getExitStatus().getExitCode();
+        if (!exitCode.equals(ExitStatus.FAILED.getExitCode()) &amp;&amp; 
+              stepExecution.getSkipCount() &gt; 0) {
             return new ExitStatus("COMPLETED WITH SKIPS");
         }
         else {
