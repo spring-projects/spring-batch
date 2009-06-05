@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
-<appendix>
-  <title>List of ItemReaders</title>
+<appendix id="listOfReadersAndWriters">
+  <title>List of ItemReaders and ItemWriters</title>
 
-  <section>
+  <section id="itemReadersAppendix">
     <title>Item Readers</title>
 
     <table>
@@ -124,7 +124,7 @@
     </table>
   </section>
 
-  <section>
+  <section id="itemWritersAppendix">
     <title>Item Writers</title>
 
     <table>
@@ -194,7 +194,7 @@
           <row>
             <entry align="left">JdbcBatchItemWriter</entry>
 
-            <entry align="left">Uses batching freatures from a
+            <entry align="left">Uses batching features from a
             <classname>PreparedStatement</classname>, if available, and can
             take rudimentary steps to locate a failure during a
             <methodname>flush</methodname>.</entry>

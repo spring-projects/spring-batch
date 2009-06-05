@@ -24,7 +24,7 @@
   <classname>ItemWriter</classname> can implement a listener interface as
   well, if appropriate.</para>
 
-  <section>
+  <section id="loggingItemProcessingAndFailures">
     <title>Logging Item Processing and Failures</title>
 
     <para>A common use case is the need for special handling of errors in a
@@ -53,13 +53,12 @@
     <para>Having implemented this listener it must be registered with the
     step:</para>
 
-    <programlisting>&lt;bean id="simpleStep"
-        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
+    <programlisting>&lt;step id="simpleStep"&gt;
     ...
-    &lt;property name="listeners"&gt;
-        &lt;bean class="org.example...ItemFailureLoggerListener"/&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+    &lt;listeners&gt;
+        &lt;listener class="org.example...ItemFailureLoggerListener"/&gt;
+    &lt;/listeners&gt;
+&lt;/step&gt;</programlisting>
 
     <para>Remember that if your listener does anything in an
     <code>onError()</code> method, it will be inside a transaction that is
@@ -70,7 +69,7 @@
     REQUIRES_NEW.</para>
   </section>
 
-  <section>
+  <section id="stoppingAJobManuallyForBusinessReasons">
     <title>Stopping a Job Manually for Business Reasons</title>
 
     <para>Spring Batch provides a <methodname>stop</methodname>() method
@@ -87,11 +86,9 @@
     <programlisting>public class PoisonPillItemWriter implements ItemWriter&lt;T&gt; {
     
     public void write(T item) throws Exception {
-
         if (isPoisonPill(item)) {
-            throw new PoisonPillException("Posion pill detected: "+item);
+            throw new PoisonPillException("Posion pill detected: " + item);
        }
-
     }
 
 }</programlisting>
@@ -106,15 +103,11 @@
     public void setDelegate(ItemReader&lt;T&gt; delegate) { ... }
     
     public T read() throws Exception {
-
         T item = delegate.read();
-
         if (isEndItem(item)) {
             return null; // end the step here
         }
-
         return item;
-
     }
 
 }</programlisting>
@@ -126,13 +119,14 @@
     injected into the <classname>Step</classname> through the
     <classname>SimpleStepFactoryBean</classname>:</para>
 
-    <programlisting>&lt;bean id="simpleStep"
-        class="org.springframework.batch.core.step.item.SimpleStepFactoryBean" &gt;
-    ...
-    &lt;property name="chunkCompletionPolicy"&gt;
-        &lt;bean class="org.example...SpecialCompletionPolicy"/&gt;
-    &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+    <programlisting>&lt;step id="simpleStep"&gt;
+    &lt;tasklet&gt;
+        &lt;chunk reader="reader" writer="writer" commit-interval="10" 
+               <emphasis role="bold">chunk-completion-policy="completionPolicy"</emphasis>/&gt;
+    &lt;/tasklet&gt;
+&lt;/step&gt;
+
+&lt;bean id="completionPolicy" class="org.example...SpecialCompletionPolicy"/&gt;</programlisting>
 
     <para>An alternative is to set a flag in the
     <classname>StepExecution</classname>, which is checked by the
@@ -166,7 +160,7 @@
     an abnormal ending to a job.</para>
   </section>
 
-  <section>
+  <section id="addingAFooterRecord">
     <title>Adding a Footer Record</title>
 
     <para>Often when writing to flat files, a "footer" record must be appended
@@ -177,25 +171,23 @@
     <classname>FlatFileHeaderCallback</classname>) are optional properties of
     the <classname>FlatFileItemWriter</classname>:</para>
 
-    <programlisting>  &lt;bean id="itemWriter" 
-        class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
+    <programlisting>&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
     &lt;property name="resource" ref="outputResource" /&gt;
     &lt;property name="lineAggregator" ref="lineAggregator"/&gt;
     <emphasis role="bold">&lt;property name="headerCallback" ref="headerCallback" /&gt;</emphasis>
     <emphasis role="bold">&lt;property name="footerCallback" ref="footerCallback" /&gt;</emphasis>
-  &lt;/bean&gt;
-</programlisting>
+&lt;/bean&gt;</programlisting>
 
     <para>The footer callback interface is very simple. It has just one method
     that is called when the footer must be written:</para>
 
-    <programlisting>  public interface FlatFileFooterCallback {
+    <programlisting>public interface FlatFileFooterCallback {
 
-      void writeFooter(Writer writer) throws IOException;
+    void writeFooter(Writer writer) throws IOException;
 
-  }</programlisting>
+}</programlisting>
 
-    <section>
+    <section id="writingASummaryFooter">
       <title>Writing a Summary Footer</title>
 
       <para>A very common requirement involving footer records is to aggregate
@@ -208,10 +200,11 @@
       Trades is placed in a footer, then the following ItemWriter
       implementation can be used:</para>
 
-      <programlisting>  public class TradeItemWriter implements ItemWriter&lt;Trade&gt;, 
-        FlatFileFooterCallback {
+      <programlisting>public class TradeItemWriter implements ItemWriter&lt;Trade&gt;, 
+                                        FlatFileFooterCallback {
 
     private ItemWriter&lt;Trade&gt; delegate;
+
     private double totalAmount = 0.0;
 
     public void write(List&lt;? extends Trade&gt; items) {
@@ -226,7 +219,7 @@
     }
 
     public void setDelegate(ItemWriter delegate) {...}
-  }</programlisting>
+}</programlisting>
 
       <para>This <classname>TradeItemWriter</classname> stores a
       <code>totalAmount</code> value that is increased with the
@@ -238,17 +231,15 @@
       the <classname>FlatFileItemWriter</classname> as the
       <code>footerCallback</code>:</para>
 
-      <programlisting>  &lt;bean id="tradeItemWriter" class="..TradeItemWriter"&gt;
-      &lt;property name="delegate" ref="flatFileItemWriter" /&gt;
-  &lt;/bean&gt;
+      <programlisting>&lt;bean id="tradeItemWriter" class="..TradeItemWriter"&gt;
+    &lt;property name="delegate" ref="flatFileItemWriter" /&gt;
+&lt;/bean&gt;
 
-  &lt;bean id="flatFileItemWriter" 
-        class="org.springframework.batch.item.file.FlatFileItemWriter"&gt;
-    &lt;property name="resource" ref="outputResource" /&gt;
-    &lt;property name="lineAggregator" ref="lineAggregator"/&gt;
-    <emphasis role="bold">&lt;property name="footerCallback" ref="tradeItemWriter" /&gt;</emphasis>
-  &lt;/bean&gt;
-</programlisting>
+&lt;bean id="flatFileItemWriter" class="org.spr...FlatFileItemWriter"&gt;
+  &lt;property name="resource" ref="outputResource" /&gt;
+  &lt;property name="lineAggregator" ref="lineAggregator"/&gt;
+  <emphasis role="bold">&lt;property name="footerCallback" ref="tradeItemWriter" /&gt;</emphasis>
+&lt;/bean&gt;</programlisting>
 
       <para>The way that the <classname>TradeItemWriter</classname> has been
       so far will only function correctly if the <classname>Step</classname>
@@ -290,7 +281,7 @@
     </section>
   </section>
 
-  <section>
+  <section id="drivingQueryBasedItemReaders">
     <title>Driving Query Based ItemReaders</title>
 
     <para>In the chapter on readers and writers, database input using paging
@@ -347,10 +338,10 @@
     spanning multiple lines with multiple formats. The following excerpt from
     a file illustrates this:</para>
 
-    <programlisting>  HEA;0013100345;2007-02-15
-  NCU;Smith;Peter;;T;20014539;F
-  BAD;;Oak Street 31/A;;Small Town;00235;IL;US
-  FOT;2;2;267.34</programlisting>
+    <programlisting>HEA;0013100345;2007-02-15
+NCU;Smith;Peter;;T;20014539;F
+BAD;;Oak Street 31/A;;Small Town;00235;IL;US
+FOT;2;2;267.34</programlisting>
 
     <para>Everything between the line starting with 'HEA' and the line
     starting with 'FOT' is considered one record. There are a few
@@ -376,22 +367,21 @@
     <classname>ItemReader</classname> should be implemented as a wrapper for
     the <classname>FlatFileItemReader</classname>.</para>
 
-    <programlisting>  &lt;bean id="itemReader" 
-        class="org.springframework.batch.sample.iosample.internal.MultiLineTradeItemReader"&gt;
+    <programlisting>&lt;bean id="itemReader" class="org.spr...MultiLineTradeItemReader"&gt;
     &lt;property name="delegate"&gt;
-      &lt;bean class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
-        &lt;property name="resource" value="data/iosample/input/multiLine.txt" /&gt;
-        &lt;property name="lineMapper"&gt;
-          &lt;bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper"&gt;
-            &lt;property name="lineTokenizer" ref="orderFileTokenizer"/&gt;
-            &lt;property name="fieldSetMapper"&gt;
-              &lt;bean class="org.springframework.batch.item.file.mapping.PassThroughFieldSetMapper" /&gt;
+        &lt;bean class="org.springframework.batch.item.file.FlatFileItemReader"&gt;
+            &lt;property name="resource" value="data/iosample/input/multiLine.txt" /&gt;
+            &lt;property name="lineMapper"&gt;
+                &lt;bean class="org.spr...DefaultLineMapper"&gt;
+                    &lt;property name="lineTokenizer" ref="orderFileTokenizer"/&gt;
+                    &lt;property name="fieldSetMapper"&gt;
+                        &lt;bean class="org.spr...PassThroughFieldSetMapper" /&gt;
+                    &lt;/property&gt;
+                &lt;/bean&gt;
             &lt;/property&gt;
-          &lt;/bean&gt;
-        &lt;/property&gt;
-      &lt;/bean&gt;
+        &lt;/bean&gt;
     &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+&lt;/bean&gt;</programlisting>
 
     <para>To ensure that each line is tokenized properly, which is especially
     important for fixed length input, the
@@ -402,17 +392,16 @@
     deliver a <classname>FieldSet</classname> for each line back to the
     wrapping <classname>ItemReader</classname>.</para>
 
-    <programlisting>  &lt;bean id="orderFileTokenizer"
-        class="org.springframework.batch.io.file.transform.PatternMatchingCompositeLineTokenizer"&gt;
+    <programlisting>&lt;bean id="orderFileTokenizer" class="org.spr...PatternMatchingCompositeLineTokenizer"&gt;
     &lt;property name="tokenizers"&gt;
-      &lt;map&gt;
-        &lt;entry key="HEA*" value-ref="headerRecordTokenizer" /&gt;
-        &lt;entry key="FOT*" value-ref="footerRecordTokenizer" /&gt;
-        &lt;entry key="NCU*" value-ref="customerLineTokenizer" /&gt;
-        &lt;entry key="BAD*" value-ref="billingAddressLineTokenizer" /&gt;
-      &lt;/map&gt;
+        &lt;map&gt;
+            &lt;entry key="HEA*" value-ref="headerRecordTokenizer" /&gt;
+            &lt;entry key="FOT*" value-ref="footerRecordTokenizer" /&gt;
+            &lt;entry key="NCU*" value-ref="customerLineTokenizer" /&gt;
+            &lt;entry key="BAD*" value-ref="billingAddressLineTokenizer" /&gt;
+        &lt;/map&gt;
     &lt;/property&gt;
-  &lt;/bean&gt;</programlisting>
+&lt;/bean&gt;</programlisting>
 
     <para>This wrapper will have to be able recognize the end of a record so
     that it can continually call <methodname>read()</methodname> on its
@@ -422,38 +411,38 @@
     <classname>ItemProcessor</classname> and
     <classname>ItemWriter</classname>.</para>
 
-    <programlisting>  private FlatFileItemReader&lt;FieldSet&gt; delegate;
+    <programlisting>private FlatFileItemReader&lt;FieldSet&gt; delegate;
 
-  public Trade read() throws Exception {
+public Trade read() throws Exception {
     Trade t = null;
 
     for (FieldSet line = null; (line = this.delegate.read()) != null;) {
-      String prefix = line.readString(0);
-      if (prefix.equals("HEA")) {
-        t = new Trade(); // Record must start with header
-      }
-      else if (prefix.equals("NCU")) {
-        Assert.notNull(t, "No header was found.");
-        t.setLast(line.readString(1));
-        t.setFirst(line.readString(2));
-        ...
-      }
-      else if (prefix.equals("BAD")) {
-        Assert.notNull(t, "No header was found.");
-        t.setCity(line.readString(4));
-        t.setState(line.readString(6));
-        ...
-      }
-      else if (prefix.equals("FOT")) {
-        return t; // Record must end with footer
-      }
+        String prefix = line.readString(0);
+        if (prefix.equals("HEA")) {
+            t = new Trade(); // Record must start with header
+        }
+        else if (prefix.equals("NCU")) {
+            Assert.notNull(t, "No header was found.");
+            t.setLast(line.readString(1));
+            t.setFirst(line.readString(2));
+            ...
+        }
+        else if (prefix.equals("BAD")) {
+            Assert.notNull(t, "No header was found.");
+            t.setCity(line.readString(4));
+            t.setState(line.readString(6));
+          ...
+        }
+        else if (prefix.equals("FOT")) {
+            return t; // Record must end with footer
+        }
     }
     Assert.isNull(t, "No 'END' was found.");
     return null;
-  }</programlisting>
+}</programlisting>
   </section>
 
-  <section>
+  <section id="executingSystemCommands">
     <title>Executing System Commands</title>
 
     <para>Many batch jobs may require that an external command be called from
@@ -466,15 +455,15 @@
     <classname>Tasklet</classname> implementation for calling system
     commands:</para>
 
-    <programlisting>  &lt;bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet"&gt;
+    <programlisting>&lt;bean class="org.springframework.batch.core.step.tasklet.SystemCommandTasklet"&gt;
     &lt;property name="command" value="echo hello" /&gt;
     &lt;!-- 5 second timeout for the command to complete --&gt;
     &lt;property name="timeout" value="5000" /&gt;
-  &lt;/bean&gt;</programlisting>
+&lt;/bean&gt;</programlisting>
   </section>
 
-  <section>
-    <title>Handling Step completion when no input is found</title>
+  <section id="handlingStepCompletionWhenNoInputIsFound">
+    <title>Handling Step Completion When No Input is Found</title>
 
     <para>In many batch scenarios, finding no rows in a database or file to
     process is not exceptional. The <classname>Step</classname> is simply
@@ -490,17 +479,16 @@
     a common use case, a listener is provided with just this
     functionality:</para>
 
-    <programlisting>
-  public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+    <programlisting>public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
-  public ExitStatus afterStep(StepExecution stepExecution) {
-    if (stepExecution.getReadCount() == 0) {
-      return ExitStatus.FAILED;
+    public ExitStatus afterStep(StepExecution stepExecution) {
+        if (stepExecution.getReadCount() == 0) {
+            return ExitStatus.FAILED;
+        }
+        return null;
     }
-    return null;
-  }
 
-</programlisting>
+}</programlisting>
 
     <para>The above <classname>StepExecutionListener</classname> inspects the
     readCount property of the <classname>StepExecution</classname> during the
@@ -511,8 +499,8 @@
     <classname>Step</classname>.</para>
   </section>
 
-  <section>
-    <title>Passing data to future steps</title>
+  <section id="passingDataToFutureSteps">
+    <title>Passing Data to Future Steps</title>
 
     <para>It is often useful to pass information from one step to another.
     This can be done using the <classname>ExecutionContext</classname>. The
@@ -580,8 +568,7 @@
     &lt;/step&gt;
 &lt;/job&gt;
 
-<emphasis role="bold">&lt;beans:bean id="promotionListener" 
-            class="org.spr....ExecutionContextPromotionListener"&gt;
+<emphasis role="bold">&lt;beans:bean id="promotionListener" class="org.spr....ExecutionContextPromotionListener"&gt;
     &lt;beans:property name="keys" value="someKey"/&gt;
 &lt;/beans:bean&gt;</emphasis></programlisting>
 
@@ -597,7 +584,8 @@
 
     @BeforeStep
     public void saveStepExecution(StepExecution stepExecution) {
-        ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
+        JobExecution jobExecution = stepExecution.getJobExecution();
+        ExecutionContext jobContext = jobExecution.getExecutionContext();
         this.someObject = jobContext.get("someKey");
     }
 }</programlisting>

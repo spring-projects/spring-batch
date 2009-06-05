@@ -11,7 +11,7 @@
   <classname>ItemReader</classname>, <classname>ItemProcessor</classname> and
   <classname>ItemWriter</classname>.</para>
 
-  <section>
+  <section id="itemReader">
     <title id="infrastructure.1">ItemReader</title>
 
     <para>Although a simple concept, an <classname>ItemReader</classname> is
@@ -70,7 +70,7 @@
     the first invocation of <methodname>read</methodname>.</para>
   </section>
 
-  <section>
+  <section id="itemWriter">
     <title id="infrastructure.1.4">ItemWriter</title>
 
     <para><classname>ItemWriter</classname> is similar in functionality to an
@@ -103,7 +103,7 @@
     Session before returning.</para>
   </section>
 
-  <section>
+  <section id="itemProcessor">
     <title>ItemProcessor</title>
 
     <para>The <classname>ItemReader</classname> and
@@ -200,7 +200,7 @@ public class BarWriter implements ItemWriter&lt;Bar&gt;{
     &lt;/step&gt;
 &lt;/job&gt;</programlisting>
 
-    <section>
+    <section id="chainingItemProcessors">
       <title>Chaining ItemProcessors</title>
 
       <para>Performing a single transformation is useful in many scenarios,
@@ -274,7 +274,7 @@ compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
 &lt;/bean&gt;</programlisting>
     </section>
 
-    <section>
+    <section id="filiteringRecords">
       <title>Filtering Records</title>
 
       <para>One typical use for an item processor is to filter out records
@@ -350,7 +350,7 @@ compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
     Quartz <classname>JobDataMap</classname>.</para>
   </section>
 
-  <section>
+  <section id="delegatePatternAndRegistering">
     <title>The Delegate Pattern and Registering with the Step</title>
 
     <para>Note that the <classname>CompositeItemWriter</classname> is an
@@ -387,7 +387,7 @@ compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
 &lt;bean id="barWriter" class="...BarWriter" /&gt;</programlisting>
   </section>
 
-  <section>
+  <section id="flatFiles">
     <title id="infrastructure.1.2">Flat Files</title>
 
     <para>One of the most common mechanisms for interchanging bulk data has
@@ -398,7 +398,7 @@ compositeProcessor.setItemProcessors(itemProcessors);</programlisting>
     files are those in which fields are separated by a delimiter, such as a
     comma. Fixed Length files have fields that are a set length.</para>
 
-    <section>
+    <section id="fieldSet">
       <title>The FieldSet</title>
 
       <para>When working with flat files in Spring Batch, regardless of
@@ -562,7 +562,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
           </tgroup>
         </table></para>
 
-      <section>
+      <section id="lineMapper">
         <title>LineMapper</title>
 
         <para>As with <classname>RowMapper</classname>, which takes a low
@@ -590,7 +590,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         mapped to an object, as described below.</para>
       </section>
 
-      <section>
+      <section id="lineTokenizer">
         <title>LineTokenizer</title>
 
         <para>An abstraction for turning a line of input into a line into a
@@ -636,7 +636,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         </itemizedlist>
       </section>
 
-      <section>
+      <section id="fieldSetMapper">
         <title>FieldSetMapper</title>
 
         <para>The <classname>FieldSetMapper</classname> interface defines a
@@ -659,7 +659,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         <classname>JdbcTemplate</classname>.</para>
       </section>
 
-      <section>
+      <section id="defaultLineMapper">
         <title>DefaultLineMapper</title>
 
         <para>Now that the basic interfaces for reading in flat files have
@@ -721,7 +721,7 @@ boolean booleanValue = fs.readBoolean(2);</programlisting>
         to the raw line is needed.</para>
       </section>
 
-      <section>
+      <section id="simpleDelimitedFileReadingExample">
         <title>Simple Delimited File Reading Example</title>
 
         <para>The following example will be used to illustrate this using an
@@ -794,8 +794,8 @@ Player player = itemReader.read();</programlisting>
         reached, null will be returned.</para>
       </section>
 
-      <section>
-        <title>Mapping fields by name</title>
+      <section id="mappingFieldsByName">
+        <title>Mapping Fields by Name</title>
 
         <para>There is one additional piece of functionality that is allowed
         by both <classname>DelimitedLineTokenizer</classname> and
@@ -808,8 +808,8 @@ Player player = itemReader.read();</programlisting>
 
         <para><programlisting>tokenizer.setNames(new String[] {"ID", "lastName","firstName","position","birthYear","debutYear"});          </programlisting></para>
 
-        <para>a <classname>FieldSetMapper</classname> can this use this
-        information as follows:</para>
+        <para>A <classname>FieldSetMapper</classname> can use this information
+        as follows:</para>
 
         <para><programlisting>public class PlayerMapper implements FieldSetMapper&lt;Player&gt; {
     public Player mapFieldSet(FieldSet fs) {
@@ -831,7 +831,7 @@ Player player = itemReader.read();</programlisting>
 }</programlisting></para>
       </section>
 
-      <section>
+      <section id="beanWrapperFieldSetMapper">
         <title>Automapping FieldSets to Domain Objects</title>
 
         <para>For many, having to write a specific
@@ -863,8 +863,8 @@ Player player = itemReader.read();</programlisting>
         required.</para>
       </section>
 
-      <section>
-        <title>Fixed Length file formats</title>
+      <section id="fixedLengthFileFormats">
+        <title>Fixed Length File Formats</title>
 
         <para>So far only delimited files have been discussed in much detail,
         however, they represent only half of the file reading picture. Many
@@ -930,7 +930,7 @@ UK21341EAH4521535.11customer5</programlisting>
       </section>
 
       <section id="prefixMatchingLineMapper">
-        <title>Multiple record types within a single file</title>
+        <title>Multiple Record Types within a Single File</title>
 
         <para>All of the file reading examples up to this point have all made
         a key assumption for simplicity's sake: all of the records in a file
@@ -1003,12 +1003,12 @@ LINEB;2134776319DEF422.99M005LI</programlisting>
 
         <para>It is also common for a flat file to contain records that each
         span multiple lines. To handle this situation, a more complex strategy
-        is required. A demonstration of this common patter can be found in
+        is required. A demonstration of this common pattern can be found in
         <xref linkend="multiLineRecords" />.</para>
       </section>
 
-      <section>
-        <title>Exception Handling in flat files</title>
+      <section id="exceptionHandlingInFlatFiles">
+        <title>Exception Handling in Flat Files</title>
 
         <para>There are many scenarios when tokenizing a line may cause
         exceptions to be thrown. Many flat files are imperfect and contain
@@ -1027,7 +1027,7 @@ LINEB;2134776319DEF422.99M005LI</programlisting>
         and indicates a more specific error encountered while
         tokenizing.</para>
 
-        <section>
+        <section id="incorrectTokenCountException">
           <title>IncorrectTokenCountException</title>
 
           <para>Both <classname>DelimitedLineTokenizer</classname> and
@@ -1056,7 +1056,7 @@ catch(IncorrectTokenCountException e){
           thrown.</para>
         </section>
 
-        <section>
+        <section id="incorrectLineLengthException">
           <title>IncorrectLineLengthException</title>
 
           <para>Files formatted in a fixed length format have additional
@@ -1105,7 +1105,7 @@ assertEquals("", tokens.readString(1));</programlisting>
       </section>
     </section>
 
-    <section>
+    <section id="flatFileItemWriter">
       <title>FlatFileItemWriter</title>
 
       <para>Writing out to flat files has the same problems and issues that
@@ -1113,7 +1113,7 @@ assertEquals("", tokens.readString(1));</programlisting>
       in either delimited or fixed length formats in a transactional
       manner.</para>
 
-      <section>
+      <section id="lineAggregator">
         <title>LineAggregator</title>
 
         <para>Just as the <classname>LineTokenizer</classname> interface is
@@ -1138,7 +1138,7 @@ assertEquals("", tokens.readString(1));</programlisting>
         <classname>item</classname> and returns a
         <classname>String</classname>.</para>
 
-        <section>
+        <section id="PassThroughLineAggregator">
           <title>PassThroughLineAggregator</title>
 
           <para>The most basic implementation of the LineAggregator interface
@@ -1160,7 +1160,7 @@ assertEquals("", tokens.readString(1));</programlisting>
         </section>
       </section>
 
-      <section>
+      <section id="SimplifiedFileWritingExample">
         <title>Simplified File Writing Example</title>
 
         <para>Now that the <classname>LineAggregator</classname> interface and
@@ -1191,17 +1191,15 @@ assertEquals("", tokens.readString(1));</programlisting>
 
         <para>A simple configuration would look like the following:</para>
 
-        <programlisting>&lt;bean id="itemWriter"
-      class="org.springframework.batch.io.file.FlatFileItemWriter"&gt;
-    &lt;property name="resource"
-              value="file:target/test-outputs/20070122.testStream.multilineStep.txt" /&gt;
+        <programlisting>&lt;bean id="itemWriter" class="org.spr...FlatFileItemWriter"&gt;
+    &lt;property name="resource" value="file:target/test-outputs/output.txt" /&gt;
     &lt;property name="lineAggregator"&gt;
         &lt;bean class="org.spr...PassThroughLineAggregator"/&gt;
     &lt;/property&gt;
 &lt;/bean&gt;</programlisting>
       </section>
 
-      <section>
+      <section id="FieldExtractor">
         <title>FieldExtractor</title>
 
         <para>The above example may be useful for the most basic uses of a
@@ -1259,23 +1257,22 @@ assertEquals("", tokens.readString(1));</programlisting>
         object, which can then be written out with a delimiter between the
         elements, or as part of a field-width line.</para>
 
-        <section>
+        <section id="PassThroughFieldExtractor">
           <title>PassThroughFieldExtractor</title>
 
-          <para>There are many cases where an array or something that can be
-          converted to an array, such as a <classname>Collection</classname>,
-          needs to be written out. For example, a <classname>List</classname>
-          could be passed through, in which case it only needs to be converted
-          to an <classname>Object</classname> array to be written out. For
-          this type of scenario the
-          <classname>PassThroughFieldExtractor</classname> can be used. It
-          should be noted, that if the object passed in is not an array, and
-          not a <classname>Collection</classname>, then an
-          <classname>Object</classname> array containing solely the item will
-          be returned.</para>
+          <para>There are many cases where a collection, such as an array,
+          <classname>Collection</classname>, or
+          <classname>FieldSet</classname>, needs to be written out.
+          "Extracting" an array from a one of these collection types is very
+          straightforward: simply convert the collection to an array.
+          Therefore, the <classname>PassThroughFieldExtractor</classname>
+          should be used in this scenario. It should be noted, that if the
+          object passed in is not a type of collection, then the
+          <classname>PassThroughFieldExtractor</classname> will return an
+          array containing solely the item to be extracted.</para>
         </section>
 
-        <section>
+        <section id="BeanWrapperFieldExtractor">
           <title>BeanWrapperFieldExtractor</title>
 
           <para>As with the <classname>BeanWrapperFieldSetMapper</classname>
@@ -1311,7 +1308,7 @@ assertEquals(born, values[2]);</programlisting>
         </section>
       </section>
 
-      <section>
+      <section id="delimitedFileWritingExample">
         <title>Delimited File Writing Example</title>
 
         <para>The most basic flat file format is one in which all fields are
@@ -1354,7 +1351,7 @@ assertEquals(born, values[2]);</programlisting>
         then written out with commas between each field.</para>
       </section>
 
-      <section>
+      <section id="fixedWidthFileWritingExample">
         <title>Fixed Width File Writing Example</title>
 
         <para>Delimited is not the only type of flat file format. Many prefer
@@ -1392,8 +1389,8 @@ assertEquals(born, values[2]);</programlisting>
         url="http://java.sun.com/j2se/1.5.0/docs/api/java/util/Formatter.html"><citetitle>Formatter</citetitle></ulink>.</para>
       </section>
 
-      <section>
-        <title>Handling file creation</title>
+      <section id="handlingFileCreation">
+        <title>Handling File Creation</title>
 
         <para><classname>FlatFileItemReader</classname> has a very simple
         relationship with file resources. When the reader is initialized, it
@@ -1416,7 +1413,7 @@ assertEquals(born, values[2]);</programlisting>
     </section>
   </section>
 
-  <section>
+  <section id="xmlReadingWriting">
     <title id="infrastructure.2.3">XML Item Readers and Writers</title>
 
     <para>Spring Batch provides transactional infrastructure for both reading
@@ -1482,7 +1479,7 @@ assertEquals(born, values[2]);</programlisting>
     <para>Now with an introduction to OXM and how one can use XML fragments to
     represent records, let's take a closer look at readers and writers.</para>
 
-    <section>
+    <section id="StaxEventItemReader">
       <title>StaxEventItemReader</title>
 
       <para>The <classname>StaxEventItemReader</classname> configuration
@@ -1618,7 +1615,7 @@ while (hasNext) {
 }</programlisting></para>
     </section>
 
-    <section>
+    <section id="StaxEventItemWriter">
       <title>StaxEventItemWriter</title>
 
       <para>Output works symmetrically to input. The
@@ -1686,7 +1683,7 @@ staxItemWriter.write(trade);</programlisting>
     </section>
   </section>
 
-  <section>
+  <section id="multiFileInput">
     <title>Multi-File Input</title>
 
     <para>It is a common requirement to process multiple files within a single
@@ -1716,7 +1713,7 @@ staxItemWriter.write(trade);</programlisting>
     individual directories until completed successfully.</para>
   </section>
 
-  <section>
+  <section id="database">
     <title id="infrastructure.2.2">Database</title>
 
     <para>Like most enterprise application styles, a database is the central
@@ -1734,7 +1731,7 @@ staxItemWriter.write(trade);</programlisting>
     provides two types of solutions for this problem: Cursor and Paging
     database ItemReaders.</para>
 
-    <section>
+    <section id="cursorBasedItemReaders">
       <title>Cursor Based ItemReaders</title>
 
       <para>Using a database cursor is generally the default approach of most
@@ -1782,7 +1779,7 @@ staxItemWriter.write(trade);</programlisting>
       collected (assuming no instance variables are maintaining references to
       them).</para>
 
-      <section>
+      <section id="JdbcCursorItemReader">
         <title>JdbcCursorItemReader</title>
 
         <para><classname>JdbcCursorItemReader</classname> is the Jdbc
@@ -1879,7 +1876,7 @@ itemReader.close(executionContext);</programlisting>
     &lt;/property&gt;
 &lt;/bean&gt;</programlisting>
 
-        <section>
+        <section id="JdbcCursorItemReaderProperties">
           <title>Additional Properties</title>
 
           <para>Because there are so many varying options for opening a cursor
@@ -1990,7 +1987,7 @@ itemReader.close(executionContext);</programlisting>
         </section>
       </section>
 
-      <section>
+      <section id="HibernateCursorItemReader">
         <title>HibernateCursorItemReader</title>
 
         <para>Just as normal Spring users make important decisions about
@@ -2050,7 +2047,7 @@ itemReader.close(executionContext);</programlisting>
       </section>
     </section>
 
-    <section>
+    <section id="pagingItemReaders">
       <title>Paging ItemReaders</title>
 
       <para>An alternative to using a database cursor is executing multiple
@@ -2059,7 +2056,7 @@ itemReader.close(executionContext);</programlisting>
       specify the starting row number and the number of rows that we want
       returned for the page.</para>
 
-      <section>
+      <section id="JdbcPagingItemReader">
         <title>JdbcPagingItemReader</title>
 
         <para>One implementation of a paging <classname>ItemReader</classname>
@@ -2122,7 +2119,7 @@ itemReader.close(executionContext);</programlisting>
         1.</para>
       </section>
 
-      <section>
+      <section id="JpaPagingItemReader">
         <title>JpaPagingItemReader</title>
 
         <para>Another implementation of a paging
@@ -2159,7 +2156,7 @@ itemReader.close(executionContext);</programlisting>
         entities read from the database for each query execution.</para>
       </section>
 
-      <section>
+      <section id="IbatisPagingItemReader">
         <title>IbatisPagingItemReader</title>
 
         <para>If you use IBATIS for your data access then you can use the
@@ -2207,7 +2204,7 @@ itemReader.close(executionContext);</programlisting>
       </section>
     </section>
 
-    <section>
+    <section id="databaseItemWriters">
       <title>Database ItemWriters</title>
 
       <para>While both Flat Files and XML have specific ItemWriters, there is
@@ -2279,7 +2276,7 @@ itemReader.close(executionContext);</programlisting>
     </section>
   </section>
 
-  <section>
+  <section id="reusingExistingServices">
     <title>Reusing Existing Services</title>
 
     <para>Batch systems are often used in conjunction with other application
@@ -2325,7 +2322,7 @@ itemReader.close(executionContext);</programlisting>
 </programlisting>
   </section>
 
-  <section>
+  <section id="validatingInput">
     <title id="infrastructure.5">Validating Input</title>
 
     <para>During the course of this chapter, multiple approaches to parsing
@@ -2391,7 +2388,7 @@ itemReader.close(executionContext);</programlisting>
   </section>
 
   <section id="process-indicator">
-    <title>Preventing state persistence</title>
+    <title>Preventing State Persistence</title>
 
     <para>By default, all of the <classname>ItemReader</classname> and
     <classname>ItemWriter</classname> implementations store their current
@@ -2432,7 +2429,7 @@ itemReader.close(executionContext);</programlisting>
     executions in which it participates.</para>
   </section>
 
-  <section>
+  <section id="customReadersWriters">
     <title id="infrastructure.1.1">Creating Custom ItemReaders and
     ItemWriters</title>
 
@@ -2447,7 +2444,7 @@ itemReader.close(executionContext);</programlisting>
     implement <classname>ItemStream</classname>, in order to illustrate how to
     make a reader or writer restartable.</para>
 
-    <section>
+    <section id="customReader">
       <title>Custom ItemReader Example</title>
 
       <para>For the purpose of this example, a simple
@@ -2490,9 +2487,9 @@ assertEquals("2", itemReader.read());
 assertEquals("3", itemReader.read());
 assertNull(itemReader.read());</programlisting>
 
-      <section>
+      <section id="restartableReader">
         <title>Making the <classname>ItemReader</classname>
-        restartable</title>
+        Restartable</title>
 
         <para>The final challenge now is to make the
         <classname>ItemReader</classname> restartable. Currently, if the power
@@ -2591,7 +2588,7 @@ assertEquals("2", itemReader.read());</programlisting>
       </section>
     </section>
 
-    <section>
+    <section id="customWriter">
       <title>Custom ItemWriter Example</title>
 
       <para>Implementing a Custom <classname>ItemWriter</classname> is similar
@@ -2615,9 +2612,9 @@ assertEquals("2", itemReader.read());</programlisting>
     }
 }</programlisting>
 
-      <section>
+      <section id="restartableWriter">
         <title>Making the <classname>ItemWriter</classname>
-        restartable</title>
+        Restartable</title>
 
         <para>To make the ItemWriter restartable we would follow the same
         process as for the <classname>ItemReader</classname>, adding and

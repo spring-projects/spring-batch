@@ -339,7 +339,7 @@ itemWriter.write(items);</programlisting>
       </section>
 
       <section id="stepRestartExample">
-        <title>Step restart configuration example</title>
+        <title>Step Restart Configuration Example</title>
 
         <programlisting>&lt;job id="footballJob" restartable="true"&gt;
     &lt;step id="playerload" next="gameLoad"&gt;

@@ -2,7 +2,7 @@
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
 <chapter id="configureJob">
-  <title>Configuring and Running A Job</title>
+  <title>Configuring and Running a Job</title>
 
   <para>In <xref linkend="domain" />, the overall architecture design was
   discussed, using the following diagram as a guide:</para>
@@ -27,7 +27,7 @@
   stored during that run. This chapter will explain the various configuration
   options and runtime concerns of a <classname>Job</classname>.</para>
 
-  <section>
+  <section id="configuringAJob">
     <title>Configuring a Job</title>
 
     <para>There are multiple implementations of the <link
@@ -52,10 +52,10 @@
     &lt;step id="playerSummarization" parent="s3"/&gt;
 &lt;/job&gt;</programlisting>
 
-    <section>
+    <section id="restartability">
       <title>Restartability</title>
 
-      <para>One key issue when execution a batch job concerns the behavior of
+      <para>One key issue when executing a batch job concerns the behavior of
       a <classname>Job</classname> when it is restarted? The launching of a
       <classname>Job</classname> is considered to be a 'restart' if a
       <classname>JobExecution</classname> already exists for the particular
@@ -99,8 +99,8 @@ catch (JobRestartException e) {
       attempt will throw a <classname>JobRestartException</classname>.</para>
     </section>
 
-    <section>
-      <title>Intercepting Job execution</title>
+    <section id="interceptingJobExecution">
+      <title>Intercepting Job Execution</title>
 
       <para>During the course of the execution of a
       <classname>Job</classname>, it may be useful to be notified of various
@@ -156,7 +156,7 @@ catch (JobRestartException e) {
       </itemizedlist>
     </section>
 
-    <section>
+    <section id="inheritingFromAParentJob">
       <title>Inheriting from a Parent Job</title>
 
       <para>If a group of <classname>Job</classname>s share similar, but not
@@ -193,7 +193,7 @@ catch (JobRestartException e) {
       for more detailed information.</para>
     </section>
 
-    <section>
+    <section id="jobFactoryAndStatefulComponentsInSteps">
       <title>JobFactory and Stateful Components in Steps</title>
 
       <para>Unlike many traditional Spring applications, many of the
@@ -221,7 +221,7 @@ catch (JobRestartException e) {
     </section>
   </section>
 
-  <section>
+  <section id="configuringJobRepository">
     <title>Configuring a JobRepository</title>
 
     <para>As described in earlier, the <link
@@ -239,7 +239,7 @@ catch (JobRestartException e) {
     <programlisting>&lt;job-repository id="jobRepository"
     dataSource="dataSource"
     transactionManager="transactionManager"
-    isolation-level-for-create="serializable"
+    isolation-level-for-create="SERIALIZABLE"
     table-prefix="BATCH_"
 /&gt;</programlisting>
 
@@ -247,8 +247,8 @@ catch (JobRestartException e) {
     the id. If they are not set, the defaults shown above will be used. They
     are shown above for awareness purposes.</para>
 
-    <section>
-      <title>Transaction Configuration For the JobRepository</title>
+    <section id="txConfigForJobRepository">
+      <title>Transaction Configuration for the JobRepository</title>
 
       <para>If the namespace is used, transactional advice will be
       automatically created around the repository. This is to ensure that the
@@ -292,7 +292,7 @@ catch (JobRestartException e) {
     </section>
 
     <section id="repositoryTablePrefix">
-      <title>Changing the table prefix</title>
+      <title>Changing the Table Prefix</title>
 
       <para>Another modifiable property of the
       <classname>JobRepository</classname> is the table prefix of the
@@ -316,7 +316,7 @@ catch (JobRestartException e) {
       </note>
     </section>
 
-    <section>
+    <section id="inMemoryRepository">
       <title>In-Memory Repository</title>
 
       <para>There are scenarios in which you may not want to persist your
@@ -344,7 +344,7 @@ catch (JobRestartException e) {
       <classname>ResourcelessTransactionManager</classname> useful.</para>
     </section>
 
-    <section>
+    <section id="nonStandardDatabaseTypesInRepository">
       <title>Non-standard Database Types in a Repository</title>
 
       <para>If you are using a database platform that is not in the list of
@@ -447,7 +447,7 @@ catch (JobRestartException e) {
     executed.</para>
   </section>
 
-  <section>
+  <section id="runningAJob">
     <title>Running a Job</title>
 
     <para>At a minimum, launching a batch job requires two things: the
@@ -461,7 +461,7 @@ catch (JobRestartException e) {
     <classname>JobLauncher</classname>, configured for asynchronous job
     launching, that multiple requests will invoke to launch their jobs.</para>
 
-    <section>
+    <section id="runningJobsFromCommandLine">
       <title>Running Jobs from the Command Line</title>
 
       <para>For users that want to run their jobs from an enterprise
@@ -473,7 +473,7 @@ catch (JobRestartException e) {
       even 'build tools' such as ant or maven. However, because most people
       are familiar with shell scripts, this example will focus on them.</para>
 
-      <section>
+      <section id="commandLineJobRunner">
         <title>The CommandLineJobRunner</title>
 
         <para>Because the script launching the job must kick off a Java
@@ -565,7 +565,7 @@ catch (JobRestartException e) {
         <classname>JobLauncher</classname></para>
       </section>
 
-      <section>
+      <section id="exitCodes">
         <title>ExitCodes</title>
 
         <para>When launching a batch job from the command-line, an enterprise
@@ -623,8 +623,8 @@ catch (JobRestartException e) {
       </section>
     </section>
 
-    <section>
-      <title>Running Jobs from within a web container</title>
+    <section id="runningJobsFromWebContainer">
+      <title>Running Jobs from within a Web Container</title>
 
       <para>Historically, offline processing such as batch jobs have been
       launched from the command-line, as described above. However, there are
@@ -719,8 +719,8 @@ public class JobLauncherController {
     below, add additional functionality for querying and controlling the meta
     data.</para>
 
-    <section>
-      <title>Querying the repository</title>
+    <section id="queryingRepository">
+      <title>Querying the Repository</title>
 
       <para>The most basic need before any advanced features is the ability to
       query the repository for existing executions. This functionality is
@@ -761,7 +761,7 @@ public class JobLauncherController {
       p:dataSource-ref="dataSource" <emphasis role="bold">p:tablePrefix="BATCH_" </emphasis>/&gt;</programlisting>
     </section>
 
-    <section>
+    <section id="JobOperator">
       <title>JobOperator</title>
 
       <para>As previously discussed, the <classname>JobRepository</classname>
@@ -827,7 +827,7 @@ public class JobLauncherController {
 &lt;/bean&gt;</programlisting>
     </section>
 
-    <section>
+    <section id="JobParametersIncrementer">
       <title>JobParametersIncrementer</title>
 
       <para>Most of the methods on <classname>JobOperator</classname> are
@@ -894,7 +894,7 @@ public class JobLauncherController {
 &lt;/job&gt;</programlisting>
     </section>
 
-    <section>
+    <section id="stoppingAJob">
       <title>Stopping a Job</title>
 
       <para>One of the most common use cases of

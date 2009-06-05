@@ -4,7 +4,7 @@
 <chapter id="retry">
   <title>Retry</title>
 
-  <section>
+  <section id="retryTemplate">
     <title>RetryTemplate</title>
 
     <para>To make processing more robust and less prone to failure, sometimes
@@ -68,7 +68,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     to the user. If that call fails then it is retried until a timeout is
     reached.</para>
 
-    <section>
+    <section id="retryContext">
       <title>RetryContext</title>
 
       <para>The method parameter for the <classname>RetryCallback</classname>
@@ -82,7 +82,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       between calls to <methodname>execute</methodname>.</para>
     </section>
 
-    <section>
+    <section id="recoveryCallback">
       <title>RecoveryCallback</title>
 
       <para>When a retry is exhausted the
@@ -104,7 +104,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       alternate processing through the recovery callback.</para>
     </section>
 
-    <section>
+    <section id="statelessRetry">
       <title>Stateless Retry</title>
 
       <para>In the simplest case, a retry is just a while loop: the
@@ -120,7 +120,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
       when it failed.</para>
     </section>
 
-    <section>
+    <section id="statefulRetry">
       <title>Stateful Retry</title>
 
       <para>Where the failure has caused a transactional resource to become
@@ -183,7 +183,7 @@ Foo result = template.execute(new RetryCallback&lt;Foo&gt;() {
     </section>
   </section>
 
-  <section>
+  <section id="retryPolicies">
     <title>Retry Policies</title>
 
     <para>Inside a <classname>RetryTemplate</classname> the decision to retry
@@ -245,7 +245,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     <para>There is also a more flexible implementation called
     <classname>ExceptionClassifierRetryPolicy</classname>, which allows the
     user to configure different retry behavior for an arbitrary set of
-    excecption types though the <classname>ExceptionClassifier</classname>
+    exception types though the <classname>ExceptionClassifier</classname>
     abstraction. The policy works by calling on the classifier to convert an
     exception into a delegate <classname>RetryPolicy</classname>, so for
     example, one exception type can be retried more times before failure than
@@ -257,7 +257,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     retryable.</para>
   </section>
 
-  <section>
+  <section id="backoffPolicies">
     <title>Backoff Policies</title>
 
     <para>When retrying after a transient failure it often helps to wait a bit
@@ -283,7 +283,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     <classname>ExponentialBackoffPolicy</classname>.</para>
   </section>
 
-  <section>
+  <section id="retryListeners">
     <title>Listeners</title>
 
     <para>Often it is useful to be able to receive additional callbacks for
@@ -304,8 +304,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     void onError(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
 
     void close(RetryContext context, RetryCallback&lt;T&gt; callback, Throwable e);
-}
-</programlisting>The <methodname>open</methodname> and
+}</programlisting>The <methodname>open</methodname> and
     <methodname>close</methodname> callbacks come before and after the entire
     retry in the simplest case and <methodname>onError</methodname> applies to
     the individual <classname>RetryCallback</classname> calls. The
@@ -319,7 +318,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
     <methodname>close</methodname> will be called in reverse order.</para>
   </section>
 
-  <section>
+  <section id="declarativeRetry">
     <title>Declarative Retry</title>
 
     <para>Sometimes there is some business processing that you know you want
@@ -344,8 +343,7 @@ template.execute(new RetryCallback&lt;Foo&gt;() {
 &lt;/aop:config&gt;
 
 &lt;bean id="retryAdvice"
-    class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"/&gt;
-</programlisting>
+    class="org.springframework.batch.retry.interceptor.RetryOperationsInterceptor"/&gt;</programlisting>
 
     <para>The example above uses a default
     <classname>RetryTemplate</classname> inside the interceptor. To change the

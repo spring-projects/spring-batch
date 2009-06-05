@@ -39,7 +39,7 @@
   <para>Next we review the single-process options first, and then the
   multi-process options.</para>
 
-  <section>
+  <section id="multithreadedStep">
     <title>Multi-threaded Step</title>
 
     <para>The simplest way to start parallel processing is to add a
@@ -47,11 +47,11 @@
     attribute of the <literal>tasklet</literal>:</para>
 
     <programlisting>&lt;step id="loading"&gt;
-   &lt;tasklet reader="stagingReader" 
-         processor="stagingProcessor" 
-         writer="tradeWriter" 
-         commit-interval="1" 
-         task-executor="taskExecutor"/&gt;
+    &lt;tasklet reader="stagingReader" 
+             processor="stagingProcessor" 
+             writer="tradeWriter" 
+             commit-interval="1" 
+             task-executor="taskExecutor"/&gt;
 &lt;/step&gt;</programlisting>
 
     <para>In this example the taskExecutor is a reference to another bean
@@ -78,7 +78,7 @@
     track of items that have been processed in a database input table.</para>
   </section>
 
-  <section>
+  <section id="scalabilityParallelSteps">
     <title>Parallel Steps</title>
 
     <para>As long as the application logic that needs to be parallelized can
@@ -89,19 +89,19 @@
     <literal>step3</literal>, you could configure a flow like this:</para>
 
     <para><programlisting>&lt;job id="job1"&gt;
-  &lt;split id="split1" task-executor="taskExecutor" next="step4"&gt;
-    &lt;flow&gt;
-      &lt;step id="step1" parent="s1" next="step2"/&gt;
-      &lt;step id="step2" parent="s2"/&gt;
-    &lt;/flow&gt;
-    &lt;flow&gt;
-      &lt;step id="step3" parent="s3"/&gt;
-    &lt;/flow&gt;
-  &lt;/split&gt;
-  &lt;step id="step4" parent="s4"/&gt;
+    &lt;split id="split1" task-executor="taskExecutor" next="step4"&gt;
+        &lt;flow&gt;
+            &lt;step id="step1" parent="s1" next="step2"/&gt;
+            &lt;step id="step2" parent="s2"/&gt;
+        &lt;/flow&gt;
+        &lt;flow&gt;
+            &lt;step id="step3" parent="s3"/&gt;
+        &lt;/flow&gt;
+    &lt;/split&gt;
+    &lt;step id="step4" parent="s4"/&gt;
 &lt;/job&gt;
 
-&lt;beans:bean id="taskExecutor" class="org.springframework.core.task.SimpleAsyncTaskExecutor"/&gt;</programlisting></para>
+&lt;beans:bean id="taskExecutor" class="org.spr...SimpleAsyncTaskExecutor"/&gt;</programlisting></para>
 
     <para>The configurable "task-executor" attribute is used to specify which
     TaskExecutor implementation should be used to execute the individual
@@ -217,7 +217,7 @@
     <classname>org.springframework.batch.core.partition</classname>
     package).</para>
 
-    <section>
+    <section id="partitionHandler">
       <title>PartitionHandler</title>
 
       <para>The <classname>PartitionHandler</classname> is the component that
@@ -247,10 +247,10 @@
       <classname>TaskExecutorPartitionHandler</classname>, and it can be
       configured like this:</para>
 
-      <para><programlisting>&lt;bean class="org.sfw..TaskExecutorPartitionHandler"&gt;
-  &lt;property name="taskExecutor" ref="taskExecutor"/&gt;
-  &lt;property name="step" ref="step1" /&gt;
-  &lt;property name="gridSize" value="10" /&gt;
+      <para><programlisting>&lt;bean class="org.spr...TaskExecutorPartitionHandler"&gt;
+    &lt;property name="taskExecutor" ref="taskExecutor"/&gt;
+    &lt;property name="step" ref="step1" /&gt;
+    &lt;property name="gridSize" value="10" /&gt;
 &lt;/bean&gt;</programlisting></para>
 
       <para>The <literal>gridSize</literal> determines the number of separate
@@ -264,7 +264,7 @@
       replicating filesystems into content management systems.</para>
     </section>
 
-    <section>
+    <section id="stepExecutionSplitter">
       <title>StepExecutionSplitter</title>
 
       <para>The <classname>StepExecutionSplitter</classname> is responsible
@@ -274,9 +274,9 @@
       principal method for this in the interface is</para>
 
       <programlisting>public interface StepExecutionSplitter {
-  ...
-  Set&lt;StepExecution&gt; split(StepExecution stepExecution, int gridSize) 
-    throws JobExecutionException;
+    ...
+    Set&lt;StepExecution&gt; split(StepExecution stepExecution, int gridSize) 
+          throws JobExecutionException;
 }</programlisting>
 
       <para>So an execution instance for the Master step is passed in, along
@@ -295,7 +295,7 @@
       restarts). It has a single method:</para>
 
       <programlisting>public interface Partitioner {
-  Map&lt;String, ExecutionContext&gt; partition(int gridSize);
+    Map&lt;String, ExecutionContext&gt; partition(int gridSize);
 }</programlisting>
 
       <para>The return value from this method associates a unique name for
@@ -322,7 +322,7 @@
       this convention.</para>
     </section>
 
-    <section>
+    <section id="bindingInputDataToSteps">
       <title>Binding Input Data to Steps</title>
 
       <para>It is very efficient for the steps that are executed by the
@@ -374,10 +374,10 @@
       <para>Then the file name can be bound to a step using late binding to
       the execution context:</para>
 
-      <programlisting>  &lt;bean id="itemReader" scope="step"
-        class="org.sfw...MultiResourceItemReader"&gt;
+      <programlisting>&lt;bean id="itemReader" scope="step"
+      class="org.spr...MultiResourceItemReader"&gt;
     &lt;property name="resource" value="<emphasis role="bold">#{stepExecutionContext[fileName]}/*</emphasis>"/&gt;
-  &lt;/bean&gt;</programlisting>
+&lt;/bean&gt;</programlisting>
     </section>
   </section>
 </chapter>

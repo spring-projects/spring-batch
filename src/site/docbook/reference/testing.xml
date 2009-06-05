@@ -12,7 +12,7 @@
   focus on. The spring-batch-test project includes classes that will help
   facilitate this end-to-end test approach.</para>
 
-  <section>
+  <section id="creatingUnitTestClass">
     <title>Creating a Unit Test Class</title>
 
     <para>In order for the unit test to run a batch job, the framework must
@@ -31,16 +31,14 @@
       </listitem>
     </itemizedlist>
 
-    <programlisting>
-  @RunWith(SpringJUnit4ClassRunner.class)
-  @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/skipSampleJob.xml" })
-  public class SkipSampleFunctionalTests extends AbstractJobTests { ... }
-
-</programlisting>
+    <programlisting>@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", 
+                                    "/jobs/skipSampleJob.xml" })
+public class SkipSampleFunctionalTests extends AbstractJobTests { ... }</programlisting>
   </section>
 
-  <section>
-    <title>End To End Testing Batch Jobs</title>
+  <section id="endToEndTesting">
+    <title>End-To-End Testing of Batch Jobs</title>
 
     <para>'End To End' testing can be defined as testing the complete run of a
     batch job from beginning to end. This allows for a test that sets up a
@@ -61,36 +59,35 @@
     case below, the test verifies that the <classname>Job</classname> ended
     with status "COMPLETED".</para>
 
-    <programlisting>
-  @RunWith(SpringJUnit4ClassRunner.class)
-  @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/skipSampleJob.xml" })
-  public class SkipSampleFunctionalTests extends AbstractJobTests {
+    <programlisting>@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/simple-job-launcher-context.xml", 
+                                    "/jobs/skipSampleJob.xml" })
+public class SkipSampleFunctionalTests extends AbstractJobTests {
 
-      private SimpleJdbcTemplate simpleJdbcTemplate;
+    private SimpleJdbcTemplate simpleJdbcTemplate;
 
-      @Autowired
-      public void setDataSource(DataSource dataSource) {
-          this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
-      }
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
+    }
 
-      @Transactional
-      @Test
-      public void testJob() throws Exception {
-          simpleJdbcTemplate.update("delete from CUSTOMER");
-          for (int i = 1; i &lt;= 10; i++) {
-              simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)", i, "customer" + i);
-          }
+    @Transactional
+    @Test
+    public void testJob() throws Exception {
+        simpleJdbcTemplate.update("delete from CUSTOMER");
+        for (int i = 1; i &lt;= 10; i++) {
+            simpleJdbcTemplate.update("insert into CUSTOMER values (?, 0, ?, 100000)", 
+                                      i, "customer" + i);
+        }
 
-          JobExecution jobExecution = <emphasis role="bold">this.launchJob()</emphasis>;
+        JobExecution jobExecution = <emphasis role="bold">this.launchJob()</emphasis>;
 
-          Assert.assertEquals("COMPLETED", jobExecution.getExitStatus());
-      }
-  }
-
-</programlisting>
+        Assert.assertEquals("COMPLETED", jobExecution.getExitStatus());
+    }
+}</programlisting>
   </section>
 
-  <section>
+  <section id="testingIndividualSteps">
     <title>Testing Individual Steps</title>
 
     <para>For complex batch jobs, test cases in the end-to-end testing
@@ -102,13 +99,10 @@
     targeted tests by allowing the test to set up data for just that step and
     to validate its results directly.</para>
 
-    <programlisting>
-  JobExecution jobExecution = this.launchStep("loadFileStep");
-
-</programlisting>
+    <programlisting>JobExecution jobExecution = this.launchStep("loadFileStep");</programlisting>
   </section>
 
-  <section>
+  <section id="validatingOutputFiles">
     <title>Validating Output Files</title>
 
     <para>When a batch job writes to the database, it is easy to query the
@@ -123,35 +117,30 @@
     file with the expected output and to compare it to the actual
     result:</para>
 
-    <programlisting>
-  private static final String EXPECTED_FILE = "src/main/resources/data/iosample/input/multiLine.txt";
-  private static final String OUTPUT_FILE = "target/test-outputs/multiLineOutput.txt";
+    <programlisting>private static final String EXPECTED_FILE = "src/main/resources/data/input.txt";
+private static final String OUTPUT_FILE = "target/test-outputs/output.txt";
 
-  AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE), new FileSystemResource(OUTPUT_FILE));
-
-</programlisting>
+AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE), 
+                            new FileSystemResource(OUTPUT_FILE));</programlisting>
   </section>
 
-  <section>
+  <section id="mockingDomainObjects">
     <title>Mocking Domain Objects</title>
 
     <para>Another common issue encountered while writing unit and integration
     tests for Spring Batch components is how to mock domain objects. A good
     example is a <classname>StepExecutionListener</classname>, as illustrated
-    below: </para>
+    below:</para>
 
-    <programlisting>
-  public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
+    <programlisting>public class NoWorkFoundStepExecutionListener extends StepExecutionListenerSupport {
 
     public ExitStatus afterStep(StepExecution stepExecution) {  
-      if (stepExecution.getReadCount() == 0) {
-        throw new NoWorkFoundException("Step has not processed any items");
-      }
-      return stepExecution.getExitStatus();
+        if (stepExecution.getReadCount() == 0) {
+            throw new NoWorkFoundException("Step has not processed any items");
+        }
+        return stepExecution.getExitStatus();
     }
-  }
-
-</programlisting>
+}</programlisting>
 
     <para>The above listener is provided by the framework and checks a
     <classname>StepExecution</classname> for an empty read count, thus
@@ -160,26 +149,22 @@
     attempting to unit test classes that implement interfaces requiring Spring
     Batch domain objects. Consider the above listener's unit test:</para>
 
-    <programlisting>    
-    private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+    <programlisting>private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
-    @Test
-    public void testAfterStep() {
-        <emphasis role="bold">StepExecution stepExecution = new StepExecution("NoProcessingStep",
-                new JobExecution(
-                new JobInstance(1L, new JobParameters(), "NoProcessingJob")));</emphasis>
+@Test
+public void testAfterStep() {
+    <emphasis role="bold">StepExecution stepExecution = new StepExecution("NoProcessingStep",
+                new JobExecution(new JobInstance(1L, new JobParameters(), "NoProcessingJob")));</emphasis>
 
-        stepExecution.setReadCount(0);
+    stepExecution.setReadCount(0);
 
-        try {
-            tested.afterStep(stepExecution);
-            fail();
-        } catch (NoWorkFoundException e) {
-           assertEquals("Step has not processed any items", e.getMessage());
-        }
+    try {
+        tested.afterStep(stepExecution);
+        fail();
+    } catch (NoWorkFoundException e) {
+        assertEquals("Step has not processed any items", e.getMessage());
     }
-
-</programlisting>
+}</programlisting>
 
     <para>Because the Spring Batch domain model follows good object orientated
     principles, the StepExecution requires a
@@ -190,27 +175,24 @@
     model, it does make creating stub objects for unit testing verbose. To
     address this issue, the Spring Batch test module includes a factory for
     creating domain objects: <classname>MetaDataInstanceFactory</classname>.
-    Given this factory, the unit test can be updated to be more concise:
-    </para>
+    Given this factory, the unit test can be updated to be more
+    concise:</para>
 
-    <programlisting>    
-    private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
+    <programlisting>private NoWorkFoundStepExecutionListener tested = new NoWorkFoundStepExecutionListener();
 
-    @Test
-    public void testAfterStep() {
-        <emphasis role="bold">StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();</emphasis>
+@Test
+public void testAfterStep() {
+    <emphasis role="bold">StepExecution stepExecution = MetaDataInstanceFactory.createStepExecution();</emphasis>
 
-        stepExecution.setReadCount(0);
+    stepExecution.setReadCount(0);
 
-        try {
-            tested.afterStep(stepExecution);
-            fail();
-        } catch (NoWorkFoundException e) {
-           assertEquals("Step has not processed any items", e.getMessage());
-        }
+    try {
+        tested.afterStep(stepExecution);
+        fail();
+    } catch (NoWorkFoundException e) {
+        assertEquals("Step has not processed any items", e.getMessage());
     }
-
-</programlisting>
+}</programlisting>
 
     <para>The above method for creating a simple
     <classname>StepExecution</classname> is just one convenience method

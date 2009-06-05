@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<appendix>
+<appendix id="metaDataSchema">
   <title>Meta-Data Schema</title>
 
-  <section>
+  <section id="metaDataSchemaOverview">
     <title>Overview</title>
 
     <para>The Spring Batch Meta-Data tables very closely match the Domain
@@ -37,7 +37,7 @@
       </imageobject>
     </mediaobject>
 
-    <section>
+    <section id="exampleDDLScripts">
       <title>Example DDL Scripts</title>
 
       <para>The root of the Spring Batch Core JAR file contains example
@@ -49,7 +49,7 @@
       short name of the target database platform.</para>
     </section>
 
-    <section>
+    <section id="metaDataVersion">
       <title>Version</title>
 
       <para>Many of the database tables discussed in this appendix contain a
@@ -64,7 +64,7 @@
       different machines, they are all using the same database tables.</para>
     </section>
 
-    <section>
+    <section id="metaDataIdentity">
       <title>Identity</title>
 
       <para>BATCH_JOB_INSTANCE, BATCH_JOB_EXECUTION, and BATCH_STEP_EXECUTION
@@ -83,7 +83,7 @@ CREATE SEQUENCE BATCH_JOB_EXECUTION_SEQ;
 CREATE SEQUENCE BATCH_JOB_SEQ;</programlisting>
 
       <para>Many database vendors don't support sequences. In these cases,
-      work arounds are used, such as the following for mySQL:</para>
+      work-arounds are used, such as the following for mySQL:</para>
 
       <programlisting>CREATE TABLE BATCH_STEP_EXECUTION_SEQ (ID BIGINT NOT NULL) type=MYISAM;
 INSERT INTO BATCH_STEP_EXECUTION_SEQ values(0);
@@ -99,7 +99,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     </section>
   </section>
 
-  <section>
+  <section id="metaDataBatchJobInstance">
     <title>BATCH_JOB_INSTANCE</title>
 
     <para>The BATCH_JOB_INSTANCE table holds all information relevant to a
@@ -145,7 +145,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="metaDataBatchJobParams">
     <title>BATCH_JOB_PARAMS</title>
 
     <para>The BATCH_JOB_PARAMS table holds all information relevant to the
@@ -211,7 +211,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     generated key, without causing any issues to the framework itself.</para>
   </section>
 
-  <section>
+  <section id="metaDataBatchJobExecution">
     <title>BATCH_JOB_EXECUTION</title>
 
     <para>The BATCH_JOB_EXECUTION table holds all information relevant to the
@@ -298,7 +298,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="metaDataBatchStepExecution">
     <title>BATCH_STEP_EXECUTION</title>
 
     <para>The BATCH_STEP_EXECUTION table holds all information relevant to the
@@ -437,7 +437,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="metaDataBatchJobExecutionContext">
     <title>BATCH_JOB_EXECUTION_CONTEXT</title>
 
     <para>The BATCH_JOB_EXECUTION_CONTEXT table holds all information relevant
@@ -478,7 +478,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="metaDataBatchStepExecutionContext">
     <title>BATCH_STEP_EXECUTION_CONTEXT</title>
 
     <para>The BATCH_STEP_EXECUTION_CONTEXT table holds all information
@@ -519,7 +519,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="metaDataArchiving">
     <title>Archiving</title>
 
     <para>Because there are entries in multiple tables every time a batch job
@@ -551,7 +551,7 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     </itemizedlist>
   </section>
 
-  <section>
+  <section id="recommendationsForIndexingMetaDataTables">
     <title>Recommendations for Indexing Meta Data Tables</title>
 
     <para>Spring Batch provides DDL samples for the meta-data tables in the
@@ -565,8 +565,8 @@ INSERT INTO BATCH_JOB_SEQ values(0);</programlisting>
     projects can make up their own minds about indexing.</para>
 
     <table>
-      <title>Where clauses in SQL statements (exluding primary keys) and their
-      approximate frequency of use.</title>
+      <title>Where clauses in SQL statements (excluding primary keys) and
+      their approximate frequency of use.</title>
 
       <tgroup cols="3">
         <tbody>

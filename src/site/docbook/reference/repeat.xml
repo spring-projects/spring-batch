@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<chapter>
+<chapter id="repeat">
   <title>Repeat</title>
 
-  <section>
+  <section id="repeatTemplate">
     <title>RepeatTemplate</title>
 
     <para>Batch processing is about repetitive actions - either as a simple
-    optimisation, or as part of a job. To strategize and generalize the
+    optimization, or as part of a job. To strategize and generalize the
     repetition as well as to provide what amounts to an iterator framework,
     Spring Batch has the <classname>RepeatOperations</classname> interface.
     The <classname>RepeatOperations</classname> interface looks like
@@ -64,7 +64,7 @@ template.iterate(new RepeatCallback() {
     completion decision is delegated to an external policy as in the case
     above.</para>
 
-    <section>
+    <section id="repeatContext">
       <title>RepeatContext</title>
 
       <para>The method parameter for the <classname>RepeatCallback</classname>
@@ -78,11 +78,11 @@ template.iterate(new RepeatCallback() {
       if there is a nested iteration in progress. The parent context is
       occasionally useful for storing data that need to be shared between
       calls to <methodname>iterate</methodname>. This is the case for instance
-      if you want to count the number of occurrences of an even in the
+      if you want to count the number of occurrences of an event in the
       iteration and remember it across subsequent calls.</para>
     </section>
 
-    <section>
+    <section id="repeatStatus">
       <title>RepeatStatus</title>
 
       <para><classname>RepeatStatus</classname> is an enumeration used by
@@ -90,7 +90,7 @@ template.iterate(new RepeatCallback() {
       possible <classname>RepeatStatus</classname> values:</para>
 
       <table>
-        <title>ExitStatus properties</title>
+        <title>ExitStatus Properties</title>
 
         <tgroup cols="2">
           <tbody>
@@ -124,13 +124,13 @@ template.iterate(new RepeatCallback() {
     </section>
   </section>
 
-  <section>
+  <section id="completionPolicies">
     <title>Completion Policies</title>
 
     <para>Inside a <classname>RepeatTemplate</classname> the termination of
     the loop in the <methodname>iterate</methodname> method is determined by a
     <classname>CompletionPolicy</classname> which is also a factory for the
-    <classname>ReapeatContext</classname>. The
+    <classname>RepeatContext</classname>. The
     <classname>RepeatTemplate</classname> has the responsibility to use the
     current policy to create a <classname>RepeatContext</classname> and pass
     that in to the <classname>RepeatCallback</classname> at every stage in the
@@ -153,7 +153,7 @@ template.iterate(new RepeatCallback() {
     would require a custom policy.</para>
   </section>
 
-  <section>
+  <section id="repeatExceptionHandling">
     <title>Exception Handling</title>
 
     <para>If there is an exception thrown inside a
@@ -186,7 +186,7 @@ template.iterate(new RepeatCallback() {
     iteration (e.g. a set of chunks inside a step).</para>
   </section>
 
-  <section>
+  <section id="repeatListeners">
     <title>Listeners</title>
 
     <para>Often it is useful to be able to receive additional callbacks for
@@ -210,8 +210,7 @@ template.iterate(new RepeatCallback() {
     void onError(RepeatContext context, Throwable e);
 
     void close(RepeatContext context);
-}
-</programlisting>The <methodname>open</methodname> and
+}</programlisting>The <methodname>open</methodname> and
     <methodname>close</methodname> callbacks come before and after the entire
     iteration. <methodname>before</methodname>, <methodname>after</methodname>
     and <methodname>onError</methodname> apply to the individual
@@ -224,7 +223,7 @@ template.iterate(new RepeatCallback() {
     <methodname>close</methodname> are called in reverse order.</para>
   </section>
 
-  <section>
+  <section id="repeatParallelProcessing">
     <title>Parallel Processing</title>
 
     <para>Implementations of <classname>RepeatOperations</classname> are not
@@ -234,12 +233,12 @@ template.iterate(new RepeatCallback() {
     <classname>TaskExecutorRepeatTemplate</classname>, which uses the Spring
     <classname>TaskExecutor</classname> strategy to run the
     <classname>RepeatCallback</classname>. The default is to use a
-    <classname>SynchronousTaskExecutor</classname>, which has the effect of executing the whole
-    iteration in the same thread (the same as a normal
+    <classname>SynchronousTaskExecutor</classname>, which has the effect of
+    executing the whole iteration in the same thread (the same as a normal
     <classname>RepeatTemplate</classname>).</para>
   </section>
 
-  <section>
+  <section id="declarativeIteration">
     <title>Declarative Iteration</title>
 
     <para>Sometimes there is some business processing that you know you want
@@ -266,9 +265,7 @@ template.iterate(new RepeatCallback() {
         advice-ref="retryAdvice" order="-1"/&gt;
 &lt;/aop:config&gt;
 
-&lt;bean id="retryAdvice"
-    class="org.springframework.batch.repeat.interceptor.RepeatOperationsInterceptor"/&gt;
-</programlisting>
+&lt;bean id="retryAdvice" class="org.spr...RepeatOperationsInterceptor"/&gt;</programlisting>
 
     <para>The example above uses a default
     <classname>RepeatTemplate</classname> inside the interceptor. To change
