@@ -15,11 +15,6 @@
  */
 package org.springframework.batch.core.listener;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.StepExecution;
@@ -46,22 +41,19 @@ import com.sun.org.apache.xerces.internal.impl.xpath.XPath.Step;
  */
 public class ExecutionContextPromotionListener extends StepExecutionListenerSupport implements InitializingBean {
 
-	private Collection<String> keys = null;
+	private String[] keys = null;
 
-	private List<String> statuses = Collections.singletonList(ExitStatus.COMPLETED.getExitCode());
+	private String[] statuses = new String[] { ExitStatus.COMPLETED.getExitCode() };
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.springframework.batch.core.domain.StepListener#afterStep(StepExecution
-	 * stepExecution)
-	 */
 	public ExitStatus afterStep(StepExecution stepExecution) {
+		ExecutionContext stepContext = stepExecution.getExecutionContext();
+		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
 		String exitCode = stepExecution.getExitStatus().getExitCode();
 		for (String statusPattern : statuses) {
 			if (PatternMatcher.match(statusPattern, exitCode)) {
-				this.performPromotion(stepExecution);
+				for (String key : keys) {
+					jobContext.put(key, stepContext.get(key));
+				}
 				break;
 			}
 		}
@@ -69,35 +61,27 @@ public class ExecutionContextPromotionListener extends StepExecutionListenerSupp
 		return null;
 	}
 
-	private void performPromotion(StepExecution stepExecution) {
-		ExecutionContext stepContext = stepExecution.getExecutionContext();
-		ExecutionContext jobContext = stepExecution.getJobExecution().getExecutionContext();
-		for (String key : keys) {
-			jobContext.put(key, stepContext.get(key));
-		}
-	}
-
 	public void afterPropertiesSet() throws Exception {
 		Assert.notNull(this.keys, "The 'keys' property must be provided");
-		Assert.notEmpty(this.statuses, "The 'keys' property must not be empty");
+		Assert.notEmpty(this.keys, "The 'keys' property must not be empty");
 		Assert.notNull(this.statuses, "The 'statuses' property must be provided");
 		Assert.notEmpty(this.statuses, "The 'statuses' property must not be empty");
 	}
 
 	/**
 	 * @param keys A list of keys corresponding to items in the {@link Step}
-	 *            {@link ExecutionContext} that must be promoted.
+	 * {@link ExecutionContext} that must be promoted.
 	 */
 	public void setKeys(String[] keys) {
-		this.keys = Arrays.asList(keys);
+		this.keys = keys;
 	}
 
 	/**
 	 * @param statuses A list of statuses for which the promotion should occur.
-	 *            Statuses can may contain wildcards recognizable by a
-	 *            {@link PatternMatcher}.
+	 * Statuses can may contain wildcards recognizable by a
+	 * {@link PatternMatcher}.
 	 */
 	public void setStatuses(String[] statuses) {
-		this.statuses = Arrays.asList(statuses);
+		this.statuses = statuses;
 	}
 }
