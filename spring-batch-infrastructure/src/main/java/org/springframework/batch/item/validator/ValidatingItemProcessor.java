@@ -13,27 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.batch.item.validator;
 
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 
 /**
- * Simple implementation of {@link ItemProcessor} validates and input and
- * returns it without modifications.
+ * Simple implementation of {@link ItemProcessor} that validates input and
+ * returns it without modifications. Should the given {@link Validator} throw a
+ * {@link ValidationException} this processor will re-throw it to indicate the
+ * item should be skipped, unless {@link #setFilter(boolean)} is set to
+ * <code>true</code>, in which case <code>null</code> will be returned to
+ * indicate the item should be filtered.
  * 
  * @author Robert Kasanicky
- * 
  */
-public class ValidatingItemProcessor<T> implements ItemProcessor<T, T> {
+public class ValidatingItemProcessor<T> implements ItemProcessor<T, T>, InitializingBean {
 
 	private Validator<? super T> validator;
-	
+
 	private boolean filter = false;
-	
-	public ValidatingItemProcessor(Validator<? super T> validator){
-		Assert.notNull(validator, "Validator must not be null.");
+
+	/**
+	 * Default constructor
+	 */
+	public ValidatingItemProcessor() {
+	}
+
+	/**
+	 * Creates a ValidatingItemProcessor based on the given Validator.
+	 */
+	public ValidatingItemProcessor(Validator<? super T> validator) {
 		this.validator = validator;
 	}
 
@@ -64,7 +75,8 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T> {
 	public T process(T item) throws ValidationException {
 		try {
 			validator.validate(item);
-		} catch (ValidationException e) {
+		}
+		catch (ValidationException e) {
 			if (filter) {
 				return null; // filter the item
 			}
@@ -73,6 +85,10 @@ public class ValidatingItemProcessor<T> implements ItemProcessor<T, T> {
 			}
 		}
 		return item;
+	}
+
+	public void afterPropertiesSet() throws Exception {
+		Assert.notNull(validator, "Validator must not be null.");
 	}
 
 }
