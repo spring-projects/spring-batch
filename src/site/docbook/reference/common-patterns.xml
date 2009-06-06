@@ -195,22 +195,32 @@
       the end of the file. This footer serves as a summarization of the file
       or provides a checksum.</para>
 
-      <para>For example, if a batch job is writing Trade records to a flat
-      file, and there is a requirement that the total amount from all the
-      Trades is placed in a footer, then the following ItemWriter
-      implementation can be used:</para>
+      <para>For example, if a batch job is writing
+      <classname>Trade</classname> records to a flat file, and there is a
+      requirement that the total amount from all the
+      <classname>Trade</classname>s is placed in a footer, then the following
+      <classname>ItemWriter</classname> implementation can be used:</para>
 
       <programlisting>public class TradeItemWriter implements ItemWriter&lt;Trade&gt;, 
                                         FlatFileFooterCallback {
 
     private ItemWriter&lt;Trade&gt; delegate;
 
-    private double totalAmount = 0.0;
+    private BigDecimal totalAmount = BigDecimal.ZERO;
 
     public void write(List&lt;? extends Trade&gt; items) {
+        for (Trade trade : items) {
+            // There must be an amount to total
+            Assert.notNull(trade.getAmount());
+        }
+
         delegate.write(items);
-        for(Trade trade : items) {
-            totalAmount += trade.getAmount();
+    }
+
+    @AfterWrite
+    public void updateTotalPrice(List&lt;Trade&gt; trades) {
+        for (Trade trade : trades) {
+            totalAmount = totalAmount.add(trade.getAmount());
         }
     }
 
@@ -226,9 +236,21 @@
       <code>amount</code> from each <classname>Trade</classname> item written.
       After the last <classname>Trade</classname> is processed, the framework
       will call <methodname>writeFooter</methodname>, which will put that
-      <code>totalAmount</code> into the file. In order for the method to be
-      called, the <classname>TradeItemWriter</classname> must be wired into
-      the <classname>FlatFileItemWriter</classname> as the
+      <code>totalAmount</code> into the file. Note that the
+      <property>totalAmount</property> is <emphasis>not</emphasis> updated in
+      the <methodname>write</methodname> method; it is updated in the
+      <classname>AfterWrite</classname> method. This is done to ensure that if
+      a skip occurs in the <methodname>write</methodname> method, that the
+      <property>totalAmount</property> will be left unchanged. The
+      <methodname>write</methodname> method also validates that the
+      <property>amount</property> on each <classname>Trade</classname> is not
+      null; this guarantees that no exceptions will be thrown by the
+      <classname>AfterWrite</classname> method.</para>
+
+      <para>In order for the <methodname>writeFooter</methodname> method to be
+      called, the <classname>TradeItemWriter</classname> (which implements
+      <classname>FlatFileFooterCallback</classname>) must be wired into the
+      <classname>FlatFileItemWriter</classname> as the
       <code>footerCallback</code>:</para>
 
       <programlisting>&lt;bean id="tradeItemWriter" class="..TradeItemWriter"&gt;
@@ -236,9 +258,9 @@
 &lt;/bean&gt;
 
 &lt;bean id="flatFileItemWriter" class="org.spr...FlatFileItemWriter"&gt;
-  &lt;property name="resource" ref="outputResource" /&gt;
-  &lt;property name="lineAggregator" ref="lineAggregator"/&gt;
-  <emphasis role="bold">&lt;property name="footerCallback" ref="tradeItemWriter" /&gt;</emphasis>
+   &lt;property name="resource" ref="outputResource" /&gt;
+   &lt;property name="lineAggregator" ref="lineAggregator"/&gt;
+  <emphasis role="bold"> &lt;property name="footerCallback" ref="tradeItemWriter" /&gt;</emphasis>
 &lt;/bean&gt;</programlisting>
 
       <para>The way that the <classname>TradeItemWriter</classname> has been
@@ -251,17 +273,17 @@
       with the methods <methodname>open</methodname> and
       <methodname>update</methodname>:</para>
 
-      <programlisting>  private static final String TOTAL_AMOUNT_KEY = "total.amount";
+      <programlisting>private static final String TOTAL_AMOUNT_KEY = "total.amount";
 
-  public void open(ExecutionContext executionContext) {
-      if (executionContext.containsKey(TOTAL_AMOUNT_KEY) {
-          totalAmount = executionContext.getDouble(TOTAL_AMOUNT_KEY);
-      }
-  }
+public void open(ExecutionContext executionContext) {
+    if (executionContext.containsKey(TOTAL_AMOUNT_KEY) {
+        totalAmount = (BigDecimal) executionContext.get(TOTAL_AMOUNT_KEY);
+    }
+}
 
-  public void update(ExecutionContext executionContext) {
-      executionContext.setDouble(TOTAL_AMOUNT_KEY, totalAmount);
-  }</programlisting>
+public void update(ExecutionContext executionContext) {
+    executionContext.put(TOTAL_AMOUNT_KEY, totalAmount);
+}</programlisting>
 
       <para>The <methodname>update</methodname> method will store the most
       current version of <code>totalAmount</code> to the
@@ -272,12 +294,6 @@
       for processing, allowing the <classname>TradeItemWriter</classname> to
       pick up on restart where it left off the previous time the
       <classname>Step</classname> was executed.</para>
-
-      <para>It should be noted that it is not always necessary to implement
-      <classname>ItemStream</classname>. For example, if the
-      <classname>ItemWriter</classname> is re-runnable, meaning that it
-      maintains its own state in a transactional resource like a database,
-      there is no need to maintain state within the writer itself.</para>
     </section>
   </section>
 
