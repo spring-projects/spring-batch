@@ -65,7 +65,7 @@
   (JobLauncher), and meta data about the currently running process needs to be
   stored (JobRepository).</para>
 
-  <section id="job">
+  <section id="domainJob">
     <title id="jobStereotypes">Job</title>
 
     <para>This section describes stereotypes relating to the concept of a
@@ -119,7 +119,7 @@
     &lt;step id="playerSummarization"/&gt;
 &lt;/job&gt;</programlisting>
 
-    <section id="jobInstance">
+    <section id="domainJobInstance">
       <title id="s.2.1.2">JobInstance</title>
 
       <para>A <classname>JobInstance</classname> refers to the concept of a
@@ -158,7 +158,7 @@
       from where you left off'.</para>
     </section>
 
-    <section id="jobParameters">
+    <section id="domainJobParameters">
       <title id="s.2.1.3">JobParameters</title>
 
       <para>Having discussed <classname>JobInstance</classname> and how it
@@ -194,7 +194,7 @@
       parameters are passed in.</para>
     </section>
 
-    <section id="jobExecution">
+    <section id="domainJobExecution">
       <title id="jobExecution">JobExecution</title>
 
       <para>A <classname>JobExecution</classname> refers to the technical
@@ -536,7 +536,7 @@
     </section>
   </section>
 
-  <section id="step">
+  <section id="domainStep">
     <title id="s.2.1">Step</title>
 
     <para>A <classname>Step</classname> is a domain object that encapsulates
@@ -568,7 +568,7 @@
       </imageobject>
     </mediaobject>
 
-    <section id="stepExecution">
+    <section id="domainStepExecution">
       <title id="stepExecution">StepExecution</title>
 
       <para>A <classname>StepExecution</classname> represents a single attempt
@@ -702,7 +702,7 @@
     </section>
   </section>
 
-  <section id="executionContext">
+  <section id="domainExecutionContext">
     <title>ExecutionContext</title>
 
     <para>An <classname>ExecutionContext</classname> represents a collection
@@ -929,7 +929,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     <classname>Step</classname> execution.</para>
   </section>
 
-  <section id="jobRepository">
+  <section id="domainJobRepository">
     <title>JobRepository</title>
 
     <para><classname>JobRepository</classname> is the persistence mechanism
@@ -945,7 +945,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     <programlisting>&lt;job-repository id="jobRepository"/&gt;</programlisting>
   </section>
 
-  <section id="jobLauncher">
+  <section id="domainJobLauncher">
     <title>JobLauncher</title>
 
     <para><classname>JobLauncher </classname>represents a simple interface for
@@ -964,7 +964,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     <classname>Job</classname>.</para>
   </section>
 
-  <section id="itemReader">
+  <section id="domainItemReader">
     <title id="s.5.1.1">Item Reader</title>
 
     <para><classname>ItemReader</classname> is an abstraction that represents
@@ -976,7 +976,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     linkend="readersAndWriters" />.</para>
   </section>
 
-  <section id="itemWriter">
+  <section id="domainItemWriter">
     <title id="s.5.1.2">Item Writer</title>
 
     <para><classname>ItemWriter</classname> is an abstraction that represents
@@ -988,7 +988,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     linkend="readersAndWriters" />.</para>
   </section>
 
-  <section id="itemProcessor">
+  <section id="domainItemProcessor">
     <title>Item Processor</title>
 
     <para><classname>ItemProcessor</classname> is an abstraction that
@@ -1002,7 +1002,7 @@ ExecutionContext ecJob = jobExecution.getExecutionContext();
     found in <xref linkend="readersAndWriters" />.</para>
   </section>
 
-  <section id="batchNamespace">
+  <section id="domainBatchNamespace">
     <title>Batch Namespace</title>
 
     <para>Many of the domain concepts listed above need to be configured in a
