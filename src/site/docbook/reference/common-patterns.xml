@@ -313,12 +313,12 @@ public void update(ExecutionContext executionContext) {
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/drivingQueryExample.png"
-                   scale="80" width="" />
+                   scale="80" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/drivingQueryExample.png"
-                   width="66%" />
+                   scale="35" />
       </imageobject>
     </mediaobject>
 
@@ -332,12 +332,12 @@ public void update(ExecutionContext executionContext) {
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/drivingQueryJob.png"
-                   scale="80" width="66%" />
+                   scale="85" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/drivingQueryJob.png"
-                   width="66%" />
+                   scale="65" />
       </imageobject>
     </mediaobject>
 

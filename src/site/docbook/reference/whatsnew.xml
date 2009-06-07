@@ -84,8 +84,7 @@
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/item-oriented-processing.png" scale="60"
-                   width="50%" />
+                   fileref="images/item-oriented-processing.png" scale="60" />
       </imageobject>
     </mediaobject>
 
@@ -151,7 +150,7 @@
       <imageobject role="fo">
         <imagedata align="center"
                    fileref="images/simplified-chunk-oriented-processing.png"
-                   scale="60" width="60%" />
+                   scale="60" />
       </imageobject>
     </mediaobject>
 
@@ -209,13 +208,11 @@ itemWriter.write(items);</programlisting>
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="images/1-1-step.png" scale="50"
-                     width="50%" />
+          <imagedata align="center" fileref="images/1-1-step.png" scale="60" />
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/1-1-step.png" scale="30"
-                     width="50%" />
+          <imagedata align="center" fileref="images/1-1-step.png" scale="50" />
         </imageobject>
       </mediaobject>
 
@@ -226,12 +223,12 @@ itemWriter.write(items);</programlisting>
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/composite-transformer.png"
-                     scale="80" width="70%" />
+                     scale="95" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center" fileref="images/composite-transformer.png"
-                     scale="40" width="" />
+                     scale="55" />
         </imageobject>
       </mediaobject>
 
@@ -247,11 +244,11 @@ itemWriter.write(items);</programlisting>
 
       <mediaobject>
         <imageobject role="html">
-          <imagedata align="center" fileref="images/step.png" scale="50" />
+          <imagedata align="center" fileref="images/step.png" scale="60" />
         </imageobject>
 
         <imageobject role="fo">
-          <imagedata align="center" fileref="images/step.png" scale="30" />
+          <imagedata align="center" fileref="images/step.png" scale="50" />
         </imageobject>
       </mediaobject>
     </section>
@@ -303,12 +300,12 @@ itemWriter.write(items);</programlisting>
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   scale="90" width="" />
+                   scale="115" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   scale="60" width="" />
+                   scale="60" />
       </imageobject>
     </mediaobject>
 
@@ -328,12 +325,12 @@ itemWriter.write(items);</programlisting>
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/sequential-flow.png"
-                   scale="50" />
+                   scale="20" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/sequential-flow.png"
-                   scale="50" width="" />
+                   scale="45" />
       </imageobject>
     </mediaobject>
 
@@ -342,12 +339,12 @@ itemWriter.write(items);</programlisting>
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="50" width="" />
+                   scale="50" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/conditional-flow.png"
-                   scale="50" width="" />
+                   scale="45" />
       </imageobject>
     </mediaobject>
 

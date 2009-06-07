@@ -10,13 +10,14 @@
   <mediaobject>
     <imageobject role="html">
       <imagedata align="center"
-                 fileref="images/spring-batch-reference-model.png" scale="80" />
+                 fileref="images/spring-batch-reference-model.png"
+                 format="PNG" scale="100" />
     </imageobject>
 
     <imageobject role="fo">
       <imagedata align="center"
-                 fileref="images/spring-batch-reference-model.png" scale="40"
-                 width="75%" />
+                 fileref="images/spring-batch-reference-model.png"
+                 format="PNG" scale="55" />
     </imageobject>
   </mediaobject>
 
@@ -397,14 +398,12 @@ catch (JobRestartException e) {
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/job-launcher-sequence-sync.png" scale="90"
-                   width="66%" />
+                   fileref="images/job-launcher-sequence-sync.png" scale="90" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/job-launcher-sequence-sync.png" scale="70"
-                   width="66%" />
+                   fileref="images/job-launcher-sequence-sync.png" scale="35" />
       </imageobject>
     </mediaobject>
 
@@ -419,14 +418,12 @@ catch (JobRestartException e) {
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/job-launcher-sequence-async.png" scale="90"
-                   width="66%" />
+                   fileref="images/job-launcher-sequence-async.png" scale="90" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/job-launcher-sequence-async.png" scale="70"
-                   width="66%" />
+                   fileref="images/job-launcher-sequence-async.png" scale="35" />
       </imageobject>
     </mediaobject>
 
@@ -635,12 +632,12 @@ catch (JobRestartException e) {
       job asynchronously:<mediaobject>
           <imageobject role="html">
             <imagedata align="center" fileref="images/launch-from-request.png"
-                       width="40%" />
+                       scale="75" />
           </imageobject>
 
           <imageobject role="fo">
             <imagedata align="center" fileref="images/launch-from-request.png"
-                       scale="80" width="40%" />
+                       scale="35" />
           </imageobject>
         </mediaobject></para>
 
@@ -683,12 +680,12 @@ public class JobLauncherController {
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/job-repository.png"
-                   width="40%" />
+                   scale="60" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/job-repository.png"
-                   scale="80" width="40%" />
+                   scale="50" />
       </imageobject>
     </mediaobject>
 
@@ -705,12 +702,12 @@ public class JobLauncherController {
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   width="65%" />
+                   role="70" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/job-repository-advanced.png"
-                   scale="70" width="65%" />
+                   scale="45" />
       </imageobject>
     </mediaobject>
 

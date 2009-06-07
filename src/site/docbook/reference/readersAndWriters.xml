@@ -1437,14 +1437,14 @@ assertEquals(born, values[2]);</programlisting>
     corresponding to individual records:</para>
 
     <para><mediaobject>
-        <imageobject role="fo">
-          <imagedata align="center" fileref="images/xmlinput.png" format="PNG"
-                     scale="80" width="40%" />
-        </imageobject>
-
         <imageobject role="html">
           <imagedata align="center" fileref="images/xmlinput.png" format="PNG"
-                     scale="70" />
+                     scale="65" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center" fileref="images/xmlinput.png" format="PNG"
+                     scale="45" />
         </imageobject>
 
         <caption><para>Figure 3.1: XML Input</para></caption>
@@ -1463,14 +1463,14 @@ assertEquals(born, values[2]);</programlisting>
     following:</para>
 
     <para><mediaobject>
-        <imageobject role="fo">
-          <imagedata align="center" fileref="images/oxm-fragments.png"
-                     format="PNG" scale="80" width="40%" />
-        </imageobject>
-
         <imageobject role="html">
           <imagedata align="center" fileref="images/oxm-fragments.png"
-                     format="PNG" scale="50" />
+                     format="PNG" scale="60" />
+        </imageobject>
+
+        <imageobject role="fo">
+          <imagedata align="center" fileref="images/oxm-fragments.png"
+                     format="PNG" scale="45" />
         </imageobject>
 
         <caption><para>Figure 3.2: OXM Binding</para></caption>
@@ -1764,7 +1764,7 @@ staxItemWriter.write(trade);</programlisting>
 
         <imageobject role="fo">
           <imagedata align="center" fileref="images/cursorExample.png"
-                     scale="40" />
+                     scale="35" />
         </imageobject>
       </mediaobject>
 
@@ -2230,7 +2230,7 @@ itemReader.close(executionContext);</programlisting>
       <para><mediaobject>
           <imageobject role="html">
             <imagedata align="center" fileref="images/errorOnFlush.png"
-                       scale="80" />
+                       scale="95" />
           </imageobject>
 
           <imageobject role="fo">
@@ -2257,7 +2257,7 @@ itemReader.close(executionContext);</programlisting>
       <mediaobject>
         <imageobject>
           <imagedata align="center" fileref="images/errorOnWrite.png"
-                     scale="80" />
+                     scale="95" />
         </imageobject>
 
         <imageobject role="fo">

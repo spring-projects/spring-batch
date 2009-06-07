@@ -19,11 +19,11 @@
 
   <mediaobject>
     <imageobject role="html">
-      <imagedata align="center" fileref="images/step.png" scale="50" />
+      <imagedata align="center" fileref="images/step.png" scale="60" />
     </imageobject>
 
     <imageobject role="fo">
-      <imagedata align="center" fileref="images/step.png" scale="30" />
+      <imagedata align="center" fileref="images/step.png" scale="50" />
     </imageobject>
   </mediaobject>
 
@@ -42,12 +42,12 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center"
-                   fileref="images/chunk-oriented-processing.png" scale="75" />
+                   fileref="images/chunk-oriented-processing.png" scale="100" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center"
-                   fileref="images/chunk-oriented-processing.png" scale="75" />
+                   fileref="images/chunk-oriented-processing.png" scale="55" />
       </imageobject>
     </mediaobject>
 
@@ -1115,12 +1115,12 @@ itemWriter.write(items);</programlisting>
       <mediaobject>
         <imageobject role="html">
           <imagedata align="center" fileref="images/sequential-flow.png"
-                     scale="80" />
+                     scale="20" />
         </imageobject>
 
         <imageobject role="fo">
           <imagedata align="center" fileref="images/sequential-flow.png"
-                     scale="40" />
+                     scale="45" />
         </imageobject>
       </mediaobject>
 
@@ -1169,12 +1169,12 @@ itemWriter.write(items);</programlisting>
       failure? <mediaobject>
           <imageobject role="html">
             <imagedata align="center" fileref="images/conditional-flow.png"
-                       scale="" width="40%" />
+                       scale="50" />
           </imageobject>
 
           <imageobject role="fo">
             <imagedata align="center" fileref="images/conditional-flow.png"
-                       width="40%" />
+                       scale="50" />
           </imageobject>
         </mediaobject></para>
 

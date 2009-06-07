@@ -154,7 +154,8 @@ AssertFile.assertFileEquals(new FileSystemResource(EXPECTED_FILE),
 @Test
 public void testAfterStep() {
     <emphasis role="bold">StepExecution stepExecution = new StepExecution("NoProcessingStep",
-                new JobExecution(new JobInstance(1L, new JobParameters(), "NoProcessingJob")));</emphasis>
+                new JobExecution(new JobInstance(1L, new JobParameters(), 
+                                 "NoProcessingJob")));</emphasis>
 
     stepExecution.setReadCount(0);
 

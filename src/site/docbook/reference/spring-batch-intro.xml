@@ -168,18 +168,20 @@
   <section id="springBatchArchitecture">
     <title id="s.1.1">Spring Batch Architecture</title>
 
+    <para></para>
+
     <para>Spring Batch is designed with extensibility and a diverse group of
     end users in mind. The figure below shows a sketch of the layered
     architecture that supports the extensibility and ease of use for end-user
     developers. <mediaobject>
         <imageobject role="fo">
           <imagedata align="center" fileref="images/spring-batch-layers.png"
-                     format="PNG" scale="40" width="35%" />
+                     format="PNG" scale="40" />
         </imageobject>
 
         <imageobject role="html">
           <imagedata align="center" fileref="images/spring-batch-layers.png"
-                     format="PNG" scale="40" scalefit="" width="35%" />
+                     format="PNG" scale="40" />
         </imageobject>
 
         <caption><para>Figure 1.1: Spring Batch Layered

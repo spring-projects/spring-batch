@@ -124,7 +124,7 @@
     <mediaobject>
       <imageobject>
         <imagedata align="center" fileref="images/remote-chunking.png"
-                   scale="70" width="75%" />
+                   scale="85" />
       </imageobject>
     </mediaobject>
 
@@ -173,7 +173,7 @@
     <mediaobject>
       <imageobject>
         <imagedata align="center" fileref="images/partitioning-overview.png"
-                   scale="70" width="75%" />
+                   scale="80" />
       </imageobject>
     </mediaobject>
 
@@ -197,7 +197,7 @@
     <mediaobject>
       <imageobject>
         <imagedata align="center" fileref="images/partitioning-spi.png"
-                   scale="70" width="75%" />
+                   scale="90" />
       </imageobject>
     </mediaobject>
 

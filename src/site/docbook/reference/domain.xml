@@ -47,13 +47,13 @@
     <imageobject role="html">
       <imagedata align="center"
                  fileref="images/spring-batch-reference-model.png"
-                 format="PNG" scale="80" />
+                 format="PNG" scale="100" />
     </imageobject>
 
     <imageobject role="fo">
       <imagedata align="center"
                  fileref="images/spring-batch-reference-model.png"
-                 format="PNG" scale="40" />
+                 format="PNG" scale="55" />
     </imageobject>
 
     <caption><para>Figure 2.1: Batch Stereotypes</para></caption>
@@ -78,12 +78,12 @@
     <mediaobject>
       <imageobject role="html">
         <imagedata align="center" fileref="images/job-heirarchy.png"
-                   scale="80" />
+                   scale="100" />
       </imageobject>
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/job-heirarchy.png"
-                   scale="40" />
+                   scale="60" />
       </imageobject>
     </mediaobject>
 
@@ -173,13 +173,13 @@
           <imageobject role="html">
             <imagedata align="center"
                        fileref="images/job-stereotypes-parameters.png"
-                       scale="80" />
+                       scale="100" />
           </imageobject>
 
           <imageobject role="fo">
             <imagedata align="center"
                        fileref="images/job-stereotypes-parameters.png"
-                       scale="40" />
+                       scale="60" />
           </imageobject>
         </mediaobject></para>
 
@@ -564,7 +564,7 @@
 
       <imageobject role="fo">
         <imagedata align="center" fileref="images/jobHeirarchyWithSteps.png"
-                   scale="40" />
+                   scale="60" />
       </imageobject>
     </mediaobject>
 
