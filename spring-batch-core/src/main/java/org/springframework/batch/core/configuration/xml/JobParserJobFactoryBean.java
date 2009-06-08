@@ -21,6 +21,7 @@ import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.SmartFactoryBean;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -30,9 +31,10 @@ import org.springframework.util.StringUtils;
  * configurable on the &lt;job/&gt;.
  * 
  * @author Dan Garrette
+ * @author Dave Syer
  * @since 2.0.1
  */
-class JobParserJobFactoryBean implements FactoryBean {
+class JobParserJobFactoryBean implements SmartFactoryBean {
 
 	private String name;
 
@@ -108,6 +110,14 @@ class JobParserJobFactoryBean implements FactoryBean {
 
 	public boolean isSingleton() {
 		return true;
+	}
+	
+	public boolean isEagerInit() {
+		return true;
+	}
+	
+	public boolean isPrototype() {
+		return false;
 	}
 
 }

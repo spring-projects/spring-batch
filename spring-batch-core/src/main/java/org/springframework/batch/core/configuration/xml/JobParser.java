@@ -59,7 +59,7 @@ public class JobParser extends AbstractSingleBeanDefinitionParser {
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 
 		CoreNamespaceUtils.autoregisterBeansForNamespace(parserContext, parserContext.extractSource(element));
-
+		
 		String jobName = element.getAttribute("id");
 		builder.addConstructorArgValue(jobName);
 
