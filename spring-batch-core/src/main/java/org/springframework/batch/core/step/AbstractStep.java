@@ -207,7 +207,8 @@ public abstract class AbstractStep implements Step, InitializingBean, BeanNameAw
 				throw new JobInterruptedException("JobExecution interrupted.");
 			}
 
-			stepExecution.setStatus(BatchStatus.COMPLETED);
+			// Need to upgrade here not set, in case the execution was stopped
+			stepExecution.upgradeStatus(BatchStatus.COMPLETED);
 			logger.debug("Step execution success: id=" + stepExecution.getId());
 		}
 		catch (Throwable e) {

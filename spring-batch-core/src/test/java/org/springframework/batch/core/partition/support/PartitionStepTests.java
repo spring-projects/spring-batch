@@ -104,4 +104,28 @@ public class PartitionStepTests {
 		assertEquals(BatchStatus.FAILED, stepExecution.getStatus());
 	}
 
+	@Test
+	public void testStoppedStepExecution() throws Exception {
+		step.setStepExecutionSplitter(new SimpleStepExecutionSplitter(jobRepository, remote));
+		step.setPartitionHandler(new PartitionHandler() {
+			public Collection<StepExecution> handle(StepExecutionSplitter stepSplitter, StepExecution stepExecution)
+					throws Exception {
+				Set<StepExecution> executions = stepSplitter.split(stepExecution, 2);
+				for (StepExecution execution : executions) {
+					execution.setStatus(BatchStatus.STOPPED);
+					execution.setExitStatus(ExitStatus.STOPPED);
+				}
+				return executions;
+			}
+		});
+		step.afterPropertiesSet();
+		JobExecution jobExecution = jobRepository.createJobExecution("vanillaJob", new JobParameters());
+		StepExecution stepExecution = jobExecution.createStepExecution("foo");
+		jobRepository.add(stepExecution);
+		step.execute(stepExecution);
+		// one master and two workers
+		assertEquals(3, stepExecution.getJobExecution().getStepExecutions().size());
+		assertEquals(BatchStatus.STOPPED, stepExecution.getStatus());
+	}
+
 }
