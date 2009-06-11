@@ -159,6 +159,18 @@ public class JobParserTests {
 	}
 
 	@Test
+	public void testUnreachableStepInFlow() {
+		try {
+			new ClassPathXmlApplicationContext(
+					"org/springframework/batch/core/configuration/xml/JobParserUnreachableStepInFlowTests-context.xml");
+			fail("Error expected");
+		}
+		catch (BeanDefinitionParsingException e) {
+			assertTrue(e.getMessage().contains("The element [s4] is unreachable"));
+		}
+	}
+
+	@Test
 	public void testNextOutOfScope() {
 		try {
 			new ClassPathXmlApplicationContext(
