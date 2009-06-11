@@ -16,8 +16,13 @@
 package org.springframework.batch.core.configuration.xml;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.support.SimpleFlow;
@@ -38,6 +43,8 @@ import org.w3c.dom.NodeList;
  * 
  */
 public class FlowParser extends AbstractSingleBeanDefinitionParser {
+
+	private static final String ID_ATTR = "id";
 
 	private static final String STEP_ELE = "step";
 
@@ -80,7 +87,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * 
 	 * @param flowName the name of the flow
 	 * @param jobFactoryRef the reference to the {@link JobParserJobFactoryBean}
-	 *        from the enclosing tag
+	 * from the enclosing tag
 	 */
 	public FlowParser(String flowName, String jobFactoryRef) {
 		this.flowName = flowName;
@@ -112,22 +119,33 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		parserContext.pushContainingComponent(compositeDef);
 
 		boolean stepExists = false;
+		Map<String, Set<String>> reachableElementMap = new HashMap<String, Set<String>>();
+		String startElement = null;
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node instanceof Element) {
 				String nodeName = node.getLocalName();
+				Element child = (Element) node;
 				if (nodeName.equals(STEP_ELE)) {
-					stateTransitions.addAll(stepParser.parse((Element) node, parserContext, jobFactoryRef));
+					stateTransitions.addAll(stepParser.parse(child, parserContext, jobFactoryRef));
 					stepExists = true;
 				}
 				else if (nodeName.equals(DECISION_ELE)) {
-					stateTransitions.addAll(decisionParser.parse((Element) node, parserContext));
+					stateTransitions.addAll(decisionParser.parse(child, parserContext));
 				}
 				else if (nodeName.equals(SPLIT_ELE)) {
-					stateTransitions.addAll(splitParser.parse((Element) node, new ParserContext(parserContext
-							.getReaderContext(), parserContext.getDelegate(), builder.getBeanDefinition())));
+					stateTransitions.addAll(splitParser
+							.parse(child, new ParserContext(parserContext.getReaderContext(), parserContext
+									.getDelegate(), builder.getBeanDefinition())));
 					stepExists = true;
+				}
+
+				if (Arrays.asList(STEP_ELE, DECISION_ELE, SPLIT_ELE).contains(nodeName)) {
+					reachableElementMap.put(child.getAttribute(ID_ATTR), findReachableElements(child));
+					if (startElement == null) {
+						startElement = child.getAttribute(ID_ATTR);
+					}
 				}
 			}
 		}
@@ -135,6 +153,15 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 		if (!stepExists && !StringUtils.hasText(element.getAttribute("parent"))) {
 			parserContext.getReaderContext().error("The flow [" + flowName + "] must contain at least one step",
 					element);
+		}
+
+		// Ensure that all elements are reachable
+		Set<String> allReachableElements = new HashSet<String>();
+		findAllReachableElements(startElement, reachableElementMap, allReachableElements);
+		for (String elementId : reachableElementMap.keySet()) {
+			if (!allReachableElements.contains(elementId)) {
+				parserContext.getReaderContext().error("The element [" + elementId + "] is unreachable", element);
+			}
 		}
 
 		builder.addConstructorArgValue(flowName);
@@ -150,12 +177,64 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	}
 
 	/**
+	 * Find all of the elements that are pointed to by this element.
+	 * 
+	 * @param element
+	 * @return a collection of reachable element names
+	 */
+	private Set<String> findReachableElements(Element element) {
+		Set<String> reachableElements = new HashSet<String>();
+
+		String nextAttribute = element.getAttribute(NEXT_ATTR);
+		if (StringUtils.hasText(nextAttribute)) {
+			reachableElements.add(nextAttribute);
+		}
+
+		@SuppressWarnings("unchecked")
+		List<Element> nextElements = (List<Element>) DomUtils.getChildElementsByTagName(element, NEXT_ELE);
+		for (Element nextElement : nextElements) {
+			String toAttribute = nextElement.getAttribute(TO_ATTR);
+			reachableElements.add(toAttribute);
+		}
+
+		@SuppressWarnings("unchecked")
+		List<Element> stopElements = (List<Element>) DomUtils.getChildElementsByTagName(element, STOP_ELE);
+		for (Element stopElement : stopElements) {
+			String restartAttribute = stopElement.getAttribute(RESTART_ATTR);
+			reachableElements.add(restartAttribute);
+		}
+
+		return reachableElements;
+	}
+
+	/**
+	 * Find all of the elements reachable from the startElement.
+	 * 
+	 * @param startElement
+	 * @param reachableElementMap
+	 * @param accumulator a collection of reachable element names
+	 */
+	private void findAllReachableElements(String startElement, Map<String, Set<String>> reachableElementMap,
+			Set<String> accumulator) {
+		Set<String> reachableIds = reachableElementMap.get(startElement);
+		accumulator.add(startElement);
+		if (reachableIds != null) {
+			for (String reachable : reachableIds) {
+				// don't explore a previously explored element; prevent loop
+				if (!accumulator.contains(reachable)) {
+					findAllReachableElements(reachable, reachableElementMap, accumulator);
+				}
+			}
+		}
+	}
+
+	/**
 	 * @param parserContext the parser context for the bean factory
 	 * @param stateDef The bean definition for the current state
 	 * @param element the &lt;step/gt; element to parse
 	 * @return a collection of
-	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *         references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
 	 */
 	protected static Collection<BeanDefinition> getNextElements(ParserContext parserContext, BeanDefinition stateDef,
 			Element element) {
@@ -165,12 +244,12 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	/**
 	 * @param parserContext the parser context for the bean factory
 	 * @param stepId the id of the current state if it is a step state, null
-	 *        otherwise
+	 * otherwise
 	 * @param stateDef The bean definition for the current state
 	 * @param element the &lt;step/gt; element to parse
 	 * @return a collection of
-	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *         references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
 	 */
 	protected static Collection<BeanDefinition> getNextElements(ParserContext parserContext, String stepId,
 			BeanDefinition stateDef, Element element) {
@@ -234,8 +313,8 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
 	 * @param a collection of
-	 *        {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *        references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
 	 */
 	private static Collection<BeanDefinition> parseTransitionElement(Element transitionElement, String stateId,
 			BeanDefinition stateDef, ParserContext parserContext) {
@@ -255,18 +334,18 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 
 	/**
 	 * @param status The batch status that this transition will set. Use
-	 *        BatchStatus.UNKNOWN if not applicable.
+	 * BatchStatus.UNKNOWN if not applicable.
 	 * @param on The pattern that this transition should match. Use null for
-	 *        "no restriction" (same as "*").
+	 * "no restriction" (same as "*").
 	 * @param next The state to which this transition should go. Use null if not
-	 *        applicable.
+	 * applicable.
 	 * @param exitCode The exit code that this transition will set. Use null to
-	 *        default to batchStatus.
+	 * default to batchStatus.
 	 * @param stateDef The bean definition for the current state
 	 * @param parserContext the parser context for the bean factory
 	 * @param a collection of
-	 *        {@link org.springframework.batch.core.job.flow.support.StateTransition}
-	 *        references
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * references
 	 */
 	private static Collection<BeanDefinition> createTransition(FlowExecutionStatus status, String on, String next,
 			String exitCode, BeanDefinition stateDef, ParserContext parserContext, boolean abandon) {
@@ -336,7 +415,7 @@ public class FlowParser extends AbstractSingleBeanDefinitionParser {
 	 * @param on the pattern value
 	 * @param next the next step id
 	 * @return a bean definition for a
-	 *         {@link org.springframework.batch.core.job.flow.support.StateTransition}
+	 * {@link org.springframework.batch.core.job.flow.support.StateTransition}
 	 */
 	public static BeanDefinition getStateTransitionReference(ParserContext parserContext,
 			BeanDefinition stateDefinition, String on, String next) {

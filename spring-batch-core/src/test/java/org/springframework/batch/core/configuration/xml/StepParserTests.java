@@ -21,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Step;
@@ -52,8 +53,13 @@ import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
  */
 public class StepParserTests {
 
-	private static final ApplicationContext stepParserParentAttributeTestsCtx = new ClassPathXmlApplicationContext(
-			"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+	private static ApplicationContext stepParserParentAttributeTestsCtx;
+
+	@BeforeClass
+	public static void loadAppCtx() {
+		stepParserParentAttributeTestsCtx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/StepParserParentAttributeTests-context.xml");
+	}
 
 	@SuppressWarnings("unchecked")
 	@Test

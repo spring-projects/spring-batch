@@ -35,11 +35,11 @@
 		<step id="s8" parent="standalone8" next="s9" />
 		<step id="s9" parent="standalone9" next="s10" />
 		<step id="s10" parent="standalone10" next="s11"/>
-		<step id="s11" parent="dummyStep"/>
-		<step id="s12" parent="dummyStep">
+		<step id="s11" parent="dummyStep" next="s12"/>
+		<step id="s12" parent="dummyStep" next="s13">
 			<tasklet ref="dummyTasklet"/>
 		</step>
-		<step id="s13" parent="dummyStepWithTaskletOnParent"/>
+		<step id="s13" parent="dummyStepWithTaskletOnParent" next="s14"/>
 		<step id="s14" parent="standaloneStepWithTaskletAndDummyParent"/>
 	</job>
 	
@@ -104,20 +104,20 @@
 	</step>
 
 	<job id="jobWithoutRepo">
-		<step id="defaultRepoStep"><tasklet ref="dummyTasklet"/></step>
-		<step id="defaultRepoStepWithParent" parent="defaultRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="defaultRepoStep" next="defaultRepoStepWithParent"><tasklet ref="dummyTasklet"/></step>
+		<step id="defaultRepoStepWithParent" parent="defaultRepoStandaloneStep" next="overrideRepoStep"><tasklet ref="dummyTasklet"/></step>
 		<step id="overrideRepoStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
 	</job>
 
 	<job id="jobWithRepo" job-repository="dummyJobRepository">
-		<step id="injectedRepoStep"><tasklet ref="dummyTasklet"/></step>
-		<step id="injectedRepoStepWithParent" parent="defaultRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoStep" next="injectedRepoStepWithParent"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoStepWithParent" parent="defaultRepoStandaloneStep" next="injectedOverrideRepoStep"><tasklet ref="dummyTasklet"/></step>
 		<step id="injectedOverrideRepoStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
 	</job>
 	
 	<job id="jobWithRepoOnParent" parent="baseJobWithRepo">
-		<step id="injectedRepoFromParentStep"><tasklet ref="dummyTasklet"/></step>
-		<step id="injectedRepoFromParentStepWithParent" parent="defaultRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoFromParentStep" next="injectedRepoFromParentStepWithParent"><tasklet ref="dummyTasklet"/></step>
+		<step id="injectedRepoFromParentStepWithParent" parent="defaultRepoStandaloneStep" next="injectedOverrideRepoFromParentStep"><tasklet ref="dummyTasklet"/></step>
 		<step id="injectedOverrideRepoFromParentStep" parent="specifiedRepoStandaloneStep"><tasklet ref="dummyTasklet"/></step>
 	</job>
 
@@ -135,9 +135,9 @@
 	<beans:bean id="dummyJobRepository2" class="org.springframework.batch.core.configuration.xml.DummyJobRepository"/>
 
 	<job id="defaultTxMgrTestJob">
-		<step id="defaultTxMgrStep"><tasklet ref="dummyTasklet"/></step>
-		<step id="specifiedTxMgrStep"><tasklet ref="dummyTasklet" transaction-manager="dummyTxMgr"/></step>
-		<step id="defaultTxMgrWithParentStep" parent="specifiedRepoStandaloneStep"/>
+		<step id="defaultTxMgrStep" next="specifiedTxMgrStep"><tasklet ref="dummyTasklet"/></step>
+		<step id="specifiedTxMgrStep" next="defaultTxMgrWithParentStep"><tasklet ref="dummyTasklet" transaction-manager="dummyTxMgr"/></step>
+		<step id="defaultTxMgrWithParentStep" parent="specifiedRepoStandaloneStep" next="overrideTxMgrOnParentStep"/>
 		<step id="overrideTxMgrOnParentStep" parent="specifiedRepoStandaloneStep"><tasklet transaction-manager="dummyTxMgr2"/></step>
 	</job>
 

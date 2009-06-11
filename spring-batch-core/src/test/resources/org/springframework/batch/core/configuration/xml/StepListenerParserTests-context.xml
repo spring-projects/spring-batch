@@ -7,7 +7,7 @@
 	<beans:import resource="common-context.xml" />
 	
 	<job id="job">
-		<step id="s1" parent="baseStep">
+		<step id="s1" parent="baseStep" next="s2">
 			<tasklet ref="dummyTasklet">
 				<listeners merge="true">
 					<listener class="org.springframework.batch.core.configuration.xml.DummyAnnotationStepExecutionListener"/>

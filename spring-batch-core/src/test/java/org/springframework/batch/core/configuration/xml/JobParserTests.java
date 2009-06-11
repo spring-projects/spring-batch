@@ -17,10 +17,12 @@ package org.springframework.batch.core.configuration.xml;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.aop.framework.Advised;
 import org.springframework.batch.core.Job;
@@ -29,6 +31,7 @@ import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -40,8 +43,13 @@ import org.springframework.test.util.ReflectionTestUtils;
  */
 public class JobParserTests {
 
-	ConfigurableApplicationContext jobParserParentAttributeTestsCtx = new ClassPathXmlApplicationContext(
-			"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
+	private static ConfigurableApplicationContext jobParserParentAttributeTestsCtx;
+
+	@BeforeClass
+	public static void loadAppCtx() {
+		jobParserParentAttributeTestsCtx = new ClassPathXmlApplicationContext(
+				"org/springframework/batch/core/configuration/xml/JobParserParentAttributeTests-context.xml");
+	}
 
 	@Test
 	public void testInheritListeners() throws Exception {
@@ -135,5 +143,29 @@ public class JobParserTests {
 		}
 		assertTrue(jobRepository instanceof JobRepository);
 		return (JobRepository) jobRepository;
+	}
+
+	@Test
+	public void testUnreachableStep() {
+		try {
+			new ClassPathXmlApplicationContext(
+					"org/springframework/batch/core/configuration/xml/JobParserUnreachableStepTests-context.xml");
+			fail("Error expected");
+		}
+		catch (BeanDefinitionParsingException e) {
+			assertTrue(e.getMessage().contains("The element [s2] is unreachable"));
+		}
+	}
+
+	@Test
+	public void testNextOutOfScope() {
+		try {
+			new ClassPathXmlApplicationContext(
+					"org/springframework/batch/core/configuration/xml/JobParserNextOutOfScopeTests-context.xml");
+			fail("Error expected");
+		}
+		catch (BeanDefinitionParsingException e) {
+			assertTrue(e.getMessage().contains("Missing state for [StateTransition: [state=s2, pattern=*, next=s3]]"));
+		}
 	}
 }
