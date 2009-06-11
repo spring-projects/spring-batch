@@ -31,6 +31,7 @@ import org.springframework.batch.core.job.AbstractJob;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.SimpleJobRepository;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -164,7 +165,7 @@ public class JobParserTests {
 					"org/springframework/batch/core/configuration/xml/JobParserNextOutOfScopeTests-context.xml");
 			fail("Error expected");
 		}
-		catch (BeanDefinitionParsingException e) {
+		catch (BeanCreationException e) {
 			assertTrue(e.getMessage().contains("Missing state for [StateTransition: [state=s2, pattern=*, next=s3]]"));
 		}
 	}
