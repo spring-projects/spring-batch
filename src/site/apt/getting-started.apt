@@ -63,7 +63,7 @@ $ mvn test
 
     * Import the <<<org.springframework.batch.samples>>> project from the samples directory.
 
-    * Find all the compile scope and non-optional runtime jar files listed in the {{dependencies.html}dependencies report}} and import them into the project.
+    * Find all the compile scope and non-optional runtime jar files listed in the {{{dependencies.html}dependencies report}} and import them into the project.
 
     * Force the workspace to build (e.g. Project -> Clean...)
 
