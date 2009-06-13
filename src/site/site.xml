@@ -49,9 +49,9 @@
 				href="http://forum.springframework.org/forumdisplay.php?f=41" />
 			<item name="JIRA" href="http://jira.springframework.org/browse/BATCH" />
 			<item name="1.0.x"
-				href="http://www.springframework.org/spring-batch/1.0.x/index.html" />
+				href="http://static.springframework.org/spring-batch/1.0.x/index.html" />
 			<item name="1.1.x"
-				href="http://www.springframework.org/spring-batch/1.1.x/index.html" />
+				href="http://static.springframework.org/spring-batch/1.1.x/index.html" />
 		</menu>
 
 		<menu name="Modules" inherit="none">
