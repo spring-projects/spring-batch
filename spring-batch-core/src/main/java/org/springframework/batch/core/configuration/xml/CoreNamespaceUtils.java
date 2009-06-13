@@ -18,6 +18,7 @@ package org.springframework.batch.core.configuration.xml;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -97,16 +98,18 @@ public class CoreNamespaceUtils {
 		for (String beanName : registry.getBeanDefinitionNames()) {
 			BeanDefinition bd = registry.getBeanDefinition(beanName);
 			if (CUSTOM_EDITOR_CONFIGURER_CLASS_NAME.equals(bd.getBeanClassName())) {
-				Map editors = (Map) bd.getPropertyValues().getPropertyValue("customEditors").getValue();
-				for (Map.Entry entry : (Set<Map.Entry>) editors.entrySet()) {
-					if (entry.getKey() instanceof TypedStringValue) {
-						if (RANGE_ARRAY_CLASS_NAME.equals(((TypedStringValue) entry.getKey()).getValue())) {
-							return true;
+				PropertyValue pv = bd.getPropertyValues().getPropertyValue("customEditors");
+				if (pv != null) {
+					for (Map.Entry entry : (Set<Map.Entry>) ((Map) pv.getValue()).entrySet()) {
+						if (entry.getKey() instanceof TypedStringValue) {
+							if (RANGE_ARRAY_CLASS_NAME.equals(((TypedStringValue) entry.getKey()).getValue())) {
+								return true;
+							}
 						}
-					}
-					else if (entry.getKey() instanceof String) {
-						if (RANGE_ARRAY_CLASS_NAME.equals((String) entry.getKey())) {
-							return true;
+						else if (entry.getKey() instanceof String) {
+							if (RANGE_ARRAY_CLASS_NAME.equals((String) entry.getKey())) {
+								return true;
+							}
 						}
 					}
 				}
