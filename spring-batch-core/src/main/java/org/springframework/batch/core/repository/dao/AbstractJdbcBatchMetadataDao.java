@@ -16,6 +16,8 @@
 
 package org.springframework.batch.core.repository.dao;
 
+import java.sql.Types;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.util.Assert;
@@ -37,6 +39,8 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 	public static final int DEFAULT_EXIT_MESSAGE_LENGTH = 2500;
 
 	private String tablePrefix = DEFAULT_TABLE_PREFIX;
+	
+	private int clobTypeToUse = Types.CLOB;
 
 	private SimpleJdbcOperations jdbcTemplate;
 
@@ -65,6 +69,14 @@ public abstract class AbstractJdbcBatchMetadataDao implements InitializingBean {
 
 	protected SimpleJdbcOperations getJdbcTemplate() {
 		return jdbcTemplate;
+	}
+	
+	public int getClobTypeToUse() {
+		return clobTypeToUse;
+	}
+
+	public void setClobTypeToUse(int clobTypeToUse) {
+		this.clobTypeToUse = clobTypeToUse;
 	}
 
 	public void afterPropertiesSet() throws Exception {

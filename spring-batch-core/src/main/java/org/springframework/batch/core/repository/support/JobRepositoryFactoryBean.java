@@ -16,6 +16,10 @@
 
 package org.springframework.batch.core.repository.support;
 
+import static org.springframework.batch.support.DatabaseType.SYBASE;
+
+import java.sql.Types;
+
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -144,6 +148,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setJobExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "JOB_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
+		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(exitMessageLength);
 		dao.afterPropertiesSet();
 		return dao;
@@ -156,6 +161,7 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		dao.setStepExecutionIncrementer(incrementerFactory.getIncrementer(databaseType, tablePrefix
 				+ "STEP_EXECUTION_SEQ"));
 		dao.setTablePrefix(tablePrefix);
+		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.setExitMessageLength(exitMessageLength);
 		dao.afterPropertiesSet();
 		return dao;
@@ -166,8 +172,18 @@ public class JobRepositoryFactoryBean extends AbstractJobRepositoryFactoryBean i
 		JdbcExecutionContextDao dao = new JdbcExecutionContextDao();
 		dao.setJdbcTemplate(jdbcTemplate);
 		dao.setTablePrefix(tablePrefix);
+		dao.setClobTypeToUse(determineClobTypeToUse(this.databaseType));
 		dao.afterPropertiesSet();
 		return dao;
+	}
+
+	private int determineClobTypeToUse(String databaseType) {
+		if (SYBASE == DatabaseType.valueOf(databaseType.toUpperCase())) {
+			return Types.LONGVARCHAR;
+		}
+		else {
+			return Types.CLOB;
+		}
 	}
 
 }

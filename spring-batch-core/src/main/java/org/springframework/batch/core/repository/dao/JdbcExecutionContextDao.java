@@ -180,7 +180,7 @@ public class JdbcExecutionContextDao extends AbstractJdbcBatchMetadataDao implem
 					lobHandler.getLobCreator().setClobAsString(ps, 2, longContext);
 				}
 				else {
-					ps.setNull(2, Types.CLOB);
+					ps.setNull(2, getClobTypeToUse());
 				}
 				ps.setLong(3, executionId);
 			}
