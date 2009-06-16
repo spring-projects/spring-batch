@@ -45,7 +45,7 @@
 			</distributionManagement>
 		</profile>
 		<profile>
-			<id>release</id>
+			<id>dist</id>
 			<build>
 				<plugins>
 					<plugin>
