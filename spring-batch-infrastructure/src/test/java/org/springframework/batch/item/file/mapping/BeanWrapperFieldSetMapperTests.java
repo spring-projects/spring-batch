@@ -16,26 +16,36 @@
 
 package org.springframework.batch.item.file.mapping;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.beans.PropertyEditor;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.springframework.batch.item.file.transform.DefaultFieldSet;
 import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.NotWritablePropertyException;
+import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.beans.propertyeditors.PropertiesEditor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
+import org.springframework.validation.DataBinder;
 
-public class BeanWrapperFieldSetMapperTests extends TestCase {
+public class BeanWrapperFieldSetMapperTests {
 
+	@Test
 	public void testNameAndTypeSpecified() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		mapper.setTargetType(TestObject.class);
@@ -48,6 +58,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testNameNorTypeSpecified() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		try {
@@ -58,6 +69,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testVanillaBeanCreatedFromType() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		mapper.setTargetType(TestObject.class);
@@ -71,6 +83,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals('C', result.getVarChar());
 	}
 
+	@Test
 	public void testMapperWithSingleton() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		StaticApplicationContext context = new StaticApplicationContext();
@@ -86,6 +99,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals('C', result.getVarChar());
 	}
 
+	@Test
 	public void testPropertyNameMatching() throws Exception {
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
 		StaticApplicationContext context = new StaticApplicationContext();
@@ -101,11 +115,13 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals('C', result.getVarChar());
 	}
 
+	@Test
 	@SuppressWarnings("unchecked")
 	public void testMapperWithPrototype() throws Exception {
 		ApplicationContext context = new ClassPathXmlApplicationContext("bean-wrapper.xml", getClass());
 
-		BeanWrapperFieldSetMapper<TestObject> mapper = (BeanWrapperFieldSetMapper<TestObject>) context.getBean("fieldSetMapper");
+		BeanWrapperFieldSetMapper<TestObject> mapper = (BeanWrapperFieldSetMapper<TestObject>) context
+				.getBean("fieldSetMapper");
 
 		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "true", "C" },
 				new String[] { "varString", "varBoolean", "varChar" });
@@ -116,6 +132,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 	}
 
+	@Test
 	public void testMapperWithNestedBeanPaths() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
@@ -140,6 +157,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals(2, result.getTestObjectB().getTestObjectC().getValue());
 	}
 
+	@Test
 	public void testMapperWithSimilarNamePropertyMatches() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 
@@ -158,6 +176,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals(1, result.getValueB());
 	}
 
+	@Test
 	public void testMapperWithNotVerySimilarNamePropertyMatches() throws Exception {
 		TestNestedC testNestedC = new TestNestedC();
 
@@ -176,6 +195,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals(1, result.getValue());
 	}
 
+	@Test
 	public void testMapperWithNestedBeanPathsAndPropertyMatches() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
@@ -197,6 +217,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals(2, result.getTestObjectB().getTestObjectC().getValue());
 	}
 
+	@Test
 	public void testMapperWithNestedBeanPathsAndPropertyMisMatches() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
@@ -219,6 +240,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testMapperWithNestedBeanPathsAndPropertyPrefixMisMatches() throws Exception {
 		TestNestedA testNestedA = new TestNestedA();
 		TestNestedB testNestedB = new TestNestedB();
@@ -241,6 +263,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 	}
 
+	@Test
 	public void testPlainBeanWrapper() throws Exception {
 		TestObject result = new TestObject();
 		BeanWrapperImpl wrapper = new BeanWrapperImpl(result);
@@ -255,6 +278,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 	// BeanWrapperFieldSetMapper doesn't currently support nesting with
 	// collections.
+	@Test
 	public void testNestedList() {
 
 		TestNestedList nestedList = new TestNestedList();
@@ -281,6 +305,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 	}
 
+	@Test
 	public void testPaddedLongWithNoEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
@@ -292,6 +317,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals(9, bean.getVarLong());
 	}
 
+	@Test
 	public void testPaddedLongWithEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
@@ -306,6 +332,7 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		assertEquals(9, bean.getVarLong());
 	}
 
+	@Test
 	public void testPaddedLongWithDefaultAndCustomEditor() throws Exception {
 
 		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
@@ -319,6 +346,98 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 
 		assertEquals(9, bean.getVarLong());
 		assertEquals(78, bean.getVarInt());
+	}
+
+	@Test
+	public void testNumberFormatWithDefaultAndCustomEditor() throws Exception {
+
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setTargetType(TestObject.class);
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7,890.1" }, new String[] { "varDouble",
+				"varFloat" });
+
+		Map<Class<?>, PropertyEditor> editors = new HashMap<Class<?>, PropertyEditor>();
+		editors.put(Double.TYPE, new CustomNumberEditor(Double.class, NumberFormat.getInstance(Locale.GERMAN), true));
+		editors.put(Float.TYPE, new CustomNumberEditor(Float.class, NumberFormat.getInstance(Locale.UK), true));
+		mapper.setCustomEditors(editors);
+
+		TestObject bean = (TestObject) mapper.mapFieldSet(fieldSet);
+
+		assertEquals(9876.1, bean.getVarDouble(), 0.01);
+		assertEquals(7890.1, bean.getVarFloat(), 0.01);
+	}
+
+	@Test
+	public void testFieldSpecificCustomEditor() throws Exception {
+
+		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<TestTwoDoubles>() {
+			@Override
+			protected void initBinder(DataBinder binder) {
+				binder.registerCustomEditor(Double.TYPE, "value", new CustomNumberEditor(Double.class, NumberFormat
+						.getNumberInstance(Locale.GERMAN), true));
+			}
+		};
+		mapper.setTargetType(TestTwoDoubles.class);
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7890.1" }, new String[] { "value", "other" });
+		TestTwoDoubles bean = mapper.mapFieldSet(fieldSet);
+
+		assertEquals(9876.1, bean.getValue(), 0.01);
+		assertEquals(7890.1, bean.getOther(), 0.01);
+	}
+
+	@Test
+	public void testFieldSpecificCustomEditorWithRegistry() throws Exception {
+
+		BeanWrapperFieldSetMapper<TestTwoDoubles> mapper = new BeanWrapperFieldSetMapper<TestTwoDoubles>() {
+			@Override
+			public void registerCustomEditors(PropertyEditorRegistry registry) {
+				super.registerCustomEditors(registry);
+				registry.registerCustomEditor(Double.TYPE, "value", new CustomNumberEditor(Double.class, NumberFormat
+						.getNumberInstance(Locale.GERMAN), true));
+			}
+		};
+		mapper.setTargetType(TestTwoDoubles.class);
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "9.876,1", "7890.1" }, new String[] { "value", "other" });
+		TestTwoDoubles bean = mapper.mapFieldSet(fieldSet);
+
+		assertEquals(9876.1, bean.getValue(), 0.01);
+		assertEquals(7890.1, bean.getOther(), 0.01);
+	}
+
+	@Test
+	public void testStrict() throws Exception {
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setStrict(true);
+		mapper.setTargetType(TestObject.class);
+		mapper.afterPropertiesSet();
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
+				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
+		try {
+			mapper.mapFieldSet(fieldSet);
+			fail("expected error");
+		}
+		catch (NotWritablePropertyException e) {
+			assertTrue(e.getMessage().contains("'illegalPropertyName'"));
+		}
+	}
+
+	@Test
+	public void testNotStrict() throws Exception {
+		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
+		mapper.setStrict(false);
+		mapper.setTargetType(TestObject.class);
+		mapper.afterPropertiesSet();
+
+		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
+				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
+		TestObject result = mapper.mapFieldSet(fieldSet);
+		assertEquals("This is some dummy string", result.getVarString());
+		assertEquals(true, result.isVarBoolean());
+		assertEquals('C', result.getVarChar());
 	}
 
 	private static class TestNestedList {
@@ -403,34 +522,26 @@ public class BeanWrapperFieldSetMapperTests extends TestCase {
 		}
 	}
 
-	public void testStrict() throws Exception {
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
-		mapper.setStrict(true);
-		mapper.setTargetType(TestObject.class);
-		mapper.afterPropertiesSet();
+	public static class TestTwoDoubles {
+		private double value;
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
-				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
-		try {
-			mapper.mapFieldSet(fieldSet);
-			fail("expected error");
+		private double other;
+
+		public double getValue() {
+			return value;
 		}
-		catch(NotWritablePropertyException e) {
-			assertTrue(e.getMessage().contains("'illegalPropertyName'"));
+
+		public void setValue(double value) {
+			this.value = value;
 		}
-	}
 
-	public void testNotStrict() throws Exception {
-		BeanWrapperFieldSetMapper<TestObject> mapper = new BeanWrapperFieldSetMapper<TestObject>();
-		mapper.setStrict(false);
-		mapper.setTargetType(TestObject.class);
-		mapper.afterPropertiesSet();
+		public double getOther() {
+			return other;
+		}
 
-		FieldSet fieldSet = new DefaultFieldSet(new String[] { "This is some dummy string", "This won't be mapped",
-				"true", "C" }, new String[] { "varString", "illegalPropertyName", "varBoolean", "varChar" });
-		TestObject result = mapper.mapFieldSet(fieldSet);
-		assertEquals("This is some dummy string", result.getVarString());
-		assertEquals(true, result.isVarBoolean());
-		assertEquals('C', result.getVarChar());
+		public void setOther(double other) {
+			this.other = other;
+		}
+
 	}
 }
