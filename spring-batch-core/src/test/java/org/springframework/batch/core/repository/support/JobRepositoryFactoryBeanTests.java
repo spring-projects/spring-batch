@@ -143,10 +143,10 @@ public class JobRepositoryFactoryBeanTests {
 
 	@Test
 	public void testCreateRepository() throws Exception {
-		String databaseType = "foo";
+		String databaseType = "HSQL";
 		factory.setDatabaseType(databaseType);
 
-		expect(incrementerFactory.isSupportedIncrementerType("foo")).andReturn(true);
+		expect(incrementerFactory.isSupportedIncrementerType("HSQL")).andReturn(true);
 		expect(incrementerFactory.getSupportedIncrementerTypes()).andReturn(new String[0]);
 		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_SEQ")).andReturn(new StubIncrementer());
 		expect(incrementerFactory.getIncrementer(databaseType, tablePrefix + "JOB_EXECUTION_SEQ")).andReturn(new StubIncrementer());

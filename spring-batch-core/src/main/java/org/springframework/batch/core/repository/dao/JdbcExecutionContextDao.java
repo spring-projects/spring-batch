@@ -19,7 +19,6 @@ package org.springframework.batch.core.repository.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
-import java.sql.Types;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.Map;
