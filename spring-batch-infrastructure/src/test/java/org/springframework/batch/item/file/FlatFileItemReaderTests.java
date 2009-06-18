@@ -167,7 +167,7 @@ public class FlatFileItemReaderTests {
 		}
 
 		public String getDescription() {
-			return "NonExistantResource";
+			return "NonExistentResource";
 		}
 
 		public InputStream getInputStream() throws IOException {
