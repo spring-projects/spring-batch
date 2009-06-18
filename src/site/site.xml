@@ -31,6 +31,7 @@
 
 		<menu name="Documentation" inherit="none">
 			<item name="Home" href="index.html" />
+			<item name="Downloads" href="downloads.html" />
 			<item name="Getting Started" href="getting-started.html" />
 			<item name="User Guide" href="reference/index.html" />
 			<item name="API" href="apidocs/index.html" />
