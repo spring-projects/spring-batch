@@ -12,8 +12,8 @@
 	<bean id="sampleJob" parent="simpleJob">
 		<property name="steps">
 			<list>
-				<ref bean="step1" />
-				<ref bean="step2" />
+				<bean id="step1" parent="s1"/>
+				<bean id="step2" parent="s2"/>
 			</list>
 		</property>
 	</bean>

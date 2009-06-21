@@ -20,20 +20,21 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/simple-job-launcher-context.xml", "/jobs/sample-steps.xml" })
-public class SampleStepTests implements ApplicationContextAware{
+public class SampleStepTests implements ApplicationContextAware {
 
 	@Autowired
 	private SimpleJdbcTemplate jdbcTemplate;
-	
+
 	private StepRunner stepRunner;
+
 	private ApplicationContext context;
-	
+
 	@Autowired
 	private JobLauncher jobLauncher;
-	
+
 	@Autowired
 	private JobRepository jobRepository;
-	
+
 	@Before
 	public void setUp() {
 		jdbcTemplate.update("create table TESTS (ID integer, NAME varchar(40))");
@@ -47,13 +48,12 @@ public class SampleStepTests implements ApplicationContextAware{
 
 	@Test
 	public void testTasklet() {
-		Step step = (Step)context.getBean("step2");
+		Step step = (Step) context.getBean("s2");
 		assertEquals(BatchStatus.COMPLETED, stepRunner.launchStep(step).getStatus());
 		assertEquals(2, jdbcTemplate.queryForInt("SELECT ID from TESTS where NAME = 'SampleTasklet2'"));
 	}
 
-	public void setApplicationContext(ApplicationContext applicationContext)
-			throws BeansException {
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.context = applicationContext;
 	}
 

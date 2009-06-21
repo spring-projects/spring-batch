@@ -34,7 +34,6 @@ package org.springframework.batch.support;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.aop.framework.Advised;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -145,6 +144,9 @@ public class SimpleMethodInvoker implements MethodInvoker {
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(25, 37).append(object.hashCode()).append(method.hashCode()).toHashCode();
+		int result = 25;
+		result = 31 * result + object.hashCode();
+		result = 31 * result + method.hashCode();
+		return result;
 	}
 }

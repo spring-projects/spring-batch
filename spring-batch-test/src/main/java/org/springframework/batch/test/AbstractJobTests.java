@@ -32,6 +32,7 @@ import org.springframework.batch.core.job.SimpleJob;
 import org.springframework.batch.core.job.flow.FlowJob;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -81,14 +82,14 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	private StepRunner stepRunner;
 
 	private ApplicationContext applicationContext;
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		this.applicationContext = applicationContext;	
+		this.applicationContext = applicationContext;
 	}
-	
+
 	/**
 	 * @return the applicationContext
 	 */
@@ -162,27 +163,58 @@ public abstract class AbstractJobTests implements ApplicationContextAware {
 	}
 
 	/**
-	 * Launch just the specified step in the job. An IllegalStateException is
-	 * thrown if there is no Step with the given name.
+	 * Launch just the specified step in the job. A unique set of JobParameters
+	 * will automatically be generated. An IllegalStateException is thrown if
+	 * there is no Step with the given name.
 	 * 
-	 * @param stepName
+	 * @param stepName The name of the step to launch
 	 * @return JobExecution
 	 */
 	public JobExecution launchStep(String stepName) {
+		return this.launchStep(stepName, this.getUniqueJobParameters(), null);
+	}
+
+	/**
+	 * Launch just the specified step in the job. A unique set of JobParameters
+	 * will automatically be generated. An IllegalStateException is thrown if
+	 * there is no Step with the given name.
+	 * 
+	 * @param stepName The name of the step to launch
+	 * @param jobExecutionContext An ExecutionContext whose values will be
+	 * loaded into the Job ExecutionContext prior to launching the step.
+	 * @return JobExecution
+	 */
+	public JobExecution launchStep(String stepName, ExecutionContext jobExecutionContext) {
+		return this.launchStep(stepName, this.getUniqueJobParameters(), jobExecutionContext);
+	}
+
+	/**
+	 * Launch just the specified step in the job. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
+	 * 
+	 * @param stepName The name of the step to launch
+	 * @param jobParameters The JobParameters to use during the launch
+	 * @return JobExecution
+	 */
+	public JobExecution launchStep(String stepName, JobParameters jobParameters) {
+		return this.launchStep(stepName, jobParameters, null);
+	}
+
+	/**
+	 * Launch just the specified step in the job. An IllegalStateException is
+	 * thrown if there is no Step with the given name.
+	 * 
+	 * @param stepName The name of the step to launch
+	 * @param jobParameters The JobParameters to use during the launch
+	 * @param jobExecutionContext An ExecutionContext whose values will be
+	 * loaded into the Job ExecutionContext prior to launching the step.
+	 * @return JobExecution
+	 */
+	public JobExecution launchStep(String stepName, JobParameters jobParameters, ExecutionContext jobExecutionContext) {
 		Step step = this.job.getStep(stepName);
 		if (step == null) {
 			throw new IllegalStateException("No Step found with name: [" + stepName + "]");
 		}
-		return getStepRunner().launchStep(step);
-	}
-
-	/**
-	 * Launch just the specified step in the job.
-	 * 
-	 * @param stepName
-	 * @param jobParameters
-	 */
-	public JobExecution launchStep(String stepName, JobParameters jobParameters) {
-		return getStepRunner().launchStep(this.job.getStep(stepName), jobParameters);
+		return getStepRunner().launchStep(step, jobParameters, jobExecutionContext);
 	}
 }
