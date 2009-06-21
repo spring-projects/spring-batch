@@ -6,14 +6,17 @@ import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
-import org.springframework.batch.core.scope.context.StepContext;
-import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 
 public class StepSynchronizationManagerTests {
 
@@ -46,6 +49,30 @@ public class StepSynchronizationManagerTests {
 		StepSynchronizationManager.close();
 		assertNull(StepSynchronizationManager.getContext());
 		assertEquals(0, list.size());
+	}
+
+	@Test
+	public void testMultithreaded() throws Exception {
+		StepContext context = StepSynchronizationManager.register(stepExecution);
+		ExecutorService executorService = Executors.newFixedThreadPool(2);
+		FutureTask<StepContext> task = new FutureTask<StepContext>(new Callable<StepContext>() {
+			public StepContext call() throws Exception {
+				try {
+					StepSynchronizationManager.register(stepExecution);
+					StepContext context = StepSynchronizationManager.getContext();
+					context.setAttribute("foo", "bar");
+					return context;
+				}
+				finally {
+					StepSynchronizationManager.close();
+				}
+			}
+		});
+		executorService.execute(task);
+		executorService.awaitTermination(1, TimeUnit.SECONDS);
+		assertEquals(context.attributeNames().length, task.get().attributeNames().length);
+		StepSynchronizationManager.close();
+		assertNull(StepSynchronizationManager.getContext());
 	}
 
 	@Test

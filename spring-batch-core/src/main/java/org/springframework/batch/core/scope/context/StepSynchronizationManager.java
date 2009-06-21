@@ -15,7 +15,10 @@
  */
 package org.springframework.batch.core.scope.context;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepExecution;
@@ -32,11 +35,32 @@ import org.springframework.batch.core.StepExecution;
  */
 public class StepSynchronizationManager {
 
-	/**
-	 * Don't use InheritableThreadLocal because there are side effects if a step
-	 * is trying to run multiple child steps (e.g. with partitioning).
+	/*
+	 * We have to deal with single and multi-threaded execution, with a single
+	 * and with multiple step execution instances. That's 2x2 = 4 scenarios.
 	 */
-	private static final ThreadLocal<Stack<StepContext>> contextHolder = new ThreadLocal<Stack<StepContext>>();
+
+	/**
+	 * Storage for the current step execution; has to be ThreadLocal because it
+	 * is needed to locate a StepContext in components that are not part of a
+	 * Step (like when re-hydrating a scoped proxy). Doesn't use
+	 * InheritableThreadLocal because there are side effects if a step is trying
+	 * to run multiple child steps (e.g. with partitioning). The Stack is used
+	 * to cover the single threaded case, so that the API is the same as
+	 * multi-threaded.
+	 */
+	private static final ThreadLocal<Stack<StepExecution>> executionHolder = new ThreadLocal<Stack<StepExecution>>();
+
+	/**
+	 * Reference counter for each step execution: how many threads are using the
+	 * same one?
+	 */
+	private static final Map<StepExecution, AtomicInteger> counts = new HashMap<StepExecution, AtomicInteger>();
+
+	/**
+	 * Simple map from a running step execution to the associated context.
+	 */
+	private static final Map<StepExecution, StepContext> contexts = new HashMap<StepExecution, StepContext>();
 
 	/**
 	 * Getter for the current context if there is one, otherwise returns null.
@@ -45,17 +69,16 @@ public class StepSynchronizationManager {
 	 * has not been registered for this thread).
 	 */
 	public static StepContext getContext() {
-		Stack<StepContext> current = getCurrent();
-		if (current.isEmpty()) {
+		if (getCurrent().isEmpty()) {
 			return null;
 		}
-		return current.peek();
+		return contexts.get(getCurrent().peek());
 	}
 
 	/**
-	 * Method for registering a context with the current thread - always put a
-	 * matching {@link #close()} call in a finally block to ensure that the
-	 * correct context is available in the enclosing block.
+	 * Register a context with the current thread - always put a matching
+	 * {@link #close()} call in a finally block to ensure that the correct
+	 * context is available in the enclosing block.
 	 * 
 	 * @param stepExecution the step context to register
 	 * @return a new {@link StepContext} or the current one if it has the same
@@ -65,19 +88,13 @@ public class StepSynchronizationManager {
 		if (stepExecution == null) {
 			return null;
 		}
-		StepContext current = getContext();
-		StepContext context;
-		if (current != null && current.getStepExecution().equals(stepExecution)) {
-			/*
-			 * If the new context has the same step execution we don't want a
-			 * new set of attributes, otherwise auto proxied beans get created
-			 * twice for the same execution.
-			 */
-			context = current;
-		} else {
+		getCurrent().push(stepExecution);
+		StepContext context = contexts.get(stepExecution);
+		if (context == null) {
 			context = new StepContext(stepExecution);
+			contexts.put(stepExecution, context);
 		}
-		getCurrent().push(context);
+		increment();
 		return context;
 	}
 
@@ -94,21 +111,43 @@ public class StepSynchronizationManager {
 		if (oldSession == null) {
 			return;
 		}
-		getCurrent().pop();
+		decrement();
 	}
 
-	private static Stack<StepContext> getCurrent() {
-		if (contextHolder.get() == null) {
-			contextHolder.set(new Stack<StepContext>());
+	private static void decrement() {
+		StepExecution current = getCurrent().pop();
+		if (current != null) {
+			int remaining = counts.get(current).decrementAndGet();
+			if (remaining <= 0) {
+				contexts.remove(current);
+			}
 		}
-		return contextHolder.get();
+	}
+
+	private static void increment() {
+		StepExecution current = getCurrent().peek();
+		if (current != null) {
+			AtomicInteger count = counts.get(current);
+			if (count == null) {
+				count = new AtomicInteger();
+				counts.put(current, count);
+			}
+			count.incrementAndGet();
+		}
+	}
+
+	private static Stack<StepExecution> getCurrent() {
+		if (executionHolder.get() == null) {
+			executionHolder.set(new Stack<StepExecution>());
+		}
+		return executionHolder.get();
 	}
 
 	/**
-	 * A "deep" close operation. Call this instead of {@link #close()} if the
-	 * step execution for the current context is ending. Delegates to
-	 * {@link StepContext#close()} and then ensures that {@link #close()} is
-	 * also called in a finally block.
+	 * A convenient "deep" close operation. Call this instead of
+	 * {@link #close()} if the step execution for the current context is ending.
+	 * Delegates to {@link StepContext#close()} and then ensures that
+	 * {@link #close()} is also called in a finally block.
 	 */
 	public static void release() {
 		StepContext context = getContext();

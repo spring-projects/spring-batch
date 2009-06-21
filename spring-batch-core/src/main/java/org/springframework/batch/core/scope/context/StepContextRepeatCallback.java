@@ -26,6 +26,7 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.repeat.RepeatCallback;
 import org.springframework.batch.repeat.RepeatContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Convenient base class for clients who need to do something in a repeat
@@ -68,6 +69,7 @@ public abstract class StepContextRepeatCallback implements RepeatCallback {
 		// The StepContext has to be the same for all chunks,
 		// otherwise step-scoped beans will be re-initialised for each chunk.
 		StepContext stepContext = StepSynchronizationManager.register(stepExecution);
+		logger.debug("Preparing chunk execution for StepContext: "+ObjectUtils.identityToString(stepContext));
 
 		ChunkContext chunkContext = attributeQueue.poll();
 		if (chunkContext == null) {

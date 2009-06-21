@@ -51,6 +51,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
 	@Before
 	public void countBeans() {
+		StepSynchronizationManager.release();
 		beanCount = beanFactory.getBeanDefinitionCount();
 	}
 
@@ -71,7 +72,7 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 	}
 
 	@Test
-	public void testGetMultiple() throws Exception {
+	public void testGetMultipleInMultipleThreads() throws Exception {
 
 		List<FutureTask<String>> tasks = new ArrayList<FutureTask<String>>();
 
@@ -100,6 +101,46 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 		int i = 0;
 		for (FutureTask<String> task : tasks) {
 			assertEquals("foo" + i, task.get());
+			i++;
+		}
+
+	}
+
+	@Test
+	public void testGetSameInMultipleThreads() throws Exception {
+
+		List<FutureTask<String>> tasks = new ArrayList<FutureTask<String>>();
+		final StepExecution stepExecution = new StepExecution("foo", new JobExecution(0L), 123L);
+		ExecutionContext executionContext = stepExecution.getExecutionContext();
+		executionContext.put("foo", "foo");
+		StepSynchronizationManager.register(stepExecution);
+		assertEquals("foo", simple.getName());
+
+		for (int i = 0; i < 12; i++) {
+			final String value = "foo"+i; 
+			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
+				public String call() throws Exception {
+					ExecutionContext executionContext = stepExecution.getExecutionContext();
+					executionContext.put("foo", value);
+					StepContext context = StepSynchronizationManager.register(stepExecution);
+					logger.debug("Registered: "+context.getStepExecutionContext());
+					try {
+						return simple.getName();
+					}
+					finally {
+						StepSynchronizationManager.close();
+					}
+				}
+			});
+			tasks.add(task);
+			taskExecutor.execute(task);
+		}
+		
+		StepSynchronizationManager.close();
+
+		int i = 0;
+		for (FutureTask<String> task : tasks) {
+			assertEquals("foo", task.get());
 			i++;
 		}
 
