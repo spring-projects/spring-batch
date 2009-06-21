@@ -72,7 +72,9 @@ public class StepSynchronizationManager {
 		if (getCurrent().isEmpty()) {
 			return null;
 		}
-		return contexts.get(getCurrent().peek());
+		synchronized (contexts) {
+			return contexts.get(getCurrent().peek());
+		}
 	}
 
 	/**
@@ -89,10 +91,13 @@ public class StepSynchronizationManager {
 			return null;
 		}
 		getCurrent().push(stepExecution);
-		StepContext context = contexts.get(stepExecution);
-		if (context == null) {
-			context = new StepContext(stepExecution);
-			contexts.put(stepExecution, context);
+		StepContext context;
+		synchronized (contexts) {
+			context = contexts.get(stepExecution);
+			if (context == null) {
+				context = new StepContext(stepExecution);
+				contexts.put(stepExecution, context);
+			}
 		}
 		increment();
 		return context;
@@ -119,7 +124,9 @@ public class StepSynchronizationManager {
 		if (current != null) {
 			int remaining = counts.get(current).decrementAndGet();
 			if (remaining <= 0) {
-				contexts.remove(current);
+				synchronized (contexts) {
+					contexts.remove(current);
+				}
 			}
 		}
 	}
@@ -127,10 +134,13 @@ public class StepSynchronizationManager {
 	private static void increment() {
 		StepExecution current = getCurrent().peek();
 		if (current != null) {
-			AtomicInteger count = counts.get(current);
-			if (count == null) {
-				count = new AtomicInteger();
-				counts.put(current, count);
+			AtomicInteger count;
+			synchronized (counts) {
+				count = counts.get(current);
+				if (count == null) {
+					count = new AtomicInteger();
+					counts.put(current, count);
+				}
 			}
 			count.incrementAndGet();
 		}

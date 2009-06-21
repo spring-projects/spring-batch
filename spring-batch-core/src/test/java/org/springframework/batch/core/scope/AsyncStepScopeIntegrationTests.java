@@ -78,14 +78,14 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 
 		for (int i = 0; i < 12; i++) {
 			final String value = "foo" + i;
-			final Long id = 123L+i;
+			final Long id = 123L + i;
 			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
 				public String call() throws Exception {
 					StepExecution stepExecution = new StepExecution(value, new JobExecution(0L), id);
 					ExecutionContext executionContext = stepExecution.getExecutionContext();
 					executionContext.put("foo", value);
 					StepContext context = StepSynchronizationManager.register(stepExecution);
-					logger.debug("Registered: "+context.getStepExecutionContext());
+					logger.debug("Registered: " + context.getStepExecutionContext());
 					try {
 						return simple.getName();
 					}
@@ -117,13 +117,13 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 		assertEquals("foo", simple.getName());
 
 		for (int i = 0; i < 12; i++) {
-			final String value = "foo"+i; 
+			final String value = "foo" + i;
 			FutureTask<String> task = new FutureTask<String>(new Callable<String>() {
 				public String call() throws Exception {
 					ExecutionContext executionContext = stepExecution.getExecutionContext();
 					executionContext.put("foo", value);
 					StepContext context = StepSynchronizationManager.register(stepExecution);
-					logger.debug("Registered: "+context.getStepExecutionContext());
+					logger.debug("Registered: " + context.getStepExecutionContext());
 					try {
 						return simple.getName();
 					}
@@ -135,14 +135,16 @@ public class AsyncStepScopeIntegrationTests implements BeanFactoryAware {
 			tasks.add(task);
 			taskExecutor.execute(task);
 		}
-		
-		StepSynchronizationManager.close();
 
 		int i = 0;
 		for (FutureTask<String> task : tasks) {
 			assertEquals("foo", task.get());
 			i++;
 		}
+
+		// Don't close the outer scope until all tasks are finished. This should
+		// always be the case if using an AbstractStep
+		StepSynchronizationManager.close();
 
 	}
 
