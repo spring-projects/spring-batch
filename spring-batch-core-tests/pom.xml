@@ -12,6 +12,7 @@
 	</parent>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
+		<bundlor.enabled>false</bundlor.enabled>
 		<spring.framework.version>3.0.0.BUILD-SNAPSHOT</spring.framework.version>
 	</properties>
 	<profiles>
