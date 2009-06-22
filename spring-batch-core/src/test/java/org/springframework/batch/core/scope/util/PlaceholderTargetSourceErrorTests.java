@@ -68,26 +68,26 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	@Test
 	public void testPartialReplaceSunnyDay() throws Exception {
-		Node target = (Node) createValue("name", "#{foo}-bar").getTarget();
+		Node target = (Node) createValue("name", "%{foo}-bar").getTarget();
 		assertEquals("bar-bar", target.getName());
 	}
 
 	@Test
 	public void testPartialReplaceMissingProperty() throws Exception {
-		Node target = (Node) createValue("name", "#{garbage}-bar").getTarget();
-		assertEquals("#{garbage}-bar", target.getName());
+		Node target = (Node) createValue("name", "%{garbage}-bar").getTarget();
+		assertEquals("%{garbage}-bar", target.getName());
 	}
 
 	@Test
 	public void testFullReplaceSunnyDay() throws Exception {
-		Node target = (Node) createValue("name", "#{foo}").getTarget();
+		Node target = (Node) createValue("name", "%{foo}").getTarget();
 		assertEquals("bar", target.getName());
 	}
 
 	@Test
 	public void testFullReplaceMissingProperty() throws Exception {
 		try {
-			Node target = (Node) createValue("name", "#{garbage}").getTarget();
+			Node target = (Node) createValue("name", "%{garbage}").getTarget();
 			assertEquals("bar", target.getName());
 			fail("Expected IllegalStateException");
 		}
@@ -99,26 +99,26 @@ public class PlaceholderTargetSourceErrorTests extends ContextFactorySupport {
 
 	@Test
 	public void testPartialReplaceIntegerToString() throws Exception {
-		Node target = (Node) createValue("name", "foo-#{integer}").getTarget();
+		Node target = (Node) createValue("name", "foo-%{integer}").getTarget();
 		assertEquals("foo-4321", target.getName());
 	}
 
 	@Test
 	public void testFullReplaceIntegerToString() throws Exception {
-		Node target = (Node) createValue("name", "#{integer}").getTarget();
+		Node target = (Node) createValue("name", "%{integer}").getTarget();
 		assertEquals("4321", target.getName());
 	}
 
 	@Test
 	public void testFullReplaceIntegerToLong() throws Exception {
-		Node target = (Node) createValue("value", "#{integer}").getTarget();
+		Node target = (Node) createValue("value", "%{integer}").getTarget();
 		assertEquals(4321L, target.getValue());
 	}
 
 	@Test
 	public void testFullReplaceIntegerToNode() throws Exception {
 		try {
-			Node target = (Node) createValue("parent", "#{integer}").getTarget();
+			Node target = (Node) createValue("parent", "%{integer}").getTarget();
 			assertEquals("4321", target.getParent());
 			fail("Expected IllegalArgumentException");
 		}

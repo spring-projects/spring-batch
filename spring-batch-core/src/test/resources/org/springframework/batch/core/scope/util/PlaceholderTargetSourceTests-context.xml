@@ -90,37 +90,37 @@
 	<bean id="simpleTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="name" value="#{map['foo.foo']}" />
+		<property name="name" value="%{map['foo.foo']}" />
 	</bean>
 
 	<bean id="compoundTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="name" value="#{foo}-bar" />
+		<property name="name" value="%{foo}-bar" />
 	</bean>
 
 	<bean id="refTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="parent" ref="#{foo}" />
+		<property name="parent" ref="%{foo}" />
 	</bean>
 
 	<bean id="valueTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="parent" value="#{parent}" />
+		<property name="parent" value="%{parent}" />
 	</bean>
 
 	<bean id="withLongTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="name" value="bar-#{long}" />
+		<property name="name" value="bar-%{long}" />
 	</bean>
 
 	<bean id="withIntegerTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="name" value="bar-#{integer}" />
+		<property name="name" value="bar-%{integer}" />
 	</bean>
 
 	<bean id="withListTarget"
@@ -128,9 +128,9 @@
 		lazy-init="true">
 		<property name="list">
 			<list>
-				<value>#{foo}</value>
-				<value>foo-#{integer}</value>
-				<value>bar-#{integer}</value>
+				<value>%{foo}</value>
+				<value>foo-%{integer}</value>
+				<value>bar-%{integer}</value>
 			</list>
 		</property>
 	</bean>
@@ -138,25 +138,25 @@
 	<bean id="withMultipleTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="name" value="bar-#{integer}-#{integer}" />
+		<property name="name" value="bar-%{integer}-%{integer}" />
 	</bean>
 
 	<bean id="withMultipleStartAndEndTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="name" value="#{integer}-#{integer}" />
+		<property name="name" value="%{integer}-%{integer}" />
 	</bean>
 
 	<bean id="withEmbeddedDateTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="name" value="bar-#{date}" />
+		<property name="name" value="bar-%{date}" />
 	</bean>
 
 	<bean id="withDateTarget"
 		class="org.springframework.batch.core.scope.util.PlaceholderTargetSourceTests$Foo"
 		lazy-init="true">
-		<property name="date" value="#{date}" />
+		<property name="date" value="%{date}" />
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">

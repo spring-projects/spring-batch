@@ -21,7 +21,7 @@
 	<bean id="simpleTarget"
 		class="org.springframework.batch.core.scope.util.SimplePlaceholderTargetSourceTests$Foo"
 		lazy-init="true" autowire-candidate="false">
-		<property name="name" value="#{foo}" />
+		<property name="name" value="%{foo}" />
 	</bean>
 
 	<bean id="context"

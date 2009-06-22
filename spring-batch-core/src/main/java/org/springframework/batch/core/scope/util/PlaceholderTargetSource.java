@@ -57,7 +57,7 @@ public class PlaceholderTargetSource extends SimpleBeanTargetSource implements I
 	/**
 	 * Key for placeholders to be replaced from the properties provided.
 	 */
-	private static final String PLACEHOLDER_PREFIX = "#{";
+	private static final String PLACEHOLDER_PREFIX = "%{";
 
 	private static final String PLACEHOLDER_SUFFIX = "}";
 

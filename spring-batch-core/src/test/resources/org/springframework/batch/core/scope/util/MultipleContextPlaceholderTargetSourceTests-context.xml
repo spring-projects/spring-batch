@@ -27,11 +27,11 @@
 	</bean>
 
 	<bean id="simpleTarget" class="org.springframework.batch.core.scope.util.MultipleContextPlaceholderTargetSourceTests$TestBean">
-		<property name="name" value="#{attributes[foo]}" />
+		<property name="name" value="%{attributes[foo]}" />
 	</bean>
 
 	<bean id="listTarget" class="org.springframework.batch.core.scope.util.MultipleContextPlaceholderTargetSourceTests$TestBean">
-		<property name="names" value="#{attributes[foo]}" />
+		<property name="names" value="%{attributes[foo]}" />
 	</bean>
 
 	<bean id="context"

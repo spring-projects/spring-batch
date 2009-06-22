@@ -103,7 +103,7 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 	/**
 	 * Flag to indicate that proxies should use dynamic subclassing. This allows
-	 * classes with no interface to be proxied.  Defaults to false.
+	 * classes with no interface to be proxied. Defaults to false.
 	 * 
 	 * @param proxyTargetClass set to true to have proxies created using dynamic
 	 * subclasses
@@ -196,14 +196,15 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 				"BeanFactory was not a BeanDefinitionRegistry, so StepScope cannot be used.");
 		BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 
-		Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass);
-
 		for (String beanName : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition definition = beanFactory.getBeanDefinition(beanName);
 			// Replace this or any of its inner beans with scoped proxy if it
 			// has this scope
+			boolean scoped = name.equals(definition.getScope());
+			Scopifier scopifier = new Scopifier(registry, name, proxyTargetClass, scoped);
 			scopifier.visitBeanDefinition(definition);
-			if (name.equals(definition.getScope())) {
+			if (scoped) {
+				new ExpressionHider(name, scoped).visitBeanDefinition(definition);
 				createScopedProxy(beanName, definition, registry, proxyTargetClass);
 			}
 		}
@@ -267,7 +268,9 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 
 		private final String scope;
 
-		public Scopifier(BeanDefinitionRegistry registry, String scope, boolean proxyTargetClass) {
+		private final boolean scoped;
+
+		public Scopifier(BeanDefinitionRegistry registry, String scope, boolean proxyTargetClass, boolean scoped) {
 			super(new StringValueResolver() {
 				public String resolveStringValue(String value) {
 					return value;
@@ -276,32 +279,99 @@ public class StepScope implements Scope, BeanFactoryPostProcessor, Ordered {
 			this.registry = registry;
 			this.proxyTargetClass = proxyTargetClass;
 			this.scope = scope;
+			this.scoped = scoped;
 		}
 
 		@Override
 		protected Object resolveValue(Object value) {
+
+			BeanDefinition definition = null;
+			String beanName = null;
 			if (value instanceof BeanDefinition) {
-				BeanDefinition definition = (BeanDefinition) value;
-				if (scope.equals(definition.getScope())) {
-					String beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
-					// Exit here so that nested inner bean definitions are not
-					// analysed
-					return createScopedProxy(beanName, definition, registry, proxyTargetClass);
-				}
+				definition = (BeanDefinition) value;
+				beanName = BeanDefinitionReaderUtils.generateBeanName(definition, registry);
 			}
 			else if (value instanceof BeanDefinitionHolder) {
 				BeanDefinitionHolder holder = (BeanDefinitionHolder) value;
-				BeanDefinition definition = holder.getBeanDefinition();
-				if (scope.equals(definition.getScope())) {
+				definition = holder.getBeanDefinition();
+				beanName = holder.getBeanName();
+			}
+
+			if (definition != null) {
+				boolean nestedScoped = scope.equals(definition.getScope());
+				boolean scopeChangeRequiresProxy = !scoped && nestedScoped;
+				new ExpressionHider(scope, nestedScoped).visitBeanDefinition(definition);
+				if (scopeChangeRequiresProxy) {
 					// Exit here so that nested inner bean definitions are not
 					// analysed
-					return createScopedProxy(holder.getBeanName(), definition, registry, proxyTargetClass);
+					return createScopedProxy(beanName, definition, registry, proxyTargetClass);				
+				}
+			}
+
+			// Nested inner bean definitions are recursively analysed here
+			value = super.resolveValue(value);
+			return value;
+
+		}
+
+	}
+
+	/**
+	 * Helper class to scan a bean definition hierarchy and hide placeholders
+	 * from Spring EL.
+	 * 
+	 * @author Dave Syer
+	 * 
+	 */
+	private static class ExpressionHider extends BeanDefinitionVisitor {
+
+		private static final String PLACEHOLDER_PREFIX = "#{";
+
+		private static final String PLACEHOLDER_SUFFIX = "}";
+
+		private static final String REPLACEMENT_PREFIX = "%{";
+
+		private final String scope;
+
+		private final boolean scoped;
+
+		private ExpressionHider(String scope, final boolean scoped) {
+			super(new StringValueResolver() {
+				public String resolveStringValue(String value) {
+					if (scoped && value.contains(PLACEHOLDER_PREFIX) && value.contains(PLACEHOLDER_SUFFIX)) {
+						value = value.replace(PLACEHOLDER_PREFIX, REPLACEMENT_PREFIX);
+					}
+					return value;
+				}
+			});
+			this.scope = scope;
+			this.scoped = scoped;
+		}
+
+		@Override
+		protected Object resolveValue(Object value) {
+			BeanDefinition definition = null;
+			if (value instanceof BeanDefinition) {
+				definition = (BeanDefinition) value;
+			}
+			else if (value instanceof BeanDefinitionHolder) {
+				BeanDefinitionHolder holder = (BeanDefinitionHolder) value;
+				definition = holder.getBeanDefinition();
+			}
+			if (definition != null) {
+				boolean scopeChange = !scope.equals(definition.getScope());
+				if (scopeChange) {
+					new ExpressionHider(definition.getScope(), !scoped).visitBeanDefinition(definition);
+					// Exit here so that nested inner bean definitions are not
+					// analysed by both vistors
+					return value;
 				}
 			}
 			// Nested inner bean definitions are recursively analysed here
 			value = super.resolveValue(value);
 			return value;
 		}
+
 	}
 
 }

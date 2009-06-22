@@ -19,7 +19,7 @@
 
 	<bean id="simpleTarget"
 		class="org.springframework.batch.core.scope.util.AsyncPlaceholderTargetSourceTests$Foo" autowire-candidate="false">
-		<property name="name" value="#{attributes[foo]}" />
+		<property name="name" value="%{attributes[foo]}" />
 	</bean>
 
 	<bean id="context"
