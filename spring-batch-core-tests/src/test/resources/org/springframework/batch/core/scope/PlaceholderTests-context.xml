@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<bean id="bean" class="org.springframework.batch.core.scope.PlaceholderTests$TestBean">
+		<property name="name" value="#{properties['name']}" />
+		<property name="value" value="#{properties['value']}" />
+		<property name="values" value="#{properties['values']}" />
+	</bean>
+
+	<util:properties id="properties">
+		<prop key="name">foo</prop>
+		<prop key="value">100</prop>
+		<prop key="values">a,b,c</prop>
+	</util:properties>
+
+</beans>
