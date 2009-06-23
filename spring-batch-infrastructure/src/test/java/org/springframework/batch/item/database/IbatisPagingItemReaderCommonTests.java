@@ -1,18 +1,19 @@
 package org.springframework.batch.item.database;
 
-import org.junit.runner.RunWith;
 import org.junit.internal.runners.JUnit4ClassRunner;
-import org.springframework.batch.item.sample.Foo;
-import org.springframework.batch.item.ItemReader;
+import org.junit.runner.RunWith;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.orm.ibatis.SqlMapClientFactoryBean;
+
 import com.ibatis.sqlmap.client.SqlMapClient;
 
 @SuppressWarnings("unchecked")
 @RunWith(JUnit4ClassRunner.class)
 public class IbatisPagingItemReaderCommonTests extends AbstractDatabaseItemStreamItemReaderTests {
-
+	
 	protected ItemReader<Foo> getItemReader() throws Exception {
 		SqlMapClientFactoryBean factory = new SqlMapClientFactoryBean();
 		factory.setConfigLocation(new ClassPathResource("ibatis-config.xml", getClass()));

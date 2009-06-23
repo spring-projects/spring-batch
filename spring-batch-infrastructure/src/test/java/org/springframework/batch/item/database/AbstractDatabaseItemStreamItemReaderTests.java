@@ -1,11 +1,16 @@
 package org.springframework.batch.item.database;
 
+import static org.junit.Assert.assertEquals;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.item.AbstractItemStreamItemReaderTests;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.sample.Foo;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.junit.Before;
 import org.junit.After;
+import org.junit.Test;
 
 public abstract class AbstractDatabaseItemStreamItemReaderTests extends AbstractItemStreamItemReaderTests {
 
@@ -21,6 +26,18 @@ public abstract class AbstractDatabaseItemStreamItemReaderTests extends Abstract
 	public void tearDown() throws Exception {
 		super.tearDown();
 		ctx.close();
+	}
+
+	@Test
+	public void testReadToExhaustion() throws Exception {
+		ItemReader<Foo> reader = getItemReader();
+		pointToEmptyInput(reader);
+		int count = 0;
+		Foo item = new Foo();
+		while (count++<100 && item!=null) {
+			item = reader.read();
+		}
+		assertEquals(2, count);
 	}
 
 	protected DataSource getDataSource() {
